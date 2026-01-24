@@ -24,6 +24,19 @@
     .chip { display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border:1px solid #22304a; border-radius:999px; background:#0b0f17; font-size:12px; }
     .chip input { transform: translateY(1px); }
     @media (max-width: 900px) { .panel { grid-template-columns:1fr; } }
+  .tier-top {
+  background: #7b5cff !important;
+  color: white;
+}
+.tier-mid {
+  background: #f2c94c !important;
+  color: #0b0f17;
+}
+.tier-low {
+  background: #8a93a6 !important;
+  color: #0b0f17;
+}
+
   </style>
 </head>
 <body>
@@ -132,6 +145,15 @@
       cb.addEventListener("change", () => {
         if (cb.checked) selected.add(r.champion);
         else selected.delete(r.champion);
+        function quantile(sortedArr, q) {
+  if (!sortedArr.length) return null;
+  const pos = (sortedArr.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  if (sortedArr[base + 1] === undefined) return sortedArr[base];
+  return sortedArr[base] + rest * (sortedArr[base + 1] - sortedArr[base]);
+}
+
         render();
       });
       const txt = document.createElement("span");
@@ -193,22 +215,47 @@
   }
 
   function renderBody(rows) {
-    tbodyEl.innerHTML = "";
-    rows.forEach(r => {
-      const tr = document.createElement("tr");
-      const tdC = document.createElement("td");
-      tdC.textContent = r.champion;
-      tr.appendChild(tdC);
+  const thresholds = {};
+  for (const c of COLS) {
+    const vals = rows
+      .map(r => r[c.key])
+      .filter(v => Number.isFinite(v))
+      .sort((a, b) => a - b);
 
-      COLS.forEach(c => {
-        const td = document.createElement("td");
-        td.textContent = fmt(r[c.key], c.decimals);
-        tr.appendChild(td);
-      });
-
-      tbodyEl.appendChild(tr);
-    });
+    if (vals.length < 3) continue;
+    thresholds[c.key] = {
+      q20: quantile(vals, 0.2),
+      q80: quantile(vals, 0.8)
+    };
   }
+
+  tbodyEl.innerHTML = "";
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+
+    const tdC = document.createElement("td");
+    tdC.textContent = r.champion;
+    tr.appendChild(tdC);
+
+    COLS.forEach(c => {
+      const td = document.createElement("td");
+      const val = r[c.key];
+      td.textContent = fmt(val, c.decimals);
+
+      const t = thresholds[c.key];
+      if (t && Number.isFinite(val)) {
+        if (val >= t.q80) td.classList.add("tier-top");
+        else if (val < t.q20) td.classList.add("tier-low");
+        else td.classList.add("tier-mid");
+      }
+
+      tr.appendChild(td);
+    });
+
+    tbodyEl.appendChild(tr);
+  });
+}
+
 
   function render() {
     buildHeader();
