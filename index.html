@@ -58,13 +58,14 @@
   </div>
 
   <div class="small" style="margin-top:10px;">
-    Data source: Google Sheets (published CSV)
+    Data source: Google Sheets (published TSV)
   </div>
 </div>
 
 <script>
   // 1) ВСТАВЬ СЮДА СВОЮ CSV-СЫЛКУ ИЗ "Опубликовать в интернете"
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSPDPf-o5VbWJ1aQp135l8HzpHJkxf_5r8QRn3OYVyi-x2srPTAfeZSFI8VdSVr82hGc24D80_uOAYp/pub?gid=1262749152&single=true&output=csv";
+  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSPDPf-o5VbWJ1aQp135l8HzpHJkxf_5r8QRn3OYVyi-x2srPTAfeZSFI8VdSVr82hGc24D80_uOAYp/pub?gid=1262749152&single=true&output=tsv";
+
 
 
   // Какие статы показываем сейчас
@@ -99,19 +100,19 @@
   }
 
   // CSV парсер (простой, под обычный CSV без сложных кавычек)
-  function parseCSV(text) {
-    const lines = text.trim().split(/\r?\n/);
-    const headers = lines[0].split(",").map(s => s.trim());
-    const rows = [];
-
-    for (let i = 1; i < lines.length; i++) {
-      const parts = lines[i].split(",").map(s => s.trim());
-      const obj = {};
-      headers.forEach((h, idx) => obj[h] = parts[idx] ?? "");
-      rows.push(obj);
-    }
-    return rows;
+ function parseTSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const headers = lines[0].split("\t").map(s => s.trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const parts = lines[i].split("\t").map(s => s.trim());
+    const obj = {};
+    headers.forEach((h, idx) => obj[h] = parts[idx] ?? "");
+    rows.push(obj);
   }
+  return rows;
+}
+
 
   function toNum(s) {
     // поддержка запятой как десятичного разделителя
@@ -223,7 +224,8 @@
 
     const res = await fetch(CSV_URL);
     const text = await res.text();
-    const rows = parseCSV(text);
+    const rows = parseTSV(text);
+
 
     // Ожидаем заголовки как в твоём DATA:
     // Champion, AD_Base, AD_Growth, HP_Base, HP_Growth, Mana_Base, Mana_Growth, Armor_Base, Armor_Growth, MR_Base, MR_Growth
