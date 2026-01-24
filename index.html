@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wild Rift – ADC Stats</title>
+  <style>
+    :root { font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+    body { margin:0; background:#0b0f17; color:#e8edf7; }
+    .wrap { max-width:1200px; margin:0 auto; padding:16px; }
+    h1 { margin:0 0 12px; font-size:20px; }
+    .panel { display:grid; gap:12px; grid-template-columns: 1.2fr 1.8fr 1fr; }
+    .card { background:#121a2a; border:1px solid #22304a; border-radius:10px; padding:12px; }
+    label { display:block; font-size:12px; opacity:.9; margin-bottom:8px; }
+    input[type="range"] { width:100%; }
+    input[type="text"] { width:100%; padding:8px 10px; border-radius:8px; border:1px solid #22304a; background:#0b0f17; color:#e8edf7; }
+    .small { font-size:12px; opacity:.75; margin-top:6px; }
+    .tableWrap { margin-top:12px; overflow:auto; border-radius:10px; border:1px solid #22304a; }
+    table { width:100%; border-collapse:collapse; }
+    th, td { padding:10px; border-bottom:1px solid #22304a; white-space:nowrap; }
+    th { position:sticky; top:0; background:#121a2a; cursor:pointer; user-select:none; }
+    tr:hover td { background:#0f1524; }
+    .chips { display:flex; flex-wrap:wrap; gap:8px; max-height:120px; overflow:auto; padding-right:4px; }
+    .chip { display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border:1px solid #22304a; border-radius:999px; background:#0b0f17; font-size:12px; }
+    .chip input { transform: translateY(1px); }
+    @media (max-width: 900px) { .panel { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Wild Rift – Champion Stats (by Level)</h1>
+
+  <div class="panel">
+    <div class="card">
+      <label for="level">Level: <span id="levelVal">10</span></label>
+      <input id="level" type="range" min="1" max="15" value="10" />
+      <div class="small">Formula: base + (level − 1) × growth</div>
+    </div>
+
+    <div class="card">
+      <label>Choose champions</label>
+      <div id="champChips" class="chips"></div>
+      <div class="small">Можно снять все галочки и оставить только нужных.</div>
+    </div>
+
+    <div class="card">
+      <label for="search">Search</label>
+      <input id="search" type="text" placeholder="Type champion name…" />
+      <div class="small">Сортировка: клик по заголовку колонки.</div>
+    </div>
+  </div>
+
+  <div class="tableWrap">
+    <table>
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="small" style="margin-top:10px;">
+    Data source: Google Sheets (published CSV)
+  </div>
+</div>
+
+<script>
+  // 1) ВСТАВЬ СЮДА СВОЮ CSV-СЫЛКУ ИЗ "Опубликовать в интернете"
+  const CSV_URL = "PASTE_YOUR_PUBLISHED_CSV_URL_HERE";
+
+  // Какие статы показываем сейчас
+  const COLS = [
+    { key: "ad",    label: "AD",    decimals: 0 },
+    { key: "hp",    label: "HP",    decimals: 0 },
+    { key: "mana",  label: "Mana",  decimals: 0 },
+    { key: "armor", label: "Armor", decimals: 0 },
+    { key: "mr",    label: "MR",    decimals: 0 },
+  ];
+
+  let raw = [];                 // { champion, ad_base, ad_growth, ... }
+  let selected = new Set();     // выбранные чемпы
+  let level = 10;
+  let sortKey = "ad";
+  let sortDir = "desc";
+  let search = "";
+
+  const levelEl = document.getElementById("level");
+  const levelValEl = document.getElementById("levelVal");
+  const chipsEl = document.getElementById("champChips");
+  const theadEl = document.getElementById("thead");
+  const tbodyEl = document.getElementById("tbody");
+  const searchEl = document.getElementById("search");
+
+  function calc(base, growth, lvl) {
+    return base + (lvl - 1) * growth;
+  }
+
+  function fmt(x, decimals) {
+    return x.toLocaleString(undefined, { maximumFractionDigits: decimals });
+  }
+
+  // CSV парсер (простой, под обычный CSV без сложных кавычек)
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/);
+    const headers = lines[0].split(",").map(s => s.trim());
+    const rows = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const parts = lines[i].split(",").map(s => s.trim());
+      const obj = {};
+      headers.forEach((h, idx) => obj[h] = parts[idx] ?? "");
+      rows.push(obj);
+    }
+    return rows;
+  }
+
+  function toNum(s) {
+    // поддержка запятой как десятичного разделителя
+    const t = String(s).replace(/\s/g, "").replace(",", ".");
+    const n = Number(t);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function buildChips() {
+    chipsEl.innerHTML = "";
+    raw.forEach(r => {
+      const label = document.createElement("label");
+      label.className = "chip";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = selected.has(r.champion);
+      cb.addEventListener("change", () => {
+        if (cb.checked) selected.add(r.champion);
+        else selected.delete(r.champion);
+        render();
+      });
+      const txt = document.createElement("span");
+      txt.textContent = r.champion;
+      label.appendChild(cb);
+      label.appendChild(txt);
+      chipsEl.appendChild(label);
+    });
+  }
+
+  function buildHeader() {
+    const tr = document.createElement("tr");
+
+    const thC = document.createElement("th");
+    thC.textContent = "Champion" + (sortKey === "champion" ? (sortDir==="desc"?" ↓":" ↑") : "");
+    thC.onclick = () => toggleSort("champion");
+    tr.appendChild(thC);
+
+    COLS.forEach(c => {
+      const th = document.createElement("th");
+      th.textContent = c.label + (sortKey === c.key ? (sortDir==="desc"?" ↓":" ↑") : "");
+      th.onclick = () => toggleSort(c.key);
+      tr.appendChild(th);
+    });
+
+    theadEl.innerHTML = "";
+    theadEl.appendChild(tr);
+  }
+
+  function toggleSort(key) {
+    if (sortKey === key) sortDir = (sortDir === "desc") ? "asc" : "desc";
+    else { sortKey = key; sortDir = "desc"; }
+    render();
+  }
+
+  function computeRows() {
+    const list = raw
+      .filter(r => selected.has(r.champion))
+      .filter(r => r.champion.toLowerCase().includes(search))
+      .map(r => {
+        const out = { champion: r.champion };
+        COLS.forEach(c => {
+          const base = r[c.key + "_base"];
+          const growth = r[c.key + "_growth"];
+          out[c.key] = calc(base, growth, level);
+        });
+        return out;
+      });
+
+    list.sort((a, b) => {
+      const dir = (sortDir === "desc") ? -1 : 1;
+      if (sortKey === "champion") return a.champion.localeCompare(b.champion) * dir;
+      const av = a[sortKey], bv = b[sortKey];
+      if (av === bv) return a.champion.localeCompare(b.champion);
+      return (av < bv ? -1 : 1) * dir;
+    });
+
+    return list;
+  }
+
+  function renderBody(rows) {
+    tbodyEl.innerHTML = "";
+    rows.forEach(r => {
+      const tr = document.createElement("tr");
+      const tdC = document.createElement("td");
+      tdC.textContent = r.champion;
+      tr.appendChild(tdC);
+
+      COLS.forEach(c => {
+        const td = document.createElement("td");
+        td.textContent = fmt(r[c.key], c.decimals);
+        tr.appendChild(td);
+      });
+
+      tbodyEl.appendChild(tr);
+    });
+  }
+
+  function render() {
+    buildHeader();
+    const rows = computeRows();
+    renderBody(rows);
+  }
+
+  async function init() {
+    if (CSV_URL.includes("PASTE_YOUR")) {
+      alert("Вставь CSV ссылку в переменную CSV_URL в index.html");
+      return;
+    }
+
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    const rows = parseCSV(text);
+
+    // Ожидаем заголовки как в твоём DATA:
+    // Champion, AD_Base, AD_Growth, HP_Base, HP_Growth, Mana_Base, Mana_Growth, Armor_Base, Armor_Growth, MR_Base, MR_Growth
+    raw = rows
+      .filter(x => x["Champion"])
+      .map(x => ({
+        champion: x["Champion"],
+        ad_base: toNum(x["AD_Base"]),       ad_growth: toNum(x["AD_Growth"]),
+        hp_base: toNum(x["HP_Base"]),       hp_growth: toNum(x["HP_Growth"]),
+        mana_base: toNum(x["Mana_Base"]),   mana_growth: toNum(x["Mana_Growth"]),
+        armor_base: toNum(x["Armor_Base"]), armor_growth: toNum(x["Armor_Growth"]),
+        mr_base: toNum(x["MR_Base"]),       mr_growth: toNum(x["MR_Growth"]),
+      }));
+
+    // По умолчанию выбираем всех
+    selected = new Set(raw.map(r => r.champion));
+
+    buildChips();
+    buildHeader();
+
+    levelEl.addEventListener("input", () => {
+      level = Number(levelEl.value);
+      levelValEl.textContent = String(level);
+      render();
+    });
+
+    searchEl.addEventListener("input", () => {
+      search = searchEl.value.trim().toLowerCase();
+      render();
+    });
+
+    levelValEl.textContent = String(level);
+    render();
+  }
+
+  init();
+</script>
+</body>
+</html>
