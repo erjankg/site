@@ -93,6 +93,71 @@
   opacity: 1;
 }
 
+.support{
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #22304a;
+  border-radius: 12px;
+  background: #121a2a;
+  display: grid;
+  gap: 12px;
+}
+
+.supportTitle{
+  font-weight: 700;
+  letter-spacing: .4px;
+  margin-bottom: 6px;
+}
+
+.supportBody{
+  font-size: 13px;
+  line-height: 1.4;
+  opacity: .9;
+}
+
+.donateBtn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #ffffff;
+  background: linear-gradient(90deg, #9146ff, #7b5cff);
+  border: 1px solid #2a3a5a;
+  font-weight: 700;
+  letter-spacing: .2px;
+  position: relative;
+  overflow: hidden;
+  animation: donatePulse 2.2s ease-in-out infinite;
+}
+
+.donateBtn::before{
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -60%;
+  width: 60%;
+  height: 180%;
+  background: rgba(255,255,255,.22);
+  transform: rotate(20deg);
+  animation: donateShine 2.8s ease-in-out infinite;
+}
+
+@keyframes donatePulse{
+  0%   { box-shadow: 0 0 0 rgba(145,70,255,0.0); }
+  50%  { box-shadow: 0 0 18px rgba(145,70,255,0.35); }
+  100% { box-shadow: 0 0 0 rgba(145,70,255,0.0); }
+}
+
+@keyframes donateShine{
+  0%   { transform: translateX(-120%) rotate(20deg); opacity: 0; }
+  15%  { opacity: 1; }
+  45%  { transform: translateX(220%) rotate(20deg); opacity: 0; }
+  100% { transform: translateX(220%) rotate(20deg); opacity: 0; }
+}
+
 
   </style>
 </head>
@@ -138,6 +203,26 @@
       <tbody id="tbody"></tbody>
     </table>
   </div>
+
+<div class="support">
+  <div class="supportText">
+    <div class="supportTitle">Поддержка проекта</div>
+    <div class="supportBody">
+      Ребята, сайт абсолютно бесплатен для всех.<br>
+      Но буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br>
+      В планах добавить всех чемпионов, все характеристики,winrate, изображения чемпов и регулярно обновлять сайт до актуальности.
+    </div>
+  </div>
+
+  <a class="donateBtn"
+     href="https://www.donationalerts.com/r/erjankg"
+     target="_blank"
+     rel="noopener">
+    💜 Поддержать через DonationAlerts
+  </a>
+</div>
+
+
 
   <div class="small" style="margin-top:10px;">
     Data source: Google Sheets (published TSV)
