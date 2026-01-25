@@ -126,6 +126,14 @@
   return rows;
 }
 
+function quantile(sortedArr, q) {
+  if (!sortedArr.length) return null;
+  const pos = (sortedArr.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  if (sortedArr[base + 1] === undefined) return sortedArr[base];
+  return sortedArr[base] + rest * (sortedArr[base + 1] - sortedArr[base]);
+}
 
   function toNum(s) {
     // поддержка запятой как десятичного разделителя
@@ -145,15 +153,7 @@
       cb.addEventListener("change", () => {
         if (cb.checked) selected.add(r.champion);
         else selected.delete(r.champion);
-        function quantile(sortedArr, q) {
-  if (!sortedArr.length) return null;
-  const pos = (sortedArr.length - 1) * q;
-  const base = Math.floor(pos);
-  const rest = pos - base;
-  if (sortedArr[base + 1] === undefined) return sortedArr[base];
-  return sortedArr[base] + rest * (sortedArr[base + 1] - sortedArr[base]);
-}
-
+       
         render();
       });
       const txt = document.createElement("span");
