@@ -64,16 +64,50 @@
   50%  { text-shadow: 0 0 12px #7b5cffcc; }
   100% { text-shadow: 0 0 4px #7b5cff44; }
 }
+.dot {
+  opacity: 0.6;
+}
+
+.twitch {
+  font-size: 14px;
+  font-weight: 600;
+  color: #9146ff; /* фирменный Twitch */
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%   { opacity: 0.6; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+.twitch {
+  font-size: 14px;
+  font-weight: 600;
+  color: #9146ff;
+  text-decoration: none; /* убираем подчёркивание */
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.twitch:hover {
+  text-decoration: underline;
+  opacity: 1;
+}
 
 
   </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="brand">
-    <span class="nick">ERjanKG</span>
-    <span class="tag">Wild Rift Stats</span>
-  </div>
+ <div class="brand">
+  <span class="nick">ERjanKG</span>
+  <span class="dot">·</span>
+  <a class="twitch" href="https://www.twitch.tv/ERjanKG" target="_blank" rel="noopener">
+    Twitch
+  </a>
+  <span class="tag">Wild Rift Stats</span>
+</div>
+
+
 
   <h1>Champion Stats (by Level)</h1>
 
