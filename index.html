@@ -501,14 +501,13 @@ function quantile(sortedArr, q) {
         mana_base: toNum(x["Mana_Base"]),   mana_growth: toNum(x["Mana_Growth"]),
         armor_base: toNum(x["Armor_Base"]), armor_growth: toNum(x["Armor_Growth"]),
         mr_base: toNum(x["MR_Base"]),       mr_growth: toNum(x["MR_Growth"]),
-         roles: {
-  Top: toBool(x["Is_Top"]),
-  Jungle: toBool(x["Is_Jungle"]),
-  Mid: toBool(x["Is_Mid"]),
-  ADC: toBool(x["Is_Adc"]),
-  Support: toBool(x["Is_Support"]),
-}
- 
+          roles: {
+      Top: toNum(x["is_Top"]) === 1,
+      Jungle: toNum(x["is_Jungle"]) === 1,
+      Mid: toNum(x["is_Mid"]) === 1,
+      ADC: toNum(x["is_ADC"]) === 1,
+      Support: toNum(x["is_Support"]) === 1,
+    }
 
       }));
 
