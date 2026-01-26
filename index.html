@@ -158,10 +158,22 @@
   100% { transform: translateX(220%) rotate(20deg); opacity: 0; }
 }
 
-/* Hover: подсветка всей строки */
-tbody tr:hover td {
-  background: #1a2440 !important;
+/* Hover: подсветка строки поверх любых tier-цветов */
+tbody tr:hover {
+  box-shadow: inset 0 0 0 2px #4c6cff;
 }
+
+/* Hover: чуть увеличиваем контраст текста */
+tbody tr:hover td {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Hover: имя чемпиона ещё сильнее */
+tbody tr:hover td:first-child {
+  font-weight: 800;
+}
+
 
 /* Hover: лёгкая “рамка” вокруг строки */
 tbody tr:hover {
