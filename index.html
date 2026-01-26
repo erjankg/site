@@ -158,6 +158,23 @@
   100% { transform: translateX(220%) rotate(20deg); opacity: 0; }
 }
 
+/* Hover: подсветка всей строки */
+tbody tr:hover td {
+  background: #1a2440 !important;
+}
+
+/* Hover: лёгкая “рамка” вокруг строки */
+tbody tr:hover {
+  outline: 1px solid #2f4166;
+  outline-offset: -1px;
+}
+
+/* Hover: чуть ярче имя чемпиона */
+tbody tr:hover td:first-child {
+  color: #ffffff;
+  font-weight: 700;
+}
+
 
   </style>
 <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "6daed475e9834e95aba528b80cdffe55"}'></script><!-- End Cloudflare Web Analytics -->
