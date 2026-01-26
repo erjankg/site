@@ -255,6 +255,7 @@
 
   let raw = [];                 // { champion, ad_base, ad_growth, ... }
   let selected = new Set();     // выбранные чемпы
+  let roles = new Set(); // выбранные роли
   let level = 10;
   let sortKey = "ad";
   let sortDir = "desc";
@@ -326,6 +327,34 @@ function quantile(sortedArr, q) {
       chipsEl.appendChild(label);
     });
   }
+  function buildRoleFilters() {
+  const rolesList = ["Top", "Jungle", "Mid", "ADC", "Support"];
+  const el = document.getElementById("roleFilters");
+  el.innerHTML = "";
+
+  rolesList.forEach(role => {
+    const label = document.createElement("label");
+    label.className = "chip";
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = roles.has(role);
+
+    cb.addEventListener("change", () => {
+      if (cb.checked) roles.add(role);
+      else roles.delete(role);
+      render();
+    });
+
+    const text = document.createElement("span");
+    text.textContent = role;
+
+    label.appendChild(cb);
+    label.appendChild(text);
+    el.appendChild(label);
+  });
+}
+
 
   function buildHeader() {
     const tr = document.createElement("tr");
@@ -353,29 +382,53 @@ function quantile(sortedArr, q) {
   }
 
   function computeRows() {
-    const list = raw
-      .filter(r => selected.has(r.champion))
-      .filter(r => r.champion.toLowerCase().includes(search))
-      .map(r => {
-        const out = { champion: r.champion };
-        COLS.forEach(c => {
-          const base = r[c.key + "_base"];
-          const growth = r[c.key + "_growth"];
-          out[c.key] = calc(base, growth, level);
-        });
-        return out;
-      });
+  const list = raw
+    // 1) ФИЛЬТР ПО РОЛЯМ
+    .filter(r => {
+      if (roles.size === 0) return true; // если роли не выбраны — все
+      return [...roles].some(role => r.roles[role]);
+    })
 
-    list.sort((a, b) => {
-      const dir = (sortDir === "desc") ? -1 : 1;
-      if (sortKey === "champion") return a.champion.localeCompare(b.champion) * dir;
-      const av = a[sortKey], bv = b[sortKey];
-      if (av === bv) return a.champion.localeCompare(b.champion);
-      return (av < bv ? -1 : 1) * dir;
+    // 2) ФИЛЬТР ПО ВЫБРАННЫМ ЧЕМПИОНАМ
+    .filter(r => selected.has(r.champion))
+
+    // 3) ПОИСК
+    .filter(r => r.champion.toLowerCase().includes(search))
+
+    // 4) РАСЧЁТ СТАТОВ
+    .map(r => {
+      const out = { champion: r.champion };
+      COLS.forEach(c => {
+        out[c.key] = calc(
+          r[c.key + "_base"],
+          r[c.key + "_growth"],
+          level
+        );
+      });
+      return out;
     });
 
-    return list;
-  }
+  // ⚠️ СОРТИРОВКУ НЕ ТРОГАЕМ
+  list.sort((a, b) => {
+    const dir = sortDir === "desc" ? -1 : 1;
+
+    if (sortKey === "champion") {
+      return a.champion.localeCompare(b.champion) * dir;
+    }
+
+    const av = a[sortKey];
+    const bv = b[sortKey];
+
+    if (av === bv) {
+      return a.champion.localeCompare(b.champion);
+    }
+
+    return (av < bv ? -1 : 1) * dir;
+  });
+
+  return list;
+}
+
 
   function renderBody(rows) {
   const thresholds = {};
@@ -448,12 +501,21 @@ function quantile(sortedArr, q) {
         mana_base: toNum(x["Mana_Base"]),   mana_growth: toNum(x["Mana_Growth"]),
         armor_base: toNum(x["Armor_Base"]), armor_growth: toNum(x["Armor_Growth"]),
         mr_base: toNum(x["MR_Base"]),       mr_growth: toNum(x["MR_Growth"]),
+          roles: {
+      Top: toNum(x["is_Top"]) === 1,
+      Jungle: toNum(x["is_Jungle"]) === 1,
+      Mid: toNum(x["is_Mid"]) === 1,
+      ADC: toNum(x["is_ADC"]) === 1,
+      Support: toNum(x["is_Support"]) === 1,
+    }
+
       }));
 
     // По умолчанию выбираем всех
     selected = new Set(raw.map(r => r.champion));
 
     buildChips();
+    buildRoleFilters();
     buildHeader();
 
     levelEl.addEventListener("input", () => {
