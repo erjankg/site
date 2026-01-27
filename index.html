@@ -186,6 +186,36 @@ tbody tr:hover td:first-child {
   color: #ffffff;
   font-weight: 700;
 }
+.levelBar{
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #121a2a;
+  border: 1px solid #22304a;
+  border-radius: 12px;
+}
+
+.levelHead{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.levelTitle{
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.levelNum{
+  font-size: 12px;
+  opacity: 0.9;
+  font-weight: 700;
+}
+
+#level{
+  width: 100%;
+}
 
 
   </style>
@@ -228,12 +258,12 @@ tbody tr:hover td:first-child {
 
 
   <div class="panel">
-    <div class="card">
-      <label for="level">Level: <span id="levelVal">10</span></label>
-      <input id="level" type="range" min="1" max="15" value="10" />
-      <div class="small">Formula: base + (level − 1) × growth</div>
-    </div>
+   
 
+
+
+
+    
     <div class="card">
       <label>Choose champions</label>
       <div id="champChips" class="chips"></div>
@@ -254,6 +284,17 @@ tbody tr:hover td:first-child {
   
   
   </div>
+
+<div class="levelBar">
+  <div class="levelHead">
+    <div class="levelTitle">Level</div>
+    <div class="levelNum"><span id="levelVal">10</span>/15</div>
+  </div>
+
+  <input id="level" type="range" min="1" max="15" value="10" />
+</div>
+
+
 
   <div class="tableWrap">
     <table>
