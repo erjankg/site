@@ -158,10 +158,6 @@
   100% { transform: translateX(220%) rotate(20deg); opacity: 0; }
 }
 
-/* Hover: подсветка строки поверх любых tier-цветов */
-tbody tr:hover {
-  box-shadow: inset 0 0 0 2px #4c6cff;
-}
 
 /* Hover: чуть увеличиваем контраст текста */
 tbody tr:hover td {
@@ -169,23 +165,30 @@ tbody tr:hover td {
   font-weight: 600;
 }
 
-/* Hover: имя чемпиона ещё сильнее */
-tbody tr:hover td:first-child {
-  font-weight: 800;
-}
-
-
 /* Hover: лёгкая “рамка” вокруг строки */
 tbody tr:hover {
   outline: 1px solid #2f4166;
   outline-offset: -1px;
 }
-
-/* Hover: чуть ярче имя чемпиона */
-tbody tr:hover td:first-child {
-  color: #ffffff;
-  font-weight: 700;
+/* Hover: вся строка — тёплый красный фон */
+tbody tr:hover {
+  background: rgba(180, 60, 60, 0.12);
+  box-shadow: inset 0 0 0 2px rgba(200, 70, 70, 0.6);
 }
+
+/* Hover: все значения — тёплый красный */
+tbody tr:hover td {
+  color: #ffb3b3;
+  font-weight: 600;
+}
+
+/* Hover: имя чемпиона — ещё ярче */
+tbody tr:hover td:first-child {
+  color: #ff6b6b;
+  font-weight: 800;
+}
+
+
 .levelBar{
   margin-top: 12px;
   margin-bottom: 12px;
