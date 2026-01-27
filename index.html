@@ -398,32 +398,46 @@ function quantile(sortedArr, q) {
     });
   }
   function buildRoleFilters() {
-  const rolesList = ["Top", "Jungle", "Mid", "ADC", "Support"];
+  const rolesList = [
+    { key: "Top", icon: "assets/roles/top.png" },
+    { key: "Jungle", icon: "assets/roles/jungle.png" },
+    { key: "Mid", icon: "assets/roles/mid.png" },
+    { key: "ADC", icon: "assets/roles/adc.png" },
+    { key: "Support", icon: "assets/roles/support.png" },
+  ];
+
   const el = document.getElementById("roleFilters");
   el.innerHTML = "";
 
-  rolesList.forEach(role => {
+  rolesList.forEach(r => {
     const label = document.createElement("label");
     label.className = "chip";
 
     const cb = document.createElement("input");
     cb.type = "checkbox";
-    cb.checked = roles.has(role);
+    cb.checked = roles.has(r.key);
 
     cb.addEventListener("change", () => {
-      if (cb.checked) roles.add(role);
-      else roles.delete(role);
+      if (cb.checked) roles.add(r.key);
+      else roles.delete(r.key);
       render();
     });
 
+    const img = document.createElement("img");
+    img.src = r.icon;
+    img.alt = r.key;
+    img.className = "role-icon";
+
     const text = document.createElement("span");
-    text.textContent = role;
+    text.textContent = r.key;
 
     label.appendChild(cb);
+    label.appendChild(img);
     label.appendChild(text);
     el.appendChild(label);
   });
 }
+
 
 
   function buildHeader() {
