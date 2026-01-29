@@ -438,85 +438,28 @@ table thead th:first-child,
 table tbody td:first-child {
   text-align: center !important;
 }
+/* Mobile: keep TABLE layout, just make it smaller */
 @media (max-width: 600px) {
-  .wrap { padding: 10px; }
+  .wrap { padding: 8px; }
+
+  /* panel/cards smaller */
   .card { padding: 10px; }
   h1 { font-size: 16px; }
 
-  /* чипсы компактнее */
-  .chips { max-height: 96px; }
-  .chip { padding: 5px 7px; font-size: 11px; }
+  /* chips smaller */
+  .chip { padding: 4px 6px; font-size: 11px; }
+  .role-icon { width: 22px; height: 22px; }
 
-  /* карточный режим таблицы */
-  .tableWrap { overflow: visible; border: none; }
-  table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
-  thead { display: none; }
+  /* TABLE stays table, just compact */
+  .tableWrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { font-size: 11px; }
+  th, td { padding: 6px 8px; }
 
-  tbody tr {
-    display: block;
-    border: 1px solid rgba(34,48,74,.9);
-    border-radius: 12px;
-    overflow: hidden;
-    background: #121a2a;
-  }
-
-  tbody td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(34,48,74,.55);
-    text-align: right !important;
-  }
-
-  tbody td:last-child { border-bottom: none; }
-
-  /* слева подпись колонки */
-  tbody td::before {
-    content: attr(data-col);
-    font-size: 11px;
-    opacity: .75;
-    font-weight: 600;
-    text-align: left;
-  }
-
-  /* имя чемпа сверху жирнее */
-  tbody td:first-child {
-    justify-content: center;
-    text-align: center !important;
-    font-weight: 800;
-  }
-
-  /* кнопки в заголовке champion (Select all / Clear) на мобиле не нужны */
-  .th-actions { display: none; }
-
-  /* X кнопка меньше */
-  .champ-x { width: 20px; height: 20px; border-radius: 8px; }
-}
-@media (max-width: 600px) {
-  th, td {
-    padding: 8px 10px;
-    font-size: 12px;
-    text-align: center;
-  }
-
-  .tableWrap {
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* фиксируем колонку Champion */
+  /* make champion column narrower */
   thead th:first-child,
-  tbody td:first-child {
-    position: sticky;
-    left: 0;
-    z-index: 3;
-    background: #121a2a;
-  }
+  tbody td:first-child { min-width: 90px; }
 
-  tbody td:first-child {
-    z-index: 2;
-    font-weight: 700;
-  }
+  .champ-name { max-width: 70px; }  /* если у тебя есть .champ-name */
 }
 
 
