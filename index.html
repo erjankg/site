@@ -840,15 +840,21 @@ function quantile(sortedArr, q) {
     const tr = document.createElement("tr");
 
    const thC = document.createElement("th");
+   thC.style.cursor = "pointer";
+thC.onclick = () => openChampModal();
+
+
 
 // контейнер: Champion + кнопки
 const box = document.createElement("div");
 box.className = "th-actions";
 
 const title = document.createElement("span");
+title.style.pointerEvents = "none";
+
 title.textContent = "Champion" + (sortKey === "champion" ? (sortDir==="desc"?" ↓":" ↑") : "");
-title.style.cursor = "pointer";
-title.onclick = () => openChampModal();
+
+
 
 
 const btnAll = document.createElement("button");
