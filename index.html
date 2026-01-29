@@ -40,10 +40,6 @@
   background: rgba(255, 77, 79, 0.18) !important; /* red bottom */
   color: #ffffff;
 }
-table th,
-table td {
-  text-align: center;
-}
 
 /* Mana = 0 (no resource) */
 
@@ -351,6 +347,97 @@ td.has-tip:hover::before {
 td.has-tip:hover::after {
   transform: translateX(-50%) translateY(-2px);
 }
+/* --- table cell separators (minimal grid) --- */
+th, td {
+  border-right: 1px solid rgba(34, 48, 74, 0.55);
+}
+th:last-child, td:last-child {
+  border-right: none;
+}
+
+/* чуть виднее разделение строк (у тебя уже есть border-bottom, усилим чуть) */
+tbody td {
+  border-bottom: 1px solid rgba(34, 48, 74, 0.65);
+}
+
+/* --- champion cell with X button --- */
+.champ-cell{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.champ-name{
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.champ-x{
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
+  border: 1px solid rgba(34, 48, 74, 0.9);
+  background: rgba(11, 15, 23, 0.55);
+  color: rgba(232, 237, 247, 0.85);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-weight: 700;
+  transition: transform 120ms ease, opacity 120ms ease, border-color 120ms ease;
+}
+
+.champ-x:hover{
+  transform: scale(1.05);
+  border-color: rgba(255, 107, 107, 0.75);
+  color: #ff6b6b;
+}
+
+/* --- header actions (Select all / Clear) --- */
+.th-actions{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+.th-actions .mini-btn{
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(34, 48, 74, 0.9);
+  background: rgba(11, 15, 23, 0.55);
+  color: rgba(232, 237, 247, 0.9);
+  cursor:pointer;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.th-actions .mini-btn:hover{
+  border-color: rgba(123, 92, 255, 0.75);
+  color: #ffffff;
+}
+
+/* Tooltip не показываем на energy-ячейках */
+td.energy.has-tip::after,
+td.energy.has-tip::before {
+  display: none !important;
+}
+/* 🔒 Жёсткое центрирование всей таблицы */
+table thead th,
+table tbody td {
+  text-align: center !important;
+  vertical-align: middle;
+}
+/* Champion — тоже по центру */
+table thead th:first-child,
+table tbody td:first-child {
+  text-align: center !important;
+}
 
 
   </style>
@@ -579,10 +666,46 @@ function quantile(sortedArr, q) {
   function buildHeader() {
     const tr = document.createElement("tr");
 
-    const thC = document.createElement("th");
-    thC.textContent = "Champion" + (sortKey === "champion" ? (sortDir==="desc"?" ↓":" ↑") : "");
-    thC.onclick = () => toggleSort("champion");
-    tr.appendChild(thC);
+   const thC = document.createElement("th");
+
+// контейнер: Champion + кнопки
+const box = document.createElement("div");
+box.className = "th-actions";
+
+const title = document.createElement("span");
+title.textContent = "Champion" + (sortKey === "champion" ? (sortDir==="desc"?" ↓":" ↑") : "");
+title.style.cursor = "pointer";
+title.onclick = () => toggleSort("champion");
+
+const btnAll = document.createElement("button");
+btnAll.className = "mini-btn";
+btnAll.type = "button";
+btnAll.textContent = "Select all";
+btnAll.onclick = (e) => {
+  e.stopPropagation();
+  selected = new Set(raw.map(r => r.champion));
+  buildChips();   // чтобы галочки в панели обновились
+  render();
+};
+
+const btnClear = document.createElement("button");
+btnClear.className = "mini-btn";
+btnClear.type = "button";
+btnClear.textContent = "Clear";
+btnClear.onclick = (e) => {
+  e.stopPropagation();
+  selected = new Set(); // ничего не выбрано
+  buildChips();         // обновить галочки
+  render();
+};
+
+box.appendChild(title);
+box.appendChild(btnAll);
+box.appendChild(btnClear);
+
+thC.appendChild(box);
+tr.appendChild(thC);
+
 
     COLS.forEach(c => {
       const th = document.createElement("th");
@@ -671,14 +794,41 @@ return out;
     const tr = document.createElement("tr");
 
     const tdC = document.createElement("td");
-    tdC.textContent = r.champion;
-    tr.appendChild(tdC);
+
+const wrap = document.createElement("div");
+wrap.className = "champ-cell";
+
+const name = document.createElement("span");
+name.className = "champ-name";
+name.textContent = r.champion;
+
+const xbtn = document.createElement("button");
+xbtn.className = "champ-x";
+xbtn.type = "button";
+xbtn.textContent = "×";
+xbtn.title = "Remove champion";
+xbtn.onclick = (e) => {
+  e.stopPropagation();
+  selected.delete(r.champion); // убрать из выбранных
+  buildChips();                // чтобы галочка в панели тоже снялась
+  render();
+};
+
+wrap.appendChild(name);
+wrap.appendChild(xbtn);
+
+tdC.appendChild(wrap);
+tr.appendChild(tdC);
+
 
     COLS.forEach(c => {
       const td = document.createElement("td");
       const val = r[c.key];
-      td.classList.add("has-tip");
-td.dataset.tip = `Growth per lvl: ${r.growth[c.key]}`;
+     if (!(c.key === "mana" && r.resource === "Energy")) {
+  td.classList.add("has-tip");
+  td.dataset.tip = `Growth per lvl: ${r.growth[c.key]}`;
+}
+
 
 
       // ENERGY: shows label instead of number
