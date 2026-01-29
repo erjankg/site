@@ -307,12 +307,18 @@ td.has-tip::after {
   left: 50%;
   bottom: calc(100% + 8px);
   transform: translateX(-50%);
-  background: rgba(15, 21, 36, 0.98);
+  background: rgba(15, 21, 36, 0.96);
   border: 1px solid #22304a;
-  color: #e8edf7;
+  color: #d6deee;
+
   padding: 6px 8px;
   border-radius: 8px;
-  font-size: 12px;
+
+  font-size: 11px;          /* ⬅ меньше */
+  font-weight: 400;         /* ⬅ НЕ жирный */
+  letter-spacing: 0.2px;    /* ⬅ аккуратно */
+  line-height: 1.35;
+
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
