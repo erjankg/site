@@ -826,7 +826,8 @@ tr.appendChild(tdC);
       const val = r[c.key];
      if (!(c.key === "mana" && r.resource === "Energy")) {
   td.classList.add("has-tip");
-  td.dataset.tip = `Growth per lvl: ${r.growth[c.key]}`;
+ td.dataset.tip = `${c.label} growth per lvl: ${r.growth[c.key]}`;
+
 }
 
 
