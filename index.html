@@ -462,6 +462,140 @@ table tbody td:first-child {
   .champ-name { max-width: 70px; }  /* если у тебя есть .champ-name */
 }
 
+/* ===== Champion Modal ===== */
+.modal.hidden { display: none; }
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.modal-backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(2px);
+}
+
+.modal-card{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(1100px, 92vw);
+  height: min(80vh, 720px);
+  background: #121a2a;
+  border: 1px solid #22304a;
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-head{
+  padding: 10px 12px;
+  border-bottom: 1px solid #22304a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modal-title{
+  font-weight: 800;
+  letter-spacing: .3px;
+}
+
+.modal-actions{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+}
+
+.modal-search{
+  width: 220px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #22304a;
+  background:#0b0f17;
+  color:#e8edf7;
+}
+
+.modal-grid{
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  overflow: auto;
+}
+
+/* role column */
+.role-col{
+  border: 1px solid rgba(34,48,74,.75);
+  border-radius: 12px;
+  background: rgba(11,15,23,.35);
+  overflow: hidden;
+  display:flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.role-head{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap: 8px;
+  padding: 10px 8px;
+  border-bottom: 1px solid rgba(34,48,74,.65);
+  background: rgba(18,26,42,.85);
+  font-weight: 800;
+}
+
+.role-head img{
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.role-body{
+  padding: 10px;
+  display:flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+}
+
+.champ-btn{
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(34,48,74,.8);
+  background: rgba(11,15,23,.65);
+  color: rgba(232,237,247,.92);
+  cursor: pointer;
+  text-align: center;
+  font-weight: 700;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.champ-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(123,92,255,.7);
+}
+
+/* Selected champion */
+.champ-btn.selected{
+  background: rgba(123,92,255,.25);
+  border-color: rgba(123,92,255,.85);
+  color: #ffffff;
+}
+
+/* Mobile: modal becomes 1 column */
+@media (max-width: 700px){
+  .modal-grid{ grid-template-columns: 1fr; }
+  .modal-search{ width: 140px; }
+}
 
   </style>
 <!-- Cloudflare Web Analyticsй fgdgggjhjhgggggfgtrrtrtr-->
@@ -509,12 +643,7 @@ table tbody td:first-child {
 
 
 
-    
-    <div class="card">
-      <label>Choose champions</label>
-      <div id="champChips" class="chips"></div>
-      <div class="small">Можно снять все галочки и оставить только нужных.</div>
-    </div>
+  
 <div class="card">
   <label>Roles</label>
   <div id="roleFilters" class="chips"></div>
@@ -553,6 +682,27 @@ table tbody td:first-child {
     Data source: Google Sheets (published TSV)
   </div>
 </div>
+
+<!-- Champion picker modal -->
+<div id="champModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" id="champModalBackdrop"></div>
+
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div class="modal-title">Choose Champions</div>
+
+      <div class="modal-actions">
+        <input id="champModalSearch" class="modal-search" type="text" placeholder="Search champion..." />
+        <button id="champModalSelectAll" class="mini-btn" type="button">Select all</button>
+        <button id="champModalClearAll" class="mini-btn" type="button">Clear all</button>
+        <button id="champModalClose" class="mini-btn" type="button">Close</button>
+      </div>
+    </div>
+
+    <div id="champModalGrid" class="modal-grid"></div>
+  </div>
+</div>
+
 
 <script>
   // 1)w ВСТАВЬ СЮДА СВОЮ C123SV-СЫЛКУ ИЗ "Опубликовать в интернете"
@@ -698,7 +848,8 @@ box.className = "th-actions";
 const title = document.createElement("span");
 title.textContent = "Champion" + (sortKey === "champion" ? (sortDir==="desc"?" ↓":" ↑") : "");
 title.style.cursor = "pointer";
-title.onclick = () => toggleSort("champion");
+title.onclick = () => openChampModal();
+
 
 const btnAll = document.createElement("button");
 btnAll.className = "mini-btn";
@@ -707,7 +858,6 @@ btnAll.textContent = "Select all";
 btnAll.onclick = (e) => {
   e.stopPropagation();
   selected = new Set(raw.map(r => r.champion));
-  buildChips();   // чтобы галочки в панели обновились
   render();
 };
 
@@ -717,8 +867,7 @@ btnClear.type = "button";
 btnClear.textContent = "Clear";
 btnClear.onclick = (e) => {
   e.stopPropagation();
-  selected = new Set(); // ничего не выбрано
-  buildChips();         // обновить галочки
+  selected = new Set(); // ничего не выбрано       // обновить галочки
   render();
 };
 
@@ -740,6 +889,80 @@ tr.appendChild(thC);
     theadEl.innerHTML = "";
     theadEl.appendChild(tr);
   }
+function openChampModal(){
+  champModalEl.classList.remove("hidden");
+  champModalEl.setAttribute("aria-hidden", "false");
+  champModalSearch.value = "";
+  renderChampModal();
+  setTimeout(() => champModalSearch.focus(), 0);
+}
+
+function closeChampModal(){
+  champModalEl.classList.add("hidden");
+  champModalEl.setAttribute("aria-hidden", "true");
+}
+
+function renderChampModal(){
+  const q = champModalSearch.value.trim().toLowerCase();
+
+  const rolesList = [
+    { key: "Top",     label: "Top",     icon: "assets/roles/top.png" },
+    { key: "Jungle",  label: "Jungle",  icon: "assets/roles/jungle.png" },
+    { key: "Mid",     label: "Mid",     icon: "assets/roles/mid.png" },
+    { key: "ADC",     label: "ADC",     icon: "assets/roles/adc.png" },
+    { key: "Support", label: "Support", icon: "assets/roles/support.png" },
+  ];
+
+  champModalGridEl.innerHTML = "";
+
+  rolesList.forEach(role => {
+    const col = document.createElement("div");
+    col.className = "role-col";
+
+    const head = document.createElement("div");
+    head.className = "role-head";
+
+    const img = document.createElement("img");
+    img.src = role.icon;
+    img.alt = role.label;
+
+    const title = document.createElement("span");
+    title.textContent = role.label;
+
+    head.appendChild(img);
+    head.appendChild(title);
+
+    const body = document.createElement("div");
+    body.className = "role-body";
+
+    const champs = raw
+      .filter(r => r.roles?.[role.key])
+      .map(r => r.champion)
+      .filter(name => name.toLowerCase().includes(q))
+      .sort((a,b) => a.localeCompare(b)); // алфавит
+
+    champs.forEach(name => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "champ-btn" + (selected.has(name) ? " selected" : "");
+      btn.textContent = name;
+
+      btn.onclick = () => {
+        if (selected.has(name)) selected.delete(name);
+        else selected.add(name);
+        renderChampModal(); // обновить подсветку выбранных
+        render();          // обновить таблицу
+      };
+
+      body.appendChild(btn);
+    });
+
+    col.appendChild(head);
+    col.appendChild(body);
+    champModalGridEl.appendChild(col);
+  });
+}
+
 
   function toggleSort(key) {
     if (sortKey === key) sortDir = (sortDir === "desc") ? "asc" : "desc";
@@ -938,6 +1161,7 @@ tr.appendChild(tdC);
     levelEl.addEventListener("input", () => {
       level = Number(levelEl.value);
       levelValEl.textContent = String(level);
+
       render();
     });
 
@@ -947,6 +1171,33 @@ tr.appendChild(tdC);
     });
 
     levelValEl.textContent = String(level);
+    // modal events
+champModalBackdrop.addEventListener("click", closeChampModal);
+champModalClose.addEventListener("click", closeChampModal);
+
+champModalSelectAll.addEventListener("click", () => {
+  selected = new Set(raw.map(r => r.champion));
+  renderChampModal();
+  render();
+});
+
+champModalClearAll.addEventListener("click", () => {
+  selected = new Set();
+  renderChampModal();
+  render();
+});
+
+champModalSearch.addEventListener("input", () => {
+  renderChampModal();
+});
+
+// Esc close
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !champModalEl.classList.contains("hidden")) {
+    closeChampModal();
+  }
+});
+
     render();
   }
 
