@@ -1206,9 +1206,7 @@ champModalClearAll.addEventListener("click", () => {
   render();
 });
 
-champModalSearch.addEventListener("input", () => {
-  renderChampModal();
-});
+
 
 // Esc close
 document.addEventListener("keydown", (e) => {
@@ -1221,12 +1219,11 @@ document.addEventListener("keydown", (e) => {
   }
 
   init();
-
-
-
+</script>
 <!-- Champion select modal -->
 <div id="champModal" class="champ-modal hidden">
-  <div class="champ-modal-backdrop"></div>
+  <div id="champModalBackdrop" class="champ-modal-backdrop"></div>
+
 
   <div class="champ-modal-box">
     <div class="champ-modal-header">
@@ -1239,11 +1236,11 @@ document.addEventListener("keydown", (e) => {
     </div>
 
     <div class="champ-modal-footer">
-      <button id="champSelectAll">Select all</button>
-      <button id="champClearAll">Clear</button>
+      <button id="champModalSelectAll">Select all</button>
+      <button id="champModalClearAll">Clear</button>
+
     </div>
   </div>
 </div>
-</script>
 </body>
 </html>
