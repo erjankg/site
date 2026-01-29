@@ -839,50 +839,12 @@ function quantile(sortedArr, q) {
   function buildHeader() {
     const tr = document.createElement("tr");
 
-   const thC = document.createElement("th");
-   thC.style.cursor = "pointer";
+ const thC = document.createElement("th");
+thC.textContent = "Champion";
+thC.style.cursor = "pointer";
 thC.onclick = () => openChampModal();
-
-
-
-// контейнер: Champion + кнопки
-const box = document.createElement("div");
-box.className = "th-actions";
-
-const title = document.createElement("span");
-title.style.pointerEvents = "none";
-
-title.textContent = "Champion" + (sortKey === "champion" ? (sortDir==="desc"?" ↓":" ↑") : "");
-
-
-
-
-const btnAll = document.createElement("button");
-btnAll.className = "mini-btn";
-btnAll.type = "button";
-btnAll.textContent = "Select all";
-btnAll.onclick = (e) => {
-  e.stopPropagation();
-  selected = new Set(raw.map(r => r.champion));
-  render();
-};
-
-const btnClear = document.createElement("button");
-btnClear.className = "mini-btn";
-btnClear.type = "button";
-btnClear.textContent = "Clear";
-btnClear.onclick = (e) => {
-  e.stopPropagation();
-  selected = new Set(); // ничего не выбрано       // обновить галочки
-  render();
-};
-
-box.appendChild(title);
-box.appendChild(btnAll);
-box.appendChild(btnClear);
-
-thC.appendChild(box);
 tr.appendChild(thC);
+
 
 
     COLS.forEach(c => {
