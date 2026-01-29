@@ -60,8 +60,8 @@
   inset: -60%;
   background: radial-gradient(
     circle,
-    rgba(140, 160, 200, 0.35),
-    rgba(90, 100, 120, 0)
+    rgba(142, 177, 248, 0.35),
+    rgba(67, 74, 87, 0.299)
   );
   animation: zeroPulse 3.2s ease-in-out infinite;
 }
@@ -437,6 +437,86 @@ table tbody td {
 table thead th:first-child,
 table tbody td:first-child {
   text-align: center !important;
+}
+@media (max-width: 600px) {
+  .wrap { padding: 10px; }
+  .card { padding: 10px; }
+  h1 { font-size: 16px; }
+
+  /* чипсы компактнее */
+  .chips { max-height: 96px; }
+  .chip { padding: 5px 7px; font-size: 11px; }
+
+  /* карточный режим таблицы */
+  .tableWrap { overflow: visible; border: none; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+  thead { display: none; }
+
+  tbody tr {
+    display: block;
+    border: 1px solid rgba(34,48,74,.9);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #121a2a;
+  }
+
+  tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(34,48,74,.55);
+    text-align: right !important;
+  }
+
+  tbody td:last-child { border-bottom: none; }
+
+  /* слева подпись колонки */
+  tbody td::before {
+    content: attr(data-col);
+    font-size: 11px;
+    opacity: .75;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  /* имя чемпа сверху жирнее */
+  tbody td:first-child {
+    justify-content: center;
+    text-align: center !important;
+    font-weight: 800;
+  }
+
+  /* кнопки в заголовке champion (Select all / Clear) на мобиле не нужны */
+  .th-actions { display: none; }
+
+  /* X кнопка меньше */
+  .champ-x { width: 20px; height: 20px; border-radius: 8px; }
+}
+@media (max-width: 600px) {
+  th, td {
+    padding: 8px 10px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .tableWrap {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* фиксируем колонку Champion */
+  thead th:first-child,
+  tbody td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: #121a2a;
+  }
+
+  tbody td:first-child {
+    z-index: 2;
+    font-weight: 700;
+  }
 }
 
 
@@ -822,51 +902,44 @@ tr.appendChild(tdC);
 
 
     COLS.forEach(c => {
-      const td = document.createElement("td");
-      const val = r[c.key];
-      // Tooltip: "<STAT> growth per lvl: X"
-if (!(c.key === "mana" && r.resource === "Energy") && !(c.key === "mana" && val === 0)) {
+  const td = document.createElement("td");
+  const val = r[c.key];
+
+  // --- SPECIAL CASES FIRST ---
+  // ENERGY: show label instead of number
+  if (c.key === "mana" && r.resource === "Energy") {
+    td.innerHTML = "<span>ENERGY</span>";
+    td.classList.add("energy");
+    tr.appendChild(td);
+    return;
+  }
+
+  // Mana=0: gray (animated) and not tier-colored, not tooltip
+  if (c.key === "mana" && val === 0) {
+    td.innerHTML = "<span>0</span>";
+    td.classList.add("mana-zero");
+    tr.appendChild(td);
+    return;
+  }
+
+  // --- NORMAL CELL ---
+  td.textContent = fmt(val, c.decimals);
+
+  // Tooltip: "<STAT> growth per lvl: X"
   td.classList.add("has-tip");
-  td.dataset.tip = `${c.label} growth per lvl: ${r.growth?.[c.key] ?? ""}`;
-}
+  td.dataset.tip = `${c.label} growth per lvl: ${r.growth[c.key]}`;
 
-     if (!(c.key === "mana" && r.resource === "Energy")) {
-  td.classList.add("has-tip");
- td.dataset.tip = `${c.label} growth per lvl: ${r.growth[c.key]}`;
+  // Tier colors (10/80/10)
+  const t = thresholds[c.key];
+  if (t && Number.isFinite(val)) {
+    if (val >= t.q90) td.classList.add("tier-top");
+    else if (val < t.q10) td.classList.add("tier-low");
+    else td.classList.add("tier-mid");
+  }
 
-}
-
-
-
-      // ENERGY: shows label instead of number
-if (c.key === "mana" && r.resource === "Energy") {
-  td.innerHTML = "<span>ENERGY</span>";
-  td.classList.add("energy");
   tr.appendChild(td);
-  return;
-}
+});
 
-      
-      // Mana=0 special: gray and NOT tier-colored
-if (c.key === "mana" && val === 0) {
-  td.innerHTML = "<span>0</span>";
-  td.classList.add("mana-zero");
-  tr.appendChild(td);
-  return;
-}
-
-      td.textContent = fmt(val, c.decimals);
-
-      const t = thresholds[c.key];
-      if (t && Number.isFinite(val)) {
-      if (val >= t.q90) td.classList.add("tier-top");
-else if (val < t.q10) td.classList.add("tier-low");
-else td.classList.add("tier-mid");
-  
-      }
-
-      tr.appendChild(td);
-    });
 
     tbodyEl.appendChild(tr);
   });
