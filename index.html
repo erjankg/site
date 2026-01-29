@@ -43,16 +43,40 @@
 
 /* Mana = 0 (no resource) */
 
+/* Zero Mana (animated, cold, disabled feeling) */
 .mana-zero {
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(80, 88, 103, 0.578),
-    rgba(90, 100, 120, 0.524) 6px,
-    rgba(60, 70, 90, 0.69) 6px,
-    rgba(60, 70, 90, 0.35) 12px
-  );
-  color: #d2d8e6;
+  position: relative;
+  background: rgba(90, 100, 120, 0.25) !important;
+  color: #cfd6e4;
+  font-weight: 800;
+  text-align: center;
+  overflow: hidden;
 }
+
+/* холодная «пульсация пустоты» */
+.mana-zero::after {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: radial-gradient(
+    circle,
+    rgba(140, 160, 200, 0.35),
+    rgba(90, 100, 120, 0)
+  );
+  animation: zeroPulse 3.2s ease-in-out infinite;
+}
+
+.mana-zero > span {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes zeroPulse {
+  0%   { transform: scale(0.9);  opacity: 0.35; }
+  50%  { transform: scale(1.05); opacity: 0.65; }
+  100% { transform: scale(0.9);  opacity: 0.35; }
+}
+
 /* Energy cell */
 .energy {
   position: relative;
@@ -612,7 +636,7 @@ if (c.key === "mana" && r.resource === "Energy") {
       
       // Mana=0 special: gray and NOT tier-colored
 if (c.key === "mana" && val === 0) {
-  td.textContent = "0";
+  td.innerHTML = "<span>0</span>";
   td.classList.add("mana-zero");
   tr.appendChild(td);
   return;
