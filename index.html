@@ -24,25 +24,54 @@
     .chip { display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border:1px solid #22304a; border-radius:999px; background:#0b0f17; font-size:12px; }
     .chip input { transform: translateY(1px); }
     @media (max-width: 900px) { .panel { grid-template-columns:1fr; } }
-  .tier-top {
-  background: #7b5cff !important;
-  color: #ffffff;
-
-
-}
-.tier-top {
-  background: #7b5cff !important;
-  color: #ffffff;
-
  
+/* Tier colors (Top 10% / Mid / Bottom 10%) */
+.tier-top {
+  background: #7b5cff !important; /* purple */
+  color: #ffffff;
 }
+
 .tier-mid {
-  background: #f2c94c !important;
-  color: #0b0f17;
+  background: rgba(138, 147, 166, 0.12) !important; /* neutral mid */
+  color: #e8edf7;
 }
+
 .tier-low {
-  background: #8a93a6 !important;
+  background: rgba(255, 77, 79, 0.18) !important; /* red bottom */
+  color: #ffffff;
+}
+
+/* Mana = 0 (no resource) */
+.mana-zero {
+  background: rgba(138, 147, 166, 0.18) !important;
+  color: #c7cfdf;
+}
+
+/* Energy cell */
+.energy {
+  position: relative;
+  background: rgba(255, 159, 28, 0.22) !important;
   color: #0b0f17;
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0.6px;
+  overflow: hidden;
+}
+.energy::after{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background: radial-gradient(circle, rgba(255,159,28,0.55), rgba(255,159,28,0));
+  animation: energyPulse 1.6s ease-in-out infinite;
+}
+.energy > span{
+  position: relative;
+  z-index: 1;
+}
+@keyframes energyPulse{
+  0%   { transform: scale(0.85); opacity: 0.55; }
+  50%  { transform: scale(1.15); opacity: 0.95; }
+  100% { transform: scale(0.85); opacity: 0.55; }
 }
 
 .brand {
@@ -503,7 +532,7 @@ function quantile(sortedArr, q) {
 
     // 4) РАСЧЁТ СТАТОВ
     .map(r => {
-      const out = { champion: r.champion };
+      const out = { champion: r.champion, resource: r.resource };
       COLS.forEach(c => {
         out[c.key] = calc(
           r[c.key + "_base"],
@@ -540,15 +569,18 @@ function quantile(sortedArr, q) {
   const thresholds = {};
   for (const c of COLS) {
     const vals = rows
-      .map(r => r[c.key])
-      .filter(v => Number.isFinite(v))
-      .sort((a, b) => a - b);
+  .map(r => r[c.key])
+  .filter(v => Number.isFinite(v))
+  .filter(v => (c.key === "mana" ? v !== 0 : true))
+  .sort((a, b) => a - b);
+
 
     if (vals.length < 3) continue;
-    thresholds[c.key] = {
-      q20: quantile(vals, 0.2),
-      q80: quantile(vals, 0.8)
-    };
+   thresholds[c.key] = {
+  q10: quantile(vals, 0.1),
+  q90: quantile(vals, 0.9)
+};
+
   }
 
   tbodyEl.innerHTML = "";
@@ -562,13 +594,32 @@ function quantile(sortedArr, q) {
     COLS.forEach(c => {
       const td = document.createElement("td");
       const val = r[c.key];
+
+      // ENERGY: shows label instead of number
+if (c.key === "mana" && r.resource === "Energy") {
+  td.innerHTML = "<span>ENERGY</span>";
+  td.classList.add("energy");
+  tr.appendChild(td);
+  return;
+}
+
+      
+      // Mana=0 special: gray and NOT tier-colored
+if (c.key === "mana" && val === 0) {
+  td.textContent = "0";
+  td.classList.add("mana-zero");
+  tr.appendChild(td);
+  return;
+}
+
       td.textContent = fmt(val, c.decimals);
 
       const t = thresholds[c.key];
       if (t && Number.isFinite(val)) {
-        if (val >= t.q80) td.classList.add("tier-top");
-        else if (val < t.q20) td.classList.add("tier-low");
-        else td.classList.add("tier-mid");
+      if (val >= t.q90) td.classList.add("tier-top");
+else if (val < t.q10) td.classList.add("tier-low");
+else td.classList.add("tier-mid");
+  
       }
 
       tr.appendChild(td);
@@ -607,7 +658,8 @@ function quantile(sortedArr, q) {
         mana_base: toNum(x["Mana_Base"]),   mana_growth: toNum(x["Mana_Growth"]),
         armor_base: toNum(x["Armor_Base"]), armor_growth: toNum(x["Armor_Growth"]),
         mr_base: toNum(x["MR_Base"]),       mr_growth: toNum(x["MR_Growth"]),
-          roles: {
+        resource: (x["Resource"] || "Mana").trim(),
+        roles: {
       Top: toNum(x["Is_Top"]) === 1,
       Jungle: toNum(x["Is_Jungle"]) === 1,
       Mid: toNum(x["Is_Mid"]) === 1,
