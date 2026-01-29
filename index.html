@@ -296,6 +296,51 @@ tbody tr:hover td:first-child {
   align-items: center;
   gap: 6px;
 }
+/* Tooltip */
+td.has-tip {
+  position: relative;
+}
+
+td.has-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  background: rgba(15, 21, 36, 0.98);
+  border: 1px solid #22304a;
+  color: #e8edf7;
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease, transform 120ms ease;
+  z-index: 50;
+}
+
+td.has-tip::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #22304a;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  z-index: 50;
+}
+
+td.has-tip:hover::after,
+td.has-tip:hover::before {
+  opacity: 1;
+}
+
+td.has-tip:hover::after {
+  transform: translateX(-50%) translateY(-2px);
+}
 
 
   </style>
@@ -319,7 +364,7 @@ tbody tr:hover td:first-child {
     <div class="supportBody">
       Ребята, сайт абсолютно бесплатен для всех.
       Но буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.
-      В планах добавить всех чемпионов, все характеристики, изображения иконок, winrate\pickrate и регулярно обновлять сайт до актуальности.
+      В планах добавить  изображения чемпов, winrate\pickrate и таблицу ганг потенцаил лесников, хп реген мана реген, фуллклир чистка таймер у лесников и регулярно обновлять сайт до актуальности.
     </div>
   </div>
 
@@ -562,15 +607,13 @@ function quantile(sortedArr, q) {
 
     // 4) РАСЧЁТ СТАТОВ
     .map(r => {
-      const out = { champion: r.champion, resource: r.resource };
-      COLS.forEach(c => {
-        out[c.key] = calc(
-          r[c.key + "_base"],
-          r[c.key + "_growth"],
-          level
-        );
-      });
-      return out;
+     const out = { champion: r.champion, resource: r.resource, growth: {} };
+COLS.forEach(c => {
+  out[c.key] = calc(r[c.key + "_base"], r[c.key + "_growth"], level);
+  out.growth[c.key] = r[c.key + "_growth"];
+});
+return out;
+
     });
 
   // ⚠️ СОРТИРОВКУ НЕ ТРОГАЕМ
@@ -624,6 +667,9 @@ function quantile(sortedArr, q) {
     COLS.forEach(c => {
       const td = document.createElement("td");
       const val = r[c.key];
+      td.classList.add("has-tip");
+td.dataset.tip = `Growth per lvl: ${r.growth[c.key]}`;
+
 
       // ENERGY: shows label instead of number
 if (c.key === "mana" && r.resource === "Energy") {
