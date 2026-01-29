@@ -653,12 +653,6 @@ table tbody td:first-child {
 
 
 
-  
-<div class="card">
-  <label>Roles</label>
-  <div id="roleFilters" class="chips"></div>
-  <div class="small">Можно выбрать несколько ролей</div>
-</div>
 
 
     <div class="card">
@@ -731,11 +725,10 @@ table tbody td:first-child {
 
   let raw = [];                 // { champion, ad_base, ad_growth, ... }
   let selected = new Set();     // выбранные чемпы
-  let roles = new Set(); // выбранные роли
   let level = 10;
   let sortKey = "ad";
   let sortDir = "desc";
-  let search = "";
+ 
 
 
 
@@ -816,46 +809,7 @@ function quantile(sortedArr, q) {
       chipsEl.appendChild(label);
     });
   }
-  function buildRoleFilters() {
-  const rolesList = [
-    { key: "Top", icon: "assets/roles/top.png" },
-    { key: "Jungle", icon: "assets/roles/jungle.png" },
-    { key: "Mid", icon: "assets/roles/mid.png" },
-    { key: "ADC", icon: "assets/roles/adc.png" },
-    { key: "Support", icon: "assets/roles/support.png" },
-  ];
-
-  const el = document.getElementById("roleFilters");
-  el.innerHTML = "";
-
-  rolesList.forEach(r => {
-    const label = document.createElement("label");
-    label.className = "chip";
-
-    const cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.checked = roles.has(r.key);
-
-    cb.addEventListener("change", () => {
-      if (cb.checked) roles.add(r.key);
-      else roles.delete(r.key);
-      render();
-    });
-
-    const img = document.createElement("img");
-    img.src = r.icon;
-    img.alt = r.key;
-    img.className = "role-icon";
-
-    const text = document.createElement("span");
-    text.textContent = r.key;
-
-    label.appendChild(cb);
-    label.appendChild(img);
-    label.appendChild(text);
-    el.appendChild(label);
-  });
-}
+ 
 
 
 
@@ -964,16 +918,12 @@ function renderChampModal(){
   function computeRows() {
   const list = raw
     // 1) ФИЛЬТР ПО РОЛЯМ
-    .filter(r => {
-      if (roles.size === 0) return true; // если роли не выбраны — все
-      return [...roles].some(role => r.roles[role]);
-    })
+
 
     // 2) ФИЛЬТР ПО ВЫБРАННЫМ ЧЕМПИОНАМ
     .filter(r => selected.has(r.champion))
 
-    // 3) ПОИСК
-    .filter(r => r.champion.toLowerCase().includes(search))
+
 
     // 4) РАСЧЁТ СТАТОВ
     .map(r => {
@@ -1119,6 +1069,33 @@ function closeChampModal() {
 }
 
 
+// ===== Modal close handlers (ONE TIME) =====
+(function bindChampModalClose(){
+  if (!champModalEl || !champModalBackdropEl || !champModalCloseEl) {
+    console.warn("Modal elements not found", { champModalEl, champModalBackdropEl, champModalCloseEl });
+    return;
+  }
+
+  // Close on button
+  champModalCloseEl.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeChampModal();
+  });
+
+  // Close on backdrop
+  champModalBackdropEl.addEventListener("click", (e) => {
+    e.preventDefault();
+    closeChampModal();
+  });
+
+  // Close on Esc
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !champModalEl.classList.contains("hidden")) {
+      closeChampModal();
+    }
+  });
+})();
 
 
 
