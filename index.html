@@ -1056,7 +1056,6 @@ xbtn.title = "Remove champion";
 xbtn.onclick = (e) => {
   e.stopPropagation();
   selected.delete(r.champion); // убрать из выбранных
-  buildChips();                // чтобы галочка в панели тоже снялась
   render();
 };
 
@@ -1154,7 +1153,7 @@ tr.appendChild(tdC);
     // По умолчанию выбираем всех
     selected = new Set(raw.map(r => r.champion));
 
-    buildChips();
+   
     buildRoleFilters();
     buildHeader();
 
