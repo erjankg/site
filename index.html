@@ -824,6 +824,12 @@ tr.appendChild(tdC);
     COLS.forEach(c => {
       const td = document.createElement("td");
       const val = r[c.key];
+      // Tooltip: "<STAT> growth per lvl: X"
+if (!(c.key === "mana" && r.resource === "Energy") && !(c.key === "mana" && val === 0)) {
+  td.classList.add("has-tip");
+  td.dataset.tip = `${c.label} growth per lvl: ${r.growth?.[c.key] ?? ""}`;
+}
+
      if (!(c.key === "mana" && r.resource === "Energy")) {
   td.classList.add("has-tip");
  td.dataset.tip = `${c.label} growth per lvl: ${r.growth[c.key]}`;
