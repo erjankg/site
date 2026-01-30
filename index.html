@@ -9,88 +9,115 @@
       --p: #7b5cff; 
       --bg: #0b0f17; 
       --card: #121a2a; 
-      --brd: rgba(255,255,255,0.2); /* Светлые рамки */
+      --brd: rgba(255,255,255,0.15); 
       --energy: #ffcc00; 
       font-family: system-ui,-apple-system,sans-serif; 
     }
-    body { margin:0; background:var(--bg); color:#e8edf7; line-height: 1.4; overflow-x: hidden; }
-    .wrap { max-width:1200px; margin:0 auto; padding:12px; }
+    body { margin:0; background:var(--bg); color:#e8edf7; line-height: 1.4; overflow-x: hidden; font-size: 14px; }
+    .wrap { max-width:1200px; margin:0 auto; padding:8px; }
     
-    .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .nick { font-size: 20px; font-weight: 700; color: var(--p); }
+    .brand { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .nick { font-size: 18px; font-weight: 700; color: var(--p); }
 
-    /* Анимированная кнопка */
     @keyframes pulse {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(145, 70, 255, 0.7); }
-      70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(145, 70, 255, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(145, 70, 255, 0); }
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); box-shadow: 0 0 15px rgba(145, 70, 255, 0.4); }
+      100% { transform: scale(1); }
     }
     .donateBtn { 
-      display: flex; align-items: center; justify-content: center; padding: 12px; 
+      display: flex; align-items: center; justify-content: center; padding: 10px; 
       border-radius: 8px; text-decoration: none; color: #fff; 
       background: linear-gradient(90deg, #9146ff, var(--p)); 
-      font-weight: 700; animation: pulse 2s infinite; 
+      font-weight: 700; animation: pulse 2s infinite; margin-bottom: 12px; font-size: 13px;
     }
 
-    /* Ползунок с линейкой */
-    .levelBar { background: var(--card); border: 1px solid var(--brd); padding: 15px; border-radius: 12px; margin-bottom: 12px; }
-    .range-wrap { position: relative; margin: 10px 0 25px 0; }
+    .levelBar { background: var(--card); border: 1px solid var(--brd); padding: 12px; border-radius: 12px; margin-bottom: 12px; }
+    .range-wrap { position: relative; margin: 5px 0 20px 0; }
     input[type="range"] { width: 100%; accent-color: var(--p); cursor: pointer; }
-    .range-labels { display: flex; justify-content: space-between; padding: 0 5px; margin-top: 5px; font-size: 10px; color: #888; }
+    .range-labels { display: flex; justify-content: space-between; padding: 0 2px; margin-top: 4px; font-size: 9px; color: #888; }
 
-    /* Таблица */
-    .tableWrap { overflow-x: auto; border: 1px solid var(--brd); border-radius: 10px; background: var(--card); }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 8px; text-align: center; border: 1px solid var(--brd); } /* Светлые границы */
-    th { background: #1a2438; cursor: pointer; text-transform: uppercase; font-size: 11px; }
+    /* Таблица с закрепленной шапкой */
+    .tableWrap { 
+      overflow-x: hidden; /* Убираем скролл влево-вправо */
+      border: 1px solid var(--brd); 
+      border-radius: 10px; 
+      background: var(--card); 
+      max-height: 70vh; 
+      overflow-y: auto; 
+    }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; } /* Фиксированная ширина колонок */
+    th, td { 
+      padding: 6px 2px; 
+      text-align: center; 
+      border: 1px solid var(--brd); 
+      word-wrap: break-word; 
+      font-size: 11px;
+    }
+    
+    /* Закрепляем первую колонку и шапку */
+    thead th { 
+      position: sticky; top: 0; 
+      background: #1a2438; z-index: 10; 
+      box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+    }
 
-    /* Новые цвета Tier-листа */
-    .tier-top1 { background: #8b0000 !important; color: #fff; } /* Темно-красный 1% */
-    .tier-top10 { background: #ff0000 !important; color: #fff; } /* Красный 10% */
-    .tier-mid { background: #ff8c00 !important; color: #000; font-weight: bold; } /* Оранжевый (Mid) */
-    .tier-low { background: #228b22 !important; color: #fff; } /* Зеленый (Bottom 10%) */
-    .energy { color: var(--energy); font-weight: 800; }
+    /* Подсказки при наведении */
+    .has-tip { position: relative; cursor: help; }
+    .has-tip:hover::after {
+      content: attr(data-tip);
+      position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: #000; color: #fff; padding: 4px 8px; border-radius: 4px;
+      font-size: 10px; white-space: nowrap; z-index: 20; border: 1px solid var(--p);
+    }
+
+    /* Мягкие цвета Tier-листа */
+    .tier-top1 { background: #5e0000 !important; color: #fff; } 
+    .tier-top10 { background: #a30000 !important; color: #fff; } 
+    .tier-mid { background: #c26a00 !important; color: #fff; } 
+    .tier-low { background: #1e5e1e !important; color: #fff; } 
+    .energy { color: var(--energy); font-weight: 800; font-size: 9px; }
+    .mana-zero { color: #666; font-size: 11px; }
 
     /* Модалка */
     .modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     .hidden { display: none; }
     .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.85); }
     .modal-card { 
-      position: relative; width: 95vw; max-width: 900px; max-height: 90vh; 
-      background: var(--card); border: 1px solid var(--brd); border-radius: 16px; 
-      display: flex; flex-direction: column; overflow: hidden; 
+      position: relative; width: 98vw; max-width: 900px; height: 90vh; 
+      background: var(--card); border: 1px solid var(--brd); border-radius: 12px; 
+      display: flex; flex-direction: column; 
     }
     .modal-close-corner { 
-      position: absolute; top: 12px; right: 12px; background: #ff4d4f; 
-      color: white; border: none; width: 32px; height: 32px; border-radius: 50%; 
+      position: absolute; top: -10px; right: -10px; background: #ff4d4f; 
+      color: white; border: 2px solid #fff; width: 34px; height: 34px; border-radius: 50%; 
       cursor: pointer; font-weight: bold; z-index: 100;
     }
-    .modal-head { padding: 15px; border-bottom: 1px solid var(--brd); }
+    .modal-head { padding: 12px; border-bottom: 1px solid var(--brd); }
 
-    /* Сетка в модалке */
+    /* Сетка чемпионов 5 колонок */
     .modal-grid { 
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; 
-      padding: 15px; overflow-y: auto; 
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; 
+      padding: 8px; overflow-y: auto; flex: 1;
     }
-    .role-col { display: flex; flex-direction: column; gap: 5px; }
+    .role-col { display: flex; flex-direction: column; gap: 4px; }
     .role-head { 
-      cursor: pointer; transition: 0.2s; padding: 5px; text-align: center;
-      background: rgba(255,255,255,0.05); border-radius: 8px;
+      cursor: pointer; padding: 4px; text-align: center;
+      background: rgba(255,255,255,0.05); border-radius: 6px;
     }
-    .role-head:hover { background: var(--p); }
-    .role-head img { width: 30px; height: 30px; display: block; margin: 0 auto; }
+    .role-head img { width: 22px; height: 22px; display: block; margin: 0 auto; }
     
     .champ-btn { 
-      padding: 6px; border-radius: 6px; border: 1px solid var(--brd); 
-      background: #0b0f17; color: #99aab5; cursor: pointer; font-size: 11px; 
+      padding: 5px 2px; border-radius: 4px; border: 1px solid var(--brd); 
+      background: #0b0f17; color: #99aab5; cursor: pointer; font-size: 10px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .champ-btn.selected { border-color: var(--p); background: #7b5cff33; color: #fff; }
+    .champ-btn.selected { border-color: var(--p); background: #7b5cff33; color: #fff; font-weight: bold; }
 
-    /* Мобильная адаптация модалки (только вертикальный скролл) */
-    @media (max-width: 768px) {
-      .modal-grid { grid-template-columns: 1fr; } /* Одна колонка на мобилках */
-      .role-col { border-bottom: 1px solid var(--brd); padding-bottom: 15px; }
-      .role-head { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    @media (max-width: 600px) {
+      .wrap { padding: 4px; }
+      th, td { font-size: 10px; padding: 4px 1px; }
+      .modal-grid { gap: 2px; padding: 4px; }
+      .champ-btn { font-size: 9px; }
     }
   </style>
 </head>
@@ -99,13 +126,13 @@
 <div class="wrap">
   <div class="brand">
     <span class="nick">ERjanKG</span>
-    <span style="opacity:.4">| Wild Rift Stats</span>
+    <span style="opacity:.4; font-size: 12px;">| Wild Rift Stats</span>
   </div>
 
   <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 ПОДДЕРЖАТЬ ПРОЕКТ</a>
 
   <div class="levelBar">
-    <div style="font-weight: 700; margin-bottom: 5px;">Уровень: <span id="levelVal">10</span></div>
+    <div style="font-weight: 700; font-size: 12px; margin-bottom: 4px;">LVL: <span id="levelVal">10</span></div>
     <div class="range-wrap">
       <input id="level" type="range" min="1" max="15" value="10" step="1">
       <div class="range-labels">
@@ -127,10 +154,10 @@
   <div class="modal-card">
     <button class="modal-close-corner" onclick="closeChampModal()">✕</button>
     <div class="modal-head">
-      <div style="font-weight:800;">Выбор чемпионов (нажми на роль для выбора всех)</div>
-      <div style="margin-top:10px; display:flex; gap:10px;">
-        <button onclick="selectAll(true)" style="cursor:pointer">Выбрать всех</button>
-        <button onclick="selectAll(false)" style="cursor:pointer">Сбросить</button>
+      <div style="font-size: 13px; font-weight:800; margin-bottom: 8px;">Нажми на иконку роли, чтобы выбрать всех</div>
+      <div style="display:flex; gap:8px;">
+        <button onclick="selectAll(true)" style="font-size:11px; cursor:pointer">Все</button>
+        <button onclick="selectAll(false)" style="font-size:11px; cursor:pointer">Сброс</button>
       </div>
     </div>
     <div id="champModalGrid" class="modal-grid"></div>
@@ -141,11 +168,11 @@
   const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
   
   const COLS = [
-    { key: "ad", label: "AD" },
-    { key: "hp", label: "HP" },
-    { key: "mana", label: "Mana" },
-    { key: "armor", label: "Armor" },
-    { key: "mr", label: "MR" }
+    { key: "ad", label: "AD", w: "15%" },
+    { key: "hp", label: "HP", w: "18%" },
+    { key: "mana", label: "Mana", w: "18%" },
+    { key: "armor", label: "Arm", w: "14%" },
+    { key: "mr", label: "MR", w: "14%" }
   ];
 
   const roles = [
@@ -189,10 +216,11 @@
 
   function buildHeader() {
     const row = document.getElementById("theadRow");
-    row.innerHTML = `<th onclick="openChampModal()">Champion ⚙️</th>`;
+    row.innerHTML = `<th style="width:21%" onclick="openChampModal()">Champ ⚙️</th>`;
     COLS.forEach(c => {
       const th = document.createElement("th");
-      th.textContent = c.label + (sortKey === c.key ? (sortDir === "desc" ? " ↓" : " ↑") : "");
+      th.style.width = c.w;
+      th.textContent = c.label + (sortKey === c.key ? (sortDir === "desc" ? "↓" : "↑") : "");
       th.onclick = () => {
         if(sortKey === c.key) sortDir = sortDir === "desc" ? "asc" : "desc";
         else { sortKey = c.key; sortDir = "desc"; }
@@ -209,7 +237,8 @@
       return {
         name: r.name, res: r.res,
         ad: calc(r.ad_b, r.ad_g), hp: calc(r.hp_b, r.hp_g),
-        mana: calc(r.mn_b, r.mn_g), armor: calc(r.ar_b, r.ar_g), mr: calc(r.mr_b, r.mr_g)
+        mana: calc(r.mn_b, r.mn_g), armor: calc(r.ar_b, r.ar_g), mr: calc(r.mr_b, r.mr_g),
+        g: { ad: r.ad_g, hp: r.hp_g, mana: r.mn_g, armor: r.ar_g, mr: r.mr_g }
       };
     }).sort((a,b) => sortDir === "desc" ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]);
 
@@ -217,24 +246,27 @@
     COLS.forEach(c => {
       let v = data.map(d => d[c.key]).sort((a,b) => a-b);
       thresholds[c.key] = {
-        top1: v[Math.floor(v.length * 0.99)],
-        top10: v[Math.floor(v.length * 0.90)],
-        low10: v[Math.floor(v.length * 0.10)]
+        top1: v[Math.floor(v.length * 0.98)],
+        top10: v[Math.floor(v.length * 0.85)],
+        low10: v[Math.floor(v.length * 0.15)]
       };
     });
 
     tbody.innerHTML = "";
     data.forEach(r => {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td><div style="display:flex; gap:5px; align-items:center;">
-        <button onclick="selected.delete('${r.name}'); renderTable();" style="color:red; background:none; border:none; cursor:pointer">✕</button>
-        ${r.name}</div></td>`;
+      tr.innerHTML = `<td><div style="display:flex; align-items:center; gap:3px; justify-content:center;">
+        <span onclick="selected.delete('${r.name}'); renderTable();" style="color:#ff4d4f; font-weight:bold; cursor:pointer">×</span>
+        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${r.name}</span></div></td>`;
       
       COLS.forEach(c => {
         const td = document.createElement("td");
+        td.className = "has-tip";
+        td.dataset.tip = `${c.label} Growth: +${r.g[c.key]}`;
         const val = r[c.key];
-        if(c.key === "mana" && r.res === "Energy") { td.className="energy"; td.innerText="ENERGY"; }
-        else if(c.key === "mana" && val === 0) { td.innerText="0"; td.style.opacity="0.3"; }
+
+        if(c.key === "mana" && r.res === "Energy") { td.className+=" energy"; td.innerText="ENERGY"; }
+        else if(c.key === "mana" && val === 0) { td.className+=" mana-zero"; td.innerText="0"; }
         else {
           td.innerText = Math.round(val);
           const t = thresholds[c.key];
@@ -262,7 +294,7 @@
     roles.forEach(role => {
       const col = document.createElement("div");
       col.className = "role-col";
-      col.innerHTML = `<div class="role-head" onclick="toggleRole('${role.key}')" title="Выбрать всех на эту роль"><img src="${role.icon}"></div>`;
+      col.innerHTML = `<div class="role-head" onclick="toggleRole('${role.key}')"><img src="${role.icon}"></div>`;
       raw.filter(r => r.is[role.key]).sort((a,b) => a.name.localeCompare(b.name)).forEach(r => {
         const btn = document.createElement("button");
         btn.className = "champ-btn" + (selected.has(r.name) ? " selected" : "");
