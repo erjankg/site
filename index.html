@@ -138,7 +138,7 @@
 
         input[type="range"] {
             width: 100%;
-            height: 6px;
+            height: 4px;
             appearance: none;
             background: linear-gradient(90deg, #2d1b4e 0%, var(--accent) 60%, var(--accent) 100%);
             border-radius: 10px;
@@ -147,8 +147,8 @@
 
         input[type="range"]::-webkit-slider-thumb {
             appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
             background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
             border: 3px solid var(--accent);
             border-radius: 50%;
@@ -254,8 +254,38 @@
             transition: all 0.2s;
         }
 
-        tr:hover td {
-            background: rgba(155, 89, 182, 0.08);
+        .champ-cell{
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .x-btn{
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 64, 64, 0.35);
+            background: linear-gradient(135deg, rgba(255, 60, 60, 0.18) 0%, rgba(255, 60, 60, 0.08) 100%);
+            color: #ff6b6b;
+            font-weight: 900;
+            cursor: pointer;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            user-select:none;
+        }
+        .x-btn:hover{
+            background: linear-gradient(135deg, rgba(255, 60, 60, 0.28) 0%, rgba(255, 60, 60, 0.12) 100%);
+            transform: translateY(-1px);
+        }
+        /* Prevent "sticky" tap highlight / darkening on row click */
+        tr:active td, td:active{
+            background: transparent !important;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            tr:hover td {
+                background: rgba(155, 89, 182, 0.08);
+            }
         }
 
         td:first-child {
@@ -593,7 +623,7 @@
             <thead>
                 <tr>
                     <th>
-                        <button class="btn-champ-cfg" onclick="openM()">Champions</button>
+                        <button class="btn-champ-cfg" onclick="openM()">Champs</button>
                     </th>
                     <th onclick="doSort('ad')">AD<span id="ar-ad"></span></th>
                     <th onclick="doSort('hp')">HP<span id="ar-hp"></span></th>
@@ -626,7 +656,7 @@
 
 <script>
 (() => {
-    // ✅ Paste your published Google Sheet TSV/CSV URL here (File → Share → Publish to web1231123
+    // ✅ Paste your published Google Sheet TSV/CSV URL here (File → Share → Publish to web)
     // Example: const G_URL = 'https://docs.google.com/spreadsheets/d/e/.../pub?output=tsv';
     const G_URL = window.G_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
 
@@ -733,39 +763,88 @@ async function start() {
         };
         const thres = { ad: getT('ad'), hp: getT('hp'), mana: getT('mana'), armor: getT('armor'), mrez: getT('mrez') };
 
-        body.innerHTML = "";
-        data.forEach(item => {
-            const tr = document.createElement('tr');
-            const isP = pinned.has(item.name);
-            let html = '<td><span class="name-tag ' + (isP?'pinned':'') + '" onclick="toggleP(\'' + item.name + '\')">' + item.name + '</span></td>';
-            
-            ['ad','hp','mana','armor','mrez'].forEach(k => {
-                const v = item[k];
-                let cls = (k === sK) ? "active-col " : "";
-                if(v >= thres[k].s) cls += "s";
-                else if(v >= thres[k].a) cls += "a";
-                else if(v <= thres[k].c) cls += "c";
-                else cls += "b";
+        
+body.innerHTML = "";
+data.forEach(item => {
+    const tr = document.createElement('tr');
+    const isP = pinned.has(item.name);
 
-                let txt = Math.round(v);
-                if(k === 'mana' && item.res === 'Energy') txt = "NRG";
-                else if(k === 'mana' && v === 0) txt = "0";
+    // --- Champion cell (X + name) ---
+    const tdChamp = document.createElement('td');
+    tdChamp.className = 'champ-cell';
 
-                html += '<td class="' + cls + '" onclick="showT(event, \'' + item.g[k] + '\')">' + txt + '</td>';
-            });
-            tr.innerHTML = html;
-            body.appendChild(tr);
-        });
-    }
+    const btnX = document.createElement('button');
+    btnX.className = 'x-btn';
+    btnX.type = 'button';
+    btnX.textContent = '×';
+    btnX.title = 'Remove from table';
+    btnX.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        removeC(item.name); // только снимаем выбор, ничего из базы не удаляем
+    });
 
-    window.showT = function(e, v) {
-        const t = document.getElementById('uiTip');
-        t.style.display = 'block';
-        t.innerText = "+" + v;
-        t.style.top = (e.pageY - 30) + 'px';
-        t.style.left = e.pageX + 'px';
-        setTimeout(() => t.style.display = 'none', 1500);
-    }
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'name-tag ' + (isP ? 'pinned' : '');
+    nameSpan.textContent = item.name;
+    nameSpan.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        toggleP(item.name);
+    });
+
+    tdChamp.appendChild(btnX);
+    tdChamp.appendChild(nameSpan);
+    tr.appendChild(tdChamp);
+
+    // --- Stat cells ---
+    ['ad','hp','mana','armor','mrez'].forEach(k => {
+        const v = item[k];
+        let cls = (k === sK) ? "active-col " : "";
+        if (v >= thres[k].s) cls += "s";
+        else if (v >= thres[k].a) cls += "a";
+        else if (v <= thres[k].c) cls += "c";
+        else cls += "b";
+
+        let txt = Math.round(v);
+        if (k === 'mana' && item.res === 'Energy') txt = "NRG";
+        else if (k === 'mana' && v === 0) txt = "0";
+
+        const td = document.createElement('td');
+        td.className = cls;
+        td.textContent = txt;
+
+        // tooltip only on hover
+        td.addEventListener('mouseenter', (ev) => showT(ev, item.g[k]));
+        td.addEventListener('mousemove', moveT);
+        td.addEventListener('mouseleave', hideT);
+
+        tr.appendChild(td);
+    });
+
+    body.appendChild(tr);
+});
+}
+
+    
+window.showT = function(e, v) {
+    const t = document.getElementById('uiTip');
+    t.style.display = 'block';
+    t.innerText = "+" + v;
+    moveT(e);
+}
+
+window.moveT = function(e) {
+    const t = document.getElementById('uiTip');
+    if (t.style.display !== 'block') return;
+    const x = e.pageX;
+    const y = e.pageY;
+    t.style.top = (y - 18) + 'px';
+    t.style.left = x + 'px';
+}
+
+window.hideT = function() {
+    const t = document.getElementById('uiTip');
+    t.style.display = 'none';
+}
 
     window.doSort = function(k) {
         if(sK === k) sD = sD === 'desc' ? 'asc' : 'desc';
@@ -776,6 +855,15 @@ async function start() {
     window.toggleP = function(n) {
         pinned.has(n) ? pinned.delete(n) : pinned.add(n);
         localStorage.setItem('p', JSON.stringify([...pinned]));
+        render();
+    }
+
+    // Remove champion from table (only from selection, NOT from data)
+    window.removeC = function(n) {
+        selected.delete(n);
+        pinned.delete(n);
+        localStorage.setItem('p', JSON.stringify([...pinned]));
+        drawM();
         render();
     }
 
@@ -800,36 +888,60 @@ async function start() {
 
     function drawM() {
         const grid = document.getElementById('mGrid');
-        const q = document.getElementById('mSearch').value.toLowerCase();
+        const qRaw = (document.getElementById('mSearch').value || '');
+        const q = qRaw.trim().toLowerCase();
         grid.innerHTML = "";
-        
-        ["Top","Jungle","Mid","ADC","Support"].forEach(role => {
+
+        const roles = ["Top","Jungle","Mid","ADC","Support"];
+
+        roles.forEach(role => {
+            const allChampsInRole = raw.filter(x => x.is[role]);
+
+            // фильтр поиска (если пусто — показываем всех)
+            const champs = q
+                ? allChampsInRole.filter(x => x.name.toLowerCase().includes(q))
+                : allChampsInRole;
+
+            // если идёт поиск и в роли ничего не найдено — не рисуем пустую колонку
+            if (q && champs.length === 0) return;
+
             const container = document.createElement('div');
             container.className = 'm-role-container';
-            
-            const champs = raw.filter(x => x.is[role]);
-            const isAll = champs.every(x => selected.has(x.name));
-            
+
+            // ALL для роли считаем по всем чемпам роли (не по фильтру поиска)
+            const isAll = allChampsInRole.length > 0 && allChampsInRole.every(x => selected.has(x.name));
+
             const roleDiv = document.createElement('div');
-            roleDiv.className = 'm-role ' + (isAll?'on':'');
+            roleDiv.className = 'm-role ' + (isAll ? 'on' : '');
             roleDiv.innerHTML = '<img src="' + roleIcons[role] + '" alt="' + role + '">';
             roleDiv.onclick = () => roleT(role, isAll);
             container.appendChild(roleDiv);
-            
-            champs.filter(x => x.name.toLowerCase().includes(q)).forEach(c => {
+
+            champs.forEach(c => {
                 const btn = document.createElement('div');
-                btn.className = 'm-item ' + (selected.has(c.name)?'on':'');
+                btn.className = 'm-item ' + (selected.has(c.name) ? 'on' : '');
                 btn.innerText = c.name;
-                btn.onclick = () => { 
-                    selected.has(c.name) ? selected.delete(c.name) : selected.add(c.name); 
-                    drawM(); 
-                    render(); 
+                btn.onclick = () => {
+                    selected.has(c.name) ? selected.delete(c.name) : selected.add(c.name);
+                    drawM();
+                    render();
                 };
                 container.appendChild(btn);
             });
-            
+
             grid.appendChild(container);
         });
+
+        // если поиск активен и вообще ничего не найдено — покажем подсказку
+        if (q && grid.children.length === 0) {
+            const empty = document.createElement('div');
+            empty.style.opacity = '0.8';
+            empty.style.fontSize = '14px';
+            empty.style.textAlign = 'center';
+            empty.style.padding = '20px';
+            empty.innerText = 'Ничего не найдено';
+            grid.appendChild(empty);
+        }
     }
 
     function roleT(r, isAll) {
