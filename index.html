@@ -1,597 +1,662 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wild Rift – Champion Stats</title>
-  <style>
-    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    body{margin:0;background:#0b0f17;color:#e8edf7}
-    .wrap{max-width:1200px;margin:0 auto;padding:16px}
-    h1{margin:0 0 12px;font-size:20px}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Wild Rift Pro Stats - ERjanKG Edition</title>
+    <style>
+        /* =========================================
+           1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ЦВЕТА
+           ========================================= */
+        :root {
+            --bg-deep: #05070a;
+            --card-main: #111622;
+            --accent: #7b5cff;
+            --text-high: #ffffff;
+            --text-mid: #a0aec0;
+            --border-ui: rgba(255, 255, 255, 0.15);
+            
+            /* КЛАССИЧЕСКИЕ ЦВЕТА ТИРОВ */
+            --s-color: #ff7f7f; /* Красный (S) */
+            --a-color: #ffbf7f; /* Оранжевый (A) */
+            --b-color: #ffff7f; /* Желтый (B) */
+            --c-color: #7fff7f; /* Зеленый (C) */
+            
+            --energy-glow: #ffff00;
+        }
 
-    .card{background:#121a2a;border:1px solid #22304a;border-radius:12px;padding:12px}
-    .small{font-size:12px;opacity:.75;margin-top:10px}
+        /* =========================================
+           2. БАЗОВЫЕ СТИЛИ (RESET)
+           ========================================= */
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        
+        body {
+            margin: 0;
+            background-color: var(--bg-deep);
+            color: var(--text-high);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-weight: 900; /* Максимальная жирность */
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
 
-    /* ====== Level slider ====== */
-    .levelBar{margin:12px 0;padding:12px;background:#121a2a;border:1px solid #22304a;border-radius:12px}
-    .levelHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-    .levelTitle{font-size:12px;opacity:.85}
-    .levelNum{font-size:12px;opacity:.9;font-weight:700}
-    #level{width:100%}
+        .app-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    /* ====== Table ====== */
-    .tableWrap{
-      margin-top:12px;
-      overflow-y:auto;
-      overflow-x:hidden; /* просили без горизонтального скролла */
-      border-radius:12px;
-      border:1px solid #22304a;
-      max-height:72vh;
-    }
-    table{width:100%;border-collapse:collapse;table-layout:fixed}
-    th,td{
-      padding:8px 10px;
-      border-bottom:1px solid rgba(34,48,74,.65);
-      border-right:1px solid rgba(34,48,74,.55);
-      text-align:center;
-      vertical-align:middle;
-      font-size:13px;
-      word-break:break-word;
-    }
-    th:last-child,td:last-child{border-right:none}
-    th{
-      position:sticky;top:0;background:#121a2a;
-      cursor:pointer;user-select:none;z-index:2
-    }
-    /* sticky champion col to avoid left-right scrolling pain */
-    th:first-child, td:first-child{
-      position:sticky;left:0;z-index:3;
-      background:#121a2a;
-    }
-    tbody tr:hover{background:rgba(180,60,60,.12);box-shadow:inset 0 0 0 2px rgba(200,70,70,.6)}
-    tbody tr:hover td{color:#fff;font-weight:800}
-    tbody tr:hover td:first-child{color:#ff6b6b}
+        /* =========================================
+           3. ШАПКА И ДОНАТ
+           ========================================= */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
 
-    /* champion cell with X */
-    .champ-cell{display:flex;align-items:center;justify-content:center;gap:8px}
-    .champ-name{display:inline-block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .champ-x{
-      width:22px;height:22px;border-radius:8px;
-      border:1px solid rgba(34,48,74,.9);
-      background:rgba(11,15,23,.55);
-      color:rgba(232,237,247,.85);
-      cursor:pointer;font-weight:800;line-height:1;
-      display:inline-flex;align-items:center;justify-content:center;
-      transition:transform .12s ease,border-color .12s ease,color .12s ease;
-    }
-    .champ-x:hover{transform:scale(1.05);border-color:rgba(255,107,107,.75);color:#ff6b6b}
+        .logo-text {
+            font-size: 32px;
+            letter-spacing: -1px;
+            background: linear-gradient(45deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    /* tiers */
-    .tier-top{background:#7b5cff!important;color:#fff}
-    .tier-mid{background:rgba(138,147,166,.12)!important;color:#e8edf7}
-    .tier-low{background:rgba(255,77,79,.18)!important;color:#fff}
+        .twitch-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #9146ff;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 5px 20px rgba(145, 70, 255, 0.4);
+            transition: 0.3s;
+        }
 
-    /* Mana=0 */
-    .mana-zero{position:relative;background:rgba(90,100,120,.25)!important;color:#cfd6e4;font-weight:900;overflow:hidden}
-    .mana-zero::after{
-      content:"";position:absolute;inset:-60%;
-      background:radial-gradient(circle,rgba(142,177,248,.35),rgba(67,74,87,.299));
-      animation:zeroPulse 3.2s ease-in-out infinite;
-    }
-    .mana-zero>span{position:relative;z-index:1}
-    @keyframes zeroPulse{0%{transform:scale(.9);opacity:.35}50%{transform:scale(1.05);opacity:.65}100%{transform:scale(.9);opacity:.35}}
+        .donate-section {
+            background: var(--card-main);
+            border: 2px solid var(--border-ui);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
 
-    /* Energy */
-    .energy{position:relative;background:rgba(255,159,28,.22)!important;color:#0b0f17;font-weight:900;overflow:hidden}
-    .energy::after{content:"";position:absolute;inset:-40%;background:radial-gradient(circle,rgba(255,159,28,.55),rgba(255,159,28,0));animation:energyPulse 1.6s ease-in-out infinite}
-    .energy>span{position:relative;z-index:1}
-    @keyframes energyPulse{0%{transform:scale(.85);opacity:.55}50%{transform:scale(1.15);opacity:.95}100%{transform:scale(.85);opacity:.55}}
+        .btn-donate {
+            display: inline-block;
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            color: #000;
+            padding: 18px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: 0.3s;
+        }
 
-    /* Tooltip */
-    td.has-tip{position:relative}
-    td.has-tip::after{
-      content:attr(data-tip);
-      position:absolute;left:50%;bottom:calc(100% + 8px);
-      transform:translateX(-50%);
-      background:rgba(15,21,36,.96);border:1px solid #22304a;color:#d6deee;
-      padding:6px 8px;border-radius:8px;font-size:11px;font-weight:400;line-height:1.35;
-      white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 120ms ease,transform 120ms ease;z-index:50;
-    }
-    td.has-tip::before{
-      content:"";position:absolute;left:50%;bottom:calc(100% + 2px);transform:translateX(-50%);
-      border:6px solid transparent;border-top-color:#22304a;opacity:0;transition:opacity 120ms ease;z-index:50;
-    }
-    td.has-tip:hover::after,td.has-tip:hover::before{opacity:1}
-    td.has-tip:hover::after{transform:translateX(-50%) translateY(-2px)}
-    td.energy.has-tip::after,td.energy.has-tip::before{display:none!important}
+        /* =========================================
+           4. ПАНЕЛЬ УРОВНЯ (ПОЛЗУНОК)
+           ========================================= */
+        .level-panel {
+            background: var(--card-main);
+            border: 2px solid var(--border-ui);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
 
-    /* ====== Header brand ====== */
-    .brand{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
-    .nick{font-size:22px;font-weight:800;letter-spacing:1px;color:#7b5cff;animation:glow 2.5s ease-in-out infinite}
-    .dot{opacity:.6}
-    .tag{font-size:12px;opacity:.7;border-left:1px solid #22304a;padding-left:12px}
-    @keyframes glow{0%{text-shadow:0 0 4px #7b5cff44}50%{text-shadow:0 0 12px #7b5cffcc}100%{text-shadow:0 0 4px #7b5cff44}}
-    .twitch{font-size:14px;font-weight:700;color:#9146ff;text-decoration:none;animation:pulse 3s ease-in-out infinite}
-    .twitch:hover{text-decoration:underline;opacity:1}
-    @keyframes pulse{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
+        .level-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-    .support{margin-top:14px;padding:14px;border:1px solid #22304a;border-radius:12px;background:#121a2a;display:grid;gap:12px}
-    .supportBody{font-size:13px;line-height:1.4;opacity:.9}
-    .donateBtn{
-      display:inline-flex;align-items:center;justify-content:center;gap:10px;
-      padding:10px 12px;border-radius:12px;text-decoration:none;color:#fff;
-      background:linear-gradient(90deg,#9146ff,#7b5cff);
-      border:1px solid #2a3a5a;font-weight:800;
-      position:relative;overflow:hidden;animation:donatePulse 2.2s ease-in-out infinite;
-    }
-    .donateBtn::before{content:"";position:absolute;top:-40%;left:-60%;width:60%;height:180%;background:rgba(255,255,255,.22);transform:rotate(20deg);animation:donateShine 2.8s ease-in-out infinite}
-    @keyframes donatePulse{0%{box-shadow:0 0 0 rgba(145,70,255,0)}50%{box-shadow:0 0 18px rgba(145,70,255,.35)}100%{box-shadow:0 0 0 rgba(145,70,255,0)}}
-    @keyframes donateShine{0%{transform:translateX(-120%) rotate(20deg);opacity:0}15%{opacity:1}45%{transform:translateX(220%) rotate(20deg);opacity:0}100%{transform:translateX(220%) rotate(20deg);opacity:0}}
+        .level-title { color: var(--accent); font-size: 20px; }
+        .level-current { font-size: 36px; text-shadow: 0 0 15px var(--accent); }
 
-    /* ====== Modal ====== */
-    .modal.hidden{display:none}
-    .modal{position:fixed;inset:0;z-index:9999}
-    .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
-    .modal-card{
-      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-      width:min(1100px,92vw);height:min(80vh,720px);
-      background:#121a2a;border:1px solid #22304a;border-radius:14px;
-      box-shadow:0 20px 60px rgba(0,0,0,.5);
-      display:flex;flex-direction:column;overflow:hidden
-    }
-    .modal-head{
-      padding:10px 12px;border-bottom:1px solid #22304a;
-      display:flex;align-items:center;justify-content:space-between;gap:10px
-    }
-    .modal-title{font-weight:900;letter-spacing:.3px}
-    .modal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    .mini-btn{
-      padding:6px 10px;border-radius:12px;border:1px solid rgba(34,48,74,.9);
-      background:rgba(11,15,23,.55);color:rgba(232,237,247,.92);
-      cursor:pointer;font-size:12px;font-weight:800;
-    }
-    .mini-btn:hover{border-color:rgba(123,92,255,.75);color:#fff}
-    .modal-search{
-      width:220px;max-width:45vw;
-      padding:8px 10px;border-radius:12px;border:1px solid #22304a;
-      background:#0b0f17;color:#e8edf7
-    }
-    .modal-grid{
-      padding:12px;
-      display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:10px;
-      overflow:auto
-    }
-    .role-col{border:1px solid rgba(34,48,74,.75);border-radius:12px;background:rgba(11,15,23,.35);overflow:hidden;display:flex;flex-direction:column;min-width:0}
-    .role-head{
-      display:flex;align-items:center;justify-content:center;
-      padding:10px 8px;border-bottom:1px solid rgba(34,48,74,.65);
-      background:rgba(18,26,42,.85);cursor:pointer
-    }
-    .role-head img{width:26px;height:26px;object-fit:contain}
-    .role-body{padding:10px;display:flex;flex-direction:column;gap:8px;overflow:auto}
-    .champ-btn{
-      width:100%;
-      padding:8px 10px;border-radius:12px;
-      border:1px solid rgba(34,48,74,.8);
-      background:rgba(11,15,23,.65);
-      color:rgba(232,237,247,.92);
-      cursor:pointer;text-align:center;font-weight:800;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-      transition:transform 120ms ease,border-color 120ms ease;
-    }
-    .champ-btn:hover{transform:translateY(-1px);border-color:rgba(123,92,255,.7)}
-    .champ-btn.selected{background:rgba(123,92,255,.25);border-color:rgba(123,92,255,.85);color:#fff}
+        .slider-wrapper { position: relative; padding: 10px 0; }
 
-    /* Close X (top-right between modal and backdrop) */
-    .modal-x{
-      position:absolute;top:14px;right:14px;z-index:10001;
-      width:40px;height:40px;border-radius:14px;
-      border:1px solid rgba(34,48,74,.95);
-      background:rgba(11,15,23,.75);color:#fff;
-      font-size:18px;font-weight:900;cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-    }
-    .modal-x:hover{border-color:rgba(255,107,107,.75);color:#ff6b6b}
+        input[type="range"] {
+            width: 100%;
+            height: 12px;
+            appearance: none;
+            background: #2d3748;
+            border-radius: 10px;
+            outline: none;
+        }
 
-    @media (max-width:600px){
-      .wrap{padding:8px}
-      h1{font-size:16px}
-      th,td{padding:6px 6px;font-size:11px}
-      .champ-name{max-width:90px}
-      .modal-card{width:96vw;height:86vh}
-      .modal-grid{gap:6px}
-      .role-head{padding:8px 6px}
-      .role-head img{width:22px;height:22px}
-      .role-body{padding:8px;gap:6px}
-      .champ-btn{padding:6px 6px;border-radius:10px;font-size:11px}
-    }
-  </style>
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            background: #fff;
+            border: 5px solid var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .slider-ruler {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 0 5px;
+        }
+
+        .ruler-digit { font-size: 14px; color: var(--text-mid); }
+
+        /* =========================================
+           5. ТАБЛИЦА С ФУНКЦИЕЙ ЗАТЕМНЕНИЯ
+           ========================================= */
+        .stats-viewport {
+            background: var(--card-main);
+            border: 2px solid var(--border-ui);
+            border-radius: 20px;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+            transition: opacity 0.4s ease;
+        }
+
+        th {
+            background: #1a2233;
+            padding: 25px 10px;
+            font-size: 14px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-bottom: 4px solid var(--border-ui);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        /* СТРЕЛОЧКИ СОРТИРОВКИ */
+        .sort-indicator {
+            display: inline-block;
+            margin-left: 8px;
+            color: var(--accent);
+            transition: transform 0.3s;
+        }
+
+        /* ЛОГИКА ЗАТЕМНЕНИЯ СТОЛБЦОВ */
+        td, th { transition: opacity 0.3s ease, background 0.3s ease; }
+
+        /* Когда таблица в режиме фокуса */
+        table.focus-active td, 
+        table.focus-active th {
+            opacity: 0.2; /* Затемняем всё */
+        }
+
+        /* Исключаем из затемнения активный столбец и имена */
+        table.focus-active .col-active,
+        table.focus-active .th-active,
+        table.focus-active td:first-child {
+            opacity: 1; /* Оставляем ярким */
+        }
+
+        td {
+            padding: 18px 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-ui);
+            font-size: 17px;
+            position: relative;
+        }
+
+        /* ЦВЕТА ТИРОВ */
+        .tier-s { background-color: var(--s-color) !important; color: #000; }
+        .tier-a { background-color: var(--a-color) !important; color: #000; }
+        .tier-b { background-color: var(--b-color) !important; color: #000; }
+        .tier-c { background-color: var(--c-color) !important; color: #000; }
+
+        /* ЧИП ИМЕНИ ЧЕМПИОНА */
+        .champ-chip {
+            background: #232d42;
+            padding: 10px 15px;
+            border-radius: 12px;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* =========================================
+           6. СИСТЕМА КАСТОМНЫХ ПОДСКАЗОК (TOOLTIP)
+           ========================================= */
+        .stat-tooltip {
+            position: absolute;
+            display: none;
+            background: #fff;
+            color: #000;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 900;
+            z-index: 500;
+            pointer-events: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transform: translate(-50%, -120%);
+        }
+        .stat-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%; left: 50%;
+            margin-left: -6px;
+            border: 6px solid transparent;
+            border-top-color: #fff;
+        }
+
+        /* =========================================
+           7. МОДАЛЬНОЕ ОКНО
+           ========================================= */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            display: none;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.is-visible { display: flex; }
+
+        .modal-content {
+            background: #0f172a;
+            width: 100%;
+            max-width: 1100px;
+            height: 85vh;
+            border-radius: 30px;
+            border: 2px solid var(--border-ui);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .modal-header { padding: 30px; border-bottom: 2px solid var(--border-ui); }
+        .search-box {
+            width: 100%;
+            padding: 18px;
+            background: #05070a;
+            border: 2px solid var(--border-ui);
+            border-radius: 15px;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .modal-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .role-group { display: flex; flex-direction: column; gap: 10px; }
+        .role-title { 
+            text-align: center; background: #1e293b; padding: 15px; border-radius: 15px; 
+            margin-bottom: 10px; cursor: pointer; border: 3px solid transparent;
+        }
+        .role-title.active { border-color: var(--accent); background: rgba(123, 92, 255, 0.2); }
+
+        .champ-toggle-btn {
+            padding: 12px;
+            background: #161e2f;
+            border: 1px solid var(--border-ui);
+            color: var(--text-mid);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 900;
+        }
+        .champ-toggle-btn.is-active { background: var(--accent); color: white; border-color: #fff; }
+
+        .close-modal-x {
+            position: absolute; top: 20px; right: 20px;
+            background: #ff4d4f; border: none; color: white;
+            width: 45px; height: 45px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 10;
+        }
+
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="brand">
-      <span class="nick">ERjanKG</span>
-      <span class="dot">·</span>
-      <a class="twitch" href="https://www.twitch.tv/ERjanKG" target="_blank" rel="noopener">Twitch</a>
-      <span class="tag">Wild Rift Stats</span>
-    </div>
 
-    <div class="support">
-      <div class="supportBody">
-        Ребята, сайт абсолютно бесплатен для всех. Но буду очень благодарен за поддержку — это мотивация развивать проект.
-        В планах: изображения чемпов, winrate/pickrate и таблица ганг-потенциала лесников (тайминги фулл-клира и т.д.).
-      </div>
-      <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank" rel="noopener">💜 Поддержать проект</a>
-    </div>
+<div class="app-container">
+    
+    <header class="main-header">
+        <div class="logo-text">ERjanKG PRO STATS</div>
+        <a href="https://www.twitch.tv/ERjanKG" class="twitch-link" target="_blank">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" width="20">
+            TWITCH.TV
+        </a>
+    </header>
 
-    <h1>Champion Stats (by Level)</h1>
+    <section class="donate-section">
+        <div style="margin-bottom: 15px; font-size: 14px; color: var(--text-mid);">ПОДДЕРЖКА АВТОРА И РАЗВИТИЕ ПРОЕКТА</div>
+        <a href="https://www.donationalerts.com/r/erjankg" class="btn-donate" target="_blank">ОТПРАВИТЬ ДОНАТ 💜</a>
+    </section>
 
-    <div class="levelBar">
-      <div class="levelHead">
-        <div class="levelTitle">Level</div>
-        <div class="levelNum"><span id="levelVal">10</span>/15</div>
-      </div>
-      <input id="level" type="range" min="1" max="15" value="10" />
-    </div>
-
-    <div class="tableWrap">
-      <table>
-        <thead id="thead"></thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-
-    <div class="small">Data source: Google Sheets (published TSV)</div>
-  </div>
-
-  <!-- Champion picker modal -->
-  <div id="champModal" class="modal hidden" aria-hidden="true">
-    <div class="modal-backdrop" id="champModalBackdrop"></div>
-    <button class="modal-x" id="champModalX" type="button" aria-label="Close">×</button>
-
-    <div class="modal-card" role="dialog" aria-modal="true">
-      <div class="modal-head">
-        <div class="modal-title">Choose Champions</div>
-        <div class="modal-actions">
-          <input id="champModalSearch" class="modal-search" type="text" placeholder="Search..." />
-          <button id="champModalSelectAll" class="mini-btn" type="button">Select all</button>
-          <button id="champModalClearAll" class="mini-btn" type="button">Clear all</button>
+    <section class="level-panel">
+        <div class="level-info-row">
+            <span class="level-title">ВЫБЕРИТЕ УРОВЕНЬ:</span>
+            <span id="lvlDisplay" class="level-current">10</span>
         </div>
-      </div>
-      <div id="champModalGrid" class="modal-grid"></div>
+        <div class="slider-wrapper">
+            <input type="range" id="lvlRange" min="1" max="15" value="10">
+            <div class="slider-ruler" id="rulerTicks"></div>
+        </div>
+    </section>
+
+    <div class="stats-viewport">
+        <table id="mainDataTable">
+            <thead>
+                <tr>
+                    <th style="width: 35%;" onclick="openChampModal()">
+                        CHAMPION <span style="font-size: 12px; color: var(--accent);">[ НАСТРОИТЬ ]</span>
+                    </th>
+                    <th onclick="handleSort('ad')">AD <span id="arr-ad" class="sort-indicator"></span></th>
+                    <th onclick="handleSort('hp')">HP <span id="arr-hp" class="sort-indicator"></span></th>
+                    <th onclick="handleSort('mana')">MN <span id="arr-mana" class="sort-indicator"></span></th>
+                    <th onclick="handleSort('armor')">AR <span id="arr-armor" class="sort-indicator"></span></th>
+                    <th onclick="handleSort('mr')">MR <span id="arr-mr" class="sort-indicator"></span></th>
+                </tr>
+            </thead>
+            <tbody id="statsBody">
+                </tbody>
+        </table>
     </div>
-  </div>
+
+    <div id="uiTooltip" class="stat-tooltip"></div>
+
+</div>
+
+<div id="modalSelect" class="modal-overlay">
+    <div class="modal-content">
+        <button class="close-modal-x" onclick="closeChampModal()">✕</button>
+        <div class="modal-header">
+            <input type="text" id="modalSearchInput" class="search-box" placeholder="Поиск чемпиона по имени..." oninput="refreshModalGrid()">
+        </div>
+        <div id="modalGrid" class="modal-grid">
+            </div>
+    </div>
+</div>
 
 <script>
-  const TSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
+    /* ============================================================
+       1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И КОНФИГУРАЦИЯ
+       ============================================================ */
+    const DATA_SOURCE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
+    
+    let championsRaw = [];
+    let activeSelection = new Set();
+    let currentLvl = 10;
+    let sorting = { key: 'ad', dir: 'desc' };
 
-  const COLS = [
-    { key: "ad",    label: "AD",    decimals: 0 },
-    { key: "hp",    label: "HP",    decimals: 0 },
-    { key: "mana",  label: "Mana",  decimals: 0 },
-    { key: "armor", label: "Armor", decimals: 0 },
-    { key: "mr",    label: "MR",    decimals: 0 },
-  ];
+    /* ============================================================
+       2. ЗАПУСК ПРИЛОЖЕНИЯ
+       ============================================================ */
+    async function startEngine() {
+        // Создаем линейку
+        const ruler = document.getElementById('rulerTicks');
+        for(let i=1; i<=15; i++) {
+            const dot = document.createElement('span');
+            dot.className = 'ruler-digit';
+            dot.innerText = i;
+            ruler.appendChild(dot);
+        }
 
-  const rolesList = [
-    { key: "Top",     icon: "assets/roles/top.png" },
-    { key: "Jungle",  icon: "assets/roles/jungle.png" },
-    { key: "Mid",     icon: "assets/roles/mid.png" },
-    { key: "ADC",     icon: "assets/roles/adc.png" },
-    { key: "Support", icon: "assets/roles/support.png" },
-  ];
+        // Загружаем данные
+        try {
+            const resp = await fetch(DATA_SOURCE);
+            const text = await resp.text();
+            processData(text);
+            
+            // Восстанавливаем сохраненный уровень
+            const savedLvl = localStorage.getItem('wr_user_lvl');
+            if(savedLvl) {
+                currentLvl = parseInt(savedLvl);
+                document.getElementById('lvlRange').value = currentLvl;
+                document.getElementById('lvlDisplay').innerText = currentLvl;
+            }
 
-  let raw = [];
-  let selected = new Set();
-  let level = 10;
-  let sortKey = "ad";
-  let sortDir = "desc";
-
-  const levelEl = document.getElementById("level");
-  const levelValEl = document.getElementById("levelVal");
-  const theadEl = document.getElementById("thead");
-  const tbodyEl = document.getElementById("tbody");
-
-  const champModalEl = document.getElementById("champModal");
-  const champModalBackdropEl = document.getElementById("champModalBackdrop");
-  const champModalXEl = document.getElementById("champModalX");
-  const champModalGridEl = document.getElementById("champModalGrid");
-  const champModalSearchEl = document.getElementById("champModalSearch");
-  const champModalSelectAllEl = document.getElementById("champModalSelectAll");
-  const champModalClearAllEl = document.getElementById("champModalClearAll");
-
-  function calc(base, growth, lvl){ return base + (lvl - 1) * growth; }
-  function fmt(x, decimals){ return x.toLocaleString(undefined, { maximumFractionDigits: decimals }); }
-
-  function parseTSV(text){
-    const lines = text.trim().split(/\r?\n/);
-    const headers = lines[0].split("\t").map(s => s.trim());
-    const rows = [];
-    for (let i = 1; i < lines.length; i++){
-      const parts = lines[i].split("\t").map(s => s.trim());
-      const obj = {};
-      headers.forEach((h, idx) => obj[h] = parts[idx] ?? "");
-      rows.push(obj);
+            // По умолчанию выбираем всех
+            activeSelection = new Set(championsRaw.map(c => c.name));
+            
+            setupListeners();
+            updateTable();
+        } catch (e) {
+            console.error("Critical error loading data:", e);
+        }
     }
-    return rows;
-  }
 
-  function toNum(s){
-    const t = String(s).replace(/\s/g, "").replace(",", ".");
-    const n = Number(t);
-    return Number.isFinite(n) ? n : 0;
-  }
+    /* ============================================================
+       3. ПАРСИНГ TSV (GOOGLE SHEETS)
+       ============================================================ */
+    function processData(tsv) {
+        const lines = tsv.trim().split('\n');
+        const heads = lines[0].split('\t').map(h => h.trim());
 
-  function quantile(sortedArr, q){
-    if (!sortedArr.length) return null;
-    const pos = (sortedArr.length - 1) * q;
-    const base = Math.floor(pos);
-    const rest = pos - base;
-    if (sortedArr[base + 1] === undefined) return sortedArr[base];
-    return sortedArr[base] + rest * (sortedArr[base + 1] - sortedArr[base]);
-  }
+        championsRaw = lines.slice(1).map(row => {
+            const cells = row.split('\t');
+            const data = {};
+            heads.forEach((h, i) => data[h] = cells[i]?.trim());
 
-  function buildHeader(){
-    const tr = document.createElement("tr");
+            return {
+                name: data["Champion"],
+                ad_b: parseFloat(data["AD_Base"]), ad_g: parseFloat(data["AD_Growth"]),
+                hp_b: parseFloat(data["HP_Base"]), hp_g: parseFloat(data["HP_Growth"]),
+                mn_b: parseFloat(data["Mana_Base"]), mn_g: parseFloat(data["Mana_Growth"]),
+                ar_b: parseFloat(data["Armor_Base"]), ar_g: parseFloat(data["Armor_Growth"]),
+                mr_b: parseFloat(data["MR_Base"]), mr_g: parseFloat(data["MR_Growth"]),
+                resType: data["Resource"] || "Mana",
+                isRole: {
+                    Top: data["Is_Top"] === "1",
+                    Jungle: data["Is_Jungle"] === "1",
+                    Mid: data["Is_Mid"] === "1",
+                    ADC: data["Is_Adc"] === "1",
+                    Support: data["Is_Support"] === "1"
+                }
+            };
+        }).filter(c => c.name);
+    }
 
-    const thC = document.createElement("th");
-    thC.textContent = "Champion";
-    thC.title = "Click to choose champions";
-    thC.onclick = () => openChampModal();
-    tr.appendChild(thC);
+    /* ============================================================
+       4. ОСНОВНАЯ ФУНКЦИЯ ОТРИСОВКИ ТАБЛИЦЫ
+       ============================================================ */
+    function updateTable() {
+        const tbody = document.getElementById('statsBody');
+        const table = document.getElementById('mainDataTable');
+        
+        // Включаем режим фокуса (затемнения)
+        table.classList.add('focus-active');
 
-    COLS.forEach(c => {
-      const th = document.createElement("th");
-      th.textContent = c.label + (sortKey === c.key ? (sortDir==="desc"?" ↓":" ↑") : "");
-      th.onclick = () => toggleSort(c.key);
-      tr.appendChild(th);
-    });
-
-    theadEl.innerHTML = "";
-    theadEl.appendChild(tr);
-  }
-
-  function toggleSort(key){
-    if (sortKey === key) sortDir = (sortDir === "desc") ? "asc" : "desc";
-    else { sortKey = key; sortDir = "desc"; }
-    render();
-  }
-
-  function computeRows(){
-    const list = raw
-      .filter(r => selected.has(r.champion))
-      .map(r => {
-        const out = { champion: r.champion, resource: r.resource, growth: {} };
-        COLS.forEach(c => {
-          out[c.key] = calc(r[c.key + "_base"], r[c.key + "_growth"], level);
-          out.growth[c.key] = r[c.key + "_growth"];
+        // Обновляем стрелочки и заголовки
+        ['ad','hp','mana','armor','mr'].forEach(k => {
+            const indicator = document.getElementById('arr-' + k);
+            const th = indicator.parentElement;
+            indicator.innerText = '';
+            th.classList.remove('th-active');
+            
+            if(k === sorting.key) {
+                indicator.innerText = sorting.dir === 'desc' ? '▼' : '▲';
+                th.classList.add('th-active');
+            }
         });
-        return out;
-      });
 
-    list.sort((a, b) => {
-      const dir = sortDir === "desc" ? -1 : 1;
-      if (sortKey === "champion") return a.champion.localeCompare(b.champion) * dir;
-      const av = a[sortKey], bv = b[sortKey];
-      if (av === bv) return a.champion.localeCompare(b.champion);
-      return (av < bv ? -1 : 1) * dir;
-    });
+        // Расчет данных на текущий уровень
+        const calculated = championsRaw.filter(c => activeSelection.has(c.name)).map(c => {
+            const f = (b, g) => b + (currentLvl - 1) * g;
+            return {
+                name: c.name, res: c.resType,
+                ad: f(c.ad_b, c.ad_g), hp: f(c.hp_b, c.hp_g), mana: f(c.mn_b, c.mn_g),
+                armor: f(c.ar_b, c.ar_g), mr: f(c.mr_b, c.mr_g),
+                grow: { ad: c.ad_g, hp: c.hp_g, mana: c.mn_g, armor: c.ar_g, mr: c.mr_g }
+            };
+        });
 
-    return list;
-  }
+        // Сортировка
+        calculated.sort((a, b) => {
+            return sorting.dir === 'desc' ? b[sorting.key] - a[sorting.key] : a[sorting.key] - b[sorting.key];
+        });
 
-  function renderBody(rows){
-    const thresholds = {};
-    for (const c of COLS){
-      const vals = rows
-        .map(r => r[c.key])
-        .filter(v => Number.isFinite(v))
-        .filter(v => (c.key === "mana" ? v !== 0 : true))
-        .sort((a,b) => a - b);
-      if (vals.length < 3) continue;
-      thresholds[c.key] = { q10: quantile(vals, 0.1), q90: quantile(vals, 0.9) };
+        // Вычисление порогов для цветов (Тиров)
+        const getLimits = (key) => {
+            const vals = calculated.map(i => i[key]).sort((a,b) => a-b);
+            return {
+                s: vals[Math.floor(vals.length * 0.95)],
+                a: vals[Math.floor(vals.length * 0.80)],
+                c: vals[Math.floor(vals.length * 0.20)]
+            };
+        };
+
+        const limits = {
+            ad: getLimits('ad'), hp: getLimits('hp'), mana: getLimits('mana'),
+            armor: getLimits('armor'), mr: getLimits('mr')
+        };
+
+        // Генерация строк
+        tbody.innerHTML = "";
+        calculated.forEach(item => {
+            const row = document.createElement('tr');
+            
+            // Колонка Имени
+            let html = `<td><span class="champ-chip">${item.name}</span></td>`;
+            
+            // Колонки Статов
+            ['ad', 'hp', 'mana', 'armor', 'mr'].forEach(key => {
+                const val = item[key];
+                let tClass = "";
+                let activeClass = (key === sorting.key) ? "col-active" : "";
+
+                if (val >= limits[key].s) tClass = "tier-s";
+                else if (val >= limits[key].a) tClass = "tier-a";
+                else if (val <= limits[key].c) tClass = "tier-c";
+                else tClass = "tier-b";
+
+                let display = Math.round(val);
+                if(key === 'mana' && item.res === 'Energy') display = `<span style="color:var(--energy-glow)">NRG</span>`;
+                else if(key === 'mana' && val === 0) display = `<span style="opacity:0.2">0</span>`;
+
+                html += `<td class="${tClass} ${activeClass}" 
+                             onmouseenter="showUIHint(this, '${item.grow[key]}')" 
+                             onmouseleave="hideUIHint()">
+                            ${display}
+                         </td>`;
+            });
+
+            row.innerHTML = html;
+            tbody.appendChild(row);
+        });
     }
 
-    tbodyEl.innerHTML = "";
-    rows.forEach(r => {
-      const tr = document.createElement("tr");
-
-      const tdC = document.createElement("td");
-      const wrap = document.createElement("div");
-      wrap.className = "champ-cell";
-
-      const name = document.createElement("span");
-      name.className = "champ-name";
-      name.textContent = r.champion;
-
-      const xbtn = document.createElement("button");
-      xbtn.className = "champ-x";
-      xbtn.type = "button";
-      xbtn.textContent = "×";
-      xbtn.title = "Remove champion";
-      xbtn.onclick = (e) => { e.stopPropagation(); selected.delete(r.champion); render(); };
-
-      wrap.appendChild(name);
-      wrap.appendChild(xbtn);
-      tdC.appendChild(wrap);
-      tr.appendChild(tdC);
-
-      COLS.forEach(c => {
-        const td = document.createElement("td");
-        const val = r[c.key];
-
-        if (c.key === "mana" && r.resource === "Energy"){
-          td.innerHTML = "<span>ENERGY</span>";
-          td.classList.add("energy");
-          tr.appendChild(td);
-          return;
+    /* ============================================================
+       5. ВСПОМОГАТЕЛЬНАЯ ЛОГИКА (SORT, TOOLTIP, MODAL)
+       ============================================================ */
+    function handleSort(key) {
+        if(sorting.key === key) {
+            sorting.dir = sorting.dir === 'desc' ? 'asc' : 'desc';
+        } else {
+            sorting.key = key;
+            sorting.dir = 'desc';
         }
-        if (c.key === "mana" && val === 0){
-          td.innerHTML = "<span>0</span>";
-          td.classList.add("mana-zero");
-          tr.appendChild(td);
-          return;
-        }
+        updateTable();
+    }
 
-        td.textContent = fmt(val, c.decimals);
-        td.classList.add("has-tip");
-        td.dataset.tip = `${c.label} growth per lvl: ${r.growth[c.key]}`;
+    function showUIHint(el, val) {
+        const tip = document.getElementById('uiTooltip');
+        const rect = el.getBoundingClientRect();
+        tip.innerText = "ПРИРОСТ: +" + val;
+        tip.style.display = 'block';
+        tip.style.top = (rect.top + window.scrollY) + 'px';
+        tip.style.left = (rect.left + rect.width / 2) + 'px';
+    }
 
-        const t = thresholds[c.key];
-        if (t && Number.isFinite(val)){
-          if (val >= t.q90) td.classList.add("tier-top");
-          else if (val < t.q10) td.classList.add("tier-low");
-          else td.classList.add("tier-mid");
-        }
+    function hideUIHint() {
+        document.getElementById('uiTooltip').style.display = 'none';
+    }
 
-        tr.appendChild(td);
-      });
+    function openChampModal() { 
+        document.getElementById('modalSelect').classList.add('is-visible'); 
+        refreshModalGrid(); 
+    }
+    
+    function closeChampModal() { 
+        document.getElementById('modalSelect').classList.remove('is-visible'); 
+    }
 
-      tbodyEl.appendChild(tr);
-    });
-  }
+    function refreshModalGrid() {
+        const grid = document.getElementById('modalGrid');
+        const filter = document.getElementById('modalSearchInput').value.toLowerCase();
+        grid.innerHTML = "";
 
-  function render(){
-    buildHeader();
-    const rows = computeRows();
-    renderBody(rows);
-  }
+        const roles = ["Top", "Jungle", "Mid", "ADC", "Support"];
+        roles.forEach(roleName => {
+            const group = document.createElement('div');
+            group.className = "role-group";
 
-  function openChampModal(){
-    champModalEl.classList.remove("hidden");
-    champModalEl.setAttribute("aria-hidden","false");
-    champModalSearchEl.value = "";
-    renderChampModal("");
-  }
+            const champsInRole = championsRaw.filter(c => c.isRole[roleName]);
+            const isAllOn = champsInRole.every(c => activeSelection.has(c.name));
 
-  function closeChampModal(){
-    champModalEl.classList.add("hidden");
-    champModalEl.setAttribute("aria-hidden","true");
-  }
+            const title = document.createElement('div');
+            title.className = "role-title" + (isAllOn ? " active" : "");
+            title.innerText = roleName.toUpperCase();
+            title.onclick = () => {
+                champsInRole.forEach(c => {
+                    if(isAllOn) activeSelection.delete(c.name);
+                    else activeSelection.add(c.name);
+                });
+                refreshModalGrid();
+                updateTable();
+            };
+            group.appendChild(title);
 
-  function champsInRole(roleKey){
-    return raw
-      .filter(r => r.roles && r.roles[roleKey])
-      .map(r => r.champion)
-      .sort((a,b) => a.localeCompare(b));
-  }
+            champsInRole
+                .filter(c => c.name.toLowerCase().includes(filter))
+                .sort((a,b) => a.name.localeCompare(b.name))
+                .forEach(c => {
+                    const b = document.createElement('button');
+                    b.className = "champ-toggle-btn" + (activeSelection.has(c.name) ? " is-active" : "");
+                    b.innerText = c.name;
+                    b.onclick = () => {
+                        if(activeSelection.has(c.name)) activeSelection.delete(c.name);
+                        else activeSelection.add(c.name);
+                        refreshModalGrid();
+                        updateTable();
+                    };
+                    group.appendChild(b);
+                });
 
-  function renderChampModal(q){
-    const query = (q || "").trim().toLowerCase();
-    champModalGridEl.innerHTML = "";
+            grid.appendChild(group);
+        });
+    }
 
-    rolesList.forEach(role => {
-      const col = document.createElement("div");
-      col.className = "role-col";
-
-      const head = document.createElement("div");
-      head.className = "role-head";
-      head.title = "Click: select/unselect all in this role";
-
-      const img = document.createElement("img");
-      img.src = role.icon;
-      img.alt = role.key;
-
-      head.appendChild(img);
-
-      const body = document.createElement("div");
-      body.className = "role-body";
-
-      const champsAll = champsInRole(role.key);
-      const champsFiltered = champsAll.filter(n => n.toLowerCase().includes(query));
-      const allSelected = champsAll.length > 0 && champsAll.every(n => selected.has(n));
-
-      head.style.cursor = "pointer";
-      head.onclick = () => {
-        if (allSelected) champsAll.forEach(n => selected.delete(n));
-        else champsAll.forEach(n => selected.add(n));
-        renderChampModal(champModalSearchEl.value);
-        render();
-      };
-
-      champsFiltered.forEach(name => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "champ-btn" + (selected.has(name) ? " selected" : "");
-        btn.textContent = name;
-        btn.onclick = () => {
-          if (selected.has(name)) selected.delete(name);
-          else selected.add(name);
-          renderChampModal(champModalSearchEl.value);
-          render();
+    function setupListeners() {
+        const slider = document.getElementById('lvlRange');
+        slider.oninput = (e) => {
+            currentLvl = parseInt(e.target.value);
+            document.getElementById('lvlDisplay').innerText = currentLvl;
+            localStorage.setItem('wr_user_lvl', currentLvl);
+            updateTable();
         };
-        body.appendChild(btn);
-      });
+    }
 
-      col.appendChild(head);
-      col.appendChild(body);
-      champModalGridEl.appendChild(col);
-    });
-  }
+    // Запуск!
+    startEngine();
 
-  // close handlers
-  champModalXEl.addEventListener("click", closeChampModal);
-  champModalBackdropEl.addEventListener("click", closeChampModal);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !champModalEl.classList.contains("hidden")) closeChampModal();
-  });
-
-  champModalSearchEl.addEventListener("input", () => {
-    renderChampModal(champModalSearchEl.value);
-  });
-
-  champModalSelectAllEl.addEventListener("click", () => {
-    selected = new Set(raw.map(r => r.champion));
-    renderChampModal(champModalSearchEl.value);
-    render();
-  });
-
-  champModalClearAllEl.addEventListener("click", () => {
-    selected = new Set();
-    renderChampModal(champModalSearchEl.value);
-    render();
-  });
-
-  async function init(){
-    const res = await fetch(TSV_URL);
-    const text = await res.text();
-    const rows = parseTSV(text);
-
-    raw = rows
-      .filter(x => x["Champion"])
-      .map(x => ({
-        champion: x["Champion"],
-        ad_base: toNum(x["AD_Base"]),       ad_growth: toNum(x["AD_Growth"]),
-        hp_base: toNum(x["HP_Base"]),       hp_growth: toNum(x["HP_Growth"]),
-        mana_base: toNum(x["Mana_Base"]),   mana_growth: toNum(x["Mana_Growth"]),
-        armor_base: toNum(x["Armor_Base"]), armor_growth: toNum(x["Armor_Growth"]),
-        mr_base: toNum(x["MR_Base"]),       mr_growth: toNum(x["MR_Growth"]),
-        resource: (x["Resource"] || "Mana").trim(),
-        roles: {
-          Top: toNum(x["Is_Top"]) === 1,
-          Jungle: toNum(x["Is_Jungle"]) === 1,
-          Mid: toNum(x["Is_Mid"]) === 1,
-          ADC: toNum(x["Is_Adc"]) === 1,
-          Support: toNum(x["Is_Support"]) === 1,
-        }
-      }));
-
-    selected = new Set(raw.map(r => r.champion));
-
-    levelEl.addEventListener("input", () => {
-      level = Number(levelEl.value);
-      levelValEl.textContent = String(level);
-      render();
-    });
-
-    levelValEl.textContent = String(level);
-    render();
-  }
-
-  init();
 </script>
 </body>
 </html>
