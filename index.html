@@ -3,149 +3,88 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Wild Rift – Stats by ERjanKG</title>
+  <title>Wild Rift Stats – ERjanKG</title>
   <style>
-    /* ПЕРЕМЕННЫЕ iOS / GOOGLE */
     :root { 
-      --p: #7b5cff; 
-      --bg: #0b0f17; 
-      --card: #1c222d; 
-      --header-bg: #252c3a;
-      --brd: rgba(255, 255, 255, 0.08);
-      --energy: #ffcc00;
-      --radius: 18px;
-      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+      --p: #7b5cff; --bg: #0b0f17; --card: #161d2b; 
+      --brd: rgba(255,255,255,0.1); --energy: #fff200;
+      --radius: 12px;
     }
+    body { margin:0; background:var(--bg); color:#f1f3f4; font-family: -apple-system, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 10px; }
 
-    body { 
-      margin: 0; 
-      background: var(--bg); 
-      color: #f1f3f4; 
-      font-family: var(--font); 
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .wrap { max-width: 1200px; margin: 0 auto; padding: 20px; }
-
-    /* ВЕРХНЯЯ ПАНЕЛЬ */
-    .header-top { 
-      display: flex; justify-content: space-between; align-items: center; 
-      margin-bottom: 24px; padding: 0 5px;
-    }
-    .nick { font-size: 28px; font-weight: 700; letter-spacing: -0.8px; }
-    
+    /* Header & Twitch */
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .nick { font-size: 22px; font-weight: 800; color: #fff; }
     @keyframes spin { 0% { transform: rotate(0deg); } 15% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
-    .twitch-link { 
-      display: flex; align-items: center; gap: 10px; text-decoration: none; 
-      color: #fff; font-weight: 600; background: #9146ff; 
-      padding: 8px 16px; border-radius: 50px; font-size: 14px;
-      box-shadow: 0 4px 12px rgba(145, 70, 255, 0.3);
-    }
-    .twitch-link img { width: 20px; animation: spin 5s infinite ease-in-out; }
+    .twitch-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #fff; background: #9146ff; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .twitch-link img { width: 18px; animation: spin 5s infinite linear; }
 
-    /* КАРТОЧКА ПОДДЕРЖКИ */
-    .support-box { 
-      background: var(--card); border: 1px solid var(--brd); 
-      padding: 24px; border-radius: var(--radius); margin-bottom: 24px; 
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    }
-    .donateBtn { 
-      display: block; text-align: center; padding: 14px; margin-top: 16px;
-      background: #fff; color: #000; text-decoration: none; 
-      border-radius: 14px; font-weight: 700; font-size: 15px;
-      transition: transform 0.2s;
-    }
-    .donateBtn:active { transform: scale(0.98); }
+    .support-box { background: var(--card); border: 1px solid var(--brd); padding: 15px; border-radius: var(--radius); margin-bottom: 15px; }
+    .donateBtn { display: block; text-align: center; padding: 12px; margin-top: 10px; background: #fff; color: #000; text-decoration: none; border-radius: 10px; font-weight: 700; }
 
-    /* ПОЛЗУНОК iOS */
-    .levelBar { 
-      background: var(--card); border: 1px solid var(--brd); 
-      padding: 24px; border-radius: var(--radius); margin-bottom: 24px;
-    }
-    .range-wrap { margin: 20px 0 10px; }
-    input[type="range"] { 
-      width: 100%; height: 6px; border-radius: 10px; background: #3c4043;
-      appearance: none; outline: none; 
-    }
-    input[type="range"]::-webkit-slider-thumb { 
-      appearance: none; width: 24px; height: 24px; background: #fff; 
-      border-radius: 50%; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    }
-    .range-labels { display: flex; justify-content: space-between; margin-top: 12px; color: #9aa0a6; font-size: 11px; font-weight: 500; }
+    /* Level Slider */
+    .levelBar { background: var(--card); border: 1px solid var(--brd); padding: 15px; border-radius: var(--radius); margin-bottom: 15px; }
+    input[type="range"] { width: 100%; accent-color: var(--p); cursor: pointer; }
+    .range-labels { display: flex; justify-content: space-between; margin-top: 8px; color: #888; font-size: 10px; font-weight: 700; }
 
-    /* ТАБЛИЦА */
-    .tableWrap { 
-      border: 1px solid var(--brd); border-radius: var(--radius); 
-      background: var(--card); overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,0.3);
-    }
+    /* Table UI */
+    .tableWrap { border: 1px solid var(--brd); border-radius: var(--radius); background: var(--card); overflow: auto; max-height: 70vh; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     th { 
-      background: var(--header-bg); padding: 14px 5px; font-size: 11px; 
-      font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #9aa0a6;
-      position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--brd);
+      background: #1f293d; color: #9aa0a6; font-size: 10px; padding: 12px 2px; 
+      text-transform: uppercase; cursor: pointer; position: sticky; top: 0; z-index: 10;
+      border-bottom: 2px solid var(--brd);
     }
-    td { padding: 14px 4px; text-align: center; border-bottom: 1px solid var(--brd); border-right: 1px solid var(--brd); font-size: 14px; }
-    tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    th:hover { color: #fff; background: #2a364d; }
+    td { padding: 10px 2px; text-align: center; border-bottom: 1px solid var(--brd); font-size: 12px; }
 
-    /* СТОЛБЕЦ ЧЕМПИОНА */
-    .champ-col { display: flex; align-items: center; justify-content: flex-start; gap: 12px; padding-left: 12px; }
-    .btn-x { 
-      color: #ff5252; cursor: pointer; border: none; background: rgba(255,82,82,0.1); 
-      width: 20px; height: 20px; border-radius: 6px; font-size: 12px;
-      display: flex; align-items: center; justify-content: center;
+    /* Карточка чемпиона в таблице */
+    .champ-card-cell { display: flex; align-items: center; gap: 4px; padding-left: 4px; }
+    .btn-x { color: #ff4d4f; cursor: pointer; background: rgba(255,77,79,0.1); border: none; width: 18px; height: 18px; border-radius: 4px; font-size: 10px; flex-shrink: 0; }
+    .champ-chip { 
+      background: #2a364d; color: #eee; padding: 5px 8px; border-radius: 6px; 
+      font-size: 11px; cursor: pointer; white-space: nowrap; overflow: hidden; 
+      text-overflow: ellipsis; width: 100%; text-align: center; border: 1px solid transparent;
     }
-    .champ-name { cursor: pointer; font-weight: 500; transition: color 0.2s; }
-    .is-pinned { color: var(--p); font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+    .champ-chip.pinned { border-color: var(--p); background: rgba(123, 92, 255, 0.3); color: #fff; font-weight: 700; box-shadow: 0 0 8px rgba(123,92,255,0.4); }
 
-    .clear-btn { 
-      background: #3c4043; color: #fff; border: none; padding: 4px 10px; 
-      border-radius: 8px; font-size: 10px; cursor: pointer; margin-left: 8px;
-    }
+    /* Tier-Maker Colors (Vibrant) */
+    .t-s { background: #ff4b4b !important; color: #fff; } /* Top 1% */
+    .t-a { background: #ff7f3f !important; color: #fff; } /* Top 10% */
+    .t-b { background: #ffbf00 !important; color: #000; font-weight: 600; } /* Mid */
+    .t-c { background: #4ecb71 !important; color: #fff; } /* Bottom */
+    .nrg { color: var(--energy); font-weight: 800; font-size: 10px; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
 
-    /* TIERS (GOOGLE STYLE - МЯГКИЕ) */
-    .tier-top1 { background: rgba(234, 67, 53, 0.45) !important; font-weight: 700; }
-    .tier-top10 { background: rgba(234, 67, 53, 0.25) !important; }
-    .tier-mid { background: rgba(251, 188, 4, 0.25) !important; color: #ffca28; }
-    .tier-low { background: rgba(52, 168, 83, 0.25) !important; color: #81c995; }
-    .energy { color: var(--energy); font-weight: 800; font-size: 10px; }
-    .mana-zero { color: #5f6368; }
+    /* Tooltip */
+    .has-tip { position: relative; }
+    .has-tip:active::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 5px; border-radius: 4px; font-size: 10px; z-index: 100; white-space: nowrap; border: 1px solid var(--p); }
 
-    /* МОДАЛКА (iOS GLASS) */
-    .modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 15px; }
+    /* Modal (No horizontal scroll) */
+    .modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 10px; }
     .hidden { display: none; }
-    .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); }
     .modal-card { 
-      position: relative; width: 100%; max-width: 850px; height: 80vh; 
-      background: rgba(30, 37, 50, 0.95); border-radius: 32px; border: 1px solid rgba(255,255,255,0.1);
-      display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+      position: relative; width: 100%; max-width: 800px; height: 85vh; 
+      background: #1c2533; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; 
     }
-    .modal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 24px; overflow-y: auto; }
-    .role-col { display: flex; flex-direction: column; gap: 8px; }
-    .role-head { 
-      cursor: pointer; padding: 12px; text-align: center; background: rgba(255,255,255,0.03); 
-      border-radius: 18px; margin-bottom: 8px; transition: 0.2s;
+    .modal-grid { 
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; 
+      padding: 10px; overflow-y: auto; flex: 1; 
     }
-    .role-head:hover { background: rgba(123, 92, 255, 0.2); }
-    .role-head img { width: 28px; height: 28px; }
-    
-    .champ-btn { 
-      width: 100%; padding: 10px 4px; border-radius: 12px; border: 1px solid transparent; 
-      background: rgba(255,255,255,0.05); color: #9aa0a6; font-size: 12px; cursor: pointer; transition: 0.2s;
-    }
-    .champ-btn.selected { background: var(--p); color: #fff; font-weight: 600; box-shadow: 0 4px 12px rgba(123, 92, 255, 0.3); }
-    
-    .close-corner { 
-      position: absolute; top: 18px; right: 18px; background: #303134; color: #fff; 
-      border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; z-index: 10; font-size: 16px;
-    }
+    .role-col { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+    .role-head { cursor: pointer; padding: 8px; text-align: center; background: rgba(255,255,255,0.05); border-radius: 10px; }
+    .role-head img { width: 24px; height: 24px; }
+    .champ-btn { width: 100%; padding: 8px 2px; border-radius: 6px; border: 1px solid var(--brd); background: #111827; color: #9ca3af; font-size: 10px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; }
+    .champ-btn.selected { background: var(--p); color: #fff; border-color: var(--p); }
+    .close-corner { position: absolute; top: 12px; right: 12px; background: #333; color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 20; }
 
-    @media (max-width: 768px) {
-      .wrap { padding: 12px; }
-      .header-top { margin-bottom: 16px; }
-      .nick { font-size: 22px; }
-      .modal-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 10px; }
-      td, th { font-size: 12px; padding: 10px 2px; }
-      .champ-name { font-size: 11px; }
+    @media (max-width: 600px) {
+      .modal-grid { gap: 3px; padding: 5px; }
+      .role-head img { width: 18px; height: 18px; }
+      .champ-btn { font-size: 9px; padding: 6px 1px; }
+      th { font-size: 9px; }
+      td { font-size: 11px; }
     }
   </style>
 </head>
@@ -155,18 +94,17 @@
   <div class="header-top">
     <div class="nick">ERjanKG</div>
     <a href="https://www.twitch.tv/ERjanKG" class="twitch-link" target="_blank">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" alt="T">
-      <span>Twitch</span>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" alt="T"> Twitch
     </a>
   </div>
 
   <div class="support-box">
-    <div style="font-size: 14px; opacity: 0.7; font-weight: 500;">Сайт бесплатен. Буду благодарен за поддержку проекта!</div>
+    <div style="font-size: 13px; opacity: 0.8;">Сайт бесплатен. Буду благодарен за поддержку проекта!</div>
     <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 Поддержать проект</a>
   </div>
 
   <div class="levelBar">
-    <div style="font-weight:600; font-size: 15px; color: #9aa0a6;">Уровень: <span id="levelVal" style="color:#fff">10</span></div>
+    <div style="font-weight:700; font-size: 13px; margin-bottom: 10px;">LEVEL: <span id="levelVal" style="color:var(--p)">10</span></div>
     <div class="range-wrap">
       <input id="level" type="range" min="1" max="15" value="10">
       <div class="range-labels">
@@ -179,12 +117,12 @@
     <table>
       <thead>
         <tr>
-          <th style="width:38%" onclick="openChampModal()">
-            <div style="display:flex; align-items:center; justify-content:center;">
-              Champion ⚙️ <button class="clear-btn" onclick="event.stopPropagation(); clearExceptPinned();">Clear</button>
-            </div>
-          </th>
-          <th>AD</th><th>HP</th><th>Mana</th><th>Arm</th><th>MR</th>
+          <th style="width:36%" onclick="openChampModal()">Champ ⚙️ <button class="clear-btn" onclick="event.stopPropagation(); clearExceptPinned();">Clear</button></th>
+          <th onclick="setSort('ad')">AD</th>
+          <th onclick="setSort('hp')">HP</th>
+          <th onclick="setSort('mana')">Mana</th>
+          <th onclick="setSort('armor')">Arm</th>
+          <th onclick="setSort('mr')">MR</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -196,9 +134,8 @@
   <div class="modal-backdrop" onclick="closeChampModal()"></div>
   <div class="modal-card">
     <button class="close-corner" onclick="closeChampModal()">✕</button>
-    <div style="padding:24px 24px 10px; border-bottom:1px solid var(--brd)">
-      <div style="font-size:20px; font-weight:700; letter-spacing:-0.5px;">Выбор чемпионов</div>
-      <div style="font-size:13px; color:#9aa0a6; margin-top:4px;">Кликни на иконку роли, чтобы выбрать всех</div>
+    <div style="padding:15px; border-bottom:1px solid var(--brd)">
+      <b style="font-size:16px;">Выбор чемпионов</b>
     </div>
     <div id="champModalGrid" class="modal-grid"></div>
   </div>
@@ -215,66 +152,71 @@
     { key: "Support", icon: "assets/roles/support.png" }
   ];
 
-  let raw = [], selected = new Set(), pinned = new Set(), level = 10;
+  let raw = [], selected = new Set(), pinned = new Set(), level = 10, sortK = 'ad', sortD = 'desc';
 
   async function init() {
-    try {
-      const res = await fetch(CSV_URL);
-      const text = await res.text();
-      const lines = text.trim().split('\n').map(l => l.split('\t'));
-      const h = lines[0].map(s => s.trim());
-      raw = lines.slice(1).map(row => {
-        let o = {}; h.forEach((n, i) => o[n] = row[i]?.trim());
-        return {
-          name: o["Champion"], ad_b: +o["AD_Base"], ad_g: +o["AD_Growth"],
-          hp_b: +o["HP_Base"], hp_g: +o["HP_Growth"], mn_b: +o["Mana_Base"], mn_g: +o["Mana_Growth"],
-          ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"], mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
-          res: o["Resource"] || "Mana",
-          is: { Top: +o["Is_Top"]===1, Jungle: +o["Is_Jungle"]===1, Mid: +o["Is_Mid"]===1, ADC: +o["Is_Adc"]===1, Support: +o["Is_Support"]===1 }
-        };
-      }).filter(r => r.name);
-      selected = new Set(raw.map(r => r.name));
-      renderTable();
-    } catch(e) { console.error("CSV Load Error"); }
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    const lines = text.trim().split('\n').map(l => l.split('\t'));
+    const h = lines[0].map(s => s.trim());
+    raw = lines.slice(1).map(row => {
+      let o = {}; h.forEach((n, i) => o[n] = row[i]?.trim());
+      return {
+        name: o["Champion"], ad_b: +o["AD_Base"], ad_g: +o["AD_Growth"],
+        hp_b: +o["HP_Base"], hp_g: +o["HP_Growth"], mn_b: +o["Mana_Base"], mn_g: +o["Mana_Growth"],
+        ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"], mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
+        res: o["Resource"] || "Mana",
+        is: { Top: +o["Is_Top"]===1, Jungle: +o["Is_Jungle"]===1, Mid: +o["Is_Mid"]===1, ADC: +o["Is_Adc"]===1, Support: +o["Is_Support"]===1 }
+      };
+    }).filter(r => r.name);
+    selected = new Set(raw.map(r => r.name));
+    renderTable();
+  }
+
+  function setSort(k) {
+    if(sortK === k) sortD = sortD === 'desc' ? 'asc' : 'desc';
+    else { sortK = k; sortD = 'desc'; }
+    renderTable();
   }
 
   function renderTable() {
     const tbody = document.getElementById("tbody");
     const data = raw.filter(r => selected.has(r.name)).map(r => {
-      let calc = (b, g) => b + (level - 1) * g;
+      let c = (b, g) => b + (level - 1) * g;
       return { 
         name: r.name, res: r.res, 
-        ad: calc(r.ad_b, r.ad_g), hp: calc(r.hp_b, r.hp_g), mana: calc(r.mn_b, r.mn_g), armor: calc(r.ar_b, r.ar_g), mr: calc(r.mr_b, r.mr_g), 
+        ad: c(r.ad_b, r.ad_g), hp: c(r.hp_b, r.hp_g), mana: c(r.mn_b, r.mn_g), armor: c(r.ar_b, r.ar_g), mr: c(r.mr_b, r.mr_g), 
         g: { ad: r.ad_g, hp: r.hp_g, mana: r.mn_g, armor: r.ar_g, mr: r.mr_g } 
       };
-    }).sort((a,b) => b.ad - a.ad);
+    }).sort((a,b) => sortD === 'desc' ? b[sortK] - a[sortK] : a[sortK] - b[sortK]);
 
     const thres = {};
     COLS.forEach(k => {
       let v = data.map(d => d[k]).sort((a,b) => a-b);
-      thres[k] = { t1: v[Math.floor(v.length*0.98)], t10: v[Math.floor(v.length*0.90)], l10: v[Math.floor(v.length*0.15)] };
+      thres[k] = { t1: v[Math.floor(v.length*0.98)], t10: v[Math.floor(v.length*0.85)], l10: v[Math.floor(v.length*0.15)] };
     });
 
     tbody.innerHTML = "";
     data.forEach(r => {
       const tr = document.createElement("tr");
       const isP = pinned.has(r.name);
-      tr.innerHTML = `<td><div class="champ-col">
+      tr.innerHTML = `<td><div class="champ-card-cell">
         <button class="btn-x" onclick="selected.delete('${r.name}'); renderTable();">×</button>
-        <span class="champ-name ${isP?'is-pinned':''}" onclick="togglePin('${r.name}')">${r.name}</span>
+        <div class="champ-chip ${isP?'pinned':''}" onclick="togglePin('${r.name}')">${r.name}</div>
       </div></td>`;
       
       COLS.forEach(k => {
         const td = document.createElement("td");
+        td.className = "has-tip"; td.dataset.tip = `Growth: +${r.g[k]}`;
         const val = r[k];
-        if(k === "mana" && r.res === "Energy") { td.className = "energy"; td.innerText = "NRG"; }
-        else if(k === "mana" && val === 0) { td.className = "mana-zero"; td.innerText = "0"; }
+        if(k === "mana" && r.res === "Energy") { td.className += " nrg"; td.innerText = "NRG"; }
+        else if(k === "mana" && val === 0) { td.className += " mana-zero"; td.innerText = "0"; }
         else {
           td.innerText = Math.round(val);
-          if(val >= thres[k].t1) td.classList.add("tier-top1");
-          else if(val >= thres[k].t10) td.classList.add("tier-top10");
-          else if(val <= thres[k].l10) td.classList.add("tier-low");
-          else td.classList.add("tier-mid");
+          if(val >= thres[k].t1) td.classList.add("t-s");
+          else if(val >= thres[k].t10) td.classList.add("t-a");
+          else if(val <= thres[k].l10) td.classList.add("t-c");
+          else td.classList.add("t-b");
         }
         tr.appendChild(td);
       });
@@ -296,10 +238,7 @@
         const btn = document.createElement("button");
         btn.className = "champ-btn" + (selected.has(r.name)?" selected":"");
         btn.innerText = r.name;
-        btn.onclick = () => { 
-          selected.has(r.name) ? selected.delete(r.name) : selected.add(r.name); 
-          renderChampModal(); renderTable(); 
-        };
+        btn.onclick = () => { selected.has(r.name)?selected.delete(r.name):selected.add(r.name); renderChampModal(); renderTable(); };
         col.appendChild(btn);
       });
       grid.appendChild(col);
