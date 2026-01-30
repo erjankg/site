@@ -3,147 +3,116 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Wild Rift – ADC Stats</title>
+  <title>Wild Rift – Stats by ERjanKG</title>
   <style>
     :root { 
-      --p: #7b5cff; 
-      --bg: #0b0f17; 
-      --card: #121a2a; 
-      --brd: rgba(255,255,255,0.15); 
-      --energy: #ffcc00; 
+      --p: #7b5cff; --bg: #0b0f17; --card: #121a2a; 
+      --brd: rgba(255,255,255,0.2); --energy: #ffcc00; 
       font-family: system-ui,-apple-system,sans-serif; 
     }
-    body { margin:0; background:var(--bg); color:#e8edf7; line-height: 1.4; overflow-x: hidden; font-size: 14px; }
-    .wrap { max-width:1200px; margin:0 auto; padding:8px; }
+    body { margin:0; background:var(--bg); color:#e8edf7; overflow-x: hidden; font-size: 14px; }
+    .wrap { max-width:1200px; margin:0 auto; padding:10px; }
     
-    .brand { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-    .nick { font-size: 18px; font-weight: 700; color: var(--p); }
+    /* Twitch & Brand */
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .nick { font-size: 22px; font-weight: 800; color: var(--p); }
+    
+    @keyframes spin { 0% { transform: rotate(0deg); } 10% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
+    .twitch-link { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #9146ff; font-weight: 700; }
+    .twitch-link img { width: 24px; animation: spin 5s infinite linear; }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.02); box-shadow: 0 0 15px rgba(145, 70, 255, 0.4); }
-      100% { transform: scale(1); }
-    }
+    /* Support Block */
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+    .support-box { background: var(--card); border: 1px solid var(--brd); padding: 12px; border-radius: 12px; margin-bottom: 15px; }
     .donateBtn { 
-      display: flex; align-items: center; justify-content: center; padding: 10px; 
-      border-radius: 8px; text-decoration: none; color: #fff; 
+      display: block; text-align: center; padding: 10px; margin-top: 8px;
       background: linear-gradient(90deg, #9146ff, var(--p)); 
-      font-weight: 700; animation: pulse 2s infinite; margin-bottom: 12px; font-size: 13px;
+      color: #fff; text-decoration: none; border-radius: 8px; font-weight: 700;
+      animation: pulse 2s infinite;
     }
 
-    .levelBar { background: var(--card); border: 1px solid var(--brd); padding: 12px; border-radius: 12px; margin-bottom: 12px; }
-    .range-wrap { position: relative; margin: 5px 0 20px 0; }
+    /* Level Slider */
+    .levelBar { background: var(--card); border: 1px solid var(--brd); padding: 12px; border-radius: 12px; margin-bottom: 15px; }
+    .range-wrap { position: relative; margin: 10px 0 20px 0; }
     input[type="range"] { width: 100%; accent-color: var(--p); cursor: pointer; }
-    .range-labels { display: flex; justify-content: space-between; padding: 0 2px; margin-top: 4px; font-size: 9px; color: #888; }
+    .range-labels { display: flex; justify-content: space-between; font-size: 9px; color: #888; margin-top: 5px; }
 
-    /* Таблица с закрепленной шапкой */
-    .tableWrap { 
-      overflow-x: hidden; /* Убираем скролл влево-вправо */
-      border: 1px solid var(--brd); 
-      border-radius: 10px; 
-      background: var(--card); 
-      max-height: 70vh; 
-      overflow-y: auto; 
-    }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; } /* Фиксированная ширина колонок */
-    th, td { 
-      padding: 6px 2px; 
-      text-align: center; 
-      border: 1px solid var(--brd); 
-      word-wrap: break-word; 
-      font-size: 11px;
-    }
+    /* Table */
+    .tableWrap { border: 1px solid var(--brd); border-radius: 10px; background: var(--card); max-height: 65vh; overflow: auto; }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    th, td { padding: 8px 2px; text-align: center; border: 1px solid var(--brd); font-size: 11px; }
     
-    /* Закрепляем первую колонку и шапку */
-    thead th { 
-      position: sticky; top: 0; 
-      background: #1a2438; z-index: 10; 
-      box-shadow: 0 2px 2px rgba(0,0,0,0.3);
-    }
+    thead th { position: sticky; top: 0; background: #1a2438; z-index: 10; }
+    
+    /* Champion Column */
+    .champ-col { display: flex; align-items: center; justify-content: flex-start; gap: 8px; padding-left: 5px; }
+    .btn-x { color: #ff4d4f; font-weight: bold; cursor: pointer; border: none; background: none; width: 15px; }
+    .champ-name { cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .is-pinned { color: var(--p); font-weight: 800; text-decoration: underline; }
 
-    /* Подсказки при наведении */
+    .clear-btn { background: #444; color: #fff; border: none; padding: 2px 5px; border-radius: 4px; font-size: 9px; cursor: pointer; margin-left: 5px; }
+    .clear-btn:hover { background: #ff4d4f; }
+
+    /* Colors */
+    .tier-top1 { background: #5e0000 !important; } .tier-top10 { background: #a30000 !important; }
+    .tier-mid { background: #c26a00 !important; } .tier-low { background: #1e5e1e !important; }
+    .energy { color: var(--energy); font-weight: 800; font-size: 9px; }
+    .mana-zero { opacity: 0.3; }
+
+    /* Tooltip */
     .has-tip { position: relative; cursor: help; }
     .has-tip:hover::after {
-      content: attr(data-tip);
-      position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-      background: #000; color: #fff; padding: 4px 8px; border-radius: 4px;
-      font-size: 10px; white-space: nowrap; z-index: 20; border: 1px solid var(--p);
+      content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      background: #000; padding: 4px; border-radius: 4px; border: 1px solid var(--p); z-index: 99; white-space: nowrap;
     }
 
-    /* Мягкие цвета Tier-листа */
-    .tier-top1 { background: #5e0000 !important; color: #fff; } 
-    .tier-top10 { background: #a30000 !important; color: #fff; } 
-    .tier-mid { background: #c26a00 !important; color: #fff; } 
-    .tier-low { background: #1e5e1e !important; color: #fff; } 
-    .energy { color: var(--energy); font-weight: 800; font-size: 9px; }
-    .mana-zero { color: #666; font-size: 11px; }
-
-    /* Модалка */
-    .modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+    /* Modal */
+    .modal { position: fixed; inset: 0; z-index: 999; display: flex; align-items: center; justify-content: center; }
     .hidden { display: none; }
     .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.85); }
-    .modal-card { 
-      position: relative; width: 98vw; max-width: 900px; height: 90vh; 
-      background: var(--card); border: 1px solid var(--brd); border-radius: 12px; 
-      display: flex; flex-direction: column; 
-    }
-    .modal-close-corner { 
-      position: absolute; top: -10px; right: -10px; background: #ff4d4f; 
-      color: white; border: 2px solid #fff; width: 34px; height: 34px; border-radius: 50%; 
-      cursor: pointer; font-weight: bold; z-index: 100;
-    }
-    .modal-head { padding: 12px; border-bottom: 1px solid var(--brd); }
-
-    /* Сетка чемпионов 5 колонок */
-    .modal-grid { 
-      display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; 
-      padding: 8px; overflow-y: auto; flex: 1;
-    }
-    .role-col { display: flex; flex-direction: column; gap: 4px; }
-    .role-head { 
-      cursor: pointer; padding: 4px; text-align: center;
-      background: rgba(255,255,255,0.05); border-radius: 6px;
-    }
-    .role-head img { width: 22px; height: 22px; display: block; margin: 0 auto; }
-    
-    .champ-btn { 
-      padding: 5px 2px; border-radius: 4px; border: 1px solid var(--brd); 
-      background: #0b0f17; color: #99aab5; cursor: pointer; font-size: 10px;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .champ-btn.selected { border-color: var(--p); background: #7b5cff33; color: #fff; font-weight: bold; }
-
-    @media (max-width: 600px) {
-      .wrap { padding: 4px; }
-      th, td { font-size: 10px; padding: 4px 1px; }
-      .modal-grid { gap: 2px; padding: 4px; }
-      .champ-btn { font-size: 9px; }
-    }
+    .modal-card { position: relative; width: 95vw; max-width: 800px; height: 85vh; background: var(--card); border: 1px solid var(--brd); border-radius: 12px; display: flex; flex-direction: column; }
+    .modal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; overflow-y: auto; }
+    .role-head { cursor: pointer; text-align: center; padding: 5px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 5px; }
+    .role-head img { width: 25px; }
+    .champ-btn { width: 100%; padding: 5px 2px; border-radius: 4px; border: 1px solid var(--brd); background: #0b0f17; color: #99aab5; font-size: 10px; cursor: pointer; margin-bottom: 3px; }
+    .champ-btn.selected { border-color: var(--p); background: #7b5cff33; color: #fff; }
+    .close-corner { position: absolute; top: 10px; right: 10px; background: #ff4d4f; color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 10; }
   </style>
 </head>
 <body>
 
 <div class="wrap">
-  <div class="brand">
-    <span class="nick">ERjanKG</span>
-    <span style="opacity:.4; font-size: 12px;">| Wild Rift Stats</span>
+  <div class="header-top">
+    <div class="nick">ERjanKG</div>
+    <a href="https://www.twitch.tv/ERjanKG" class="twitch-link" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" alt="Twitch">
+      Twitch
+    </a>
   </div>
 
-  <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 ПОДДЕРЖАТЬ ПРОЕКТ</a>
+  <div class="support-box">
+    <div style="font-size: 12px; opacity: 0.8;">Сайт бесплатен. Буду благодарен за поддержку проекта!</div>
+    <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 ПОДДЕРЖАТЬ ПРОЕКТ</a>
+  </div>
 
   <div class="levelBar">
-    <div style="font-weight: 700; font-size: 12px; margin-bottom: 4px;">LVL: <span id="levelVal">10</span></div>
+    <div style="font-weight:700">Level: <span id="levelVal">10</span></div>
     <div class="range-wrap">
-      <input id="level" type="range" min="1" max="15" value="10" step="1">
-      <div class="range-labels">
-        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
-      </div>
+      <input id="level" type="range" min="1" max="15" value="10">
+      <div class="range-labels"><span>1</span><span>5</span><span>10</span><span>15</span></div>
     </div>
   </div>
 
   <div class="tableWrap">
     <table>
-      <thead><tr id="theadRow"></tr></thead>
+      <thead>
+        <tr>
+          <th style="width:30%">
+            Champ <button class="clear-btn" onclick="clearExceptPinned()">Clear</button>
+          </th>
+          <th>AD</th><th>HP</th><th>Mana</th><th>Arm</th><th>MR</th>
+        </tr>
+      </thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
@@ -152,13 +121,9 @@
 <div id="champModal" class="modal hidden">
   <div class="modal-backdrop" onclick="closeChampModal()"></div>
   <div class="modal-card">
-    <button class="modal-close-corner" onclick="closeChampModal()">✕</button>
-    <div class="modal-head">
-      <div style="font-size: 13px; font-weight:800; margin-bottom: 8px;">Нажми на иконку роли, чтобы выбрать всех</div>
-      <div style="display:flex; gap:8px;">
-        <button onclick="selectAll(true)" style="font-size:11px; cursor:pointer">Все</button>
-        <button onclick="selectAll(false)" style="font-size:11px; cursor:pointer">Сброс</button>
-      </div>
+    <button class="close-corner" onclick="closeChampModal()">✕</button>
+    <div style="padding:15px; border-bottom:1px solid var(--brd)">
+      <b style="font-size:14px">Выбор чемпионов</b>
     </div>
     <div id="champModalGrid" class="modal-grid"></div>
   </div>
@@ -166,113 +131,69 @@
 
 <script>
   const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
-  
-  const COLS = [
-    { key: "ad", label: "AD", w: "15%" },
-    { key: "hp", label: "HP", w: "18%" },
-    { key: "mana", label: "Mana", w: "18%" },
-    { key: "armor", label: "Arm", w: "14%" },
-    { key: "mr", label: "MR", w: "14%" }
-  ];
-
+  const COLS = ["ad", "hp", "mana", "armor", "mr"];
   const roles = [
-    { key: "Top",     icon: "assets/roles/top.png" },
-    { key: "Jungle",  icon: "assets/roles/jungle.png" },
-    { key: "Mid",     icon: "assets/roles/mid.png" },
-    { key: "ADC",     icon: "assets/roles/adc.png" },
+    { key: "Top", icon: "assets/roles/top.png" },
+    { key: "Jungle", icon: "assets/roles/jungle.png" },
+    { key: "Mid", icon: "assets/roles/mid.png" },
+    { key: "ADC", icon: "assets/roles/adc.png" },
     { key: "Support", icon: "assets/roles/support.png" }
   ];
 
-  let raw = [], selected = new Set(), level = 10, sortKey = "ad", sortDir = "desc";
+  let raw = [], selected = new Set(), pinned = new Set(), level = 10;
 
   async function init() {
     const res = await fetch(CSV_URL);
     const text = await res.text();
     const lines = text.trim().split('\n').map(l => l.split('\t'));
     const h = lines[0].map(s => s.trim());
-    
     raw = lines.slice(1).map(row => {
-      let obj = {}; h.forEach((name, i) => obj[name] = row[i]?.trim());
+      let o = {}; h.forEach((n, i) => o[n] = row[i]?.trim());
       return {
-        name: obj["Champion"],
-        ad_b: +obj["AD_Base"], ad_g: +obj["AD_Growth"],
-        hp_b: +obj["HP_Base"], hp_g: +obj["HP_Growth"],
-        mn_b: +obj["Mana_Base"], mn_g: +obj["Mana_Growth"],
-        ar_b: +obj["Armor_Base"], ar_g: +obj["Armor_Growth"],
-        mr_b: +obj["MR_Base"], mr_g: +obj["MR_Growth"],
-        res: obj["Resource"] || "Mana",
-        is: { Top: +obj["Is_Top"]===1, Jungle: +obj["Is_Jungle"]===1, Mid: +obj["Is_Mid"]===1, ADC: +obj["Is_Adc"]===1, Support: +obj["Is_Support"]===1 }
+        name: o["Champion"], ad_b: +o["AD_Base"], ad_g: +o["AD_Growth"],
+        hp_b: +o["HP_Base"], hp_g: +o["HP_Growth"], mn_b: +o["Mana_Base"], mn_g: +o["Mana_Growth"],
+        ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"], mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
+        res: o["Resource"] || "Mana",
+        is: { Top: +o["Is_Top"]===1, Jungle: +o["Is_Jungle"]===1, Mid: +o["Is_Mid"]===1, ADC: +o["Is_Adc"]===1, Support: +o["Is_Support"]===1 }
       };
     }).filter(r => r.name);
-
     selected = new Set(raw.map(r => r.name));
-    renderAll();
-  }
-
-  function renderAll() {
-    buildHeader();
     renderTable();
-  }
-
-  function buildHeader() {
-    const row = document.getElementById("theadRow");
-    row.innerHTML = `<th style="width:21%" onclick="openChampModal()">Champ ⚙️</th>`;
-    COLS.forEach(c => {
-      const th = document.createElement("th");
-      th.style.width = c.w;
-      th.textContent = c.label + (sortKey === c.key ? (sortDir === "desc" ? "↓" : "↑") : "");
-      th.onclick = () => {
-        if(sortKey === c.key) sortDir = sortDir === "desc" ? "asc" : "desc";
-        else { sortKey = c.key; sortDir = "desc"; }
-        renderAll();
-      };
-      row.appendChild(th);
-    });
   }
 
   function renderTable() {
     const tbody = document.getElementById("tbody");
     const data = raw.filter(r => selected.has(r.name)).map(r => {
-      let calc = (b, g) => b + (level - 1) * g;
-      return {
-        name: r.name, res: r.res,
-        ad: calc(r.ad_b, r.ad_g), hp: calc(r.hp_b, r.hp_g),
-        mana: calc(r.mn_b, r.mn_g), armor: calc(r.ar_b, r.ar_g), mr: calc(r.mr_b, r.mr_g),
-        g: { ad: r.ad_g, hp: r.hp_g, mana: r.mn_g, armor: r.ar_g, mr: r.mr_g }
-      };
-    }).sort((a,b) => sortDir === "desc" ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]);
+      let c = (b, g) => b + (level - 1) * g;
+      return { name: r.name, res: r.res, ad: c(r.ad_b, r.ad_g), hp: c(r.hp_b, r.hp_g), mana: c(r.mn_b, r.mn_g), armor: c(r.ar_b, r.ar_g), mr: c(r.mr_b, r.mr_g), g: { ad: r.ad_g, hp: r.hp_g, mana: r.mn_g, armor: r.ar_g, mr: r.mr_g } };
+    });
 
     const thresholds = {};
-    COLS.forEach(c => {
-      let v = data.map(d => d[c.key]).sort((a,b) => a-b);
-      thresholds[c.key] = {
-        top1: v[Math.floor(v.length * 0.98)],
-        top10: v[Math.floor(v.length * 0.85)],
-        low10: v[Math.floor(v.length * 0.15)]
-      };
+    COLS.forEach(key => {
+      let v = data.map(d => d[key]).sort((a,b) => a-b);
+      thresholds[key] = { t1: v[Math.floor(v.length*0.98)], t10: v[Math.floor(v.length*0.85)], l10: v[Math.floor(v.length*0.15)] };
     });
 
     tbody.innerHTML = "";
     data.forEach(r => {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td><div style="display:flex; align-items:center; gap:3px; justify-content:center;">
-        <span onclick="selected.delete('${r.name}'); renderTable();" style="color:#ff4d4f; font-weight:bold; cursor:pointer">×</span>
-        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${r.name}</span></div></td>`;
+      const isP = pinned.has(r.name);
+      tr.innerHTML = `<td><div class="champ-col">
+        <button class="btn-x" onclick="selected.delete('${r.name}'); renderTable();">×</button>
+        <span class="champ-name ${isP?'is-pinned':''}" onclick="togglePin('${r.name}')">${r.name}</span>
+      </div></td>`;
       
-      COLS.forEach(c => {
+      COLS.forEach(k => {
         const td = document.createElement("td");
-        td.className = "has-tip";
-        td.dataset.tip = `${c.label} Growth: +${r.g[c.key]}`;
-        const val = r[c.key];
-
-        if(c.key === "mana" && r.res === "Energy") { td.className+=" energy"; td.innerText="ENERGY"; }
-        else if(c.key === "mana" && val === 0) { td.className+=" mana-zero"; td.innerText="0"; }
+        td.className = "has-tip"; td.dataset.tip = `Growth: +${r.g[k]}`;
+        const val = r[k];
+        if(k === "mana" && r.res === "Energy") { td.className += " energy"; td.innerText = "ENERGY"; }
+        else if(k === "mana" && val === 0) { td.className += " mana-zero"; td.innerText = "0"; }
         else {
           td.innerText = Math.round(val);
-          const t = thresholds[c.key];
-          if(val >= t.top1) td.classList.add("tier-top1");
-          else if(val >= t.top10) td.classList.add("tier-top10");
-          else if(val <= t.low10) td.classList.add("tier-low");
+          if(val >= thresholds[k].t1) td.classList.add("tier-top1");
+          else if(val >= thresholds[k].t10) td.classList.add("tier-top10");
+          else if(val <= thresholds[k].l10) td.classList.add("tier-low");
           else td.classList.add("tier-mid");
         }
         tr.appendChild(td);
@@ -281,43 +202,36 @@
     });
   }
 
-  function toggleRole(roleKey) {
-    const roleChamps = raw.filter(r => r.is[roleKey]).map(r => r.name);
-    const allSelected = roleChamps.every(name => selected.has(name));
-    roleChamps.forEach(name => allSelected ? selected.delete(name) : selected.add(name));
-    renderChampModal(); renderTable();
-  }
+  function togglePin(name) { pinned.has(name) ? pinned.delete(name) : pinned.add(name); renderTable(); }
+  function clearExceptPinned() { selected = new Set([...pinned]); renderTable(); }
+  function openChampModal() { document.getElementById("champModal").classList.remove("hidden"); renderChampModal(); }
+  function closeChampModal() { document.getElementById("champModal").classList.add("hidden"); }
 
   function renderChampModal() {
-    const grid = document.getElementById("champModalGrid");
-    grid.innerHTML = "";
+    const grid = document.getElementById("champModalGrid"); grid.innerHTML = "";
     roles.forEach(role => {
-      const col = document.createElement("div");
-      col.className = "role-col";
+      const col = document.createElement("div"); col.className = "role-col";
       col.innerHTML = `<div class="role-head" onclick="toggleRole('${role.key}')"><img src="${role.icon}"></div>`;
-      raw.filter(r => r.is[role.key]).sort((a,b) => a.name.localeCompare(b.name)).forEach(r => {
+      raw.filter(r => r.is[role.key]).forEach(r => {
         const btn = document.createElement("button");
-        btn.className = "champ-btn" + (selected.has(r.name) ? " selected" : "");
+        btn.className = "champ-btn" + (selected.has(r.name)?" selected":"");
         btn.innerText = r.name;
-        btn.onclick = () => {
-          selected.has(r.name) ? selected.delete(r.name) : selected.add(r.name);
-          btn.classList.toggle("selected");
-          renderTable();
-        };
+        btn.onclick = () => { selected.has(r.name)?selected.delete(r.name):selected.add(r.name); renderChampModal(); renderTable(); };
         col.appendChild(btn);
       });
       grid.appendChild(col);
     });
   }
 
-  function openChampModal() { document.getElementById("champModal").classList.remove("hidden"); renderChampModal(); }
-  function closeChampModal() { document.getElementById("champModal").classList.add("hidden"); }
-  function selectAll(b) { if(b) raw.forEach(r => selected.add(r.name)); else selected.clear(); renderChampModal(); renderTable(); }
+  function toggleRole(key) {
+    const names = raw.filter(r => r.is[key]).map(r => r.name);
+    const all = names.every(n => selected.has(n));
+    names.forEach(n => all ? selected.delete(n) : selected.add(n));
+    renderChampModal(); renderTable();
+  }
 
   document.getElementById("level").oninput = (e) => {
-    level = +e.target.value;
-    document.getElementById("levelVal").innerText = level;
-    renderTable();
+    level = +e.target.value; document.getElementById("levelVal").innerText = level; renderTable();
   };
 
   init();
