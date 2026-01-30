@@ -5,61 +5,92 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>Wild Rift – ADC Stats</title>
   <style>
-    :root { --p: #7b5cff; --bg: #0b0f17; --card: #121a2a; --brd: #22304a; font-family: system-ui,-apple-system,sans-serif; }
+    :root { 
+      --p: #7b5cff; 
+      --bg: #0b0f17; 
+      --card: #121a2a; 
+      --brd: rgba(255,255,255,0.2); /* Светлые рамки */
+      --energy: #ffcc00; 
+      font-family: system-ui,-apple-system,sans-serif; 
+    }
     body { margin:0; background:var(--bg); color:#e8edf7; line-height: 1.4; overflow-x: hidden; }
     .wrap { max-width:1200px; margin:0 auto; padding:12px; }
     
-    /* Brand & Support */
     .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .nick { font-size: 20px; font-weight: 700; color: var(--p); text-shadow: 0 0 10px #7b5cff44; }
-    .twitch { font-size: 14px; color: #9146ff; text-decoration: none; font-weight: 600; }
-    .support { padding: 12px; border: 1px solid var(--brd); border-radius: 12px; background: var(--card); margin-bottom: 16px; }
-    .supportBody { font-size: 12px; opacity: .8; margin-bottom: 10px; }
-    .donateBtn { display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 8px; text-decoration: none; color: #fff; background: linear-gradient(90deg, #9146ff, var(--p)); font-weight: 700; font-size: 13px; }
+    .nick { font-size: 20px; font-weight: 700; color: var(--p); }
 
-    /* Level Slider */
-    .levelBar { background: var(--card); border: 1px solid var(--brd); padding: 12px; border-radius: 12px; margin-bottom: 12px; }
-    .levelHead { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; font-weight: 700; }
+    /* Анимированная кнопка */
+    @keyframes pulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(145, 70, 255, 0.7); }
+      70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(145, 70, 255, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(145, 70, 255, 0); }
+    }
+    .donateBtn { 
+      display: flex; align-items: center; justify-content: center; padding: 12px; 
+      border-radius: 8px; text-decoration: none; color: #fff; 
+      background: linear-gradient(90deg, #9146ff, var(--p)); 
+      font-weight: 700; animation: pulse 2s infinite; 
+    }
+
+    /* Ползунок с линейкой */
+    .levelBar { background: var(--card); border: 1px solid var(--brd); padding: 15px; border-radius: 12px; margin-bottom: 12px; }
+    .range-wrap { position: relative; margin: 10px 0 25px 0; }
     input[type="range"] { width: 100%; accent-color: var(--p); cursor: pointer; }
+    .range-labels { display: flex; justify-content: space-between; padding: 0 5px; margin-top: 5px; font-size: 10px; color: #888; }
 
-    /* Table Settings */
+    /* Таблица */
     .tableWrap { overflow-x: auto; border: 1px solid var(--brd); border-radius: 10px; background: var(--card); }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { padding: 8px 4px; text-align: center; border-bottom: 1px solid var(--brd); border-right: 1px solid #22304a44; }
-    th { background: #1a2438; position: sticky; top: 0; cursor: pointer; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .champ-cell { display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 100px; }
-    .champ-x { background: #ff4d4f22; color: #ff4d4f; border: 1px solid #ff4d4f44; border-radius: 4px; cursor: pointer; padding: 0 4px; font-weight: bold; }
+    th, td { padding: 8px; text-align: center; border: 1px solid var(--brd); } /* Светлые границы */
+    th { background: #1a2438; cursor: pointer; text-transform: uppercase; font-size: 11px; }
 
-    /* Tiers & Special Cells */
-    .tier-top { background: #7b5cff33 !important; color: #fff; font-weight: 700; }
-    .tier-low { background: #ff4d4f22 !important; opacity: 0.8; }
-    .mana-zero { color: #5a6478; font-size: 11px; }
-    .energy { color: #ff9f1c; font-weight: 800; font-size: 10px; }
+    /* Новые цвета Tier-листа */
+    .tier-top1 { background: #8b0000 !important; color: #fff; } /* Темно-красный 1% */
+    .tier-top10 { background: #ff0000 !important; color: #fff; } /* Красный 10% */
+    .tier-mid { background: #ff8c00 !important; color: #000; font-weight: bold; } /* Оранжевый (Mid) */
+    .tier-low { background: #228b22 !important; color: #fff; } /* Зеленый (Bottom 10%) */
+    .energy { color: var(--energy); font-weight: 800; }
 
-    /* Modal */
+    /* Модалка */
     .modal { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; }
     .hidden { display: none; }
-    .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
-    .modal-card { position: relative; width: 95vw; max-width: 1000px; height: 85vh; background: var(--card); border: 1px solid var(--brd); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; }
-    
-    .modal-head { padding: 12px; border-bottom: 1px solid var(--brd); display: flex; justify-content: space-between; align-items: center; background: #1a2438; }
-    .modal-close-corner { position: absolute; top: 10px; right: 10px; background: #ff4d4f; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; z-index: 10; }
-    
-    .mini-btn { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--brd); background: var(--bg); color: #fff; cursor: pointer; font-size: 11px; font-weight: 600; }
-    .mini-btn:hover { border-color: var(--p); }
+    .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.85); }
+    .modal-card { 
+      position: relative; width: 95vw; max-width: 900px; max-height: 90vh; 
+      background: var(--card); border: 1px solid var(--brd); border-radius: 16px; 
+      display: flex; flex-direction: column; overflow: hidden; 
+    }
+    .modal-close-corner { 
+      position: absolute; top: 12px; right: 12px; background: #ff4d4f; 
+      color: white; border: none; width: 32px; height: 32px; border-radius: 50%; 
+      cursor: pointer; font-weight: bold; z-index: 100;
+    }
+    .modal-head { padding: 15px; border-bottom: 1px solid var(--brd); }
 
-    .modal-grid { flex: 1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; overflow-y: auto; }
-    .role-col { display: flex; flex-direction: column; gap: 6px; border: 1px solid #ffffff0a; border-radius: 8px; padding: 4px; }
-    .role-head { text-align: center; padding: 4px; background: #0b0f17; border-radius: 6px; }
-    .role-head img { width: 24px; height: 24px; }
+    /* Сетка в модалке */
+    .modal-grid { 
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; 
+      padding: 15px; overflow-y: auto; 
+    }
+    .role-col { display: flex; flex-direction: column; gap: 5px; }
+    .role-head { 
+      cursor: pointer; transition: 0.2s; padding: 5px; text-align: center;
+      background: rgba(255,255,255,0.05); border-radius: 8px;
+    }
+    .role-head:hover { background: var(--p); }
+    .role-head img { width: 30px; height: 30px; display: block; margin: 0 auto; }
     
-    .champ-btn { padding: 8px 4px; border-radius: 8px; border: 1px solid var(--brd); background: #0b0f17; color: #99aab5; cursor: pointer; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .champ-btn.selected { border-color: var(--p); background: #7b5cff22; color: #fff; font-weight: 700; }
+    .champ-btn { 
+      padding: 6px; border-radius: 6px; border: 1px solid var(--brd); 
+      background: #0b0f17; color: #99aab5; cursor: pointer; font-size: 11px; 
+    }
+    .champ-btn.selected { border-color: var(--p); background: #7b5cff33; color: #fff; }
 
-    @media (max-width: 600px) {
-      .modal-grid { grid-template-columns: repeat(5, 1fr); padding: 5px; gap: 3px; }
-      th, td { font-size: 11px; padding: 6px 2px; }
-      .champ-btn { font-size: 9px; padding: 6px 2px; }
+    /* Мобильная адаптация модалки (только вертикальный скролл) */
+    @media (max-width: 768px) {
+      .modal-grid { grid-template-columns: 1fr; } /* Одна колонка на мобилках */
+      .role-col { border-bottom: 1px solid var(--brd); padding-bottom: 15px; }
+      .role-head { display: flex; align-items: center; justify-content: center; gap: 10px; }
     }
   </style>
 </head>
@@ -68,27 +99,24 @@
 <div class="wrap">
   <div class="brand">
     <span class="nick">ERjanKG</span>
-    <a class="twitch" href="https://www.twitch.tv/ERjanKG" target="_blank">Twitch</a>
-    <span style="opacity:.4">| Stats</span>
+    <span style="opacity:.4">| Wild Rift Stats</span>
   </div>
 
-  <div class="support">
-    <div class="supportBody">Сайт бесплатен. Буду благодарен за поддержку проекта!</div>
-    <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 Поддержать проект</a>
-  </div>
+  <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 ПОДДЕРЖАТЬ ПРОЕКТ</a>
 
   <div class="levelBar">
-    <div class="levelHead"><span>Level</span> <span><span id="levelVal">10</span>/15</span></div>
-    <input id="level" type="range" min="1" max="15" value="10" />
+    <div style="font-weight: 700; margin-bottom: 5px;">Уровень: <span id="levelVal">10</span></div>
+    <div class="range-wrap">
+      <input id="level" type="range" min="1" max="15" value="10" step="1">
+      <div class="range-labels">
+        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+      </div>
+    </div>
   </div>
 
   <div class="tableWrap">
     <table>
-      <thead>
-        <tr id="theadRow">
-          <th onclick="openChampModal()">Champion ⚙️</th>
-        </tr>
-      </thead>
+      <thead><tr id="theadRow"></tr></thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
@@ -99,10 +127,10 @@
   <div class="modal-card">
     <button class="modal-close-corner" onclick="closeChampModal()">✕</button>
     <div class="modal-head">
-      <div style="font-weight:800; font-size: 14px;">Select Champions</div>
-      <div style="display:flex; gap:5px; margin-right: 35px;">
-        <button class="mini-btn" onclick="selectAll(true)">All</button>
-        <button class="mini-btn" onclick="selectAll(false)">Clear</button>
+      <div style="font-weight:800;">Выбор чемпионов (нажми на роль для выбора всех)</div>
+      <div style="margin-top:10px; display:flex; gap:10px;">
+        <button onclick="selectAll(true)" style="cursor:pointer">Выбрать всех</button>
+        <button onclick="selectAll(false)" style="cursor:pointer">Сбросить</button>
       </div>
     </div>
     <div id="champModalGrid" class="modal-grid"></div>
@@ -111,52 +139,52 @@
 
 <script>
   const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
+  
   const COLS = [
     { key: "ad", label: "AD" },
     { key: "hp", label: "HP" },
     { key: "mana", label: "Mana" },
-    { key: "armor", label: "Arm" },
+    { key: "armor", label: "Armor" },
     { key: "mr", label: "MR" }
   ];
+
   const roles = [
-    { key: "Top", icon: "https://raw.githubusercontent.com/RiotGames/developer-relations/master/icons/lane/top.png" },
-    { key: "Jungle", icon: "https://raw.githubusercontent.com/RiotGames/developer-relations/master/icons/lane/jungle.png" },
-    { key: "Mid", icon: "https://raw.githubusercontent.com/RiotGames/developer-relations/master/icons/lane/mid.png" },
-    { key: "ADC", icon: "https://raw.githubusercontent.com/RiotGames/developer-relations/master/icons/lane/bot.png" },
-    { key: "Support", icon: "https://raw.githubusercontent.com/RiotGames/developer-relations/master/icons/lane/utility.png" }
+    { key: "Top",     icon: "assets/roles/top.png" },
+    { key: "Jungle",  icon: "assets/roles/jungle.png" },
+    { key: "Mid",     icon: "assets/roles/mid.png" },
+    { key: "ADC",     icon: "assets/roles/adc.png" },
+    { key: "Support", icon: "assets/roles/support.png" }
   ];
 
   let raw = [], selected = new Set(), level = 10, sortKey = "ad", sortDir = "desc";
 
   async function init() {
-    try {
-      const res = await fetch(CSV_URL);
-      const text = await res.text();
-      const lines = text.trim().split('\n').map(l => l.split('\t'));
-      const h = lines[0].map(s => s.trim());
-      
-      raw = lines.slice(1).map(row => {
-        let obj = {};
-        h.forEach((name, i) => obj[name] = row[i]?.trim());
-        return {
-          name: obj["Champion"],
-          ad_b: +obj["AD_Base"], ad_g: +obj["AD_Growth"],
-          hp_b: +obj["HP_Base"], hp_g: +obj["HP_Growth"],
-          mn_b: +obj["Mana_Base"], mn_g: +obj["Mana_Growth"],
-          ar_b: +obj["Armor_Base"], ar_g: +obj["Armor_Growth"],
-          mr_b: +obj["MR_Base"], mr_g: +obj["MR_Growth"],
-          res: obj["Resource"] || "Mana",
-          is: {
-            Top: +obj["Is_Top"]===1, Jungle: +obj["Is_Jungle"]===1, 
-            Mid: +obj["Is_Mid"]===1, ADC: +obj["Is_Adc"]===1, Support: +obj["Is_Support"]===1
-          }
-        };
-      }).filter(r => r.name);
+    const res = await fetch(CSV_URL);
+    const text = await res.text();
+    const lines = text.trim().split('\n').map(l => l.split('\t'));
+    const h = lines[0].map(s => s.trim());
+    
+    raw = lines.slice(1).map(row => {
+      let obj = {}; h.forEach((name, i) => obj[name] = row[i]?.trim());
+      return {
+        name: obj["Champion"],
+        ad_b: +obj["AD_Base"], ad_g: +obj["AD_Growth"],
+        hp_b: +obj["HP_Base"], hp_g: +obj["HP_Growth"],
+        mn_b: +obj["Mana_Base"], mn_g: +obj["Mana_Growth"],
+        ar_b: +obj["Armor_Base"], ar_g: +obj["Armor_Growth"],
+        mr_b: +obj["MR_Base"], mr_g: +obj["MR_Growth"],
+        res: obj["Resource"] || "Mana",
+        is: { Top: +obj["Is_Top"]===1, Jungle: +obj["Is_Jungle"]===1, Mid: +obj["Is_Mid"]===1, ADC: +obj["Is_Adc"]===1, Support: +obj["Is_Support"]===1 }
+      };
+    }).filter(r => r.name);
 
-      selected = new Set(raw.map(r => r.name));
-      buildHeader();
-      render();
-    } catch (e) { console.error("Data error", e); }
+    selected = new Set(raw.map(r => r.name));
+    renderAll();
+  }
+
+  function renderAll() {
+    buildHeader();
+    renderTable();
   }
 
   function buildHeader() {
@@ -168,46 +196,52 @@
       th.onclick = () => {
         if(sortKey === c.key) sortDir = sortDir === "desc" ? "asc" : "desc";
         else { sortKey = c.key; sortDir = "desc"; }
-        buildHeader(); render();
+        renderAll();
       };
       row.appendChild(th);
     });
   }
 
-  function render() {
+  function renderTable() {
     const tbody = document.getElementById("tbody");
     const data = raw.filter(r => selected.has(r.name)).map(r => {
       let calc = (b, g) => b + (level - 1) * g;
       return {
         name: r.name, res: r.res,
         ad: calc(r.ad_b, r.ad_g), hp: calc(r.hp_b, r.hp_g),
-        mana: calc(r.mn_b, r.mn_g), armor: calc(r.ar_b, r.ar_g), mr: calc(r.mr_b, r.mr_g),
-        growth: { ad: r.ad_g, hp: r.hp_g, mana: r.mn_g, armor: r.ar_g, mr: r.mr_g }
+        mana: calc(r.mn_b, r.mn_g), armor: calc(r.ar_b, r.ar_g), mr: calc(r.mr_b, r.mr_g)
       };
-    }).sort((a,b) => {
-      let v1 = a[sortKey], v2 = b[sortKey];
-      return sortDir === "desc" ? v2 - v1 : v1 - v2;
-    });
+    }).sort((a,b) => sortDir === "desc" ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]);
 
     const thresholds = {};
     COLS.forEach(c => {
       let v = data.map(d => d[c.key]).sort((a,b) => a-b);
-      thresholds[c.key] = { low: v[Math.floor(v.length*0.1)], top: v[Math.floor(v.length*0.9)] };
+      thresholds[c.key] = {
+        top1: v[Math.floor(v.length * 0.99)],
+        top10: v[Math.floor(v.length * 0.90)],
+        low10: v[Math.floor(v.length * 0.10)]
+      };
     });
 
     tbody.innerHTML = "";
     data.forEach(r => {
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td><div class="champ-cell"><button class="champ-x" onclick="selected.delete('${r.name}'); render();">×</button> <span>${r.name}</span></div></td>`;
+      tr.innerHTML = `<td><div style="display:flex; gap:5px; align-items:center;">
+        <button onclick="selected.delete('${r.name}'); renderTable();" style="color:red; background:none; border:none; cursor:pointer">✕</button>
+        ${r.name}</div></td>`;
+      
       COLS.forEach(c => {
         const td = document.createElement("td");
         const val = r[c.key];
         if(c.key === "mana" && r.res === "Energy") { td.className="energy"; td.innerText="ENERGY"; }
-        else if(c.key === "mana" && val === 0) { td.className="mana-zero"; td.innerText="NO MANA"; }
+        else if(c.key === "mana" && val === 0) { td.innerText="0"; td.style.opacity="0.3"; }
         else {
           td.innerText = Math.round(val);
-          if(val >= thresholds[c.key].top) td.classList.add("tier-top");
-          if(val <= thresholds[c.key].low) td.classList.add("tier-low");
+          const t = thresholds[c.key];
+          if(val >= t.top1) td.classList.add("tier-top1");
+          else if(val >= t.top10) td.classList.add("tier-top10");
+          else if(val <= t.low10) td.classList.add("tier-low");
+          else td.classList.add("tier-mid");
         }
         tr.appendChild(td);
       });
@@ -215,16 +249,11 @@
     });
   }
 
-  function openChampModal() {
-    document.getElementById("champModal").classList.remove("hidden");
-    renderChampModal();
-  }
-  function closeChampModal() { document.getElementById("champModal").classList.add("hidden"); }
-  
-  function selectAll(bool) {
-    if(bool) selected = new Set(raw.map(r => r.name));
-    else selected.clear();
-    renderChampModal(); render();
+  function toggleRole(roleKey) {
+    const roleChamps = raw.filter(r => r.is[roleKey]).map(r => r.name);
+    const allSelected = roleChamps.every(name => selected.has(name));
+    roleChamps.forEach(name => allSelected ? selected.delete(name) : selected.add(name));
+    renderChampModal(); renderTable();
   }
 
   function renderChampModal() {
@@ -233,7 +262,7 @@
     roles.forEach(role => {
       const col = document.createElement("div");
       col.className = "role-col";
-      col.innerHTML = `<div class="role-head"><img src="${role.icon}"></div>`;
+      col.innerHTML = `<div class="role-head" onclick="toggleRole('${role.key}')" title="Выбрать всех на эту роль"><img src="${role.icon}"></div>`;
       raw.filter(r => r.is[role.key]).sort((a,b) => a.name.localeCompare(b.name)).forEach(r => {
         const btn = document.createElement("button");
         btn.className = "champ-btn" + (selected.has(r.name) ? " selected" : "");
@@ -241,7 +270,7 @@
         btn.onclick = () => {
           selected.has(r.name) ? selected.delete(r.name) : selected.add(r.name);
           btn.classList.toggle("selected");
-          render();
+          renderTable();
         };
         col.appendChild(btn);
       });
@@ -249,10 +278,14 @@
     });
   }
 
+  function openChampModal() { document.getElementById("champModal").classList.remove("hidden"); renderChampModal(); }
+  function closeChampModal() { document.getElementById("champModal").classList.add("hidden"); }
+  function selectAll(b) { if(b) raw.forEach(r => selected.add(r.name)); else selected.clear(); renderChampModal(); renderTable(); }
+
   document.getElementById("level").oninput = (e) => {
     level = +e.target.value;
     document.getElementById("levelVal").innerText = level;
-    render();
+    renderTable();
   };
 
   init();
