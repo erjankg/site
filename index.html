@@ -3,229 +3,261 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Wild Rift Ultra Stats – ERjanKG</title>
+  <title>Wild Rift Pro Stats – Ultra Edition</title>
   <style>
     :root { 
       --p: #7b5cff; 
       --bg: #05070a; 
       --card: #111622; 
-      --brd: rgba(255,255,255,0.15);
-      --energy: #ffff00;
-      --radius: 20px;
-      /* Сочная Тетрада */
-      --t-s: #ff0055; /* Фуксия/Красный */
-      --t-a: #ff6600; /* Оранжевый */
-      --t-b: #ffcc00; /* Желтый */
-      --t-c: #00ffaa; /* Бирюзово-зеленый */
+      --brd: rgba(255,255,255,0.12);
+      --energy: #f3e61c;
+      --radius: 24px;
+      /* Успокоенная Тетрада (Благородные тона) */
+      --t-s: #8b1a3f; /* Глубокий малиновый */
+      --t-a: #a34e0d; /* Приглушенный терракот */
+      --t-b: #8a730c; /* Темное золото */
+      --t-c: #0f4d4a; /* Глубокий хвойный */
     }
 
+    * { box-sizing: border-box; }
     body { 
       margin: 0; background: var(--bg); color: #fff; 
-      font-family: "Inter", -apple-system, sans-serif; 
-      font-weight: 800; -webkit-tap-highlight-color: transparent; 
+      font-family: "Inter", "Segoe UI", sans-serif; 
+      font-weight: 900; -webkit-tap-highlight-color: transparent; 
     }
 
-    .wrap { max-width: 1400px; margin: 0 auto; padding: 15px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
-    /* Header */
-    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-    .nick { font-size: 32px; font-weight: 900; letter-spacing: -1.5px; text-shadow: 0 0 20px rgba(123,92,255,0.5); }
+    /* Header Section */
+    .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .logo-box .nick { font-size: 36px; font-weight: 900; letter-spacing: -2px; text-shadow: 0 0 30px rgba(123,92,255,0.4); }
     
-    @keyframes spin { 0% { transform: rotate(0deg); } 20% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
-    .twitch-link { 
+    @keyframes rotateTwitch { 0% { transform: rotate(0); } 10% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
+    .twitch-btn { 
       display: flex; align-items: center; gap: 12px; text-decoration: none; 
-      color: #fff; background: #9146ff; padding: 10px 20px; border-radius: 50px; 
-      font-size: 16px; box-shadow: 0 5px 20px rgba(145,70,255,0.5); 
+      color: #fff; background: #9146ff; padding: 12px 24px; border-radius: 50px; 
+      font-size: 16px; box-shadow: 0 8px 25px rgba(145,70,255,0.4); transition: 0.3s;
     }
-    .twitch-link img { width: 22px; animation: spin 6s infinite ease-in-out; }
+    .twitch-btn:hover { transform: scale(1.05); }
+    .twitch-btn img { width: 22px; animation: rotateTwitch 7s infinite ease-in-out; }
 
-    /* Support */
-    .support-box { background: var(--card); border: 2px solid var(--brd); padding: 25px; border-radius: var(--radius); margin-bottom: 20px; position: relative; overflow: hidden; }
-    .support-box::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--p); }
-    .donateBtn { 
-      display: block; text-align: center; padding: 18px; margin-top: 15px; 
-      background: #fff; color: #000; text-decoration: none; border-radius: 15px; 
-      font-size: 18px; font-weight: 900; transition: 0.3s;
+    /* Support Block */
+    .promo-card { 
+      background: linear-gradient(135deg, var(--card) 0%, #1a2235 100%); 
+      border: 2px solid var(--brd); padding: 30px; border-radius: var(--radius); 
+      margin-bottom: 25px; position: relative; overflow: hidden;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.5);
     }
-    .donateBtn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,255,255,0.2); }
+    .promo-card::after { content: ''; position: absolute; right: -50px; top: -50px; width: 150px; height: 150px; background: var(--p); filter: blur(100px); opacity: 0.2; }
+    .donate-link { 
+      display: block; text-align: center; padding: 20px; margin-top: 20px; 
+      background: #fff; color: #000; text-decoration: none; border-radius: 18px; 
+      font-size: 20px; font-weight: 900; transition: 0.3s;
+    }
 
-    /* Level Slider */
-    .levelBar { background: var(--card); border: 2px solid var(--brd); padding: 25px; border-radius: var(--radius); margin-bottom: 20px; }
+    /* Level UI */
+    .level-panel { background: var(--card); border: 2px solid var(--brd); padding: 30px; border-radius: var(--radius); margin-bottom: 20px; }
+    .level-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .level-label { color: var(--p); font-size: 22px; }
+    .level-number { font-size: 40px; color: #fff; text-shadow: 0 0 15px var(--p); }
+    
     input[type="range"] { 
-      width: 100%; height: 12px; border-radius: 15px; background: #1e293b; 
-      appearance: none; outline: none; margin: 20px 0;
+      width: 100%; height: 14px; border-radius: 20px; background: #05070a; 
+      appearance: none; outline: none; border: 1px solid var(--brd);
     }
     input[type="range"]::-webkit-slider-thumb { 
-      appearance: none; width: 32px; height: 32px; background: var(--p); 
-      border-radius: 50%; border: 4px solid #fff; cursor: pointer; 
+      appearance: none; width: 36px; height: 36px; background: #fff; 
+      border-radius: 50%; border: 5px solid var(--p); cursor: pointer; box-shadow: 0 0 20px var(--p);
     }
-    .range-labels { display: flex; justify-content: space-between; color: #64748b; font-size: 14px; }
 
-    /* Table */
-    .tableWrap { border: 2px solid var(--brd); border-radius: var(--radius); background: var(--card); overflow: auto; max-height: 80vh; }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-    th { 
-      background: #1a2233; color: #fff; font-size: 14px; padding: 20px 5px; 
-      text-transform: uppercase; cursor: pointer; position: sticky; top: 0; z-index: 100;
-      border-bottom: 4px solid var(--brd); letter-spacing: 2px;
+    /* Legend */
+    .tier-legend { 
+      display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; 
+      padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; flex-wrap: wrap;
     }
-    td { padding: 15px 2px; text-align: center; border-bottom: 1px solid var(--brd); font-size: 16px; font-weight: 900; }
-    tr.focused { background: rgba(123, 92, 255, 0.15) !important; }
+    .legend-tag { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #a0aec0; }
+    .tag-box { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); }
 
-    /* Champ Column */
-    .champ-head-cell { display: flex; align-items: center; justify-content: center; gap: 10px; }
-    .select-all-cb { width: 22px; height: 22px; cursor: pointer; accent-color: var(--p); }
+    /* TABLE CORE */
+    .main-table-container { 
+      background: var(--card); border: 2px solid var(--brd); border-radius: var(--radius); 
+      overflow: auto; max-height: 70vh; box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+      position: relative;
+    }
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 600px; }
     
-    .champ-card-cell { display: flex; align-items: center; gap: 8px; padding: 0 10px; }
-    .btn-row-del { 
-      color: #ff4d4f; cursor: pointer; background: rgba(255,77,79,0.1); 
-      border: 2px solid #ff4d4f; width: 26px; height: 26px; border-radius: 8px; font-weight: 900;
+    th { 
+      background: #161e2f; color: #fff; font-size: 14px; padding: 22px 5px; 
+      text-transform: uppercase; cursor: pointer; position: sticky; top: 0; z-index: 500;
+      border-bottom: 5px solid var(--brd); letter-spacing: 2px;
     }
-    .champ-chip { 
-      background: #2d3748; color: #fff; padding: 10px; border-radius: 12px; 
+    th:hover { background: #1f293d; }
+    .sort-icon { color: var(--p); margin-left: 6px; font-size: 16px; }
+
+    td { 
+      padding: 18px 4px; text-align: center; border-bottom: 1px solid var(--brd); 
+      font-size: 17px; border-right: 1px solid rgba(255,255,255,0.05);
+      transition: background 0.2s;
+    }
+
+    /* Champ Cell */
+    .champ-col-header { display: flex; align-items: center; justify-content: center; gap: 12px; }
+    .master-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--p); }
+    
+    .champ-row-ui { display: flex; align-items: center; gap: 10px; padding: 0 10px; }
+    .del-row-btn { 
+      background: rgba(255,77,79,0.1); color: #ff4d4f; border: 2px solid #ff4d4f;
+      width: 28px; height: 28px; border-radius: 8px; cursor: pointer; font-weight: 900;
+    }
+    .champ-badge { 
+      background: #232d42; color: #fff; padding: 10px; border-radius: 12px; 
       width: 100%; text-align: center; border: 2px solid transparent; 
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px;
     }
-    .champ-chip.pinned { border-color: var(--p); background: var(--p); box-shadow: 0 0 15px var(--p); }
+    .champ-badge.pinned { background: var(--p); border-color: #fff; box-shadow: 0 0 15px rgba(123,92,255,0.6); }
 
-    /* Tiers */
-    .t-s { background: var(--t-s) !important; color: #fff; }
-    .t-a { background: var(--t-a) !important; color: #fff; }
-    .t-b { background: var(--t-b) !important; color: #000; }
-    .t-c { background: var(--t-c) !important; color: #000; }
-    .nrg-cell { color: var(--energy) !important; font-size: 12px !important; }
+    /* Tier Cell Coloring with Inner Border */
+    .tier-s { background: var(--t-s) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15); }
+    .tier-a { background: var(--t-a) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15); }
+    .tier-b { background: var(--t-b) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15); }
+    .tier-c { background: var(--t-c) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15); }
+    .energy-text { color: var(--energy) !important; font-size: 12px; }
 
-    /* TOOLTIP ENGINE */
-    .has-tip { position: relative; cursor: help; }
-    .tip-box { 
-      visibility: hidden; position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
-      background: #fff; color: #000; padding: 10px 15px; border-radius: 12px; font-size: 14px;
-      z-index: 1000; white-space: nowrap; font-weight: 900; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-      opacity: 0; transition: 0.2s; pointer-events: none;
+    /* Tooltip System */
+    .tip-anchor { position: relative; cursor: help; }
+    .tip-popup { 
+      display: none; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+      background: #fff; color: #000; padding: 12px 18px; border-radius: 14px; font-size: 14px;
+      z-index: 1000; white-space: nowrap; font-weight: 900; box-shadow: 0 10px 40px #000;
+      border: 2px solid var(--p);
     }
-    .tip-box::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -8px; border: 8px solid transparent; border-top-color: #fff; }
-    .has-tip:hover .tip-box, .has-tip.active .tip-box { visibility: visible; opacity: 1; bottom: 110%; }
+    .tip-popup::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -8px; border: 8px solid transparent; border-top-color: #fff; }
 
-    /* Modal */
-    .modal { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 10px; }
+    /* Stats Block */
+    .stats-summary { 
+      margin-top: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+      gap: 20px; background: var(--card); padding: 25px; border-radius: var(--radius); border: 2px solid var(--brd);
+    }
+    .summary-item { text-align: center; border-right: 1px solid var(--brd); }
+    .summary-item:last-child { border-right: none; }
+    .summary-label { font-size: 13px; color: #64748b; margin-bottom: 8px; }
+    .summary-val { font-size: 26px; color: var(--p); }
+
+    /* Modal System */
+    .modal-overlay { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 15px; }
     .hidden { display: none; }
-    .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); }
-    .modal-card { 
-      position: relative; width: 100%; max-width: 1000px; height: 90vh; 
+    .blur-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(25px); }
+    .modal-window { 
+      position: relative; width: 100%; max-width: 1000px; height: 85vh; 
       background: #0f172a; border-radius: 40px; border: 2px solid var(--brd); 
-      display: flex; flex-direction: column; overflow: hidden; 
+      display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 100px rgba(123,92,255,0.2);
     }
-    
-    .modal-header { padding: 30px; border-bottom: 2px solid var(--brd); }
-    .search-input { 
+    .modal-top { padding: 35px; border-bottom: 2px solid var(--brd); }
+    .champ-search { 
       width: 100%; padding: 20px; background: #05070a; border: 2px solid var(--brd); 
-      border-radius: 20px; color: #fff; font-size: 20px; font-weight: 800; outline: none;
+      border-radius: 20px; color: #fff; font-size: 20px; font-weight: 800; outline: none; transition: 0.3s;
     }
-    .search-input:focus { border-color: var(--p); }
+    .champ-search:focus { border-color: var(--p); box-shadow: 0 0 20px rgba(123,92,255,0.3); }
 
-    .modal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 20px; overflow-y: auto; flex: 1; }
-    .role-col { display: flex; flex-direction: column; gap: 8px; }
-    .role-head { 
+    .modal-content { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; padding: 25px; overflow-y: auto; flex: 1; }
+    .role-column { display: flex; flex-direction: column; gap: 10px; }
+    .role-selector { 
       cursor: pointer; padding: 15px; text-align: center; background: #1e293b; 
       border-radius: 20px; border: 3px solid transparent; transition: 0.3s;
     }
-    .role-head.active-role { border-color: var(--p); background: rgba(123,92,255,0.2); box-shadow: 0 0 20px rgba(123,92,255,0.4); }
-    .role-head img { width: 35px; height: 35px; }
+    .role-selector.active { border-color: var(--p); background: rgba(123,92,255,0.2); }
+    .role-selector img { width: 35px; height: 35px; }
     
-    .champ-btn { 
-      width: 100%; padding: 14px 5px; border-radius: 12px; border: 2px solid var(--brd); 
-      background: #0f172a; color: #64748b; font-size: 12px; font-weight: 900; cursor: pointer; 
+    .champ-toggle-btn { 
+      width: 100%; padding: 15px 5px; border-radius: 12px; border: 2px solid var(--brd); 
+      background: #161e2f; color: #64748b; font-size: 11px; font-weight: 900; cursor: pointer; transition: 0.2s;
     }
-    .champ-btn.selected { background: var(--p); color: #fff; border-color: #fff; }
+    .champ-toggle-btn.active { background: var(--p); color: #fff; border-color: #fff; }
 
-    .close-corner { 
+    .modal-close { 
       position: absolute; top: 25px; right: 25px; background: #ff4d4f; color: #fff; 
-      border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 100; font-size: 24px; font-weight: 900;
+      border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 100; font-size: 22px;
     }
 
-    /* Avg Stats Block */
-    .stats-footer { background: var(--card); border: 2px solid var(--brd); border-radius: var(--radius); padding: 20px; margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-    .stat-item { text-align: center; }
-    .stat-label { font-size: 12px; color: #64748b; margin-bottom: 5px; }
-    .stat-val { font-size: 20px; color: var(--p); }
-
-    @media (max-width: 800px) {
-      .modal-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; }
-      .role-head img { width: 24px; height: 24px; }
-      .champ-btn { font-size: 9px; padding: 10px 2px; }
-      th { font-size: 11px; padding: 15px 2px; }
+    @media (max-width: 900px) {
+      .modal-content { grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 10px; }
+      .role-selector img { width: 28px; height: 28px; }
+      th { font-size: 11px; padding: 18px 2px; }
       td { font-size: 14px; }
-      .nick { font-size: 24px; }
+      .nick { font-size: 26px; }
     }
   </style>
 </head>
 <body>
 
-<div class="wrap">
-  <div class="header-top">
-    <div class="nick">ERjanKG</div>
-    <a href="https://www.twitch.tv/ERjanKG" class="twitch-link" target="_blank">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" alt="T"> Twitch
+<div class="container">
+  <header class="app-header">
+    <div class="logo-box"><span class="nick">ERjanKG</span></div>
+    <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" alt="T"> TWITCH
     </a>
-  </div>
+  </header>
 
-  <div class="support-box">
-    <div style="font-size: 16px; margin-bottom: 5px;">🔥 ПОДДЕРЖКА ПРОЕКТА</div>
-    <div style="opacity: 0.6; font-size: 12px;">Сайт развивается благодаря тебе.</div>
-    <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 ЗАДОНАТИТЬ</a>
-  </div>
+  <section class="promo-card">
+    <div style="font-size: 18px; margin-bottom: 8px;">👑 ПОДДЕРЖКА ПРОЕКТА</div>
+    <div style="opacity: 0.7; font-size: 14px;">Твой вклад помогает делать сайт круче и быстрее!</div>
+    <a class="donate-link" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 ОТПРАВИТЬ ДОНАТ</a>
+  </section>
 
-  <div class="levelBar">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <span style="color:var(--p); font-size: 20px;">УРОВЕНЬ:</span>
-      <span id="levelVal" style="font-size: 32px; color:#fff">10</span>
+  <div class="level-panel">
+    <div class="level-info">
+      <span class="level-label">ТЕКУЩИЙ УРОВЕНЬ:</span>
+      <span id="levelVal" class="level-number">10</span>
     </div>
     <input id="level" type="range" min="1" max="15" value="10">
-    <div class="range-labels">
-      <span>1</span><span>3</span><span>5</span><span>7</span><span>9</span><span>11</span><span>13</span><span>15</span>
-    </div>
   </div>
 
-  <div class="tableWrap">
-    <table>
+  <div class="tier-legend">
+    <div class="legend-tag"><div class="tag-box" style="background:var(--t-s)"></div> Tier S</div>
+    <div class="legend-tag"><div class="tag-box" style="background:var(--t-a)"></div> Tier A</div>
+    <div class="legend-tag"><div class="tag-box" style="background:var(--t-b)"></div> Tier B</div>
+    <div class="legend-tag"><div class="tag-box" style="background:var(--t-c)"></div> Tier C</div>
+  </div>
+
+  <div class="main-table-container">
+    <table id="mainTable">
       <thead>
         <tr>
-          <th style="width:38%">
-            <div class="champ-head-cell">
-              <input type="checkbox" id="selectAll" class="select-all-cb" checked onclick="toggleSelectAll(this.checked)">
-              <span onclick="openChampModal()">CHAMP ⚙️</span>
+          <th style="width:36%">
+            <div class="champ-col-header">
+              <input type="checkbox" id="selectAllCheck" class="master-check" checked title="Выбрать всех" onclick="toggleSelectAll(this.checked)">
+              <span onclick="openModal()" style="cursor:pointer">CHAMPION ⚙️</span>
             </div>
           </th>
-          <th onclick="setSort('ad')">AD<span id="s-ad" class="sort-arrow"></span></th>
-          <th onclick="setSort('hp')">HP<span id="s-hp" class="sort-arrow"></span></th>
-          <th onclick="setSort('mana')">MN<span id="s-mana" class="sort-arrow"></span></th>
-          <th onclick="setSort('armor')">ARM<span id="s-armor" class="sort-arrow"></span></th>
-          <th onclick="setSort('mr')">MR<span id="s-mr" class="sort-arrow"></span></th>
+          <th onclick="applySort('ad')">AD<span id="s-ad" class="sort-icon"></span></th>
+          <th onclick="applySort('hp')">HP<span id="s-hp" class="sort-icon"></span></th>
+          <th onclick="applySort('mana')">MN<span id="s-mana" class="sort-icon"></span></th>
+          <th onclick="applySort('armor')">ARM<span id="s-armor" class="sort-icon"></span></th>
+          <th onclick="applySort('mr')">MR<span id="s-mr" class="sort-icon"></span></th>
         </tr>
       </thead>
-      <tbody id="tbody"></tbody>
+      <tbody id="tableBody"></tbody>
     </table>
   </div>
 
-  <div class="stats-footer" id="statsFooter"></div>
+  <div class="stats-summary" id="statsFooter"></div>
 </div>
 
-<div id="champModal" class="modal hidden">
-  <div class="modal-backdrop" onclick="closeChampModal()"></div>
-  <div class="modal-card">
-    <button class="close-corner" onclick="closeChampModal()">✕</button>
-    <div class="modal-header">
-      <div style="font-size:24px; margin-bottom:15px;">ВЫБОР ГЕРОЕВ</div>
-      <input type="text" id="champSearch" class="search-input" placeholder="Начни писать имя..." oninput="renderChampModal()">
+<div id="champModal" class="modal-overlay hidden">
+  <div class="blur-bg" onclick="closeModal()"></div>
+  <div class="modal-window">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-top">
+      <input type="text" id="searchBox" class="champ-search" placeholder="Поиск чемпиона..." oninput="drawModal()">
     </div>
-    <div id="champModalGrid" class="modal-grid"></div>
+    <div id="modalGrid" class="modal-content"></div>
   </div>
 </div>
 
 <script>
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
-  const COLS = ["ad", "hp", "mana", "armor", "mr"];
-  const roles = [
+  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
+  const STAT_KEYS = ["ad", "hp", "mana", "armor", "mr"];
+  const ROLE_LIST = [
     { key: "Top", icon: "assets/roles/top.png" },
     { key: "Jungle", icon: "assets/roles/jungle.png" },
     { key: "Mid", icon: "assets/roles/mid.png" },
@@ -233,160 +265,176 @@
     { key: "Support", icon: "assets/roles/support.png" }
   ];
 
-  let raw = [], selected = new Set(), pinned = new Set(), level = 10, sortK = 'ad', sortD = 'desc';
+  let rawData = [], selectedChamps = new Set(), pinnedChamps = new Set();
+  let currentLevel = 10, sortKey = 'ad', sortDir = 'desc';
 
-  // Load from Storage
-  if(localStorage.getItem('pinned')) pinned = new Set(JSON.parse(localStorage.getItem('pinned')));
-  if(localStorage.getItem('level')) level = +localStorage.getItem('level');
+  // Persistence
+  if(localStorage.getItem('wr_pinned')) pinnedChamps = new Set(JSON.parse(localStorage.getItem('wr_pinned')));
+  if(localStorage.getItem('wr_level')) currentLevel = +localStorage.getItem('wr_level');
 
-  async function init() {
-    const res = await fetch(CSV_URL);
-    const text = await res.text();
-    const lines = text.trim().split('\n').map(l => l.split('\t'));
-    const h = lines[0].map(s => s.trim());
-    raw = lines.slice(1).map(row => {
-      let o = {}; h.forEach((n, i) => o[n] = row[i]?.trim());
-      return {
-        name: o["Champion"], ad_b: +o["AD_Base"], ad_g: +o["AD_Growth"],
-        hp_b: +o["HP_Base"], hp_g: +o["HP_Growth"], mn_b: +o["Mana_Base"], mn_g: +o["Mana_Growth"],
-        ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"], mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
-        res: o["Resource"] || "Mana",
-        is: { Top: +o["Is_Top"]===1, Jungle: +o["Is_Jungle"]===1, Mid: +o["Is_Mid"]===1, ADC: +o["Is_Adc"]===1, Support: +o["Is_Support"]===1 }
-      };
-    }).filter(r => r.name);
+  async function loadData() {
+    try {
+      const r = await fetch(SHEET_URL);
+      const t = await r.text();
+      const lines = t.trim().split('\n').map(l => l.split('\t'));
+      const header = lines[0].map(s => s.trim());
+      
+      rawData = lines.slice(1).map(row => {
+        let o = {}; header.forEach((name, i) => o[name] = row[i]?.trim());
+        return {
+          name: o["Champion"], 
+          ad_b: +o["AD_Base"], ad_g: +o["AD_Growth"],
+          hp_b: +o["HP_Base"], hp_g: +o["HP_Growth"], 
+          mn_b: +o["Mana_Base"], mn_g: +o["Mana_Growth"],
+          ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"], 
+          mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
+          resType: o["Resource"] || "Mana",
+          roles: { 
+            Top: +o["Is_Top"]===1, Jungle: +o["Is_Jungle"]===1, 
+            Mid: +o["Is_Mid"]===1, ADC: +o["Is_Adc"]===1, 
+            Support: +o["Is_Support"]===1 
+          }
+        };
+      }).filter(x => x.name);
+
+      selectedChamps = new Set(rawData.map(x => x.name));
+      document.getElementById('level').value = currentLevel;
+      document.getElementById('levelVal').innerText = currentLevel;
+      refreshTable();
+    } catch(e) { console.error("Data Load Error", e); }
+  }
+
+  function applySort(key) {
+    if(sortKey === key) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
+    else { sortKey = key; sortDir = 'desc'; }
+    refreshTable();
+  }
+
+  function refreshTable() {
+    const tbody = document.getElementById("tableBody");
     
-    selected = new Set(raw.map(r => r.name));
-    document.getElementById('level').value = level;
-    document.getElementById('levelVal').innerText = level;
-    renderTable();
-  }
-
-  function setSort(k) {
-    if(sortK === k) sortD = sortD === 'desc' ? 'asc' : 'desc';
-    else { sortK = k; sortD = 'desc'; }
-    renderTable();
-  }
-
-  function renderTable() {
-    const tbody = document.getElementById("tbody");
-    COLS.forEach(k => {
+    // Sort Icons
+    STAT_KEYS.forEach(k => {
       const el = document.getElementById('s-' + k);
-      if(k === sortK) el.innerText = sortD === 'desc' ? ' ▼' : ' ▲';
+      if(k === sortKey) el.innerText = sortDir === 'desc' ? ' ▼' : ' ▲';
       else el.innerText = '';
     });
 
-    const data = raw.filter(r => selected.has(r.name)).map(r => {
-      let c = (b, g) => b + (level - 1) * g;
+    const processed = rawData.filter(x => selectedChamps.has(x.name)).map(x => {
+      const calc = (b, g) => b + (currentLevel - 1) * g;
       return { 
-        name: r.name, res: r.res, 
-        ad: c(r.ad_b, r.ad_g), hp: c(r.hp_b, r.hp_g), mana: c(r.mn_b, r.mn_g), armor: c(r.ar_b, r.ar_g), mr: c(r.mr_b, r.mr_g), 
-        g: { ad: r.ad_g, hp: r.hp_g, mana: r.mn_g, armor: r.ar_g, mr: r.mr_g } 
+        name: x.name, resType: x.resType, 
+        ad: calc(x.ad_b, x.ad_g), hp: calc(x.hp_b, x.hp_g), 
+        mana: calc(x.mn_b, x.mn_g), armor: calc(x.ar_b, x.ar_g), 
+        mr: calc(x.mr_b, x.mr_g), 
+        growth: { ad: x.ad_g, hp: x.hp_g, mana: x.mn_g, armor: x.ar_g, mr: x.mr_g } 
       };
-    }).sort((a,b) => sortD === 'desc' ? b[sortK] - a[sortK] : a[sortK] - b[sortK]);
+    }).sort((a,b) => sortDir === 'desc' ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]);
 
-    const thres = {};
-    COLS.forEach(k => {
-      let v = data.map(d => d[k]).sort((a,b) => a-b);
-      thres[k] = { t1: v[Math.floor(v.length*0.98)], t10: v[Math.floor(v.length*0.85)], l10: v[Math.floor(v.length*0.15)] };
+    const thresholds = {};
+    STAT_KEYS.forEach(k => {
+      let vals = processed.map(d => d[k]).sort((a,b) => a-b);
+      thresholds[k] = { 
+        s: vals[Math.floor(vals.length*0.97)], 
+        a: vals[Math.floor(vals.length*0.85)], 
+        c: vals[Math.floor(vals.length*0.15)] 
+      };
     });
 
     tbody.innerHTML = "";
-    data.forEach(r => {
+    processed.forEach(item => {
       const tr = document.createElement("tr");
-      const isP = pinned.has(r.name);
-      tr.onclick = () => {
-        document.querySelectorAll('tr').forEach(t => t.classList.remove('focused'));
-        tr.classList.add('focused');
-      };
+      const isPinned = pinnedChamps.has(item.name);
 
-      tr.innerHTML = `<td><div class="champ-card-cell">
-        <button class="btn-row-del" onclick="event.stopPropagation(); selected.delete('${r.name}'); renderTable();">✕</button>
-        <div class="champ-chip ${isP?'pinned':''}" onclick="event.stopPropagation(); togglePin('${r.name}')">${r.name}</div>
+      tr.innerHTML = `<td><div class="champ-row-ui">
+        <button class="del-row-btn" onclick="event.stopPropagation(); selectedChamps.delete('${item.name}'); refreshTable();">✕</button>
+        <div class="champ-badge ${isPinned?'pinned':''}" onclick="event.stopPropagation(); togglePin('${item.name}')">${item.name}</div>
       </div></td>`;
       
-      COLS.forEach(k => {
+      STAT_KEYS.forEach(k => {
         const td = document.createElement("td");
-        td.className = "has-tip";
-        const val = r[k];
+        td.className = "tip-anchor";
+        const val = item[k];
         
-        // Tooltip logic
+        // Tooltip
         const tip = document.createElement("div");
-        tip.className = "tip-box";
-        tip.innerText = `РОСТ: +${r.g[k]}`;
+        tip.className = "tip-popup";
+        tip.innerText = `ПРИРОСТ: +${item.growth[k]}`;
         td.appendChild(tip);
         
-        // Toggle for mobile
         td.onclick = (e) => {
           e.stopPropagation();
-          const active = td.classList.contains('active');
-          document.querySelectorAll('.has-tip').forEach(h => h.classList.remove('active'));
-          if(!active) td.classList.add('active');
+          const alreadyOpen = tip.style.display === 'block';
+          document.querySelectorAll('.tip-popup').forEach(p => p.style.display = 'none');
+          tip.style.display = alreadyOpen ? 'none' : 'block';
         };
 
-        if(k === "mana" && r.res === "Energy") { td.classList.add("nrg-cell"); td.innerHTML += "NRG"; }
-        else if(k === "mana" && val === 0) { td.style.opacity = "0.1"; td.innerHTML += "0"; }
-        else {
+        if(k === "mana" && item.resType === "Energy") { 
+          td.classList.add("energy-text"); td.innerHTML += "NRG"; 
+        } else if(k === "mana" && val === 0) { 
+          td.style.opacity = "0.2"; td.innerHTML += "0"; 
+        } else {
           td.innerHTML += Math.round(val);
-          if(val >= thres[k].t1) td.classList.add("t-s");
-          else if(val >= thres[k].t10) td.classList.add("t-a");
-          else if(val <= thres[k].l10) td.classList.add("t-c");
-          else td.classList.add("t-b");
+          if(val >= thresholds[k].s) td.classList.add("tier-s");
+          else if(val >= thresholds[k].a) td.classList.add("tier-a");
+          else if(val <= thresholds[k].c) td.classList.add("tier-c");
+          else td.classList.add("tier-b");
         }
         tr.appendChild(td);
       });
       tbody.appendChild(tr);
     });
-    renderFooterStats(data);
+    updateStatsSummary(processed);
   }
 
-  function renderFooterStats(data) {
-    if(!data.length) return;
+  function updateStatsSummary(data) {
     const foot = document.getElementById("statsFooter");
-    const avgAD = Math.round(data.reduce((a,b)=>a+b.ad,0)/data.length);
-    const avgHP = Math.round(data.reduce((a,b)=>a+b.hp,0)/data.length);
+    if(!data.length) { foot.innerHTML = ""; return; }
+    const avgAD = Math.round(data.reduce((s,x)=>s+x.ad,0)/data.length);
+    const avgHP = Math.round(data.reduce((s,x)=>s+x.hp,0)/data.length);
     foot.innerHTML = `
-      <div class="stat-item"><div class="stat-label">СРЕДНИЙ AD</div><div class="stat-val">${avgAD}</div></div>
-      <div class="stat-item"><div class="stat-label">СРЕДНИЙ HP</div><div class="stat-val">${avgHP}</div></div>
-      <div class="stat-item"><div class="stat-label">ГЕРОЕВ</div><div class="stat-val">${data.length}</div></div>
+      <div class="summary-item"><div class="summary-label">СРЕДНИЙ AD</div><div class="summary-val">${avgAD}</div></div>
+      <div class="summary-item"><div class="summary-label">СРЕДНИЙ HP</div><div class="summary-val">${avgHP}</div></div>
+      <div class="summary-item"><div class="summary-label">ВЫБРАНО</div><div class="summary-val">${data.length}</div></div>
     `;
   }
 
   function togglePin(name) { 
-    pinned.has(name) ? pinned.delete(name) : pinned.add(name); 
-    localStorage.setItem('pinned', JSON.stringify([...pinned]));
-    renderTable(); 
+    pinnedChamps.has(name) ? pinnedChamps.delete(name) : pinnedChamps.add(name); 
+    localStorage.setItem('wr_pinned', JSON.stringify([...pinnedChamps]));
+    refreshTable(); 
   }
 
-  function toggleSelectAll(checked) {
-    selected = checked ? new Set(raw.map(r => r.name)) : new Set([...pinned]);
-    renderTable();
+  function toggleSelectAll(val) {
+    selectedChamps = val ? new Set(rawData.map(x => x.name)) : new Set([...pinnedChamps]);
+    refreshTable();
   }
 
-  function openChampModal() { document.getElementById("champModal").classList.remove("hidden"); renderChampModal(); }
-  function closeChampModal() { document.getElementById("champModal").classList.add("hidden"); }
+  function openModal() { document.getElementById("champModal").classList.remove("hidden"); drawModal(); }
+  function closeModal() { document.getElementById("champModal").classList.add("hidden"); }
 
-  function renderChampModal() {
-    const grid = document.getElementById("champModalGrid");
-    const query = document.getElementById("champSearch").value.toLowerCase();
+  function drawModal() {
+    const grid = document.getElementById("modalGrid");
+    const q = document.getElementById("searchBox").value.toLowerCase();
     grid.innerHTML = "";
 
-    roles.forEach(role => {
-      const col = document.createElement("div"); col.className = "role-col";
-      const namesInRole = raw.filter(r => r.is[role.key]).map(r => r.name);
-      const isRoleFull = namesInRole.every(n => selected.has(n));
+    ROLE_LIST.forEach(role => {
+      const col = document.createElement("div"); col.className = "role-column";
+      const roleChamps = rawData.filter(x => x.roles[role.key]).map(x => x.name);
+      const isFull = roleChamps.every(n => selectedChamps.has(n));
 
-      col.innerHTML = `<div class="role-head ${isRoleFull?'active-role':''}" onclick="toggleRole('${role.key}')">
+      col.innerHTML = `<div class="role-selector ${isFull?'active':''}" onclick="batchToggleRole('${role.key}')">
         <img src="${role.icon}">
       </div>`;
       
-      const filtered = raw.filter(r => r.is[role.key] && r.name.toLowerCase().includes(query)).sort((a,b)=>a.name.localeCompare(b.name));
-      filtered.forEach(r => {
+      rawData.filter(x => x.roles[role.key] && x.name.toLowerCase().includes(q))
+             .sort((a,b)=>a.name.localeCompare(b.name)).forEach(x => {
         const btn = document.createElement("button");
-        btn.className = "champ-btn" + (selected.has(r.name)?" selected":"");
-        btn.innerText = r.name;
+        btn.className = "champ-toggle-btn" + (selectedChamps.has(x.name)?" active":"");
+        btn.innerText = x.name;
         btn.onclick = () => { 
-          selected.has(r.name) ? selected.delete(r.name) : selected.add(r.name); 
-          renderChampModal(); renderTable(); 
+          selectedChamps.has(x.name) ? selectedChamps.delete(x.name) : selectedChamps.add(x.name); 
+          drawModal(); refreshTable(); 
         };
         col.appendChild(btn);
       });
@@ -394,24 +442,24 @@
     });
   }
 
-  function toggleRole(key) {
-    const names = raw.filter(r => r.is[key]).map(r => r.name);
-    const all = names.every(n => selected.has(n));
-    names.forEach(n => all ? selected.delete(n) : selected.add(n));
-    renderChampModal(); renderTable();
+  function batchToggleRole(key) {
+    const names = rawData.filter(x => x.roles[key]).map(x => x.name);
+    const allIn = names.every(n => selectedChamps.has(n));
+    names.forEach(n => allIn ? selectedChamps.delete(n) : selectedChamps.add(n));
+    drawModal(); refreshTable();
   }
 
   document.getElementById("level").oninput = (e) => {
-    level = +e.target.value; 
-    document.getElementById("levelVal").innerText = level; 
-    localStorage.setItem('level', level);
-    renderTable();
+    currentLevel = +e.target.value; 
+    document.getElementById("levelVal").innerText = currentLevel; 
+    localStorage.setItem('wr_level', currentLevel);
+    refreshTable();
   };
 
-  // Close tips
-  window.onclick = () => document.querySelectorAll('.has-tip').forEach(h => h.classList.remove('active'));
+  // Global click to close tooltips
+  window.onclick = () => document.querySelectorAll('.tip-popup').forEach(p => p.style.display = 'none');
 
-  init();
+  loadData();
 </script>
 </body>
 </html>
