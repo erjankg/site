@@ -3,202 +3,540 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>WILD RIFT STATS - FULL MOBILE FIX</title>
+    <title>WILD RIFT STATS</title>
     <style>
-        /* --- 1. ЖЕСТКАЯ БЛОКИРОВКА СКРОЛЛА --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         html, body {
-            margin: 0; padding: 0;
             width: 100%;
             max-width: 100%;
-            overflow-x: hidden; /* ЗАПРЕТ СКРОЛЛА */
-            background-color: #05070a;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
             color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-weight: 900;
+            font-weight: 700;
         }
 
         :root {
-            --accent: #7b5cff;
-            --bg-card: #111622;
-            --border: rgba(255, 255, 255, 0.1);
-            --tier-s: #ff7f7f;
-            --tier-a: #ffbf7f;
-            --tier-b: #ffff7f;
-            --tier-c: #7fff7f;
+            --accent: #c89b3c;
+            --accent-glow: rgba(200, 155, 60, 0.4);
+            --bg-card: rgba(17, 22, 34, 0.8);
+            --border: rgba(200, 155, 60, 0.2);
+            --tier-s: #ff6b6b;
+            --tier-a: #ffa94d;
+            --tier-b: #ffd43b;
+            --tier-c: #51cf66;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+            50% { box-shadow: 0 0 30px var(--accent-glow), 0 0 40px var(--accent-glow); }
         }
 
         .app-wrapper {
             width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
+            max-width: 100vw;
+            padding: 12px;
+            overflow-x: hidden;
         }
 
+        /* HEADER */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #c89b3c 0%, #f0e68c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 20px var(--accent-glow);
         }
 
         .twitch-btn {
-            background: #9146ff;
+            background: linear-gradient(135deg, #9146ff 0%, #772ce8 100%);
             color: white;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             text-decoration: none;
-            font-size: 11px;
-            animation: twitchPulse 2s infinite;
+            font-size: 12px;
+            font-weight: 900;
+            animation: glow 2s infinite;
+            transition: transform 0.2s;
         }
 
-        @keyframes twitchPulse {
-            0% { box-shadow: 0 0 0 0 rgba(145, 70, 255, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(145, 70, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(145, 70, 255, 0); }
+        .twitch-btn:active {
+            transform: scale(0.95);
         }
 
+        /* SUPPORT BUTTON */
         .btn-support {
             display: block;
-            background: #ffffff;
+            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
             color: #000;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 14px;
+            border-radius: 12px;
             text-decoration: none;
             font-size: 14px;
             text-align: center;
             margin-bottom: 15px;
+            font-weight: 900;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            animation: fadeIn 0.6s ease;
+            transition: transform 0.2s;
         }
 
-        /* --- ПОЛЗУНОК --- */
+        .btn-support:active {
+            transform: scale(0.98);
+        }
+
+        /* LEVEL SLIDER */
         .lvl-container {
             background: var(--bg-card);
-            padding: 15px;
+            backdrop-filter: blur(10px);
+            padding: 18px;
             border-radius: 15px;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             margin-bottom: 15px;
+            animation: fadeIn 0.7s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        .lvl-info { display: flex; justify-content: space-between; align-items: center; }
-        .lvl-num { font-size: 24px; color: var(--accent); }
+        .lvl-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .lvl-num {
+            font-size: 32px;
+            color: var(--accent);
+            font-weight: 900;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .slider-wrapper {
+            position: relative;
+            padding-bottom: 25px;
+        }
 
         input[type="range"] {
             width: 100%;
-            height: 6px;
+            height: 8px;
             appearance: none;
-            background: #2d3748;
-            border-radius: 5px;
+            background: linear-gradient(90deg, #2d3748 0%, var(--accent) 60%, var(--accent) 100%);
+            border-radius: 10px;
             outline: none;
-            margin-top: 10px;
+            transition: all 0.3s;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             appearance: none;
-            width: 22px; height: 22px;
-            background: #fff;
-            border: 4px solid var(--accent);
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            border: 3px solid var(--accent);
             border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-glow);
+            transition: transform 0.2s;
         }
 
-        /* --- ТАБЛИЦА БЕЗ СКРОЛЛА --- */
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+
+        /* RULER NUMBERS */
+        .ruler {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding: 0 2px;
+        }
+
+        .ruler span {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .ruler span.active {
+            color: var(--accent);
+            font-weight: 900;
+        }
+
+        /* TABLE */
         .table-hold {
             width: 100%;
             background: var(--bg-card);
+            backdrop-filter: blur(10px);
             border-radius: 15px;
-            border: 1px solid var(--border);
-            overflow: hidden; /* НИКАКОГО СКРОЛЛА */
+            border: 2px solid var(--border);
+            overflow: hidden;
+            max-height: 60vh;
+            overflow-y: auto;
+            animation: fadeIn 0.8s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            table-layout: fixed; /* ЖЕСТКАЯ СЕТКА */
+            table-layout: fixed;
         }
 
         th {
-            background: #1a2233;
-            padding: 10px 2px;
-            font-size: 9px; /* МИНИМАЛЬНЫЙ ШРИФТ ЗАГОЛОВКОВ */
+            background: linear-gradient(135deg, #1a2233 0%, #0f1419 100%);
+            padding: 10px 4px;
+            font-size: 10px;
             border-bottom: 2px solid var(--border);
             cursor: pointer;
-            word-wrap: break-word;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+
+        th:hover {
+            background: linear-gradient(135deg, #252f45 0%, #1a2233 100%);
         }
 
         .btn-champ-cfg {
-            background: var(--accent);
-            color: white;
-            padding: 5px;
-            border-radius: 4px;
-            font-size: 8px;
+            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
+            color: #000;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 9px;
             border: none;
             font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--accent-glow);
+            transition: transform 0.2s;
         }
 
-        /* ЗАТЕМНЕНИЕ */
-        table.focus-mode td:not(:first-child) { opacity: 0.25; }
-        table.focus-mode td.active-col { opacity: 1 !important; }
+        .btn-champ-cfg:active {
+            transform: scale(0.95);
+        }
+
+        table.focus-mode td:not(:first-child) {
+            opacity: 0.3;
+        }
+
+        table.focus-mode td.active-col {
+            opacity: 1 !important;
+        }
 
         td {
-            padding: 8px 1px;
+            padding: 10px 3px;
             text-align: center;
-            font-size: 12px; /* ШРИФТ ЧИСЕЛ */
-            border-bottom: 1px solid var(--border);
+            font-size: 11px;
+            border-bottom: 1px solid rgba(200, 155, 60, 0.1);
+            transition: all 0.2s;
         }
 
-        /* КОЛОНКА ИМЕНИ */
+        tr:hover td {
+            background: rgba(200, 155, 60, 0.05);
+        }
+
         td:first-child {
-            width: 80px; /* ФИКСИРОВАННАЯ ШИРИНА ДЛЯ ИМЕНИ */
-            font-size: 10px;
+            width: 75px;
+            font-size: 9px;
             text-align: left;
-            padding-left: 5px;
+            padding-left: 6px;
         }
 
         .name-tag {
-            background: #232d42;
-            padding: 4px;
-            border-radius: 4px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 5px 6px;
+            border-radius: 6px;
             display: block;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s;
         }
-        .name-tag.pinned { background: var(--accent) !important; color: white; }
 
-        /* ТИРЫ */
-        .s { background: var(--tier-s) !important; color: #000; }
-        .a { background: var(--tier-a) !important; color: #000; }
-        .b { background: var(--tier-b) !important; color: #000; }
-        .c { background: var(--tier-c) !important; color: #000; }
+        .name-tag:hover {
+            border-color: var(--accent);
+        }
 
-        /* ПОДСКАЗКА */
+        .name-tag.pinned {
+            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
+            color: #000;
+            font-weight: 900;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* TIERS */
+        .s { background: linear-gradient(135deg, var(--tier-s) 0%, #ff8787 100%); color: #000; font-weight: 900; }
+        .a { background: linear-gradient(135deg, var(--tier-a) 0%, #ffc078 100%); color: #000; font-weight: 900; }
+        .b { background: linear-gradient(135deg, var(--tier-b) 0%, #ffe066 100%); color: #000; font-weight: 900; }
+        .c { background: linear-gradient(135deg, var(--tier-c) 0%, #69db7c 100%); color: #000; font-weight: 900; }
+
+        /* TOOLTIP */
         #uiTip {
-            position: absolute; display: none; background: #fff; color: #000;
-            padding: 5px 10px; border-radius: 5px; font-size: 11px; z-index: 1000;
-            pointer-events: none; transform: translate(-50%, -100%);
+            position: absolute;
+            display: none;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 900;
+            z-index: 1000;
+            pointer-events: none;
+            transform: translate(-50%, -100%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        /* МОДАЛКА */
+        /* MODAL */
         .m-mask {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            display: none; z-index: 2000; padding: 10px;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(5px);
+            display: none;
+            z-index: 2000;
+            padding: 0;
         }
-        .m-mask.active { display: flex; align-items: center; justify-content: center; }
-        .m-win {
-            background: #0f172a; width: 100%; height: 90vh; border-radius: 20px;
-            display: flex; flex-direction: column; position: relative;
-        }
-        .m-grid {
-            flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); /* 3 КОЛОНКИ НА МОБИЛЕ */
-            gap: 8px; padding: 15px; overflow-y: auto;
-        }
-        .m-role { background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; font-size: 10px; margin-bottom: 5px; }
-        .m-role.on { border: 2px solid var(--accent); }
-        .m-item { background: #161e2f; padding: 8px 2px; border-radius: 5px; font-size: 9px; text-align: center; margin-bottom: 4px; color: #718096; }
-        .m-item.on { background: var(--accent); color: #fff; }
 
-        @media (min-width: 600px) {
-            th { font-size: 12px; }
-            td { font-size: 15px; }
-            td:first-child { font-size: 13px; width: 120px; }
-            .m-grid { grid-template-columns: repeat(5, 1fr); }
+        .m-mask.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .m-win {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            width: 95%;
+            max-width: 500px;
+            height: 85vh;
+            border-radius: 20px;
+            border: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+
+        /* CLOSE BUTTON */
+        .btn-close-x {
+            position: absolute;
+            top: -18px;
+            right: -18px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #fff;
+            border: 4px solid #0a0e27;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.6);
+            z-index: 10;
+            font-weight: 900;
+            transition: transform 0.2s;
+        }
+
+        .btn-close-x:active {
+            transform: scale(0.9);
+        }
+
+        /* CONTROLS */
+        .m-controls {
+            padding: 20px 15px 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .m-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 900;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .m-btn-all {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .m-btn-clear {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .m-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* SEARCH */
+        .m-search {
+            padding: 0 15px 15px;
+        }
+
+        .m-search input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 12px;
+            background: rgba(5, 7, 10, 0.6);
+            border: 2px solid var(--border);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .m-search input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .m-search input::placeholder {
+            color: #64748b;
+        }
+
+        /* GRID */
+        .m-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            padding: 0 15px 15px;
+            overflow-y: auto;
+        }
+
+        /* ROLE ICON */
+        .m-role-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .m-role {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            padding: 12px 4px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .m-role img {
+            width: 100%;
+            max-width: 50px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            filter: brightness(0.8);
+            transition: all 0.3s;
+        }
+
+        .m-role:hover {
+            transform: translateY(-3px);
+        }
+
+        .m-role:hover img {
+            filter: brightness(1.2);
+        }
+
+        .m-role.on {
+            border: 2px solid var(--accent);
+            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
+            box-shadow: 0 0 25px var(--accent-glow), 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .m-role.on img {
+            filter: brightness(1.3) drop-shadow(0 0 8px rgba(255,255,255,0.5));
+        }
+
+        /* CHAMPION */
+        .m-item {
+            background: linear-gradient(135deg, #161e2f 0%, #0f1419 100%);
+            padding: 10px 4px;
+            border-radius: 10px;
+            font-size: 10px;
+            text-align: center;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.05);
+            line-height: 1.4;
+            font-weight: 700;
+        }
+
+        .m-item:hover {
+            background: linear-gradient(135deg, #1e293b 0%, #161e2f 100%);
+            transform: translateY(-2px);
+        }
+
+        .m-item.on {
+            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
+            color: #000;
+            font-weight: 900;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f0e68c 0%, var(--accent) 100%);
+        }
+
+        @media (max-width: 400px) {
+            .logo { font-size: 16px; }
+            .twitch-btn { font-size: 10px; padding: 6px 12px; }
+            th { font-size: 8px; }
+            td { font-size: 9px; }
+            td:first-child { font-size: 8px; width: 65px; }
+            .btn-champ-cfg { font-size: 7px; padding: 4px 6px; }
+            .m-item { font-size: 9px; padding: 8px 3px; }
+            .m-role img { max-width: 40px; }
         }
     </style>
 </head>
@@ -208,26 +546,29 @@
 
 <div class="app-wrapper">
     <header>
-        <div style="font-size: 18px;">ERjanKG <span style="color:var(--accent)">STATS</span></div>
-        <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">TWITCH</a>
+        <div class="logo">ERjanKG STATS</div>
+        <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">🎮 TWITCH</a>
     </header>
 
-    <a href="https://www.donationalerts.com/r/erjankg" class="btn-support" target="_blank">ПОДДЕРЖАТЬ ПРОЕКТ</a>
+    <a href="https://www.donationalerts.com/r/erjankg" class="btn-support" target="_blank">💎 ПОДДЕРЖАТЬ ПРОЕКТ</a>
 
     <div class="lvl-container">
         <div class="lvl-info">
-            <span style="font-size:12px">УРОВЕНЬ:</span>
+            <span style="font-size:13px; font-weight:700;">УРОВЕНЬ:</span>
             <span id="lvlLabel" class="lvl-num">10</span>
         </div>
-        <input type="range" id="lvlRange" min="1" max="15" value="10">
+        <div class="slider-wrapper">
+            <input type="range" id="lvlRange" min="1" max="15" value="10">
+            <div class="ruler" id="ruler"></div>
+        </div>
     </div>
 
     <div class="table-hold">
         <table id="statTable">
             <thead>
                 <tr>
-                    <th style="width: 85px;">
-                        <input type="checkbox" id="masterCheck" checked>
+                    <th>
+                        <input type="checkbox" id="masterCheck" checked style="margin-right:4px;">
                         <button class="btn-champ-cfg" onclick="openM()">CHAMP</button>
                     </th>
                     <th onclick="doSort('ad')">AD<span id="ar-ad"></span></th>
@@ -244,10 +585,17 @@
 
 <div class="m-mask" id="mMask">
     <div class="m-win">
-        <button onclick="closeM()" style="position:absolute; top:10px; right:10px; background:red; color:#fff; border:none; border-radius:50%; width:30px; height:30px;">✕</button>
-        <div style="padding: 40px 15px 10px;">
-            <input type="text" id="mSearch" placeholder="ПОИСК..." style="width:100%; padding:10px; border-radius:10px; background:#05070a; border:1px solid var(--border); color:#fff;" oninput="drawM()">
+        <button class="btn-close-x" onclick="closeM()">✕</button>
+        
+        <div class="m-controls">
+            <button class="m-btn m-btn-all" onclick="selectAll()">✓ SELECT ALL</button>
+            <button class="m-btn m-btn-clear" onclick="clearAll()">✕ CLEAR ALL</button>
         </div>
+
+        <div class="m-search">
+            <input type="text" id="mSearch" placeholder="🔍 Поиск чемпиона..." oninput="drawM()">
+        </div>
+
         <div class="m-grid" id="mGrid"></div>
     </div>
 </div>
@@ -255,6 +603,15 @@
 <script>
     const G_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
     let raw = [], selected = new Set(), pinned = new Set(), lvl = 10, sK = 'ad', sD = 'desc';
+
+    // ROLE ICONS - Base64 версии загруженных изображений
+    const roleIconsBase64 = {
+        "Support": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084556.png",
+        "ADC": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084544.png",
+        "Mid": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084530.png",
+        "Jungle": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084515.png",
+        "Top": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084500.png"
+    };
 
     async function start() {
         if(localStorage.getItem('p')) pinned = new Set(JSON.parse(localStorage.getItem('p')));
@@ -281,7 +638,28 @@
         
         selected = new Set(raw.map(x => x.name));
         initApp();
+        createRuler();
         render();
+    }
+
+    function createRuler() {
+        const ruler = document.getElementById('ruler');
+        for(let i = 1; i <= 15; i++) {
+            const span = document.createElement('span');
+            span.innerText = i;
+            span.id = 'lvl-' + i;
+            if(i === lvl) span.classList.add('active');
+            ruler.appendChild(span);
+        }
+    }
+
+    function updateRuler() {
+        for(let i = 1; i <= 15; i++) {
+            const el = document.getElementById('lvl-' + i);
+            if(el) {
+                el.classList.toggle('active', i === lvl);
+            }
+        }
     }
 
     function render() {
@@ -295,7 +673,16 @@
 
         const data = raw.filter(x => selected.has(x.name)).map(x => {
             const f = (b, g) => b + (lvl - 1) * g;
-            return { name: x.name, res: x.res, ad: f(x.ad_b, x.ad_g), hp: f(x.hp_b, x.hp_g), mana: f(x.mn_b, x.mn_g), armor: f(x.ar_b, x.ar_g), mrez: f(x.mr_b, x.mr_g), g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g} };
+            return { 
+                name: x.name, 
+                res: x.res, 
+                ad: f(x.ad_b, x.ad_g), 
+                hp: f(x.hp_b, x.hp_g), 
+                mana: f(x.mn_b, x.mn_g), 
+                armor: f(x.ar_b, x.ar_g), 
+                mrez: f(x.mr_b, x.mr_g), 
+                g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g} 
+            };
         }).sort((a,b) => sD === 'desc' ? b[sK] - a[sK] : a[sK] - b[sK]);
 
         const getT = (k) => {
@@ -333,7 +720,7 @@
         const t = document.getElementById('uiTip');
         t.style.display = 'block';
         t.innerText = "+" + v;
-        t.style.top = (e.pageY - 10) + 'px';
+        t.style.top = (e.pageY - 30) + 'px';
         t.style.left = e.pageX + 'px';
         setTimeout(() => t.style.display = 'none', 1500);
     }
@@ -350,40 +737,79 @@
         render();
     }
 
-    function openM() { document.getElementById('mMask').classList.add('active'); drawM(); }
-    function closeM() { document.getElementById('mMask').classList.remove('active'); }
+    function openM() { 
+        document.getElementById('mMask').classList.add('active'); 
+        drawM(); 
+    }
+    
+    function closeM() { 
+        document.getElementById('mMask').classList.remove('active'); 
+    }
+
+    function selectAll() {
+        selected = new Set(raw.map(x => x.name));
+        document.getElementById('masterCheck').checked = true;
+        drawM();
+        render();
+    }
+
+    function clearAll() {
+        selected = new Set([...pinned]);
+        document.getElementById('masterCheck').checked = false;
+        drawM();
+        render();
+    }
 
     function drawM() {
         const grid = document.getElementById('mGrid');
         const q = document.getElementById('mSearch').value.toLowerCase();
         grid.innerHTML = "";
-        ["Top","Jungle","Mid","ADC","Support"].forEach(role => {
-            const sec = document.createElement('div');
+        
+        ["Support","ADC","Mid","Jungle","Top"].forEach(role => {
+            const container = document.createElement('div');
+            container.className = 'm-role-container';
+            
             const champs = raw.filter(x => x.is[role]);
             const isAll = champs.every(x => selected.has(x.name));
-            sec.innerHTML = `<div class="m-role ${isAll?'on':''}" onclick="roleT('${role}', ${isAll})">${role}</div>`;
+            
+            // ROLE ICON
+            const roleDiv = document.createElement('div');
+            roleDiv.className = `m-role ${isAll?'on':''}`;
+            roleDiv.innerHTML = `<img src="${roleIconsBase64[role]}" alt="${role}">`;
+            roleDiv.onclick = () => roleT(role, isAll);
+            container.appendChild(roleDiv);
+            
+            // CHAMPIONS
             champs.filter(x => x.name.toLowerCase().includes(q)).forEach(c => {
                 const btn = document.createElement('div');
                 btn.className = `m-item ${selected.has(c.name)?'on':''}`;
                 btn.innerText = c.name;
-                btn.onclick = () => { selected.has(c.name)?selected.delete(c.name):selected.add(c.name); drawM(); render(); };
-                sec.appendChild(btn);
+                btn.onclick = () => { 
+                    selected.has(c.name) ? selected.delete(c.name) : selected.add(c.name); 
+                    drawM(); 
+                    render(); 
+                };
+                container.appendChild(btn);
             });
-            grid.appendChild(sec);
+            
+            grid.appendChild(container);
         });
     }
 
     function roleT(r, isAll) {
         raw.filter(x => x.is[r]).forEach(x => isAll ? selected.delete(x.name) : selected.add(x.name));
-        drawM(); render();
+        drawM(); 
+        render();
     }
 
     function initApp() {
         document.getElementById('lvlRange').oninput = (e) => {
             lvl = +e.target.value;
             document.getElementById('lvlLabel').innerText = lvl;
+            updateRuler();
             render();
         };
+        
         document.getElementById('masterCheck').onchange = (e) => {
             selected = e.target.checked ? new Set(raw.map(x => x.name)) : new Set([...pinned]);
             render();
