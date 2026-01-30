@@ -592,15 +592,53 @@ table tbody td:first-child {
 }
 
 /* Mobile: modal becomes 1 column */
-@media (max-width: 700px){
-  .modal-grid{ grid-template-columns: 1fr; }
-  .modal-search{ width: 140px; }
+
+
+
+
+
+
+/* Modal grid: always 5 columns */
+.modal-grid{
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
 }
 
+/* Make champion buttons fit in narrow columns */
+.champ-btn{
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-
-
-
+/* Mobile: keep 5 columns, just make it smaller */
+@media (max-width: 600px){
+  .modal-card{
+    width: 96vw;
+    height: 86vh;
+  }
+  .modal-grid{
+    gap: 6px;
+  }
+  .role-head{
+    padding: 8px 6px;
+  }
+  .role-head img{
+    width: 22px;
+    height: 22px;
+  }
+  .role-body{
+    padding: 8px;
+    gap: 6px;
+  }
+  .champ-btn{
+    padding: 6px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+  }
+}
 
 
 
@@ -655,12 +693,7 @@ table tbody td:first-child {
 
 
 
-    <div class="card">
-      <label for="search">Search</label>
-      <input id="search" type="text" placeholder="Type champion name…" />
-      <div class="small">Сортировка: клик по заголовку колонки.</div>
-    </div>
-  
+   
   
   </div>
 
@@ -696,7 +729,7 @@ table tbody td:first-child {
       <div class="modal-title">Choose Champions</div>
 
       <div class="modal-actions">
-        <input id="champModalSearch" class="modal-search" type="text" placeholder="Search champion..." />
+      
         <button id="champModalSelectAll" class="mini-btn" type="button">Select all</button>
         <button id="champModalClearAll" class="mini-btn" type="button">Clear all</button>
         <button id="champModalClose" class="mini-btn" type="button">Close</button>
@@ -837,9 +870,9 @@ tr.appendChild(thC);
 function openChampModal(){
   champModalEl.classList.remove("hidden");
   champModalEl.setAttribute("aria-hidden", "false");
-  champModalSearch.value = "";
+ 
   renderChampModal();
-  setTimeout(() => champModalSearch.focus(), 0);
+
 }
 
 function closeChampModal(){
@@ -847,8 +880,8 @@ function closeChampModal(){
   champModalEl.setAttribute("aria-hidden", "true");
 }
 
-function renderChampModal(){
-  const q = champModalSearch.value.trim().toLowerCase();
+
+ 
 
   const rolesList = [
     { key: "Top",     label: "Top",     icon: "assets/roles/top.png" },
@@ -906,7 +939,27 @@ function renderChampModal(){
     col.appendChild(body);
     champModalGridEl.appendChild(col);
   });
-}
+
+const champsAll = raw
+  .filter(r => r.roles?.[role.key])
+  .map(r => r.champion)
+  .sort((a,b) => a.localeCompare(b));
+
+const allSelected = champsAll.length > 0 && champsAll.every(n => selected.has(n));
+
+// сделаем header кликабельным
+head.style.cursor = "pointer";
+head.title = allSelected ? "Unselect all in this role" : "Select all in this role";
+
+head.onclick = () => {
+  if (allSelected) {
+    champsAll.forEach(n => selected.delete(n));
+  } else {
+    champsAll.forEach(n => selected.add(n));
+  }
+  renderChampModal();
+  render();
+};
 
 
   function toggleSort(key) {
@@ -1135,6 +1188,19 @@ function closeChampModal() {
 
     // По умолчанию выбираем всех
     selected = new Set(raw.map(r => r.champion));
+    // Modal buttons (after raw is loaded)
+champModalSelectAllEl.onclick = () => {
+  selected = new Set(raw.map(r => r.champion));
+  renderChampModal();
+  render();
+};
+
+champModalClearAllEl.onclick = () => {
+  selected = new Set();
+  renderChampModal();
+  render();
+};
+
 
    
     buildHeader();
