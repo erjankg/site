@@ -593,6 +593,13 @@
             .m-item { font-size: 9px; padding: 6px 2px; }
             .m-role img { max-width: 38px; }
         }
+        /* 🚫 убираем затемняющий hover у строк таблицы */
+tbody tr:hover,
+tbody tr:active,
+tbody tr:focus {
+  background: transparent !important;
+}
+
     </style>
 </head>
 <body>
