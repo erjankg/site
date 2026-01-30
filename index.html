@@ -3,660 +3,299 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Wild Rift Pro Stats - ERjanKG Edition</title>
+    <title>Wild Rift Stats PRO</title>
     <style>
         /* =========================================
-           1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ЦВЕТА
+           1. ПЕРЕМЕННЫЕ И ТЕМЫ
            ========================================= */
         :root {
-            --bg-deep: #05070a;
-            --card-main: #111622;
-            --accent: #7b5cff;
-            --text-high: #ffffff;
-            --text-mid: #a0aec0;
-            --border-ui: rgba(255, 255, 255, 0.15);
-            
-            /* КЛАССИЧЕСКИЕ ЦВЕТА ТИРОВ */
-            --s-color: #ff7f7f; /* Красный (S) */
-            --a-color: #ffbf7f; /* Оранжевый (A) */
-            --b-color: #ffff7f; /* Желтый (B) */
-            --c-color: #7fff7f; /* Зеленый (C) */
-            
-            --energy-glow: #ffff00;
+            --bg: #05070a; --card: #111622; --text: #ffffff; --sub: #a0aec0;
+            --brd: rgba(255, 255, 255, 0.1); --primary: #7b5cff;
+            --t-s: #ff7f7f; --t-a: #ffbf7f; --t-b: #ffff7f; --t-c: #7fff7f;
+        }
+        body.light-mode {
+            --bg: #f0f2f5; --card: #ffffff; --text: #1a202c; --sub: #4a5568;
+            --brd: rgba(0, 0, 0, 0.1); --primary: #6366f1;
+            --t-s: #ff9999; --t-a: #ffcc99; --t-b: #ffff99; --t-c: #99ff99;
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { 
+            margin: 0; padding: 0; width: 100%; overflow-x: hidden; 
+            font-family: system-ui, -apple-system, sans-serif; font-weight: 800;
+            background: var(--bg); color: var(--text); transition: background 0.3s;
+        }
+
+        .wrapper { width: 100%; max-width: 100%; padding: 10px; margin: 0 auto; }
+
         /* =========================================
-           2. БАЗОВЫЕ СТИЛИ (RESET)
+           2. ШАПКА И КНОПКИ (АНИМАЦИЯ)
            ========================================= */
-        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .logo { font-size: 1.2rem; font-weight: 900; }
         
-        body {
-            margin: 0;
-            background-color: var(--bg-deep);
-            color: var(--text-high);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            font-weight: 900; /* Максимальная жирность */
-            overflow-x: hidden;
-            line-height: 1.5;
+        .twitch-btn {
+            background: #9146ff; color: #fff; padding: 8px 12px; border-radius: 20px;
+            text-decoration: none; font-size: 12px; animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(145, 70, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(145, 70, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(145, 70, 255, 0); }
         }
 
-        .app-container {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
+        .theme-toggle { 
+            background: var(--card); border: 1px solid var(--brd); 
+            color: var(--text); padding: 5px 10px; border-radius: 10px; cursor: pointer;
         }
 
-        /* =========================================
-           3. ШАПКА И ДОНАТ
-           ========================================= */
-        .main-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+        .support-box { 
+            background: var(--card); border: 1px solid var(--brd); 
+            padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: center;
         }
-
-        .logo-text {
-            font-size: 32px;
-            letter-spacing: -1px;
-            background: linear-gradient(45deg, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .twitch-link {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #9146ff;
-            padding: 12px 24px;
-            border-radius: 50px;
-            text-decoration: none;
-            color: white;
-            font-size: 14px;
-            box-shadow: 0 5px 20px rgba(145, 70, 255, 0.4);
-            transition: 0.3s;
-        }
-
-        .donate-section {
-            background: var(--card-main);
-            border: 2px solid var(--border-ui);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .btn-donate {
-            display: inline-block;
-            width: 100%;
-            max-width: 500px;
-            background: #ffffff;
-            color: #000;
-            padding: 18px;
-            border-radius: 14px;
-            text-decoration: none;
-            font-size: 18px;
-            transition: 0.3s;
+        .support-link { 
+            display: block; background: var(--primary); color: #fff; 
+            text-decoration: none; padding: 12px; border-radius: 10px; font-size: 14px;
         }
 
         /* =========================================
-           4. ПАНЕЛЬ УРОВНЯ (ПОЛЗУНОК)
+           3. ПОЛЗУНОК
            ========================================= */
-        .level-panel {
-            background: var(--card-main);
-            border: 2px solid var(--border-ui);
-            padding: 30px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-        }
-
-        .level-info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .level-title { color: var(--accent); font-size: 20px; }
-        .level-current { font-size: 36px; text-shadow: 0 0 15px var(--accent); }
-
-        .slider-wrapper { position: relative; padding: 10px 0; }
-
-        input[type="range"] {
-            width: 100%;
-            height: 12px;
-            appearance: none;
-            background: #2d3748;
-            border-radius: 10px;
-            outline: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 32px;
-            height: 32px;
-            background: #fff;
-            border: 5px solid var(--accent);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-        }
-
-        .slider-ruler {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            padding: 0 5px;
-        }
-
-        .ruler-digit { font-size: 14px; color: var(--text-mid); }
+        .lvl-box { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+        .lvl-head { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+        input[type="range"] { width: 100%; height: 8px; appearance: none; background: #2d3748; border-radius: 5px; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: #fff; border: 3px solid var(--primary); border-radius: 50%; }
+        .ruler { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: var(--sub); }
 
         /* =========================================
-           5. ТАБЛИЦА С ФУНКЦИЕЙ ЗАТЕМНЕНИЯ
+           4. ТАБЛИЦА (ЗАТЕМНЕНИЕ И СКРОЛЛ)
            ========================================= */
-        .stats-viewport {
-            background: var(--card-main);
-            border: 2px solid var(--border-ui);
-            border-radius: 20px;
-            overflow-x: auto;
-            position: relative;
+        .table-container { 
+            width: 100%; overflow-x: auto; background: var(--card); 
+            border-radius: 15px; border: 1px solid var(--brd);
+            -webkit-overflow-scrolling: touch;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 900px;
-            transition: opacity 0.4s ease;
+        table { width: 100%; border-collapse: collapse; min-width: 500px; table-layout: fixed; }
+        th { 
+            background: var(--card); padding: 12px 5px; font-size: 11px; 
+            position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--brd);
         }
-
-        th {
-            background: #1a2233;
-            padding: 25px 10px;
-            font-size: 14px;
-            text-transform: uppercase;
-            cursor: pointer;
-            border-bottom: 4px solid var(--border-ui);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        
+        /* Логика затемнения */
+        table.focus-mode td:not(:first-child) { opacity: 0.4; } /* Затемняем только статы */
+        table.focus-mode td.active-col { opacity: 1 !important; background: rgba(123, 92, 255, 0.1); }
+        
+        td { padding: 10px 2px; text-align: center; font-size: 13px; border-bottom: 1px solid var(--brd); }
+        
+        .champ-name { 
+            display: block; padding: 6px; background: #2d3748; border-radius: 6px; 
+            font-size: 10px; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
         }
+        .pinned { background: var(--primary) !important; color: #fff; box-shadow: 0 0 10px var(--primary); }
 
-        /* СТРЕЛОЧКИ СОРТИРОВКИ */
-        .sort-indicator {
-            display: inline-block;
-            margin-left: 8px;
-            color: var(--accent);
-            transition: transform 0.3s;
-        }
-
-        /* ЛОГИКА ЗАТЕМНЕНИЯ СТОЛБЦОВ */
-        td, th { transition: opacity 0.3s ease, background 0.3s ease; }
-
-        /* Когда таблица в режиме фокуса */
-        table.focus-active td, 
-        table.focus-active th {
-            opacity: 0.2; /* Затемняем всё */
-        }
-
-        /* Исключаем из затемнения активный столбец и имена */
-        table.focus-active .col-active,
-        table.focus-active .th-active,
-        table.focus-active td:first-child {
-            opacity: 1; /* Оставляем ярким */
-        }
-
-        td {
-            padding: 18px 10px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-ui);
-            font-size: 17px;
-            position: relative;
-        }
-
-        /* ЦВЕТА ТИРОВ */
-        .tier-s { background-color: var(--s-color) !important; color: #000; }
-        .tier-a { background-color: var(--a-color) !important; color: #000; }
-        .tier-b { background-color: var(--b-color) !important; color: #000; }
-        .tier-c { background-color: var(--c-color) !important; color: #000; }
-
-        /* ЧИП ИМЕНИ ЧЕМПИОНА */
-        .champ-chip {
-            background: #232d42;
-            padding: 10px 15px;
-            border-radius: 12px;
-            display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        /* Цвета Тиров */
+        .s { background: var(--t-s) !important; color: #000; }
+        .a { background: var(--t-a) !important; color: #000; }
+        .b { background: var(--t-b) !important; color: #000; }
+        .c { background: var(--t-c) !important; color: #000; }
 
         /* =========================================
-           6. СИСТЕМА КАСТОМНЫХ ПОДСКАЗОК (TOOLTIP)
+           5. МОДАЛКА
            ========================================= */
-        .stat-tooltip {
-            position: absolute;
-            display: none;
-            background: #fff;
-            color: #000;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 900;
-            z-index: 500;
-            pointer-events: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            transform: translate(-50%, -120%);
+        .modal { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            display: none; z-index: 1000; padding: 10px; 
         }
-        .stat-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%; left: 50%;
-            margin-left: -6px;
-            border: 6px solid transparent;
-            border-top-color: #fff;
+        .modal-content { 
+            background: var(--bg); width: 100%; height: 90vh; border-radius: 20px; 
+            display: flex; flex-direction: column; position: relative;
         }
+        .modal-grid { 
+            flex: 1; display: grid; grid-template-columns: repeat(5, 1fr); 
+            gap: 8px; padding: 10px; overflow-y: auto; 
+        }
+        .role-btn { 
+            background: var(--card); padding: 10px; border-radius: 10px; 
+            text-align: center; border: 2px solid transparent; 
+        }
+        .role-btn.on { border-color: var(--primary); }
+        .role-btn img { width: 20px; height: 20px; }
+        .champ-item { 
+            padding: 8px 2px; background: var(--card); border: 1px solid var(--brd); 
+            border-radius: 6px; font-size: 9px; color: var(--sub); cursor: pointer;
+        }
+        .champ-item.on { background: var(--primary); color: #fff; }
 
-        /* =========================================
-           7. МОДАЛЬНОЕ ОКНО
-           ========================================= */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 2000;
-            display: none;
-            padding: 20px;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-overlay.is-visible { display: flex; }
-
-        .modal-content {
-            background: #0f172a;
-            width: 100%;
-            max-width: 1100px;
-            height: 85vh;
-            border-radius: 30px;
-            border: 2px solid var(--border-ui);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .modal-header { padding: 30px; border-bottom: 2px solid var(--border-ui); }
-        .search-box {
-            width: 100%;
-            padding: 18px;
-            background: #05070a;
-            border: 2px solid var(--border-ui);
-            border-radius: 15px;
-            color: #fff;
-            font-size: 20px;
-            font-weight: 800;
-        }
-
-        .modal-grid {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            padding: 25px;
-            overflow-y: auto;
-        }
-
-        .role-group { display: flex; flex-direction: column; gap: 10px; }
-        .role-title { 
-            text-align: center; background: #1e293b; padding: 15px; border-radius: 15px; 
-            margin-bottom: 10px; cursor: pointer; border: 3px solid transparent;
-        }
-        .role-title.active { border-color: var(--accent); background: rgba(123, 92, 255, 0.2); }
-
-        .champ-toggle-btn {
-            padding: 12px;
-            background: #161e2f;
-            border: 1px solid var(--border-ui);
-            color: var(--text-mid);
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 900;
-        }
-        .champ-toggle-btn.is-active { background: var(--accent); color: white; border-color: #fff; }
-
-        .close-modal-x {
-            position: absolute; top: 20px; right: 20px;
-            background: #ff4d4f; border: none; color: white;
-            width: 45px; height: 45px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 10;
-        }
-
+        /* Всплывающее окно (Tooltip) работает через браузерный title или кастомный блок */
+        .custom-tip { position: absolute; background: #fff; color: #000; padding: 5px; border-radius: 5px; display: none; z-index: 100; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    
-    <header class="main-header">
-        <div class="logo-text">ERjanKG PRO STATS</div>
-        <a href="https://www.twitch.tv/ERjanKG" class="twitch-link" target="_blank">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" width="20">
-            TWITCH.TV
-        </a>
-    </header>
-
-    <section class="donate-section">
-        <div style="margin-bottom: 15px; font-size: 14px; color: var(--text-mid);">ПОДДЕРЖКА АВТОРА И РАЗВИТИЕ ПРОЕКТА</div>
-        <a href="https://www.donationalerts.com/r/erjankg" class="btn-donate" target="_blank">ОТПРАВИТЬ ДОНАТ 💜</a>
-    </section>
-
-    <section class="level-panel">
-        <div class="level-info-row">
-            <span class="level-title">ВЫБЕРИТЕ УРОВЕНЬ:</span>
-            <span id="lvlDisplay" class="level-current">10</span>
+<div class="wrapper">
+    <div class="header">
+        <div class="logo">ERjanKG</div>
+        <div style="display:flex; gap:10px;">
+            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+            <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">TWITCH</a>
         </div>
-        <div class="slider-wrapper">
-            <input type="range" id="lvlRange" min="1" max="15" value="10">
-            <div class="slider-ruler" id="rulerTicks"></div>
-        </div>
-    </section>
-
-    <div class="stats-viewport">
-        <table id="mainDataTable">
-            <thead>
-                <tr>
-                    <th style="width: 35%;" onclick="openChampModal()">
-                        CHAMPION <span style="font-size: 12px; color: var(--accent);">[ НАСТРОИТЬ ]</span>
-                    </th>
-                    <th onclick="handleSort('ad')">AD <span id="arr-ad" class="sort-indicator"></span></th>
-                    <th onclick="handleSort('hp')">HP <span id="arr-hp" class="sort-indicator"></span></th>
-                    <th onclick="handleSort('mana')">MN <span id="arr-mana" class="sort-indicator"></span></th>
-                    <th onclick="handleSort('armor')">AR <span id="arr-armor" class="sort-indicator"></span></th>
-                    <th onclick="handleSort('mr')">MR <span id="arr-mr" class="sort-indicator"></span></th>
-                </tr>
-            </thead>
-            <tbody id="statsBody">
-                </tbody>
-        </table>
     </div>
 
-    <div id="uiTooltip" class="stat-tooltip"></div>
+    <div class="support-box">
+        <a href="https://www.donationalerts.com/r/erjankg" class="support-link" target="_blank">ПОДДЕРЖАТЬ</a>
+    </div>
 
+    <div class="lvl-box">
+        <div class="lvl-head"><span>УРОВЕНЬ:</span><span id="lvlVal" style="font-size:20px; color:var(--primary)">10</span></div>
+        <input type="range" id="lvlIn" min="1" max="15" value="10">
+        <div class="ruler"><span>1</span><span>5</span><span>10</span><span>15</span></div>
+    </div>
+
+    <div class="table-container">
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th style="width:100px">
+                        <input type="checkbox" id="masterBox" checked onclick="masterToggle(this.checked)">
+                        <span onclick="openModal()" style="border-bottom:1px solid">CHAMP ⚙️</span>
+                    </th>
+                    <th onclick="setSort('ad')">AD <span id="s-ad"></span></th>
+                    <th onclick="setSort('hp')">HP <span id="s-hp"></span></th>
+                    <th onclick="setSort('mana')">MN <span id="s-mana"></span></th>
+                    <th onclick="setSort('armor')">AR <span id="s-armor"></span></th>
+                    <th onclick="setSort('mr')">MR <span id="s-mr"></span></th>
+                </tr>
+            </thead>
+            <tbody id="tBody"></tbody>
+        </table>
+    </div>
 </div>
 
-<div id="modalSelect" class="modal-overlay">
+<div id="modal" class="modal">
     <div class="modal-content">
-        <button class="close-modal-x" onclick="closeChampModal()">✕</button>
-        <div class="modal-header">
-            <input type="text" id="modalSearchInput" class="search-box" placeholder="Поиск чемпиона по имени..." oninput="refreshModalGrid()">
-        </div>
-        <div id="modalGrid" class="modal-grid">
-            </div>
+        <button onclick="closeModal()" style="position:absolute; top:10px; right:10px; background:red; color:#fff; border:none; border-radius:50%; width:30px; height:30px;">✕</button>
+        <div style="padding:40px 10px 10px;"><input type="text" id="mSearch" placeholder="Поиск..." style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--brd); background:var(--card); color:var(--text);" oninput="renderModal()"></div>
+        <div id="mGrid" class="modal-grid"></div>
     </div>
 </div>
 
 <script>
-    /* ============================================================
-       1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И КОНФИГУРАЦИЯ
-       ============================================================ */
-    const DATA_SOURCE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
-    
-    let championsRaw = [];
-    let activeSelection = new Set();
-    let currentLvl = 10;
-    let sorting = { key: 'ad', dir: 'desc' };
+    const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
+    let raw = [], selected = new Set(), pinned = new Set(), lvl = 10, sK = 'ad', sD = 'desc';
 
-    /* ============================================================
-       2. ЗАПУСК ПРИЛОЖЕНИЯ
-       ============================================================ */
-    async function startEngine() {
-        // Создаем линейку
-        const ruler = document.getElementById('rulerTicks');
-        for(let i=1; i<=15; i++) {
-            const dot = document.createElement('span');
-            dot.className = 'ruler-digit';
-            dot.innerText = i;
-            ruler.appendChild(dot);
-        }
-
-        // Загружаем данные
-        try {
-            const resp = await fetch(DATA_SOURCE);
-            const text = await resp.text();
-            processData(text);
-            
-            // Восстанавливаем сохраненный уровень
-            const savedLvl = localStorage.getItem('wr_user_lvl');
-            if(savedLvl) {
-                currentLvl = parseInt(savedLvl);
-                document.getElementById('lvlRange').value = currentLvl;
-                document.getElementById('lvlDisplay').innerText = currentLvl;
-            }
-
-            // По умолчанию выбираем всех
-            activeSelection = new Set(championsRaw.map(c => c.name));
-            
-            setupListeners();
-            updateTable();
-        } catch (e) {
-            console.error("Critical error loading data:", e);
-        }
-    }
-
-    /* ============================================================
-       3. ПАРСИНГ TSV (GOOGLE SHEETS)
-       ============================================================ */
-    function processData(tsv) {
-        const lines = tsv.trim().split('\n');
-        const heads = lines[0].split('\t').map(h => h.trim());
-
-        championsRaw = lines.slice(1).map(row => {
-            const cells = row.split('\t');
-            const data = {};
-            heads.forEach((h, i) => data[h] = cells[i]?.trim());
-
+    async function init() {
+        const r = await fetch(URL);
+        const t = await r.text();
+        const rows = t.trim().split('\n').map(l => l.split('\t'));
+        const h = rows[0].map(c => c.trim());
+        raw = rows.slice(1).map(row => {
+            let o = {}; h.forEach((n, i) => o[n] = row[i]?.trim());
             return {
-                name: data["Champion"],
-                ad_b: parseFloat(data["AD_Base"]), ad_g: parseFloat(data["AD_Growth"]),
-                hp_b: parseFloat(data["HP_Base"]), hp_g: parseFloat(data["HP_Growth"]),
-                mn_b: parseFloat(data["Mana_Base"]), mn_g: parseFloat(data["Mana_Growth"]),
-                ar_b: parseFloat(data["Armor_Base"]), ar_g: parseFloat(data["Armor_Growth"]),
-                mr_b: parseFloat(data["MR_Base"]), mr_g: parseFloat(data["MR_Growth"]),
-                resType: data["Resource"] || "Mana",
-                isRole: {
-                    Top: data["Is_Top"] === "1",
-                    Jungle: data["Is_Jungle"] === "1",
-                    Mid: data["Is_Mid"] === "1",
-                    ADC: data["Is_Adc"] === "1",
-                    Support: data["Is_Support"] === "1"
-                }
+                name: o["Champion"], 
+                ad_b: +o["AD_Base"], ad_g: +o["AD_Growth"],
+                hp_b: +o["HP_Base"], hp_g: +o["HP_Growth"],
+                mn_b: +o["Mana_Base"], mn_g: +o["Mana_Growth"],
+                ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"],
+                mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
+                is: { Top: +o["Is_Top"]==1, Jungle: +o["Is_Jungle"]==1, Mid: +o["Is_Mid"]==1, ADC: +o["Is_Adc"]==1, Support: +o["Is_Support"]==1 }
             };
-        }).filter(c => c.name);
+        }).filter(x => x.name);
+        selected = new Set(raw.map(x => x.name));
+        render();
     }
 
-    /* ============================================================
-       4. ОСНОВНАЯ ФУНКЦИЯ ОТРИСОВКИ ТАБЛИЦЫ
-       ============================================================ */
-    function updateTable() {
-        const tbody = document.getElementById('statsBody');
-        const table = document.getElementById('mainDataTable');
-        
-        // Включаем режим фокуса (затемнения)
-        table.classList.add('focus-active');
+    function setSort(k) {
+        if(sK === k) sD = sD === 'desc' ? 'asc' : 'desc';
+        else { sK = k; sD = 'desc'; }
+        render();
+    }
 
-        // Обновляем стрелочки и заголовки
+    function render() {
+        const b = document.getElementById("tBody");
+        const table = document.getElementById("mainTable");
+        table.classList.add("focus-mode");
+
+        document.querySelectorAll('th span').forEach(s => s.innerText = '');
+        document.getElementById('s-'+sK).innerText = sD === 'desc' ? '▼' : '▲';
+
+        const data = raw.filter(x => selected.has(x.name)).map(x => {
+            const c = (b, g) => b + (lvl - 1) * g;
+            return { name: x.name, ad: c(x.ad_b, x.ad_g), hp: c(x.hp_b, x.hp_g), mana: c(x.mn_b, x.mn_g), armor: c(x.ar_b, x.ar_g), mr: c(x.mr_b, x.mr_g), grow: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mr:x.mr_g} };
+        }).sort((a,b) => sD === 'desc' ? b[sK] - a[sK] : a[sK] - b[sK]);
+
+        const thres = {};
         ['ad','hp','mana','armor','mr'].forEach(k => {
-            const indicator = document.getElementById('arr-' + k);
-            const th = indicator.parentElement;
-            indicator.innerText = '';
-            th.classList.remove('th-active');
-            
-            if(k === sorting.key) {
-                indicator.innerText = sorting.dir === 'desc' ? '▼' : '▲';
-                th.classList.add('th-active');
-            }
+            let v = data.map(d => d[k]).sort((a,b) => a-b);
+            thres[k] = { s: v[Math.floor(v.length*0.95)], a: v[Math.floor(v.length*0.80)], c: v[Math.floor(v.length*0.20)] };
         });
 
-        // Расчет данных на текущий уровень
-        const calculated = championsRaw.filter(c => activeSelection.has(c.name)).map(c => {
-            const f = (b, g) => b + (currentLvl - 1) * g;
-            return {
-                name: c.name, res: c.resType,
-                ad: f(c.ad_b, c.ad_g), hp: f(c.hp_b, c.hp_g), mana: f(c.mn_b, c.mn_g),
-                armor: f(c.ar_b, c.ar_g), mr: f(c.mr_b, c.mr_g),
-                grow: { ad: c.ad_g, hp: c.hp_g, mana: c.mn_g, armor: c.ar_g, mr: c.mr_g }
-            };
-        });
-
-        // Сортировка
-        calculated.sort((a, b) => {
-            return sorting.dir === 'desc' ? b[sorting.key] - a[sorting.key] : a[sorting.key] - b[sorting.key];
-        });
-
-        // Вычисление порогов для цветов (Тиров)
-        const getLimits = (key) => {
-            const vals = calculated.map(i => i[key]).sort((a,b) => a-b);
-            return {
-                s: vals[Math.floor(vals.length * 0.95)],
-                a: vals[Math.floor(vals.length * 0.80)],
-                c: vals[Math.floor(vals.length * 0.20)]
-            };
-        };
-
-        const limits = {
-            ad: getLimits('ad'), hp: getLimits('hp'), mana: getLimits('mana'),
-            armor: getLimits('armor'), mr: getLimits('mr')
-        };
-
-        // Генерация строк
-        tbody.innerHTML = "";
-        calculated.forEach(item => {
-            const row = document.createElement('tr');
+        b.innerHTML = "";
+        data.forEach(x => {
+            const tr = document.createElement("tr");
+            const isP = pinned.has(x.name);
+            tr.innerHTML = `<td><span class="champ-name ${isP?'pinned':''}" onclick="togglePin('${x.name}')">${x.name}</span></td>`;
             
-            // Колонка Имени
-            let html = `<td><span class="champ-chip">${item.name}</span></td>`;
-            
-            // Колонки Статов
-            ['ad', 'hp', 'mana', 'armor', 'mr'].forEach(key => {
-                const val = item[key];
-                let tClass = "";
-                let activeClass = (key === sorting.key) ? "col-active" : "";
+            ['ad','hp','mana','armor','mr'].forEach(k => {
+                const td = document.createElement("td");
+                const v = x[k];
+                if(k === sK) td.className = "active-col ";
+                
+                td.innerText = Math.round(v);
+                if(v >= thres[k].s) td.className += "s";
+                else if(v >= thres[k].a) td.className += "a";
+                else if(v <= thres[k].c) td.className += "c";
+                else td.className += "b";
 
-                if (val >= limits[key].s) tClass = "tier-s";
-                else if (val >= limits[key].a) tClass = "tier-a";
-                else if (val <= limits[key].c) tClass = "tier-c";
-                else tClass = "tier-b";
-
-                let display = Math.round(val);
-                if(key === 'mana' && item.res === 'Energy') display = `<span style="color:var(--energy-glow)">NRG</span>`;
-                else if(key === 'mana' && val === 0) display = `<span style="opacity:0.2">0</span>`;
-
-                html += `<td class="${tClass} ${activeClass}" 
-                             onmouseenter="showUIHint(this, '${item.grow[key]}')" 
-                             onmouseleave="hideUIHint()">
-                            ${display}
-                         </td>`;
+                td.onclick = () => alert(x.name + " " + k.toUpperCase() + " Прирост: +" + x.grow[k]);
+                tr.appendChild(td);
             });
-
-            row.innerHTML = html;
-            tbody.appendChild(row);
+            b.appendChild(tr);
         });
     }
 
-    /* ============================================================
-       5. ВСПОМОГАТЕЛЬНАЯ ЛОГИКА (SORT, TOOLTIP, MODAL)
-       ============================================================ */
-    function handleSort(key) {
-        if(sorting.key === key) {
-            sorting.dir = sorting.dir === 'desc' ? 'asc' : 'desc';
-        } else {
-            sorting.key = key;
-            sorting.dir = 'desc';
-        }
-        updateTable();
+    function togglePin(n) { pinned.has(n) ? pinned.delete(n) : pinned.add(n); render(); }
+
+    function masterToggle(on) {
+        if(on) selected = new Set(raw.map(x => x.name));
+        else selected = new Set([...pinned]);
+        render();
     }
 
-    function showUIHint(el, val) {
-        const tip = document.getElementById('uiTooltip');
-        const rect = el.getBoundingClientRect();
-        tip.innerText = "ПРИРОСТ: +" + val;
-        tip.style.display = 'block';
-        tip.style.top = (rect.top + window.scrollY) + 'px';
-        tip.style.left = (rect.left + rect.width / 2) + 'px';
-    }
+    function openModal() { document.getElementById("modal").style.display = "block"; renderModal(); }
+    function closeModal() { document.getElementById("modal").style.display = "none"; }
 
-    function hideUIHint() {
-        document.getElementById('uiTooltip').style.display = 'none';
-    }
+    function renderModal() {
+        const g = document.getElementById("mGrid");
+        const q = document.getElementById("mSearch").value.toLowerCase();
+        g.innerHTML = "";
+        const roles = ["Top","Jungle","Mid","ADC","Support"];
+        roles.forEach(r => {
+            const col = document.createElement("div"); col.style.display="flex"; col.style.flexDirection="column"; col.style.gap="5px";
+            const champs = raw.filter(x => x.is[r]);
+            const isAll = champs.every(x => selected.has(x.name));
+            
+            const rb = document.createElement("div"); rb.className = "role-btn " + (isAll?'on':'');
+            rb.innerHTML = `<img src="https://placehold.co/20x20?text=${r[0]}">`;
+            rb.onclick = () => { champs.forEach(x => isAll ? selected.delete(x.name) : selected.add(x.name)); renderModal(); render(); };
+            col.appendChild(rb);
 
-    function openChampModal() { 
-        document.getElementById('modalSelect').classList.add('is-visible'); 
-        refreshModalGrid(); 
-    }
-    
-    function closeChampModal() { 
-        document.getElementById('modalSelect').classList.remove('is-visible'); 
-    }
-
-    function refreshModalGrid() {
-        const grid = document.getElementById('modalGrid');
-        const filter = document.getElementById('modalSearchInput').value.toLowerCase();
-        grid.innerHTML = "";
-
-        const roles = ["Top", "Jungle", "Mid", "ADC", "Support"];
-        roles.forEach(roleName => {
-            const group = document.createElement('div');
-            group.className = "role-group";
-
-            const champsInRole = championsRaw.filter(c => c.isRole[roleName]);
-            const isAllOn = champsInRole.every(c => activeSelection.has(c.name));
-
-            const title = document.createElement('div');
-            title.className = "role-title" + (isAllOn ? " active" : "");
-            title.innerText = roleName.toUpperCase();
-            title.onclick = () => {
-                champsInRole.forEach(c => {
-                    if(isAllOn) activeSelection.delete(c.name);
-                    else activeSelection.add(c.name);
-                });
-                refreshModalGrid();
-                updateTable();
-            };
-            group.appendChild(title);
-
-            champsInRole
-                .filter(c => c.name.toLowerCase().includes(filter))
-                .sort((a,b) => a.name.localeCompare(b.name))
-                .forEach(c => {
-                    const b = document.createElement('button');
-                    b.className = "champ-toggle-btn" + (activeSelection.has(c.name) ? " is-active" : "");
-                    b.innerText = c.name;
-                    b.onclick = () => {
-                        if(activeSelection.has(c.name)) activeSelection.delete(c.name);
-                        else activeSelection.add(c.name);
-                        refreshModalGrid();
-                        updateTable();
-                    };
-                    group.appendChild(b);
-                });
-
-            grid.appendChild(group);
+            champs.filter(x => x.name.toLowerCase().includes(q)).forEach(x => {
+                const i = document.createElement("div"); i.className = "champ-item " + (selected.has(x.name)?'on':'');
+                i.innerText = x.name;
+                i.onclick = () => { selected.has(x.name)?selected.delete(x.name):selected.add(x.name); renderModal(); render(); };
+                col.appendChild(i);
+            });
+            g.appendChild(col);
         });
     }
 
-    function setupListeners() {
-        const slider = document.getElementById('lvlRange');
-        slider.oninput = (e) => {
-            currentLvl = parseInt(e.target.value);
-            document.getElementById('lvlDisplay').innerText = currentLvl;
-            localStorage.setItem('wr_user_lvl', currentLvl);
-            updateTable();
-        };
-    }
+    function toggleTheme() { document.body.classList.toggle("light-mode"); }
 
-    // Запуск!
-    startEngine();
+    document.getElementById("lvlIn").oninput = (e) => {
+        lvl = +e.target.value; document.getElementById("lvlVal").innerText = lvl; render();
+    };
 
+    init();
 </script>
 </body>
 </html>
