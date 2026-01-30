@@ -948,18 +948,7 @@ const champsAll = raw
 const allSelected = champsAll.length > 0 && champsAll.every(n => selected.has(n));
 
 // сделаем header кликабельным
-head.style.cursor = "pointer";
-head.title = allSelected ? "Unselect all in this role" : "Select all in this role";
 
-head.onclick = () => {
-  if (allSelected) {
-    champsAll.forEach(n => selected.delete(n));
-  } else {
-    champsAll.forEach(n => selected.add(n));
-  }
-  renderChampModal();
-  render();
-};
 
 
   function toggleSort(key) {
