@@ -15,21 +15,21 @@
             width: 100%;
             max-width: 100%;
             overflow-x: hidden;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
             color: #ffffff;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-weight: 700;
         }
 
         :root {
-            --accent: #c89b3c;
-            --accent-glow: rgba(200, 155, 60, 0.4);
-            --bg-card: rgba(17, 22, 34, 0.8);
-            --border: rgba(200, 155, 60, 0.2);
-            --tier-s: #ff6b6b;
-            --tier-a: #ffa94d;
-            --tier-b: #ffd43b;
-            --tier-c: #51cf66;
+            --accent: #9b59b6;
+            --accent-glow: rgba(155, 89, 182, 0.5);
+            --bg-card: rgba(26, 13, 46, 0.85);
+            --border: rgba(155, 89, 182, 0.3);
+            --tier-s: #e74c3c;
+            --tier-a: #e67e22;
+            --tier-b: #f39c12;
+            --tier-c: #2ecc71;
         }
 
         @keyframes fadeIn {
@@ -44,8 +44,9 @@
 
         .app-wrapper {
             width: 100%;
-            max-width: 100vw;
-            padding: 12px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px;
             overflow-x: hidden;
         }
 
@@ -54,27 +55,26 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             animation: fadeIn 0.5s ease;
         }
 
         .logo {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 900;
-            background: linear-gradient(135deg, #c89b3c 0%, #f0e68c 100%);
+            background: linear-gradient(135deg, #9b59b6 0%, #e74c3c 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 20px var(--accent-glow);
         }
 
         .twitch-btn {
             background: linear-gradient(135deg, #9146ff 0%, #772ce8 100%);
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 25px;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 900;
             animation: glow 2s infinite;
             transition: transform 0.2s;
@@ -84,17 +84,17 @@
             transform: scale(0.95);
         }
 
-        /* SUPPORT BUTTON */
+        /* SUPPORT */
         .btn-support {
             display: block;
-            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
-            color: #000;
-            padding: 14px;
-            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
+            color: #fff;
+            padding: 16px;
+            border-radius: 15px;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 16px;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: 900;
             box-shadow: 0 4px 15px var(--accent-glow);
             animation: fadeIn 0.6s ease;
@@ -105,14 +105,14 @@
             transform: scale(0.98);
         }
 
-        /* LEVEL SLIDER */
+        /* SLIDER */
         .lvl-container {
             background: var(--bg-card);
             backdrop-filter: blur(10px);
-            padding: 18px;
+            padding: 20px;
             border-radius: 15px;
             border: 2px solid var(--border);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             animation: fadeIn 0.7s ease;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
@@ -138,12 +138,11 @@
 
         input[type="range"] {
             width: 100%;
-            height: 8px;
+            height: 6px;
             appearance: none;
-            background: linear-gradient(90deg, #2d3748 0%, var(--accent) 60%, var(--accent) 100%);
+            background: linear-gradient(90deg, #2d1b4e 0%, var(--accent) 60%, var(--accent) 100%);
             border-radius: 10px;
             outline: none;
-            transition: all 0.3s;
         }
 
         input[type="range"]::-webkit-slider-thumb {
@@ -162,7 +161,7 @@
             transform: scale(1.2);
         }
 
-        /* RULER NUMBERS */
+        /* RULER */
         .ruler {
             display: flex;
             justify-content: space-between;
@@ -171,14 +170,16 @@
         }
 
         .ruler span {
-            font-size: 10px;
-            color: #64748b;
+            font-size: 11px;
+            color: #6c5788;
             font-weight: 600;
+            transition: all 0.2s;
         }
 
         .ruler span.active {
             color: var(--accent);
             font-weight: 900;
+            transform: scale(1.3);
         }
 
         /* TABLE */
@@ -189,7 +190,7 @@
             border-radius: 15px;
             border: 2px solid var(--border);
             overflow: hidden;
-            max-height: 60vh;
+            max-height: 65vh;
             overflow-y: auto;
             animation: fadeIn 0.8s ease;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
@@ -202,27 +203,29 @@
         }
 
         th {
-            background: linear-gradient(135deg, #1a2233 0%, #0f1419 100%);
-            padding: 10px 4px;
-            font-size: 10px;
+            background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
+            padding: 12px 6px;
+            font-size: 13px;
             border-bottom: 2px solid var(--border);
+            border-right: 1px solid rgba(155, 89, 182, 0.1);
             cursor: pointer;
             position: sticky;
             top: 0;
             z-index: 10;
             transition: background 0.2s;
+            user-select: none;
         }
 
         th:hover {
-            background: linear-gradient(135deg, #252f45 0%, #1a2233 100%);
+            background: linear-gradient(135deg, #2a1d3e 0%, #1f1030 100%);
         }
 
         .btn-champ-cfg {
-            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
-            color: #000;
+            background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
+            color: #fff;
             padding: 6px 10px;
             border-radius: 6px;
-            font-size: 9px;
+            font-size: 10px;
             border: none;
             font-weight: 900;
             cursor: pointer;
@@ -243,34 +246,36 @@
         }
 
         td {
-            padding: 10px 3px;
+            padding: 10px 4px;
             text-align: center;
-            font-size: 11px;
-            border-bottom: 1px solid rgba(200, 155, 60, 0.1);
+            font-size: 13px;
+            border-bottom: 1px solid rgba(155, 89, 182, 0.1);
+            border-right: 1px solid rgba(155, 89, 182, 0.08);
             transition: all 0.2s;
         }
 
         tr:hover td {
-            background: rgba(200, 155, 60, 0.05);
+            background: rgba(155, 89, 182, 0.08);
         }
 
         td:first-child {
-            width: 75px;
-            font-size: 9px;
+            width: 120px;
+            font-size: 12px;
             text-align: left;
-            padding-left: 6px;
+            padding-left: 8px;
         }
 
         .name-tag {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            padding: 5px 6px;
-            border-radius: 6px;
+            background: linear-gradient(135deg, #1e0f2e 0%, #0f0520 100%);
+            padding: 6px 8px;
+            border-radius: 8px;
             display: block;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(155, 89, 182, 0.2);
             transition: all 0.2s;
+            cursor: pointer;
         }
 
         .name-tag:hover {
@@ -278,17 +283,17 @@
         }
 
         .name-tag.pinned {
-            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
-            color: #000;
+            background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
+            color: #fff;
             font-weight: 900;
             box-shadow: 0 0 10px var(--accent-glow);
         }
 
         /* TIERS */
-        .s { background: linear-gradient(135deg, var(--tier-s) 0%, #ff8787 100%); color: #000; font-weight: 900; }
-        .a { background: linear-gradient(135deg, var(--tier-a) 0%, #ffc078 100%); color: #000; font-weight: 900; }
-        .b { background: linear-gradient(135deg, var(--tier-b) 0%, #ffe066 100%); color: #000; font-weight: 900; }
-        .c { background: linear-gradient(135deg, var(--tier-c) 0%, #69db7c 100%); color: #000; font-weight: 900; }
+        .s { background: linear-gradient(135deg, var(--tier-s) 0%, #c0392b 100%); color: #fff; font-weight: 900; border-radius: 4px; }
+        .a { background: linear-gradient(135deg, var(--tier-a) 0%, #d35400 100%); color: #fff; font-weight: 900; border-radius: 4px; }
+        .b { background: linear-gradient(135deg, var(--tier-b) 0%, #d68910 100%); color: #000; font-weight: 900; border-radius: 4px; }
+        .c { background: linear-gradient(135deg, var(--tier-c) 0%, #27ae60 100%); color: #fff; font-weight: 900; border-radius: 4px; }
 
         /* TOOLTIP */
         #uiTip {
@@ -296,9 +301,9 @@
             display: none;
             background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
             color: #000;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 13px;
             font-weight: 900;
             z-index: 1000;
             pointer-events: none;
@@ -325,9 +330,9 @@
         }
 
         .m-win {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
             width: 95%;
-            max-width: 500px;
+            max-width: 900px;
             height: 85vh;
             border-radius: 20px;
             border: 2px solid var(--border);
@@ -337,14 +342,14 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.8);
         }
 
-        /* CLOSE BUTTON */
+        /* CLOSE BTN */
         .btn-close-x {
             position: absolute;
             top: -18px;
             right: -18px;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: #fff;
-            border: 4px solid #0a0e27;
+            border: 4px solid #0f0520;
             border-radius: 50%;
             width: 45px;
             height: 45px;
@@ -353,7 +358,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.6);
+            box-shadow: 0 4px 20px rgba(231, 76, 60, 0.6);
             z-index: 10;
             font-weight: 900;
             transition: transform 0.2s;
@@ -365,9 +370,9 @@
 
         /* CONTROLS */
         .m-controls {
-            padding: 20px 15px 10px;
+            padding: 20px 15px 12px;
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .m-btn {
@@ -376,19 +381,19 @@
             border-radius: 12px;
             border: none;
             font-weight: 900;
-            font-size: 11px;
+            font-size: 12px;
             cursor: pointer;
             transition: all 0.2s;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .m-btn-all {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
             color: white;
         }
 
         .m-btn-clear {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: white;
         }
 
@@ -405,10 +410,10 @@
             width: 100%;
             padding: 12px 15px;
             border-radius: 12px;
-            background: rgba(5, 7, 10, 0.6);
+            background: rgba(15, 5, 32, 0.6);
             border: 2px solid var(--border);
             color: #fff;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
         }
 
@@ -419,7 +424,7 @@
         }
 
         .m-search input::placeholder {
-            color: #64748b;
+            color: #6c5788;
         }
 
         /* GRID */
@@ -427,12 +432,12 @@
             flex: 1;
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
+            gap: 12px;
             padding: 0 15px 15px;
             overflow-y: auto;
         }
 
-        /* ROLE ICON */
+        /* ROLE COLUMN */
         .m-role-container {
             display: flex;
             flex-direction: column;
@@ -440,7 +445,7 @@
         }
 
         .m-role {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            background: linear-gradient(135deg, #1e0f2e 0%, #2a1d3e 100%);
             padding: 12px 4px;
             border-radius: 12px;
             text-align: center;
@@ -454,55 +459,55 @@
 
         .m-role img {
             width: 100%;
-            max-width: 50px;
+            max-width: 60px;
             height: auto;
             display: block;
             margin: 0 auto;
-            filter: brightness(0.8);
+            filter: brightness(0.9) contrast(1.1);
             transition: all 0.3s;
         }
 
         .m-role:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
         }
 
         .m-role:hover img {
-            filter: brightness(1.2);
+            filter: brightness(1.2) contrast(1.2);
         }
 
         .m-role.on {
             border: 2px solid var(--accent);
-            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
             box-shadow: 0 0 25px var(--accent-glow), 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .m-role.on img {
-            filter: brightness(1.3) drop-shadow(0 0 8px rgba(255,255,255,0.5));
+            filter: brightness(1.4) drop-shadow(0 0 8px rgba(255,255,255,0.6));
         }
 
         /* CHAMPION */
         .m-item {
-            background: linear-gradient(135deg, #161e2f 0%, #0f1419 100%);
+            background: linear-gradient(135deg, #1e0f2e 0%, #0f0520 100%);
             padding: 10px 4px;
             border-radius: 10px;
-            font-size: 10px;
+            font-size: 12px;
             text-align: center;
-            color: #94a3b8;
+            color: #a689c4;
             cursor: pointer;
             transition: all 0.2s;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(155, 89, 182, 0.15);
             line-height: 1.4;
             font-weight: 700;
         }
 
         .m-item:hover {
-            background: linear-gradient(135deg, #1e293b 0%, #161e2f 100%);
+            background: linear-gradient(135deg, #2a1d3e 0%, #1e0f2e 100%);
             transform: translateY(-2px);
         }
 
         .m-item.on {
-            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
-            color: #000;
+            background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
+            color: #fff;
             font-weight: 900;
             border-color: var(--accent);
             box-shadow: 0 0 15px var(--accent-glow);
@@ -520,23 +525,43 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--accent) 0%, #f0e68c 100%);
+            background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
             border-radius: 10px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #f0e68c 0%, var(--accent) 100%);
+            background: linear-gradient(135deg, #8e44ad 0%, var(--accent) 100%);
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .app-wrapper { padding: 12px; }
+            .logo { font-size: 18px; }
+            .twitch-btn { font-size: 11px; padding: 7px 14px; }
+            .btn-support { font-size: 13px; padding: 12px; }
+            .lvl-container { padding: 14px; }
+            .lvl-num { font-size: 26px; }
+            .ruler span { font-size: 9px; }
+            
+            th { font-size: 9px; padding: 8px 3px; }
+            td { font-size: 10px; padding: 8px 2px; }
+            td:first-child { font-size: 9px; width: 70px; padding-left: 4px; }
+            .btn-champ-cfg { font-size: 8px; padding: 5px 8px; }
+            
+            .m-win { width: 95%; max-width: 500px; }
+            .m-btn { font-size: 10px; padding: 10px; }
+            .m-search input { font-size: 12px; padding: 10px 12px; }
+            .m-item { font-size: 10px; padding: 8px 3px; }
+            .m-role img { max-width: 45px; }
+            .m-grid { gap: 8px; }
         }
 
         @media (max-width: 400px) {
-            .logo { font-size: 16px; }
-            .twitch-btn { font-size: 10px; padding: 6px 12px; }
-            th { font-size: 8px; }
-            td { font-size: 9px; }
-            td:first-child { font-size: 8px; width: 65px; }
-            .btn-champ-cfg { font-size: 7px; padding: 4px 6px; }
-            .m-item { font-size: 9px; padding: 8px 3px; }
-            .m-role img { max-width: 40px; }
+            th { font-size: 8px; padding: 6px 2px; }
+            td { font-size: 9px; padding: 6px 1px; }
+            td:first-child { font-size: 8px; width: 60px; }
+            .m-item { font-size: 9px; padding: 6px 2px; }
+            .m-role img { max-width: 38px; }
         }
     </style>
 </head>
@@ -550,11 +575,11 @@
         <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">🎮 TWITCH</a>
     </header>
 
-    <a href="https://www.donationalerts.com/r/erjankg" class="btn-support" target="_blank">💎 ПОДДЕРЖАТЬ ПРОЕКТ</a>
+    <a href="https://www.donationalerts.com/r/erjankg" class="btn-support" target="_blank">💎 ПОДДЕРЖАТЬ</a>
 
     <div class="lvl-container">
         <div class="lvl-info">
-            <span style="font-size:13px; font-weight:700;">УРОВЕНЬ:</span>
+            <span style="font-size:14px;">УРОВЕНЬ:</span>
             <span id="lvlLabel" class="lvl-num">10</span>
         </div>
         <div class="slider-wrapper">
@@ -588,12 +613,12 @@
         <button class="btn-close-x" onclick="closeM()">✕</button>
         
         <div class="m-controls">
-            <button class="m-btn m-btn-all" onclick="selectAll()">✓ SELECT ALL</button>
-            <button class="m-btn m-btn-clear" onclick="clearAll()">✕ CLEAR ALL</button>
+            <button class="m-btn m-btn-all" onclick="selectAll()">✓ ALL</button>
+            <button class="m-btn m-btn-clear" onclick="clearAll()">✕ CLEAR</button>
         </div>
 
         <div class="m-search">
-            <input type="text" id="mSearch" placeholder="🔍 Поиск чемпиона..." oninput="drawM()">
+            <input type="text" id="mSearch" placeholder="🔍 Поиск..." oninput="drawM()">
         </div>
 
         <div class="m-grid" id="mGrid"></div>
@@ -601,18 +626,12 @@
 </div>
 
 <script>
-    const G_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
-    let raw = [], selected = new Set(), pinned = new Set(), lvl = 10, sK = 'ad', sD = 'desc';
+    const roleIcons = {HTMLEOF
 
-    // ROLE ICONS - Base64 версии загруженных изображений
-    const roleIconsBase64 = {
-        "Support": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084556.png",
-        "ADC": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084544.png",
-        "Mid": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084530.png",
-        "Jungle": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084515.png",
-        "Top": "/mnt/user-data/uploads/Снимок_экрана_2026-01-27_084500.png"
-    };
-
+# Add base64 icons data
+tail -5 /home/claude/icons_base64.txt | while read line; do
+    role=$(echo "$line" | cut -d'|' -f1)
+    data=$(echo "$line" | cut -d'|' -f4)
     async function start() {
         if(localStorage.getItem('p')) pinned = new Set(JSON.parse(localStorage.getItem('p')));
         const r = await fetch(G_URL);
@@ -632,7 +651,13 @@
                 ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"],
                 mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
                 res: o["Resource"],
-                is: { Top: +o["Is_Top"]==1, Jungle: +o["Is_Jungle"]==1, Mid: +o["Is_Mid"]==1, ADC: +o["Is_Adc"]==1, Support: +o["Is_Support"]==1 }
+                is: { 
+                    Top: +o["Is_Top"]==1, 
+                    Jungle: +o["Is_Jungle"]==1, 
+                    Mid: +o["Is_Mid"]==1, 
+                    ADC: +o["Is_Adc"]==1, 
+                    Support: +o["Is_Support"]==1 
+                }
             };
         }).filter(x => x.name);
         
@@ -656,9 +681,7 @@
     function updateRuler() {
         for(let i = 1; i <= 15; i++) {
             const el = document.getElementById('lvl-' + i);
-            if(el) {
-                el.classList.toggle('active', i === lvl);
-            }
+            if(el) el.classList.toggle('active', i === lvl);
         }
     }
 
@@ -695,7 +718,7 @@
         data.forEach(item => {
             const tr = document.createElement('tr');
             const isP = pinned.has(item.name);
-            let html = `<td><span class="name-tag ${isP?'pinned':''}" onclick="toggleP('${item.name}')">${item.name}</span></td>`;
+            let html = '<td><span class="name-tag ' + (isP?'pinned':'') + '" onclick="toggleP(\'' + item.name + '\')">' + item.name + '</span></td>';
             
             ['ad','hp','mana','armor','mrez'].forEach(k => {
                 const v = item[k];
@@ -709,14 +732,14 @@
                 if(k === 'mana' && item.res === 'Energy') txt = "NRG";
                 else if(k === 'mana' && v === 0) txt = "0";
 
-                html += `<td class="${cls}" onclick="showT(event, '${item.g[k]}')">${txt}</td>`;
+                html += '<td class="' + cls + '" onclick="showT(event, \'' + item.g[k] + '\')">' + txt + '</td>';
             });
             tr.innerHTML = html;
             body.appendChild(tr);
         });
     }
 
-    function showT(e, v) {
+    window.showT = function(e, v) {
         const t = document.getElementById('uiTip');
         t.style.display = 'block';
         t.innerText = "+" + v;
@@ -725,35 +748,35 @@
         setTimeout(() => t.style.display = 'none', 1500);
     }
 
-    function doSort(k) {
+    window.doSort = function(k) {
         if(sK === k) sD = sD === 'desc' ? 'asc' : 'desc';
         else { sK = k; sD = 'desc'; }
         render();
     }
 
-    function toggleP(n) {
+    window.toggleP = function(n) {
         pinned.has(n) ? pinned.delete(n) : pinned.add(n);
         localStorage.setItem('p', JSON.stringify([...pinned]));
         render();
     }
 
-    function openM() { 
+    window.openM = function() { 
         document.getElementById('mMask').classList.add('active'); 
         drawM(); 
     }
     
-    function closeM() { 
+    window.closeM = function() { 
         document.getElementById('mMask').classList.remove('active'); 
     }
 
-    function selectAll() {
+    window.selectAll = function() {
         selected = new Set(raw.map(x => x.name));
         document.getElementById('masterCheck').checked = true;
         drawM();
         render();
     }
 
-    function clearAll() {
+    window.clearAll = function() {
         selected = new Set([...pinned]);
         document.getElementById('masterCheck').checked = false;
         drawM();
@@ -765,24 +788,22 @@
         const q = document.getElementById('mSearch').value.toLowerCase();
         grid.innerHTML = "";
         
-        ["Support","ADC","Mid","Jungle","Top"].forEach(role => {
+        ["Top","Jungle","Mid","ADC","Support"].forEach(role => {
             const container = document.createElement('div');
             container.className = 'm-role-container';
             
             const champs = raw.filter(x => x.is[role]);
             const isAll = champs.every(x => selected.has(x.name));
             
-            // ROLE ICON
             const roleDiv = document.createElement('div');
-            roleDiv.className = `m-role ${isAll?'on':''}`;
-            roleDiv.innerHTML = `<img src="${roleIconsBase64[role]}" alt="${role}">`;
+            roleDiv.className = 'm-role ' + (isAll?'on':'');
+            roleDiv.innerHTML = '<img src="' + roleIcons[role] + '" alt="' + role + '">';
             roleDiv.onclick = () => roleT(role, isAll);
             container.appendChild(roleDiv);
             
-            // CHAMPIONS
             champs.filter(x => x.name.toLowerCase().includes(q)).forEach(c => {
                 const btn = document.createElement('div');
-                btn.className = `m-item ${selected.has(c.name)?'on':''}`;
+                btn.className = 'm-item ' + (selected.has(c.name)?'on':'');
                 btn.innerText = c.name;
                 btn.onclick = () => { 
                     selected.has(c.name) ? selected.delete(c.name) : selected.add(c.name); 
@@ -817,6 +838,7 @@
     }
 
     start();
+})();
 </script>
 </body>
 </html>
