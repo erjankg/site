@@ -1,465 +1,766 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Wild Rift Pro Stats – Ultra Edition</title>
-  <style>
-    :root { 
-      --p: #7b5cff; 
-      --bg: #05070a; 
-      --card: #111622; 
-      --brd: rgba(255,255,255,0.12);
-      --energy: #f3e61c;
-      --radius: 24px;
-      /* Успокоенная Тетрада (Благородные тона) */
-      --t-s: #8b1a3f; /* Глубокий малиновый */
-      --t-a: #a34e0d; /* Приглушенный терракот */
-      --t-b: #8a730c; /* Темное золото */
-      --t-c: #0f4d4a; /* Глубокий хвойный */
-    }
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Wild Rift Ultra Stats by ERjanKG</title>
+    <style>
+        /* --- ГЛОБАЛЬНЫЕ НАСТРОЙКИ И ЦВЕТА --- */
+        :root {
+            --bg-color: #05070a;
+            --card-bg: #111622;
+            --primary: #7b5cff;
+            --border: rgba(255, 255, 255, 0.15);
+            --text-main: #ffffff;
+            --text-dim: #a0aec0;
+            
+            /* ЦВЕТА ИЗ ТИРМЕЙКЕРА (Меняй HEX коды здесь) */
+            --tier-s: #ff7f7f; /* Красный */
+            --tier-a: #ffbf7f; /* Оранжевый */
+            --tier-b: #ffff7f; /* Желтый */
+            --tier-c: #7fff7f; /* Зеленый */
+            
+            --energy-color: #ffff00;
+        }
 
-    * { box-sizing: border-box; }
-    body { 
-      margin: 0; background: var(--bg); color: #fff; 
-      font-family: "Inter", "Segoe UI", sans-serif; 
-      font-weight: 900; -webkit-tap-highlight-color: transparent; 
-    }
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
 
-    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-weight: 800; /* Жирный шрифт по умолчанию */
+            overflow-x: hidden;
+            line-height: 1.4;
+        }
 
-    /* Header Section */
-    .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-    .logo-box .nick { font-size: 36px; font-weight: 900; letter-spacing: -2px; text-shadow: 0 0 30px rgba(123,92,255,0.4); }
-    
-    @keyframes rotateTwitch { 0% { transform: rotate(0); } 10% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
-    .twitch-btn { 
-      display: flex; align-items: center; gap: 12px; text-decoration: none; 
-      color: #fff; background: #9146ff; padding: 12px 24px; border-radius: 50px; 
-      font-size: 16px; box-shadow: 0 8px 25px rgba(145,70,255,0.4); transition: 0.3s;
-    }
-    .twitch-btn:hover { transform: scale(1.05); }
-    .twitch-btn img { width: 22px; animation: rotateTwitch 7s infinite ease-in-out; }
+        .main-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    /* Support Block */
-    .promo-card { 
-      background: linear-gradient(135deg, var(--card) 0%, #1a2235 100%); 
-      border: 2px solid var(--brd); padding: 30px; border-radius: var(--radius); 
-      margin-bottom: 25px; position: relative; overflow: hidden;
-      box-shadow: 0 15px 45px rgba(0,0,0,0.5);
-    }
-    .promo-card::after { content: ''; position: absolute; right: -50px; top: -50px; width: 150px; height: 150px; background: var(--p); filter: blur(100px); opacity: 0.2; }
-    .donate-link { 
-      display: block; text-align: center; padding: 20px; margin-top: 20px; 
-      background: #fff; color: #000; text-decoration: none; border-radius: 18px; 
-      font-size: 20px; font-weight: 900; transition: 0.3s;
-    }
+        /* ШАПКА */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
 
-    /* Level UI */
-    .level-panel { background: var(--card); border: 2px solid var(--brd); padding: 30px; border-radius: var(--radius); margin-bottom: 20px; }
-    .level-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .level-label { color: var(--p); font-size: 22px; }
-    .level-number { font-size: 40px; color: #fff; text-shadow: 0 0 15px var(--p); }
-    
-    input[type="range"] { 
-      width: 100%; height: 14px; border-radius: 20px; background: #05070a; 
-      appearance: none; outline: none; border: 1px solid var(--brd);
-    }
-    input[type="range"]::-webkit-slider-thumb { 
-      appearance: none; width: 36px; height: 36px; background: #fff; 
-      border-radius: 50%; border: 5px solid var(--p); cursor: pointer; box-shadow: 0 0 20px var(--p);
-    }
+        .brand-name {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    /* Legend */
-    .tier-legend { 
-      display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; 
-      padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; flex-wrap: wrap;
-    }
-    .legend-tag { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #a0aec0; }
-    .tag-box { width: 16px; height: 16px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); }
+        .twitch-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #9146ff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(145, 70, 255, 0.4);
+        }
 
-    /* TABLE CORE */
-    .main-table-container { 
-      background: var(--card); border: 2px solid var(--brd); border-radius: var(--radius); 
-      overflow: auto; max-height: 70vh; box-shadow: 0 25px 60px rgba(0,0,0,0.7);
-      position: relative;
-    }
-    table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 600px; }
-    
-    th { 
-      background: #161e2f; color: #fff; font-size: 14px; padding: 22px 5px; 
-      text-transform: uppercase; cursor: pointer; position: sticky; top: 0; z-index: 500;
-      border-bottom: 5px solid var(--brd); letter-spacing: 2px;
-    }
-    th:hover { background: #1f293d; }
-    .sort-icon { color: var(--p); margin-left: 6px; font-size: 16px; }
+        .twitch-badge:hover {
+            transform: translateY(-2px);
+        }
 
-    td { 
-      padding: 18px 4px; text-align: center; border-bottom: 1px solid var(--brd); 
-      font-size: 17px; border-right: 1px solid rgba(255,255,255,0.05);
-      transition: background 0.2s;
-    }
+        /* КНОПКА ПОДДЕРЖКИ */
+        .support-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-    /* Champ Cell */
-    .champ-col-header { display: flex; align-items: center; justify-content: center; gap: 12px; }
-    .master-check { width: 22px; height: 22px; cursor: pointer; accent-color: var(--p); }
-    
-    .champ-row-ui { display: flex; align-items: center; gap: 10px; padding: 0 10px; }
-    .del-row-btn { 
-      background: rgba(255,77,79,0.1); color: #ff4d4f; border: 2px solid #ff4d4f;
-      width: 28px; height: 28px; border-radius: 8px; cursor: pointer; font-weight: 900;
-    }
-    .champ-badge { 
-      background: #232d42; color: #fff; padding: 10px; border-radius: 12px; 
-      width: 100%; text-align: center; border: 2px solid transparent; 
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px;
-    }
-    .champ-badge.pinned { background: var(--p); border-color: #fff; box-shadow: 0 0 15px rgba(123,92,255,0.6); }
+        .support-btn {
+            display: inline-block;
+            width: 100%;
+            max-width: 400px;
+            background: #ffffff;
+            color: #000000;
+            padding: 15px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 900;
+            transition: 0.3s;
+        }
 
-    /* Tier Cell Coloring with Inner Border */
-    .tier-s { background: var(--t-s) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15); }
-    .tier-a { background: var(--t-a) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15); }
-    .tier-b { background: var(--t-b) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15); }
-    .tier-c { background: var(--t-c) !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15); }
-    .energy-text { color: var(--energy) !important; font-size: 12px; }
+        .support-btn:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 20px var(--primary);
+        }
 
-    /* Tooltip System */
-    .tip-anchor { position: relative; cursor: help; }
-    .tip-popup { 
-      display: none; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
-      background: #fff; color: #000; padding: 12px 18px; border-radius: 14px; font-size: 14px;
-      z-index: 1000; white-space: nowrap; font-weight: 900; box-shadow: 0 10px 40px #000;
-      border: 2px solid var(--p);
-    }
-    .tip-popup::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -8px; border: 8px solid transparent; border-top-color: #fff; }
+        /* ПОЛЗУНОК УРОВНЯ */
+        .level-control {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+        }
 
-    /* Stats Block */
-    .stats-summary { 
-      margin-top: 25px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-      gap: 20px; background: var(--card); padding: 25px; border-radius: var(--radius); border: 2px solid var(--brd);
-    }
-    .summary-item { text-align: center; border-right: 1px solid var(--brd); }
-    .summary-item:last-child { border-right: none; }
-    .summary-label { font-size: 13px; color: #64748b; margin-bottom: 8px; }
-    .summary-val { font-size: 26px; color: var(--p); }
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
 
-    /* Modal System */
-    .modal-overlay { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 15px; }
-    .hidden { display: none; }
-    .blur-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.92); backdrop-filter: blur(25px); }
-    .modal-window { 
-      position: relative; width: 100%; max-width: 1000px; height: 85vh; 
-      background: #0f172a; border-radius: 40px; border: 2px solid var(--brd); 
-      display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 0 100px rgba(123,92,255,0.2);
-    }
-    .modal-top { padding: 35px; border-bottom: 2px solid var(--brd); }
-    .champ-search { 
-      width: 100%; padding: 20px; background: #05070a; border: 2px solid var(--brd); 
-      border-radius: 20px; color: #fff; font-size: 20px; font-weight: 800; outline: none; transition: 0.3s;
-    }
-    .champ-search:focus { border-color: var(--p); box-shadow: 0 0 20px rgba(123,92,255,0.3); }
+        .level-title { color: var(--primary); font-size: 18px; }
+        .level-val { font-size: 30px; font-weight: 900; }
 
-    .modal-content { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; padding: 25px; overflow-y: auto; flex: 1; }
-    .role-column { display: flex; flex-direction: column; gap: 10px; }
-    .role-selector { 
-      cursor: pointer; padding: 15px; text-align: center; background: #1e293b; 
-      border-radius: 20px; border: 3px solid transparent; transition: 0.3s;
-    }
-    .role-selector.active { border-color: var(--p); background: rgba(123,92,255,0.2); }
-    .role-selector img { width: 35px; height: 35px; }
-    
-    .champ-toggle-btn { 
-      width: 100%; padding: 15px 5px; border-radius: 12px; border: 2px solid var(--brd); 
-      background: #161e2f; color: #64748b; font-size: 11px; font-weight: 900; cursor: pointer; transition: 0.2s;
-    }
-    .champ-toggle-btn.active { background: var(--p); color: #fff; border-color: #fff; }
+        .slider-container {
+            position: relative;
+            padding: 10px 0;
+        }
 
-    .modal-close { 
-      position: absolute; top: 25px; right: 25px; background: #ff4d4f; color: #fff; 
-      border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 100; font-size: 22px;
-    }
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            appearance: none;
+            background: #2d3748;
+            border-radius: 10px;
+            outline: none;
+        }
 
-    @media (max-width: 900px) {
-      .modal-content { grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 10px; }
-      .role-selector img { width: 28px; height: 28px; }
-      th { font-size: 11px; padding: 18px 2px; }
-      td { font-size: 14px; }
-      .nick { font-size: 26px; }
-    }
-  </style>
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            background: #fff;
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .ruler {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 0 10px;
+        }
+
+        .ruler-mark {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+
+        /* ТАБЛИЦА */
+        .stats-table-wrapper {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow-x: auto;
+            margin-bottom: 50px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: #1a2233;
+            padding: 20px 10px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid var(--border);
+        }
+
+        th:hover { color: var(--primary); }
+
+        td {
+            padding: 15px 5px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 16px;
+            font-weight: 800;
+            position: relative;
+        }
+
+        /* Ячейки чемпионов */
+        .champ-cell-flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 15px;
+        }
+
+        .btn-remove {
+            background: rgba(255, 77, 79, 0.1);
+            border: 1px solid #ff4d4f;
+            color: #ff4d4f;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .champ-name-box {
+            background: #232d42;
+            padding: 8px 12px;
+            border-radius: 10px;
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .champ-name-box.is-pinned {
+            background: var(--primary);
+            border-color: #fff;
+        }
+
+        /* ТИРЫ (Ячейки) */
+        .cell-s { background-color: var(--tier-s) !important; color: #000; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+        .cell-a { background-color: var(--tier-a) !important; color: #000; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+        .cell-b { background-color: var(--tier-b) !important; color: #000; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+        .cell-c { background-color: var(--tier-c) !important; color: #000; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
+        
+        .energy-label { color: var(--energy-color) !important; font-size: 11px; }
+
+        /* TOOLTIP */
+        .custom-tooltip {
+            display: none;
+            position: absolute;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffffff;
+            color: #000000;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 999;
+            white-space: nowrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+        .custom-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border: 6px solid transparent;
+            border-top-color: #ffffff;
+        }
+
+        /* МОДАЛЬНОЕ ОКНО */
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-mask.active { display: flex; }
+
+        .modal-container {
+            background: #0f172a;
+            width: 100%;
+            max-width: 1000px;
+            height: 90vh;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 25px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            padding: 15px 20px;
+            background: #05070a;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            color: #fff;
+            font-size: 18px;
+            outline: none;
+        }
+
+        .modal-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .role-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .role-btn-group {
+            cursor: pointer;
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid transparent;
+            transition: 0.2s;
+        }
+
+        .role-btn-group.selected {
+            border-color: var(--primary);
+            background: rgba(123, 92, 255, 0.2);
+        }
+
+        .role-btn-group img { width: 30px; height: 30px; }
+
+        .champ-toggle {
+            width: 100%;
+            padding: 12px 5px;
+            background: #161e2f;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .champ-toggle.active {
+            background: var(--primary);
+            color: white;
+            border-color: #fff;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff4d4f;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        @media (max-width: 800px) {
+            .modal-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; }
+            .champ-toggle { font-size: 9px; padding: 8px 2px; }
+            .brand-name { font-size: 20px; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="container">
-  <header class="app-header">
-    <div class="logo-box"><span class="nick">ERjanKG</span></div>
-    <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" alt="T"> TWITCH
-    </a>
-  </header>
+<div class="main-wrapper">
+    <header class="app-header">
+        <div class="brand-name">ERjanKG Stats</div>
+        <a href="https://www.twitch.tv/ERjanKG" class="twitch-badge" target="_blank">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" width="20" />
+            TWITCH
+        </a>
+    </header>
 
-  <section class="promo-card">
-    <div style="font-size: 18px; margin-bottom: 8px;">👑 ПОДДЕРЖКА ПРОЕКТА</div>
-    <div style="opacity: 0.7; font-size: 14px;">Твой вклад помогает делать сайт круче и быстрее!</div>
-    <a class="donate-link" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 ОТПРАВИТЬ ДОНАТ</a>
-  </section>
-
-  <div class="level-panel">
-    <div class="level-info">
-      <span class="level-label">ТЕКУЩИЙ УРОВЕНЬ:</span>
-      <span id="levelVal" class="level-number">10</span>
+    <div class="support-panel">
+        <a href="https://www.donationalerts.com/r/erjankg" class="support-btn" target="_blank">ПОДДЕРЖАТЬ ПРОЕКТ 💜</a>
     </div>
-    <input id="level" type="range" min="1" max="15" value="10">
-  </div>
 
-  <div class="tier-legend">
-    <div class="legend-tag"><div class="tag-box" style="background:var(--t-s)"></div> Tier S</div>
-    <div class="legend-tag"><div class="tag-box" style="background:var(--t-a)"></div> Tier A</div>
-    <div class="legend-tag"><div class="tag-box" style="background:var(--t-b)"></div> Tier B</div>
-    <div class="legend-tag"><div class="tag-box" style="background:var(--t-c)"></div> Tier C</div>
-  </div>
+    <div class="level-control">
+        <div class="level-header">
+            <span class="level-title">УРОВЕНЬ ПЕРСОНАЖА</span>
+            <span id="lvlLabel" class="level-val">10</span>
+        </div>
+        <div class="slider-container">
+            <input type="range" id="lvlInput" min="1" max="15" value="10">
+            <div class="ruler" id="lvlRuler"></div>
+        </div>
+    </div>
 
-  <div class="main-table-container">
-    <table id="mainTable">
-      <thead>
-        <tr>
-          <th style="width:36%">
-            <div class="champ-col-header">
-              <input type="checkbox" id="selectAllCheck" class="master-check" checked title="Выбрать всех" onclick="toggleSelectAll(this.checked)">
-              <span onclick="openModal()" style="cursor:pointer">CHAMPION ⚙️</span>
-            </div>
-          </th>
-          <th onclick="applySort('ad')">AD<span id="s-ad" class="sort-icon"></span></th>
-          <th onclick="applySort('hp')">HP<span id="s-hp" class="sort-icon"></span></th>
-          <th onclick="applySort('mana')">MN<span id="s-mana" class="sort-icon"></span></th>
-          <th onclick="applySort('armor')">ARM<span id="s-armor" class="sort-icon"></span></th>
-          <th onclick="applySort('mr')">MR<span id="s-mr" class="sort-icon"></span></th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
-
-  <div class="stats-summary" id="statsFooter"></div>
+    <div class="stats-table-wrapper">
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th style="width: 35%">
+                        <div class="champ-cell-flex">
+                            <input type="checkbox" id="masterToggle" checked style="transform: scale(1.5);">
+                            <span onclick="openModal()" style="border-bottom: 2px dashed var(--primary);">ЧЕМПИОН ⚙️</span>
+                        </div>
+                    </th>
+                    <th data-sort="ad">AD</th>
+                    <th data-sort="hp">HP</th>
+                    <th data-sort="mana">MANA</th>
+                    <th data-sort="armor">ARMOR</th>
+                    <th data-sort="mr">MR</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
 </div>
 
-<div id="champModal" class="modal-overlay hidden">
-  <div class="blur-bg" onclick="closeModal()"></div>
-  <div class="modal-window">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-top">
-      <input type="text" id="searchBox" class="champ-search" placeholder="Поиск чемпиона..." oninput="drawModal()">
+<div class="modal-mask" id="modalMask">
+    <div class="modal-container">
+        <button class="close-btn" onclick="closeModal()">✕</button>
+        <div class="modal-header">
+            <div class="search-wrapper">
+                <input type="text" id="champSearch" placeholder="Введите имя героя...">
+            </div>
+        </div>
+        <div class="modal-grid" id="modalGrid"></div>
     </div>
-    <div id="modalGrid" class="modal-content"></div>
-  </div>
 </div>
 
 <script>
-  const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
-  const STAT_KEYS = ["ad", "hp", "mana", "armor", "mr"];
-  const ROLE_LIST = [
-    { key: "Top", icon: "assets/roles/top.png" },
-    { key: "Jungle", icon: "assets/roles/jungle.png" },
-    { key: "Mid", icon: "assets/roles/mid.png" },
-    { key: "ADC", icon: "assets/roles/adc.png" },
-    { key: "Support", icon: "assets/roles/support.png" }
-  ];
-
-  let rawData = [], selectedChamps = new Set(), pinnedChamps = new Set();
-  let currentLevel = 10, sortKey = 'ad', sortDir = 'desc';
-
-  // Persistence
-  if(localStorage.getItem('wr_pinned')) pinnedChamps = new Set(JSON.parse(localStorage.getItem('wr_pinned')));
-  if(localStorage.getItem('wr_level')) currentLevel = +localStorage.getItem('wr_level');
-
-  async function loadData() {
-    try {
-      const r = await fetch(SHEET_URL);
-      const t = await r.text();
-      const lines = t.trim().split('\n').map(l => l.split('\t'));
-      const header = lines[0].map(s => s.trim());
-      
-      rawData = lines.slice(1).map(row => {
-        let o = {}; header.forEach((name, i) => o[name] = row[i]?.trim());
-        return {
-          name: o["Champion"], 
-          ad_b: +o["AD_Base"], ad_g: +o["AD_Growth"],
-          hp_b: +o["HP_Base"], hp_g: +o["HP_Growth"], 
-          mn_b: +o["Mana_Base"], mn_g: +o["Mana_Growth"],
-          ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"], 
-          mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
-          resType: o["Resource"] || "Mana",
-          roles: { 
-            Top: +o["Is_Top"]===1, Jungle: +o["Is_Jungle"]===1, 
-            Mid: +o["Is_Mid"]===1, ADC: +o["Is_Adc"]===1, 
-            Support: +o["Is_Support"]===1 
-          }
-        };
-      }).filter(x => x.name);
-
-      selectedChamps = new Set(rawData.map(x => x.name));
-      document.getElementById('level').value = currentLevel;
-      document.getElementById('levelVal').innerText = currentLevel;
-      refreshTable();
-    } catch(e) { console.error("Data Load Error", e); }
-  }
-
-  function applySort(key) {
-    if(sortKey === key) sortDir = sortDir === 'desc' ? 'asc' : 'desc';
-    else { sortKey = key; sortDir = 'desc'; }
-    refreshTable();
-  }
-
-  function refreshTable() {
-    const tbody = document.getElementById("tableBody");
+    /**
+     * КОНФИГУРАЦИЯ И ДАННЫЕ
+     */
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
     
-    // Sort Icons
-    STAT_KEYS.forEach(k => {
-      const el = document.getElementById('s-' + k);
-      if(k === sortKey) el.innerText = sortDir === 'desc' ? ' ▼' : ' ▲';
-      else el.innerText = '';
-    });
+    let rawData = [];
+    let selectedSet = new Set();
+    let pinnedSet = new Set();
+    let userLevel = 10;
+    let sortConfig = { key: 'ad', dir: 'desc' };
 
-    const processed = rawData.filter(x => selectedChamps.has(x.name)).map(x => {
-      const calc = (b, g) => b + (currentLevel - 1) * g;
-      return { 
-        name: x.name, resType: x.resType, 
-        ad: calc(x.ad_b, x.ad_g), hp: calc(x.hp_b, x.hp_g), 
-        mana: calc(x.mn_b, x.mn_g), armor: calc(x.ar_b, x.ar_g), 
-        mr: calc(x.mr_b, x.mr_g), 
-        growth: { ad: x.ad_g, hp: x.hp_g, mana: x.mn_g, armor: x.ar_g, mr: x.mr_g } 
-      };
-    }).sort((a,b) => sortDir === 'desc' ? b[sortKey] - a[sortKey] : a[sortKey] - b[sortKey]);
+    const roleIcons = {
+        Top: "assets/roles/top.png",
+        Jungle: "assets/roles/jungle.png",
+        Mid: "assets/roles/mid.png",
+        ADC: "assets/roles/adc.png",
+        Support: "assets/roles/support.png"
+    };
 
-    const thresholds = {};
-    STAT_KEYS.forEach(k => {
-      let vals = processed.map(d => d[k]).sort((a,b) => a-b);
-      thresholds[k] = { 
-        s: vals[Math.floor(vals.length*0.97)], 
-        a: vals[Math.floor(vals.length*0.85)], 
-        c: vals[Math.floor(vals.length*0.15)] 
-      };
-    });
-
-    tbody.innerHTML = "";
-    processed.forEach(item => {
-      const tr = document.createElement("tr");
-      const isPinned = pinnedChamps.has(item.name);
-
-      tr.innerHTML = `<td><div class="champ-row-ui">
-        <button class="del-row-btn" onclick="event.stopPropagation(); selectedChamps.delete('${item.name}'); refreshTable();">✕</button>
-        <div class="champ-badge ${isPinned?'pinned':''}" onclick="event.stopPropagation(); togglePin('${item.name}')">${item.name}</div>
-      </div></td>`;
-      
-      STAT_KEYS.forEach(k => {
-        const td = document.createElement("td");
-        td.className = "tip-anchor";
-        const val = item[k];
+    /**
+     * ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
+     */
+    async function startApp() {
+        console.log("App starting...");
         
-        // Tooltip
-        const tip = document.createElement("div");
-        tip.className = "tip-popup";
-        tip.innerText = `ПРИРОСТ: +${item.growth[k]}`;
-        td.appendChild(tip);
+        // Загрузка настроек
+        if(localStorage.getItem('er_pinned')) pinnedSet = new Set(JSON.parse(localStorage.getItem('er_pinned')));
+        if(localStorage.getItem('er_level')) userLevel = parseInt(localStorage.getItem('er_level'));
         
-        td.onclick = (e) => {
-          e.stopPropagation();
-          const alreadyOpen = tip.style.display === 'block';
-          document.querySelectorAll('.tip-popup').forEach(p => p.style.display = 'none');
-          tip.style.display = alreadyOpen ? 'none' : 'block';
-        };
-
-        if(k === "mana" && item.resType === "Energy") { 
-          td.classList.add("energy-text"); td.innerHTML += "NRG"; 
-        } else if(k === "mana" && val === 0) { 
-          td.style.opacity = "0.2"; td.innerHTML += "0"; 
-        } else {
-          td.innerHTML += Math.round(val);
-          if(val >= thresholds[k].s) td.classList.add("tier-s");
-          else if(val >= thresholds[k].a) td.classList.add("tier-a");
-          else if(val <= thresholds[k].c) td.classList.add("tier-c");
-          else td.classList.add("tier-b");
+        // Генерация линейки
+        const ruler = document.getElementById('lvlRuler');
+        for(let i=1; i<=15; i++) {
+            const span = document.createElement('span');
+            span.className = 'ruler-mark';
+            span.innerText = i;
+            ruler.appendChild(span);
         }
-        tr.appendChild(td);
-      });
-      tbody.appendChild(tr);
-    });
-    updateStatsSummary(processed);
-  }
 
-  function updateStatsSummary(data) {
-    const foot = document.getElementById("statsFooter");
-    if(!data.length) { foot.innerHTML = ""; return; }
-    const avgAD = Math.round(data.reduce((s,x)=>s+x.ad,0)/data.length);
-    const avgHP = Math.round(data.reduce((s,x)=>s+x.hp,0)/data.length);
-    foot.innerHTML = `
-      <div class="summary-item"><div class="summary-label">СРЕДНИЙ AD</div><div class="summary-val">${avgAD}</div></div>
-      <div class="summary-item"><div class="summary-label">СРЕДНИЙ HP</div><div class="summary-val">${avgHP}</div></div>
-      <div class="summary-item"><div class="summary-label">ВЫБРАНО</div><div class="summary-val">${data.length}</div></div>
-    `;
-  }
+        // Загрузка данных
+        try {
+            const response = await fetch(SHEET_URL);
+            const text = await response.text();
+            parseTSV(text);
+            
+            // Ставим уровень
+            document.getElementById('lvlInput').value = userLevel;
+            document.getElementById('lvlLabel').innerText = userLevel;
+            
+            // По умолчанию выбраны все
+            selectedSet = new Set(rawData.map(c => c.name));
+            
+            bindEvents();
+            renderTable();
+        } catch (err) {
+            console.error("Failed to load data", err);
+        }
+    }
 
-  function togglePin(name) { 
-    pinnedChamps.has(name) ? pinnedChamps.delete(name) : pinnedChamps.add(name); 
-    localStorage.setItem('wr_pinned', JSON.stringify([...pinnedChamps]));
-    refreshTable(); 
-  }
+    /**
+     * ПАРСИНГ ДАННЫХ
+     */
+    function parseTSV(data) {
+        const lines = data.trim().split('\n');
+        const headers = lines[0].split('\t').map(h => h.trim());
+        
+        rawData = lines.slice(1).map(line => {
+            const cols = line.split('\t');
+            const row = {};
+            headers.forEach((h, i) => row[h] = cols[i]?.trim());
+            
+            return {
+                name: row["Champion"],
+                ad_b: parseFloat(row["AD_Base"]), ad_g: parseFloat(row["AD_Growth"]),
+                hp_b: parseFloat(row["HP_Base"]), hp_g: parseFloat(row["HP_Growth"]),
+                mn_b: parseFloat(row["Mana_Base"]), mn_g: parseFloat(row["Mana_Growth"]),
+                ar_b: parseFloat(row["Armor_Base"]), ar_g: parseFloat(row["Armor_Growth"]),
+                mr_b: parseFloat(row["MR_Base"]), mr_g: parseFloat(row["MR_Growth"]),
+                resource: row["Resource"] || "Mana",
+                roles: {
+                    Top: row["Is_Top"] === "1",
+                    Jungle: row["Is_Jungle"] === "1",
+                    Mid: row["Is_Mid"] === "1",
+                    ADC: row["Is_Adc"] === "1",
+                    Support: row["Is_Support"] === "1"
+                }
+            };
+        }).filter(c => c.name);
+    }
 
-  function toggleSelectAll(val) {
-    selectedChamps = val ? new Set(rawData.map(x => x.name)) : new Set([...pinnedChamps]);
-    refreshTable();
-  }
+    /**
+     * ЛОГИКА ОТРИСОВКИ ТАБЛИЦЫ
+     */
+    function renderTable() {
+        const body = document.getElementById('tableBody');
+        
+        // 1. Подготовка данных с учетом уровня
+        const tableData = rawData.filter(c => selectedSet.has(c.name)).map(c => {
+            const calc = (base, growth) => base + (userLevel - 1) * growth;
+            return {
+                name: c.name,
+                resource: c.resource,
+                ad: calc(c.ad_b, c.ad_g),
+                hp: calc(c.hp_b, c.hp_g),
+                mana: calc(c.mn_b, c.mn_g),
+                armor: calc(c.ar_b, c.ar_g),
+                mr: calc(c.mr_b, c.mr_g),
+                growth: { ad: c.ad_g, hp: c.hp_g, mana: c.mn_g, armor: c.ar_g, mr: c.mr_g }
+            };
+        });
 
-  function openModal() { document.getElementById("champModal").classList.remove("hidden"); drawModal(); }
-  function closeModal() { document.getElementById("champModal").classList.add("hidden"); }
+        // 2. Сортировка
+        tableData.sort((a, b) => {
+            const valA = a[sortConfig.key];
+            const valB = b[sortConfig.key];
+            return sortConfig.dir === 'desc' ? valB - valA : valA - valB;
+        });
 
-  function drawModal() {
-    const grid = document.getElementById("modalGrid");
-    const q = document.getElementById("searchBox").value.toLowerCase();
-    grid.innerHTML = "";
-
-    ROLE_LIST.forEach(role => {
-      const col = document.createElement("div"); col.className = "role-column";
-      const roleChamps = rawData.filter(x => x.roles[role.key]).map(x => x.name);
-      const isFull = roleChamps.every(n => selectedChamps.has(n));
-
-      col.innerHTML = `<div class="role-selector ${isFull?'active':''}" onclick="batchToggleRole('${role.key}')">
-        <img src="${role.icon}">
-      </div>`;
-      
-      rawData.filter(x => x.roles[role.key] && x.name.toLowerCase().includes(q))
-             .sort((a,b)=>a.name.localeCompare(b.name)).forEach(x => {
-        const btn = document.createElement("button");
-        btn.className = "champ-toggle-btn" + (selectedChamps.has(x.name)?" active":"");
-        btn.innerText = x.name;
-        btn.onclick = () => { 
-          selectedChamps.has(x.name) ? selectedChamps.delete(x.name) : selectedChamps.add(x.name); 
-          drawModal(); refreshTable(); 
+        // 3. Вычисление порогов для цветов (Тиры)
+        const getThresholds = (key) => {
+            const sortedVals = tableData.map(d => d[key]).sort((a, b) => a - b);
+            return {
+                s: sortedVals[Math.floor(sortedVals.length * 0.95)],
+                a: sortedVals[Math.floor(sortedVals.length * 0.80)],
+                c: sortedVals[Math.floor(sortedVals.length * 0.20)]
+            };
         };
-        col.appendChild(btn);
-      });
-      grid.appendChild(col);
-    });
-  }
 
-  function batchToggleRole(key) {
-    const names = rawData.filter(x => x.roles[key]).map(x => x.name);
-    const allIn = names.every(n => selectedChamps.has(n));
-    names.forEach(n => allIn ? selectedChamps.delete(n) : selectedChamps.add(n));
-    drawModal(); refreshTable();
-  }
+        const thres = {
+            ad: getThresholds('ad'),
+            hp: getThresholds('hp'),
+            mana: getThresholds('mana'),
+            armor: getThresholds('armor'),
+            mr: getThresholds('mr')
+        };
 
-  document.getElementById("level").oninput = (e) => {
-    currentLevel = +e.target.value; 
-    document.getElementById("levelVal").innerText = currentLevel; 
-    localStorage.setItem('wr_level', currentLevel);
-    refreshTable();
-  };
+        // 4. Генерация HTML
+        body.innerHTML = "";
+        tableData.forEach(item => {
+            const tr = document.createElement('tr');
+            const pinned = pinnedSet.has(item.name);
 
-  // Global click to close tooltips
-  window.onclick = () => document.querySelectorAll('.tip-popup').forEach(p => p.style.display = 'none');
+            // Ячейка имени
+            let html = `
+                <td>
+                    <div class="champ-cell-flex">
+                        <button class="btn-remove" onclick="removeChamp('${item.name}')">✕</button>
+                        <div class="champ-name-box ${pinned ? 'is-pinned' : ''}" onclick="togglePin('${item.name}')">
+                            ${item.name}
+                        </div>
+                    </div>
+                </td>
+            `;
 
-  loadData();
+            // Ячейки статов
+            ['ad', 'hp', 'mana', 'armor', 'mr'].forEach(key => {
+                const val = item[key];
+                let className = "";
+                
+                if (val >= thres[key].s) className = "cell-s";
+                else if (val >= thres[key].a) className = "cell-a";
+                else if (val <= thres[key].c) className = "cell-c";
+                else className = "cell-b";
+
+                let displayVal = Math.round(val);
+                if (key === 'mana' && item.resource === 'Energy') {
+                    displayVal = `<span class="energy-label">NRG</span>`;
+                } else if (key === 'mana' && val === 0) {
+                    displayVal = `<span style="opacity:0.3">0</span>`;
+                }
+
+                html += `
+                    <td class="${className}" onclick="showTip(this, '${item.growth[key]}')">
+                        ${displayVal}
+                        <div class="custom-tooltip">ПРИРОСТ: +${item.growth[key]}</div>
+                    </td>
+                `;
+            });
+
+            tr.innerHTML = html;
+            body.appendChild(tr);
+        });
+    }
+
+    /**
+     * МОДАЛЬНОЕ ОКНО ВЫБОРА
+     */
+    function drawModal() {
+        const grid = document.getElementById('modalGrid');
+        const search = document.getElementById('champSearch').value.toLowerCase();
+        grid.innerHTML = "";
+
+        const roles = ["Top", "Jungle", "Mid", "ADC", "Support"];
+
+        roles.forEach(role => {
+            const container = document.createElement('div');
+            container.className = "role-section";
+
+            // Кнопка выбора всей роли
+            const roleChamps = rawData.filter(c => c.roles[role]);
+            const isAllSelected = roleChamps.every(c => selectedSet.has(c.name));
+
+            const head = document.createElement('div');
+            head.className = `role-btn-group ${isAllSelected ? 'selected' : ''}`;
+            head.innerHTML = `<img src="assets/roles/${role.toLowerCase()}.png" onerror="this.src='https://placehold.co/40x40?text=${role[0]}'">`;
+            head.onclick = () => toggleRoleGroup(role, isAllSelected);
+            container.appendChild(head);
+
+            // Кнопки героев
+            roleChamps
+                .filter(c => c.name.toLowerCase().includes(search))
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .forEach(c => {
+                    const btn = document.createElement('button');
+                    btn.className = `champ-toggle ${selectedSet.has(c.name) ? 'active' : ''}`;
+                    btn.innerText = c.name;
+                    btn.onclick = () => {
+                        if(selectedSet.has(c.name)) selectedSet.delete(c.name);
+                        else selectedSet.add(c.name);
+                        drawModal();
+                        renderTable();
+                    };
+                    container.appendChild(btn);
+                });
+
+            grid.appendChild(container);
+        });
+    }
+
+    /**
+     * ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+     */
+    function togglePin(name) {
+        if(pinnedSet.has(name)) pinnedSet.delete(name);
+        else pinnedSet.add(name);
+        localStorage.setItem('er_pinned', JSON.stringify([...pinnedSet]));
+        renderTable();
+    }
+
+    function removeChamp(name) {
+        selectedSet.delete(name);
+        renderTable();
+    }
+
+    function toggleRoleGroup(role, currentState) {
+        const champs = rawData.filter(c => c.roles[role]);
+        champs.forEach(c => {
+            if(currentState) selectedSet.delete(c.name);
+            else selectedSet.add(c.name);
+        });
+        drawModal();
+        renderTable();
+    }
+
+    function toggleSelectAll(on) {
+        if(on) selectedSet = new Set(rawData.map(c => c.name));
+        else selectedSet = new Set([...pinnedSet]);
+        renderTable();
+    }
+
+    function showTip(el, value) {
+        // Закрываем все другие
+        document.querySelectorAll('.custom-tooltip').forEach(t => t.style.display = 'none');
+        const tip = el.querySelector('.custom-tooltip');
+        tip.style.display = 'block';
+        setTimeout(() => {
+            window.addEventListener('click', function hide() {
+                tip.style.display = 'none';
+                window.removeEventListener('click', hide);
+            }, {once: true});
+        }, 10);
+    }
+
+    function bindEvents() {
+        // Ползунок уровня
+        const slider = document.getElementById('lvlInput');
+        slider.oninput = (e) => {
+            userLevel = parseInt(e.target.value);
+            document.getElementById('lvlLabel').innerText = userLevel;
+            localStorage.setItem('er_level', userLevel);
+            renderTable();
+        };
+
+        // Сортировка заголовков
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.onclick = () => {
+                const key = th.getAttribute('data-sort');
+                if(sortConfig.key === key) {
+                    sortConfig.dir = sortConfig.dir === 'desc' ? 'asc' : 'desc';
+                } else {
+                    sortConfig.key = key;
+                    sortConfig.dir = 'desc';
+                }
+                renderTable();
+            };
+        });
+
+        // Мастер-чекбокс
+        document.getElementById('masterToggle').onchange = (e) => {
+            toggleSelectAll(e.target.checked);
+        };
+    }
+
+    function openModal() { document.getElementById('modalMask').classList.add('active'); drawModal(); }
+    function closeModal() { document.getElementById('modalMask').classList.remove('active'); }
+
+    // Запуск
+    startApp();
 </script>
 </body>
 </html>
