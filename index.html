@@ -3,299 +3,394 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Wild Rift Stats PRO</title>
+    <title>WILD RIFT STATS - FULL MOBILE FIX</title>
     <style>
-        /* =========================================
-           1. ПЕРЕМЕННЫЕ И ТЕМЫ
-           ========================================= */
+        /* --- 1. ЖЕСТКАЯ БЛОКИРОВКА СКРОЛЛА --- */
+        html, body {
+            margin: 0; padding: 0;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden; /* ЗАПРЕТ СКРОЛЛА */
+            background-color: #05070a;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-weight: 900;
+        }
+
         :root {
-            --bg: #05070a; --card: #111622; --text: #ffffff; --sub: #a0aec0;
-            --brd: rgba(255, 255, 255, 0.1); --primary: #7b5cff;
-            --t-s: #ff7f7f; --t-a: #ffbf7f; --t-b: #ffff7f; --t-c: #7fff7f;
-        }
-        body.light-mode {
-            --bg: #f0f2f5; --card: #ffffff; --text: #1a202c; --sub: #4a5568;
-            --brd: rgba(0, 0, 0, 0.1); --primary: #6366f1;
-            --t-s: #ff9999; --t-a: #ffcc99; --t-b: #ffff99; --t-c: #99ff99;
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { 
-            margin: 0; padding: 0; width: 100%; overflow-x: hidden; 
-            font-family: system-ui, -apple-system, sans-serif; font-weight: 800;
-            background: var(--bg); color: var(--text); transition: background 0.3s;
+            --accent: #7b5cff;
+            --bg-card: #111622;
+            --border: rgba(255, 255, 255, 0.1);
+            --tier-s: #ff7f7f;
+            --tier-a: #ffbf7f;
+            --tier-b: #ffff7f;
+            --tier-c: #7fff7f;
         }
 
-        .wrapper { width: 100%; max-width: 100%; padding: 10px; margin: 0 auto; }
+        .app-wrapper {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
 
-        /* =========================================
-           2. ШАПКА И КНОПКИ (АНИМАЦИЯ)
-           ========================================= */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .logo { font-size: 1.2rem; font-weight: 900; }
-        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
         .twitch-btn {
-            background: #9146ff; color: #fff; padding: 8px 12px; border-radius: 20px;
-            text-decoration: none; font-size: 12px; animation: pulse 2s infinite;
+            background: #9146ff;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 11px;
+            animation: twitchPulse 2s infinite;
         }
-        @keyframes pulse {
+
+        @keyframes twitchPulse {
             0% { box-shadow: 0 0 0 0 rgba(145, 70, 255, 0.7); }
             70% { box-shadow: 0 0 0 10px rgba(145, 70, 255, 0); }
             100% { box-shadow: 0 0 0 0 rgba(145, 70, 255, 0); }
         }
 
-        .theme-toggle { 
-            background: var(--card); border: 1px solid var(--brd); 
-            color: var(--text); padding: 5px 10px; border-radius: 10px; cursor: pointer;
+        .btn-support {
+            display: block;
+            background: #ffffff;
+            color: #000;
+            padding: 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
         }
 
-        .support-box { 
-            background: var(--card); border: 1px solid var(--brd); 
-            padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: center;
-        }
-        .support-link { 
-            display: block; background: var(--primary); color: #fff; 
-            text-decoration: none; padding: 12px; border-radius: 10px; font-size: 14px;
+        /* --- ПОЛЗУНОК --- */
+        .lvl-container {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
         }
 
-        /* =========================================
-           3. ПОЛЗУНОК
-           ========================================= */
-        .lvl-box { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 15px; }
-        .lvl-head { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
-        input[type="range"] { width: 100%; height: 8px; appearance: none; background: #2d3748; border-radius: 5px; }
-        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 22px; height: 22px; background: #fff; border: 3px solid var(--primary); border-radius: 50%; }
-        .ruler { display: flex; justify-content: space-between; margin-top: 8px; font-size: 10px; color: var(--sub); }
+        .lvl-info { display: flex; justify-content: space-between; align-items: center; }
+        .lvl-num { font-size: 24px; color: var(--accent); }
 
-        /* =========================================
-           4. ТАБЛИЦА (ЗАТЕМНЕНИЕ И СКРОЛЛ)
-           ========================================= */
-        .table-container { 
-            width: 100%; overflow-x: auto; background: var(--card); 
-            border-radius: 15px; border: 1px solid var(--brd);
-            -webkit-overflow-scrolling: touch;
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            appearance: none;
+            background: #2d3748;
+            border-radius: 5px;
+            outline: none;
+            margin-top: 10px;
         }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; table-layout: fixed; }
-        th { 
-            background: var(--card); padding: 12px 5px; font-size: 11px; 
-            position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--brd);
-        }
-        
-        /* Логика затемнения */
-        table.focus-mode td:not(:first-child) { opacity: 0.4; } /* Затемняем только статы */
-        table.focus-mode td.active-col { opacity: 1 !important; background: rgba(123, 92, 255, 0.1); }
-        
-        td { padding: 10px 2px; text-align: center; font-size: 13px; border-bottom: 1px solid var(--brd); }
-        
-        .champ-name { 
-            display: block; padding: 6px; background: #2d3748; border-radius: 6px; 
-            font-size: 10px; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
-        }
-        .pinned { background: var(--primary) !important; color: #fff; box-shadow: 0 0 10px var(--primary); }
 
-        /* Цвета Тиров */
-        .s { background: var(--t-s) !important; color: #000; }
-        .a { background: var(--t-a) !important; color: #000; }
-        .b { background: var(--t-b) !important; color: #000; }
-        .c { background: var(--t-c) !important; color: #000; }
-
-        /* =========================================
-           5. МОДАЛКА
-           ========================================= */
-        .modal { 
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            display: none; z-index: 1000; padding: 10px; 
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 22px; height: 22px;
+            background: #fff;
+            border: 4px solid var(--accent);
+            border-radius: 50%;
         }
-        .modal-content { 
-            background: var(--bg); width: 100%; height: 90vh; border-radius: 20px; 
+
+        /* --- ТАБЛИЦА БЕЗ СКРОЛЛА --- */
+        .table-hold {
+            width: 100%;
+            background: var(--bg-card);
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            overflow: hidden; /* НИКАКОГО СКРОЛЛА */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* ЖЕСТКАЯ СЕТКА */
+        }
+
+        th {
+            background: #1a2233;
+            padding: 10px 2px;
+            font-size: 9px; /* МИНИМАЛЬНЫЙ ШРИФТ ЗАГОЛОВКОВ */
+            border-bottom: 2px solid var(--border);
+            cursor: pointer;
+            word-wrap: break-word;
+        }
+
+        .btn-champ-cfg {
+            background: var(--accent);
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 8px;
+            border: none;
+            font-weight: 900;
+        }
+
+        /* ЗАТЕМНЕНИЕ */
+        table.focus-mode td:not(:first-child) { opacity: 0.25; }
+        table.focus-mode td.active-col { opacity: 1 !important; }
+
+        td {
+            padding: 8px 1px;
+            text-align: center;
+            font-size: 12px; /* ШРИФТ ЧИСЕЛ */
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* КОЛОНКА ИМЕНИ */
+        td:first-child {
+            width: 80px; /* ФИКСИРОВАННАЯ ШИРИНА ДЛЯ ИМЕНИ */
+            font-size: 10px;
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        .name-tag {
+            background: #232d42;
+            padding: 4px;
+            border-radius: 4px;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .name-tag.pinned { background: var(--accent) !important; color: white; }
+
+        /* ТИРЫ */
+        .s { background: var(--tier-s) !important; color: #000; }
+        .a { background: var(--tier-a) !important; color: #000; }
+        .b { background: var(--tier-b) !important; color: #000; }
+        .c { background: var(--tier-c) !important; color: #000; }
+
+        /* ПОДСКАЗКА */
+        #uiTip {
+            position: absolute; display: none; background: #fff; color: #000;
+            padding: 5px 10px; border-radius: 5px; font-size: 11px; z-index: 1000;
+            pointer-events: none; transform: translate(-50%, -100%);
+        }
+
+        /* МОДАЛКА */
+        .m-mask {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            display: none; z-index: 2000; padding: 10px;
+        }
+        .m-mask.active { display: flex; align-items: center; justify-content: center; }
+        .m-win {
+            background: #0f172a; width: 100%; height: 90vh; border-radius: 20px;
             display: flex; flex-direction: column; position: relative;
         }
-        .modal-grid { 
-            flex: 1; display: grid; grid-template-columns: repeat(5, 1fr); 
-            gap: 8px; padding: 10px; overflow-y: auto; 
+        .m-grid {
+            flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); /* 3 КОЛОНКИ НА МОБИЛЕ */
+            gap: 8px; padding: 15px; overflow-y: auto;
         }
-        .role-btn { 
-            background: var(--card); padding: 10px; border-radius: 10px; 
-            text-align: center; border: 2px solid transparent; 
-        }
-        .role-btn.on { border-color: var(--primary); }
-        .role-btn img { width: 20px; height: 20px; }
-        .champ-item { 
-            padding: 8px 2px; background: var(--card); border: 1px solid var(--brd); 
-            border-radius: 6px; font-size: 9px; color: var(--sub); cursor: pointer;
-        }
-        .champ-item.on { background: var(--primary); color: #fff; }
+        .m-role { background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; font-size: 10px; margin-bottom: 5px; }
+        .m-role.on { border: 2px solid var(--accent); }
+        .m-item { background: #161e2f; padding: 8px 2px; border-radius: 5px; font-size: 9px; text-align: center; margin-bottom: 4px; color: #718096; }
+        .m-item.on { background: var(--accent); color: #fff; }
 
-        /* Всплывающее окно (Tooltip) работает через браузерный title или кастомный блок */
-        .custom-tip { position: absolute; background: #fff; color: #000; padding: 5px; border-radius: 5px; display: none; z-index: 100; }
+        @media (min-width: 600px) {
+            th { font-size: 12px; }
+            td { font-size: 15px; }
+            td:first-child { font-size: 13px; width: 120px; }
+            .m-grid { grid-template-columns: repeat(5, 1fr); }
+        }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
-    <div class="header">
-        <div class="logo">ERjanKG</div>
-        <div style="display:flex; gap:10px;">
-            <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
-            <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">TWITCH</a>
+<div id="uiTip"></div>
+
+<div class="app-wrapper">
+    <header>
+        <div style="font-size: 18px;">ERjanKG <span style="color:var(--accent)">STATS</span></div>
+        <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">TWITCH</a>
+    </header>
+
+    <a href="https://www.donationalerts.com/r/erjankg" class="btn-support" target="_blank">ПОДДЕРЖАТЬ ПРОЕКТ</a>
+
+    <div class="lvl-container">
+        <div class="lvl-info">
+            <span style="font-size:12px">УРОВЕНЬ:</span>
+            <span id="lvlLabel" class="lvl-num">10</span>
         </div>
+        <input type="range" id="lvlRange" min="1" max="15" value="10">
     </div>
 
-    <div class="support-box">
-        <a href="https://www.donationalerts.com/r/erjankg" class="support-link" target="_blank">ПОДДЕРЖАТЬ</a>
-    </div>
-
-    <div class="lvl-box">
-        <div class="lvl-head"><span>УРОВЕНЬ:</span><span id="lvlVal" style="font-size:20px; color:var(--primary)">10</span></div>
-        <input type="range" id="lvlIn" min="1" max="15" value="10">
-        <div class="ruler"><span>1</span><span>5</span><span>10</span><span>15</span></div>
-    </div>
-
-    <div class="table-container">
-        <table id="mainTable">
+    <div class="table-hold">
+        <table id="statTable">
             <thead>
                 <tr>
-                    <th style="width:100px">
-                        <input type="checkbox" id="masterBox" checked onclick="masterToggle(this.checked)">
-                        <span onclick="openModal()" style="border-bottom:1px solid">CHAMP ⚙️</span>
+                    <th style="width: 85px;">
+                        <input type="checkbox" id="masterCheck" checked>
+                        <button class="btn-champ-cfg" onclick="openM()">CHAMP</button>
                     </th>
-                    <th onclick="setSort('ad')">AD <span id="s-ad"></span></th>
-                    <th onclick="setSort('hp')">HP <span id="s-hp"></span></th>
-                    <th onclick="setSort('mana')">MN <span id="s-mana"></span></th>
-                    <th onclick="setSort('armor')">AR <span id="s-armor"></span></th>
-                    <th onclick="setSort('mr')">MR <span id="s-mr"></span></th>
+                    <th onclick="doSort('ad')">AD<span id="ar-ad"></span></th>
+                    <th onclick="doSort('hp')">HP<span id="ar-hp"></span></th>
+                    <th onclick="doSort('mana')">MANA<span id="ar-mana"></span></th>
+                    <th onclick="doSort('armor')">ARMOR<span id="ar-armor"></span></th>
+                    <th onclick="doSort('mrez')">MREZ<span id="ar-mrez"></span></th>
                 </tr>
             </thead>
-            <tbody id="tBody"></tbody>
+            <tbody id="statBody"></tbody>
         </table>
     </div>
 </div>
 
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <button onclick="closeModal()" style="position:absolute; top:10px; right:10px; background:red; color:#fff; border:none; border-radius:50%; width:30px; height:30px;">✕</button>
-        <div style="padding:40px 10px 10px;"><input type="text" id="mSearch" placeholder="Поиск..." style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--brd); background:var(--card); color:var(--text);" oninput="renderModal()"></div>
-        <div id="mGrid" class="modal-grid"></div>
+<div class="m-mask" id="mMask">
+    <div class="m-win">
+        <button onclick="closeM()" style="position:absolute; top:10px; right:10px; background:red; color:#fff; border:none; border-radius:50%; width:30px; height:30px;">✕</button>
+        <div style="padding: 40px 15px 10px;">
+            <input type="text" id="mSearch" placeholder="ПОИСК..." style="width:100%; padding:10px; border-radius:10px; background:#05070a; border:1px solid var(--border); color:#fff;" oninput="drawM()">
+        </div>
+        <div class="m-grid" id="mGrid"></div>
     </div>
 </div>
 
 <script>
-    const URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
+    const G_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
     let raw = [], selected = new Set(), pinned = new Set(), lvl = 10, sK = 'ad', sD = 'desc';
 
-    async function init() {
-        const r = await fetch(URL);
+    async function start() {
+        if(localStorage.getItem('p')) pinned = new Set(JSON.parse(localStorage.getItem('p')));
+        const r = await fetch(G_URL);
         const t = await r.text();
-        const rows = t.trim().split('\n').map(l => l.split('\t'));
-        const h = rows[0].map(c => c.trim());
-        raw = rows.slice(1).map(row => {
-            let o = {}; h.forEach((n, i) => o[n] = row[i]?.trim());
+        const lines = t.trim().split('\n');
+        const heads = lines[0].split('\t').map(h => h.trim());
+        
+        raw = lines.slice(1).map(l => {
+            const c = l.split('\t');
+            const o = {};
+            heads.forEach((h, i) => o[h] = c[i]?.trim());
             return {
-                name: o["Champion"], 
+                name: o["Champion"],
                 ad_b: +o["AD_Base"], ad_g: +o["AD_Growth"],
                 hp_b: +o["HP_Base"], hp_g: +o["HP_Growth"],
                 mn_b: +o["Mana_Base"], mn_g: +o["Mana_Growth"],
                 ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"],
                 mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
+                res: o["Resource"],
                 is: { Top: +o["Is_Top"]==1, Jungle: +o["Is_Jungle"]==1, Mid: +o["Is_Mid"]==1, ADC: +o["Is_Adc"]==1, Support: +o["Is_Support"]==1 }
             };
         }).filter(x => x.name);
+        
         selected = new Set(raw.map(x => x.name));
+        initApp();
         render();
     }
 
-    function setSort(k) {
+    function render() {
+        const body = document.getElementById('statBody');
+        const table = document.getElementById('statTable');
+        table.classList.add('focus-mode');
+
+        ['ad','hp','mana','armor','mrez'].forEach(k => {
+            document.getElementById('ar-'+k).innerText = (k === sK) ? (sD === 'desc' ? '▼' : '▲') : '';
+        });
+
+        const data = raw.filter(x => selected.has(x.name)).map(x => {
+            const f = (b, g) => b + (lvl - 1) * g;
+            return { name: x.name, res: x.res, ad: f(x.ad_b, x.ad_g), hp: f(x.hp_b, x.hp_g), mana: f(x.mn_b, x.mn_g), armor: f(x.ar_b, x.ar_g), mrez: f(x.mr_b, x.mr_g), g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g} };
+        }).sort((a,b) => sD === 'desc' ? b[sK] - a[sK] : a[sK] - b[sK]);
+
+        const getT = (k) => {
+            const s = data.map(i => i[k]).sort((a,b) => a-b);
+            return { s: s[Math.floor(s.length*0.95)], a: s[Math.floor(s.length*0.8)], c: s[Math.floor(s.length*0.2)] };
+        };
+        const thres = { ad: getT('ad'), hp: getT('hp'), mana: getT('mana'), armor: getT('armor'), mrez: getT('mrez') };
+
+        body.innerHTML = "";
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            const isP = pinned.has(item.name);
+            let html = `<td><span class="name-tag ${isP?'pinned':''}" onclick="toggleP('${item.name}')">${item.name}</span></td>`;
+            
+            ['ad','hp','mana','armor','mrez'].forEach(k => {
+                const v = item[k];
+                let cls = (k === sK) ? "active-col " : "";
+                if(v >= thres[k].s) cls += "s";
+                else if(v >= thres[k].a) cls += "a";
+                else if(v <= thres[k].c) cls += "c";
+                else cls += "b";
+
+                let txt = Math.round(v);
+                if(k === 'mana' && item.res === 'Energy') txt = "NRG";
+                else if(k === 'mana' && v === 0) txt = "0";
+
+                html += `<td class="${cls}" onclick="showT(event, '${item.g[k]}')">${txt}</td>`;
+            });
+            tr.innerHTML = html;
+            body.appendChild(tr);
+        });
+    }
+
+    function showT(e, v) {
+        const t = document.getElementById('uiTip');
+        t.style.display = 'block';
+        t.innerText = "+" + v;
+        t.style.top = (e.pageY - 10) + 'px';
+        t.style.left = e.pageX + 'px';
+        setTimeout(() => t.style.display = 'none', 1500);
+    }
+
+    function doSort(k) {
         if(sK === k) sD = sD === 'desc' ? 'asc' : 'desc';
         else { sK = k; sD = 'desc'; }
         render();
     }
 
-    function render() {
-        const b = document.getElementById("tBody");
-        const table = document.getElementById("mainTable");
-        table.classList.add("focus-mode");
-
-        document.querySelectorAll('th span').forEach(s => s.innerText = '');
-        document.getElementById('s-'+sK).innerText = sD === 'desc' ? '▼' : '▲';
-
-        const data = raw.filter(x => selected.has(x.name)).map(x => {
-            const c = (b, g) => b + (lvl - 1) * g;
-            return { name: x.name, ad: c(x.ad_b, x.ad_g), hp: c(x.hp_b, x.hp_g), mana: c(x.mn_b, x.mn_g), armor: c(x.ar_b, x.ar_g), mr: c(x.mr_b, x.mr_g), grow: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mr:x.mr_g} };
-        }).sort((a,b) => sD === 'desc' ? b[sK] - a[sK] : a[sK] - b[sK]);
-
-        const thres = {};
-        ['ad','hp','mana','armor','mr'].forEach(k => {
-            let v = data.map(d => d[k]).sort((a,b) => a-b);
-            thres[k] = { s: v[Math.floor(v.length*0.95)], a: v[Math.floor(v.length*0.80)], c: v[Math.floor(v.length*0.20)] };
-        });
-
-        b.innerHTML = "";
-        data.forEach(x => {
-            const tr = document.createElement("tr");
-            const isP = pinned.has(x.name);
-            tr.innerHTML = `<td><span class="champ-name ${isP?'pinned':''}" onclick="togglePin('${x.name}')">${x.name}</span></td>`;
-            
-            ['ad','hp','mana','armor','mr'].forEach(k => {
-                const td = document.createElement("td");
-                const v = x[k];
-                if(k === sK) td.className = "active-col ";
-                
-                td.innerText = Math.round(v);
-                if(v >= thres[k].s) td.className += "s";
-                else if(v >= thres[k].a) td.className += "a";
-                else if(v <= thres[k].c) td.className += "c";
-                else td.className += "b";
-
-                td.onclick = () => alert(x.name + " " + k.toUpperCase() + " Прирост: +" + x.grow[k]);
-                tr.appendChild(td);
-            });
-            b.appendChild(tr);
-        });
-    }
-
-    function togglePin(n) { pinned.has(n) ? pinned.delete(n) : pinned.add(n); render(); }
-
-    function masterToggle(on) {
-        if(on) selected = new Set(raw.map(x => x.name));
-        else selected = new Set([...pinned]);
+    function toggleP(n) {
+        pinned.has(n) ? pinned.delete(n) : pinned.add(n);
+        localStorage.setItem('p', JSON.stringify([...pinned]));
         render();
     }
 
-    function openModal() { document.getElementById("modal").style.display = "block"; renderModal(); }
-    function closeModal() { document.getElementById("modal").style.display = "none"; }
+    function openM() { document.getElementById('mMask').classList.add('active'); drawM(); }
+    function closeM() { document.getElementById('mMask').classList.remove('active'); }
 
-    function renderModal() {
-        const g = document.getElementById("mGrid");
-        const q = document.getElementById("mSearch").value.toLowerCase();
-        g.innerHTML = "";
-        const roles = ["Top","Jungle","Mid","ADC","Support"];
-        roles.forEach(r => {
-            const col = document.createElement("div"); col.style.display="flex"; col.style.flexDirection="column"; col.style.gap="5px";
-            const champs = raw.filter(x => x.is[r]);
+    function drawM() {
+        const grid = document.getElementById('mGrid');
+        const q = document.getElementById('mSearch').value.toLowerCase();
+        grid.innerHTML = "";
+        ["Top","Jungle","Mid","ADC","Support"].forEach(role => {
+            const sec = document.createElement('div');
+            const champs = raw.filter(x => x.is[role]);
             const isAll = champs.every(x => selected.has(x.name));
-            
-            const rb = document.createElement("div"); rb.className = "role-btn " + (isAll?'on':'');
-            rb.innerHTML = `<img src="https://placehold.co/20x20?text=${r[0]}">`;
-            rb.onclick = () => { champs.forEach(x => isAll ? selected.delete(x.name) : selected.add(x.name)); renderModal(); render(); };
-            col.appendChild(rb);
-
-            champs.filter(x => x.name.toLowerCase().includes(q)).forEach(x => {
-                const i = document.createElement("div"); i.className = "champ-item " + (selected.has(x.name)?'on':'');
-                i.innerText = x.name;
-                i.onclick = () => { selected.has(x.name)?selected.delete(x.name):selected.add(x.name); renderModal(); render(); };
-                col.appendChild(i);
+            sec.innerHTML = `<div class="m-role ${isAll?'on':''}" onclick="roleT('${role}', ${isAll})">${role}</div>`;
+            champs.filter(x => x.name.toLowerCase().includes(q)).forEach(c => {
+                const btn = document.createElement('div');
+                btn.className = `m-item ${selected.has(c.name)?'on':''}`;
+                btn.innerText = c.name;
+                btn.onclick = () => { selected.has(c.name)?selected.delete(c.name):selected.add(c.name); drawM(); render(); };
+                sec.appendChild(btn);
             });
-            g.appendChild(col);
+            grid.appendChild(sec);
         });
     }
 
-    function toggleTheme() { document.body.classList.toggle("light-mode"); }
+    function roleT(r, isAll) {
+        raw.filter(x => x.is[r]).forEach(x => isAll ? selected.delete(x.name) : selected.add(x.name));
+        drawM(); render();
+    }
 
-    document.getElementById("lvlIn").oninput = (e) => {
-        lvl = +e.target.value; document.getElementById("lvlVal").innerText = lvl; render();
-    };
+    function initApp() {
+        document.getElementById('lvlRange').oninput = (e) => {
+            lvl = +e.target.value;
+            document.getElementById('lvlLabel').innerText = lvl;
+            render();
+        };
+        document.getElementById('masterCheck').onchange = (e) => {
+            selected = e.target.checked ? new Set(raw.map(x => x.name)) : new Set([...pinned]);
+            render();
+        };
+    }
 
-    init();
+    start();
 </script>
 </body>
 </html>
