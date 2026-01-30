@@ -1,766 +1,597 @@
 <!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>Wild Rift Ultra Stats by ERjanKG</title>
-    <style>
-        /* --- ГЛОБАЛЬНЫЕ НАСТРОЙКИ И ЦВЕТА --- */
-        :root {
-            --bg-color: #05070a;
-            --card-bg: #111622;
-            --primary: #7b5cff;
-            --border: rgba(255, 255, 255, 0.15);
-            --text-main: #ffffff;
-            --text-dim: #a0aec0;
-            
-            /* ЦВЕТА ИЗ ТИРМЕЙКЕРА (Меняй HEX коды здесь) */
-            --tier-s: #ff7f7f; /* Красный */
-            --tier-a: #ffbf7f; /* Оранжевый */
-            --tier-b: #ffff7f; /* Желтый */
-            --tier-c: #7fff7f; /* Зеленый */
-            
-            --energy-color: #ffff00;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wild Rift – Champion Stats</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    body{margin:0;background:#0b0f17;color:#e8edf7}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    h1{margin:0 0 12px;font-size:20px}
 
-        * {
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-        }
+    .card{background:#121a2a;border:1px solid #22304a;border-radius:12px;padding:12px}
+    .small{font-size:12px;opacity:.75;margin-top:10px}
 
-        body {
-            margin: 0;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Inter', -apple-system, sans-serif;
-            font-weight: 800; /* Жирный шрифт по умолчанию */
-            overflow-x: hidden;
-            line-height: 1.4;
-        }
+    /* ====== Level slider ====== */
+    .levelBar{margin:12px 0;padding:12px;background:#121a2a;border:1px solid #22304a;border-radius:12px}
+    .levelHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .levelTitle{font-size:12px;opacity:.85}
+    .levelNum{font-size:12px;opacity:.9;font-weight:700}
+    #level{width:100%}
 
-        .main-wrapper {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    /* ====== Table ====== */
+    .tableWrap{
+      margin-top:12px;
+      overflow-y:auto;
+      overflow-x:hidden; /* просили без горизонтального скролла */
+      border-radius:12px;
+      border:1px solid #22304a;
+      max-height:72vh;
+    }
+    table{width:100%;border-collapse:collapse;table-layout:fixed}
+    th,td{
+      padding:8px 10px;
+      border-bottom:1px solid rgba(34,48,74,.65);
+      border-right:1px solid rgba(34,48,74,.55);
+      text-align:center;
+      vertical-align:middle;
+      font-size:13px;
+      word-break:break-word;
+    }
+    th:last-child,td:last-child{border-right:none}
+    th{
+      position:sticky;top:0;background:#121a2a;
+      cursor:pointer;user-select:none;z-index:2
+    }
+    /* sticky champion col to avoid left-right scrolling pain */
+    th:first-child, td:first-child{
+      position:sticky;left:0;z-index:3;
+      background:#121a2a;
+    }
+    tbody tr:hover{background:rgba(180,60,60,.12);box-shadow:inset 0 0 0 2px rgba(200,70,70,.6)}
+    tbody tr:hover td{color:#fff;font-weight:800}
+    tbody tr:hover td:first-child{color:#ff6b6b}
 
-        /* ШАПКА */
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
+    /* champion cell with X */
+    .champ-cell{display:flex;align-items:center;justify-content:center;gap:8px}
+    .champ-name{display:inline-block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .champ-x{
+      width:22px;height:22px;border-radius:8px;
+      border:1px solid rgba(34,48,74,.9);
+      background:rgba(11,15,23,.55);
+      color:rgba(232,237,247,.85);
+      cursor:pointer;font-weight:800;line-height:1;
+      display:inline-flex;align-items:center;justify-content:center;
+      transition:transform .12s ease,border-color .12s ease,color .12s ease;
+    }
+    .champ-x:hover{transform:scale(1.05);border-color:rgba(255,107,107,.75);color:#ff6b6b}
 
-        .brand-name {
-            font-size: 28px;
-            font-weight: 900;
-            letter-spacing: -1px;
-            text-transform: uppercase;
-            background: linear-gradient(to right, #fff, var(--primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+    /* tiers */
+    .tier-top{background:#7b5cff!important;color:#fff}
+    .tier-mid{background:rgba(138,147,166,.12)!important;color:#e8edf7}
+    .tier-low{background:rgba(255,77,79,.18)!important;color:#fff}
 
-        .twitch-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #9146ff;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-size: 14px;
-            transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(145, 70, 255, 0.4);
-        }
+    /* Mana=0 */
+    .mana-zero{position:relative;background:rgba(90,100,120,.25)!important;color:#cfd6e4;font-weight:900;overflow:hidden}
+    .mana-zero::after{
+      content:"";position:absolute;inset:-60%;
+      background:radial-gradient(circle,rgba(142,177,248,.35),rgba(67,74,87,.299));
+      animation:zeroPulse 3.2s ease-in-out infinite;
+    }
+    .mana-zero>span{position:relative;z-index:1}
+    @keyframes zeroPulse{0%{transform:scale(.9);opacity:.35}50%{transform:scale(1.05);opacity:.65}100%{transform:scale(.9);opacity:.35}}
 
-        .twitch-badge:hover {
-            transform: translateY(-2px);
-        }
+    /* Energy */
+    .energy{position:relative;background:rgba(255,159,28,.22)!important;color:#0b0f17;font-weight:900;overflow:hidden}
+    .energy::after{content:"";position:absolute;inset:-40%;background:radial-gradient(circle,rgba(255,159,28,.55),rgba(255,159,28,0));animation:energyPulse 1.6s ease-in-out infinite}
+    .energy>span{position:relative;z-index:1}
+    @keyframes energyPulse{0%{transform:scale(.85);opacity:.55}50%{transform:scale(1.15);opacity:.95}100%{transform:scale(.85);opacity:.55}}
 
-        /* КНОПКА ПОДДЕРЖКИ */
-        .support-panel {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+    /* Tooltip */
+    td.has-tip{position:relative}
+    td.has-tip::after{
+      content:attr(data-tip);
+      position:absolute;left:50%;bottom:calc(100% + 8px);
+      transform:translateX(-50%);
+      background:rgba(15,21,36,.96);border:1px solid #22304a;color:#d6deee;
+      padding:6px 8px;border-radius:8px;font-size:11px;font-weight:400;line-height:1.35;
+      white-space:nowrap;pointer-events:none;opacity:0;transition:opacity 120ms ease,transform 120ms ease;z-index:50;
+    }
+    td.has-tip::before{
+      content:"";position:absolute;left:50%;bottom:calc(100% + 2px);transform:translateX(-50%);
+      border:6px solid transparent;border-top-color:#22304a;opacity:0;transition:opacity 120ms ease;z-index:50;
+    }
+    td.has-tip:hover::after,td.has-tip:hover::before{opacity:1}
+    td.has-tip:hover::after{transform:translateX(-50%) translateY(-2px)}
+    td.energy.has-tip::after,td.energy.has-tip::before{display:none!important}
 
-        .support-btn {
-            display: inline-block;
-            width: 100%;
-            max-width: 400px;
-            background: #ffffff;
-            color: #000000;
-            padding: 15px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: 900;
-            transition: 0.3s;
-        }
+    /* ====== Header brand ====== */
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+    .nick{font-size:22px;font-weight:800;letter-spacing:1px;color:#7b5cff;animation:glow 2.5s ease-in-out infinite}
+    .dot{opacity:.6}
+    .tag{font-size:12px;opacity:.7;border-left:1px solid #22304a;padding-left:12px}
+    @keyframes glow{0%{text-shadow:0 0 4px #7b5cff44}50%{text-shadow:0 0 12px #7b5cffcc}100%{text-shadow:0 0 4px #7b5cff44}}
+    .twitch{font-size:14px;font-weight:700;color:#9146ff;text-decoration:none;animation:pulse 3s ease-in-out infinite}
+    .twitch:hover{text-decoration:underline;opacity:1}
+    @keyframes pulse{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
 
-        .support-btn:hover {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 0 20px var(--primary);
-        }
+    .support{margin-top:14px;padding:14px;border:1px solid #22304a;border-radius:12px;background:#121a2a;display:grid;gap:12px}
+    .supportBody{font-size:13px;line-height:1.4;opacity:.9}
+    .donateBtn{
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      padding:10px 12px;border-radius:12px;text-decoration:none;color:#fff;
+      background:linear-gradient(90deg,#9146ff,#7b5cff);
+      border:1px solid #2a3a5a;font-weight:800;
+      position:relative;overflow:hidden;animation:donatePulse 2.2s ease-in-out infinite;
+    }
+    .donateBtn::before{content:"";position:absolute;top:-40%;left:-60%;width:60%;height:180%;background:rgba(255,255,255,.22);transform:rotate(20deg);animation:donateShine 2.8s ease-in-out infinite}
+    @keyframes donatePulse{0%{box-shadow:0 0 0 rgba(145,70,255,0)}50%{box-shadow:0 0 18px rgba(145,70,255,.35)}100%{box-shadow:0 0 0 rgba(145,70,255,0)}}
+    @keyframes donateShine{0%{transform:translateX(-120%) rotate(20deg);opacity:0}15%{opacity:1}45%{transform:translateX(220%) rotate(20deg);opacity:0}100%{transform:translateX(220%) rotate(20deg);opacity:0}}
 
-        /* ПОЛЗУНОК УРОВНЯ */
-        .level-control {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 25px;
-            border-radius: 20px;
-            margin-bottom: 25px;
-        }
+    /* ====== Modal ====== */
+    .modal.hidden{display:none}
+    .modal{position:fixed;inset:0;z-index:9999}
+    .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
+    .modal-card{
+      position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+      width:min(1100px,92vw);height:min(80vh,720px);
+      background:#121a2a;border:1px solid #22304a;border-radius:14px;
+      box-shadow:0 20px 60px rgba(0,0,0,.5);
+      display:flex;flex-direction:column;overflow:hidden
+    }
+    .modal-head{
+      padding:10px 12px;border-bottom:1px solid #22304a;
+      display:flex;align-items:center;justify-content:space-between;gap:10px
+    }
+    .modal-title{font-weight:900;letter-spacing:.3px}
+    .modal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .mini-btn{
+      padding:6px 10px;border-radius:12px;border:1px solid rgba(34,48,74,.9);
+      background:rgba(11,15,23,.55);color:rgba(232,237,247,.92);
+      cursor:pointer;font-size:12px;font-weight:800;
+    }
+    .mini-btn:hover{border-color:rgba(123,92,255,.75);color:#fff}
+    .modal-search{
+      width:220px;max-width:45vw;
+      padding:8px 10px;border-radius:12px;border:1px solid #22304a;
+      background:#0b0f17;color:#e8edf7
+    }
+    .modal-grid{
+      padding:12px;
+      display:grid;
+      grid-template-columns:repeat(5,minmax(0,1fr));
+      gap:10px;
+      overflow:auto
+    }
+    .role-col{border:1px solid rgba(34,48,74,.75);border-radius:12px;background:rgba(11,15,23,.35);overflow:hidden;display:flex;flex-direction:column;min-width:0}
+    .role-head{
+      display:flex;align-items:center;justify-content:center;
+      padding:10px 8px;border-bottom:1px solid rgba(34,48,74,.65);
+      background:rgba(18,26,42,.85);cursor:pointer
+    }
+    .role-head img{width:26px;height:26px;object-fit:contain}
+    .role-body{padding:10px;display:flex;flex-direction:column;gap:8px;overflow:auto}
+    .champ-btn{
+      width:100%;
+      padding:8px 10px;border-radius:12px;
+      border:1px solid rgba(34,48,74,.8);
+      background:rgba(11,15,23,.65);
+      color:rgba(232,237,247,.92);
+      cursor:pointer;text-align:center;font-weight:800;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      transition:transform 120ms ease,border-color 120ms ease;
+    }
+    .champ-btn:hover{transform:translateY(-1px);border-color:rgba(123,92,255,.7)}
+    .champ-btn.selected{background:rgba(123,92,255,.25);border-color:rgba(123,92,255,.85);color:#fff}
 
-        .level-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
+    /* Close X (top-right between modal and backdrop) */
+    .modal-x{
+      position:absolute;top:14px;right:14px;z-index:10001;
+      width:40px;height:40px;border-radius:14px;
+      border:1px solid rgba(34,48,74,.95);
+      background:rgba(11,15,23,.75);color:#fff;
+      font-size:18px;font-weight:900;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .modal-x:hover{border-color:rgba(255,107,107,.75);color:#ff6b6b}
 
-        .level-title { color: var(--primary); font-size: 18px; }
-        .level-val { font-size: 30px; font-weight: 900; }
-
-        .slider-container {
-            position: relative;
-            padding: 10px 0;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            height: 10px;
-            appearance: none;
-            background: #2d3748;
-            border-radius: 10px;
-            outline: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            appearance: none;
-            width: 30px;
-            height: 30px;
-            background: #fff;
-            border: 4px solid var(--primary);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-
-        .ruler {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            padding: 0 10px;
-        }
-
-        .ruler-mark {
-            font-size: 12px;
-            color: var(--text-dim);
-            font-weight: 700;
-        }
-
-        /* ТАБЛИЦА */
-        .stats-table-wrapper {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            overflow-x: auto;
-            margin-bottom: 50px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
-        }
-
-        th {
-            background: #1a2233;
-            padding: 20px 10px;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 3px solid var(--border);
-        }
-
-        th:hover { color: var(--primary); }
-
-        td {
-            padding: 15px 5px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            font-size: 16px;
-            font-weight: 800;
-            position: relative;
-        }
-
-        /* Ячейки чемпионов */
-        .champ-cell-flex {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 15px;
-        }
-
-        .btn-remove {
-            background: rgba(255, 77, 79, 0.1);
-            border: 1px solid #ff4d4f;
-            color: #ff4d4f;
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .champ-name-box {
-            background: #232d42;
-            padding: 8px 12px;
-            border-radius: 10px;
-            width: 100%;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .champ-name-box.is-pinned {
-            background: var(--primary);
-            border-color: #fff;
-        }
-
-        /* ТИРЫ (Ячейки) */
-        .cell-s { background-color: var(--tier-s) !important; color: #000; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
-        .cell-a { background-color: var(--tier-a) !important; color: #000; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
-        .cell-b { background-color: var(--tier-b) !important; color: #000; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
-        .cell-c { background-color: var(--tier-c) !important; color: #000; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); }
-        
-        .energy-label { color: var(--energy-color) !important; font-size: 11px; }
-
-        /* TOOLTIP */
-        .custom-tooltip {
-            display: none;
-            position: absolute;
-            bottom: 110%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ffffff;
-            color: #000000;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            z-index: 999;
-            white-space: nowrap;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            pointer-events: none;
-        }
-        .custom-tooltip::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -6px;
-            border: 6px solid transparent;
-            border-top-color: #ffffff;
-        }
-
-        /* МОДАЛЬНОЕ ОКНО */
-        .modal-mask {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .modal-mask.active { display: flex; }
-
-        .modal-container {
-            background: #0f172a;
-            width: 100%;
-            max-width: 1000px;
-            height: 90vh;
-            border-radius: 30px;
-            border: 1px solid var(--border);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .modal-header {
-            padding: 25px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .search-wrapper input {
-            width: 100%;
-            padding: 15px 20px;
-            background: #05070a;
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            color: #fff;
-            font-size: 18px;
-            outline: none;
-        }
-
-        .modal-grid {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .role-section {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .role-btn-group {
-            cursor: pointer;
-            background: #1e293b;
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            border: 3px solid transparent;
-            transition: 0.2s;
-        }
-
-        .role-btn-group.selected {
-            border-color: var(--primary);
-            background: rgba(123, 92, 255, 0.2);
-        }
-
-        .role-btn-group img { width: 30px; height: 30px; }
-
-        .champ-toggle {
-            width: 100%;
-            padding: 12px 5px;
-            background: #161e2f;
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 800;
-            cursor: pointer;
-        }
-
-        .champ-toggle.active {
-            background: var(--primary);
-            color: white;
-            border-color: #fff;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #ff4d4f;
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 10;
-        }
-
-        @media (max-width: 800px) {
-            .modal-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; }
-            .champ-toggle { font-size: 9px; padding: 8px 2px; }
-            .brand-name { font-size: 20px; }
-        }
-    </style>
+    @media (max-width:600px){
+      .wrap{padding:8px}
+      h1{font-size:16px}
+      th,td{padding:6px 6px;font-size:11px}
+      .champ-name{max-width:90px}
+      .modal-card{width:96vw;height:86vh}
+      .modal-grid{gap:6px}
+      .role-head{padding:8px 6px}
+      .role-head img{width:22px;height:22px}
+      .role-body{padding:8px;gap:6px}
+      .champ-btn{padding:6px 6px;border-radius:10px;font-size:11px}
+    }
+  </style>
 </head>
 <body>
-
-<div class="main-wrapper">
-    <header class="app-header">
-        <div class="brand-name">ERjanKG Stats</div>
-        <a href="https://www.twitch.tv/ERjanKG" class="twitch-badge" target="_blank">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg" width="20" />
-            TWITCH
-        </a>
-    </header>
-
-    <div class="support-panel">
-        <a href="https://www.donationalerts.com/r/erjankg" class="support-btn" target="_blank">ПОДДЕРЖАТЬ ПРОЕКТ 💜</a>
+  <div class="wrap">
+    <div class="brand">
+      <span class="nick">ERjanKG</span>
+      <span class="dot">·</span>
+      <a class="twitch" href="https://www.twitch.tv/ERjanKG" target="_blank" rel="noopener">Twitch</a>
+      <span class="tag">Wild Rift Stats</span>
     </div>
 
-    <div class="level-control">
-        <div class="level-header">
-            <span class="level-title">УРОВЕНЬ ПЕРСОНАЖА</span>
-            <span id="lvlLabel" class="level-val">10</span>
+    <div class="support">
+      <div class="supportBody">
+        Ребята, сайт абсолютно бесплатен для всех. Но буду очень благодарен за поддержку — это мотивация развивать проект.
+        В планах: изображения чемпов, winrate/pickrate и таблица ганг-потенциала лесников (тайминги фулл-клира и т.д.).
+      </div>
+      <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank" rel="noopener">💜 Поддержать проект</a>
+    </div>
+
+    <h1>Champion Stats (by Level)</h1>
+
+    <div class="levelBar">
+      <div class="levelHead">
+        <div class="levelTitle">Level</div>
+        <div class="levelNum"><span id="levelVal">10</span>/15</div>
+      </div>
+      <input id="level" type="range" min="1" max="15" value="10" />
+    </div>
+
+    <div class="tableWrap">
+      <table>
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="small">Data source: Google Sheets (published TSV)</div>
+  </div>
+
+  <!-- Champion picker modal -->
+  <div id="champModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" id="champModalBackdrop"></div>
+    <button class="modal-x" id="champModalX" type="button" aria-label="Close">×</button>
+
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div class="modal-title">Choose Champions</div>
+        <div class="modal-actions">
+          <input id="champModalSearch" class="modal-search" type="text" placeholder="Search..." />
+          <button id="champModalSelectAll" class="mini-btn" type="button">Select all</button>
+          <button id="champModalClearAll" class="mini-btn" type="button">Clear all</button>
         </div>
-        <div class="slider-container">
-            <input type="range" id="lvlInput" min="1" max="15" value="10">
-            <div class="ruler" id="lvlRuler"></div>
-        </div>
+      </div>
+      <div id="champModalGrid" class="modal-grid"></div>
     </div>
-
-    <div class="stats-table-wrapper">
-        <table id="mainTable">
-            <thead>
-                <tr>
-                    <th style="width: 35%">
-                        <div class="champ-cell-flex">
-                            <input type="checkbox" id="masterToggle" checked style="transform: scale(1.5);">
-                            <span onclick="openModal()" style="border-bottom: 2px dashed var(--primary);">ЧЕМПИОН ⚙️</span>
-                        </div>
-                    </th>
-                    <th data-sort="ad">AD</th>
-                    <th data-sort="hp">HP</th>
-                    <th data-sort="mana">MANA</th>
-                    <th data-sort="armor">ARMOR</th>
-                    <th data-sort="mr">MR</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
-</div>
-
-<div class="modal-mask" id="modalMask">
-    <div class="modal-container">
-        <button class="close-btn" onclick="closeModal()">✕</button>
-        <div class="modal-header">
-            <div class="search-wrapper">
-                <input type="text" id="champSearch" placeholder="Введите имя героя...">
-            </div>
-        </div>
-        <div class="modal-grid" id="modalGrid"></div>
-    </div>
-</div>
+  </div>
 
 <script>
-    /**
-     * КОНФИГУРАЦИЯ И ДАННЫЕ
-     */
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
-    
-    let rawData = [];
-    let selectedSet = new Set();
-    let pinnedSet = new Set();
-    let userLevel = 10;
-    let sortConfig = { key: 'ad', dir: 'desc' };
+  const TSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv";
 
-    const roleIcons = {
-        Top: "assets/roles/top.png",
-        Jungle: "assets/roles/jungle.png",
-        Mid: "assets/roles/mid.png",
-        ADC: "assets/roles/adc.png",
-        Support: "assets/roles/support.png"
-    };
+  const COLS = [
+    { key: "ad",    label: "AD",    decimals: 0 },
+    { key: "hp",    label: "HP",    decimals: 0 },
+    { key: "mana",  label: "Mana",  decimals: 0 },
+    { key: "armor", label: "Armor", decimals: 0 },
+    { key: "mr",    label: "MR",    decimals: 0 },
+  ];
 
-    /**
-     * ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
-     */
-    async function startApp() {
-        console.log("App starting...");
-        
-        // Загрузка настроек
-        if(localStorage.getItem('er_pinned')) pinnedSet = new Set(JSON.parse(localStorage.getItem('er_pinned')));
-        if(localStorage.getItem('er_level')) userLevel = parseInt(localStorage.getItem('er_level'));
-        
-        // Генерация линейки
-        const ruler = document.getElementById('lvlRuler');
-        for(let i=1; i<=15; i++) {
-            const span = document.createElement('span');
-            span.className = 'ruler-mark';
-            span.innerText = i;
-            ruler.appendChild(span);
+  const rolesList = [
+    { key: "Top",     icon: "assets/roles/top.png" },
+    { key: "Jungle",  icon: "assets/roles/jungle.png" },
+    { key: "Mid",     icon: "assets/roles/mid.png" },
+    { key: "ADC",     icon: "assets/roles/adc.png" },
+    { key: "Support", icon: "assets/roles/support.png" },
+  ];
+
+  let raw = [];
+  let selected = new Set();
+  let level = 10;
+  let sortKey = "ad";
+  let sortDir = "desc";
+
+  const levelEl = document.getElementById("level");
+  const levelValEl = document.getElementById("levelVal");
+  const theadEl = document.getElementById("thead");
+  const tbodyEl = document.getElementById("tbody");
+
+  const champModalEl = document.getElementById("champModal");
+  const champModalBackdropEl = document.getElementById("champModalBackdrop");
+  const champModalXEl = document.getElementById("champModalX");
+  const champModalGridEl = document.getElementById("champModalGrid");
+  const champModalSearchEl = document.getElementById("champModalSearch");
+  const champModalSelectAllEl = document.getElementById("champModalSelectAll");
+  const champModalClearAllEl = document.getElementById("champModalClearAll");
+
+  function calc(base, growth, lvl){ return base + (lvl - 1) * growth; }
+  function fmt(x, decimals){ return x.toLocaleString(undefined, { maximumFractionDigits: decimals }); }
+
+  function parseTSV(text){
+    const lines = text.trim().split(/\r?\n/);
+    const headers = lines[0].split("\t").map(s => s.trim());
+    const rows = [];
+    for (let i = 1; i < lines.length; i++){
+      const parts = lines[i].split("\t").map(s => s.trim());
+      const obj = {};
+      headers.forEach((h, idx) => obj[h] = parts[idx] ?? "");
+      rows.push(obj);
+    }
+    return rows;
+  }
+
+  function toNum(s){
+    const t = String(s).replace(/\s/g, "").replace(",", ".");
+    const n = Number(t);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function quantile(sortedArr, q){
+    if (!sortedArr.length) return null;
+    const pos = (sortedArr.length - 1) * q;
+    const base = Math.floor(pos);
+    const rest = pos - base;
+    if (sortedArr[base + 1] === undefined) return sortedArr[base];
+    return sortedArr[base] + rest * (sortedArr[base + 1] - sortedArr[base]);
+  }
+
+  function buildHeader(){
+    const tr = document.createElement("tr");
+
+    const thC = document.createElement("th");
+    thC.textContent = "Champion";
+    thC.title = "Click to choose champions";
+    thC.onclick = () => openChampModal();
+    tr.appendChild(thC);
+
+    COLS.forEach(c => {
+      const th = document.createElement("th");
+      th.textContent = c.label + (sortKey === c.key ? (sortDir==="desc"?" ↓":" ↑") : "");
+      th.onclick = () => toggleSort(c.key);
+      tr.appendChild(th);
+    });
+
+    theadEl.innerHTML = "";
+    theadEl.appendChild(tr);
+  }
+
+  function toggleSort(key){
+    if (sortKey === key) sortDir = (sortDir === "desc") ? "asc" : "desc";
+    else { sortKey = key; sortDir = "desc"; }
+    render();
+  }
+
+  function computeRows(){
+    const list = raw
+      .filter(r => selected.has(r.champion))
+      .map(r => {
+        const out = { champion: r.champion, resource: r.resource, growth: {} };
+        COLS.forEach(c => {
+          out[c.key] = calc(r[c.key + "_base"], r[c.key + "_growth"], level);
+          out.growth[c.key] = r[c.key + "_growth"];
+        });
+        return out;
+      });
+
+    list.sort((a, b) => {
+      const dir = sortDir === "desc" ? -1 : 1;
+      if (sortKey === "champion") return a.champion.localeCompare(b.champion) * dir;
+      const av = a[sortKey], bv = b[sortKey];
+      if (av === bv) return a.champion.localeCompare(b.champion);
+      return (av < bv ? -1 : 1) * dir;
+    });
+
+    return list;
+  }
+
+  function renderBody(rows){
+    const thresholds = {};
+    for (const c of COLS){
+      const vals = rows
+        .map(r => r[c.key])
+        .filter(v => Number.isFinite(v))
+        .filter(v => (c.key === "mana" ? v !== 0 : true))
+        .sort((a,b) => a - b);
+      if (vals.length < 3) continue;
+      thresholds[c.key] = { q10: quantile(vals, 0.1), q90: quantile(vals, 0.9) };
+    }
+
+    tbodyEl.innerHTML = "";
+    rows.forEach(r => {
+      const tr = document.createElement("tr");
+
+      const tdC = document.createElement("td");
+      const wrap = document.createElement("div");
+      wrap.className = "champ-cell";
+
+      const name = document.createElement("span");
+      name.className = "champ-name";
+      name.textContent = r.champion;
+
+      const xbtn = document.createElement("button");
+      xbtn.className = "champ-x";
+      xbtn.type = "button";
+      xbtn.textContent = "×";
+      xbtn.title = "Remove champion";
+      xbtn.onclick = (e) => { e.stopPropagation(); selected.delete(r.champion); render(); };
+
+      wrap.appendChild(name);
+      wrap.appendChild(xbtn);
+      tdC.appendChild(wrap);
+      tr.appendChild(tdC);
+
+      COLS.forEach(c => {
+        const td = document.createElement("td");
+        const val = r[c.key];
+
+        if (c.key === "mana" && r.resource === "Energy"){
+          td.innerHTML = "<span>ENERGY</span>";
+          td.classList.add("energy");
+          tr.appendChild(td);
+          return;
+        }
+        if (c.key === "mana" && val === 0){
+          td.innerHTML = "<span>0</span>";
+          td.classList.add("mana-zero");
+          tr.appendChild(td);
+          return;
         }
 
-        // Загрузка данных
-        try {
-            const response = await fetch(SHEET_URL);
-            const text = await response.text();
-            parseTSV(text);
-            
-            // Ставим уровень
-            document.getElementById('lvlInput').value = userLevel;
-            document.getElementById('lvlLabel').innerText = userLevel;
-            
-            // По умолчанию выбраны все
-            selectedSet = new Set(rawData.map(c => c.name));
-            
-            bindEvents();
-            renderTable();
-        } catch (err) {
-            console.error("Failed to load data", err);
+        td.textContent = fmt(val, c.decimals);
+        td.classList.add("has-tip");
+        td.dataset.tip = `${c.label} growth per lvl: ${r.growth[c.key]}`;
+
+        const t = thresholds[c.key];
+        if (t && Number.isFinite(val)){
+          if (val >= t.q90) td.classList.add("tier-top");
+          else if (val < t.q10) td.classList.add("tier-low");
+          else td.classList.add("tier-mid");
         }
-    }
 
-    /**
-     * ПАРСИНГ ДАННЫХ
-     */
-    function parseTSV(data) {
-        const lines = data.trim().split('\n');
-        const headers = lines[0].split('\t').map(h => h.trim());
-        
-        rawData = lines.slice(1).map(line => {
-            const cols = line.split('\t');
-            const row = {};
-            headers.forEach((h, i) => row[h] = cols[i]?.trim());
-            
-            return {
-                name: row["Champion"],
-                ad_b: parseFloat(row["AD_Base"]), ad_g: parseFloat(row["AD_Growth"]),
-                hp_b: parseFloat(row["HP_Base"]), hp_g: parseFloat(row["HP_Growth"]),
-                mn_b: parseFloat(row["Mana_Base"]), mn_g: parseFloat(row["Mana_Growth"]),
-                ar_b: parseFloat(row["Armor_Base"]), ar_g: parseFloat(row["Armor_Growth"]),
-                mr_b: parseFloat(row["MR_Base"]), mr_g: parseFloat(row["MR_Growth"]),
-                resource: row["Resource"] || "Mana",
-                roles: {
-                    Top: row["Is_Top"] === "1",
-                    Jungle: row["Is_Jungle"] === "1",
-                    Mid: row["Is_Mid"] === "1",
-                    ADC: row["Is_Adc"] === "1",
-                    Support: row["Is_Support"] === "1"
-                }
-            };
-        }).filter(c => c.name);
-    }
+        tr.appendChild(td);
+      });
 
-    /**
-     * ЛОГИКА ОТРИСОВКИ ТАБЛИЦЫ
-     */
-    function renderTable() {
-        const body = document.getElementById('tableBody');
-        
-        // 1. Подготовка данных с учетом уровня
-        const tableData = rawData.filter(c => selectedSet.has(c.name)).map(c => {
-            const calc = (base, growth) => base + (userLevel - 1) * growth;
-            return {
-                name: c.name,
-                resource: c.resource,
-                ad: calc(c.ad_b, c.ad_g),
-                hp: calc(c.hp_b, c.hp_g),
-                mana: calc(c.mn_b, c.mn_g),
-                armor: calc(c.ar_b, c.ar_g),
-                mr: calc(c.mr_b, c.mr_g),
-                growth: { ad: c.ad_g, hp: c.hp_g, mana: c.mn_g, armor: c.ar_g, mr: c.mr_g }
-            };
-        });
+      tbodyEl.appendChild(tr);
+    });
+  }
 
-        // 2. Сортировка
-        tableData.sort((a, b) => {
-            const valA = a[sortConfig.key];
-            const valB = b[sortConfig.key];
-            return sortConfig.dir === 'desc' ? valB - valA : valA - valB;
-        });
+  function render(){
+    buildHeader();
+    const rows = computeRows();
+    renderBody(rows);
+  }
 
-        // 3. Вычисление порогов для цветов (Тиры)
-        const getThresholds = (key) => {
-            const sortedVals = tableData.map(d => d[key]).sort((a, b) => a - b);
-            return {
-                s: sortedVals[Math.floor(sortedVals.length * 0.95)],
-                a: sortedVals[Math.floor(sortedVals.length * 0.80)],
-                c: sortedVals[Math.floor(sortedVals.length * 0.20)]
-            };
+  function openChampModal(){
+    champModalEl.classList.remove("hidden");
+    champModalEl.setAttribute("aria-hidden","false");
+    champModalSearchEl.value = "";
+    renderChampModal("");
+  }
+
+  function closeChampModal(){
+    champModalEl.classList.add("hidden");
+    champModalEl.setAttribute("aria-hidden","true");
+  }
+
+  function champsInRole(roleKey){
+    return raw
+      .filter(r => r.roles && r.roles[roleKey])
+      .map(r => r.champion)
+      .sort((a,b) => a.localeCompare(b));
+  }
+
+  function renderChampModal(q){
+    const query = (q || "").trim().toLowerCase();
+    champModalGridEl.innerHTML = "";
+
+    rolesList.forEach(role => {
+      const col = document.createElement("div");
+      col.className = "role-col";
+
+      const head = document.createElement("div");
+      head.className = "role-head";
+      head.title = "Click: select/unselect all in this role";
+
+      const img = document.createElement("img");
+      img.src = role.icon;
+      img.alt = role.key;
+
+      head.appendChild(img);
+
+      const body = document.createElement("div");
+      body.className = "role-body";
+
+      const champsAll = champsInRole(role.key);
+      const champsFiltered = champsAll.filter(n => n.toLowerCase().includes(query));
+      const allSelected = champsAll.length > 0 && champsAll.every(n => selected.has(n));
+
+      head.style.cursor = "pointer";
+      head.onclick = () => {
+        if (allSelected) champsAll.forEach(n => selected.delete(n));
+        else champsAll.forEach(n => selected.add(n));
+        renderChampModal(champModalSearchEl.value);
+        render();
+      };
+
+      champsFiltered.forEach(name => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "champ-btn" + (selected.has(name) ? " selected" : "");
+        btn.textContent = name;
+        btn.onclick = () => {
+          if (selected.has(name)) selected.delete(name);
+          else selected.add(name);
+          renderChampModal(champModalSearchEl.value);
+          render();
         };
+        body.appendChild(btn);
+      });
 
-        const thres = {
-            ad: getThresholds('ad'),
-            hp: getThresholds('hp'),
-            mana: getThresholds('mana'),
-            armor: getThresholds('armor'),
-            mr: getThresholds('mr')
-        };
+      col.appendChild(head);
+      col.appendChild(body);
+      champModalGridEl.appendChild(col);
+    });
+  }
 
-        // 4. Генерация HTML
-        body.innerHTML = "";
-        tableData.forEach(item => {
-            const tr = document.createElement('tr');
-            const pinned = pinnedSet.has(item.name);
+  // close handlers
+  champModalXEl.addEventListener("click", closeChampModal);
+  champModalBackdropEl.addEventListener("click", closeChampModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !champModalEl.classList.contains("hidden")) closeChampModal();
+  });
 
-            // Ячейка имени
-            let html = `
-                <td>
-                    <div class="champ-cell-flex">
-                        <button class="btn-remove" onclick="removeChamp('${item.name}')">✕</button>
-                        <div class="champ-name-box ${pinned ? 'is-pinned' : ''}" onclick="togglePin('${item.name}')">
-                            ${item.name}
-                        </div>
-                    </div>
-                </td>
-            `;
+  champModalSearchEl.addEventListener("input", () => {
+    renderChampModal(champModalSearchEl.value);
+  });
 
-            // Ячейки статов
-            ['ad', 'hp', 'mana', 'armor', 'mr'].forEach(key => {
-                const val = item[key];
-                let className = "";
-                
-                if (val >= thres[key].s) className = "cell-s";
-                else if (val >= thres[key].a) className = "cell-a";
-                else if (val <= thres[key].c) className = "cell-c";
-                else className = "cell-b";
+  champModalSelectAllEl.addEventListener("click", () => {
+    selected = new Set(raw.map(r => r.champion));
+    renderChampModal(champModalSearchEl.value);
+    render();
+  });
 
-                let displayVal = Math.round(val);
-                if (key === 'mana' && item.resource === 'Energy') {
-                    displayVal = `<span class="energy-label">NRG</span>`;
-                } else if (key === 'mana' && val === 0) {
-                    displayVal = `<span style="opacity:0.3">0</span>`;
-                }
+  champModalClearAllEl.addEventListener("click", () => {
+    selected = new Set();
+    renderChampModal(champModalSearchEl.value);
+    render();
+  });
 
-                html += `
-                    <td class="${className}" onclick="showTip(this, '${item.growth[key]}')">
-                        ${displayVal}
-                        <div class="custom-tooltip">ПРИРОСТ: +${item.growth[key]}</div>
-                    </td>
-                `;
-            });
+  async function init(){
+    const res = await fetch(TSV_URL);
+    const text = await res.text();
+    const rows = parseTSV(text);
 
-            tr.innerHTML = html;
-            body.appendChild(tr);
-        });
-    }
+    raw = rows
+      .filter(x => x["Champion"])
+      .map(x => ({
+        champion: x["Champion"],
+        ad_base: toNum(x["AD_Base"]),       ad_growth: toNum(x["AD_Growth"]),
+        hp_base: toNum(x["HP_Base"]),       hp_growth: toNum(x["HP_Growth"]),
+        mana_base: toNum(x["Mana_Base"]),   mana_growth: toNum(x["Mana_Growth"]),
+        armor_base: toNum(x["Armor_Base"]), armor_growth: toNum(x["Armor_Growth"]),
+        mr_base: toNum(x["MR_Base"]),       mr_growth: toNum(x["MR_Growth"]),
+        resource: (x["Resource"] || "Mana").trim(),
+        roles: {
+          Top: toNum(x["Is_Top"]) === 1,
+          Jungle: toNum(x["Is_Jungle"]) === 1,
+          Mid: toNum(x["Is_Mid"]) === 1,
+          ADC: toNum(x["Is_Adc"]) === 1,
+          Support: toNum(x["Is_Support"]) === 1,
+        }
+      }));
 
-    /**
-     * МОДАЛЬНОЕ ОКНО ВЫБОРА
-     */
-    function drawModal() {
-        const grid = document.getElementById('modalGrid');
-        const search = document.getElementById('champSearch').value.toLowerCase();
-        grid.innerHTML = "";
+    selected = new Set(raw.map(r => r.champion));
 
-        const roles = ["Top", "Jungle", "Mid", "ADC", "Support"];
+    levelEl.addEventListener("input", () => {
+      level = Number(levelEl.value);
+      levelValEl.textContent = String(level);
+      render();
+    });
 
-        roles.forEach(role => {
-            const container = document.createElement('div');
-            container.className = "role-section";
+    levelValEl.textContent = String(level);
+    render();
+  }
 
-            // Кнопка выбора всей роли
-            const roleChamps = rawData.filter(c => c.roles[role]);
-            const isAllSelected = roleChamps.every(c => selectedSet.has(c.name));
-
-            const head = document.createElement('div');
-            head.className = `role-btn-group ${isAllSelected ? 'selected' : ''}`;
-            head.innerHTML = `<img src="assets/roles/${role.toLowerCase()}.png" onerror="this.src='https://placehold.co/40x40?text=${role[0]}'">`;
-            head.onclick = () => toggleRoleGroup(role, isAllSelected);
-            container.appendChild(head);
-
-            // Кнопки героев
-            roleChamps
-                .filter(c => c.name.toLowerCase().includes(search))
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .forEach(c => {
-                    const btn = document.createElement('button');
-                    btn.className = `champ-toggle ${selectedSet.has(c.name) ? 'active' : ''}`;
-                    btn.innerText = c.name;
-                    btn.onclick = () => {
-                        if(selectedSet.has(c.name)) selectedSet.delete(c.name);
-                        else selectedSet.add(c.name);
-                        drawModal();
-                        renderTable();
-                    };
-                    container.appendChild(btn);
-                });
-
-            grid.appendChild(container);
-        });
-    }
-
-    /**
-     * ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-     */
-    function togglePin(name) {
-        if(pinnedSet.has(name)) pinnedSet.delete(name);
-        else pinnedSet.add(name);
-        localStorage.setItem('er_pinned', JSON.stringify([...pinnedSet]));
-        renderTable();
-    }
-
-    function removeChamp(name) {
-        selectedSet.delete(name);
-        renderTable();
-    }
-
-    function toggleRoleGroup(role, currentState) {
-        const champs = rawData.filter(c => c.roles[role]);
-        champs.forEach(c => {
-            if(currentState) selectedSet.delete(c.name);
-            else selectedSet.add(c.name);
-        });
-        drawModal();
-        renderTable();
-    }
-
-    function toggleSelectAll(on) {
-        if(on) selectedSet = new Set(rawData.map(c => c.name));
-        else selectedSet = new Set([...pinnedSet]);
-        renderTable();
-    }
-
-    function showTip(el, value) {
-        // Закрываем все другие
-        document.querySelectorAll('.custom-tooltip').forEach(t => t.style.display = 'none');
-        const tip = el.querySelector('.custom-tooltip');
-        tip.style.display = 'block';
-        setTimeout(() => {
-            window.addEventListener('click', function hide() {
-                tip.style.display = 'none';
-                window.removeEventListener('click', hide);
-            }, {once: true});
-        }, 10);
-    }
-
-    function bindEvents() {
-        // Ползунок уровня
-        const slider = document.getElementById('lvlInput');
-        slider.oninput = (e) => {
-            userLevel = parseInt(e.target.value);
-            document.getElementById('lvlLabel').innerText = userLevel;
-            localStorage.setItem('er_level', userLevel);
-            renderTable();
-        };
-
-        // Сортировка заголовков
-        document.querySelectorAll('th[data-sort]').forEach(th => {
-            th.onclick = () => {
-                const key = th.getAttribute('data-sort');
-                if(sortConfig.key === key) {
-                    sortConfig.dir = sortConfig.dir === 'desc' ? 'asc' : 'desc';
-                } else {
-                    sortConfig.key = key;
-                    sortConfig.dir = 'desc';
-                }
-                renderTable();
-            };
-        });
-
-        // Мастер-чекбокс
-        document.getElementById('masterToggle').onchange = (e) => {
-            toggleSelectAll(e.target.checked);
-        };
-    }
-
-    function openModal() { document.getElementById('modalMask').classList.add('active'); drawModal(); }
-    function closeModal() { document.getElementById('modalMask').classList.remove('active'); }
-
-    // Запуск
-    startApp();
+  init();
 </script>
 </body>
 </html>
