@@ -3,107 +3,159 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Wild Rift Pro Stats – ERjanKG</title>
+  <title>Wild Rift Ultra Stats – ERjanKG</title>
   <style>
     :root { 
-      /* Цветовая схема Тетрада (акценты) */
-      --p: #7b5cff; /* Фиолетовый (Основной) */
+      --p: #7b5cff; 
       --bg: #05070a; 
       --card: #111622; 
-      --brd: rgba(255,255,255,0.12);
-      --energy: #ffdf00;
-      --radius: 16px;
-      
-      /* Цвета Тиров (Тетрада из ИИ обзора) */
-      --t-s: rgba(123, 92, 255, 0.5);  /* Фиолетовый */
-      --t-a: rgba(255, 69, 0, 0.45);   /* Красно-оранжевый */
-      --t-b: rgba(255, 215, 0, 0.35);  /* Желтый */
-      --t-c: rgba(0, 168, 150, 0.4);   /* Сине-зеленый */
+      --brd: rgba(255,255,255,0.15);
+      --energy: #ffff00;
+      --radius: 20px;
+      /* Сочная Тетрада */
+      --t-s: #ff0055; /* Фуксия/Красный */
+      --t-a: #ff6600; /* Оранжевый */
+      --t-b: #ffcc00; /* Желтый */
+      --t-c: #00ffaa; /* Бирюзово-зеленый */
     }
-    body { margin:0; background:var(--bg); color:#e2e8f0; font-family: -apple-system, system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
-    .wrap { max-width: 1200px; margin: 0 auto; padding: 15px; }
+
+    body { 
+      margin: 0; background: var(--bg); color: #fff; 
+      font-family: "Inter", -apple-system, sans-serif; 
+      font-weight: 800; -webkit-tap-highlight-color: transparent; 
+    }
+
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 15px; }
 
     /* Header */
-    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .nick { font-size: 28px; font-weight: 900; letter-spacing: -1px; color: #fff; }
-    @keyframes spin { 0% { transform: rotate(0deg); } 15% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
-    .twitch-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; background: #9146ff; padding: 8px 16px; border-radius: 50px; font-size: 14px; font-weight: 700; box-shadow: 0 4px 15px rgba(145,70,255,0.4); }
-    .twitch-link img { width: 20px; animation: spin 5s infinite linear; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .nick { font-size: 32px; font-weight: 900; letter-spacing: -1.5px; text-shadow: 0 0 20px rgba(123,92,255,0.5); }
+    
+    @keyframes spin { 0% { transform: rotate(0deg); } 20% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
+    .twitch-link { 
+      display: flex; align-items: center; gap: 12px; text-decoration: none; 
+      color: #fff; background: #9146ff; padding: 10px 20px; border-radius: 50px; 
+      font-size: 16px; box-shadow: 0 5px 20px rgba(145,70,255,0.5); 
+    }
+    .twitch-link img { width: 22px; animation: spin 6s infinite ease-in-out; }
 
-    .support-box { background: var(--card); border: 1px solid var(--brd); padding: 20px; border-radius: var(--radius); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .donateBtn { display: block; text-align: center; padding: 14px; margin-top: 12px; background: #fff; color: #000; text-decoration: none; border-radius: 12px; font-weight: 800; }
+    /* Support */
+    .support-box { background: var(--card); border: 2px solid var(--brd); padding: 25px; border-radius: var(--radius); margin-bottom: 20px; position: relative; overflow: hidden; }
+    .support-box::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--p); }
+    .donateBtn { 
+      display: block; text-align: center; padding: 18px; margin-top: 15px; 
+      background: #fff; color: #000; text-decoration: none; border-radius: 15px; 
+      font-size: 18px; font-weight: 900; transition: 0.3s;
+    }
+    .donateBtn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(255,255,255,0.2); }
 
     /* Level Slider */
-    .levelBar { background: var(--card); border: 1px solid var(--brd); padding: 20px; border-radius: var(--radius); margin-bottom: 20px; }
-    input[type="range"] { width: 100%; height: 8px; border-radius: 10px; background: #2d3748; appearance: none; outline: none; }
-    input[type="range"]::-webkit-slider-thumb { appearance: none; width: 26px; height: 26px; background: #fff; border-radius: 50%; cursor: pointer; }
-    .range-labels { display: flex; justify-content: space-between; margin-top: 12px; color: #a0aec0; font-size: 12px; font-weight: 800; }
+    .levelBar { background: var(--card); border: 2px solid var(--brd); padding: 25px; border-radius: var(--radius); margin-bottom: 20px; }
+    input[type="range"] { 
+      width: 100%; height: 12px; border-radius: 15px; background: #1e293b; 
+      appearance: none; outline: none; margin: 20px 0;
+    }
+    input[type="range"]::-webkit-slider-thumb { 
+      appearance: none; width: 32px; height: 32px; background: var(--p); 
+      border-radius: 50%; border: 4px solid #fff; cursor: pointer; 
+    }
+    .range-labels { display: flex; justify-content: space-between; color: #64748b; font-size: 14px; }
 
-    /* Table UI */
-    .tableWrap { border: 1px solid var(--brd); border-radius: var(--radius); background: var(--card); overflow: auto; max-height: 75vh; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    /* Table */
+    .tableWrap { border: 2px solid var(--brd); border-radius: var(--radius); background: var(--card); overflow: auto; max-height: 80vh; }
     table { width: 100%; border-collapse: collapse; table-layout: fixed; }
     th { 
-      background: #1a2233; color: #ffffff; font-size: 13px; padding: 15px 2px; 
-      text-transform: uppercase; cursor: pointer; position: sticky; top: 0; z-index: 10;
-      border-bottom: 3px solid var(--brd); letter-spacing: 1px;
+      background: #1a2233; color: #fff; font-size: 14px; padding: 20px 5px; 
+      text-transform: uppercase; cursor: pointer; position: sticky; top: 0; z-index: 100;
+      border-bottom: 4px solid var(--brd); letter-spacing: 2px;
     }
-    th:hover { background: #242f45; }
-    .sort-arrow { color: var(--p); font-size: 14px; margin-left: 4px; }
-    td { padding: 12px 2px; text-align: center; border-bottom: 1px solid var(--brd); font-size: 14px; border-right: 1px solid var(--brd); }
+    td { padding: 15px 2px; text-align: center; border-bottom: 1px solid var(--brd); font-size: 16px; font-weight: 900; }
+    tr.focused { background: rgba(123, 92, 255, 0.15) !important; }
 
-    /* Champ Header & Select All */
-    .champ-head-cell { display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .select-all-cb { width: 18px; height: 18px; cursor: pointer; accent-color: var(--p); }
-    .btn-clear-x { background: #ff4d4f; color: #fff; border: none; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-weight: 900; font-size: 12px; }
+    /* Champ Column */
+    .champ-head-cell { display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .select-all-cb { width: 22px; height: 22px; cursor: pointer; accent-color: var(--p); }
     
-    .champ-card-cell { display: flex; align-items: center; gap: 6px; padding: 0 8px; }
-    .btn-row-del { color: #ff4d4f; cursor: pointer; background: none; border: 1px solid rgba(255,77,79,0.3); width: 22px; height: 22px; border-radius: 6px; font-size: 11px; flex-shrink: 0; }
+    .champ-card-cell { display: flex; align-items: center; gap: 8px; padding: 0 10px; }
+    .btn-row-del { 
+      color: #ff4d4f; cursor: pointer; background: rgba(255,77,79,0.1); 
+      border: 2px solid #ff4d4f; width: 26px; height: 26px; border-radius: 8px; font-weight: 900;
+    }
     .champ-chip { 
-      background: #1f293d; color: #fff; padding: 8px 10px; border-radius: 10px; 
-      font-size: 12px; cursor: pointer; width: 100%; text-align: center; 
-      border: 1px solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      background: #2d3748; color: #fff; padding: 10px; border-radius: 12px; 
+      width: 100%; text-align: center; border: 2px solid transparent; 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px;
     }
-    .champ-chip.pinned { border-color: var(--p); background: rgba(123, 92, 255, 0.3); box-shadow: 0 0 15px rgba(123,92,255,0.4); font-weight: 800; }
+    .champ-chip.pinned { border-color: var(--p); background: var(--p); box-shadow: 0 0 15px var(--p); }
 
-    /* Dark Tiers (Тетрада) */
-    .t-s { background: var(--t-s) !important; color: #fff; font-weight: 800; }
+    /* Tiers */
+    .t-s { background: var(--t-s) !important; color: #fff; }
     .t-a { background: var(--t-a) !important; color: #fff; }
-    .t-b { background: var(--t-b) !important; color: #fff; }
-    .t-c { background: var(--t-c) !important; color: #fff; }
-    .nrg { color: var(--energy); font-weight: 900; }
-    .mana-zero { opacity: 0.1; }
+    .t-b { background: var(--t-b) !important; color: #000; }
+    .t-c { background: var(--t-c) !important; color: #000; }
+    .nrg-cell { color: var(--energy) !important; font-size: 12px !important; }
 
-    /* Tooltip Mobile Friendly */
-    .has-tip { position: relative; }
+    /* TOOLTIP ENGINE */
+    .has-tip { position: relative; cursor: help; }
     .tip-box { 
-      display: none; position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
-      background: #000; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 12px;
-      z-index: 100; border: 1px solid var(--p); white-space: nowrap; box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+      visibility: hidden; position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+      background: #fff; color: #000; padding: 10px 15px; border-radius: 12px; font-size: 14px;
+      z-index: 1000; white-space: nowrap; font-weight: 900; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      opacity: 0; transition: 0.2s; pointer-events: none;
     }
+    .tip-box::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -8px; border: 8px solid transparent; border-top-color: #fff; }
+    .has-tip:hover .tip-box, .has-tip.active .tip-box { visibility: visible; opacity: 1; bottom: 110%; }
 
     /* Modal */
-    .modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 15px; }
+    .modal { position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 10px; }
     .hidden { display: none; }
-    .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); }
-    .modal-card { position: relative; width: 100%; max-width: 900px; height: 85vh; background: #0f172a; border-radius: 30px; border: 1px solid var(--brd); display: flex; flex-direction: column; overflow: hidden; }
+    .modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); }
+    .modal-card { 
+      position: relative; width: 100%; max-width: 1000px; height: 90vh; 
+      background: #0f172a; border-radius: 40px; border: 2px solid var(--brd); 
+      display: flex; flex-direction: column; overflow: hidden; 
+    }
     
-    .modal-header { padding: 20px; border-bottom: 1px solid var(--brd); background: #161e2f; }
-    .search-input { width: 100%; padding: 14px; background: #05070a; border: 1px solid var(--brd); border-radius: 12px; color: #fff; outline: none; font-size: 16px; box-sizing: border-box; }
+    .modal-header { padding: 30px; border-bottom: 2px solid var(--brd); }
+    .search-input { 
+      width: 100%; padding: 20px; background: #05070a; border: 2px solid var(--brd); 
+      border-radius: 20px; color: #fff; font-size: 20px; font-weight: 800; outline: none;
+    }
+    .search-input:focus { border-color: var(--p); }
 
-    .modal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding: 15px; overflow-y: auto; flex: 1; }
-    .role-col { display: flex; flex-direction: column; gap: 6px; }
-    .role-head { cursor: pointer; padding: 10px; text-align: center; background: rgba(255,255,255,0.05); border-radius: 12px; }
-    .role-head img { width: 28px; height: 28px; }
+    .modal-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; padding: 20px; overflow-y: auto; flex: 1; }
+    .role-col { display: flex; flex-direction: column; gap: 8px; }
+    .role-head { 
+      cursor: pointer; padding: 15px; text-align: center; background: #1e293b; 
+      border-radius: 20px; border: 3px solid transparent; transition: 0.3s;
+    }
+    .role-head.active-role { border-color: var(--p); background: rgba(123,92,255,0.2); box-shadow: 0 0 20px rgba(123,92,255,0.4); }
+    .role-head img { width: 35px; height: 35px; }
     
-    .champ-btn { width: 100%; padding: 12px 2px; border-radius: 10px; border: 1px solid var(--brd); background: #1e293b; color: #94a3b8; font-size: 11px; cursor: pointer; }
-    .champ-btn.selected { background: var(--p); color: #fff; border-color: var(--p); font-weight: 700; }
-    .close-corner { position: absolute; top: 20px; right: 20px; background: #2d3748; color: #fff; border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; z-index: 100; font-size: 20px; }
+    .champ-btn { 
+      width: 100%; padding: 14px 5px; border-radius: 12px; border: 2px solid var(--brd); 
+      background: #0f172a; color: #64748b; font-size: 12px; font-weight: 900; cursor: pointer; 
+    }
+    .champ-btn.selected { background: var(--p); color: #fff; border-color: #fff; }
 
-    @media (max-width: 768px) {
-      th { font-size: 10px; padding: 12px 1px; }
-      td { font-size: 12px; }
-      .modal-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
-      .champ-btn { font-size: 9px; padding: 8px 1px; }
+    .close-corner { 
+      position: absolute; top: 25px; right: 25px; background: #ff4d4f; color: #fff; 
+      border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; z-index: 100; font-size: 24px; font-weight: 900;
+    }
+
+    /* Avg Stats Block */
+    .stats-footer { background: var(--card); border: 2px solid var(--brd); border-radius: var(--radius); padding: 20px; margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+    .stat-item { text-align: center; }
+    .stat-label { font-size: 12px; color: #64748b; margin-bottom: 5px; }
+    .stat-val { font-size: 20px; color: var(--p); }
+
+    @media (max-width: 800px) {
+      .modal-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; padding: 10px; }
+      .role-head img { width: 24px; height: 24px; }
+      .champ-btn { font-size: 9px; padding: 10px 2px; }
+      th { font-size: 11px; padding: 15px 2px; }
+      td { font-size: 14px; }
+      .nick { font-size: 24px; }
     }
   </style>
 </head>
@@ -118,17 +170,19 @@
   </div>
 
   <div class="support-box">
-    <div style="font-size: 14px; font-weight: 700; color: #cbd5e0;">Сайт бесплатен. Буду благодарен за поддержку проекта!</div>
-    <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 ПОДДЕРЖАТЬ ПРОЕКТ</a>
+    <div style="font-size: 16px; margin-bottom: 5px;">🔥 ПОДДЕРЖКА ПРОЕКТА</div>
+    <div style="opacity: 0.6; font-size: 12px;">Сайт развивается благодаря тебе.</div>
+    <a class="donateBtn" href="https://www.donationalerts.com/r/erjankg" target="_blank">💜 ЗАДОНАТИТЬ</a>
   </div>
 
   <div class="levelBar">
-    <div style="font-weight:900; font-size: 15px; margin-bottom: 12px; color: var(--p);">LEVEL: <span id="levelVal" style="color:#fff">10</span></div>
-    <div class="range-wrap">
-      <input id="level" type="range" min="1" max="15" value="10">
-      <div class="range-labels">
-        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
-      </div>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="color:var(--p); font-size: 20px;">УРОВЕНЬ:</span>
+      <span id="levelVal" style="font-size: 32px; color:#fff">10</span>
+    </div>
+    <input id="level" type="range" min="1" max="15" value="10">
+    <div class="range-labels">
+      <span>1</span><span>3</span><span>5</span><span>7</span><span>9</span><span>11</span><span>13</span><span>15</span>
     </div>
   </div>
 
@@ -136,23 +190,24 @@
     <table>
       <thead>
         <tr>
-          <th style="width:40%">
+          <th style="width:38%">
             <div class="champ-head-cell">
-              <input type="checkbox" id="selectAll" class="select-all-cb" checked title="Выбрать всех" onclick="toggleSelectAll(this.checked)">
-              <span onclick="openChampModal()" style="cursor:pointer">CHAMP ⚙️</span>
-              <button class="btn-clear-x" onclick="clearExceptPinned()" title="Удалить всех кроме закрепленных">✕</button>
+              <input type="checkbox" id="selectAll" class="select-all-cb" checked onclick="toggleSelectAll(this.checked)">
+              <span onclick="openChampModal()">CHAMP ⚙️</span>
             </div>
           </th>
           <th onclick="setSort('ad')">AD<span id="s-ad" class="sort-arrow"></span></th>
           <th onclick="setSort('hp')">HP<span id="s-hp" class="sort-arrow"></span></th>
-          <th onclick="setSort('mana')">MANA<span id="s-mana" class="sort-arrow"></span></th>
-          <th onclick="setSort('armor')">ARMOR<span id="s-armor" class="sort-arrow"></span></th>
+          <th onclick="setSort('mana')">MN<span id="s-mana" class="sort-arrow"></span></th>
+          <th onclick="setSort('armor')">ARM<span id="s-armor" class="sort-arrow"></span></th>
           <th onclick="setSort('mr')">MR<span id="s-mr" class="sort-arrow"></span></th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
     </table>
   </div>
+
+  <div class="stats-footer" id="statsFooter"></div>
 </div>
 
 <div id="champModal" class="modal hidden">
@@ -160,10 +215,8 @@
   <div class="modal-card">
     <button class="close-corner" onclick="closeChampModal()">✕</button>
     <div class="modal-header">
-      <b style="font-size:20px; color: #fff;">Выбор чемпионов</b>
-      <div style="margin-top:15px;">
-        <input type="text" id="champSearch" class="search-input" placeholder="Поиск чемпиона..." oninput="renderChampModal()">
-      </div>
+      <div style="font-size:24px; margin-bottom:15px;">ВЫБОР ГЕРОЕВ</div>
+      <input type="text" id="champSearch" class="search-input" placeholder="Начни писать имя..." oninput="renderChampModal()">
     </div>
     <div id="champModalGrid" class="modal-grid"></div>
   </div>
@@ -182,6 +235,10 @@
 
   let raw = [], selected = new Set(), pinned = new Set(), level = 10, sortK = 'ad', sortD = 'desc';
 
+  // Load from Storage
+  if(localStorage.getItem('pinned')) pinned = new Set(JSON.parse(localStorage.getItem('pinned')));
+  if(localStorage.getItem('level')) level = +localStorage.getItem('level');
+
   async function init() {
     const res = await fetch(CSV_URL);
     const text = await res.text();
@@ -197,7 +254,10 @@
         is: { Top: +o["Is_Top"]===1, Jungle: +o["Is_Jungle"]===1, Mid: +o["Is_Mid"]===1, ADC: +o["Is_Adc"]===1, Support: +o["Is_Support"]===1 }
       };
     }).filter(r => r.name);
+    
     selected = new Set(raw.map(r => r.name));
+    document.getElementById('level').value = level;
+    document.getElementById('levelVal').innerText = level;
     renderTable();
   }
 
@@ -216,10 +276,10 @@
     });
 
     const data = raw.filter(r => selected.has(r.name)).map(r => {
-      let calc = (b, g) => b + (level - 1) * g;
+      let c = (b, g) => b + (level - 1) * g;
       return { 
         name: r.name, res: r.res, 
-        ad: calc(r.ad_b, r.ad_g), hp: calc(r.hp_b, r.hp_g), mana: calc(r.mn_b, r.mn_g), armor: calc(r.ar_b, r.ar_g), mr: calc(r.mr_b, r.mr_g), 
+        ad: c(r.ad_b, r.ad_g), hp: c(r.hp_b, r.hp_g), mana: c(r.mn_b, r.mn_g), armor: c(r.ar_b, r.ar_g), mr: c(r.mr_b, r.mr_g), 
         g: { ad: r.ad_g, hp: r.hp_g, mana: r.mn_g, armor: r.ar_g, mr: r.mr_g } 
       };
     }).sort((a,b) => sortD === 'desc' ? b[sortK] - a[sortK] : a[sortK] - b[sortK]);
@@ -227,16 +287,21 @@
     const thres = {};
     COLS.forEach(k => {
       let v = data.map(d => d[k]).sort((a,b) => a-b);
-      thres[k] = { t1: v[Math.floor(v.length*0.98)], t10: v[Math.floor(v.length*0.88)], l10: v[Math.floor(v.length*0.15)] };
+      thres[k] = { t1: v[Math.floor(v.length*0.98)], t10: v[Math.floor(v.length*0.85)], l10: v[Math.floor(v.length*0.15)] };
     });
 
     tbody.innerHTML = "";
     data.forEach(r => {
       const tr = document.createElement("tr");
       const isP = pinned.has(r.name);
+      tr.onclick = () => {
+        document.querySelectorAll('tr').forEach(t => t.classList.remove('focused'));
+        tr.classList.add('focused');
+      };
+
       tr.innerHTML = `<td><div class="champ-card-cell">
-        <button class="btn-row-del" onclick="selected.delete('${r.name}'); renderTable();">✕</button>
-        <div class="champ-chip ${isP?'pinned':''}" onclick="togglePin('${r.name}')">${r.name}</div>
+        <button class="btn-row-del" onclick="event.stopPropagation(); selected.delete('${r.name}'); renderTable();">✕</button>
+        <div class="champ-chip ${isP?'pinned':''}" onclick="event.stopPropagation(); togglePin('${r.name}')">${r.name}</div>
       </div></td>`;
       
       COLS.forEach(k => {
@@ -244,19 +309,22 @@
         td.className = "has-tip";
         const val = r[k];
         
-        // Tooltip logic for mobile
+        // Tooltip logic
         const tip = document.createElement("div");
         tip.className = "tip-box";
-        tip.innerText = `Прирост: +${r.g[k]}`;
+        tip.innerText = `РОСТ: +${r.g[k]}`;
         td.appendChild(tip);
+        
+        // Toggle for mobile
         td.onclick = (e) => {
-          document.querySelectorAll('.tip-box').forEach(b => b.style.display = 'none');
-          tip.style.display = 'block';
           e.stopPropagation();
+          const active = td.classList.contains('active');
+          document.querySelectorAll('.has-tip').forEach(h => h.classList.remove('active'));
+          if(!active) td.classList.add('active');
         };
 
-        if(k === "mana" && r.res === "Energy") { td.classList.add("nrg"); td.innerHTML += "ENERGY"; }
-        else if(k === "mana" && val === 0) { td.classList.add("mana-zero"); td.innerHTML += "0"; }
+        if(k === "mana" && r.res === "Energy") { td.classList.add("nrg-cell"); td.innerHTML += "NRG"; }
+        else if(k === "mana" && val === 0) { td.style.opacity = "0.1"; td.innerHTML += "0"; }
         else {
           td.innerHTML += Math.round(val);
           if(val >= thres[k].t1) td.classList.add("t-s");
@@ -268,19 +336,29 @@
       });
       tbody.appendChild(tr);
     });
+    renderFooterStats(data);
   }
 
-  // Close tooltips on click outside
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.tip-box').forEach(b => b.style.display = 'none');
-  });
+  function renderFooterStats(data) {
+    if(!data.length) return;
+    const foot = document.getElementById("statsFooter");
+    const avgAD = Math.round(data.reduce((a,b)=>a+b.ad,0)/data.length);
+    const avgHP = Math.round(data.reduce((a,b)=>a+b.hp,0)/data.length);
+    foot.innerHTML = `
+      <div class="stat-item"><div class="stat-label">СРЕДНИЙ AD</div><div class="stat-val">${avgAD}</div></div>
+      <div class="stat-item"><div class="stat-label">СРЕДНИЙ HP</div><div class="stat-val">${avgHP}</div></div>
+      <div class="stat-item"><div class="stat-label">ГЕРОЕВ</div><div class="stat-val">${data.length}</div></div>
+    `;
+  }
 
-  function togglePin(name) { pinned.has(name) ? pinned.delete(name) : pinned.add(name); renderTable(); }
-  function clearExceptPinned() { selected = new Set([...pinned]); renderTable(); }
-  
+  function togglePin(name) { 
+    pinned.has(name) ? pinned.delete(name) : pinned.add(name); 
+    localStorage.setItem('pinned', JSON.stringify([...pinned]));
+    renderTable(); 
+  }
+
   function toggleSelectAll(checked) {
-    if(checked) selected = new Set(raw.map(r => r.name));
-    else selected = new Set([...pinned]);
+    selected = checked ? new Set(raw.map(r => r.name)) : new Set([...pinned]);
     renderTable();
   }
 
@@ -294,7 +372,13 @@
 
     roles.forEach(role => {
       const col = document.createElement("div"); col.className = "role-col";
-      col.innerHTML = `<div class="role-head" onclick="toggleRole('${role.key}')"><img src="${role.icon}"></div>`;
+      const namesInRole = raw.filter(r => r.is[role.key]).map(r => r.name);
+      const isRoleFull = namesInRole.every(n => selected.has(n));
+
+      col.innerHTML = `<div class="role-head ${isRoleFull?'active-role':''}" onclick="toggleRole('${role.key}')">
+        <img src="${role.icon}">
+      </div>`;
+      
       const filtered = raw.filter(r => r.is[role.key] && r.name.toLowerCase().includes(query)).sort((a,b)=>a.name.localeCompare(b.name));
       filtered.forEach(r => {
         const btn = document.createElement("button");
@@ -318,8 +402,14 @@
   }
 
   document.getElementById("level").oninput = (e) => {
-    level = +e.target.value; document.getElementById("levelVal").innerText = level; renderTable();
+    level = +e.target.value; 
+    document.getElementById("levelVal").innerText = level; 
+    localStorage.setItem('level', level);
+    renderTable();
   };
+
+  // Close tips
+  window.onclick = () => document.querySelectorAll('.has-tip').forEach(h => h.classList.remove('active'));
 
   init();
 </script>
