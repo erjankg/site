@@ -189,7 +189,8 @@
             backdrop-filter: blur(10px);
             border-radius: 15px;
             border: 2px solid var(--border);
-            overflow: hidden;
+            overflow-x: auto;
+            overflow-y: auto;
             max-height: 65vh;
             overflow-y: auto;
             animation: fadeIn 0.8s ease;
@@ -259,7 +260,46 @@
             align-items:center;
             gap:8px;
         }
-        .x-btn{
+        
+        /* Champ cell: keep X + name neat and fill the cell */
+        .champ-cell .name-tag{
+            flex: 1;
+            min-width: 0;
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Never darken table rows on hover/active (desktop + mobile) */
+        #statTable tbody tr:hover td,
+        #statTable tbody tr:active td,
+        #statTable tbody tr:focus td{
+            background: transparent !important;
+        }
+
+        /* Mobile: allow champ names to wrap and enable horizontal scroll if needed */
+        @media (max-width: 560px){
+            .table-hold{
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .champ-cell .name-tag{
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+                line-height: 1.15;
+            }
+            th, td{
+                padding: 10px 8px;
+            }
+            .x-btn{
+                width: 24px;
+                height: 24px;
+                border-radius: 7px;
+            }
+        }
+.x-btn{
             width: 26px;
             height: 26px;
             border-radius: 8px;
@@ -281,13 +321,6 @@
         tr:active td, td:active{
             background: transparent !important;
         }
-
-        @media (hover: hover) and (pointer: fine) {
-            tr:hover td {
-                background: rgba(155, 89, 182, 0.08);
-            }
-        }
-
         td:first-child {
             width: 120px;
             font-size: 12px;
@@ -593,24 +626,6 @@
             .m-item { font-size: 9px; padding: 6px 2px; }
             .m-role img { max-width: 38px; }
         }
-        /* 🚫 убираем затемняющий hover у строк таблицы */
-tbody tr:hover,
-tbody tr:active,
-tbody tr:focus {
-  background: transparent !important;
-}
-/* Champ cell: X + имя растягиваем красиво на всю ширину */
-.champ-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.champ-cell .name-tag {
-  flex: 1;        /* ← главное */
-  min-width: 0;   /* ← чтобы работал ellipsis */
-}
-
     </style>
 </head>
 <body>
@@ -676,7 +691,7 @@ tbody tr:focus {
 (() => {
     // ✅ Paste your published Google Sheet TSV/CSV URL here (File → Share → Publish to web)
     // Example: const G_URL = 'https://docs.google.com/spreadsheets/d/e/.../pub?output=tsv';
-    const G_URL = window.G_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
+    const G_URL = window.G_URL || '';
 
     let raw = [];
     let selected = new Set();
