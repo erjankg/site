@@ -599,6 +599,17 @@ tbody tr:active,
 tbody tr:focus {
   background: transparent !important;
 }
+/* Champ cell: X + имя растягиваем красиво на всю ширину */
+.champ-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.champ-cell .name-tag {
+  flex: 1;        /* ← главное */
+  min-width: 0;   /* ← чтобы работал ellipsis */
+}
 
     </style>
 </head>
