@@ -202,6 +202,15 @@
             border-collapse: collapse;
             table-layout: fixed;
         }
+        /* Make Champions column wider for readability (esp. mobile) */
+        #statTable th:first-child, #statTable td:first-child{
+            width: 220px;
+        }
+        @media (max-width: 560px){
+            #statTable th:first-child, #statTable td:first-child{
+                width: 180px;
+            }
+        }
 
         th {
             background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
@@ -239,7 +248,7 @@
         }
 
         table.focus-mode td:not(:first-child) {
-            opacity: 0.3;
+            opacity: 1;
         }
 
         table.focus-mode td.active-col {
@@ -931,9 +940,10 @@ window.hideT = function() {
             const allChampsInRole = raw.filter(x => x.is[role]);
 
             // фильтр поиска (если пусто — показываем всех)
-            const champs = q
+            const champs = (q
                 ? allChampsInRole.filter(x => x.name.toLowerCase().includes(q))
-                : allChampsInRole;
+                : allChampsInRole
+            ).slice().sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
 
             // если идёт поиск и в роли ничего не найдено — не рисуем пустую колонку
             if (q && champs.length === 0) return;
