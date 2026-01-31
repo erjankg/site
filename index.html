@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         html, body {
@@ -226,8 +227,11 @@
             user-select: none;
         }
 
-        th:hover {
-            background: linear-gradient(135deg, #2a1d3e 0%, #1f1030 100%);
+        /* Hover effects only on real mouse devices (prevents mobile "sticky" highlight) */
+        @media (hover: hover) and (pointer: fine) {
+            th:hover {
+                background: linear-gradient(135deg, #2a1d3e 0%, #1f1030 100%);
+            }
         }
 
         .btn-champ-cfg {
@@ -268,6 +272,7 @@
             display:flex;
             align-items:center;
             gap:8px;
+            width: 100%;
         }
         
         /* Champ cell: keep X + name neat and fill the cell */
@@ -275,6 +280,7 @@
             flex: 1;
             min-width: 0;
             display: block;
+            width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -293,6 +299,10 @@
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
+            /* Let the table scroll horizontally instead of squashing champ names */
+            #statTable{
+                min-width: 760px;
+            }
             .champ-cell .name-tag{
                 white-space: normal;
                 overflow: visible;
@@ -302,7 +312,7 @@
             th, td{
                 padding: 10px 8px;
             }
-            .x-btn{
+	.x-btn{
                 width: 24px;
                 height: 24px;
                 border-radius: 7px;
@@ -322,16 +332,18 @@
             justify-content:center;
             user-select:none;
         }
-        .x-btn:hover{
-            background: linear-gradient(135deg, rgba(255, 60, 60, 0.28) 0%, rgba(255, 60, 60, 0.12) 100%);
-            transform: translateY(-1px);
-        }
+	        @media (hover: hover) and (pointer: fine) {
+	            .x-btn:hover{
+	                background: linear-gradient(135deg, rgba(255, 60, 60, 0.28) 0%, rgba(255, 60, 60, 0.12) 100%);
+	                transform: translateY(-1px);
+	            }
+	        }
         /* Prevent "sticky" tap highlight / darkening on row click */
         tr:active td, td:active{
             background: transparent !important;
         }
-        td:first-child {
-            width: 120px;
+        /* Champions column styling (width is defined above via #statTable td:first-child) */
+        #statTable td:first-child {
             font-size: 12px;
             text-align: left;
             padding-left: 8px;
@@ -350,8 +362,14 @@
             cursor: pointer;
         }
 
-        .name-tag:hover {
-            border-color: var(--accent);
+        @media (hover: hover) and (pointer: fine) {
+	        @media (hover: hover) and (pointer: fine) {
+        @media (hover: hover) and (pointer: fine) {
+            .name-tag:hover {
+                border-color: var(--accent);
+            }
+        }
+	        }
         }
 
         .name-tag.pinned {
@@ -617,7 +635,7 @@
             
             th { font-size: 9px; padding: 8px 3px; }
             td { font-size: 10px; padding: 8px 2px; }
-            td:first-child { font-size: 9px; width: 70px; padding-left: 4px; }
+	            #statTable td:first-child { font-size: 9px; padding-left: 6px; }
             .btn-champ-cfg { font-size: 8px; padding: 5px 8px; }
             
             .m-win { width: 95%; max-width: 500px; }
@@ -631,7 +649,7 @@
         @media (max-width: 400px) {
             th { font-size: 8px; padding: 6px 2px; }
             td { font-size: 9px; padding: 6px 1px; }
-            td:first-child { font-size: 8px; width: 60px; }
+	            #statTable td:first-child { font-size: 8px; }
             .m-item { font-size: 9px; padding: 6px 2px; }
             .m-role img { max-width: 38px; }
         }
