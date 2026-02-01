@@ -1539,5 +1539,89 @@ window.hideT = function() {
 })();
 </script>
 
+
+<style id="v22-overrides">
+/* ===== LEVEL PILLS ===== */
+
+/* Mobile: remove level pill buttons entirely */
+@media (max-width: 768px) {
+  .lvl-pill, .level-pill, .ruler .pill {
+    display: none !important;
+  }
+}
+
+/* Desktop: keep small pills, increase size by 50%, align across slider */
+@media (min-width: 769px) {
+  .lvl-pill {
+    font-size: 14px;
+    padding: 6px 10px;
+    transform: translateX(-50%) scale(1.5);
+    transform-origin: center;
+  }
+}
+
+/* ===== STAT COLORS ===== */
+.stat-ad    { background: rgba(255,140,0,0.25); }
+.stat-hp    { background: rgba(0,160,80,0.25); }
+.stat-mana  { background: rgba(60,120,255,0.25); }
+.stat-armor { background: rgba(150,90,40,0.25); }
+.stat-mr    { background: rgba(20,40,120,0.35); }
+
+/* Numbers always white */
+.stat-ad, .stat-hp, .stat-mana, .stat-armor, .stat-mr {
+  color: #fff !important;
+}
+
+/* ===== TIER VISUALS ===== */
+/* mid (default) -> no change */
+
+/* top 10% -> slightly more contrast */
+.tier-top10 {
+  filter: contrast(1.15);
+}
+
+/* top 3% -> brighter */
+.tier-top3 {
+  filter: contrast(1.35) brightness(1.1);
+}
+
+/* bottom 10% -> darker background only */
+.tier-bottom10 {
+  filter: brightness(0.9);
+}
+</style>
+
+<script id="v22-js">
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const pills = document.querySelectorAll('.lvl-pill');
+  if (!pills.length) return;
+
+  // Remove duplicates: keep first occurrence of each value
+  const seen = new Set();
+  pills.forEach(p => {
+    const v = p.dataset.value;
+    if (seen.has(v)) p.remove();
+    else seen.add(v);
+  });
+
+  if (isMobile) return;
+
+  // Align pills to slider positions on desktop
+  const slider = document.querySelector('input[type="range"]');
+  if (!slider) return;
+
+  const min = Number(slider.min || 1);
+  const max = Number(slider.max || 15);
+
+  document.querySelectorAll('.lvl-pill').forEach(p => {
+    const v = Number(p.dataset.value);
+    if (isNaN(v)) return;
+    const pct = (v - min) / (max - min);
+    p.style.left = (pct * 100) + '%';
+  });
+})();
+</script>
+
 </body>
 </html>
