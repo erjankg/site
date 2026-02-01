@@ -1364,1072 +1364,99 @@ window.hideT = function() {
 })();
 </script>
 
-<style id="v21-overrides">
-/* 1) Main table scrolls with page, no inner scroll box */
-.table-hold{
-  max-height: none !important;
-  height: auto !important;
-  overflow: visible !important; /* let page scroll */
-}
-
-/* Keep table full width */
-.table-hold, .app-wrapper{ width: 100% !important; }
-
-/* Sticky headers on mobile during page scroll */
-@media (max-width: 768px){
-  #statTable thead th{
-    position: sticky;
-    top: 0;
-    z-index: 60;
-    background: var(--bg-card);
-    backdrop-filter: blur(10px);
-  }
-}
-
-/* 3) Mobile proportions: Champs 40%, others equal */
-@media (max-width: 768px){
-  #statTable{ table-layout: fixed; width: 100% !important; }
-  #statTable th:first-child, #statTable td:first-child{ width: 40% !important; }
-  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 12% !important; }
-}
-
-/* 3) Mobile X smaller by 30% (use size, not scale) */
-@media (max-width: 768px){
-  .btn-x, .remove-btn, .xbtn{
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 12px !important;
-    border-radius: 8px !important;
-  }
-}
-
-/* 2/4) Ruler buttons styling */
-#ruler{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 4px;
-  padding: 10px 2px 0;
-  user-select: none;
-}
-.ruler-btn{
-  border: 0;
-  background: var(--accent);
-  color: #fff;
-  border-radius: 999px;
-  padding: 4px 7px;
-  font-weight: 800;
-  line-height: 1;
-  cursor: pointer;
-  transition: transform .12s ease, filter .12s ease;
-}
-.ruler-btn:active{
-  transform: scale(1.1); /* +10% */
-}
-.ruler-btn.is-active{
-  filter: brightness(1.15);
-  outline: 2px solid rgba(255,255,255,.35);
-  outline-offset: 1px;
-}
-
-/* Mobile: make ruler pills 2x bigger than before but still fit */
-@media (max-width: 768px){
-  .ruler-btn{
-    padding: 5px 6px;
-    font-size: 12px;
-  }
-}
-
-/* 5) Support + Twitch "imba" animation: glow + shine sweep */
-.btn-support, .twitch-btn{
-  position: relative;
-  overflow: hidden;
-}
-.btn-support::before, .twitch-btn::before{
-  content:"";
-  position:absolute;
-  inset:-40%;
-  background: radial-gradient(circle, rgba(124,77,255,.55), transparent 60%);
-  animation: v21GlowSpin 4s linear infinite;
-  pointer-events:none;
-}
-@keyframes v21GlowSpin{ to{ transform: rotate(360deg); } }
-
-.btn-support::after, .twitch-btn::after{
-  content:"";
-  position:absolute;
-  top:-30%;
-  left:-60%;
-  width: 45%;
-  height: 160%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
-  transform: rotate(20deg);
-  animation: v21Shine 2.8s ease-in-out infinite;
-  pointer-events:none;
-}
-@keyframes v21Shine{
-  0%{ left:-60%; opacity:0; }
-  15%{ opacity:1; }
-  45%{ left:120%; opacity:0; }
-  100%{ left:120%; opacity:0; }
-}
-
-/* Support text block */
-#support-text{
-  margin-top: 12px;
-  opacity: .9;
-  font-size: 14px;
-  line-height: 1.35;
-}
-</style>
-
-<script id="v21-js">
-(function(){
-  // 6) Rename label to Champ lvl (covers RU/EN)
-  const lvlTitle = document.querySelector('.slider-title, .level-title, .lvl-title, .level-label');
-  if (lvlTitle) lvlTitle.textContent = 'Champ lvl';
-
-  // 2/4) Build ruler pill buttons that match slider positions
-  const slider = document.getElementById('lvlRange');
-  const ruler = document.getElementById('ruler');
-  if (slider && ruler){
-    const min = Number(slider.min||1);
-    const max = Number(slider.max||15);
-
-    function renderRuler(){
-      ruler.innerHTML = '';
-      for(let v=min; v<=max; v++){
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'ruler-btn';
-        b.dataset.value = String(v);
-        b.textContent = String(v);
-        b.addEventListener('click', ()=>{
-          slider.value = String(v);
-          slider.dispatchEvent(new Event('input', {bubbles:true}));
-          slider.dispatchEvent(new Event('change', {bubbles:true}));
-          setActive(v);
-        });
-        ruler.appendChild(b);
-      }
-      setActive(Number(slider.value||min));
-    }
-
-    function setActive(v){
-      ruler.querySelectorAll('.ruler-btn').forEach(btn=>{
-        btn.classList.toggle('is-active', Number(btn.dataset.value)===v);
-      });
-    }
-
-    // Keep in sync when dragging slider
-    slider.addEventListener('input', ()=> setActive(Number(slider.value)));
-    // Render after the app's start() runs (non-destructive)
-    setTimeout(renderRuler, 0);
-  }
-
-  // 4/5) Add support text under support button
-  if (!document.getElementById('support-text')){
-    const supportBtn = document.querySelector('.btn-support');
-    if (supportBtn && supportBtn.parentElement){
-      const box = document.createElement('div');
-      box.id = 'support-text';
-      box.innerHTML = `Ребята, сайт абсолютно бесплатен для всех.<br><br>
-(Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
-В планах: добавить характеристики HP реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)`;
-      supportBtn.parentElement.appendChild(box);
-    }
-  }
-})();
-</script>
 
 
-<style id="v23-overrides">
-/* ===== 1) TABLE: no inner scroll; page scrolls ===== */
-.table-hold{
-  max-height: none !important;
-  overflow: visible !important;
-}
 
-/* ===== 2) LEVEL PILLS ===== */
-/* Mobile: remove completely */
-@media (max-width: 768px){
-  #ruler{ display:none !important; }
-}
-/* Desktop: rebuild + style small pills (+50% vs small baseline) */
+
+
+
+
+
+<style id="v33-overrides">
+/* ===== RULER (PC) ===== */
 @media (min-width: 769px){
+  /* keep ruler under slider, no wrap, no duplicates */
   #ruler{
-    position: relative !important;
-    display:block !important;
-    height: 32px;
-    margin-top: 10px;
-    padding: 0;
+    position: absolute !important;
+    height: 36px !important;
+    pointer-events: auto;
+    z-index: 4;
   }
   #ruler .lvl-pill{
-    position:absolute !important;
-    top: 0;
-    transform: translateX(-50%);
-    display:inline-flex !important;
-    align-items:center;
-    justify-content:center;
-    font-weight: 700;
-    /* small baseline * 1.5 */
-    font-size: 12px;          /* was 8px baseline */
-    padding: 4px 8px;         /* was 3/6 baseline */
-    min-width: 30px;          /* was 20px baseline */
+    position: absolute !important;
+    transform: translateX(-50%) !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    font-weight: 800;
+    font-size: 12px;
+    padding: 4px 10px;
+    min-width: 28px;
     border-radius: 999px;
     background: rgba(124,77,255,0.95);
     color: #fff;
     border: 1px solid rgba(255,255,255,0.18);
-    box-shadow: 0 6px 18px rgba(124,77,255,0.28);
-    transition: transform .15s ease, filter .15s ease;
-    user-select:none;
+    box-shadow: 0 10px 22px rgba(124,77,255,0.22);
+    user-select: none;
+    z-index: 1;
+    white-space: nowrap;
   }
-  #ruler .lvl-pill:active{
-    transform: translateX(-50%) scale(1.1); /* +10% on press */
-  }
+  #ruler .lvl-pill:active{ transform: translateX(-50%) scale(1.1); }
 }
 
-/* ===== 3) Mobile: X smaller by 30% ===== */
-@media (max-width: 768px){
-  .x-btn{
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 14px !important;
-  }
-}
-
-/* ===== 4) Support text under support button ===== */
-#support-panel-text{
-  margin-top: 10px;
-  font-size: 14px;
-  line-height: 1.35;
-  opacity: .92;
-}
-
-/* ===== 5) Stat colors (AD/HP/MANA/ARMOR/MR) + tier rules ===== */
-/* Columns: 1=Champion, 2=AD, 3=HP, 4=MANA, 5=ARMOR, 6=MR */
-:root{
-  --col-ad:    255,140,0;    /* orange */
-  --col-hp:    0,160,80;     /* green  */
-  --col-mana:  60,120,255;   /* blue   */
-  --col-armor: 150,90,40;    /* brown  */
-  --col-mr:    20,40,120;    /* dark blue */
-}
-#statTable td:nth-child(2){ background: rgba(var(--col-ad),   .26); color:#fff !important; }
-#statTable td:nth-child(3){ background: rgba(var(--col-hp),   .26); color:#fff !important; }
-#statTable td:nth-child(4){ background: rgba(var(--col-mana), .26); color:#fff !important; }
-#statTable td:nth-child(5){ background: rgba(var(--col-armor),.26); color:#fff !important; }
-#statTable td:nth-child(6){ background: rgba(var(--col-mr),   .30); color:#fff !important; }
-
-/* Mid default = class b (no extra) */
-
-/* Top10% = class a : slightly more contrast */
-#statTable td.a:nth-child(2){ background: rgba(var(--col-ad),   .32); }
-#statTable td.a:nth-child(3){ background: rgba(var(--col-hp),   .32); }
-#statTable td.a:nth-child(4){ background: rgba(var(--col-mana), .32); }
-#statTable td.a:nth-child(5){ background: rgba(var(--col-armor),.32); }
-#statTable td.a:nth-child(6){ background: rgba(var(--col-mr),   .36); }
-
-/* Top3% = class s : brighter + subtle white overlay */
-#statTable td.s:nth-child(2){ background: linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.08)), rgba(var(--col-ad),   .38); }
-#statTable td.s:nth-child(3){ background: linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.08)), rgba(var(--col-hp),   .38); }
-#statTable td.s:nth-child(4){ background: linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.08)), rgba(var(--col-mana), .38); }
-#statTable td.s:nth-child(5){ background: linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.08)), rgba(var(--col-armor),.38); }
-#statTable td.s:nth-child(6){ background: linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.08)), rgba(var(--col-mr),   .42); }
-
-/* Bottom10% = class c : darken only background (~10%), text stays white */
-#statTable td.c:nth-child(2){ background: rgba(var(--col-ad),   .22); }
-#statTable td.c:nth-child(3){ background: rgba(var(--col-hp),   .22); }
-#statTable td.c:nth-child(4){ background: rgba(var(--col-mana), .22); }
-#statTable td.c:nth-child(5){ background: rgba(var(--col-armor),.22); }
-#statTable td.c:nth-child(6){ background: rgba(var(--col-mr),   .26); }
-</style>
-
-<script id="v23-js">
-/* Rebuild ruler pills only on desktop, remove duplicates, align to slider positions. */
-(function(){
-  const slider = document.getElementById('lvlRange');
-  const ruler = document.getElementById('ruler');
-  if(!slider || !ruler) return;
-
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(isMobile){
-    ruler.innerHTML = '';
-    return;
-  }
-
-  // Clear and rebuild exactly 15 pills
-  ruler.innerHTML = '';
-  const min = Number(slider.min || 1);
-  const max = Number(slider.max || 15);
-
-  for(let i=min;i<=max;i++){
-    const span = document.createElement('span');
-    span.className = 'lvl-pill';
-    span.dataset.value = String(i);
-    span.textContent = String(i);
-    const pct = (i - min) / (max - min);
-    span.style.left = (pct * 100) + '%';
-    span.onclick = () => {
-      slider.value = String(i);
-      slider.dispatchEvent(new Event('input', { bubbles:true }));
-    };
-    ruler.appendChild(span);
-  }
-})();
-
-/* Add support text under the support button (visible, in the support panel/header). */
-(function(){
-  if(document.getElementById('support-panel-text')) return;
-  const btn = document.querySelector('.btn-support');
-  if(!btn) return;
-  const block = document.createElement('div');
-  block.id = 'support-panel-text';
-  block.innerHTML = `
-Ребята, сайт абсолютно бесплатен для всех.<br><br>
-(Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
-В планах: добавить характеристики HP реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)
-  `.trim();
-  // Insert right after the button
-  btn.insertAdjacentElement('afterend', block);
-})();
-</script>
-
-
-<style id="v24-overrides">
-/* Remove any stray bottom support text blocks (if they exist visually) */
-#support-text { display:none !important; }
-
-/* Support panel text should look like a boxed note under the button */
-#support-panel-text{
-  margin-top: 10px;
-  padding: 12px 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(124,77,255,0.12);
-  max-width: 560px;
-}
-
-/* Make stat colors more contrast, keep numbers white */
-:root{
-  --col-ad:    255,140,0;    /* orange */
-  --col-hp:    0,180,85;     /* greener */
-  --col-mana:  70,135,255;   /* blue */
-  --col-armor: 170,105,55;   /* brown */
-  --col-mr:    35,65,170;    /* dark blue */
-}
-#statTable td:nth-child(2){ background: rgba(var(--col-ad),   .44); color:#fff !important; }
-#statTable td:nth-child(3){ background: rgba(var(--col-hp),   .44); color:#fff !important; }
-#statTable td:nth-child(4){ background: rgba(var(--col-mana), .44); color:#fff !important; }
-#statTable td:nth-child(5){ background: rgba(var(--col-armor),.44); color:#fff !important; }
-#statTable td:nth-child(6){ background: rgba(var(--col-mr),   .48); color:#fff !important; }
-
-/* Top10% (a) a bit stronger */
-#statTable td.a:nth-child(2){ background: rgba(var(--col-ad),   .52); }
-#statTable td.a:nth-child(3){ background: rgba(var(--col-hp),   .52); }
-#statTable td.a:nth-child(4){ background: rgba(var(--col-mana), .52); }
-#statTable td.a:nth-child(5){ background: rgba(var(--col-armor),.52); }
-#statTable td.a:nth-child(6){ background: rgba(var(--col-mr),   .56); }
-
-/* Top3% (s) bright with subtle white overlay */
-#statTable td.s:nth-child(2){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-ad),   .60); }
-#statTable td.s:nth-child(3){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-hp),   .60); }
-#statTable td.s:nth-child(4){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-mana), .60); }
-#statTable td.s:nth-child(5){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-armor),.60); }
-#statTable td.s:nth-child(6){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-mr),   .64); }
-
-/* Bottom10% (c) slightly dimmer background only */
-#statTable td.c:nth-child(2){ background: rgba(var(--col-ad),   .38); }
-#statTable td.c:nth-child(3){ background: rgba(var(--col-hp),   .38); }
-#statTable td.c:nth-child(4){ background: rgba(var(--col-mana), .38); }
-#statTable td.c:nth-child(5){ background: rgba(var(--col-armor),.38); }
-#statTable td.c:nth-child(6){ background: rgba(var(--col-mr),   .42); }
-
-/* Desktop ruler pills remain in #ruler; improve visual alignment container */
+/* Hide any pills that are NOT inside #ruler (prevents ghost duplicates) */
 @media (min-width: 769px){
-  #ruler{
-    position: relative !important;
-    height: 34px;
-  }
-  #ruler .lvl-pill{
-    top: 0 !important;
-  }
+  .lvl-pill{ display:none !important; }
+  #ruler .lvl-pill{ display:inline-flex !important; }
 }
-</style>
 
-<script id="v24-js">
-/* 1) Remove the very bottom stray text if present */
-(function(){
-  const stray = document.getElementById('support-text');
-  if (stray) stray.remove();
-})();
-
-/* 2) Align desktop ruler pills to the real slider thumb positions */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if (isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const ruler = document.getElementById('ruler');
-  if (!slider || !ruler) return;
-
-  const min = Number(slider.min || 1);
-  const max = Number(slider.max || 15);
-
-  function layout(){
-    const sw = slider.clientWidth;
-    // approximate thumb size (works with most browsers)
-    const thumb = 18;
-    const usable = Math.max(1, sw - thumb);
-    const leftPad = thumb/2;
-
-    // Make ruler match slider width
-    ruler.style.width = sw + 'px';
-
-    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
-      const v = Number(p.dataset.value);
-      if (isNaN(v)) return;
-      const pct = (v - min) / (max - min);
-      const px = leftPad + pct * usable;
-      p.style.left = px + 'px';
-    });
-  }
-
-  window.addEventListener('resize', layout);
-  // run after layout
-  setTimeout(layout, 0);
-  setTimeout(layout, 150);
-})();
-
-/* 3) Ensure support text is inside the support panel under the button */
-(function(){
-  const btn = document.querySelector('.btn-support');
-  const block = document.getElementById('support-panel-text');
-  if (!btn || !block) return;
-  // If block got detached somehow, reinsert right after the button
-  if (btn.nextElementSibling !== block) {
-    btn.insertAdjacentElement('afterend', block);
-  }
-})();
-</script>
-
-
-<style id="v25-overrides">
-/* Modal search: instant filtering on any input method */
-#mSearch { -webkit-text-size-adjust: 100%; }
-
-/* Support text box: full width on laptop/desktop */
+/* ===== Champion name alignment (PC) ===== */
 @media (min-width: 769px){
-  #support-panel-text{
-    max-width: none !important;
-    width: 100% !important;
+  .champ-cell{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap: 10px !important;
+  }
+  .champ-cell .x-btn, .champ-cell .btn-x, .champ-cell .remove-btn, .champ-cell .xbtn{
+    flex: 0 0 auto !important;
+    margin-right: 6px !important;
+  }
+  .champ-cell .name-tag, .champ-cell .champ-pill{
+    flex: 1 1 auto !important;
+    display: inline-flex !important;
+    justify-content: center !important;
+    text-align: center !important;
   }
 }
 
-/* Remove "white overlay" filters for top3: use pure contrast via alpha only */
-#statTable td.s:nth-child(2){ background: rgba(var(--col-ad),   .68) !important; }
-#statTable td.s:nth-child(3){ background: rgba(var(--col-hp),   .68) !important; }
-#statTable td.s:nth-child(4){ background: rgba(var(--col-mana), .68) !important; }
-#statTable td.s:nth-child(5){ background: rgba(var(--col-armor),.68) !important; }
-#statTable td.s:nth-child(6){ background: rgba(var(--col-mr),   .72) !important; }
-
-/* Make colors a bit more contrast overall (without clashing): bump base alphas slightly */
-#statTable td:nth-child(2){ background: rgba(var(--col-ad),   .50) !important; }
-#statTable td:nth-child(3){ background: rgba(var(--col-hp),   .50) !important; }
-#statTable td:nth-child(4){ background: rgba(var(--col-mana), .50) !important; }
-#statTable td:nth-child(5){ background: rgba(var(--col-armor),.50) !important; }
-#statTable td:nth-child(6){ background: rgba(var(--col-mr),   .54) !important; }
-#statTable td.a:nth-child(2){ background: rgba(var(--col-ad),   .58) !important; }
-#statTable td.a:nth-child(3){ background: rgba(var(--col-hp),   .58) !important; }
-#statTable td.a:nth-child(4){ background: rgba(var(--col-mana), .58) !important; }
-#statTable td.a:nth-child(5){ background: rgba(var(--col-armor),.58) !important; }
-#statTable td.a:nth-child(6){ background: rgba(var(--col-mr),   .62) !important; }
-#statTable td.c:nth-child(2){ background: rgba(var(--col-ad),   .44) !important; }
-#statTable td.c:nth-child(3){ background: rgba(var(--col-hp),   .44) !important; }
-#statTable td.c:nth-child(4){ background: rgba(var(--col-mana), .44) !important; }
-#statTable td.c:nth-child(5){ background: rgba(var(--col-armor),.44) !important; }
-#statTable td.c:nth-child(6){ background: rgba(var(--col-mr),   .48) !important; }
-
-/* Mobile: sort arrows under headers (triangle under text) */
-@media (max-width: 768px){
-  #statTable thead th:not(:first-child){
-    padding-top: 10px;
-    padding-bottom: 8px;
-    text-align: center;
-  }
-  #statTable thead th:not(:first-child){
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-  }
-  #statTable thead th span[id^="ar-"]{
-    display:block !important;
-    font-size: 12px;
-    line-height: 1;
-    margin: 0;
-  }
-}
-</style>
-
-<script id="v25-js">
-/* 1) Modal search: update list instantly (input/keyup/change/composition) */
-(function(){
-  const inp = document.getElementById('mSearch');
-  if(!inp) return;
-  const fire = () => { try { drawM(); } catch(e){} };
-  ['input','keyup','change','compositionend'].forEach(ev=>inp.addEventListener(ev, fire));
-})();
-
-/* 2) Desktop ruler: make pills match slider thumb positions precisely */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if (isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const ruler  = document.getElementById('ruler');
-  if(!slider || !ruler) return;
-
-  const min = Number(slider.min || 1);
-  const max = Number(slider.max || 15);
-
-  function layout(){
-    // Ensure slider parent is positioning context
-    const parent = slider.parentElement;
-    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
-
-    const sRect = slider.getBoundingClientRect();
-    const pRect = parent.getBoundingClientRect();
-
-    // Place ruler exactly under the slider and same width
-    ruler.style.position = 'absolute';
-    ruler.style.left = (sRect.left - pRect.left) + 'px';
-    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
-    ruler.style.width = sRect.width + 'px';
-    ruler.style.height = '34px';
-
-    // Thumb compensation (approx) for common browsers
-    const thumb = 18;
-    const usable = Math.max(1, sRect.width - thumb);
-    const leftPad = thumb/2;
-
-    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
-      const v = Number(p.dataset.value);
-      if(isNaN(v)) return;
-      const pct = (v - min) / (max - min);
-      const x = leftPad + pct * usable;
-      p.style.left = x + 'px';
-    });
-  }
-
-  window.addEventListener('resize', layout);
-  setTimeout(layout, 0);
-  setTimeout(layout, 120);
-  setTimeout(layout, 300);
-})();
-
-/* 3) Mobile: ensure header arrows show as triangles below (reuse existing arrow text) */
-(function(){
-  // nothing needed; CSS handles placement
-})();
-</script>
-
-
-<style id="v26-overrides">
-/* Separate support text panel from level panel */
-#support-panel-text{
-  margin-top: 14px !important;
-}
-/* Extra spacing below slider/ruler area so blocks don't blend */
-#ruler{ margin-bottom: 14px !important; }
-
-/* Mobile: show a small triangle under each stat header (like PC indicator) */
-@media (max-width: 768px){
-  #statTable thead th span[id^="ar-"]{
-    display:block !important;
-    min-height: 12px;
-  }
-  /* If JS hasn't filled arrow text, show default ▼ */
-  #statTable thead th span[id^="ar-"]:empty::before{
-    content:"▼";
-    font-size: 11px;
-    line-height: 1;
-    opacity: .9;
-  }
-}
-</style>
-
-<script id="v26-js">
-/* Ensure modal search is instant on mobile/desktop */
-(function(){
-  const inp=document.getElementById('mSearch');
-  if(!inp) return;
-  const fire=()=>{ if (typeof window.drawM === 'function') window.drawM(); };
-  ['input','keyup','change','compositionend','search'].forEach(ev=>inp.addEventListener(ev, fire));
-})();
-</script>
-
-
-<style id="v27-overrides">
-/* 1) HEADERS: keep normal (no vertical stack), add tiny triangle under text */
-#statTable thead th { 
-  display: table-cell !important;
-  vertical-align: middle !important;
-}
+/* ===== Header arrows: tiny triangle UNDER text without breaking layout ===== */
+#statTable thead th{ display: table-cell !important; vertical-align: middle !important; }
 #statTable thead th span[id^="ar-"]{
   display:block !important;
   font-size: 11px !important;
   line-height: 1 !important;
-  margin-top: 2px !important;
-  opacity: .95 !important;
-  text-align: center !important;
-}
-#statTable thead th span[id^="ar-"]:empty::before{
-  content:"▼";
-}
-
-/* 2) Higher rating -> darker background (black overlay increases with rank) */
-:root{
-  --ov-mid: 0.10;
-  --ov-top10: 0.18;
-  --ov-top3: 0.28;
-  --ov-bot10: 0.05;
-  --alpha-base: 0.55;
-}
-#statTable td:nth-child(2){
-  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-ad), var(--alpha-base)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(3){
-  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-hp), var(--alpha-base)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(4){
-  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-mana), var(--alpha-base)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(5){
-  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-armor), var(--alpha-base)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(6){
-  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-mr), calc(var(--alpha-base) + 0.05)) !important;
-  color:#fff !important;
-}
-#statTable td.a:nth-child(2){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-ad), var(--alpha-base)) !important; }
-#statTable td.a:nth-child(3){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-hp), var(--alpha-base)) !important; }
-#statTable td.a:nth-child(4){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-mana), var(--alpha-base)) !important; }
-#statTable td.a:nth-child(5){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-armor), var(--alpha-base)) !important; }
-#statTable td.a:nth-child(6){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-mr), calc(var(--alpha-base) + 0.05)) !important; }
-#statTable td.s:nth-child(2){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-ad), var(--alpha-base)) !important; }
-#statTable td.s:nth-child(3){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-hp), var(--alpha-base)) !important; }
-#statTable td.s:nth-child(4){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-mana), var(--alpha-base)) !important; }
-#statTable td.s:nth-child(5){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-armor), var(--alpha-base)) !important; }
-#statTable td.s:nth-child(6){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-mr), calc(var(--alpha-base) + 0.05)) !important; }
-#statTable td.c:nth-child(2){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-ad), var(--alpha-base)) !important; }
-#statTable td.c:nth-child(3){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-hp), var(--alpha-base)) !important; }
-#statTable td.c:nth-child(4){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-mana), var(--alpha-base)) !important; }
-#statTable td.c:nth-child(5){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-armor), var(--alpha-base)) !important; }
-#statTable td.c:nth-child(6){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-mr), calc(var(--alpha-base) + 0.05)) !important; }
-
-/* 3) Reduce colored pills by ~10% */
-.name-tag, .champ-pill, .lvl-pill{ font-size: 0.9em !important; }
-.name-tag, .champ-pill{ padding: 5px 12px !important; }
-.lvl-pill{ padding: 3px 7px !important; min-width: 28px !important; }
-</style>
-
-
-<style id="v28-overrides">
-/* ✅ Headers: keep normal layout + show tiny triangle row always visible */
-#statTable thead th { display: table-cell !important; vertical-align: middle !important; }
-#statTable thead th span[id^="ar-"]{
-  display:block !important;
-  font-size: 11px !important;
-  line-height: 1 !important;
-  margin-top: 2px !important;
+  margin-top: 12px !important; /* under header */
   text-align:center !important;
-  color: #fff !important;
-  font-weight: 900 !important;
   opacity: .95 !important;
   min-height: 12px !important;
 }
+#statTable thead th span[id^="ar-"]:empty::before{ content:"▼"; }
 
-/* ✅ Stronger 3D look + clearer separation for colored stat cells */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){
-  border: 1px solid rgba(255,255,255,0.10) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35) !important;
-}
-
-/* Shade strength by rank: higher rating => darker */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){ --shade: .14; --alpha: .60; }   /* mid */
-#statTable td.a:nth-child(2),
-#statTable td.a:nth-child(3),
-#statTable td.a:nth-child(4),
-#statTable td.a:nth-child(5),
-#statTable td.a:nth-child(6){ --shade: .24; --alpha: .62; }  /* top10 */
-#statTable td.s:nth-child(2),
-#statTable td.s:nth-child(3),
-#statTable td.s:nth-child(4),
-#statTable td.s:nth-child(5),
-#statTable td.s:nth-child(6){ --shade: .36; --alpha: .64; }  /* top3 */
-#statTable td.c:nth-child(2),
-#statTable td.c:nth-child(3),
-#statTable td.c:nth-child(4),
-#statTable td.c:nth-child(5),
-#statTable td.c:nth-child(6){ --shade: .08; --alpha: .56; }  /* bottom10 */
-
-/* 3D gradient layers: white sheen + dark shade + base color */
-#statTable td:nth-child(2){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-ad), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(3){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-hp), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(4){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-mana), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(5){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-armor), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(6){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-mr), calc(var(--alpha) + 0.04)) !important;
-  color:#fff !important;
-}
-
-/* ✅ Desktop ruler pills: force ruler to sit exactly under slider and align by px */
-@media (min-width: 769px){
-  #ruler{
-    position:absolute !important;
-    height: 34px !important;
-    pointer-events: auto;
-  }
-  #ruler .lvl-pill{
-    position:absolute !important;
-    transform: translateX(-50%) !important;
-  }
-}
-</style>
-
-<script id="v28-js">
-/* ✅ Fix PC level buttons alignment to slider thumb positions */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if (isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const ruler  = document.getElementById('ruler');
-  if (!slider || !ruler) return;
-
-  const min = Number(slider.min || 1);
-  const max = Number(slider.max || 15);
-
-  function layout(){
-    const parent = slider.parentElement;
-    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
-
-    const sRect = slider.getBoundingClientRect();
-    const pRect = parent.getBoundingClientRect();
-
-    // Place ruler directly under the slider
-    ruler.style.left = (sRect.left - pRect.left) + 'px';
-    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
-    ruler.style.width = sRect.width + 'px';
-
-    const thumb = 18; // good default for most browsers
-    const usable = Math.max(1, sRect.width - thumb);
-    const leftPad = thumb/2;
-
-    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
-      const v = Number(p.dataset.value);
-      if (isNaN(v)) return;
-      const pct = (v - min) / (max - min);
-      const x = leftPad + pct * usable;
-      p.style.left = x + 'px';
-    });
-  }
-
-  window.addEventListener('resize', layout);
-  setTimeout(layout, 0);
-  setTimeout(layout, 120);
-  setTimeout(layout, 300);
-})();
-
-/* ✅ Ensure triangles always visible under headers (no layout change) */
-(function(){
-  const keys = ['ad','hp','mana','armor','mrez'];
-  function update(key, dir){
-    keys.forEach(k=>{
-      const el = document.getElementById('ar-' + k);
-      if (!el) return;
-      el.textContent = '▾'; // default tiny triangle
-      el.style.opacity = '0.75';
-    });
-    const active = document.getElementById('ar-' + key);
-    if (active){
-      active.textContent = (dir === 'asc') ? '▲' : '▼';
-      active.style.opacity = '0.98';
-    }
-  }
-
-  // wrap doSort without changing existing behavior
-  const orig = window.doSort;
-  if (typeof orig === 'function'){
-    let curKey = 'ad';
-    let curDir = 'desc';
-    window.doSort = function(k){
-      if (k === curKey) curDir = (curDir === 'asc') ? 'desc' : 'asc';
-      else { curKey = k; curDir = 'desc'; }
-      const res = orig.apply(this, arguments);
-      setTimeout(()=>update(curKey, curDir), 0);
-      return res;
-    };
-    // initial paint
-    setTimeout(()=>update(curKey, curDir), 0);
-  } else {
-    // if doSort isn't global, still show default triangles
-    setTimeout(()=>update('ad','desc'), 0);
-  }
-})();
-</script>
-
-
-<style id="v29-overrides">
-/* 1) Arrow triangle: move ~10px down so it doesn't cover header text */
-#statTable thead th span[id^="ar-"]{
-  margin-top: 12px !important;
-}
-
-/* 2) Make ALL stat cells (AD/HP/MN/AR/MR) consistently 3D */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){
-  position: relative !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  border-bottom-color: rgba(0,0,0,0.55) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.20),
-    inset 0 -2px 0 rgba(0,0,0,0.45),
-    0 4px 10px rgba(0,0,0,0.18) !important;
-}
-
-/* 3D sheen (works with our layered backgrounds) */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){
-  background-blend-mode: overlay, normal, normal;
-}
-
-/* 3) Top 3%: glow + rim + sparkle highlight */
-#statTable td.s:nth-child(2),
-#statTable td.s:nth-child(3),
-#statTable td.s:nth-child(4),
-#statTable td.s:nth-child(5),
-#statTable td.s:nth-child(6){
-  outline: 1px solid rgba(255,255,255,0.22) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.26),
-    inset 0 -2px 0 rgba(0,0,0,0.55),
-    0 0 0 1px rgba(124,77,255,0.22),
-    0 6px 14px rgba(0,0,0,0.22) !important;
-}
-
-#statTable td.s:nth-child(2)::before,
-#statTable td.s:nth-child(3)::before,
-#statTable td.s:nth-child(4)::before,
-#statTable td.s:nth-child(5)::before,
-#statTable td.s:nth-child(6)::before{
-  content:"";
-  position:absolute;
-  left: 3px;
-  right: 3px;
-  top: 3px;
-  height: 40%;
-  border-radius: 10px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.18), rgba(255,255,255,0.00));
-  pointer-events:none;
-  opacity: .9;
-}
-
-/* 4) Support text panel: full width + 20% smaller panel & font */
-#support-panel-text{
-  width: 100% !important;
-  max-width: none !important;
-  box-sizing: border-box !important;
-  font-size: 11.2px !important;
-  padding: 9px 10px !important;
-  border-radius: 12px !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-}
-</style>
-
-
-<style id="v30-overrides">
-/* ===== 1) Universal "imba" rim + sparkle for all stat cells; rank controls darkness ===== */
-
-/* Stat cells */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){
-  position: relative !important;
-  overflow: hidden; /* keep sparkle inside */
-  /* rank-driven vars (defaults = mid) */
-  --shade: 0.14;          /* higher = darker */
-  --alpha: 0.62;          /* base color strength */
-  --rimA: 0.10;           /* rim opacity */
-  --sparkA: 0.14;         /* sparkle opacity */
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  border-bottom-color: rgba(0,0,0,0.55) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.20),
-    inset 0 -2px 0 rgba(0,0,0,0.48),
-    0 4px 10px rgba(0,0,0,0.18) !important;
-}
-
-/* Rank variants: s(top3) darkest + strongest rim, a(top10) medium, c(bottom10) lightest */
-#statTable td.s:nth-child(2),
-#statTable td.s:nth-child(3),
-#statTable td.s:nth-child(4),
-#statTable td.s:nth-child(5),
-#statTable td.s:nth-child(6){
-  --shade: 0.34;
-  --alpha: 0.66;
-  --rimA: 0.22;
-  --sparkA: 0.20;
-}
-#statTable td.a:nth-child(2),
-#statTable td.a:nth-child(3),
-#statTable td.a:nth-child(4),
-#statTable td.a:nth-child(5),
-#statTable td.a:nth-child(6){
-  --shade: 0.22;
-  --alpha: 0.64;
-  --rimA: 0.16;
-  --sparkA: 0.17;
-}
-#statTable td.c:nth-child(2),
-#statTable td.c:nth-child(3),
-#statTable td.c:nth-child(4),
-#statTable td.c:nth-child(5),
-#statTable td.c:nth-child(6){
-  --shade: 0.08;
-  --alpha: 0.58;
-  --rimA: 0.08;
-  --sparkA: 0.12;
-}
-
-/* Rim for all (strength via --rimA) */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){
-  outline: 1px solid rgba(255,255,255,var(--rimA)) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.22),
-    inset 0 -2px 0 rgba(0,0,0,0.50),
-    0 0 0 1px rgba(124,77,255, calc(var(--rimA) * 0.8)),
-    0 6px 14px rgba(0,0,0,0.22) !important;
-}
-
-/* Sparkle highlight for all (strength via --sparkA) */
-#statTable td:nth-child(2)::before,
-#statTable td:nth-child(3)::before,
-#statTable td:nth-child(4)::before,
-#statTable td:nth-child(5)::before,
-#statTable td:nth-child(6)::before{
-  content:"";
-  position:absolute;
-  left: 3px;
-  right: 3px;
-  top: 3px;
-  height: 42%;
-  border-radius: 10px;
-  background: linear-gradient(to bottom, rgba(255,255,255,var(--sparkA)), rgba(255,255,255,0.00));
-  pointer-events:none;
-}
-
-/* Rebuild 3-layer background with rank-driven shade for each column */
-#statTable td:nth-child(2){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-ad), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(3){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-hp), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(4){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-mana), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(5){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-armor), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(6){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-mr), calc(var(--alpha) + 0.04)) !important;
-  color:#fff !important;
-}
-
-/* ===== 2) Mobile +/- buttons for level control ===== */
+/* ===== Mobile +/- buttons: right side, not covering slider ===== */
 @media (max-width: 768px){
   .lvl-stepper{
+    position: relative;
+    top: 25px;
     display: inline-flex;
     gap: 8px;
     align-items: center;
     margin-left: 10px;
+    margin-right: 0;
   }
   .lvl-stepper button{
-    appearance: none;
+    appearance:none;
     border: 1px solid rgba(255,255,255,0.18);
     background: rgba(124,77,255,0.95);
     color: #fff;
@@ -2438,14 +1465,115 @@ window.hideT = function() {
     font-weight: 900;
     line-height: 1;
   }
-  .lvl-stepper button:active{
-    transform: scale(1.06);
-  }
+  .lvl-stepper button:active{ transform: scale(1.06); }
+}
+
+/* ===== Stronger rank separation (darker = higher) + 3D for all stat cells ===== */
+#statTable td:nth-child(2),
+#statTable td:nth-child(3),
+#statTable td:nth-child(4),
+#statTable td:nth-child(5),
+#statTable td:nth-child(6){
+  position: relative !important;
+  overflow: hidden;
+  --shade: 0.20;     /* mid */
+  --alpha: 0.62;
+  --rimA: 0.10;
+  --sparkA: 0.14;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-bottom-color: rgba(0,0,0,0.60) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.20),
+    inset 0 -2px 0 rgba(0,0,0,0.52),
+    0 6px 14px rgba(0,0,0,0.20) !important;
+  outline: 1px solid rgba(255,255,255,var(--rimA)) !important;
+}
+/* Top10 */
+#statTable td.a:nth-child(2),
+#statTable td.a:nth-child(3),
+#statTable td.a:nth-child(4),
+#statTable td.a:nth-child(5),
+#statTable td.a:nth-child(6){
+  --shade: 0.38;
+  --rimA: 0.18;
+  --sparkA: 0.18;
+}
+/* Top3 */
+#statTable td.s:nth-child(2),
+#statTable td.s:nth-child(3),
+#statTable td.s:nth-child(4),
+#statTable td.s:nth-child(5),
+#statTable td.s:nth-child(6){
+  --shade: 0.62;
+  --rimA: 0.26;
+  --sparkA: 0.22;
+}
+/* Bottom10 */
+#statTable td.c:nth-child(2),
+#statTable td.c:nth-child(3),
+#statTable td.c:nth-child(4),
+#statTable td.c:nth-child(5),
+#statTable td.c:nth-child(6){
+  --shade: 0.08;
+  --rimA: 0.08;
+  --sparkA: 0.12;
+}
+
+/* Rim + sparkle for all */
+#statTable td:nth-child(2)::before,
+#statTable td:nth-child(3)::before,
+#statTable td:nth-child(4)::before,
+#statTable td:nth-child(5)::before,
+#statTable td:nth-child(6)::before{
+  content:"";
+  position:absolute;
+  left: 3px; right: 3px; top: 3px;
+  height: 44%;
+  border-radius: 10px;
+  background: linear-gradient(to bottom, rgba(255,255,255,var(--sparkA)), rgba(255,255,255,0.00));
+  pointer-events:none;
+}
+
+/* Background layers per column */
+#statTable td:nth-child(2){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-ad), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(3){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-hp), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(4){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-mana), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(5){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-armor), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(6){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-mr), calc(var(--alpha) + 0.04)) !important;
+  color:#fff !important;
 }
 </style>
 
-<script id="v30-js">
-/* 3) Fix duplicate PC level buttons: rebuild ruler once (removes extra 15) */
+<script id="v33-js">
+/* ===== Desktop ruler: rebuild exactly once and align to slider thumb ===== */
 (function(){
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
   if (isMobile) return;
@@ -2454,25 +1582,54 @@ window.hideT = function() {
   const ruler  = document.getElementById('ruler');
   if(!slider || !ruler) return;
 
-  const min = Number(slider.min || 1);
-  const max = Number(slider.max || 15);
+  // hard rebuild once
+  const min0 = Number(slider.min || 1);
+  const max0 = Number(slider.max || 15);
+  const min = Math.min(min0, max0);
+  const max = Math.max(min0, max0);
 
-  // Clear everything and rebuild exactly 1..15
   ruler.innerHTML = '';
   for(let i=min;i<=max;i++){
     const span = document.createElement('span');
     span.className = 'lvl-pill';
     span.dataset.value = String(i);
     span.textContent = String(i);
-    span.onclick = () => {
+    span.addEventListener('click', ()=>{
       slider.value = String(i);
       slider.dispatchEvent(new Event('input', { bubbles:true }));
-    };
+    });
     ruler.appendChild(span);
   }
+
+  function layout(){
+    const parent = slider.parentElement;
+    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+
+    const sRect = slider.getBoundingClientRect();
+    const pRect = parent.getBoundingClientRect();
+
+    ruler.style.left = (sRect.left - pRect.left) + 'px';
+    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
+    ruler.style.width = sRect.width + 'px';
+
+    const thumb = 18;
+    const usable = Math.max(1, sRect.width - thumb);
+    const leftPad = thumb/2;
+
+    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
+      const v = Number(p.dataset.value);
+      const pct = (v - min) / (max - min);
+      p.style.left = (leftPad + pct * usable) + 'px';
+    });
+  }
+
+  window.addEventListener('resize', layout);
+  setTimeout(layout, 0);
+  setTimeout(layout, 150);
+  setTimeout(layout, 350);
 })();
 
-/* Mobile +/- buttons */
+/* ===== Mobile +/- buttons: keep on the right (after slider), not overlapping ===== */
 (function(){
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
   if(!isMobile) return;
@@ -2480,7 +1637,6 @@ window.hideT = function() {
   const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
   if(!slider) return;
 
-  // avoid duplicates
   if (document.querySelector('.lvl-stepper')) return;
 
   const wrap = document.createElement('div');
@@ -2501,291 +1657,13 @@ window.hideT = function() {
     slider.value = String(v);
     slider.dispatchEvent(new Event('input', { bubbles:true }));
   }
-
   minus.addEventListener('click', ()=>step(-1));
   plus.addEventListener('click', ()=>step(1));
 
   wrap.appendChild(minus);
   wrap.appendChild(plus);
 
-  // place next to slider
-  slider.insertAdjacentElement('afterend', wrap);
-})();
-</script>
-
-
-<style id="v31-overrides">
-/* 1) Desktop: hide any stray lvl-pill not inside #ruler (prevents duplicate 15 overlays) */
-@media (min-width: 769px){
-  .lvl-pill{ display:none; }
-  #ruler .lvl-pill{ display:inline-flex !important; }
-}
-
-/* 2) Desktop: center champion names, keep X pinned left */
-@media (min-width: 769px){
-  .champ-cell{
-    justify-content: flex-start !important;
-  }
-  .champ-cell .name-tag,
-  .champ-cell .champ-pill{
-    flex: 1 1 auto !important;
-    text-align: center !important;
-  }
-}
-
-/* 3) Make higher rating noticeably darker (keep 3D) */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){
-  --shade: 0.18 !important;   /* mid */
-}
-#statTable td.a:nth-child(2),
-#statTable td.a:nth-child(3),
-#statTable td.a:nth-child(4),
-#statTable td.a:nth-child(5),
-#statTable td.a:nth-child(6){
-  --shade: 0.32 !important;   /* top10 */
-}
-#statTable td.s:nth-child(2),
-#statTable td.s:nth-child(3),
-#statTable td.s:nth-child(4),
-#statTable td.s:nth-child(5),
-#statTable td.s:nth-child(6){
-  --shade: 0.48 !important;   /* top3 */
-}
-#statTable td.c:nth-child(2),
-#statTable td.c:nth-child(3),
-#statTable td.c:nth-child(4),
-#statTable td.c:nth-child(5),
-#statTable td.c:nth-child(6){
-  --shade: 0.10 !important;   /* bottom10 */
-}
-
-/* 4) Mobile: move +/- down by 25px */
-@media (max-width: 768px){
-  .lvl-stepper{
-    position: relative;
-    top: 25px;
-  }
-}
-</style>
-
-<script id="v31-js">
-/* Desktop: rebuild ruler ONCE and align pills to slider thumb positions (px-perfect) */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if (isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const ruler  = document.getElementById('ruler');
-  if(!slider || !ruler) return;
-
-  // Guard: avoid multiple rebuilds from older scripts
-  if (ruler.dataset.v31Built === '1') return;
-  ruler.dataset.v31Built = '1';
-
-  const min = Number(slider.min || 1);
-  const max = Number(slider.max || 15);
-
-  // Clear and rebuild exactly once
-  ruler.innerHTML = '';
-  for(let i=min;i<=max;i++){
-    const span = document.createElement('span');
-    span.className = 'lvl-pill';
-    span.dataset.value = String(i);
-    span.textContent = String(i);
-    span.addEventListener('click', ()=>{
-      slider.value = String(i);
-      slider.dispatchEvent(new Event('input', { bubbles:true }));
-    });
-    ruler.appendChild(span);
-  }
-
-  function layout(){
-    // Put ruler under slider and same width
-    const parent = slider.parentElement;
-    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
-
-    const sRect = slider.getBoundingClientRect();
-    const pRect = parent.getBoundingClientRect();
-
-    ruler.style.position = 'absolute';
-    ruler.style.left = (sRect.left - pRect.left) + 'px';
-    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
-    ruler.style.width = sRect.width + 'px';
-    ruler.style.height = '34px';
-
-    // Better thumb estimate by font-size (keeps close across browsers)
-    const thumb = 18;
-    const usable = Math.max(1, sRect.width - thumb);
-    const leftPad = thumb/2;
-
-    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
-      const v = Number(p.dataset.value);
-      if(isNaN(v)) return;
-      const pct = (v - min) / (max - min);
-      const x = leftPad + pct * usable;
-      p.style.left = x + 'px';
-    });
-  }
-
-  window.addEventListener('resize', layout);
-  setTimeout(layout, 0);
-  setTimeout(layout, 120);
-  setTimeout(layout, 300);
-})();
-</script>
-
-
-<style id="v32-overrides">
-/* ===== Fix duplicate/reversed ruler pills visual stacking ===== */
-@media (min-width: 769px){
-  #ruler{ overflow: visible !important; }
-  #ruler .lvl-pill{ z-index: 1; }
-}
-
-/* ===== Center champion names on desktop; keep X pinned left ===== */
-@media (min-width: 769px){
-  .champ-cell{ display:flex !important; align-items:center !important; }
-  .champ-cell .x-btn, .champ-cell .btn-x, .champ-cell .remove-btn, .champ-cell .xbtn{
-    margin-right: 8px !important;
-  }
-  .champ-cell .name-tag, .champ-cell .champ-pill{
-    margin-left: auto !important;
-    margin-right: auto !important;
-    text-align: center !important;
-  }
-}
-
-/* ===== Make rank darkness differences more noticeable ===== */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){
-  --shade: 0.18 !important;   /* mid */
-}
-#statTable td.a:nth-child(2),
-#statTable td.a:nth-child(3),
-#statTable td.a:nth-child(4),
-#statTable td.a:nth-child(5),
-#statTable td.a:nth-child(6){
-  --shade: 0.35 !important;   /* top10 */
-}
-#statTable td.s:nth-child(2),
-#statTable td.s:nth-child(3),
-#statTable td.s:nth-child(4),
-#statTable td.s:nth-child(5),
-#statTable td.s:nth-child(6){
-  --shade: 0.55 !important;   /* top3 */
-}
-#statTable td.c:nth-child(2),
-#statTable td.c:nth-child(3),
-#statTable td.c:nth-child(4),
-#statTable td.c:nth-child(5),
-#statTable td.c:nth-child(6){
-  --shade: 0.06 !important;   /* bottom10 */
-}
-
-/* ===== Mobile: move +/- to the LEFT side of slider ===== */
-@media (max-width: 768px){
-  .lvl-stepper{
-    margin-left: 0 !important;
-    margin-right: 10px !important;
-    top: 25px; /* keep your down offset */
-  }
-}
-</style>
-
-<script id="v32-js">
-/* ===== Desktop: rebuild ruler deterministically (fix '15 over 1' and duplicates) ===== */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if (isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const ruler  = document.getElementById('ruler');
-  if(!slider || !ruler) return;
-
-  // Hard reset: clear, then rebuild 1..15 once, and keep it that way
-  const min0 = Number(slider.min || 1);
-  const max0 = Number(slider.max || 15);
-  const min = Math.min(min0, max0);
-  const max = Math.max(min0, max0);
-
-  function rebuild(){
-    ruler.innerHTML = '';
-    for(let i=min;i<=max;i++){
-      const span = document.createElement('span');
-      span.className = 'lvl-pill';
-      span.dataset.value = String(i);
-      span.textContent = String(i);
-      span.addEventListener('click', ()=>{
-        slider.value = String(i);
-        slider.dispatchEvent(new Event('input', { bubbles:true }));
-      });
-      ruler.appendChild(span);
-    }
-  }
-
-  rebuild();
-
-  function layout(){
-    const parent = slider.parentElement;
-    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
-
-    const sRect = slider.getBoundingClientRect();
-    const pRect = parent.getBoundingClientRect();
-
-    ruler.style.position = 'absolute';
-    ruler.style.left = (sRect.left - pRect.left) + 'px';
-    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
-    ruler.style.width = sRect.width + 'px';
-    ruler.style.height = '34px';
-
-    const thumb = 18;
-    const usable = Math.max(1, sRect.width - thumb);
-    const leftPad = thumb/2;
-
-    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
-      const v = Number(p.dataset.value);
-      const pct = (v - min) / (max - min);
-      const x = leftPad + pct * usable;
-      p.style.left = x + 'px';
-    });
-  }
-
-  // If any other old script tries to append pills later, delete extras
-  const obs = new MutationObserver(() => {
-    const pills = ruler.querySelectorAll('.lvl-pill');
-    if (pills.length !== (max-min+1)) rebuild();
-    layout();
-  });
-  obs.observe(ruler, {childList:true});
-
-  window.addEventListener('resize', layout);
-  setTimeout(layout, 0);
-  setTimeout(layout, 200);
-  setTimeout(layout, 500);
-})();
-
-/* ===== Mobile: place +/- BEFORE slider (left side) ===== */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  if(!slider) return;
-
-  const stepper = document.querySelector('.lvl-stepper');
-  if(!stepper) return;
-
-  // Move to left of slider
-  if (slider.previousElementSibling !== stepper){
-    slider.insertAdjacentElement('beforebegin', stepper);
-  }
+  slider.insertAdjacentElement('afterend', wrap); /* right side */
 })();
 </script>
 
