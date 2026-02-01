@@ -1832,8 +1832,8 @@ html, body { overflow-y: auto !important; }
   block.id = 'support-panel-text';
   block.innerHTML = `
 Ребята, сайт абсолютно бесплатен для всех.<br><br>
-(Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
-В планах: добавить характеристики HP реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)
+Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
+В планах: добавить характеристики HP реген, winrate/pickrate, мана реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)
   `.trim();
   btn.insertAdjacentElement('afterend', block);
 })();
@@ -2327,65 +2327,38 @@ html, body { overflow-y: auto !important; }
 #nickname{
   position: relative;
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: 14px;
-  color: #fff !important;
+  padding: 0;               /* no card/pill — only text */
+  border-radius: 0;
   text-decoration: none;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-  text-shadow:
-    0 0 10px rgba(124,77,255,0.98),
-    0 0 28px rgba(124,77,255,0.70),
-    0 0 60px rgba(70,190,255,0.45);
-  box-shadow:
-    0 0 16px rgba(124,77,255,0.55),
-    0 0 44px rgba(124,77,255,0.25);
-  overflow: hidden;
-  animation: nickPulse 2.1s ease-in-out infinite;
+  font-weight: 900;
+  letter-spacing: 0.3px;
+
+  /* animated gradient INSIDE the text */
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.95),
+    rgba(124,77,255,1),
+    rgba(70,190,255,1),
+    rgba(124,77,255,1),
+    rgba(255,255,255,0.95)
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* subtle glow around the letters (not a box) */
+  filter: drop-shadow(0 0 8px rgba(124,77,255,0.65))
+          drop-shadow(0 0 18px rgba(70,190,255,0.35));
+
+  animation: nickTextFlow 1.6s linear infinite;
 }
-@keyframes nickPulse{
-  0%,100%{ transform: translateZ(0) scale(1); }
-  50%{ transform: translateZ(0) scale(1.08); }
+
+@keyframes nickTextFlow{
+  0%{ background-position: 0% 50%; }
+  100%{ background-position: 100% 50%; }
 }
-#nickname::before{
-  content:"";
-  position:absolute;
-  inset:-140%;
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent,
-      rgba(255,255,255,0.88),
-      transparent,
-      rgba(124,77,255,1),
-      transparent,
-      rgba(70,190,255,0.85),
-      transparent
-    );
-  animation: nickRotate 2.9s linear infinite;
-  mix-blend-mode: screen;
-  pointer-events:none;
-}
-@keyframes nickRotate{ to{ transform: rotate(360deg); } }
-#nickname::after{
-  content:"";
-  position:absolute;
-  top:-45%;
-  left:-80%;
-  width: 75%;
-  height: 200%;
-  background: linear-gradient(110deg, transparent, rgba(255,255,255,0.40), transparent);
-  transform: rotate(10deg);
-  animation: nickShine 1.35s ease-in-out infinite;
-  pointer-events:none;
-}
-@keyframes nickShine{
-  0%{ transform: translateX(0) rotate(10deg); opacity:0; }
-  18%{ opacity:1; }
-  55%{ transform: translateX(280%) rotate(10deg); opacity:1; }
-  78%{ opacity:0; }
-  100%{ transform: translateX(280%) rotate(10deg); opacity:0; }
-}
+
 #nickname:active{ transform: scale(0.96); }
 
 /* ===== Triangles UNDER headers (mobile + desktop) ===== */
