@@ -1692,5 +1692,123 @@ window.hideT = function() {
 })();
 </script>
 
+
+<style id="v24-overrides">
+/* Remove any stray bottom support text blocks (if they exist visually) */
+#support-text { display:none !important; }
+
+/* Support panel text should look like a boxed note under the button */
+#support-panel-text{
+  margin-top: 10px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(124,77,255,0.12);
+  max-width: 560px;
+}
+
+/* Make stat colors more contrast, keep numbers white */
+:root{
+  --col-ad:    255,140,0;    /* orange */
+  --col-hp:    0,180,85;     /* greener */
+  --col-mana:  70,135,255;   /* blue */
+  --col-armor: 170,105,55;   /* brown */
+  --col-mr:    35,65,170;    /* dark blue */
+}
+#statTable td:nth-child(2){ background: rgba(var(--col-ad),   .44); color:#fff !important; }
+#statTable td:nth-child(3){ background: rgba(var(--col-hp),   .44); color:#fff !important; }
+#statTable td:nth-child(4){ background: rgba(var(--col-mana), .44); color:#fff !important; }
+#statTable td:nth-child(5){ background: rgba(var(--col-armor),.44); color:#fff !important; }
+#statTable td:nth-child(6){ background: rgba(var(--col-mr),   .48); color:#fff !important; }
+
+/* Top10% (a) a bit stronger */
+#statTable td.a:nth-child(2){ background: rgba(var(--col-ad),   .52); }
+#statTable td.a:nth-child(3){ background: rgba(var(--col-hp),   .52); }
+#statTable td.a:nth-child(4){ background: rgba(var(--col-mana), .52); }
+#statTable td.a:nth-child(5){ background: rgba(var(--col-armor),.52); }
+#statTable td.a:nth-child(6){ background: rgba(var(--col-mr),   .56); }
+
+/* Top3% (s) bright with subtle white overlay */
+#statTable td.s:nth-child(2){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-ad),   .60); }
+#statTable td.s:nth-child(3){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-hp),   .60); }
+#statTable td.s:nth-child(4){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-mana), .60); }
+#statTable td.s:nth-child(5){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-armor),.60); }
+#statTable td.s:nth-child(6){ background: linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.08)), rgba(var(--col-mr),   .64); }
+
+/* Bottom10% (c) slightly dimmer background only */
+#statTable td.c:nth-child(2){ background: rgba(var(--col-ad),   .38); }
+#statTable td.c:nth-child(3){ background: rgba(var(--col-hp),   .38); }
+#statTable td.c:nth-child(4){ background: rgba(var(--col-mana), .38); }
+#statTable td.c:nth-child(5){ background: rgba(var(--col-armor),.38); }
+#statTable td.c:nth-child(6){ background: rgba(var(--col-mr),   .42); }
+
+/* Desktop ruler pills remain in #ruler; improve visual alignment container */
+@media (min-width: 769px){
+  #ruler{
+    position: relative !important;
+    height: 34px;
+  }
+  #ruler .lvl-pill{
+    top: 0 !important;
+  }
+}
+</style>
+
+<script id="v24-js">
+/* 1) Remove the very bottom stray text if present */
+(function(){
+  const stray = document.getElementById('support-text');
+  if (stray) stray.remove();
+})();
+
+/* 2) Align desktop ruler pills to the real slider thumb positions */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const ruler = document.getElementById('ruler');
+  if (!slider || !ruler) return;
+
+  const min = Number(slider.min || 1);
+  const max = Number(slider.max || 15);
+
+  function layout(){
+    const sw = slider.clientWidth;
+    // approximate thumb size (works with most browsers)
+    const thumb = 18;
+    const usable = Math.max(1, sw - thumb);
+    const leftPad = thumb/2;
+
+    // Make ruler match slider width
+    ruler.style.width = sw + 'px';
+
+    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
+      const v = Number(p.dataset.value);
+      if (isNaN(v)) return;
+      const pct = (v - min) / (max - min);
+      const px = leftPad + pct * usable;
+      p.style.left = px + 'px';
+    });
+  }
+
+  window.addEventListener('resize', layout);
+  // run after layout
+  setTimeout(layout, 0);
+  setTimeout(layout, 150);
+})();
+
+/* 3) Ensure support text is inside the support panel under the button */
+(function(){
+  const btn = document.querySelector('.btn-support');
+  const block = document.getElementById('support-panel-text');
+  if (!btn || !block) return;
+  // If block got detached somehow, reinsert right after the button
+  if (btn.nextElementSibling !== block) {
+    btn.insertAdjacentElement('afterend', block);
+  }
+})();
+</script>
+
 </body>
 </html>
