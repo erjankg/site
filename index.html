@@ -2513,5 +2513,130 @@ window.hideT = function() {
 })();
 </script>
 
+
+<style id="v31-overrides">
+/* 1) Desktop: hide any stray lvl-pill not inside #ruler (prevents duplicate 15 overlays) */
+@media (min-width: 769px){
+  .lvl-pill{ display:none; }
+  #ruler .lvl-pill{ display:inline-flex !important; }
+}
+
+/* 2) Desktop: center champion names, keep X pinned left */
+@media (min-width: 769px){
+  .champ-cell{
+    justify-content: flex-start !important;
+  }
+  .champ-cell .name-tag,
+  .champ-cell .champ-pill{
+    flex: 1 1 auto !important;
+    text-align: center !important;
+  }
+}
+
+/* 3) Make higher rating noticeably darker (keep 3D) */
+#statTable td:nth-child(2),
+#statTable td:nth-child(3),
+#statTable td:nth-child(4),
+#statTable td:nth-child(5),
+#statTable td:nth-child(6){
+  --shade: 0.18 !important;   /* mid */
+}
+#statTable td.a:nth-child(2),
+#statTable td.a:nth-child(3),
+#statTable td.a:nth-child(4),
+#statTable td.a:nth-child(5),
+#statTable td.a:nth-child(6){
+  --shade: 0.32 !important;   /* top10 */
+}
+#statTable td.s:nth-child(2),
+#statTable td.s:nth-child(3),
+#statTable td.s:nth-child(4),
+#statTable td.s:nth-child(5),
+#statTable td.s:nth-child(6){
+  --shade: 0.48 !important;   /* top3 */
+}
+#statTable td.c:nth-child(2),
+#statTable td.c:nth-child(3),
+#statTable td.c:nth-child(4),
+#statTable td.c:nth-child(5),
+#statTable td.c:nth-child(6){
+  --shade: 0.10 !important;   /* bottom10 */
+}
+
+/* 4) Mobile: move +/- down by 25px */
+@media (max-width: 768px){
+  .lvl-stepper{
+    position: relative;
+    top: 25px;
+  }
+}
+</style>
+
+<script id="v31-js">
+/* Desktop: rebuild ruler ONCE and align pills to slider thumb positions (px-perfect) */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const ruler  = document.getElementById('ruler');
+  if(!slider || !ruler) return;
+
+  // Guard: avoid multiple rebuilds from older scripts
+  if (ruler.dataset.v31Built === '1') return;
+  ruler.dataset.v31Built = '1';
+
+  const min = Number(slider.min || 1);
+  const max = Number(slider.max || 15);
+
+  // Clear and rebuild exactly once
+  ruler.innerHTML = '';
+  for(let i=min;i<=max;i++){
+    const span = document.createElement('span');
+    span.className = 'lvl-pill';
+    span.dataset.value = String(i);
+    span.textContent = String(i);
+    span.addEventListener('click', ()=>{
+      slider.value = String(i);
+      slider.dispatchEvent(new Event('input', { bubbles:true }));
+    });
+    ruler.appendChild(span);
+  }
+
+  function layout(){
+    // Put ruler under slider and same width
+    const parent = slider.parentElement;
+    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+
+    const sRect = slider.getBoundingClientRect();
+    const pRect = parent.getBoundingClientRect();
+
+    ruler.style.position = 'absolute';
+    ruler.style.left = (sRect.left - pRect.left) + 'px';
+    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
+    ruler.style.width = sRect.width + 'px';
+    ruler.style.height = '34px';
+
+    // Better thumb estimate by font-size (keeps close across browsers)
+    const thumb = 18;
+    const usable = Math.max(1, sRect.width - thumb);
+    const leftPad = thumb/2;
+
+    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
+      const v = Number(p.dataset.value);
+      if(isNaN(v)) return;
+      const pct = (v - min) / (max - min);
+      const x = leftPad + pct * usable;
+      p.style.left = x + 'px';
+    });
+  }
+
+  window.addEventListener('resize', layout);
+  setTimeout(layout, 0);
+  setTimeout(layout, 120);
+  setTimeout(layout, 300);
+})();
+</script>
+
 </body>
 </html>
