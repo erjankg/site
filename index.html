@@ -1832,8 +1832,8 @@ html, body { overflow-y: auto !important; }
   block.id = 'support-panel-text';
   block.innerHTML = `
 Ребята, сайт абсолютно бесплатен для всех.<br><br>
-(Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
-В планах: добавить характеристики HP реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)
+Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
+В планах: добавить характеристики HP реген, winrate/pickrate, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности))
   `.trim();
   btn.insertAdjacentElement('afterend', block);
 })();
@@ -2163,6 +2163,160 @@ html, body { overflow-y: auto !important; }
 
   if (slider.nextElementSibling !== stepper){
     slider.insertAdjacentElement('afterend', stepper);
+  }
+})();
+</script>
+
+
+<style id="v38-overrides">
+/* ===================== */
+/* 1) Mobile +/- FORCE RIGHT (same row as slider) */
+/* ===================== */
+@media (max-width: 768px){
+  .lvl-stepper{
+    position: static !important;
+    margin-left: 12px !important;
+    margin-right: 0 !important;
+  }
+  .lvl-range-wrap,
+  .level-wrap,
+  .lvl-wrap{
+    display:flex !important;
+    align-items:center !important;
+  }
+}
+
+/* ===================== */
+/* 2) Restore rating arrows under headers */
+/* ===================== */
+#statTable thead th span[id^="ar-"]{
+  display:block !important;
+  font-size: 11px !important;
+  margin-top: 10px !important;
+  opacity: 0.9 !important;
+}
+#statTable thead th span[id^="ar-"]:empty::before{
+  content:"▼";
+}
+
+/* ===================== */
+/* 3) GOD-TIER animation for nickname */
+/* ===================== */
+.nick-btn, .btn-nick, .user-nick, .nickname{
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  animation: v38Pulse 2.4s ease-in-out infinite;
+  box-shadow:
+    0 0 0 rgba(124,77,255,0.0),
+    0 0 0 rgba(124,77,255,0.0);
+}
+
+@keyframes v38Pulse{
+  0%{
+    box-shadow:
+      0 0 0 rgba(124,77,255,0.0),
+      0 0 0 rgba(124,77,255,0.0);
+  }
+  50%{
+    box-shadow:
+      0 0 18px rgba(124,77,255,0.65),
+      0 0 42px rgba(124,77,255,0.35);
+  }
+  100%{
+    box-shadow:
+      0 0 0 rgba(124,77,255,0.0),
+      0 0 0 rgba(124,77,255,0.0);
+  }
+}
+
+.nick-btn::before,
+.btn-nick::before,
+.user-nick::before,
+.nickname::before{
+  content:"";
+  position:absolute;
+  inset:-120%;
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent,
+      rgba(255,255,255,0.9),
+      transparent,
+      rgba(124,77,255,0.9),
+      transparent
+    );
+  animation: v38Rotate 3.2s linear infinite;
+  mix-blend-mode: screen;
+  z-index: -1;
+}
+
+@keyframes v38Rotate{
+  to{ transform: rotate(360deg); }
+}
+
+.nick-btn::after,
+.btn-nick::after,
+.user-nick::after,
+.nickname::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      120deg,
+      rgba(255,255,255,0.35),
+      transparent 40%,
+      transparent 60%,
+      rgba(255,255,255,0.25)
+    );
+  animation: v38Sweep 1.8s ease-in-out infinite;
+}
+
+@keyframes v38Sweep{
+  0%{ transform: translateX(-120%); opacity:0; }
+  30%{ opacity:1; }
+  60%{ transform: translateX(120%); opacity:1; }
+  100%{ transform: translateX(120%); opacity:0; }
+}
+</style>
+
+<script id="v38-js">
+/* Ensure mobile +/- is AFTER slider (right side) */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const stepper = document.querySelector('.lvl-stepper');
+  if(!slider || !stepper) return;
+  if (slider.nextElementSibling !== stepper){
+    slider.insertAdjacentElement('afterend', stepper);
+  }
+})();
+
+/* Force rating arrows visible after sort */
+(function(){
+  const keys = ['ad','hp','mana','armor','mrez'];
+  function paint(active, dir){
+    keys.forEach(k=>{
+      const el = document.getElementById('ar-'+k);
+      if(el){
+        el.textContent = (k===active ? (dir==='asc'?'▲':'▼') : '▼');
+      }
+    });
+  }
+  const orig = window.doSort;
+  if(typeof orig === 'function'){
+    let cur='ad', dir='desc';
+    window.doSort = function(k){
+      if(k===cur) dir = dir==='asc'?'desc':'asc';
+      else { cur=k; dir='desc'; }
+      const r = orig.apply(this, arguments);
+      setTimeout(()=>paint(cur,dir),0);
+      return r;
+    };
+    setTimeout(()=>paint(cur,dir),0);
   }
 })();
 </script>
