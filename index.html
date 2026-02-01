@@ -2469,5 +2469,51 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 })();
 </script>
 
+
+<style id="v43-arrows-mobile">
+/* FORCE rating arrows visible on MOBILE */
+@media (max-width:768px){
+  #statTable thead th{
+    display: table-cell !important;
+    vertical-align: middle !important;
+  }
+  #statTable thead th span[id^="ar-"]{
+    display:block !important;
+    visibility: visible !important;
+    opacity: 0.95 !important;
+    font-size: 10px !important;
+    margin-top: 4px !important;
+    line-height: 1 !important;
+    min-height: 12px !important;
+  }
+}
+</style>
+
+<script id="v43-arrows-js">
+/* Keep arrows under headers on mobile after any render */
+(function(){
+  const keys=['ad','hp','mana','armor','mrez'];
+  function paint(active,dir){
+    keys.forEach(k=>{
+      const el=document.getElementById('ar-'+k);
+      if(!el) return;
+      el.textContent = (k===active)?(dir==='asc'?'▲':'▼'):'▼';
+    });
+  }
+  const orig=window.doSort;
+  if(typeof orig==='function'){
+    let cur='ad',dir='desc';
+    window.doSort=function(k){
+      if(k===cur) dir=(dir==='asc')?'desc':'asc';
+      else{cur=k;dir='desc';}
+      const r=orig.apply(this,arguments);
+      setTimeout(()=>paint(cur,dir),0);
+      return r;
+    };
+    setTimeout(()=>paint(cur,dir),0);
+  }
+})();
+</script>
+
 </body>
 </html>
