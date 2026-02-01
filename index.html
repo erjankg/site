@@ -983,7 +983,7 @@ html, body{ overflow-x: hidden !important; }
 
 <div class="app-wrapper">
     <header>
-        <div class="logo">ERjanKG STATS</div>
+        <div class="logo"><a id="nickname" href="#" aria-label="ERjanKG">ERjanKG</a> STATS</div>
         <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">🎮 TWITCH</a>
     </header>
 
@@ -1831,11 +1831,9 @@ html, body { overflow-y: auto !important; }
   const block = document.createElement('div');
   block.id = 'support-panel-text';
   block.innerHTML = `
-Ребята, сайт абсолютно бесплатен для всех.
-
-Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.
-
-В планах: добавить характеристики HP реген, winrate/pickrate, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности))
+Ребята, сайт абсолютно бесплатен для всех.<br><br>
+(Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
+В планах: добавить характеристики HP реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)
   `.trim();
   btn.insertAdjacentElement('afterend', block);
 })();
@@ -2324,25 +2322,73 @@ html, body { overflow-y: auto !important; }
 </script>
 
 
-<style id="v39-overrides">
-/* ===== Mobile +/- ALWAYS on the RIGHT of slider, same row ===== */
-@media (max-width: 768px){
-  .lvl-stepper{
-    position: static !important;
-    margin-left: 12px !important;
-    margin-right: 0 !important;
-    top: 0 !important;
-  }
-  /* make sure slider row can hold both */
-  #lvlRange{ flex: 1 1 auto !important; }
-  .lvl-row, .lvl-range-wrap, .level-wrap, .lvl-wrap, .lvl-range-row{
-    display:flex !important;
-    align-items:center !important;
-    gap: 10px !important;
-  }
+<style id="v41-overrides">
+/* ===== Nick animation (ONLY ERjanKG in header) ===== */
+#nickname{
+  position: relative;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 14px;
+  color: #fff !important;
+  text-decoration: none;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-shadow:
+    0 0 10px rgba(124,77,255,0.98),
+    0 0 28px rgba(124,77,255,0.70),
+    0 0 60px rgba(70,190,255,0.45);
+  box-shadow:
+    0 0 16px rgba(124,77,255,0.55),
+    0 0 44px rgba(124,77,255,0.25);
+  overflow: hidden;
+  animation: nickPulse 2.1s ease-in-out infinite;
 }
+@keyframes nickPulse{
+  0%,100%{ transform: translateZ(0) scale(1); }
+  50%{ transform: translateZ(0) scale(1.08); }
+}
+#nickname::before{
+  content:"";
+  position:absolute;
+  inset:-140%;
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent,
+      rgba(255,255,255,0.88),
+      transparent,
+      rgba(124,77,255,1),
+      transparent,
+      rgba(70,190,255,0.85),
+      transparent
+    );
+  animation: nickRotate 2.9s linear infinite;
+  mix-blend-mode: screen;
+  pointer-events:none;
+}
+@keyframes nickRotate{ to{ transform: rotate(360deg); } }
+#nickname::after{
+  content:"";
+  position:absolute;
+  top:-45%;
+  left:-80%;
+  width: 75%;
+  height: 200%;
+  background: linear-gradient(110deg, transparent, rgba(255,255,255,0.40), transparent);
+  transform: rotate(10deg);
+  animation: nickShine 1.35s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes nickShine{
+  0%{ transform: translateX(0) rotate(10deg); opacity:0; }
+  18%{ opacity:1; }
+  55%{ transform: translateX(280%) rotate(10deg); opacity:1; }
+  78%{ opacity:0; }
+  100%{ transform: translateX(280%) rotate(10deg); opacity:0; }
+}
+#nickname:active{ transform: scale(0.96); }
 
-/* ===== Triangles under AD/HP/MANA/ARMOR/MR headers ===== */
+/* ===== Triangles UNDER headers (mobile + desktop) ===== */
 #statTable thead th span[id^="ar-"]{
   display:block !important;
   font-size: 11px !important;
@@ -2354,84 +2400,39 @@ html, body { overflow-y: auto !important; }
 }
 #statTable thead th span[id^="ar-"]:empty::before{ content:"▼"; }
 
-/* ===== ERjanKG GOD MODE (class-based, safe) ===== */
-.erjankg-hype{
-  position: relative !important;
-  overflow: hidden;
-  border-radius: 16px;
-  color:#fff !important;
-  text-shadow:
-    0 0 10px rgba(124,77,255,0.95),
-    0 0 26px rgba(124,77,255,0.65),
-    0 0 46px rgba(70,190,255,0.35);
-  animation: erjankgPulse 2.2s ease-in-out infinite;
-  box-shadow:
-    0 0 18px rgba(124,77,255,0.55),
-    0 0 48px rgba(124,77,255,0.25);
+/* ===== Mobile +/- on the RIGHT of slider, same row ===== */
+@media (max-width: 768px){
+  .slider-wrapper{
+    display:flex !important;
+    align-items:center !important;
+    gap: 10px !important;
+  }
+  #lvlRange{ flex: 1 1 auto !important; }
+  .lvl-stepper{
+    display:inline-flex !important;
+    gap: 8px !important;
+    align-items:center !important;
+    margin-left: 0 !important;
+  }
+  .lvl-stepper button{
+    appearance:none;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(124,77,255,0.95);
+    color: #fff;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .lvl-stepper button:active{ transform: scale(1.06); }
 }
-@keyframes erjankgPulse{
-  0%,100%{ transform: translateZ(0) scale(1); }
-  50%{ transform: translateZ(0) scale(1.06); }
-}
-.erjankg-hype::before{
-  content:"";
-  position:absolute;
-  inset:-120%;
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent,
-      rgba(255,255,255,0.85),
-      transparent,
-      rgba(124,77,255,0.95),
-      transparent,
-      rgba(70,190,255,0.70),
-      transparent
-    );
-  animation: erjankgRotate 3.2s linear infinite;
-  mix-blend-mode: screen;
-  pointer-events:none;
-  z-index: 0;
-}
-@keyframes erjankgRotate{ to{ transform: rotate(360deg); } }
-.erjankg-hype::after{
-  content:"";
-  position:absolute;
-  top:-45%;
-  left:-80%;
-  width: 70%;
-  height: 190%;
-  background: linear-gradient(110deg, transparent, rgba(255,255,255,0.35), transparent);
-  transform: rotate(10deg);
-  animation: erjankgShine 1.6s ease-in-out infinite;
-  pointer-events:none;
-  z-index: 1;
-}
-@keyframes erjankgShine{
-  0%{ transform: translateX(0) rotate(10deg); opacity:0; }
-  20%{ opacity:1; }
-  55%{ transform: translateX(260%) rotate(10deg); opacity:1; }
-  75%{ opacity:0; }
-  100%{ transform: translateX(260%) rotate(10deg); opacity:0; }
-}
-/* keep text above effects */
-.erjankg-hype > *{ position: relative; z-index: 2; }
 </style>
 
-<script id="v39-js">
-/* ===== Ensure mobile +/- is AFTER slider (right side) ===== */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const stepper = document.querySelector('.lvl-stepper');
-  if(!slider || !stepper) return;
-  if (slider.nextElementSibling !== stepper){
-    slider.insertAdjacentElement('afterend', stepper);
-  }
-})();
+<script id="v41-js">
+// prevent nickname link jump
+document.getElementById('nickname')?.addEventListener('click', e => e.preventDefault());
 
-/* ===== Keep header arrows always visible and synced with sorting ===== */
+/* Keep rating arrows alive + update on sort */
 (function(){
   const keys = ['ad','hp','mana','armor','mrez'];
   function paint(active, dir){
@@ -2457,15 +2458,41 @@ html, body { overflow-y: auto !important; }
   }
 })();
 
-/* ===== Apply ERjanKG hype to the actual nickname element ===== */
+/* Create +/- on mobile and place AFTER slider (right side) */
 (function(){
-  const targetText = 'ERjanKG';
-  // Find first element that exactly matches the nickname (button/a/div/span)
-  const candidates = Array.from(document.querySelectorAll('button, a, span, div'))
-    .filter(el => (el.textContent || '').trim() === targetText);
-  if (!candidates.length) return;
-  const el = candidates[0];
-  el.classList.add('erjankg-hype');
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+
+  const slider = document.getElementById('lvlRange');
+  if(!slider) return;
+
+  // ensure stepper exists once
+  let stepper = document.querySelector('.lvl-stepper');
+  if(!stepper){
+    stepper = document.createElement('div');
+    stepper.className = 'lvl-stepper';
+    const minus = document.createElement('button');
+    minus.type='button'; minus.textContent='−';
+    const plus = document.createElement('button');
+    plus.type='button'; plus.textContent='+';
+
+    function step(delta){
+      const min = Number(slider.min||1), max = Number(slider.max||15);
+      const v = Math.min(max, Math.max(min, Number(slider.value)+delta));
+      slider.value = String(v);
+      slider.dispatchEvent(new Event('input', {bubbles:true}));
+    }
+    minus.addEventListener('click', ()=>step(-1));
+    plus.addEventListener('click', ()=>step(1));
+
+    stepper.appendChild(minus);
+    stepper.appendChild(plus);
+  }
+
+  // Place it right after slider (same row due to CSS flex)
+  if (slider.nextElementSibling !== stepper){
+    slider.insertAdjacentElement('afterend', stepper);
+  }
 })();
 </script>
 
