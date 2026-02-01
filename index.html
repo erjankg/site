@@ -743,6 +743,84 @@ html, body{ overflow-x: hidden !important; }
 }
 
 
+
+
+/* ===========================
+   v15 mobile fit + champ column fix
+   =========================== */
+
+/* Remove the "divider" look inside Champs column */
+#statTable th:first-child,
+#statTable td:first-child{
+  border-right: none !important;
+}
+
+/* Stronger column-focus dim (20%) */
+#statTable.focus-mode td:not(:first-child):not(.active-col){
+  opacity: 0.80 !important; /* 20% dim */
+}
+#statTable td.active-col{ opacity: 1 !important; }
+
+/* MOBILE: make Champs wider, stats narrower (still no horizontal scroll) */
+@media (max-width: 768px){
+  #statTable th:first-child, #statTable td:first-child{ width: 55% !important; }
+  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 9% !important; }
+
+  /* Smaller header text + no clipping */
+  #statTable th{ padding: 7px 1px !important; font-size: 10px !important; }
+
+  /* Abbreviate stat headers on mobile to avoid clipping (keeps layout stable) */
+  #statTable th:not(:first-child){
+    color: transparent !important; /* hide original text */
+    position: relative;
+  }
+  #statTable th:not(:first-child)::after{
+    content: attr(data-short);
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-weight: 900;
+    font-size: 10px;
+    pointer-events: none;
+  }
+
+  /* Champ name: show full name (wrap if needed), no clamp/ellipsis */
+  .champ-cell{ gap: 6px !important; }
+  .champ-cell .name-tag{
+    display: block !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.1 !important;
+    padding: 6px 8px !important;
+  }
+
+  /* Slightly bigger Champs button */
+  .btn-champ-cfg{
+    font-size: 12px !important;
+    padding: 8px 14px !important;
+    border-radius: 12px !important;
+  }
+
+  /* Slider thinner (~15%) */
+  input[type="range"]{ height: 3.4px !important; }
+}
+
+/* DESKTOP: tighten Champs column so it doesn't look half-empty */
+@media (min-width: 769px){
+  #statTable th:first-child, #statTable td:first-child{ width: 26% !important; }
+  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 14.8% !important; }
+
+  /* Bigger Champs button on PC too */
+  .btn-champ-cfg{
+    font-size: 13px !important;
+    padding: 9px 16px !important;
+    border-radius: 12px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -775,11 +853,11 @@ html, body{ overflow-x: hidden !important; }
                     <th>
                         <button class="btn-champ-cfg" onclick="openM()">Champs</button>
                     </th>
-                    <th onclick="doSort('ad')">AD<span id="ar-ad"></span></th>
-                    <th onclick="doSort('hp')">HP<span id="ar-hp"></span></th>
-                    <th onclick="doSort('mana')">MANA<span id="ar-mana"></span></th>
-                    <th onclick="doSort('armor')">ARMOR<span id="ar-armor"></span></th>
-                    <th onclick="doSort('mrez')">MREZ<span id="ar-mrez"></span></th>
+                    <th data-short="AD" onclick="doSort('ad')">AD<span id="ar-ad"></span></th>
+                    <th data-short="HP" onclick="doSort('hp')">HP<span id="ar-hp"></span></th>
+                    <th data-short="MN" onclick="doSort('mana')">MANA<span id="ar-mana"></span></th>
+                    <th data-short="AR" onclick="doSort('armor')">ARMOR<span id="ar-armor"></span></th>
+                    <th data-short="MR" onclick="doSort('mrez')">MREZ<span id="ar-mrez"></span></th>
                 </tr>
             </thead>
             <tbody id="statBody"></tbody>
