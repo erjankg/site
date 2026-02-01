@@ -2295,5 +2295,223 @@ window.hideT = function() {
 }
 </style>
 
+
+<style id="v30-overrides">
+/* ===== 1) Universal "imba" rim + sparkle for all stat cells; rank controls darkness ===== */
+
+/* Stat cells */
+#statTable td:nth-child(2),
+#statTable td:nth-child(3),
+#statTable td:nth-child(4),
+#statTable td:nth-child(5),
+#statTable td:nth-child(6){
+  position: relative !important;
+  overflow: hidden; /* keep sparkle inside */
+  /* rank-driven vars (defaults = mid) */
+  --shade: 0.14;          /* higher = darker */
+  --alpha: 0.62;          /* base color strength */
+  --rimA: 0.10;           /* rim opacity */
+  --sparkA: 0.14;         /* sparkle opacity */
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-bottom-color: rgba(0,0,0,0.55) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.20),
+    inset 0 -2px 0 rgba(0,0,0,0.48),
+    0 4px 10px rgba(0,0,0,0.18) !important;
+}
+
+/* Rank variants: s(top3) darkest + strongest rim, a(top10) medium, c(bottom10) lightest */
+#statTable td.s:nth-child(2),
+#statTable td.s:nth-child(3),
+#statTable td.s:nth-child(4),
+#statTable td.s:nth-child(5),
+#statTable td.s:nth-child(6){
+  --shade: 0.34;
+  --alpha: 0.66;
+  --rimA: 0.22;
+  --sparkA: 0.20;
+}
+#statTable td.a:nth-child(2),
+#statTable td.a:nth-child(3),
+#statTable td.a:nth-child(4),
+#statTable td.a:nth-child(5),
+#statTable td.a:nth-child(6){
+  --shade: 0.22;
+  --alpha: 0.64;
+  --rimA: 0.16;
+  --sparkA: 0.17;
+}
+#statTable td.c:nth-child(2),
+#statTable td.c:nth-child(3),
+#statTable td.c:nth-child(4),
+#statTable td.c:nth-child(5),
+#statTable td.c:nth-child(6){
+  --shade: 0.08;
+  --alpha: 0.58;
+  --rimA: 0.08;
+  --sparkA: 0.12;
+}
+
+/* Rim for all (strength via --rimA) */
+#statTable td:nth-child(2),
+#statTable td:nth-child(3),
+#statTable td:nth-child(4),
+#statTable td:nth-child(5),
+#statTable td:nth-child(6){
+  outline: 1px solid rgba(255,255,255,var(--rimA)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    inset 0 -2px 0 rgba(0,0,0,0.50),
+    0 0 0 1px rgba(124,77,255, calc(var(--rimA) * 0.8)),
+    0 6px 14px rgba(0,0,0,0.22) !important;
+}
+
+/* Sparkle highlight for all (strength via --sparkA) */
+#statTable td:nth-child(2)::before,
+#statTable td:nth-child(3)::before,
+#statTable td:nth-child(4)::before,
+#statTable td:nth-child(5)::before,
+#statTable td:nth-child(6)::before{
+  content:"";
+  position:absolute;
+  left: 3px;
+  right: 3px;
+  top: 3px;
+  height: 42%;
+  border-radius: 10px;
+  background: linear-gradient(to bottom, rgba(255,255,255,var(--sparkA)), rgba(255,255,255,0.00));
+  pointer-events:none;
+}
+
+/* Rebuild 3-layer background with rank-driven shade for each column */
+#statTable td:nth-child(2){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-ad), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(3){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-hp), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(4){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-mana), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(5){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-armor), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(6){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-mr), calc(var(--alpha) + 0.04)) !important;
+  color:#fff !important;
+}
+
+/* ===== 2) Mobile +/- buttons for level control ===== */
+@media (max-width: 768px){
+  .lvl-stepper{
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    margin-left: 10px;
+  }
+  .lvl-stepper button{
+    appearance: none;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(124,77,255,0.95);
+    color: #fff;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .lvl-stepper button:active{
+    transform: scale(1.06);
+  }
+}
+</style>
+
+<script id="v30-js">
+/* 3) Fix duplicate PC level buttons: rebuild ruler once (removes extra 15) */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const ruler  = document.getElementById('ruler');
+  if(!slider || !ruler) return;
+
+  const min = Number(slider.min || 1);
+  const max = Number(slider.max || 15);
+
+  // Clear everything and rebuild exactly 1..15
+  ruler.innerHTML = '';
+  for(let i=min;i<=max;i++){
+    const span = document.createElement('span');
+    span.className = 'lvl-pill';
+    span.dataset.value = String(i);
+    span.textContent = String(i);
+    span.onclick = () => {
+      slider.value = String(i);
+      slider.dispatchEvent(new Event('input', { bubbles:true }));
+    };
+    ruler.appendChild(span);
+  }
+})();
+
+/* Mobile +/- buttons */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  if(!slider) return;
+
+  // avoid duplicates
+  if (document.querySelector('.lvl-stepper')) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'lvl-stepper';
+
+  const minus = document.createElement('button');
+  minus.type = 'button';
+  minus.textContent = '−';
+
+  const plus = document.createElement('button');
+  plus.type = 'button';
+  plus.textContent = '+';
+
+  function step(delta){
+    const min = Number(slider.min || 1);
+    const max = Number(slider.max || 15);
+    const v = Math.min(max, Math.max(min, Number(slider.value) + delta));
+    slider.value = String(v);
+    slider.dispatchEvent(new Event('input', { bubbles:true }));
+  }
+
+  minus.addEventListener('click', ()=>step(-1));
+  plus.addEventListener('click', ()=>step(1));
+
+  wrap.appendChild(minus);
+  wrap.appendChild(plus);
+
+  // place next to slider
+  slider.insertAdjacentElement('afterend', wrap);
+})();
+</script>
+
 </body>
 </html>
