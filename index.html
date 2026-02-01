@@ -1889,5 +1889,204 @@ html, body { overflow-y: auto !important; }
 })();
 </script>
 
+
+<style id="v35-overrides">
+/* ===== Mobile: ensure champions table content is visible ===== */
+@media (max-width: 768px){
+  #statTable, #statTable thead, #statTable tbody, #statTable tr, #statTable td, #statTable th{
+    visibility: visible !important;
+  }
+  #statTable tbody{ display: table-row-group !important; }
+  #statTable td:first-child{ overflow: visible !important; }
+  .champ-cell{ overflow: visible !important; }
+}
+
+/* ===== Mobile +/-: mirror to LEFT side (no vertical move) ===== */
+@media (max-width: 768px){
+  .lvl-stepper{
+    top: 0 !important;             /* cancel earlier down shift */
+    margin-left: 0 !important;
+    margin-right: 10px !important; /* space between +/- and slider */
+  }
+}
+
+/* ===== Desktop: kill ANY duplicate lvl-pill not inside #ruler ===== */
+@media (min-width: 769px){
+  .lvl-pill{ display:none !important; }
+  #ruler .lvl-pill{ display:inline-flex !important; }
+}
+</style>
+
+<script id="v35-js">
+/* Mobile: place +/- to the LEFT of slider (mirror) */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  if(!slider) return;
+
+  const stepper = document.querySelector('.lvl-stepper');
+  if(!stepper) return;
+
+  // Put stepper immediately before slider
+  if (slider.previousElementSibling !== stepper){
+    slider.insertAdjacentElement('beforebegin', stepper);
+  }
+})();
+
+/* Desktop: remove duplicate 15 (and any duplicates) anywhere + ensure only 1..15 in #ruler */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(isMobile) return;
+
+  const ruler = document.getElementById('ruler');
+  if(!ruler) return;
+
+  function cleanRuler(){
+    const seen = new Set();
+    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
+      const v = p.dataset.value || p.textContent.trim();
+      if (seen.has(v)) p.remove();
+      else seen.add(v);
+    });
+  }
+
+  // Remove any lvl-pill elements not inside ruler
+  function cleanGlobal(){
+    document.querySelectorAll('.lvl-pill').forEach(p=>{
+      if (!ruler.contains(p)) p.remove();
+    });
+  }
+
+  cleanGlobal();
+  cleanRuler();
+
+  const obs = new MutationObserver(()=>{
+    cleanGlobal();
+    cleanRuler();
+  });
+  obs.observe(document.body, {childList:true, subtree:true});
+})();
+</script>
+
+
+<style id="v36-overrides">
+/* Mobile +/- should be on the RIGHT side, no vertical shift */
+@media (max-width: 768px){
+  .lvl-stepper{
+    top: 0 !important;
+    margin-left: 10px !important;
+    margin-right: 0 !important;
+  }
+}
+</style>
+
+<script id="v36-js">
+/* Mobile: move +/- to RIGHT (after slider) */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const stepper = document.querySelector('.lvl-stepper');
+  if(!slider || !stepper) return;
+  if (slider.nextElementSibling !== stepper){
+    slider.insertAdjacentElement('afterend', stepper);
+  }
+})();
+
+/* Desktop: enforce ruler pills = exactly 1..15 always (kills duplicate 15 that appears on load) */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const ruler  = document.getElementById('ruler');
+  if(!slider || !ruler) return;
+
+  const min0 = Number(slider.min || 1);
+  const max0 = Number(slider.max || 15);
+  const min = Math.min(min0, max0);
+  const max = Math.max(min0, max0);
+  const expectedCount = max - min + 1;
+
+  function rebuild(){
+    ruler.innerHTML = '';
+    for(let i=min;i<=max;i++){
+      const span = document.createElement('span');
+      span.className = 'lvl-pill';
+      span.dataset.value = String(i);
+      span.textContent = String(i);
+      span.addEventListener('click', ()=>{
+        slider.value = String(i);
+        slider.dispatchEvent(new Event('input', { bubbles:true }));
+      });
+      ruler.appendChild(span);
+    }
+  }
+
+  function layout(){
+    const parent = slider.parentElement;
+    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+
+    const sRect = slider.getBoundingClientRect();
+    const pRect = parent.getBoundingClientRect();
+
+    ruler.style.position = 'absolute';
+    ruler.style.left = (sRect.left - pRect.left) + 'px';
+    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
+    ruler.style.width = sRect.width + 'px';
+    ruler.style.height = '36px';
+
+    const thumb = 18;
+    const usable = Math.max(1, sRect.width - thumb);
+    const leftPad = thumb/2;
+
+    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
+      const v = Number(p.dataset.value);
+      if(!Number.isFinite(v)) return;
+      const pct = (v - min) / (max - min);
+      p.style.left = (leftPad + pct * usable) + 'px';
+    });
+  }
+
+  function enforce(){
+    // Remove any global pills not in ruler
+    document.querySelectorAll('.lvl-pill').forEach(p=>{
+      if (!ruler.contains(p)) p.remove();
+    });
+
+    const pills = Array.from(ruler.querySelectorAll('.lvl-pill'));
+
+    // Validate: correct count, unique values, in range
+    const seen = new Set();
+    let ok = (pills.length === expectedCount);
+    for (const p of pills){
+      const v = Number(p.dataset.value || p.textContent.trim());
+      if (!Number.isFinite(v) || v < min || v > max || seen.has(v)){
+        ok = false; break;
+      }
+      seen.add(v);
+    }
+
+    if (!ok) rebuild();
+    layout();
+  }
+
+  // Initial enforce after load
+  rebuild();
+  enforce();
+
+  // Keep enforcing during async data load (when duplicate 15 shows up)
+  const obs = new MutationObserver(enforce);
+  obs.observe(document.body, {childList:true, subtree:true});
+
+  window.addEventListener('resize', enforce);
+  setTimeout(enforce, 100);
+  setTimeout(enforce, 400);
+  setTimeout(enforce, 900);
+})();
+</script>
+
 </body>
 </html>
