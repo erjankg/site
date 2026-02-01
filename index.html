@@ -1831,8 +1831,10 @@ html, body { overflow-y: auto !important; }
   const block = document.createElement('div');
   block.id = 'support-panel-text';
   block.innerHTML = `
-Ребята, сайт абсолютно бесплатен для всех.<br><br>
-Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
+Ребята, сайт абсолютно бесплатен для всех.
+
+Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.
+
 В планах: добавить характеристики HP реген, winrate/pickrate, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности))
   `.trim();
   btn.insertAdjacentElement('afterend', block);
@@ -2318,6 +2320,152 @@ html, body { overflow-y: auto !important; }
     };
     setTimeout(()=>paint(cur,dir),0);
   }
+})();
+</script>
+
+
+<style id="v39-overrides">
+/* ===== Mobile +/- ALWAYS on the RIGHT of slider, same row ===== */
+@media (max-width: 768px){
+  .lvl-stepper{
+    position: static !important;
+    margin-left: 12px !important;
+    margin-right: 0 !important;
+    top: 0 !important;
+  }
+  /* make sure slider row can hold both */
+  #lvlRange{ flex: 1 1 auto !important; }
+  .lvl-row, .lvl-range-wrap, .level-wrap, .lvl-wrap, .lvl-range-row{
+    display:flex !important;
+    align-items:center !important;
+    gap: 10px !important;
+  }
+}
+
+/* ===== Triangles under AD/HP/MANA/ARMOR/MR headers ===== */
+#statTable thead th span[id^="ar-"]{
+  display:block !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+  margin-top: 10px !important;
+  text-align: center !important;
+  opacity: .92 !important;
+  min-height: 12px !important;
+}
+#statTable thead th span[id^="ar-"]:empty::before{ content:"▼"; }
+
+/* ===== ERjanKG GOD MODE (class-based, safe) ===== */
+.erjankg-hype{
+  position: relative !important;
+  overflow: hidden;
+  border-radius: 16px;
+  color:#fff !important;
+  text-shadow:
+    0 0 10px rgba(124,77,255,0.95),
+    0 0 26px rgba(124,77,255,0.65),
+    0 0 46px rgba(70,190,255,0.35);
+  animation: erjankgPulse 2.2s ease-in-out infinite;
+  box-shadow:
+    0 0 18px rgba(124,77,255,0.55),
+    0 0 48px rgba(124,77,255,0.25);
+}
+@keyframes erjankgPulse{
+  0%,100%{ transform: translateZ(0) scale(1); }
+  50%{ transform: translateZ(0) scale(1.06); }
+}
+.erjankg-hype::before{
+  content:"";
+  position:absolute;
+  inset:-120%;
+  background:
+    conic-gradient(
+      from 0deg,
+      transparent,
+      rgba(255,255,255,0.85),
+      transparent,
+      rgba(124,77,255,0.95),
+      transparent,
+      rgba(70,190,255,0.70),
+      transparent
+    );
+  animation: erjankgRotate 3.2s linear infinite;
+  mix-blend-mode: screen;
+  pointer-events:none;
+  z-index: 0;
+}
+@keyframes erjankgRotate{ to{ transform: rotate(360deg); } }
+.erjankg-hype::after{
+  content:"";
+  position:absolute;
+  top:-45%;
+  left:-80%;
+  width: 70%;
+  height: 190%;
+  background: linear-gradient(110deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: rotate(10deg);
+  animation: erjankgShine 1.6s ease-in-out infinite;
+  pointer-events:none;
+  z-index: 1;
+}
+@keyframes erjankgShine{
+  0%{ transform: translateX(0) rotate(10deg); opacity:0; }
+  20%{ opacity:1; }
+  55%{ transform: translateX(260%) rotate(10deg); opacity:1; }
+  75%{ opacity:0; }
+  100%{ transform: translateX(260%) rotate(10deg); opacity:0; }
+}
+/* keep text above effects */
+.erjankg-hype > *{ position: relative; z-index: 2; }
+</style>
+
+<script id="v39-js">
+/* ===== Ensure mobile +/- is AFTER slider (right side) ===== */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const stepper = document.querySelector('.lvl-stepper');
+  if(!slider || !stepper) return;
+  if (slider.nextElementSibling !== stepper){
+    slider.insertAdjacentElement('afterend', stepper);
+  }
+})();
+
+/* ===== Keep header arrows always visible and synced with sorting ===== */
+(function(){
+  const keys = ['ad','hp','mana','armor','mrez'];
+  function paint(active, dir){
+    keys.forEach(k=>{
+      const el = document.getElementById('ar-'+k);
+      if(!el) return;
+      el.textContent = (k === active) ? (dir === 'asc' ? '▲' : '▼') : '▼';
+    });
+  }
+  const orig = window.doSort;
+  if(typeof orig === 'function'){
+    let cur='ad', dir='desc';
+    window.doSort = function(k){
+      if(k===cur) dir = (dir==='asc') ? 'desc' : 'asc';
+      else { cur=k; dir='desc'; }
+      const r = orig.apply(this, arguments);
+      setTimeout(()=>paint(cur,dir),0);
+      return r;
+    };
+    setTimeout(()=>paint(cur,dir),0);
+  } else {
+    setTimeout(()=>paint('ad','desc'),0);
+  }
+})();
+
+/* ===== Apply ERjanKG hype to the actual nickname element ===== */
+(function(){
+  const targetText = 'ERjanKG';
+  // Find first element that exactly matches the nickname (button/a/div/span)
+  const candidates = Array.from(document.querySelectorAll('button, a, span, div'))
+    .filter(el => (el.textContent || '').trim() === targetText);
+  if (!candidates.length) return;
+  const el = candidates[0];
+  el.classList.add('erjankg-hype');
 })();
 </script>
 
