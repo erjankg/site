@@ -1810,5 +1810,127 @@ window.hideT = function() {
 })();
 </script>
 
+
+<style id="v25-overrides">
+/* Modal search: instant filtering on any input method */
+#mSearch { -webkit-text-size-adjust: 100%; }
+
+/* Support text box: full width on laptop/desktop */
+@media (min-width: 769px){
+  #support-panel-text{
+    max-width: none !important;
+    width: 100% !important;
+  }
+}
+
+/* Remove "white overlay" filters for top3: use pure contrast via alpha only */
+#statTable td.s:nth-child(2){ background: rgba(var(--col-ad),   .68) !important; }
+#statTable td.s:nth-child(3){ background: rgba(var(--col-hp),   .68) !important; }
+#statTable td.s:nth-child(4){ background: rgba(var(--col-mana), .68) !important; }
+#statTable td.s:nth-child(5){ background: rgba(var(--col-armor),.68) !important; }
+#statTable td.s:nth-child(6){ background: rgba(var(--col-mr),   .72) !important; }
+
+/* Make colors a bit more contrast overall (without clashing): bump base alphas slightly */
+#statTable td:nth-child(2){ background: rgba(var(--col-ad),   .50) !important; }
+#statTable td:nth-child(3){ background: rgba(var(--col-hp),   .50) !important; }
+#statTable td:nth-child(4){ background: rgba(var(--col-mana), .50) !important; }
+#statTable td:nth-child(5){ background: rgba(var(--col-armor),.50) !important; }
+#statTable td:nth-child(6){ background: rgba(var(--col-mr),   .54) !important; }
+#statTable td.a:nth-child(2){ background: rgba(var(--col-ad),   .58) !important; }
+#statTable td.a:nth-child(3){ background: rgba(var(--col-hp),   .58) !important; }
+#statTable td.a:nth-child(4){ background: rgba(var(--col-mana), .58) !important; }
+#statTable td.a:nth-child(5){ background: rgba(var(--col-armor),.58) !important; }
+#statTable td.a:nth-child(6){ background: rgba(var(--col-mr),   .62) !important; }
+#statTable td.c:nth-child(2){ background: rgba(var(--col-ad),   .44) !important; }
+#statTable td.c:nth-child(3){ background: rgba(var(--col-hp),   .44) !important; }
+#statTable td.c:nth-child(4){ background: rgba(var(--col-mana), .44) !important; }
+#statTable td.c:nth-child(5){ background: rgba(var(--col-armor),.44) !important; }
+#statTable td.c:nth-child(6){ background: rgba(var(--col-mr),   .48) !important; }
+
+/* Mobile: sort arrows under headers (triangle under text) */
+@media (max-width: 768px){
+  #statTable thead th:not(:first-child){
+    padding-top: 10px;
+    padding-bottom: 8px;
+    text-align: center;
+  }
+  #statTable thead th:not(:first-child){
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  #statTable thead th span[id^="ar-"]{
+    display:block !important;
+    font-size: 12px;
+    line-height: 1;
+    margin: 0;
+  }
+}
+</style>
+
+<script id="v25-js">
+/* 1) Modal search: update list instantly (input/keyup/change/composition) */
+(function(){
+  const inp = document.getElementById('mSearch');
+  if(!inp) return;
+  const fire = () => { try { drawM(); } catch(e){} };
+  ['input','keyup','change','compositionend'].forEach(ev=>inp.addEventListener(ev, fire));
+})();
+
+/* 2) Desktop ruler: make pills match slider thumb positions precisely */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const ruler  = document.getElementById('ruler');
+  if(!slider || !ruler) return;
+
+  const min = Number(slider.min || 1);
+  const max = Number(slider.max || 15);
+
+  function layout(){
+    // Ensure slider parent is positioning context
+    const parent = slider.parentElement;
+    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+
+    const sRect = slider.getBoundingClientRect();
+    const pRect = parent.getBoundingClientRect();
+
+    // Place ruler exactly under the slider and same width
+    ruler.style.position = 'absolute';
+    ruler.style.left = (sRect.left - pRect.left) + 'px';
+    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
+    ruler.style.width = sRect.width + 'px';
+    ruler.style.height = '34px';
+
+    // Thumb compensation (approx) for common browsers
+    const thumb = 18;
+    const usable = Math.max(1, sRect.width - thumb);
+    const leftPad = thumb/2;
+
+    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
+      const v = Number(p.dataset.value);
+      if(isNaN(v)) return;
+      const pct = (v - min) / (max - min);
+      const x = leftPad + pct * usable;
+      p.style.left = x + 'px';
+    });
+  }
+
+  window.addEventListener('resize', layout);
+  setTimeout(layout, 0);
+  setTimeout(layout, 120);
+  setTimeout(layout, 300);
+})();
+
+/* 3) Mobile: ensure header arrows show as triangles below (reuse existing arrow text) */
+(function(){
+  // nothing needed; CSS handles placement
+})();
+</script>
+
 </body>
 </html>
