@@ -226,8 +226,7 @@ overflow-y: auto;
 
     .x-btn{ width: 20px; height: 20px; border-radius: 7px; font-size: 14px; }
     .name-tag{ padding: 5px 6px; border-radius: 8px; font-size: 11px; }
-
-    }
+}
 
         th {
             background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
@@ -346,8 +345,6 @@ overflow-y: auto;
                 border-color: var(--accent);
             }
         }
-	        
-    
 
         .name-tag.pinned {
             background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
@@ -632,18 +629,69 @@ overflow-y: auto;
         }
     
 /* ===========================
-   FINAL TABLE FIXES (v12)
+   FINAL TABLE FIXES (v13)
    =========================== */
 
-/* Disable any row highlight on hover/active/focus WITHOUT killing colored stat cells */
-#statTable tbody tr:hover td,
-#statTable tbody tr:active td,
-#statTable tbody tr:focus td,
-#statTable tbody tr:focus-within td{
+/* 1) Убираем подсветку/затемнение при тапе/фокусе (не ломая цветные клетки) */
+#statTable, #statTable *{
+  -webkit-tap-highlight-color: transparent !important;
+}
+#statTable td, #statTable th{
+  outline: none !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+#statTable td:focus, #statTable th:focus,
+#statTable td:active, #statTable th:active{
+  outline: none !important;
   filter: none !important;
-  opacity: 1 !important;
   box-shadow: none !important;
-  /* Champ name: allow up to 2 lines so full name fits without horizontal scroll */
+  opacity: 1 !important;
+}
+
+/* 2) Таблица никогда не скроллится горизонтально */
+.table-hold{ overflow-x: hidden !important; }
+html, body{ overflow-x: hidden !important; }
+
+/* 3) Разные ширины для ПК и телефона (фикс не влияет друг на друга) */
+#statTable{
+  width: 100% !important;
+  table-layout: fixed !important; /* всегда влезает */
+}
+
+/* DESKTOP (ПК) */
+@media (min-width: 769px){
+  #statTable th:first-child, #statTable td:first-child{ width: 30% !important; }
+  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 14% !important; }
+
+  .btn-champ-cfg{
+    font-size: 12px !important;
+    padding: 8px 14px !important;
+    border-radius: 10px !important;
+  }
+
+  /* Champs cell fills — no "half empty" look */
+  .champ-cell{ gap: 10px; }
+  .name-tag{ font-size: 12px; padding: 7px 10px; }
+}
+
+/* MOBILE (телефон) */
+@media (max-width: 768px){
+  /* ширины колонок (влезает без скролла) */
+  #statTable th:first-child, #statTable td:first-child{ width: 42% !important; }
+  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 11.6% !important; }
+
+  /* чуть тоньше ползунок (~15%) */
+  input[type="range"]{ height: 3px !important; }
+
+  /* кнопка Champs чуть больше */
+  .btn-champ-cfg{
+    font-size: 11px !important;
+    padding: 7px 12px !important;
+    border-radius: 10px !important;
+  }
+
+  /* имя чемпа видно полностью насколько возможно: 2 строки, без ... */
   .champ-cell .name-tag{
     white-space: normal !important;
     overflow: hidden !important;
@@ -652,88 +700,48 @@ overflow-y: auto;
     -webkit-line-clamp: 2 !important;
     -webkit-box-orient: vertical !important;
     line-height: 1.05 !important;
+    padding: 6px 8px !important;
   }
-
 }
 
-/* Keep colored stat backgrounds intact on interactions */
-#statTable td.s, #statTable td.a, #statTable td.b, #statTable td.c,
-#statTable td.active-col{
-  filter: none !important;
-  opacity: 1 !important;
-}
-
-/* Champion column should look FULL, not half-empty */
-#statTable td:first-child{
-  padding-left: 8px !important;
-}
+/* 4) Champs cell: X + имя заполняют ширину без пустот */
 .champ-cell{
+  display: flex;
+  align-items: center;
   width: 100% !important;
+  max-width: 100% !important;
 }
 .champ-cell .name-tag{
   flex: 1 1 auto !important;
   min-width: 0 !important;
   width: 100% !important;
-  display: block !important;
-  /* fill the remaining space visually */
-}
-
-/* Make the pill fill the cell width */
-.champ-cell .name-tag{
   box-sizing: border-box !important;
 }
 
-/* Mobile: always fit to screen width, no horizontal scroll */
-.table-hold{
-  overflow-x: hidden !important;
+/* 5) Лёгкое затемнение только стат-столбцов при выборе (Champs не трогаем) */
+#statTable.focus-mode td:not(:first-child):not(.active-col){
+  opacity: 0.90; /* 10% затемнение */
 }
-#statTable{
-  width: 100% !important;
-  table-layout: fixed !important;
+#statTable td.active-col{
+  opacity: 1 !important;
 }
 
-/* Tighter spacing on mobile so everything fits */
-@media (max-width: 560px){
-  #statTable{
-    border-spacing: 4px !important;
-  }
-  #statTable th, #statTable td{
-    padding: 6px 2px !important;
-    font-size: 11px !important;
-  }
-  /* column widths sum to 100%: 38 + 5*12.4 */
-  #statTable th:first-child, #statTable td:first-child{ width: 38% !important; }
-  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 12.4% !important; }
-
-  .x-btn{
-    width: 22px !important;
-    height: 22px !important;
-    font-size: 14px !important;
-  }
-  .name-tag{
-    padding: 5px 6px !important;
-    font-size: 11px !important;
+/* 6) Убираем любые row-hover эффекты (только для мышки, и без изменения фона) */
+@media (hover: hover) and (pointer: fine){
+  #statTable tbody tr:hover td{
+    filter: none !important;
+    opacity: 1 !important;
   }
 }
 
-/* Remove tap highlight (this prevents the "row darkens on tap" feel) */
-#statTable, #statTable *{
-  -webkit-tap-highlight-color: transparent !important;
-}
-#statTable td, #statTable th{
-  outline: none !important;
-}
-#statTable td:focus, #statTable th:focus{
-  outline: none !important;
-}
-
-/* Modal role icons: same size, аккуратно */
+/* 7) Modal role icons: одинаковый размер, аккуратно */
 .m-role img{
   width: 42px !important;
   height: 42px !important;
   object-fit: contain !important;
   display: block !important;
 }
+
 
 </style>
 </head>
@@ -808,6 +816,7 @@ overflow-y: auto;
     let lvl = 10;
     let sK = 'ad';
     let sD = 'desc';
+    let colFocus = false; // dim other stat columns only after user selects a stat column
 
 
     const roleIcons = {
@@ -879,7 +888,7 @@ async function start() {
     function render() {
         const body = document.getElementById('statBody');
         const table = document.getElementById('statTable');
-        table.classList.add('focus-mode');
+        table.classList.toggle('focus-mode', colFocus);
 
         ['ad','hp','mana','armor','mrez'].forEach(k => {
             document.getElementById('ar-'+k).innerText = (k === sK) ? (sD === 'desc' ? '▼' : '▲') : '';
@@ -989,7 +998,8 @@ window.hideT = function() {
 }
 
     window.doSort = function(k) {
-        if(sK === k) sD = sD === 'desc' ? 'asc' : 'desc';
+        colFocus = true;
+        if (sK === k) sD = sD === 'desc' ? 'asc' : 'desc';
         else { sK = k; sD = 'desc'; }
         render();
     }
