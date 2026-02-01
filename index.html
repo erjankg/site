@@ -1038,7 +1038,7 @@ html, body{ overflow-x: hidden !important; }
 
 <script>
 (() => {
-    // ✅ Paste your published Google Sheet TSV/CSV URL here (File → Share → Publish to web)
+    // ✅ Paste your published Google Sheet TSV/CSV URL here (File → Share → Publish to web)123123
     // Example: const G_URL = 'https://docs.google.com/spreadsheets/d/e/.../pub?output=tsv';
     const G_URL = window.G_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
 
@@ -1408,6 +1408,102 @@ document.querySelectorAll('.lvl-pill').forEach(p=>{
     slider.dispatchEvent(new Event('change', {bubbles:true}));
   });
 });
+</script>
+
+
+<style id="v19-overrides">
+/* 1) Table must live on main page, no inner scroll containers */
+.table-panel, .panel, .card, .table-card, .table-wrap, .tableWrap {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+/* Ensure page scrolls, not inner panels */
+html, body {
+  overflow-y: auto !important;
+}
+
+/* 3) Mobile: reduce X button by 30% */
+@media (max-width: 768px) {
+  .btn-x, .remove-btn, .xbtn {
+    transform: scale(0.7);
+    transform-origin: center;
+  }
+}
+
+/* 2) Level pills sizing & interaction */
+@media (max-width: 768px) {
+  .lvl-pill {
+    transform: scale(0.33);
+    transition: transform .15s ease;
+  }
+  .lvl-pill:active {
+    transform: scale(0.36); /* +10% on tap */
+  }
+}
+
+/* Position level pills along slider width */
+.level-track {
+  position: relative;
+}
+.level-track .lvl-pill {
+  position: absolute;
+  top: 100%;
+  translate: -50% 0;
+}
+
+/* 5) Support & Twitch enhanced animations */
+.support-btn, .twitch-btn {
+  position: relative;
+  overflow: hidden;
+}
+.support-btn::after, .twitch-btn::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(circle at center, rgba(124,77,255,.45), transparent 60%);
+  animation: spinGlow 4s linear infinite;
+}
+@keyframes spinGlow {
+  to { transform: rotate(360deg); }
+}
+</style>
+
+<script id="v19-js">
+// 2) Align level pills to slider positions (non-destructive)
+(function(){
+  const slider = document.querySelector('input[type="range"]');
+  const pills = document.querySelectorAll('.lvl-pill');
+  if (!slider || !pills.length) return;
+  const min = Number(slider.min||1), max = Number(slider.max||15);
+  pills.forEach(p=>{
+    const v = Number(p.dataset.value);
+    if (isNaN(v)) return;
+    const pct = (v - min) / (max - min);
+    p.style.left = (pct * 100) + '%';
+    p.addEventListener('click', ()=>{
+      slider.value = v;
+      slider.dispatchEvent(new Event('input', {bubbles:true}));
+      slider.dispatchEvent(new Event('change', {bubbles:true}));
+    });
+  });
+})();
+
+// 4) Add support text block if missing
+(function(){
+  if (document.getElementById('support-text')) return;
+  const btn = document.querySelector('.support-btn');
+  if (!btn) return;
+  const p = document.createElement('p');
+  p.id = 'support-text';
+  p.style.marginTop = '8px';
+  p.style.opacity = '0.9';
+  p.innerHTML = `Ребята, сайт абсолютно бесплатен для всех.<br><br>
+  Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
+  В планах: добавить характеристики HP реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности`;
+  btn.parentElement.appendChild(p);
+})();
 </script>
 
 </body>
