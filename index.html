@@ -1667,5 +1667,227 @@ window.hideT = function() {
 })();
 </script>
 
+
+<style id="v34-overrides">
+/* ===== 0) Remove inner scroll "panel" behavior for table and page ===== */
+.table-hold, .tableHold, .table-panel, .table-wrap, .tableWrap {
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+html, body { overflow-y: auto !important; }
+
+/* ===== 1) Mobile table proportions: Champions 40%, others equal ===== */
+@media (max-width: 768px){
+  #statTable{ width:100% !important; table-layout: fixed !important; }
+  #statTable th:first-child, #statTable td:first-child{ width:40% !important; }
+  #statTable th:not(:first-child), #statTable td:not(:first-child){ width:12% !important; }
+}
+
+/* ===== 2) Restore stat colors on ALL devices ===== */
+:root{
+  --col-ad:    255,140,0;
+  --col-hp:    0,180,85;
+  --col-mana:  70,135,255;
+  --col-armor: 170,105,55;
+  --col-mr:    35,65,170;
+}
+
+/* Apply our 3D+rank system to stat columns */
+#statTable td:nth-child(2),
+#statTable td:nth-child(3),
+#statTable td:nth-child(4),
+#statTable td:nth-child(5),
+#statTable td:nth-child(6){
+  position: relative !important;
+  overflow: hidden;
+  --shade: 0.20;     /* mid */
+  --alpha: 0.62;
+  --rimA: 0.10;
+  --sparkA: 0.14;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-bottom-color: rgba(0,0,0,0.60) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.20),
+    inset 0 -2px 0 rgba(0,0,0,0.52),
+    0 6px 14px rgba(0,0,0,0.20) !important;
+  outline: 1px solid rgba(255,255,255,var(--rimA)) !important;
+}
+#statTable td.a:nth-child(2),
+#statTable td.a:nth-child(3),
+#statTable td.a:nth-child(4),
+#statTable td.a:nth-child(5),
+#statTable td.a:nth-child(6){
+  --shade: 0.38;
+  --rimA: 0.18;
+  --sparkA: 0.18;
+}
+#statTable td.s:nth-child(2),
+#statTable td.s:nth-child(3),
+#statTable td.s:nth-child(4),
+#statTable td.s:nth-child(5),
+#statTable td.s:nth-child(6){
+  --shade: 0.62;
+  --rimA: 0.26;
+  --sparkA: 0.22;
+}
+#statTable td.c:nth-child(2),
+#statTable td.c:nth-child(3),
+#statTable td.c:nth-child(4),
+#statTable td.c:nth-child(5),
+#statTable td.c:nth-child(6){
+  --shade: 0.08;
+  --rimA: 0.08;
+  --sparkA: 0.12;
+}
+#statTable td:nth-child(2)::before,
+#statTable td:nth-child(3)::before,
+#statTable td:nth-child(4)::before,
+#statTable td:nth-child(5)::before,
+#statTable td:nth-child(6)::before{
+  content:"";
+  position:absolute;
+  left: 3px; right: 3px; top: 3px;
+  height: 44%;
+  border-radius: 10px;
+  background: linear-gradient(to bottom, rgba(255,255,255,var(--sparkA)), rgba(255,255,255,0.00));
+  pointer-events:none;
+}
+#statTable td:nth-child(2){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-ad), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(3){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-hp), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(4){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-mana), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(5){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-armor), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(6){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-mr), calc(var(--alpha) + 0.04)) !important;
+  color:#fff !important;
+}
+
+/* ===== 3) Mobile: NO level pills (hide ruler entirely) ===== */
+@media (max-width: 768px){
+  #ruler{ display:none !important; }
+}
+
+/* ===== 4) Support text panel: full width, visible, boxed ===== */
+#support-panel-text{
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  margin-top: 14px !important;
+  padding: 9px 10px !important;
+  font-size: 11.2px !important;
+  line-height: 1.35 !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  background: rgba(124,77,255,0.12) !important;
+}
+
+/* ===== 5) Mobile +/- buttons: right side, below slider (no overlap) ===== */
+@media (max-width: 768px){
+  .lvl-stepper{
+    position: relative;
+    top: 25px;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    margin-left: 10px;
+    margin-right: 0;
+  }
+}
+</style>
+
+<script id="v34-js">
+/* Ensure support text exists under the support button */
+(function(){
+  if (document.getElementById('support-panel-text')) return;
+  const btn = document.querySelector('.btn-support') || document.querySelector('.support-btn');
+  if(!btn) return;
+  const block = document.createElement('div');
+  block.id = 'support-panel-text';
+  block.innerHTML = `
+Ребята, сайт абсолютно бесплатен для всех.<br><br>
+(Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
+В планах: добавить характеристики HP реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)
+  `.trim();
+  btn.insertAdjacentElement('afterend', block);
+})();
+
+/* Mobile: remove any ruler pills if some script created them */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+  const ruler = document.getElementById('ruler');
+  if (ruler) ruler.innerHTML = '';
+})();
+
+/* Mobile: ensure +/- exists and is placed to the RIGHT (after slider) */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  if(!slider) return;
+
+  // remove old stepper if it exists before slider (wrong placement)
+  const existing = document.querySelector('.lvl-stepper');
+  if (existing && slider.previousElementSibling === existing){
+    existing.remove();
+  }
+  if (document.querySelector('.lvl-stepper')) return;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'lvl-stepper';
+
+  const minus = document.createElement('button');
+  minus.type = 'button';
+  minus.textContent = '−';
+
+  const plus = document.createElement('button');
+  plus.type = 'button';
+  plus.textContent = '+';
+
+  function step(delta){
+    const min = Number(slider.min || 1);
+    const max = Number(slider.max || 15);
+    const v = Math.min(max, Math.max(min, Number(slider.value) + delta));
+    slider.value = String(v);
+    slider.dispatchEvent(new Event('input', { bubbles:true }));
+  }
+  minus.addEventListener('click', ()=>step(-1));
+  plus.addEventListener('click', ()=>step(1));
+
+  wrap.appendChild(minus);
+  wrap.appendChild(plus);
+
+  slider.insertAdjacentElement('afterend', wrap);
+})();
+</script>
+
 </body>
 </html>
