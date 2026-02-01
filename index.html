@@ -1361,244 +1361,181 @@ window.hideT = function() {
 })();
 </script>
 
-<style id="v18-overrides">
-@media (max-width: 768px) {
-  #statTable thead th {
+<style id="v21-overrides">
+/* 1) Main table scrolls with page, no inner scroll box */
+.table-hold{
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important; /* let page scroll */
+}
+
+/* Keep table full width */
+.table-hold, .app-wrapper{ width: 100% !important; }
+
+/* Sticky headers on mobile during page scroll */
+@media (max-width: 768px){
+  #statTable thead th{
     position: sticky;
     top: 0;
-    z-index: 5;
-    background: var(--panel, #1a1330);
-  }
-}
-.table-panel, .panel, .card, .table-card {
-  max-width: none !important;
-  width: 100% !important;
-}
-@media (max-width: 768px) {
-  #statTable th:first-child,
-  #statTable td:first-child { width: 40% !important; }
-  #statTable th:not(:first-child),
-  #statTable td:not(:first-child) { width: 12% !important; }
-}
-@media (max-width: 768px) {
-  .lvl-pill {
-    transform: scale(0.33);
-    transform-origin: top left;
-  }
-}
-.support-btn { animation: pulseGlow 2.5s infinite; }
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 rgba(124,77,255,0.0); }
-  50% { box-shadow: 0 0 18px rgba(124,77,255,0.6); }
-  100% { box-shadow: 0 0 0 rgba(124,77,255,0.0); }
-}
-</style>
-
-<script id="v18-js">
-document.querySelectorAll('.level-label, .lvl-label').forEach(el=>{
-  if (el.textContent.toLowerCase().includes('уров')) el.textContent = 'Champ lvl';
-});
-document.querySelectorAll('.lvl-pill').forEach(p=>{
-  p.addEventListener('click', ()=>{
-    const v = Number(p.dataset.value);
-    const slider = document.querySelector('input[type="range"]');
-    if (!slider || isNaN(v)) return;
-    slider.value = v;
-    slider.dispatchEvent(new Event('input', {bubbles:true}));
-    slider.dispatchEvent(new Event('change', {bubbles:true}));
-  });
-});
-</script>
-
-
-<style id="v19-overrides">
-/* 1) Table must live on main page, no inner scroll containers */
-.table-panel, .panel, .card, .table-card, .table-wrap, .tableWrap {
-  overflow: visible !important;
-  height: auto !important;
-  max-height: none !important;
-}
-
-/* Ensure page scrolls, not inner panels */
-html, body {
-  overflow-y: auto !important;
-}
-
-/* 3) Mobile: reduce X button by 30% */
-@media (max-width: 768px) {
-  .btn-x, .remove-btn, .xbtn {
-    transform: scale(0.7);
-    transform-origin: center;
+    z-index: 60;
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
   }
 }
 
-/* 2) Level pills sizing & interaction */
-@media (max-width: 768px) {
-  .lvl-pill {
-    transform: scale(0.33);
-    transition: transform .15s ease;
-  }
-  .lvl-pill:active {
-    transform: scale(0.36); /* +10% on tap */
-  }
+/* 3) Mobile proportions: Champs 40%, others equal */
+@media (max-width: 768px){
+  #statTable{ table-layout: fixed; width: 100% !important; }
+  #statTable th:first-child, #statTable td:first-child{ width: 40% !important; }
+  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 12% !important; }
 }
 
-/* Position level pills along slider width */
-.level-track {
-  position: relative;
-}
-.level-track .lvl-pill {
-  position: absolute;
-  top: 100%;
-  translate: -50% 0;
-}
-
-/* 5) Support & Twitch enhanced animations */
-.support-btn, .twitch-btn {
-  position: relative;
-  overflow: hidden;
-}
-.support-btn::after, .twitch-btn::after {
-  content: "";
-  position: absolute;
-  inset: -50%;
-  background: radial-gradient(circle at center, rgba(124,77,255,.45), transparent 60%);
-  animation: spinGlow 4s linear infinite;
-}
-@keyframes spinGlow {
-  to { transform: rotate(360deg); }
-}
-</style>
-
-<script id="v19-js">
-// 2) Align level pills to slider positions (non-destructive)
-(function(){
-  const slider = document.querySelector('input[type="range"]');
-  const pills = document.querySelectorAll('.lvl-pill');
-  if (!slider || !pills.length) return;
-  const min = Number(slider.min||1), max = Number(slider.max||15);
-  pills.forEach(p=>{
-    const v = Number(p.dataset.value);
-    if (isNaN(v)) return;
-    const pct = (v - min) / (max - min);
-    p.style.left = (pct * 100) + '%';
-    p.addEventListener('click', ()=>{
-      slider.value = v;
-      slider.dispatchEvent(new Event('input', {bubbles:true}));
-      slider.dispatchEvent(new Event('change', {bubbles:true}));
-    });
-  });
-})();
-
-// 4) Add support text block if missing
-(function(){
-  if (document.getElementById('support-text')) return;
-  const btn = document.querySelector('.support-btn');
-  if (!btn) return;
-  const p = document.createElement('p');
-  p.id = 'support-text';
-  p.style.marginTop = '8px';
-  p.style.opacity = '0.9';
-  p.innerHTML = `Ребята, сайт абсолютно бесплатен для всех.<br><br>
-  Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
-  В планах: добавить характеристики HP реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности`;
-  btn.parentElement.appendChild(p);
-})();
-</script>
-
-
-<style id="v20-overrides">
-/* 1) No inner scroll panels: page scroll only */
-html, body {
-  height: auto !important;
-  overflow-y: auto !important;
-}
-.panel, .card, .container, .wrapper, .table-panel, .table-wrap, .tableWrap, .table-card {
-  overflow: visible !important;
-  max-height: none !important;
-  height: auto !important;
-}
-
-/* 3) Mobile: reduce X button by 30% */
-@media (max-width: 768px) {
-  .btn-x, .remove-btn, .xbtn {
+/* 3) Mobile X smaller by 30% (use size, not scale) */
+@media (max-width: 768px){
+  .btn-x, .remove-btn, .xbtn{
     width: 24px !important;
     height: 24px !important;
     font-size: 12px !important;
+    border-radius: 8px !important;
   }
 }
 
-/* 2) Level pills: real size, +10% on tap */
-.level-track {
-  position: relative;
-  width: 100%;
+/* 2/4) Ruler buttons styling */
+#ruler{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 2px 0;
+  user-select: none;
 }
-.lvl-pill {
-  position: absolute;
-  top: 100%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: #7c4dff;
+.ruler-btn{
+  border: 0;
+  background: var(--accent);
   color: #fff;
-  transition: transform .15s ease;
+  border-radius: 999px;
+  padding: 4px 7px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .12s ease, filter .12s ease;
 }
-.lvl-pill:active {
-  transform: translateX(-50%) scale(1.1);
+.ruler-btn:active{
+  transform: scale(1.1); /* +10% */
+}
+.ruler-btn.is-active{
+  filter: brightness(1.15);
+  outline: 2px solid rgba(255,255,255,.35);
+  outline-offset: 1px;
 }
 
-/* 5) Strong animations for Support & Twitch */
-.support-btn, .twitch-btn {
+/* Mobile: make ruler pills 2x bigger than before but still fit */
+@media (max-width: 768px){
+  .ruler-btn{
+    padding: 5px 6px;
+    font-size: 12px;
+  }
+}
+
+/* 5) Support + Twitch "imba" animation: glow + shine sweep */
+.btn-support, .twitch-btn{
   position: relative;
   overflow: hidden;
 }
-.support-btn::before, .twitch-btn::before {
-  content: "";
-  position: absolute;
-  inset: -40%;
+.btn-support::before, .twitch-btn::before{
+  content:"";
+  position:absolute;
+  inset:-40%;
   background: radial-gradient(circle, rgba(124,77,255,.55), transparent 60%);
-  animation: glowSpin 4s linear infinite;
+  animation: v21GlowSpin 4s linear infinite;
+  pointer-events:none;
 }
-@keyframes glowSpin { to { transform: rotate(360deg); } }
+@keyframes v21GlowSpin{ to{ transform: rotate(360deg); } }
+
+.btn-support::after, .twitch-btn::after{
+  content:"";
+  position:absolute;
+  top:-30%;
+  left:-60%;
+  width: 45%;
+  height: 160%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.22), transparent);
+  transform: rotate(20deg);
+  animation: v21Shine 2.8s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes v21Shine{
+  0%{ left:-60%; opacity:0; }
+  15%{ opacity:1; }
+  45%{ left:120%; opacity:0; }
+  100%{ left:120%; opacity:0; }
+}
+
+/* Support text block */
+#support-text{
+  margin-top: 12px;
+  opacity: .9;
+  font-size: 14px;
+  line-height: 1.35;
+}
 </style>
 
-<script id="v20-js">
-// 2) Sync level pills to slider positions (non-destructive)
+<script id="v21-js">
 (function(){
-  const slider = document.querySelector('input[type="range"]');
-  const pills = document.querySelectorAll('.lvl-pill');
-  if (!slider || !pills.length) return;
-  const min = Number(slider.min||1), max = Number(slider.max||15);
-  pills.forEach(p=>{
-    const v = Number(p.dataset.value);
-    if (isNaN(v)) return;
-    const pct = (v - min) / (max - min);
-    p.style.left = (pct * 100) + '%';
-    p.addEventListener('click', ()=>{
-      slider.value = v;
-      slider.dispatchEvent(new Event('input', {bubbles:true}));
-      slider.dispatchEvent(new Event('change', {bubbles:true}));
-    });
-  });
-})();
+  // 6) Rename label to Champ lvl (covers RU/EN)
+  const lvlTitle = document.querySelector('.slider-title, .level-title, .lvl-title, .level-label');
+  if (lvlTitle) lvlTitle.textContent = 'Champ lvl';
 
-// 4) Add support text (if not exists)
-(function(){
-  if (document.getElementById('support-text')) return;
-  const btn = document.querySelector('.support-btn');
-  if (!btn) return;
-  const text = document.createElement('div');
-  text.id = 'support-text';
-  text.style.marginTop = '12px';
-  text.style.opacity = '0.9';
-  text.style.fontSize = '14px';
-  text.innerHTML = `Ребята, сайт абсолютно бесплатен для всех.<br><br>
-  Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
-  В планах: добавить характеристики HP реген, особый столбец для лесников:
-  фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа,
-  изображения чемпов и регулярно обновлять сайт до актуальности`;
-  btn.parentElement.appendChild(text);
+  // 2/4) Build ruler pill buttons that match slider positions
+  const slider = document.getElementById('lvlRange');
+  const ruler = document.getElementById('ruler');
+  if (slider && ruler){
+    const min = Number(slider.min||1);
+    const max = Number(slider.max||15);
+
+    function renderRuler(){
+      ruler.innerHTML = '';
+      for(let v=min; v<=max; v++){
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'ruler-btn';
+        b.dataset.value = String(v);
+        b.textContent = String(v);
+        b.addEventListener('click', ()=>{
+          slider.value = String(v);
+          slider.dispatchEvent(new Event('input', {bubbles:true}));
+          slider.dispatchEvent(new Event('change', {bubbles:true}));
+          setActive(v);
+        });
+        ruler.appendChild(b);
+      }
+      setActive(Number(slider.value||min));
+    }
+
+    function setActive(v){
+      ruler.querySelectorAll('.ruler-btn').forEach(btn=>{
+        btn.classList.toggle('is-active', Number(btn.dataset.value)===v);
+      });
+    }
+
+    // Keep in sync when dragging slider
+    slider.addEventListener('input', ()=> setActive(Number(slider.value)));
+    // Render after the app's start() runs (non-destructive)
+    setTimeout(renderRuler, 0);
+  }
+
+  // 4/5) Add support text under support button
+  if (!document.getElementById('support-text')){
+    const supportBtn = document.querySelector('.btn-support');
+    if (supportBtn && supportBtn.parentElement){
+      const box = document.createElement('div');
+      box.id = 'support-text';
+      box.innerHTML = `Ребята, сайт абсолютно бесплатен для всех.<br><br>
+(Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
+В планах: добавить характеристики HP реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)`;
+      supportBtn.parentElement.appendChild(box);
+    }
+  }
 })();
 </script>
 
