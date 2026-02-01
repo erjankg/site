@@ -1970,5 +1970,74 @@ window.hideT = function() {
 })();
 </script>
 
+
+<style id="v27-overrides">
+/* 1) HEADERS: keep normal (no vertical stack), add tiny triangle under text */
+#statTable thead th { 
+  display: table-cell !important;
+  vertical-align: middle !important;
+}
+#statTable thead th span[id^="ar-"]{
+  display:block !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+  margin-top: 2px !important;
+  opacity: .95 !important;
+  text-align: center !important;
+}
+#statTable thead th span[id^="ar-"]:empty::before{
+  content:"▼";
+}
+
+/* 2) Higher rating -> darker background (black overlay increases with rank) */
+:root{
+  --ov-mid: 0.10;
+  --ov-top10: 0.18;
+  --ov-top3: 0.28;
+  --ov-bot10: 0.05;
+  --alpha-base: 0.55;
+}
+#statTable td:nth-child(2){
+  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-ad), var(--alpha-base)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(3){
+  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-hp), var(--alpha-base)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(4){
+  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-mana), var(--alpha-base)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(5){
+  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-armor), var(--alpha-base)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(6){
+  background: linear-gradient(rgba(0,0,0,var(--ov-mid)), rgba(0,0,0,var(--ov-mid))), rgba(var(--col-mr), calc(var(--alpha-base) + 0.05)) !important;
+  color:#fff !important;
+}
+#statTable td.a:nth-child(2){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-ad), var(--alpha-base)) !important; }
+#statTable td.a:nth-child(3){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-hp), var(--alpha-base)) !important; }
+#statTable td.a:nth-child(4){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-mana), var(--alpha-base)) !important; }
+#statTable td.a:nth-child(5){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-armor), var(--alpha-base)) !important; }
+#statTable td.a:nth-child(6){ background: linear-gradient(rgba(0,0,0,var(--ov-top10)), rgba(0,0,0,var(--ov-top10))), rgba(var(--col-mr), calc(var(--alpha-base) + 0.05)) !important; }
+#statTable td.s:nth-child(2){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-ad), var(--alpha-base)) !important; }
+#statTable td.s:nth-child(3){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-hp), var(--alpha-base)) !important; }
+#statTable td.s:nth-child(4){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-mana), var(--alpha-base)) !important; }
+#statTable td.s:nth-child(5){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-armor), var(--alpha-base)) !important; }
+#statTable td.s:nth-child(6){ background: linear-gradient(rgba(0,0,0,var(--ov-top3)), rgba(0,0,0,var(--ov-top3))), rgba(var(--col-mr), calc(var(--alpha-base) + 0.05)) !important; }
+#statTable td.c:nth-child(2){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-ad), var(--alpha-base)) !important; }
+#statTable td.c:nth-child(3){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-hp), var(--alpha-base)) !important; }
+#statTable td.c:nth-child(4){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-mana), var(--alpha-base)) !important; }
+#statTable td.c:nth-child(5){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-armor), var(--alpha-base)) !important; }
+#statTable td.c:nth-child(6){ background: linear-gradient(rgba(0,0,0,var(--ov-bot10)), rgba(0,0,0,var(--ov-bot10))), rgba(var(--col-mr), calc(var(--alpha-base) + 0.05)) !important; }
+
+/* 3) Reduce colored pills by ~10% */
+.name-tag, .champ-pill, .lvl-pill{ font-size: 0.9em !important; }
+.name-tag, .champ-pill{ padding: 5px 12px !important; }
+.lvl-pill{ padding: 3px 7px !important; min-width: 28px !important; }
+</style>
+
 </body>
 </html>
