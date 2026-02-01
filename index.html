@@ -1506,5 +1506,101 @@ html, body {
 })();
 </script>
 
+
+<style id="v20-overrides">
+/* 1) No inner scroll panels: page scroll only */
+html, body {
+  height: auto !important;
+  overflow-y: auto !important;
+}
+.panel, .card, .container, .wrapper, .table-panel, .table-wrap, .tableWrap, .table-card {
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* 3) Mobile: reduce X button by 30% */
+@media (max-width: 768px) {
+  .btn-x, .remove-btn, .xbtn {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* 2) Level pills: real size, +10% on tap */
+.level-track {
+  position: relative;
+  width: 100%;
+}
+.lvl-pill {
+  position: absolute;
+  top: 100%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #7c4dff;
+  color: #fff;
+  transition: transform .15s ease;
+}
+.lvl-pill:active {
+  transform: translateX(-50%) scale(1.1);
+}
+
+/* 5) Strong animations for Support & Twitch */
+.support-btn, .twitch-btn {
+  position: relative;
+  overflow: hidden;
+}
+.support-btn::before, .twitch-btn::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle, rgba(124,77,255,.55), transparent 60%);
+  animation: glowSpin 4s linear infinite;
+}
+@keyframes glowSpin { to { transform: rotate(360deg); } }
+</style>
+
+<script id="v20-js">
+// 2) Sync level pills to slider positions (non-destructive)
+(function(){
+  const slider = document.querySelector('input[type="range"]');
+  const pills = document.querySelectorAll('.lvl-pill');
+  if (!slider || !pills.length) return;
+  const min = Number(slider.min||1), max = Number(slider.max||15);
+  pills.forEach(p=>{
+    const v = Number(p.dataset.value);
+    if (isNaN(v)) return;
+    const pct = (v - min) / (max - min);
+    p.style.left = (pct * 100) + '%';
+    p.addEventListener('click', ()=>{
+      slider.value = v;
+      slider.dispatchEvent(new Event('input', {bubbles:true}));
+      slider.dispatchEvent(new Event('change', {bubbles:true}));
+    });
+  });
+})();
+
+// 4) Add support text (if not exists)
+(function(){
+  if (document.getElementById('support-text')) return;
+  const btn = document.querySelector('.support-btn');
+  if (!btn) return;
+  const text = document.createElement('div');
+  text.id = 'support-text';
+  text.style.marginTop = '12px';
+  text.style.opacity = '0.9';
+  text.style.fontSize = '14px';
+  text.innerHTML = `Ребята, сайт абсолютно бесплатен для всех.<br><br>
+  Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
+  В планах: добавить характеристики HP реген, особый столбец для лесников:
+  фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа,
+  изображения чемпов и регулярно обновлять сайт до актуальности`;
+  btn.parentElement.appendChild(text);
+})();
+</script>
+
 </body>
 </html>
