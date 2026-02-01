@@ -2088,5 +2088,84 @@ html, body { overflow-y: auto !important; }
 })();
 </script>
 
+
+<style id="v37-overrides">
+/* 1) Level pill press animation (fast pop) */
+#ruler .lvl-pill{
+  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+}
+#ruler .lvl-pill:active{
+  transform: translateX(-50%) scale(0.92) !important;
+  filter: brightness(1.08);
+  box-shadow: 0 6px 14px rgba(124,77,255,0.28);
+}
+
+/* 2) Mobile +/- must be on the RIGHT side */
+@media (max-width: 768px){
+  .lvl-stepper{
+    margin-left: 10px !important;
+    margin-right: 0 !important;
+  }
+}
+
+/* 3) Support + Twitch: strong glow + moving shine */
+.btn-support, .support-btn, .twitch-btn{
+  position: relative;
+  overflow: hidden;
+}
+.btn-support::before, .support-btn::before, .twitch-btn::before{
+  content:"";
+  position:absolute;
+  inset:-60%;
+  background: radial-gradient(circle at center, rgba(124,77,255,0.55), transparent 60%);
+  animation: v37Glow 3.2s linear infinite;
+}
+@keyframes v37Glow{ to { transform: rotate(360deg); } }
+
+.btn-support::after, .support-btn::after, .twitch-btn::after{
+  content:"";
+  position:absolute;
+  top:-40%;
+  left:-60%;
+  width: 60%;
+  height: 180%;
+  background: linear-gradient(110deg, transparent, rgba(255,255,255,0.22), transparent);
+  transform: rotate(10deg);
+  animation: v37Shine 2.8s ease-in-out infinite;
+}
+@keyframes v37Shine{
+  0%   { transform: translateX(0) rotate(10deg); opacity: 0; }
+  20%  { opacity: 1; }
+  50%  { transform: translateX(220%) rotate(10deg); opacity: 1; }
+  70%  { opacity: 0; }
+  100% { transform: translateX(220%) rotate(10deg); opacity: 0; }
+}
+
+/* 4) Adjust column base colors to be more distinct:
+   AD -> lighter orange, HP -> brighter green, MANA -> more cyan/blue */
+:root{
+  --col-ad:    255,165,60;   /* lighter orange */
+  --col-hp:    0,210,105;    /* brighter green */
+  --col-mana:  70,190,255;   /* cyan-blue */
+  /* armor and mr remain the same as in v34+; keep if already defined */
+}
+</style>
+
+<script id="v37-js">
+/* Ensure mobile +/- is after slider (right side) */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const stepper = document.querySelector('.lvl-stepper');
+  if(!slider || !stepper) return;
+
+  if (slider.nextElementSibling !== stepper){
+    slider.insertAdjacentElement('afterend', stepper);
+  }
+})();
+</script>
+
 </body>
 </html>
