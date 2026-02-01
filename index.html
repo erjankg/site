@@ -821,6 +821,76 @@ html, body{ overflow-x: hidden !important; }
   }
 }
 
+
+/* ===========================
+   v16 overrides: adaptive pills, separate mobile/desktop sizing
+   (do not delete old rules; these override them)
+   =========================== */
+
+/* Champ cell: X + pill should not create empty half */
+#statTable td.champ-cell{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  width:100% !important;
+  min-width:0 !important;
+}
+
+/* X button: fixed, no shrink */
+#statTable .champ-cell .x-btn{
+  flex:0 0 auto !important;
+  width:32px !important;
+  height:32px !important;
+  min-width:32px !important;
+}
+
+/* Pill: size by content (no fixed width), single line */
+#statTable .champ-cell .name-tag{
+  flex:0 0 auto !important;      /* don't stretch to full cell */
+  width:auto !important;         /* pill fits text */
+  max-width:none !important;      /* do not clamp */
+  white-space:nowrap !important;  /* no 2 lines */
+  overflow:visible !important;    /* don't cut on desktop */
+  text-overflow:clip !important;  /* never "..." */
+  padding:6px 14px !important;
+  border-radius:999px !important;
+}
+
+/* Mobile: table proportions (Champion 40%, others equal 12%) */
+@media (max-width: 768px){
+  #statTable{
+    width:100% !important;
+    table-layout:fixed !important;
+  }
+  #statTable th:first-child,
+  #statTable td:first-child{ width:40% !important; }
+  #statTable th:not(:first-child),
+  #statTable td:not(:first-child){ width:12% !important; }
+
+  /* Slightly smaller pill text on mobile to ensure fit */
+  #statTable .champ-cell .name-tag{
+    font-size: clamp(11px, 3.2vw, 13px) !important;
+  }
+}
+
+/* Desktop: make champ pills + X about 30% bigger */
+@media (min-width: 769px){
+  #statTable .champ-cell .name-tag{
+    font-size: 1.3em !important;
+    padding: 8px 18px !important;
+  }
+  #statTable .champ-cell .x-btn{
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+  }
+}
+
+/* Column dimming strength (if present): 20% dim */
+#statTable.dim-cols td.dimmed{
+  opacity: 0.80 !important;
+}
+
 </style>
 </head>
 <body>
