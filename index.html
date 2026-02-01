@@ -2039,5 +2039,186 @@ window.hideT = function() {
 .lvl-pill{ padding: 3px 7px !important; min-width: 28px !important; }
 </style>
 
+
+<style id="v28-overrides">
+/* ✅ Headers: keep normal layout + show tiny triangle row always visible */
+#statTable thead th { display: table-cell !important; vertical-align: middle !important; }
+#statTable thead th span[id^="ar-"]{
+  display:block !important;
+  font-size: 11px !important;
+  line-height: 1 !important;
+  margin-top: 2px !important;
+  text-align:center !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  opacity: .95 !important;
+  min-height: 12px !important;
+}
+
+/* ✅ Stronger 3D look + clearer separation for colored stat cells */
+#statTable td:nth-child(2),
+#statTable td:nth-child(3),
+#statTable td:nth-child(4),
+#statTable td:nth-child(5),
+#statTable td:nth-child(6){
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.35) !important;
+}
+
+/* Shade strength by rank: higher rating => darker */
+#statTable td:nth-child(2),
+#statTable td:nth-child(3),
+#statTable td:nth-child(4),
+#statTable td:nth-child(5),
+#statTable td:nth-child(6){ --shade: .14; --alpha: .60; }   /* mid */
+#statTable td.a:nth-child(2),
+#statTable td.a:nth-child(3),
+#statTable td.a:nth-child(4),
+#statTable td.a:nth-child(5),
+#statTable td.a:nth-child(6){ --shade: .24; --alpha: .62; }  /* top10 */
+#statTable td.s:nth-child(2),
+#statTable td.s:nth-child(3),
+#statTable td.s:nth-child(4),
+#statTable td.s:nth-child(5),
+#statTable td.s:nth-child(6){ --shade: .36; --alpha: .64; }  /* top3 */
+#statTable td.c:nth-child(2),
+#statTable td.c:nth-child(3),
+#statTable td.c:nth-child(4),
+#statTable td.c:nth-child(5),
+#statTable td.c:nth-child(6){ --shade: .08; --alpha: .56; }  /* bottom10 */
+
+/* 3D gradient layers: white sheen + dark shade + base color */
+#statTable td:nth-child(2){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-ad), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(3){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-hp), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(4){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-mana), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(5){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-armor), var(--alpha)) !important;
+  color:#fff !important;
+}
+#statTable td:nth-child(6){
+  background:
+    linear-gradient(to bottom, rgba(255,255,255,0.14), rgba(255,255,255,0.02)),
+    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
+    rgba(var(--col-mr), calc(var(--alpha) + 0.04)) !important;
+  color:#fff !important;
+}
+
+/* ✅ Desktop ruler pills: force ruler to sit exactly under slider and align by px */
+@media (min-width: 769px){
+  #ruler{
+    position:absolute !important;
+    height: 34px !important;
+    pointer-events: auto;
+  }
+  #ruler .lvl-pill{
+    position:absolute !important;
+    transform: translateX(-50%) !important;
+  }
+}
+</style>
+
+<script id="v28-js">
+/* ✅ Fix PC level buttons alignment to slider thumb positions */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const ruler  = document.getElementById('ruler');
+  if (!slider || !ruler) return;
+
+  const min = Number(slider.min || 1);
+  const max = Number(slider.max || 15);
+
+  function layout(){
+    const parent = slider.parentElement;
+    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+
+    const sRect = slider.getBoundingClientRect();
+    const pRect = parent.getBoundingClientRect();
+
+    // Place ruler directly under the slider
+    ruler.style.left = (sRect.left - pRect.left) + 'px';
+    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
+    ruler.style.width = sRect.width + 'px';
+
+    const thumb = 18; // good default for most browsers
+    const usable = Math.max(1, sRect.width - thumb);
+    const leftPad = thumb/2;
+
+    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
+      const v = Number(p.dataset.value);
+      if (isNaN(v)) return;
+      const pct = (v - min) / (max - min);
+      const x = leftPad + pct * usable;
+      p.style.left = x + 'px';
+    });
+  }
+
+  window.addEventListener('resize', layout);
+  setTimeout(layout, 0);
+  setTimeout(layout, 120);
+  setTimeout(layout, 300);
+})();
+
+/* ✅ Ensure triangles always visible under headers (no layout change) */
+(function(){
+  const keys = ['ad','hp','mana','armor','mrez'];
+  function update(key, dir){
+    keys.forEach(k=>{
+      const el = document.getElementById('ar-' + k);
+      if (!el) return;
+      el.textContent = '▾'; // default tiny triangle
+      el.style.opacity = '0.75';
+    });
+    const active = document.getElementById('ar-' + key);
+    if (active){
+      active.textContent = (dir === 'asc') ? '▲' : '▼';
+      active.style.opacity = '0.98';
+    }
+  }
+
+  // wrap doSort without changing existing behavior
+  const orig = window.doSort;
+  if (typeof orig === 'function'){
+    let curKey = 'ad';
+    let curDir = 'desc';
+    window.doSort = function(k){
+      if (k === curKey) curDir = (curDir === 'asc') ? 'desc' : 'asc';
+      else { curKey = k; curDir = 'desc'; }
+      const res = orig.apply(this, arguments);
+      setTimeout(()=>update(curKey, curDir), 0);
+      return res;
+    };
+    // initial paint
+    setTimeout(()=>update(curKey, curDir), 0);
+  } else {
+    // if doSort isn't global, still show default triangles
+    setTimeout(()=>update('ad','desc'), 0);
+  }
+})();
+</script>
+
 </body>
 </html>
