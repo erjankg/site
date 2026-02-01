@@ -1932,5 +1932,123 @@ window.hideT = function() {
 })();
 </script>
 
+
+<style id="v26-overrides">
+/* --- Modal search: already instant; hide any "apply/check" UI if present --- */
+.m-search button, .m-search .apply, .m-search .m-apply, .m-search input[type="checkbox"] { display:none !important; }
+
+/* --- Support text: full width on laptop and keep separated from level panel --- */
+@media (min-width: 769px){
+  #support-panel-text{
+    max-width: none !important;
+    width: 100% !important;
+    margin-top: 14px !important;
+  }
+}
+#support-panel-text{ display:block; }
+
+/* --- Table numbers as small colorful pills (rounded) --- */
+#statTable td:nth-child(n+2){
+  border-radius: 14px !important;
+  padding: 10px 8px !important;
+  font-size: clamp(11px, 2.2vw, 13px) !important; /* ~10% smaller than before */
+}
+
+/* --- Mobile: keep headers in row, but arrow under text --- */
+@media (max-width: 768px){
+  #statTable thead th{
+    display: table-cell !important;   /* undo flex column from earlier */
+    vertical-align: middle !important;
+    text-align: center !important;
+  }
+  #statTable thead th span[id^="ar-"]{
+    display:block !important;
+    margin-top: 2px !important;
+  }
+}
+
+/* --- Desktop ruler: grid layout for perfect 1..15 spacing --- */
+@media (min-width: 769px){
+  #ruler{
+    display: grid !important;
+    grid-template-columns: repeat(15, 1fr) !important;
+    align-items: center !important;
+    gap: 0 !important;
+    height: 34px !important;
+    position: absolute !important; /* positioned by JS */
+  }
+  #ruler .lvl-pill{
+    position: static !important;
+    justify-self: center !important;
+    transform: none !important;
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+    min-width: 30px !important;
+    border-radius: 999px !important;
+    background: rgba(124,77,255,0.95) !important;
+    color:#fff !important;
+    border: 1px solid rgba(255,255,255,0.18) !important;
+    box-shadow: 0 6px 18px rgba(124,77,255,0.28) !important;
+    transition: transform .15s ease !important;
+  }
+  #ruler .lvl-pill:active{
+    transform: scale(1.1) !important; /* +10% */
+  }
+}
+</style>
+
+<script id="v26-js">
+/* Modal search: ensure instant draw (some mobile keyboards delay) */
+(function(){
+  const inp = document.getElementById('mSearch');
+  if(!inp) return;
+  const fire = () => { try { drawM(); } catch(e){} };
+  ['input','keyup','change','compositionend'].forEach(ev=>inp.addEventListener(ev, fire));
+})();
+
+/* Desktop ruler: rebuild exactly 15 pills, align ruler under slider and match width */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const ruler  = document.getElementById('ruler');
+  if(!slider || !ruler) return;
+
+  if(isMobile) return; // mobile can keep its behavior
+
+  // rebuild
+  ruler.innerHTML = '';
+  const min = Number(slider.min || 1);
+  const max = Number(slider.max || 15);
+  for(let i=min;i<=max;i++){
+    const b = document.createElement('span');
+    b.className = 'lvl-pill';
+    b.dataset.value = String(i);
+    b.textContent = String(i);
+    b.onclick = () => {
+      slider.value = String(i);
+      slider.dispatchEvent(new Event('input', {bubbles:true}));
+      slider.dispatchEvent(new Event('change', {bubbles:true}));
+    };
+    ruler.appendChild(b);
+  }
+
+  function place(){
+    const parent = slider.parentElement;
+    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+
+    const sRect = slider.getBoundingClientRect();
+    const pRect = parent.getBoundingClientRect();
+
+    ruler.style.left = (sRect.left - pRect.left) + 'px';
+    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
+    ruler.style.width = sRect.width + 'px';
+  }
+
+  window.addEventListener('resize', place);
+  setTimeout(place, 0);
+  setTimeout(place, 150);
+})();
+</script>
+
 </body>
 </html>
