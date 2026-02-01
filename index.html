@@ -2638,5 +2638,156 @@ window.hideT = function() {
 })();
 </script>
 
+
+<style id="v32-overrides">
+/* ===== Fix duplicate/reversed ruler pills visual stacking ===== */
+@media (min-width: 769px){
+  #ruler{ overflow: visible !important; }
+  #ruler .lvl-pill{ z-index: 1; }
+}
+
+/* ===== Center champion names on desktop; keep X pinned left ===== */
+@media (min-width: 769px){
+  .champ-cell{ display:flex !important; align-items:center !important; }
+  .champ-cell .x-btn, .champ-cell .btn-x, .champ-cell .remove-btn, .champ-cell .xbtn{
+    margin-right: 8px !important;
+  }
+  .champ-cell .name-tag, .champ-cell .champ-pill{
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+  }
+}
+
+/* ===== Make rank darkness differences more noticeable ===== */
+#statTable td:nth-child(2),
+#statTable td:nth-child(3),
+#statTable td:nth-child(4),
+#statTable td:nth-child(5),
+#statTable td:nth-child(6){
+  --shade: 0.18 !important;   /* mid */
+}
+#statTable td.a:nth-child(2),
+#statTable td.a:nth-child(3),
+#statTable td.a:nth-child(4),
+#statTable td.a:nth-child(5),
+#statTable td.a:nth-child(6){
+  --shade: 0.35 !important;   /* top10 */
+}
+#statTable td.s:nth-child(2),
+#statTable td.s:nth-child(3),
+#statTable td.s:nth-child(4),
+#statTable td.s:nth-child(5),
+#statTable td.s:nth-child(6){
+  --shade: 0.55 !important;   /* top3 */
+}
+#statTable td.c:nth-child(2),
+#statTable td.c:nth-child(3),
+#statTable td.c:nth-child(4),
+#statTable td.c:nth-child(5),
+#statTable td.c:nth-child(6){
+  --shade: 0.06 !important;   /* bottom10 */
+}
+
+/* ===== Mobile: move +/- to the LEFT side of slider ===== */
+@media (max-width: 768px){
+  .lvl-stepper{
+    margin-left: 0 !important;
+    margin-right: 10px !important;
+    top: 25px; /* keep your down offset */
+  }
+}
+</style>
+
+<script id="v32-js">
+/* ===== Desktop: rebuild ruler deterministically (fix '15 over 1' and duplicates) ===== */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if (isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  const ruler  = document.getElementById('ruler');
+  if(!slider || !ruler) return;
+
+  // Hard reset: clear, then rebuild 1..15 once, and keep it that way
+  const min0 = Number(slider.min || 1);
+  const max0 = Number(slider.max || 15);
+  const min = Math.min(min0, max0);
+  const max = Math.max(min0, max0);
+
+  function rebuild(){
+    ruler.innerHTML = '';
+    for(let i=min;i<=max;i++){
+      const span = document.createElement('span');
+      span.className = 'lvl-pill';
+      span.dataset.value = String(i);
+      span.textContent = String(i);
+      span.addEventListener('click', ()=>{
+        slider.value = String(i);
+        slider.dispatchEvent(new Event('input', { bubbles:true }));
+      });
+      ruler.appendChild(span);
+    }
+  }
+
+  rebuild();
+
+  function layout(){
+    const parent = slider.parentElement;
+    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+
+    const sRect = slider.getBoundingClientRect();
+    const pRect = parent.getBoundingClientRect();
+
+    ruler.style.position = 'absolute';
+    ruler.style.left = (sRect.left - pRect.left) + 'px';
+    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
+    ruler.style.width = sRect.width + 'px';
+    ruler.style.height = '34px';
+
+    const thumb = 18;
+    const usable = Math.max(1, sRect.width - thumb);
+    const leftPad = thumb/2;
+
+    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
+      const v = Number(p.dataset.value);
+      const pct = (v - min) / (max - min);
+      const x = leftPad + pct * usable;
+      p.style.left = x + 'px';
+    });
+  }
+
+  // If any other old script tries to append pills later, delete extras
+  const obs = new MutationObserver(() => {
+    const pills = ruler.querySelectorAll('.lvl-pill');
+    if (pills.length !== (max-min+1)) rebuild();
+    layout();
+  });
+  obs.observe(ruler, {childList:true});
+
+  window.addEventListener('resize', layout);
+  setTimeout(layout, 0);
+  setTimeout(layout, 200);
+  setTimeout(layout, 500);
+})();
+
+/* ===== Mobile: place +/- BEFORE slider (left side) ===== */
+(function(){
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  if(!isMobile) return;
+
+  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
+  if(!slider) return;
+
+  const stepper = document.querySelector('.lvl-stepper');
+  if(!stepper) return;
+
+  // Move to left of slider
+  if (slider.previousElementSibling !== stepper){
+    slider.insertAdjacentElement('beforebegin', stepper);
+  }
+})();
+</script>
+
 </body>
 </html>
