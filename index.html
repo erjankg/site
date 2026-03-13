@@ -32,10 +32,10 @@
             --accent-glow: rgba(109, 63, 245, 0.45);
             --bg-card: rgba(26, 13, 46, 0.85);
             --border: rgba(155, 89, 182, 0.3);
-            --tier-s: #e74c3c;
-            --tier-a: #e67e22;
-            --tier-b: #f39c12;
-            --tier-c: #2ecc71;
+            --tier-s: #FF3B3B;
+            --tier-a: #FF8C00;
+            --tier-b: #FFD700;
+            --tier-c: #2ECC71;
         }
 
         @keyframes fadeIn {
@@ -360,10 +360,10 @@
         }
 
         /* TIERS */
-        .s { background: linear-gradient(135deg, var(--tier-s) 0%, #c0392b 100%); color: #fff; font-weight: 900; border-radius: 4px; }
-        .a { background: linear-gradient(135deg, var(--tier-a) 0%, #d35400 100%); color: #fff; font-weight: 900; border-radius: 4px; }
-        .b { background: linear-gradient(135deg, var(--tier-b) 0%, #d68910 100%); color: #000; font-weight: 900; border-radius: 4px; }
-        .c { background: linear-gradient(135deg, var(--tier-c) 0%, #27ae60 100%); color: #fff; font-weight: 900; border-radius: 4px; }
+        .s { background: var(--tier-s); color: #fff; font-weight: 900; border-radius: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+        .a { background: var(--tier-a); color: #fff; font-weight: 900; border-radius: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .b { background: var(--tier-b); color: #6b4800; font-weight: 900; border-radius: 4px; }
+        .c { background: var(--tier-c); color: #0e5c30; font-weight: 900; border-radius: 4px; }
 
         /* TOOLTIP */
         #uiTip {
@@ -416,8 +416,8 @@
         /* CLOSE BTN */
         .btn-close-x {
             position: absolute;
-            top: -18px;
-            right: -18px;
+            top: 12px;
+            right: 12px;
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: #fff;
             border: 4px solid #0f0520;
@@ -727,14 +727,14 @@ html, body{ overflow-x: hidden !important; }
 
 /* 5) Лёгкое затемнение только стат-столбцов при выборе (Champs не трогаем) */
 #statTable.focus-mode td:not(:first-child):not(.active-col){
-  opacity: 0.45;
-  filter: blur(0.6px);
-  transition: opacity 0.25s, filter 0.25s;
+  opacity: 0.38;
+  filter: blur(0.7px) brightness(0.55) saturate(0.6);
+  transition: opacity 0.3s ease, filter 0.3s ease;
 }
 #statTable td.active-col{
   opacity: 1 !important;
   filter: none !important;
-  transition: opacity 0.25s, filter 0.25s;
+  transition: opacity 0.3s ease, filter 0.3s ease;
 }
 #statTable.focus-mode td:first-child {
   opacity: 1 !important;
@@ -772,9 +772,11 @@ html, body{ overflow-x: hidden !important; }
 
 /* Stronger column-focus dim (20%) */
 #statTable.focus-mode td:not(:first-child):not(.active-col){
-  opacity: 0.80 !important; /* 20% dim */
+  opacity: 0.38;
+  filter: blur(0.7px) brightness(0.55) saturate(0.6);
+  transition: opacity 0.3s ease, filter 0.3s ease;
 }
-#statTable td.active-col{ opacity: 1 !important; }
+#statTable td.active-col{ opacity: 1 !important; filter: none !important; }
 
 /* MOBILE: make Champs wider, stats narrower (still no horizontal scroll) */
 @media (max-width: 768px){
@@ -1044,6 +1046,57 @@ html, body{ overflow-x: hidden !important; }
                 opacity: 0.3;
             }
         }
+
+        /* Row tap highlight */
+        #statTable tbody tr {
+            transition: background 0.15s ease;
+        }
+        #statTable tbody tr.row-flash {
+            background: rgba(109, 63, 245, 0.18) !important;
+        }
+        /* Skeleton loader */
+        .skeleton-wrap { padding: 8px; }
+        .skeleton-row {
+            display: flex; gap: 6px; align-items: center;
+            padding: 10px 8px; border-bottom: 1px solid rgba(155,89,182,0.08);
+        }
+        .skeleton-cell {
+            border-radius: 6px;
+            background: linear-gradient(90deg, rgba(109,63,245,0.08) 25%, rgba(109,63,245,0.18) 50%, rgba(109,63,245,0.08) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        .sk-icon { width: 32px; height: 32px; flex-shrink:0; }
+        .sk-name { width: 70px; height: 14px; }
+        .sk-stat { flex:1; height: 14px; }
+        /* Number pop animation on level change */
+        @keyframes numPop {
+            0%   { transform: scale(1);    color: inherit; }
+            35%  { transform: scale(1.18); color: #b96fff; }
+            100% { transform: scale(1);    color: inherit; }
+        }
+        .num-anim { animation: numPop 0.32s ease; }
+        /* Fadeout gradient at bottom */
+        .table-wrap-outer {
+            position: relative;
+        }
+        .table-wrap-outer::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, rgba(15,5,32,0.85));
+            pointer-events: none;
+            border-radius: 0 0 13px 13px;
+            z-index: 5;
+        }
+
+        /* Pinned icon ring */
+        .champ-icon.icon-pinned {
+            border: 2px solid #b96fff !important;
+            box-shadow: 0 0 6px rgba(185,111,255,0.6);
+        }
 </style>
 </head>
 <body>
@@ -1069,7 +1122,8 @@ html, body{ overflow-x: hidden !important; }
         </div>
     </div>
 
-    <div class="table-hold">
+    <div class="table-wrap-outer">
+    <div class="table-hold" id="tableHold">
         <table id="statTable">
             <thead>
                 <tr>
@@ -1125,7 +1179,7 @@ html, body{ overflow-x: hidden !important; }
             'M.Fortune':'MissFortune','Tw. Fate':'TwistedFate','Au. Sol':'AurelionSol',
             'Jarvan':'JarvanIV','XinZhao':'XinZhao','KhaZix':'Khazix','KogMaw':'KogMaw',
             'KaiSa':'Kaisa','Morde':'Mordekaiser','Seraph':'Seraphine',
-            'Fiddle':'FiddleSticks','Fiddles':'FiddleSticks','Trynda':'Tryndamere','Trynd':'Tryndamere','Heimer':'Heimerdinger',
+            'Fiddle':'Fiddlesticks','Fiddles':'Fiddlesticks','FiddleSticks':'Fiddlesticks','Fiddlesticks':'Fiddlesticks','Trynda':'Tryndamere','Trynd':'Tryndamere','Trinda':'Tryndamere','Heimer':'Heimerdinger',
             'Mundo':'DrMundo','Nunu':'Nunu',
         };
         return m[n] || n.replace(/[\s\'\.\#&]/g,'');
@@ -1161,6 +1215,15 @@ async function start() {
             const _saved = localStorage.getItem('p');
             if(_saved) pinned = new Set(JSON.parse(_saved));
         } catch(e) { /* incognito or storage disabled */ }
+        // Show skeleton loader
+        const tableHoldEl = document.getElementById('tableHold');
+        if(tableHoldEl) {
+            let skHtml = '<div class="skeleton-wrap">';
+            for(let i=0;i<12;i++) skHtml += `<div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div>`;
+            skHtml += '</div>';
+            tableHoldEl.innerHTML = skHtml;
+        }
+
         const r = await fetch(G_URL);
         const t = await r.text();
         const lines = t.trim().split('\n');
@@ -1259,6 +1322,10 @@ body.innerHTML = "";
 data.forEach((item, idx) => {
     const tr = document.createElement('tr');
     const isP = pinned.has(item.name);
+    tr.addEventListener('click', () => {
+        tr.classList.add('row-flash');
+        setTimeout(() => tr.classList.remove('row-flash'), 400);
+    });
 
     // --- Champion cell (num + X + icon + name) ---
     const tdChamp = document.createElement('td');
@@ -1296,10 +1363,14 @@ data.forEach((item, idx) => {
         'Mel': 'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg',
     };
     champImg.src = _specialIcons[item.name] || (DD_URL + champKey(item.name) + '.png');
-    champImg.onerror = function(){
-        // fallback: colored square with first letter
-        this.style.display='none';
-    };
+    champImg.onerror = function(){ this.style.display='none'; };
+    champImg.style.cursor = 'pointer';
+    champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
+    if(isP) champImg.classList.add('icon-pinned');
+    champImg.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        toggleP(item.name);
+    });
 
     tdChamp.appendChild(btnX);
     tdChamp.appendChild(champImg);
@@ -1477,6 +1548,14 @@ window.hideT = function() {
             document.getElementById('lvlLabel').innerText = lvl;
             updateRuler();
             render();
+            // Pop animation on all stat numbers
+            requestAnimationFrame(() => {
+                document.querySelectorAll('#statTable tbody td:not(:first-child)').forEach(td => {
+                    td.classList.remove('num-anim');
+                    void td.offsetWidth;
+                    td.classList.add('num-anim');
+                });
+            });
         };
     }
 
