@@ -32,10 +32,10 @@
             --accent-glow: rgba(109, 63, 245, 0.45);
             --bg-card: rgba(26, 13, 46, 0.85);
             --border: rgba(155, 89, 182, 0.3);
-            --tier-s: #FF3B3B;
-            --tier-a: #FF8C00;
-            --tier-b: #FFD700;
-            --tier-c: #2ECC71;
+            --tier-s: #E8413A;
+            --tier-a: #E8820A;
+            --tier-b: #C9A800;
+            --tier-c: #27AE60;
         }
 
         @keyframes fadeIn {
@@ -374,10 +374,10 @@
         }
 
         /* TIERS */
-        .s { background: var(--tier-s); color: #fff; font-weight: 900; border-radius: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
-        .a { background: var(--tier-a); color: #fff; font-weight: 900; border-radius: 4px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        .b { background: var(--tier-b); color: #6b4800; font-weight: 900; border-radius: 4px; }
-        .c { background: var(--tier-c); color: #0e5c30; font-weight: 900; border-radius: 4px; }
+        .s { background: var(--tier-s); color: #fff; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 4px rgba(0,0,0,0.5); letter-spacing: 0.5px; }
+        .a { background: var(--tier-a); color: #fff; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.4); letter-spacing: 0.5px; }
+        .b { background: var(--tier-b); color: #4a3200; font-weight: 900; border-radius: 5px; letter-spacing: 0.5px; }
+        .c { background: var(--tier-c); color: #fff; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); letter-spacing: 0.5px; }
 
         /* TOOLTIP */
         #uiTip {
@@ -741,9 +741,9 @@ html, body{ overflow-x: hidden !important; }
 
 /* 5) Лёгкое затемнение только стат-столбцов при выборе (Champs не трогаем) */
 #statTable.focus-mode td:not(:first-child):not(.active-col){
-  opacity: 0.38;
-  filter: blur(0.7px) brightness(0.55) saturate(0.6);
-  transition: opacity 0.3s ease, filter 0.3s ease;
+  opacity: 0.55;
+  filter: brightness(0.72) saturate(0.5);
+  transition: opacity 0.2s ease, filter 0.2s ease;
 }
 #statTable td.active-col{
   opacity: 1 !important;
@@ -786,9 +786,9 @@ html, body{ overflow-x: hidden !important; }
 
 /* Stronger column-focus dim (20%) */
 #statTable.focus-mode td:not(:first-child):not(.active-col){
-  opacity: 0.38;
-  filter: blur(0.7px) brightness(0.55) saturate(0.6);
-  transition: opacity 0.3s ease, filter 0.3s ease;
+  opacity: 0.55;
+  filter: brightness(0.72) saturate(0.5);
+  transition: opacity 0.2s ease, filter 0.2s ease;
 }
 #statTable td.active-col{ opacity: 1 !important; filter: none !important; }
 
@@ -1282,11 +1282,12 @@ async function start() {
             span.setAttribute('role','button');
             span.tabIndex = 0;
             span.onclick = () => {
+                lvl = i;
                 const rng = document.getElementById('lvlRange');
-                if(rng){
-                    rng.value = String(i);
-                    rng.dispatchEvent(new Event('input', { bubbles: true }));
-                }
+                if(rng) rng.value = String(i);
+                document.getElementById('lvlLabel').innerText = i;
+                updateRuler();
+                renderUpdate();
             };
             span.onkeydown = (e) => {
                 if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); span.click(); }
