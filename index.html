@@ -1303,123 +1303,135 @@ async function start() {
         }
     }
 
-    function render() {
-        const body = document.getElementById('statBody');
-        const table = document.getElementById('statTable');
-        table.classList.toggle('focus-mode', colFocus);
-
-        ['ad','hp','mana','armor','mrez'].forEach(k => {
-            document.getElementById('ar-'+k).innerText = (k === sK) ? (sD === 'desc' ? '▼' : '▲') : '';
-        });
-
-        const data = raw.filter(x => selected.has(x.name)).map(x => {
-            const f = (b, g) => b + (lvl - 1) * g;
-            return { 
-                name: x.name, 
-                res: x.res, 
-                ad: f(x.ad_b, x.ad_g), 
-                hp: f(x.hp_b, x.hp_g), 
-                mana: f(x.mn_b, x.mn_g), 
-                armor: f(x.ar_b, x.ar_g), 
-                mrez: f(x.mr_b, x.mr_g), 
-                g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g} 
-            };
-        }).sort((a,b) => sD === 'desc' ? b[sK] - a[sK] : a[sK] - b[sK]);
-
+    // Compute data array for current level + sort
+    function computeData() {
+        const f = (b, g) => b + (lvl - 1) * g;
+        const data = raw.filter(x => selected.has(x.name)).map(x => ({
+            name: x.name, res: x.res,
+            ad:   f(x.ad_b, x.ad_g),
+            hp:   f(x.hp_b, x.hp_g),
+            mana: f(x.mn_b, x.mn_g),
+            armor:f(x.ar_b, x.ar_g),
+            mrez: f(x.mr_b, x.mr_g),
+            g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g}
+        })).sort((a,b) => sD === 'desc' ? b[sK] - a[sK] : a[sK] - b[sK]);
         const getT = (k) => {
             const s = data.map(i => i[k]).sort((a,b) => a-b);
             return { s: s[Math.floor(s.length*0.95)], a: s[Math.floor(s.length*0.8)], c: s[Math.floor(s.length*0.2)] };
         };
-        const thres = { ad: getT('ad'), hp: getT('hp'), mana: getT('mana'), armor: getT('armor'), mrez: getT('mrez') };
+        const thres = { ad:getT('ad'), hp:getT('hp'), mana:getT('mana'), armor:getT('armor'), mrez:getT('mrez') };
+        return { data, thres };
+    }
 
-        
-body.innerHTML = "";
-data.forEach((item, idx) => {
-    const tr = document.createElement('tr');
-    const isP = pinned.has(item.name);
-    tr.addEventListener('click', () => {
-        tr.classList.add('row-flash');
-        setTimeout(() => tr.classList.remove('row-flash'), 400);
-    });
+    // FAST UPDATE — only rewrites numbers + tier classes, no DOM rebuild
+    // Called on level slider change
+    function renderUpdate() {
+        const table = document.getElementById('statTable');
+        table.classList.toggle('focus-mode', colFocus);
+        ['ad','hp','mana','armor','mrez'].forEach(k => {
+            document.getElementById('ar-'+k).innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
+        });
+        const { data, thres } = computeData();
+        const rows = document.querySelectorAll('#statBody tr');
+        // If row count changed (e.g. champion removed) — fall back to full render
+        if(rows.length !== data.length) { renderFull(); return; }
+        data.forEach((item, idx) => {
+            const tr = rows[idx];
+            // update row-num
+            const numEl = tr.querySelector('.row-num');
+            if(numEl) numEl.textContent = idx + 1;
+            // update stat tds (skip first td = champ cell)
+            const tds = tr.querySelectorAll('td:not(:first-child)');
+            ['ad','hp','mana','armor','mrez'].forEach((k, ki) => {
+                const td = tds[ki];
+                if(!td) return;
+                const v = item[k];
+                let cls = (k===sK) ? 'active-col ' : '';
+                if(v >= thres[k].s) cls += 's';
+                else if(v >= thres[k].a) cls += 'a';
+                else if(v <= thres[k].c) cls += 'c';
+                else cls += 'b';
+                td.className = cls;
+                let txt = Math.round(v);
+                if(k==='mana' && item.res==='Energy') txt = 'NRG';
+                else if(k==='mana' && v===0) txt = '0';
+                td.textContent = txt;
+            });
+        });
+        // Pop animation
+        requestAnimationFrame(() => {
+            document.querySelectorAll('#statTable tbody td:not(:first-child)').forEach(td => {
+                td.classList.remove('num-anim'); void td.offsetWidth; td.classList.add('num-anim');
+            });
+        });
+    }
 
-    // --- Champion cell (num + X + icon + name) ---
-    const tdChamp = document.createElement('td');
-    tdChamp.className = 'champ-cell';
+    // FULL RENDER — rebuilds DOM from scratch
+    // Called on champion add/remove, sort change, pin change
+    function renderFull() {
+        const body = document.getElementById('statBody');
+        const table = document.getElementById('statTable');
+        table.classList.toggle('focus-mode', colFocus);
+        ['ad','hp','mana','armor','mrez'].forEach(k => {
+            document.getElementById('ar-'+k).innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
+        });
+        const { data, thres } = computeData();
+        body.innerHTML = '';
+        data.forEach((item, idx) => {
+            const tr = document.createElement('tr');
+            const isP = pinned.has(item.name);
+            tr.addEventListener('click', () => {
+                tr.classList.add('row-flash');
+                setTimeout(() => tr.classList.remove('row-flash'), 400);
+            });
+            const tdChamp = document.createElement('td');
+            tdChamp.className = 'champ-cell';
+            const numSpan = document.createElement('span');
+            numSpan.className = 'row-num';
+            numSpan.textContent = idx + 1;
+            tdChamp.appendChild(numSpan);
+            const btnX = document.createElement('button');
+            btnX.className = 'x-btn'; btnX.type = 'button'; btnX.textContent = '×';
+            btnX.title = 'Remove from table';
+            btnX.addEventListener('click', (ev) => { ev.stopPropagation(); removeC(item.name); });
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'name-tag ' + (isP ? 'pinned' : '');
+            nameSpan.textContent = item.name;
+            nameSpan.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
+            const champImg = document.createElement('img');
+            champImg.alt = ''; champImg.className = 'champ-icon';
+            const _sp = {'Norra':'https://static.wikia.nocookie.net/leagueoflegends/images/e/ee/Norra_OriginalCentered.jpg','Mel':'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg'};
+            champImg.src = _sp[item.name] || (DD_URL + champKey(item.name) + '.png');
+            champImg.onerror = function(){ this.style.display='none'; };
+            champImg.style.cursor = 'pointer';
+            champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
+            if(isP) champImg.classList.add('icon-pinned');
+            champImg.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
+            tdChamp.appendChild(btnX); tdChamp.appendChild(champImg); tdChamp.appendChild(nameSpan);
+            tr.appendChild(tdChamp);
+            ['ad','hp','mana','armor','mrez'].forEach(k => {
+                const v = item[k];
+                let cls = (k===sK) ? 'active-col ' : '';
+                if(v >= thres[k].s) cls += 's';
+                else if(v >= thres[k].a) cls += 'a';
+                else if(v <= thres[k].c) cls += 'c';
+                else cls += 'b';
+                let txt = Math.round(v);
+                if(k==='mana' && item.res==='Energy') txt = 'NRG';
+                else if(k==='mana' && v===0) txt = '0';
+                const td = document.createElement('td');
+                td.className = cls; td.textContent = txt;
+                td.addEventListener('mouseenter', (ev) => showT(ev, item.g[k]));
+                td.addEventListener('mousemove', moveT);
+                td.addEventListener('mouseleave', hideT);
+                tr.appendChild(td);
+            });
+            body.appendChild(tr);
+        });
+    }
 
-    const numSpan = document.createElement('span');
-    numSpan.className = 'row-num';
-    numSpan.textContent = idx + 1;
-    tdChamp.appendChild(numSpan);
-
-    const btnX = document.createElement('button');
-    btnX.className = 'x-btn';
-    btnX.type = 'button';
-    btnX.textContent = '×';
-    btnX.title = 'Remove from table';
-    btnX.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        removeC(item.name); // только снимаем выбор, ничего из базы не удаляем
-    });
-
-    const nameSpan = document.createElement('span');
-    nameSpan.className = 'name-tag ' + (isP ? 'pinned' : '');
-    nameSpan.textContent = item.name;
-    nameSpan.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        toggleP(item.name);
-    });
-
-    const champImg = document.createElement('img');
-    champImg.alt = '';
-    champImg.className = 'champ-icon';
-    // Norra and Mel not yet on DataDragon — use LoL wiki CDN
-    const _specialIcons = {
-        'Norra': 'https://static.wikia.nocookie.net/leagueoflegends/images/e/ee/Norra_OriginalCentered.jpg',
-        'Mel': 'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg',
-    };
-    champImg.src = _specialIcons[item.name] || (DD_URL + champKey(item.name) + '.png');
-    champImg.onerror = function(){ this.style.display='none'; };
-    champImg.style.cursor = 'pointer';
-    champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
-    if(isP) champImg.classList.add('icon-pinned');
-    champImg.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        toggleP(item.name);
-    });
-
-    tdChamp.appendChild(btnX);
-    tdChamp.appendChild(champImg);
-    tdChamp.appendChild(nameSpan);
-    tr.appendChild(tdChamp);
-
-    // --- Stat cells ---
-    ['ad','hp','mana','armor','mrez'].forEach(k => {
-        const v = item[k];
-        let cls = (k === sK) ? "active-col " : "";
-        if (v >= thres[k].s) cls += "s";
-        else if (v >= thres[k].a) cls += "a";
-        else if (v <= thres[k].c) cls += "c";
-        else cls += "b";
-
-        let txt = Math.round(v);
-        if (k === 'mana' && item.res === 'Energy') txt = "NRG";
-        else if (k === 'mana' && v === 0) txt = "0";
-
-        const td = document.createElement('td');
-        td.className = cls;
-        td.textContent = txt;
-
-        // tooltip only on hover
-        td.addEventListener('mouseenter', (ev) => showT(ev, item.g[k]));
-        td.addEventListener('mousemove', moveT);
-        td.addEventListener('mouseleave', hideT);
-
-        tr.appendChild(td);
-    });
-
-    body.appendChild(tr);
-});
-}
+    // render() = full rebuild (used everywhere except level slider)
+    function render() { renderFull(); }
 
     
 window.showT = function(e, v) {
@@ -1562,15 +1574,7 @@ window.hideT = function() {
             lvl = +e.target.value;
             document.getElementById('lvlLabel').innerText = lvl;
             updateRuler();
-            render();
-            // Pop animation on all stat numbers
-            requestAnimationFrame(() => {
-                document.querySelectorAll('#statTable tbody td:not(:first-child)').forEach(td => {
-                    td.classList.remove('num-anim');
-                    void td.offsetWidth;
-                    td.classList.add('num-anim');
-                });
-            });
+            renderUpdate(); // fast path — only update numbers
         };
     }
 
