@@ -4,6 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>WILD RIFT STATS</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
+    <meta name="description" content="Wild Rift champion base stats by level — AD, HP, Mana, Armor, Magic Resist. Compare all champions at every level 1-15.">
+    <meta property="og:title" content="Wild Rift Stats — Champion Base Stats">
+    <meta property="og:description" content="Compare AD, HP, Mana, Armor and MR for all Wild Rift champions at any level.">
+    <meta name="theme-color" content="#6D3FF5">
     <style>
         * {
             margin: 0;
@@ -191,9 +196,8 @@
             border-radius: 15px;
             border: 2px solid var(--border);
             overflow-x: hidden;
-overflow-y: auto;
-            max-height: 65vh;
             overflow-y: auto;
+            max-height: 65vh;
             animation: fadeIn 0.8s ease;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
@@ -975,6 +979,19 @@ html, body{ overflow-x: hidden !important; }
   animation: twitchPulse 2.4s ease-in-out infinite;
 }
 
+
+        /* CHAMPION ICONS (Data Dragon) */
+        .champ-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid rgba(155,89,182,0.35);
+        }
+        @media (max-width: 768px) {
+            .champ-icon { width: 22px; height: 22px; border-radius: 4px; }
+        }
 </style>
 </head>
 <body>
@@ -1042,6 +1059,21 @@ html, body{ overflow-x: hidden !important; }
     // Example: const G_URL = 'https://docs.google.com/spreadsheets/d/e/.../pub?output=tsv';
     const G_URL = window.G_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
 
+
+    // Map champion names to Data Dragon keys
+    function champKey(n) {
+        const m = {
+            'Aurelion Sol':'AurelionSol','Dr. Mundo':'DrMundo','Jarvan IV':'JarvanIV',
+            'Lee Sin':'LeeSin','Master Yi':'MasterYi','Miss Fortune':'MissFortune',
+            'Twisted Fate':'TwistedFate','Xin Zhao':'XinZhao','Nunu & Willump':'Nunu',
+            "Cho'Gath":'Chogath',"Vel'Koz":'Velkoz',"Kai'Sa":'Kaisa',"Kha'Zix":'Khazix',"Kog'Maw":'KogMaw',
+            "Rek'Sai":'RekSai','Tahm Kench':'TahmKench','Wukong':'MonkeyKing',
+            "Rek'Sai":'RekSai','Tahm Kench':'TahmKench','Wukong':'MonkeyKing',
+        };
+        return m[n] || n.replace(/[\s\'\.'&]/g,'');
+    }
+    const DD_URL = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
+
     let raw = [];
     let selected = new Set();
     let pinned = new Set();
@@ -1067,7 +1099,10 @@ async function start() {
             return;
         }
 
-        if(localStorage.getItem('p')) pinned = new Set(JSON.parse(localStorage.getItem('p')));
+        try {
+            const _saved = localStorage.getItem('p');
+            if(_saved) pinned = new Set(JSON.parse(_saved));
+        } catch(e) { /* incognito or storage disabled */ }
         const r = await fetch(G_URL);
         const t = await r.text();
         const lines = t.trim().split('\n');
@@ -1189,7 +1224,14 @@ data.forEach(item => {
         toggleP(item.name);
     });
 
+    const champImg = document.createElement('img');
+    champImg.src = DD_URL + champKey(item.name) + '.png';
+    champImg.alt = '';
+    champImg.className = 'champ-icon';
+    champImg.onerror = function(){ this.style.display='none'; };
+
     tdChamp.appendChild(btnX);
+    tdChamp.appendChild(champImg);
     tdChamp.appendChild(nameSpan);
     tr.appendChild(tdChamp);
 
@@ -1253,7 +1295,7 @@ window.hideT = function() {
 
     window.toggleP = function(n) {
         pinned.has(n) ? pinned.delete(n) : pinned.add(n);
-        localStorage.setItem('p', JSON.stringify([...pinned]));
+        try { localStorage.setItem('p', JSON.stringify([...pinned])); } catch(e) {}
         render();
     }
 
@@ -1261,7 +1303,7 @@ window.hideT = function() {
     window.removeC = function(n) {
         selected.delete(n);
         pinned.delete(n);
-        localStorage.setItem('p', JSON.stringify([...pinned]));
+        try { localStorage.setItem('p', JSON.stringify([...pinned])); } catch(e) {}
         drawM();
         render();
     }
@@ -2284,44 +2326,7 @@ html, body { overflow-y: auto !important; }
 }
 </style>
 
-<script id="v38-js">
-/* Ensure mobile +/- is AFTER slider (right side) */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const stepper = document.querySelector('.lvl-stepper');
-  if(!slider || !stepper) return;
-  if (slider.nextElementSibling !== stepper){
-    slider.insertAdjacentElement('afterend', stepper);
-  }
-})();
-
-/* Force rating arrows visible after sort */
-(function(){
-  const keys = ['ad','hp','mana','armor','mrez'];
-  function paint(active, dir){
-    keys.forEach(k=>{
-      const el = document.getElementById('ar-'+k);
-      if(el){
-        el.textContent = (k===active ? (dir==='asc'?'▲':'▼') : '▼');
-      }
-    });
-  }
-  const orig = window.doSort;
-  if(typeof orig === 'function'){
-    let cur='ad', dir='desc';
-    window.doSort = function(k){
-      if(k===cur) dir = dir==='asc'?'desc':'asc';
-      else { cur=k; dir='desc'; }
-      const r = orig.apply(this, arguments);
-      setTimeout(()=>paint(cur,dir),0);
-      return r;
-    };
-    setTimeout(()=>paint(cur,dir),0);
-  }
-})();
-</script>
+<!-- doSort arrow logic handled by main render() -->
 
 
 <style id="v41-overrides">
@@ -2407,32 +2412,6 @@ html, body { overflow-y: auto !important; }
 // prevent nickname link jump
 document.getElementById('nickname')?.addEventListener('click', e => e.preventDefault());
 
-/* Keep rating arrows alive + update on sort */
-(function(){
-  const keys = ['ad','hp','mana','armor','mrez'];
-  function paint(active, dir){
-    keys.forEach(k=>{
-      const el = document.getElementById('ar-'+k);
-      if(!el) return;
-      el.textContent = (k === active) ? (dir === 'asc' ? '▲' : '▼') : '▼';
-    });
-  }
-  const orig = window.doSort;
-  if(typeof orig === 'function'){
-    let cur='ad', dir='desc';
-    window.doSort = function(k){
-      if(k===cur) dir = (dir==='asc') ? 'desc' : 'asc';
-      else { cur=k; dir='desc'; }
-      const r = orig.apply(this, arguments);
-      setTimeout(()=>paint(cur,dir),0);
-      return r;
-    };
-    setTimeout(()=>paint(cur,dir),0);
-  } else {
-    setTimeout(()=>paint('ad','desc'),0);
-  }
-})();
-
 /* Create +/- on mobile and place AFTER slider (right side) */
 (function(){
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
@@ -2491,31 +2470,7 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 }
 </style>
 
-<script id="v43-arrows-js">
-/* Keep arrows under headers on mobile after any render */
-(function(){
-  const keys=['ad','hp','mana','armor','mrez'];
-  function paint(active,dir){
-    keys.forEach(k=>{
-      const el=document.getElementById('ar-'+k);
-      if(!el) return;
-      el.textContent = (k===active)?(dir==='asc'?'▲':'▼'):'▼';
-    });
-  }
-  const orig=window.doSort;
-  if(typeof orig==='function'){
-    let cur='ad',dir='desc';
-    window.doSort=function(k){
-      if(k===cur) dir=(dir==='asc')?'desc':'asc';
-      else{cur=k;dir='desc';}
-      const r=orig.apply(this,arguments);
-      setTimeout(()=>paint(cur,dir),0);
-      return r;
-    };
-    setTimeout(()=>paint(cur,dir),0);
-  }
-})();
-</script>
+
 
 </body>
 </html>
