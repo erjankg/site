@@ -91,9 +91,19 @@
         }
 
         /* SUPPORT */
+        @keyframes supportPulse {
+            0%   { box-shadow: 0 4px 15px rgba(109,63,245,0.5); }
+            50%  { box-shadow: 0 4px 30px rgba(109,63,245,0.9), 0 0 40px rgba(185,111,255,0.4); }
+            100% { box-shadow: 0 4px 15px rgba(109,63,245,0.5); }
+        }
+        @keyframes shimmerSlide {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
         .btn-support {
             display: block;
-            background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
+            background: linear-gradient(100deg, #6D3FF5 0%, #9b59b6 40%, #b96fff 55%, #9b59b6 70%, #6D3FF5 100%);
+            background-size: 200% auto;
             color: #fff;
             padding: 16px;
             border-radius: 15px;
@@ -102,13 +112,17 @@
             text-align: center;
             margin-bottom: 20px;
             font-weight: 900;
-            box-shadow: 0 4px 15px var(--accent-glow);
-            animation: fadeIn 0.6s ease;
-            transition: transform 0.2s;
+            animation: fadeIn 0.6s ease, supportPulse 2.5s ease-in-out infinite, shimmerSlide 3s linear infinite;
+            transition: transform 0.15s, filter 0.15s;
+            position: relative;
+            overflow: hidden;
         }
-
+        .btn-support:hover {
+            transform: translateY(-2px) scale(1.01);
+            filter: brightness(1.15);
+        }
         .btn-support:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
         }
 
         /* SLIDER */
@@ -1123,6 +1137,7 @@ html, body{ overflow-x: hidden !important; }
     </div>
 
     <div class="table-wrap-outer">
+    <div id="skeletonOverlay" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;background:var(--bg-card);border-radius:15px;overflow:hidden;padding:8px;"><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div></div>
     <div class="table-hold" id="tableHold">
         <table id="statTable">
             <thead>
@@ -1215,14 +1230,10 @@ async function start() {
             const _saved = localStorage.getItem('p');
             if(_saved) pinned = new Set(JSON.parse(_saved));
         } catch(e) { /* incognito or storage disabled */ }
-        // Show skeleton loader
-        const tableHoldEl = document.getElementById('tableHold');
-        if(tableHoldEl) {
-            let skHtml = '<div class="skeleton-wrap">';
-            for(let i=0;i<12;i++) skHtml += `<div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div>`;
-            skHtml += '</div>';
-            tableHoldEl.innerHTML = skHtml;
-        }
+        // Show skeleton loader overlay (don't touch the real table)
+        const skEl = document.getElementById('skeletonOverlay');
+        if(skEl) skEl.style.display = 'block';
+        document.getElementById('statTable').style.visibility = 'hidden';
 
         const r = await fetch(G_URL);
         const t = await r.text();
@@ -1255,6 +1266,10 @@ async function start() {
         initApp();
         createRuler();
         render();
+        // Hide skeleton, show real table
+        const skEl2 = document.getElementById('skeletonOverlay');
+        if(skEl2) skEl2.style.display = 'none';
+        document.getElementById('statTable').style.visibility = 'visible';
     }
 
     function createRuler() {
