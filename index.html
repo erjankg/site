@@ -1177,7 +1177,7 @@
         .item-card img { width: 38px; height: 38px; border-radius: 6px; display: block; }
 
         .item-cost { font-size: 8px; color: #C9A800; margin-top: 2px; font-weight: 700; }
-        /* ── Calculatoсr buttons row ── */
+        /* ── Calculator buttons row ── */
         .calc-btns-row {
             display: flex;
             gap: 10px;
@@ -2125,7 +2125,8 @@ window.hideT = function() {
 
     function applyI18n() {
         // Buttons outside modals
-        const champBtn = document.querySelector('.btn-champ-cfg');
+        // Only change the header Champions button, not the modal items
+        const champBtn = document.querySelector('#statTable .btn-champ-cfg');
         if(champBtn) champBtn.textContent = LANG.champions;
         const suppBtn = document.querySelector('.btn-support');
         if(suppBtn && suppBtn.textContent.includes('ПОДДЕРЖАТЬ')) suppBtn.textContent = LANG.support;
@@ -3022,109 +3023,111 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 <!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
-  <div class="m-win" style="width:92vw;max-width:720px;max-height:93vh;overflow-y:auto;padding:22px 20px 20px;">
+  <div class="m-win" style="width:94vw;max-width:780px;max-height:95vh;overflow-y:auto;padding:24px 22px 22px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
-    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:16px;">⚔ Калькулятор урона</div>
+    <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:18px;letter-spacing:0.5px;">⚔ Калькулятор урона</div>
 
-    <!-- Два столбца: твои статы + статы врага -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-      <div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;">ТВОИ СТАТЫ</div>
+    <!-- ── TWO COLUMNS: GREEN (my) + RED (enemy) ── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+
+      <!-- GREEN — my stats -->
+      <div style="background:rgba(39,174,96,0.08);border:1.5px solid rgba(39,174,96,0.35);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🟢 МОИ СТАТЫ</div>
         <div class="calc-field" style="margin-bottom:8px;">
           <label class="calc-label">AD (физ. урон)</label>
           <input type="number" id="cDmg" placeholder="150" min="0" class="calc-input" oninput="calcDmg()">
         </div>
         <div class="calc-field" style="margin-bottom:8px;">
-          <label class="calc-label">% Пробивание брони</label>
+          <label class="calc-label">% Пробив. брони</label>
           <input type="number" id="cPen" placeholder="0" min="0" max="100" value="0" class="calc-input" oninput="calcDmg()">
         </div>
         <div class="calc-field" style="margin-bottom:8px;">
-          <label class="calc-label">Твой HP (для Thornmail)</label>
+          <label class="calc-label">Мой HP</label>
           <input type="number" id="cMyHp" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()">
         </div>
         <div class="calc-field">
-          <label class="calc-label">Твоя броня (для Thornmail)</label>
+          <label class="calc-label">Моя броня</label>
           <input type="number" id="cMyArmor" placeholder="80" min="0" class="calc-input" oninput="calcDmg()">
         </div>
       </div>
-      <div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;" class="i18n" data-i18n="enemyStats">СТАТЫ ВРАГА</div>
+
+      <!-- RED — enemy stats -->
+      <div style="background:rgba(231,76,60,0.08);border:1.5px solid rgba(231,76,60,0.35);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:10px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🔴 СТАТЫ ВРАГА</div>
         <div class="calc-field" style="margin-bottom:8px;">
-          <label class="calc-label">Броня / Сопротивление</label>
+          <label class="calc-label">Броня / МС врага</label>
           <input type="number" id="cArmor" placeholder="100" min="-99" class="calc-input" oninput="calcDmg()">
         </div>
         <div class="calc-field" style="margin-bottom:8px;">
-          <label class="calc-label">Макс. HP (Sunfire/Liandry)</label>
+          <label class="calc-label">Макс. HP врага</label>
           <input type="number" id="cEnemyHpMax" placeholder="2500" min="0" class="calc-input" oninput="calcDmg()">
         </div>
         <div class="calc-field">
-          <label class="calc-label">Текущий HP (BotRK)</label>
+          <label class="calc-label">Тек. HP врага</label>
           <input type="number" id="cEnemyHpCur" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()">
         </div>
       </div>
     </div>
 
-    <!-- Предметы -->
-    <div style="margin-bottom:12px;">
-      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;" class="i18n" data-i18n="item">ПРЕДМЕТ</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+    <!-- ── ITEM BUTTONS ── -->
+    <div style="margin-bottom:14px;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:8px;">ПРЕДМЕТ (нажми для расчёта)</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="calc-item-btn active" id="itemNone" onclick="selectCalcItem('none')" title="Без предмета">
-          <span style="font-size:20px;display:block;width:36px;height:36px;line-height:36px;text-align:center;">⚡</span>
+          <span style="font-size:20px;display:block;width:38px;height:38px;line-height:38px;text-align:center;">⚡</span>
         </button>
         <button class="calc-item-btn" id="itemThornmail" onclick="selectCalcItem('thornmail')" title="Шипованный доспех">
-          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3075.png" style="width:36px;height:36px;border-radius:6px;" onerror="this.style.background='#333'">
+          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3075.png" onerror="this.style.display='none'" style="width:38px;height:38px;border-radius:6px;">
         </button>
         <button class="calc-item-btn" id="itemBotrk" onclick="selectCalcItem('botrk')" title="Клинок короля-разрушителя">
-          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3153.png" style="width:36px;height:36px;border-radius:6px;" onerror="this.style.background='#333'">
+          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3153.png" onerror="this.style.display='none'" style="width:38px;height:38px;border-radius:6px;">
         </button>
         <button class="calc-item-btn" id="itemSunfire" onclick="selectCalcItem('sunfire')" title="Эгида Солнечного огня">
-          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3068.png" style="width:36px;height:36px;border-radius:6px;" onerror="this.style.background='#333'">
+          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3068.png" onerror="this.style.display='none'" style="width:38px;height:38px;border-radius:6px;">
         </button>
         <button class="calc-item-btn" id="itemLiandry" onclick="selectCalcItem('liandry')" title="Мучения Лиандри">
-          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6653.png" style="width:36px;height:36px;border-radius:6px;" onerror="this.style.background='#333'">
+          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6653.png" onerror="this.style.display='none'" style="width:38px;height:38px;border-radius:6px;">
         </button>
       </div>
-      <div id="calcItemHint" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px;line-height:1.5;min-height:14px;"></div>
+      <div id="calcItemHint" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:7px;line-height:1.6;min-height:14px;"></div>
     </div>
 
-    <!-- Урон способностей -->
-    <div style="margin-bottom:12px;">
-      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;" class="i18n" data-i18n="abilityDmg">⚡ УРОН СПОСОБНОСТИ</div>
-      <div id="abilityRows" style="display:flex;flex-direction:column;gap:6px;"></div>
-      <button onclick="addAbilityRow()" style="margin-top:6px;width:100%;background:rgba(109,63,245,0.12);border:1.5px dashed rgba(155,89,182,0.4);color:rgba(255,255,255,0.55);border-radius:8px;padding:7px;font-size:12px;cursor:pointer;">
-        + Добавить скейл
-      </button>
-      <div id="abilityResult" style="display:none;margin-top:8px;">
-        <div class="calc-stat-box" style="background:rgba(93,173,226,0.1);border-color:rgba(93,173,226,0.3);">
-          <div class="calc-stat-label">⚡ Итого урона способности (после резистов)</div>
-          <div class="calc-stat-val" id="abilityResultVal" style="color:#5dade2;font-size:22px;"></div>
-        </div>
-        <div id="abilityFormula" style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.25);font-family:monospace;line-height:1.5;"></div>
-      </div>
+    <!-- ── ABILITY SCALING ── -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:8px;">⚡ УРОН СПОСОБНОСТИ</div>
+      <div id="abilityRows" style="display:flex;flex-direction:column;gap:7px;"></div>
+      <button onclick="addAbilityRow()" style="margin-top:8px;width:100%;background:rgba(109,63,245,0.12);border:1.5px dashed rgba(155,89,182,0.4);color:rgba(255,255,255,0.5);border-radius:8px;padding:7px;font-size:12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(109,63,245,0.22)'" onmouseout="this.style.background='rgba(109,63,245,0.12)'">+ Добавить скейл</button>
     </div>
 
-    <!-- Результат -->
+    <!-- ── RESULTS ── -->
     <div id="calcResult" style="display:none;">
-      <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:12px;"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:14px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="calc-stat-box">
           <div class="calc-stat-label">Эфф. броня</div>
-          <div class="calc-stat-val" id="resEff" style="color:#5dade2;font-size:17px;"></div>
+          <div class="calc-stat-val" id="resEff" style="color:#5dade2;font-size:18px;"></div>
         </div>
         <div class="calc-stat-box">
           <div class="calc-stat-label">Снижение урона</div>
-          <div class="calc-stat-val" id="resMit" style="color:#e74c3c;font-size:17px;"></div>
+          <div class="calc-stat-val" id="resMit" style="color:#e74c3c;font-size:18px;"></div>
         </div>
         <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.4);">
-          <div class="calc-stat-label">✅ Реально нанесено урона</div>
-          <div class="calc-stat-val" id="resDmg" style="color:#b96fff;font-size:26px;"></div>
+          <div class="calc-stat-label">✅ Нанесено урона</div>
+          <div class="calc-stat-val" id="resDmg" style="color:#b96fff;font-size:28px;"></div>
         </div>
-        <div id="calcItemResult" class="calc-stat-box" style="grid-column:1/-1;display:none;background:rgba(232,130,10,0.12);border-color:rgba(232,130,10,0.35);">
+        <div id="calcItemResult" class="calc-stat-box" style="grid-column:1/-1;display:none;background:rgba(232,130,10,0.12);border-color:rgba(232,130,10,0.4);">
           <div class="calc-stat-label" id="calcItemResultLabel"></div>
-          <div class="calc-stat-val" id="calcItemResultVal" style="color:#e07820;font-size:18px;"></div>
+          <div class="calc-stat-val" id="calcItemResultVal" style="color:#e07820;font-size:22px;"></div>
+        </div>
+        <div id="abilityResult" style="grid-column:1/-1;display:none;">
+          <div class="calc-stat-box" style="background:rgba(93,173,226,0.1);border-color:rgba(93,173,226,0.3);">
+            <div class="calc-stat-label">⚡ Итого урона способности (после резистов)</div>
+            <div class="calc-stat-val" id="abilityResultVal" style="color:#5dade2;font-size:22px;"></div>
+          </div>
+          <div id="abilityFormula" style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.28);font-family:monospace;line-height:1.5;"></div>
         </div>
       </div>
-      <div id="calcFormula" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.25);font-family:monospace;line-height:1.5;"></div>
+      <div id="calcFormula" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.28);font-family:monospace;line-height:1.5;"></div>
     </div>
   </div>
 </div>
@@ -3249,5 +3252,6 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 </div>
 
     </div><!-- balance fix -->
+<div id="itemTooltip"></div>
 </body>
 </html>
