@@ -1046,9 +1046,9 @@
             .row-num { font-size: 8px; min-width: 10px; }
         }
         /* Modal champion items with icons */
-        .m-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .m-item img { width: 36px; height: 36px; border-radius: 7px; object-fit: cover; }
-        @media (max-width: 768px) { .m-item img { width: 28px; height: 28px; } }
+        .m-item { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 4px !important; }
+        .m-item img { width: 46px; height: 46px; border-radius: 8px; object-fit: cover; display: block; }
+        @media (max-width: 768px) { .m-item img { width: 38px; height: 38px; border-radius: 7px; } }
 
         /* Mobile: force sort arrows visible under header text */
         @media (max-width: 768px) {
@@ -1149,10 +1149,62 @@
             color: #fff;
         }
 
+
+        /* ── Items reference modal ── */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+            gap: 6px;
+        }
+        .item-card {
+            background: rgba(255,255,255,0.03);
+            border: 1.5px solid rgba(155,89,182,0.18);
+            border-radius: 8px;
+            padding: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+        }
+        .item-card:hover {
+            border-color: #b96fff;
+            background: rgba(109,63,245,0.22);
+            transform: translateY(-2px) scale(1.08);
+            z-index: 2;
+        }
+        .item-card img { width: 38px; height: 38px; border-radius: 6px; display: block; }
+        /* Item tooltip on hover */
+        .item-card { position: relative; }
+        .item-card::after {
+            content: attr(title);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15,5,32,0.97);
+            border: 1px solid rgba(155,89,182,0.5);
+            color: rgba(255,255,255,0.85);
+            font-size: 11px;
+            line-height: 1.5;
+            padding: 8px 10px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            width: 220px;
+            max-width: 90vw;
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            word-break: break-word;
+        }
+        .item-card:hover::after { opacity: 1; }
+        @media (max-width: 768px) { .item-card::after { display: none; } }
+        .item-cost { font-size: 8px; color: #C9A800; margin-top: 2px; font-weight: 700; }
         /* ── Calculator buttons row ── */
         .calc-btns-row {
             display: flex;
             gap: 10px;
+            margin-top: 14px;
             margin-bottom: 12px;
         }
         .btn-calc-main {
@@ -1170,8 +1222,8 @@
         }
         .btn-calc-main:hover { background: rgba(109,63,245,0.3); transform: translateY(-1px); }
         .btn-calc-main:active { transform: scale(0.97); }
-        .btn-calc-ehp { border-color: rgba(93,173,226,0.45); background: rgba(93,173,226,0.1); }
-        .btn-calc-ehp:hover { background: rgba(93,173,226,0.22); }
+        .btn-calc-items { border-color: rgba(255,193,7,0.4); background: rgba(255,193,7,0.08); }
+        .btn-calc-items:hover { background: rgba(255,193,7,0.18); }
         /* Mana label: full on PC, short on mobile */
         .mana-label-short { display: none; }
         .mana-label-full  { display: inline; }
@@ -1179,6 +1231,42 @@
             .mana-label-short { display: inline; }
             .mana-label-full  { display: none; }
         }
+
+
+        /* ── Calc tab buttons ── */
+        .calc-tab-btn {
+            flex: 1;
+            padding: 9px;
+            border-radius: 10px;
+            border: 1.5px solid rgba(155,89,182,0.3);
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            font-weight: 900;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .calc-tab-btn:hover { background: rgba(109,63,245,0.15); color:#fff; }
+        .calc-tab-active { border-color: #b96fff !important; background: rgba(109,63,245,0.3) !important; color: #fff !important; }
+        /* ── Item calculator buttons ── */
+        .calc-item-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(155,89,182,0.25);
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.15s;
+            min-width: 52px;
+        }
+        .calc-item-btn:hover { border-color: rgba(155,89,182,0.6); background: rgba(109,63,245,0.15); color:#fff; }
+        .calc-item-btn.active { border-color: #b96fff; background: rgba(109,63,245,0.25); color: #fff; }
+        .calc-item-name { font-size: 10px; font-weight: 700; }
         /* FAB action buttons */
         .fab-action {
             background: rgba(26,13,46,0.96);
@@ -1210,13 +1298,13 @@
     <a href="https://www.donationalerts.com/r/erjankg" class="btn-support" target="_blank">💎 ПОДДЕРЖАТЬ</a>
 
     <div class="calc-btns-row">
-        <button class="btn-calc-main" onclick="openCalc()">🧮 Калькулятор урона</button>
-        <button class="btn-calc-main btn-calc-ehp" onclick="openEhp()">🛡 Эффективный HP</button>
+        <button class="btn-calc-main" onclick="openCalc()">⚔ Damage Calc</button>
+        <button class="btn-calc-main btn-calc-items" onclick="openItems()">📦 Items</button>
     </div>
 
     <div class="lvl-container">
         <div class="lvl-info">
-            <span style="font-size:14px;">УРОВЕНЬ:</span>
+            <span style="font-size:14px;">Level</span>
             <span id="lvlLabel" class="lvl-num">10</span>
         </div>
         <div class="slider-wrapper">
@@ -1634,8 +1722,8 @@ window.hideT = function() {
                 mImg.src = DD_URL + champKey(c.name) + '.png';
                 mImg.alt = '';
                 mImg.onerror = function(){ this.style.display='none'; };
+                mImg.title = c.name;
                 btn.appendChild(mImg);
-                btn.appendChild(document.createTextNode(c.name));
                 btn.onclick = () => {
                     selected.has(c.name) ? selected.delete(c.name) : selected.add(c.name);
                     drawM();
@@ -1695,74 +1783,103 @@ window.hideT = function() {
             document.getElementById('fabMain').style.transform = '';
         }
     });
-    // ══════════════ DAMAGE CALCULATOR ══════════════
+    // ══════════════ DAMAGE CALCULATOR + ITEMS ══════════════
+    let _activeCalcItem = 'none';
+
     window.openCalc = function() {
         document.getElementById('calcMask').classList.add('active');
-        switchCalcTab('dmg');
-        document.getElementById('cDmg').focus();
+        setTimeout(() => { const el = document.getElementById('cDmg'); if(el) el.focus(); }, 80);
     };
-
-    window.switchCalcTab = function(tab) {
-        const isDmg = tab === 'dmg';
-        document.getElementById('calcPanelDmg').style.display = isDmg ? 'flex' : 'none';
-        document.getElementById('calcPanelEhp').style.display = isDmg ? 'none' : 'flex';
-        document.getElementById('calcTabDmg').style.background = isDmg ? 'rgba(109,63,245,0.3)' : 'transparent';
-        document.getElementById('calcTabDmg').style.color = isDmg ? '#fff' : 'rgba(255,255,255,0.5)';
-        document.getElementById('calcTabDmg').style.borderColor = isDmg ? '#b96fff' : 'rgba(155,89,182,0.3)';
-        document.getElementById('calcTabEhp').style.background = isDmg ? 'transparent' : 'rgba(109,63,245,0.3)';
-        document.getElementById('calcTabEhp').style.color = isDmg ? 'rgba(255,255,255,0.5)' : '#fff';
-        document.getElementById('calcTabEhp').style.borderColor = isDmg ? 'rgba(155,89,182,0.3)' : '#b96fff';
-        document.getElementById('calcPanelDmg').style.flexDirection = 'column';
-        document.getElementById('calcPanelEhp').style.flexDirection = 'column';
-    };
-
     window.closeCalc = function() {
         document.getElementById('calcMask').classList.remove('active');
     };
+
     window.calcDmg = function() {
-        const dmg   = parseFloat(document.getElementById('cDmg').value)   || 0;
-        const armor = parseFloat(document.getElementById('cArmor').value)  || 0;
-        const pen   = parseFloat(document.getElementById('cPen').value)    || 0;
-        const res   = document.getElementById('calcResult');
-        if(!dmg || dmg <= 0) { res.style.display = 'none'; return; }
-        // LoL formula: effective armor after % pen
-        const effArmor = armor > 0 ? armor * (1 - pen / 100) : armor;
-        const mult     = 100 / (100 + effArmor);
-        const finalDmg = dmg * mult;
+        const dmg     = parseFloat(document.getElementById('cDmg').value)    || 0;
+        const armor   = parseFloat(document.getElementById('cArmor').value)   || 0;
+        const pen     = parseFloat(document.getElementById('cPen').value)     || 0;
+        const myHp    = parseFloat(document.getElementById('cMyHp').value)    || 0;
+        const myArmor = parseFloat(document.getElementById('cMyArmor').value) || 0;
+        const eHpMax  = parseFloat(document.getElementById('cEnemyHpMax').value) || 0;
+        const eHpCur  = parseFloat(document.getElementById('cEnemyHpCur').value) || 0;
+        const res     = document.getElementById('calcResult');
+
+        if(!dmg && !eHpMax && !eHpCur && !myHp) { res.style.display = 'none'; return; }
+
+        // Base damage calc
+        const effArmor  = armor > 0 ? armor * (1 - pen / 100) : armor;
+        const finalDmg  = dmg > 0 ? dmg * 100 / (100 + effArmor) : 0;
         const mitigated = dmg - finalDmg;
-        const mitPct   = (mitigated / dmg * 100);
-        document.getElementById('resEff').textContent  = Math.round(effArmor * 10) / 10;
-        document.getElementById('resMit').textContent  = mitPct.toFixed(1) + '%';
-        document.getElementById('resDmg').textContent  = Math.round(finalDmg);
-        document.getElementById('calcFormula').innerHTML =
-            dmg + ' × 100 / (100 + ' + Math.round(effArmor*10)/10 + ') = ' + Math.round(finalDmg) + '<br>' +
-            (pen > 0 ? 'Пробивание ' + pen + '% → броня ' + armor + ' → ' + (Math.round(effArmor*10)/10) + '<br>' : '') +
-            'Броня поглотила: ' + Math.round(mitigated) + ' урона (' + mitPct.toFixed(1) + '%)';
+        const mitPct    = dmg > 0 ? (mitigated / dmg * 100) : 0;
+
+        if(dmg > 0) {
+            document.getElementById('resEff').textContent = Math.round(effArmor * 10) / 10;
+            document.getElementById('resMit').textContent = mitPct.toFixed(1) + '%';
+            document.getElementById('resDmg').textContent = Math.round(finalDmg);
+            document.getElementById('calcFormula').innerHTML =
+                dmg + ' × 100/(100+' + (Math.round(effArmor*10)/10) + ') = ' + Math.round(finalDmg) +
+                (pen > 0 ? '  |  pen ' + pen + '% → armor ' + armor + '→' + (Math.round(effArmor*10)/10) : '') +
+                '<br>Absorbed: ' + Math.round(mitigated) + ' (' + mitPct.toFixed(1) + '%)';
+        } else {
+            document.getElementById('resEff').textContent = '--';
+            document.getElementById('resMit').textContent = '--';
+            document.getElementById('resDmg').textContent = '--';
+            document.getElementById('calcFormula').textContent = '';
+        }
         res.style.display = 'block';
+
+        // Item proc
+        const itemRes = document.getElementById('calcItemResult');
+        const lblEl   = document.getElementById('calcItemResultLabel');
+        const valEl   = document.getElementById('calcItemResultVal');
+
+        if(_activeCalcItem === 'thornmail' && (myArmor || myHp)) {
+            const bonusArmor = Math.max(0, myArmor - 30);
+            const bonusHp    = Math.max(0, myHp - 600);
+            const rawDmg     = 20 + 0.06 * bonusArmor + 0.02 * bonusHp;
+            const finalItem  = rawDmg * 100 / (100 + Math.max(0, armor));
+            lblEl.textContent = '🛡 Thornmail Thorns dmg/hit (after enemy MR)';
+            valEl.textContent = Math.round(finalItem);
+            itemRes.style.display = 'block';
+        } else if(_activeCalcItem === 'botrk' && eHpCur) {
+            // WR BotRK: melee 9%, ranged 6%. Min 15.
+            const rawDmg   = Math.max(15, eHpCur * 0.09);
+            const finalItem = rawDmg * 100 / (100 + Math.max(0, effArmor));
+            lblEl.textContent = '⚔ BotRK Ruined Strikes 9% cur HP (melee) after armor';
+            valEl.textContent = Math.round(finalItem);
+            itemRes.style.display = 'block';
+        } else if(_activeCalcItem === 'sunfire' && (myHp || eHpMax)) {
+            // WR Sunfire: 16-30 + 1% bonus HP/s, max stacks ×1.42
+            const bonusHp  = Math.max(0, myHp - 600);
+            const rawBase  = 23 + 0.01 * bonusHp; // avg base 23
+            const rawStack = rawBase * 1.42;
+            const mit      = 100 / (100 + Math.max(0, armor));
+            lblEl.textContent = '🔥 Sunfire Immolate/s  base → max stacked (after MR)';
+            valEl.innerHTML = Math.round(rawBase*mit) + '/s → <b>' + Math.round(rawStack*mit) + '/s</b>';
+            itemRes.style.display = 'block';
+        } else if(_activeCalcItem === 'liandry' && eHpMax) {
+            // WR Liandry: 0.5% max HP per second over 3s (no AP bonus in WR)
+            const rawPerSec  = eHpMax * 0.005;
+            const rawTotal   = rawPerSec * 3;
+            const mit        = 100 / (100 + Math.max(0, armor));
+            lblEl.textContent = "🔥 Liandry's Torment dmg/s → total 3s (after MR)";
+            valEl.innerHTML = Math.round(rawPerSec*mit) + '/s → <b>' + Math.round(rawTotal*mit) + ' total</b>';
+            itemRes.style.display = 'block';
+        } else {
+            itemRes.style.display = 'none';
+        }
     };
 
-    // ══════════════ CHAMPION GROWTH CHART ══════════════
+
+
+        // ══════════════ CHAMPION GROWTH CHART ══════════════
     let growthChartObj = null;
     let chartStat = 'hp';
     let chartChamp = null;
 
-    window.openChart = function(champName) {
-        const champ = raw.find(x => x.name === champName);
-        if(!champ) return;
-        chartChamp = champ;
-        document.getElementById('chartTitle').textContent = '📈 ' + champName + ' — рост статов';
-        document.getElementById('chartMask').classList.add('active');
-        buildChartBtns();
-        renderGrowthChart();
-    };
-    window.closeChart = function() {
-        document.getElementById('chartMask').classList.remove('active');
-    };
-    window.setChartStat = function(k) {
-        chartStat = k;
-        document.querySelectorAll('.chart-stat-btn').forEach(b => b.classList.toggle('active', b.dataset.k === k));
-        renderGrowthChart();
-    };
+
+
+
 
     function buildChartBtns() {
         const stats = [{k:'hp',l:'HP'},{k:'ad',l:'AD'},{k:'mana',l:'MANA'},{k:'armor',l:'ARMOR'},{k:'mrez',l:'MREZ'}];
@@ -1817,31 +1934,92 @@ window.hideT = function() {
     }
 
 
-    // ══════════════ EFFECTIVE HP CALCULATOR ══════════════
+
+
+
+
+    window.openItems = function() {
+        document.getElementById('itemsMask').classList.add('active');
+    };
+    window.closeItems = function() {
+        document.getElementById('itemsMask').classList.remove('active');
+    };
+    // openEhp now opens calc modal
     window.openEhp = function() {
         document.getElementById('calcMask').classList.add('active');
-        switchCalcTab('ehp');
-        document.getElementById('ehpHp').focus();
     };
     window.closeEhp = function() {
         document.getElementById('calcMask').classList.remove('active');
     };
-    window.calcEhp = function() {
-        const hp    = parseFloat(document.getElementById('ehpHp').value)    || 0;
-        const armor = parseFloat(document.getElementById('ehpArmor').value) || 0;
-        const mr    = parseFloat(document.getElementById('ehpMr').value)    || 0;
-        const res   = document.getElementById('ehpResult');
-        if(!hp || hp <= 0) { res.style.display = 'none'; return; }
-        const ehpPhys  = Math.round(hp * (1 + armor / 100));
-        const ehpMagic = Math.round(hp * (1 + mr / 100));
-        document.getElementById('ehpPhys').textContent  = ehpPhys.toLocaleString();
-        document.getElementById('ehpMagic').textContent = ehpMagic.toLocaleString();
-        document.getElementById('ehpFormula').innerHTML =
-            'Физ: ' + hp + ' × (1 + ' + armor + '/100) = ' + ehpPhys + '<br>' +
-            'Маг: ' + hp + ' × (1 + ' + mr + '/100) = ' + ehpMagic;
-        res.style.display = 'block';
+    
+    // ══════════════ ABILITY DMG CALCULATOR ══════════════
+    let abilityRowCount = 0;
+
+    window.addAbilityRow = function() {
+        abilityRowCount++;
+        const rowId = 'arow_' + abilityRowCount;
+        const row = document.createElement('div');
+        row.id = rowId;
+        row.style.cssText = 'display:flex;gap:6px;align-items:center;flex-wrap:wrap;';
+        row.innerHTML = `
+          <input type="number" class="calc-input ability-base" placeholder="Base dmg" style="flex:2;min-width:80px;" oninput="calcAbility()">
+          <select class="calc-input ability-scale-type" onchange="calcAbility()" style="flex:2;min-width:90px;padding:8px 6px;">
+            <option value="none">+ flat</option>
+            <option value="myHp">+ % My HP</option>
+            <option value="myAd">+ % My AD</option>
+            <option value="myArmor">+ % My Armor</option>
+            <option value="enemyHpMax">+ % Enemy Max HP</option>
+            <option value="enemyHpCur">+ % Enemy Cur HP</option>
+            <option value="enemyArmor">+ % Enemy Armor</option>
+          </select>
+          <input type="number" class="calc-input ability-scale-val" placeholder="%" min="0" step="0.1" style="flex:1;min-width:55px;" oninput="calcAbility()">
+          <button onclick="document.getElementById('${rowId}').remove();calcAbility();" style="background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;">✕</button>
+        `;
+        document.getElementById('abilityRows').appendChild(row);
+        calcAbility();
     };
-    start();
+
+    window.calcAbility = function() {
+        const rows = document.querySelectorAll('#abilityRows > div');
+        if(rows.length === 0) { document.getElementById('abilityResult').style.display='none'; return; }
+
+        const myHp       = parseFloat(document.getElementById('cMyHp')?.value)       || 0;
+        const myArmor    = parseFloat(document.getElementById('cMyArmor')?.value)     || 0;
+        const myAd       = parseFloat(document.getElementById('cDmg')?.value)         || 0;
+        const enemyHpMax = parseFloat(document.getElementById('cEnemyHpMax')?.value)  || 0;
+        const enemyHpCur = parseFloat(document.getElementById('cEnemyHpCur')?.value)  || 0;
+        const enemyArmor = parseFloat(document.getElementById('cArmor')?.value)       || 0;
+        const pen        = parseFloat(document.getElementById('cPen')?.value)         || 0;
+
+        const statMap = { myHp, myAd, myArmor, enemyHpMax, enemyHpCur, enemyArmor };
+        let totalRaw = 0;
+        const parts = [];
+
+        rows.forEach(row => {
+            const base      = parseFloat(row.querySelector('.ability-base')?.value)      || 0;
+            const scaleType = row.querySelector('.ability-scale-type')?.value || 'none';
+            const scalePct  = parseFloat(row.querySelector('.ability-scale-val')?.value) || 0;
+            const bonus     = scaleType !== 'none' ? (statMap[scaleType] || 0) * scalePct / 100 : 0;
+            const total     = base + bonus;
+            totalRaw += total;
+            if(base || bonus) parts.push(
+                base ? (bonus ? base + '+' + Math.round(bonus) : base) : Math.round(bonus)
+            );
+        });
+
+        if(totalRaw <= 0) { document.getElementById('abilityResult').style.display='none'; return; }
+
+        const effArmor   = enemyArmor > 0 ? enemyArmor * (1 - pen/100) : enemyArmor;
+        const finalTotal = totalRaw * 100 / (100 + effArmor);
+
+        document.getElementById('abilityResultVal').textContent = Math.round(finalTotal);
+        document.getElementById('abilityFormula').innerHTML =
+            '(' + parts.join(' + ') + ') × 100/(100+' + Math.round(effArmor) + ') = ' + Math.round(finalTotal) +
+            (pen > 0 ? '  |  pen ' + pen + '%' : '');
+        document.getElementById('abilityResult').style.display = 'block';
+    };
+
+        start();
 })();
 </script>
 
@@ -2697,83 +2875,121 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 
 
-<!-- ═══════════════ DAMAGE CALCULATOR MODAL ═══════════════ -->
+<!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
-  <div class="m-win" style="max-width:462px;height:auto;max-height:90vh;padding:28px 26px 26px;">
+  <div class="m-win" style="max-width:520px;height:auto;max-height:92vh;overflow-y:auto;padding:28px 24px 24px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
-    <div style="display:flex;gap:8px;margin-bottom:18px;">
-      <button id="calcTabDmg" onclick="switchCalcTab('dmg')" style="flex:1;padding:8px;border-radius:10px;border:1.5px solid #b96fff;background:rgba(109,63,245,0.3);color:#fff;font-weight:900;font-size:13px;cursor:pointer;">⚔️ Урон</button>
-      <button id="calcTabEhp" onclick="switchCalcTab('ehp')" style="flex:1;padding:8px;border-radius:10px;border:1.5px solid rgba(155,89,182,0.3);background:transparent;color:rgba(255,255,255,0.5);font-weight:900;font-size:13px;cursor:pointer;">🛡 Эфф. HP</button>
+    <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:18px;letter-spacing:1px;">⚔ Damage Calculator</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+      <div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">YOUR STATS</div>
+        <div class="calc-field" style="margin-bottom:10px;">
+          <label class="calc-label">Your attack damage (AD)</label>
+          <input type="number" id="cDmg" placeholder="150" min="0" class="calc-input" oninput="calcDmg()">
+        </div>
+        <div class="calc-field" style="margin-bottom:10px;">
+          <label class="calc-label">% Armor penetration</label>
+          <input type="number" id="cPen" placeholder="0" min="0" max="100" value="0" class="calc-input" oninput="calcDmg()">
+        </div>
+        <div class="calc-field" style="margin-bottom:10px;">
+          <label class="calc-label">Your HP (for Thornmail)</label>
+          <input type="number" id="cMyHp" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()">
+        </div>
+        <div class="calc-field">
+          <label class="calc-label">Your Armor (for Thornmail)</label>
+          <input type="number" id="cMyArmor" placeholder="80" min="0" class="calc-input" oninput="calcDmg()">
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">ENEMY STATS</div>
+        <div class="calc-field" style="margin-bottom:10px;">
+          <label class="calc-label">Armor / Magic Resist</label>
+          <input type="number" id="cArmor" placeholder="100" min="-99" class="calc-input" oninput="calcDmg()">
+        </div>
+        <div class="calc-field" style="margin-bottom:10px;">
+          <label class="calc-label">Max HP (Sunfire/Liandry)</label>
+          <input type="number" id="cEnemyHpMax" placeholder="2500" min="0" class="calc-input" oninput="calcDmg()">
+        </div>
+        <div class="calc-field">
+          <label class="calc-label">Current HP (BotRK)</label>
+          <input type="number" id="cEnemyHpCur" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()">
+        </div>
+      </div>
     </div>
-    <!-- DMG TAB -->
-    <div id="calcPanelDmg">
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="calc-field">
-        <label class="calc-label">Урон (до применения брони)</label>
-        <input type="number" id="cDmg" placeholder="например: 1000" min="0" class="calc-input" oninput="calcDmg()">
+
+    <!-- Item selector -->
+    <div style="margin-bottom:14px;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">ITEM PROC</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="calc-item-btn active" id="itemNone" onclick="selectCalcItem('none')" title="Ability (no item proc)">
+          <span style="font-size:22px;line-height:32px;display:block;width:38px;height:38px;text-align:center;">⚡</span>
+        </button>
+        <button class="calc-item-btn" id="itemThornmail" onclick="selectCalcItem('thornmail')" title="Thorns: 20 + 6% bonus Armor + 2% bonus HP magic dmg when attacked">
+          <img src="https://www.wildriftfire.com/images/items/thornmail.png" onerror="this.style.display='none'" style="width:28px;height:28px;border-radius:5px;">
+          
+        </button>
+        <button class="calc-item-btn" id="itemBotrk" onclick="selectCalcItem('botrk')" title="Ruined Strikes: 9% current HP physical dmg/hit (melee), 6% ranged. Min 15.">
+          <img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" onerror="this.style.display='none'" style="width:28px;height:28px;border-radius:5px;">
+          
+        </button>
+        <button class="calc-item-btn" id="itemSunfire" onclick="selectCalcItem('sunfire')" title="Immolate: 16–30 + 1% bonus HP/s magic, stacks ×1.42 at max">
+          <img src="https://www.wildriftfire.com/images/items/sunfire-aegis.png" onerror="this.style.display='none'" style="width:28px;height:28px;border-radius:5px;">
+          
+        </button>
+        <button class="calc-item-btn" id="itemLiandry" onclick="selectCalcItem('liandry')" title="Torment: 0.5% max HP/s over 3s per ability (+ 0.5% per 100 AP)">
+          <img src="https://www.wildriftfire.com/images/items/liandrys-torment.png" onerror="this.style.display='none'" style="width:28px;height:28px;border-radius:5px;">
+          
+        </button>
       </div>
-      <div class="calc-field">
-        <label class="calc-label">Броня / Сопротивление магии</label>
-        <input type="number" id="cArmor" placeholder="например: 100" min="-99" class="calc-input" oninput="calcDmg()">
+      <div id="calcItemHint" style="font-size:11px;color:rgba(255,255,255,0.28);margin-top:8px;line-height:1.5;min-height:16px;"></div>
+    </div>
+
+
+    <!-- ═══ Ability DMG Calculator ═══ -->
+    <div style="margin-bottom:14px;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">⚡ ABILITY DAMAGE</div>
+      <div id="abilityScalings" style="display:flex;flex-direction:column;gap:8px;">
+        <div id="abilityRows"></div>
+        <button onclick="addAbilityRow()" style="background:rgba(109,63,245,0.15);border:1.5px dashed rgba(155,89,182,0.4);color:rgba(255,255,255,0.5);border-radius:8px;padding:7px;font-size:12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(109,63,245,0.25)'" onmouseout="this.style.background='rgba(109,63,245,0.15)'">
+          + Add scaling
+        </button>
       </div>
-      <div class="calc-field">
-        <label class="calc-label">Пробивание (%, например Serylda = 33)</label>
-        <input type="number" id="cPen" placeholder="0" min="0" max="100" value="0" class="calc-input" oninput="calcDmg()">
+      <div id="abilityResult" style="display:none;margin-top:10px;">
+        <div style="height:1px;background:rgba(155,89,182,0.2);margin-bottom:10px;"></div>
+        <div class="calc-stat-box" style="background:rgba(93,173,226,0.1);border-color:rgba(93,173,226,0.3);">
+          <div class="calc-stat-label">⚡ Total ability damage (after resistances)</div>
+          <div class="calc-stat-val" id="abilityResultVal" style="color:#5dade2;font-size:22px;"></div>
+        </div>
+        <div id="abilityFormula" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.28);font-family:monospace;line-height:1.6;"></div>
       </div>
     </div>
-    <div id="calcResult" style="margin-top:20px;display:none;">
-      <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:16px;"></div>
+
+    <!-- Divider + Results -->
+    <div id="calcResult" style="display:none;">
+      <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:14px;"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="calc-stat-box">
-          <div class="calc-stat-label">Эффективная броня</div>
-          <div class="calc-stat-val" id="resEff" style="color:#5dade2;"></div>
+          <div class="calc-stat-label">Effective armor</div>
+          <div class="calc-stat-val" id="resEff" style="color:#5dade2;font-size:18px;"></div>
         </div>
         <div class="calc-stat-box">
-          <div class="calc-stat-label">Снижение урона</div>
-          <div class="calc-stat-val" id="resMit" style="color:#e74c3c;"></div>
+          <div class="calc-stat-label">Dmg reduction</div>
+          <div class="calc-stat-val" id="resMit" style="color:#e74c3c;font-size:18px;"></div>
         </div>
         <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.4);">
-          <div class="calc-stat-label">✅ Реально нанесено урона</div>
+          <div class="calc-stat-label">✅ Actual damage dealt</div>
           <div class="calc-stat-val" id="resDmg" style="color:#b96fff;font-size:26px;"></div>
         </div>
-      </div>
-      <div id="calcFormula" style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;line-height:1.7;"></div>
-    </div>
-    </div><!-- end calcPanelDmg -->
-
-    <!-- EHP TAB inside calc modal -->
-    <div id="calcPanelEhp" style="display:none;flex-direction:column;gap:14px;">
-      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;line-height:1.5;">Формула: eHP = HP × (1 + Armor/100)</div>
-      <div class="calc-field">
-        <label class="calc-label">HP</label>
-        <input type="number" id="ehpHp" placeholder="например: 2000" min="1" class="calc-input" oninput="calcEhp()">
-      </div>
-      <div class="calc-field">
-        <label class="calc-label">Броня (Armor)</label>
-        <input type="number" id="ehpArmor" placeholder="например: 80" min="0" class="calc-input" oninput="calcEhp()">
-      </div>
-      <div class="calc-field">
-        <label class="calc-label">Маг. сопротивление (MR)</label>
-        <input type="number" id="ehpMr" placeholder="например: 50" min="0" class="calc-input" oninput="calcEhp()">
-      </div>
-      <div id="ehpResult" style="display:none;margin-top:8px;">
-        <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:14px;"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3);">
-            <div class="calc-stat-label">🛡 Эфф. HP vs Физ. урон</div>
-            <div class="calc-stat-val" id="ehpPhys" style="color:#e07820;font-size:22px;"></div>
-          </div>
-          <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(93,173,226,0.1);border-color:rgba(93,173,226,0.3);">
-            <div class="calc-stat-label">🔮 Эфф. HP vs Маг. урон</div>
-            <div class="calc-stat-val" id="ehpMagic" style="color:#5dade2;font-size:22px;"></div>
-          </div>
+        <div id="calcItemResult" class="calc-stat-box" style="grid-column:1/-1;display:none;background:rgba(232,130,10,0.12);border-color:rgba(232,130,10,0.35);">
+          <div class="calc-stat-label" id="calcItemResultLabel"></div>
+          <div class="calc-stat-val" id="calcItemResultVal" style="color:#e07820;font-size:20px;"></div>
         </div>
-        <div id="ehpFormula" style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;line-height:1.7;"></div>
       </div>
-    </div><!-- end calcPanelEhp -->
-
-  </div><!-- end m-win -->
-</div><!-- end calcMask -->
+      <div id="calcFormula" style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.28);font-family:monospace;line-height:1.6;"></div>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════ CHAMPION GROWTH CHART POPUP ═══════════════ -->
 <div class="m-mask" id="chartMask" onclick="if(event.target===this)closeChart()">
@@ -2792,5 +3008,263 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
     </div>
   </div>
 </div>
+
+<!-- ═══════════════ ITEMS REFERENCE MODAL ═══════════════ -->
+<div class="m-mask" id="itemsMask" onclick="if(event.target===this)closeItems()">
+  <div class="m-win" style="max-width:580px;height:auto;max-height:90vh;overflow-y:auto;padding:24px 20px 20px;">
+    <button class="btn-close-x" onclick="closeItems()">✕</button>
+    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;letter-spacing:1px;">📦 Wild Rift Items</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Hover / tap icon for full stats</div>
+    <div style="font-size:10px;color:#e07820;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">⚔ PHYSICAL</div>
+    <div class="items-grid">
+      <div class="item-card" title="Blade of the Ruined King&#10;3000g&#10;+25 AD  +35% AS  +10% Omni Vamp&#10;Ruined Strikes: 8.5% current HP phys/hit (melee 10%). Drain: 3rd hit deals 30-100 magic dmg + steals 25% MS 2s (60s CD)">
+        <img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" alt="Blade of the Ruined King" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Infinity Edge&#10;3400g&#10;+60 AD  +25% Crit&#10;Infinity: Crits deal 205% dmg. Limit Break: excess crit% gives +0.6 bonus crit dmg per 1%.">
+        <img src="https://www.wildriftfire.com/images/items/infinity-edge.png" alt="Infinity Edge" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Bloodthirster&#10;3000g&#10;+55 AD  +250 HP  +25% Crit&#10;Bloody: +8% Physical Vamp. Crits gain extra +4% Vamp. Life Shield at <30% HP.">
+        <img src="https://www.wildriftfire.com/images/items/bloodthirster.png" alt="Bloodthirster" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Guardian Angel&#10;3400g&#10;+40 AD  +40 Armor&#10;Resurrect: Restore 50% HP + 30% Mana after 4s stasis on lethal dmg. (210s CD)">
+        <img src="https://www.wildriftfire.com/images/items/guardian-angel.png" alt="Guardian Angel" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Runaan's Hurricane&#10;2900g&#10;+35% AS  +25% Crit&#10;Wind's Fury: Attacks hit 2 extra enemies for 55% AD. Wind Blade: +15 bonus phys on-hit.">
+        <img src="https://www.wildriftfire.com/images/items/runaans-hurricane.png" alt="Runaan's Hurricane" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Youmuu's Ghostblade&#10;3000g&#10;+55 AD  +15 AH  +15 Armor Pen&#10;Momentum: Moving builds up to +50 MS. Spectral Haste: attacks at max Momentum give 25% AS for 4s.">
+        <img src="https://www.wildriftfire.com/images/items/youmuus-ghostblade.png" alt="Youmuu's Ghostblade" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Duskblade of Draktharr&#10;3000g&#10;+55 AD  +10 AH  +18 Armor Pen&#10;Nightstalker: First attack on champion deals 60-160 bonus phys + 99% slow 0.35s. (10s CD, resets on kill)">
+        <img src="https://www.wildriftfire.com/images/items/duskblade-of-draktharr.png" alt="Duskblade of Draktharr" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Black Cleaver&#10;3000g&#10;+400 HP  +40 AD  +20 AH&#10;Sunder: Phys dmg reduces enemy Armor 6% per hit, max 4 stacks (24% total). Rage: +20 MS on phys dmg.">
+        <img src="https://www.wildriftfire.com/images/items/black-cleaver.png" alt="Black Cleaver" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Trinity Force&#10;3333g&#10;+25 AD  +30% AS  +300 HP  +15 AH&#10;Spellblade: After ability, next attack deals 200% base AD bonus phys dmg.">
+        <img src="https://www.wildriftfire.com/images/items/trinity-force.png" alt="Trinity Force" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Divine Sunderer&#10;3300g&#10;+40 AD  +400 HP  +20 AH&#10;Spellblade: After ability, next attack deals 12% enemy max HP (9% ranged) bonus phys. Heals 50% of bonus.">
+        <img src="https://www.wildriftfire.com/images/items/divine-sunderer.png" alt="Divine Sunderer" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Serylda's Grudge&#10;3200g&#10;+45 AD  +20 AH  +33% Armor Pen&#10;Bitter Cold: Abilities slow enemies 30% for 1s.">
+        <img src="https://www.wildriftfire.com/images/items/seryldas-grudge.png" alt="Serylda's Grudge" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Lord Dominik's Regards&#10;3000g&#10;+30 AD  +25% Crit  +15% AS&#10;Last Whisper: +30% Armor Pen. Giant Slayer: up to +20% bonus dmg vs enemies with >1750 HP.">
+        <img src="https://www.wildriftfire.com/images/items/mortal-reminder.png" alt="Lord Dominik's Regards" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Mortal Reminder&#10;3300g&#10;+25 AD  +25% Crit  +15% AS&#10;Last Whisper: +30% Armor Pen. Sepsis: phys dmg applies 50% Grievous Wounds 3s.">
+        <img src="https://www.wildriftfire.com/images/items/mortal-reminder.png" alt="Mortal Reminder" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Death's Dance&#10;3000g&#10;+50 AD  +15 AH  +15 Armor&#10;Ignore Pain: 30% of dmg taken stored as bleed. Defy: kills remove the bleed.">
+        <img src="https://www.wildriftfire.com/images/items/deaths-dance.png" alt="Death's Dance" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Maw of Malmortius&#10;3000g&#10;+50 AD  +15 AH  +10% Magic Pen&#10;Lifeline: At <30% HP gain a magic shield. Mawshield: if it holds, gain +10 AD and +15% Vamp for 5s.">
+        <img src="https://www.wildriftfire.com/images/items/maw-of-malmortius.png" alt="Maw of Malmortius" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Wit's End&#10;3100g&#10;+40% AS  +50 MR&#10;Fray: Attacks deal 15-80 magic dmg on-hit. At <50% HP, steal 20 MS. Feral: +15% Phys Vamp.">
+        <img src="https://www.wildriftfire.com/images/items/wits-end.png" alt="Wit's End" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Sterak's Gage&#10;3000g&#10;+450 HP  +20 AH&#10;Lifeline: At <30% HP gain a growing shield. Primal Instinct: shield decays over 4s.">
+        <img src="https://www.wildriftfire.com/images/items/steraks-gage.png" alt="Sterak's Gage" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Stormrazor&#10;3000g&#10;+55 AD  +25% Crit  +5% MS&#10;Energized: Moving & attacking builds stacks. Paralyze: Energized attack slows 40%.">
+        <img src="https://www.wildriftfire.com/images/items/stormrazor.png" alt="Stormrazor" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Phantom Dancer&#10;2800g&#10;+25% Crit  +25% AS  +7% MS&#10;Ghosting: Move through units. Spectral Waltz: Crits grant +10% AS for 2s. Life Drain: +10% PVamp.">
+        <img src="https://www.wildriftfire.com/images/items/phantom-dancer.png" alt="Phantom Dancer" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Manamune&#10;2700g&#10;+25 AD  +300 Mana  +20 AH&#10;Awe: +1.5% AD from max Mana. Mana Charge: +18 per hit, cap 700. Transforms to Muramana.">
+        <img src="https://www.wildriftfire.com/images/items/manamune.png" alt="Manamune" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Muramana&#10;2700g&#10;+35 AD  +700 Mana  +20 AH&#10;Awe: +3% AD from Mana. Shock: Single-target abilities deal 6% current Mana bonus phys dmg.">
+        <img src="https://www.wildriftfire.com/images/items/manamune.png" alt="Muramana" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Edge of Night&#10;3000g&#10;+55 AD  +10 AH  +18 Armor Pen&#10;Night Edge: Channel 1.25s to gain a spell shield (25s CD, resets on kill).">
+        <img src="https://www.wildriftfire.com/images/items/edge-of-night.png" alt="Edge of Night" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Essence Reaver&#10;3000g&#10;+45 AD  +20 AH  +25% Crit&#10;Spellblade: After ability, next attack restores 3% max Mana.">
+        <img src="https://www.wildriftfire.com/images/items/essence-reaver.png" alt="Essence Reaver" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Navori Quickblades&#10;3000g&#10;+65 AD  +20 AH  +20% Crit&#10;Transcendence: Crits reduce ability CDs by 15% of remaining. Requires ≥60% crit.">
+        <img src="https://www.wildriftfire.com/images/items/navori-quickblades.png" alt="Navori Quickblades" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Hullbreaker&#10;3000g&#10;+60 AD  +400 HP&#10;Overwhelm: Solo = +20-60 bonus Armor/MR and +20% dmg vs structures.">
+        <img src="https://www.wildriftfire.com/images/items/hullbreaker.png" alt="Hullbreaker" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+    
+      <div class="item-card" title="Spear of Shojin | 3100g | +55 AD  +300 HP  +20 AH | Martial Cadence: Abilities reduce your current Basic Attack recharge."><img src="https://www.wildriftfire.com/images/items/spear-of-shojin.png" loading="lazy"></div>
+      <div class="item-card" title="Sundered Sky | 3200g | +55 AD  +450 HP  +15 AH | Lightshield Strike: First attack on champ deals 100% base AD bonus phys + heals 100% bonus. (8s CD)"><img src="https://www.wildriftfire.com/images/items/sundered-sky.png" loading="lazy"></div>
+      <div class="item-card" title="Goredrinker | 3000g | +45 AD  +450 HP  +20 AH | Thirsting Slash (Active): Deal 100% AD in AoE + restore HP for each enemy hit. (30s CD)"><img src="https://www.wildriftfire.com/images/items/goredrinker.png" loading="lazy"></div>
+      <div class="item-card" title="Stridebreaker | 3000g | +50 AD  +400 HP  +20 AH | Halting Slash (Active): Deal AoE phys, slow 40% for 2s. Permafrost: Halting Slash root for 0.75s."><img src="https://www.wildriftfire.com/images/items/stridebreaker.png" loading="lazy"></div>
+      <div class="item-card" title="Navori Quickblades | 3200g | +65 AD  +15 AH  +25% Crit | Transcendence: Crits reduce ability cooldowns by 15% of max. Quick Strike: 1.25 attack time after ability."><img src="https://www.wildriftfire.com/images/items/navori-quickblades.png" loading="lazy"></div>
+      <div class="item-card" title="Eclipse | 3000g | +55 AD  +15 AH  +18 Armor Pen | Ever Rising Moon: Hitting 2 abilities in 1.5s deals 6% max HP bonus phys + shield + 15% MS for 2s."><img src="https://www.wildriftfire.com/images/items/eclipse.png" loading="lazy"></div>
+      <div class="item-card" title="Terminus | 3000g | +40 AD  +20% AS | Light: On-hit adds +20 Magic Pen stack. Dark: On-hit adds +10 Armor stack. Switches between light and dark."><img src="https://www.wildriftfire.com/images/items/terminus.png" loading="lazy"></div>
+      <div class="item-card" title="Titanic Hydra | 3000g | +500 HP  +30 AD  +20 AH | Cleave: Attacks deal 5 + 1% max HP to nearby. Crescent: Active — AoE in cone. Passive doubles."><img src="https://www.wildriftfire.com/images/items/titanic-hydra.png" loading="lazy"></div>
+      <div class="item-card" title="Serpent's Fang | 3000g | +55 AD  +18 Armor Pen | Shield Reaver: Reduce enemy shields 50% (on you) or 35% (on allies)."><img src="https://www.wildriftfire.com/images/items/serpents-fang.png" loading="lazy"></div>
+      <div class="item-card" title="Hullbreaker | 3000g | +60 AD  +400 HP  +5% MS | Boarding Party: While alone or with minions, gain +30 Armor/MR. Minions gain Damage and Resist aura."><img src="https://www.wildriftfire.com/images/items/hullbreaker.png" loading="lazy"></div>
+      <div class="item-card" title="Galeforce | 3400g | +55 AD  +25% Crit  +15% AS | Cloudburst (Active): Dash in direction, firing 3 missiles each dealing 75-200 to lowest HP enemy. (90s CD)"><img src="https://www.wildriftfire.com/images/items/galeforce.png" loading="lazy"></div>
+      <div class="item-card" title="Guinsoo's Rageblade | 2800g | +25% AS  +15% Crit | Wrath: Attacks deal your crit dmg as on-hit instead of critting. Guinsoo's Rage: Every 3rd hit triggers on-hit effects twice."><img src="https://www.wildriftfire.com/images/items/guinsoos-rageblade.png" loading="lazy"></div>
+      <div class="item-card" title="Chempunk Chainsword | 2700g | +55 AD  +300 HP  +20 AH | Hackshorn: Phys dmg applies 60% Grievous Wounds 3s."><img src="https://www.wildriftfire.com/images/items/chempunk-chainsword.png" loading="lazy"></div>
+    </div>
+    <div style="font-size:10px;color:#9b59b6;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">🔮 MAGIC</div>
+    <div class="items-grid">
+      <div class="item-card" title="Liandry's Torment&#10;3000g&#10;+300 HP  +90 AP  +7% MPen&#10;Torment: 0.5% max HP magic/s over 3s per ability hit. Suffering: +2% dmg/s in combat (max 6%).">
+        <img src="https://www.wildriftfire.com/images/items/liandrys-torment.png" alt="Liandry's Torment" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Riftmaker&#10;3300g&#10;+150 HP  +80 AP  +7% MPen  +15 AH&#10;Assimilation: +2.5% magic dmg/s in combat (max 7.5%). At max, converts to true dmg. +11% Magic Vamp.">
+        <img src="https://www.wildriftfire.com/images/items/riftmaker.png" alt="Riftmaker" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Rabadon's Deathcap&#10;3500g&#10;+120 AP&#10;Magical Opus: Increase total AP by 40%.">
+        <img src="https://www.wildriftfire.com/images/items/rabadons-deathcap.png" alt="Rabadon's Deathcap" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Void Staff&#10;3000g&#10;+90 AP&#10;+40% Magic Penetration.">
+        <img src="https://www.wildriftfire.com/images/items/morellonomicon.png" alt="Void Staff" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Luden's Tempest&#10;3000g&#10;+80 AP  +20 AH  +7% MPen&#10;Echo: At 100 charges, next ability deals 60-160 bonus magic dmg to target + 4 nearby. +10% MS.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6655.png" alt="Luden's Tempest" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Hextech Rocketbelt&#10;3200g&#10;+80 AP  +300 HP  +20 AH&#10;Supersonic: Dash 300 units + deal 150 magic dmg nearby (40s CD). Gain 50 MS vs champions 5s.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3152.png" alt="Hextech Rocketbelt" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Shadowflame&#10;3000g&#10;+100 AP  +200 HP&#10;Cinderbloom: Dmg to shielded or low HP enemies gains 10-20% magic pen.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4645.png" alt="Shadowflame" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Zhonya's Hourglass&#10;3000g&#10;+80 AP  +50 Armor  +10 AH&#10;Active: Invulnerable + untargetable 2.5s (120s CD). Serenity: take 10% less dmg.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3157.png" alt="Zhonya's Hourglass" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Cosmic Drive&#10;3000g&#10;+70 AP  +300 HP  +15 AH&#10;Spelldance: Hit champion with 3 abilities in 3s = +20% MS + 40 AP for 3s.">
+        <img src="https://www.wildriftfire.com/images/items/cosmic-drive.png" alt="Cosmic Drive" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Crown of the Shattered Queen&#10;3000g&#10;+75 AP  +250 HP  +15 AH&#10;Poise: After being hit by ability, gain a shield 1.5s. Blessing: while shielded, +75 AP.">
+        <img src="https://www.wildriftfire.com/images/items/crown-of-the-shattered-queen.png" alt="Crown of the Shattered Queen" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Archangel's Staff&#10;3000g&#10;+80 AP  +600 Mana  +20 AH&#10;Awe: +1.5% AP from max Mana. Mana Charge: +24 Mana per ability, cap 700. Transforms to Seraph's.">
+        <img src="https://www.wildriftfire.com/images/items/archangels-staff.png" alt="Archangel's Staff" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Seraph's Embrace&#10;3000g&#10;+80 AP  +1300 Mana  +20 AH&#10;Awe: +3% AP from max Mana. Active: Consume 20% Mana for a shield = consumed Mana + 150.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3040.png" alt="Seraph's Embrace" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Nashor's Tooth&#10;3000g&#10;+80 AP  +50% AS  +10 AH&#10;Icathian Bite: Attacks deal 15+15% AP bonus magic dmg on-hit.">
+        <img src="https://www.wildriftfire.com/images/items/nashors-tooth.png" alt="Nashor's Tooth" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Morellonomicon&#10;2500g&#10;+70 AP  +300 HP&#10;Affliction: Dealing magic dmg applies 40% Grievous Wounds 3s.">
+        <img src="https://www.wildriftfire.com/images/items/morellonomicon.png" alt="Morellonomicon" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Fimbulwinter&#10;2700g&#10;+400 HP  +400 Mana  +10 AH&#10;Everlasting: +10 HP/15 Mana per ability, cap 1000. Frozen Colossus: near 2+ enemies gain 200-600 HP shield.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4642.png" alt="Fimbulwinter" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Abyssal Mask&#10;2800g&#10;+450 HP  +40 MR  +15 AH&#10;Eternity: 15% of dmg taken = Mana restore. Unmake: nearby enemies take +5-20% more magic dmg.">
+        <img src="https://www.wildriftfire.com/images/items/abyssal-mask.png" alt="Abyssal Mask" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Horizon Focus&#10;3000g&#10;+100 AP  +15 AH&#10;Hypershot: Immobilizing or hitting enemies at long range reveals them. Marked enemies take +10% dmg.">
+        <img src="https://www.wildriftfire.com/images/items/horizon-focus.png" alt="Horizon Focus" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+    
+      <div class="item-card" title="Awakened Soulstealer | 3000g | +60 AP  +300 HP  +20 AH | Soulflare: Ability kills grant Soulflare charges. 10 stacks → consume all for 3 free ability casts within 5s."><img src="https://www.wildriftfire.com/images/items/awakened-soulstealer.png" loading="lazy"></div>
+      <div class="item-card" title="Crown of the Shattered Queen | 3000g | +70 AP  +300 HP  +20 AH | Safeguard: Taking dmg grants Poise. At max Poise, gain 75% dmg reduction for 1.5s (15s CD)."><img src="https://www.wildriftfire.com/images/items/crown-of-the-shattered-queen.png" loading="lazy"></div>
+      <div class="item-card" title="Infinity Orb | 2800g | +60 AP  +200 HP | Perfection: Abilities deal 20% more dmg to enemies below 35% HP. +10% Magic Pen."><img src="https://www.wildriftfire.com/images/items/infinity-orb.png" loading="lazy"></div>
+      <div class="item-card" title="Lich Bane | 3000g | +70 AP  +300 Mana  +20 AH | Spellblade: After ability, next attack deals 150% base AD + 35% AP bonus magic dmg."><img src="https://www.wildriftfire.com/images/items/lich-bane.png" loading="lazy"></div>
+      <div class="item-card" title="Malignance | 2700g | +70 AP  +300 Mana  +20 AH | Haunt: Ult applies Haunt field for 4s; enemies in field take 15% more dmg from your abilities."><img src="https://www.wildriftfire.com/images/items/malignance.png" loading="lazy"></div>
+      <div class="item-card" title="Bandle Fantasy | 3000g | +60 AP  +400 HP  +20 AH | Yordle Anima: Abilities create Yordle explosions around you dealing 30-100 magic dmg to nearby."><img src="https://www.wildriftfire.com/images/items/bandle-fantasy.png" loading="lazy"></div>
+      <div class="item-card" title="Psychic Projector | 3000g | +80 AP  +15 AH | Projector: Ability dmg marks enemy. Next attack detonates for 60-200 magic dmg."><img src="https://www.wildriftfire.com/images/items/psychic-projector.png" loading="lazy"></div>
+    </div>
+    <div style="font-size:10px;color:#5dade2;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">🛡 DEFENSE</div>
+    <div class="items-grid">
+      <div class="item-card" title="Thornmail&#10;2700g&#10;+75 Armor  +200 HP&#10;Thorns: On-hit reflects 20 + 6% bonus Armor + 2% bonus HP magic dmg. Inflicts Grievous Wounds 3s.">
+        <img src="https://www.wildriftfire.com/images/items/thornmail.png" alt="Thornmail" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Sunfire Aegis&#10;3000g&#10;+500 HP  +15 AH&#10;Immolate: 16–30 + 1% bonus HP magic/s. Each champ hit stacks +7% for 5s (max ×1.42). +15% vs minions.">
+        <img src="https://www.wildriftfire.com/images/items/sunfire-aegis.png" alt="Sunfire Aegis" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Warmog's Armor&#10;3000g&#10;+800 HP  +200% HP Regen&#10;Warmog's Heart: Restore 5% max HP/s if out of combat 5s and HP >1000.">
+        <img src="https://www.wildriftfire.com/images/items/warmogs-armor.png" alt="Warmog's Armor" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Frozen Heart&#10;2700g&#10;+80 Armor  +400 HP  +20 AH&#10;Winter's Caress: Reduces attack speed of nearby enemies by 20%. Consumes: reduces phys dmg taken 5%.">
+        <img src="https://www.wildriftfire.com/images/items/frozen-heart.png" alt="Frozen Heart" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Spirit Visage&#10;2900g&#10;+450 HP  +60 MR  +150% HP Regen&#10;Blessed: Increases shields and healing received by 25%.">
+        <img src="https://www.wildriftfire.com/images/items/mantle-of-the-twelfth-hour.png" alt="Spirit Visage" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Gargoyle Stoneplate&#10;3200g&#10;+60 Armor  +60 MR  +200 HP&#10;Stone Skin: Near 2+ enemies gain 6 Armor + 6 MR. Active: +100 Armor/MR for 4s (90s CD).">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3193.png" alt="Gargoyle Stoneplate" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Randuin's Omen&#10;2800g&#10;+350 HP  +80 Armor&#10;Cold Steel: Reduces AS of attackers by 15%. Active: Slow nearby enemies 55% for 2s (60s CD).">
+        <img src="https://www.wildriftfire.com/images/items/randuins-omen.png" alt="Randuin's Omen" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Dead Man's Plate&#10;2800g&#10;+300 HP  +50 Armor&#10;Momentum: Build 50 MS. Crushing Blow: Fully charged attack deals 100 bonus phys + slow.">
+        <img src="https://www.wildriftfire.com/images/items/dead-mans-plate.png" alt="Dead Man's Plate" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Force of Nature&#10;3000g&#10;+350 HP  +60 MR  +5% MS&#10;Absorb: Magic dmg charges stacks. At 6+, gain 20 MR + 6% MS for 5s. Dissipate: -10% magic dmg taken.">
+        <img src="https://www.wildriftfire.com/images/items/force-of-nature.png" alt="Force of Nature" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Iceborn Gauntlet&#10;2800g&#10;+250 HP  +75 Armor  +15 AH&#10;Spellblade: After ability, next attack deals 100% base AD bonus phys + slows nearby 30%.">
+        <img src="https://www.wildriftfire.com/images/items/iceborn-gauntlet.png" alt="Iceborn Gauntlet" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Banshee's Veil&#10;2500g&#10;+350 HP  +60 MR&#10;Annul: Gain a spell shield every 40s blocking 1 enemy ability. Blessed: +10% Heal/Shield Power.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3102.png" alt="Banshee's Veil" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Knight's Vow&#10;2200g&#10;+250 HP  +150% HP Regen  +20 AH&#10;Sacrifice: Link to ally. Redirect 12% of their dmg to you. When they kill, you heal 8% max HP.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3109.png" alt="Knight's Vow" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+    
+      <div class="item-card" title="Kaenic Rookern | 3000g | +400 HP  +70 MR | Null Field: Taking magic dmg builds Null stacks. At max, gain a magic shield for 3s (30s CD)."><img src="https://www.wildriftfire.com/images/items/kaenic-rookern.png" loading="lazy"></div>
+      <div class="item-card" title="Hollow Radiance | 3000g | +500 HP  +20 AH | Immolate: 16-30 + 1% bonus HP magic/s. Void: Deals 50% bonus dmg and inflicts Grievous Wounds."><img src="https://www.wildriftfire.com/images/items/hollow-radiance.png" loading="lazy"></div>
+      <div class="item-card" title="Amaranth's Twinguard | 3200g | +400 HP  +50 Armor  +50 MR | Resolve: Each second in combat gains +4 Armor and +4 MR, stacking up to 8 times (32 each)."><img src="https://www.wildriftfire.com/images/items/amaranths-twinguard.png" loading="lazy"></div>
+      <div class="item-card" title="Heartsteel | 2700g | +800 HP  +15% HP Regen | Colossal Consumption: Charges up over 3s on nearby champion. On hit: deal 125 + 6% bonus HP magic dmg + permanently gain 10 HP."><img src="https://www.wildriftfire.com/images/items/heartsteel.png" loading="lazy"></div>
+      <div class="item-card" title="Force of Nature | 2900g | +350 HP  +60 MR | Steadfast: Taking magic dmg builds Steadfast stacks (max 8) granting +4 MR each. At max, gain +10% MS."><img src="https://www.wildriftfire.com/images/items/force-of-nature.png" loading="lazy"></div>
+      <div class="item-card" title="Gargoyle | 2700g | +450 HP  +40 Armor  +40 MR | Stoneplate (Active): Gain +100% bonus HP as a shield for 3.5s but reduce size and reduce dmg dealt 60%. (90s CD)"><img src="https://www.wildriftfire.com/images/items/gargoyle.png" loading="lazy"></div>
+      <div class="item-card" title="Iceborn Gauntlet | 2700g | +400 HP  +20 AH  +20 Armor | Spellblade: After ability, next attack creates AoE slow zone 35% for 2s."><img src="https://www.wildriftfire.com/images/items/iceborn-gauntlet.png" loading="lazy"></div>
+      <div class="item-card" title="Soul Transfer | 3000g | +400 HP  +40 Armor  +40 MR | Transcendence: Upon taking lethal dmg, become invincible for 2s and cast abilities for free. (240s CD)"><img src="https://www.wildriftfire.com/images/items/soul-transfer.png" loading="lazy"></div>
+    </div>
+    <div style="font-size:10px;color:#2ecc71;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">💛 SUPPORTS & MISC</div>
+    <div class="items-grid">
+      <div class="item-card" title="Mikael's Blessing&#10;2000g&#10;+250 HP  +40 MR  +10 AH&#10;Active: Remove CC from ally and grant 40-70% MS for 1.5s (90s CD). Revive Blessing: +10% Heal/Shield.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3222.png" alt="Mikael's Blessing" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Zeke's Convergence&#10;2200g&#10;+250 HP  +50 MR  +10 AH&#10;Conduit: Link to ally. When you CC an enemy, surround linked ally in fire, dealing 20 magic dmg/attack 6s.">
+        <img src="https://www.wildriftfire.com/images/items/zekes-convergence.png" alt="Zeke's Convergence" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Chemtech Putrifier&#10;2300g&#10;+250 HP  +40 AP  +10 AH&#10;Puffcap Toxin: Healing/shielding an ally causes their next attack to apply 60% Grievous Wounds 3s.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3011.png" alt="Chemtech Putrifier" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Redemption&#10;2300g&#10;+300 HP  +150% HP Regen  +20 AH&#10;Active: Target an area. After 2.5s, allies in area are healed 200-470 HP and enemies take 10% max HP magic dmg.">
+        <img src="https://www.wildriftfire.com/images/items/redemption.png" alt="Redemption" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Locket of the Iron Solari&#10;2200g&#10;+300 HP  +30 MR  +10 AH&#10;Active: Grant nearby allies a 80-160 HP shield for 2.5s (90s CD).">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3190.png" alt="Locket of the Iron Solari" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Ardent Censer&#10;2100g&#10;+250 HP  +30 AP  +10 AH&#10;Sanctify: Healing/shielding an ally grants them +15-30% AS and 20-30 on-hit magic dmg for 6s.">
+        <img src="https://www.wildriftfire.com/images/items/ardent-censer.png" alt="Ardent Censer" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      </div>
+      <div class="item-card" title="Shurelya's Battlesong&#10;2200g&#10;+300 HP  +30 AP  +10 AH&#10;Motivate: Active: Nearby allies gain 40% MS for 3s (60s CD). Inspire: healing/shielding allies grants 15% MS 1.5s.">
+        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/2065.png" alt="Shurelya's Battlesong" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
+      
+      <div class="item-card" title="Zeke's Convergence | 2200g | +300 HP  +250 Mana  +15 AH | Conduit: Bind to ally. Your slows/immobilizes in their AoE deal 20% bonus magic dmg from their next ability."><img src="https://www.wildriftfire.com/images/items/zekes-convergence.png" loading="lazy"></div>
+      <div class="item-card" title="Radiant Virtue | 2700g | +400 HP  +20 AH | Guiding Light (Active): Pulses light to nearby ally → both gain 20% max HP as temporary HP + 20 AH for 6s. (90s CD)"><img src="https://www.wildriftfire.com/images/items/radiant-virtue.png" loading="lazy"></div>
+      <div class="item-card" title="Dawnshroud | 2400g | +300 HP  +250 Mana  +20 AH | Sentry: Moving through brushes reveals nearby enemy area 8s. Empowers nearby ally abilities."><img src="https://www.wildriftfire.com/images/items/dawnshroud.png" loading="lazy"></div>
+      <div class="item-card" title="Dream Maker | 2400g | +300 HP  +200 Mana  +20 AH | Dream Catcher: Heals/shields on allies apply Dreaming. At 3 stacks: next ally ability restores 10% max HP."><img src="https://www.wildriftfire.com/images/items/dream-maker.png" loading="lazy"></div>
+      <div class="item-card" title="Searing Crown | 2700g | +400 HP  +40 Armor | Scorched Earth: After immobilizing enemy champion, nearby area burns for 4s dealing magic dmg."><img src="https://www.wildriftfire.com/images/items/searing-crown.png" loading="lazy"></div>
+    </div>
+    </div>
+
+    <div style="font-size:10px;color:#f39c12;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">✨ ENCHANTMENTS</div>
+    <div class="items-grid">
+
+      <div class="item-card" title="Stasis (Enchantment) | 650g | Active: Become invulnerable and untargetable for 2.5s. Cannot act. (180s CD)"><img src="https://www.wildriftfire.com/images/items/stasis.png" loading="lazy"></div>
+      <div class="item-card" title="Quicksilver (Enchantment) | 650g | Active: Remove all CC debuffs and gain 50% bonus MS for 1.5s. (90s CD)"><img src="https://www.wildriftfire.com/images/items/quicksilver.png" loading="lazy"></div>
+      <div class="item-card" title="Glorious (Enchantment) | 650g | Active: Gain Glorious aura for 6s — allies in range gain +15% MS and +10 AD / +15 AP. (90s CD)"><img src="https://www.wildriftfire.com/images/items/glorious.png" loading="lazy"></div>
+      <div class="item-card" title="Veil (Enchantment) | 650g | Passive: Gain a spell shield every 40s that blocks the next enemy ability."><img src="https://www.wildriftfire.com/images/items/veil.png" loading="lazy"></div>
+      <div class="item-card" title="Yordle Trap (Enchantment) | 650g | Active: Deploy a Yordle Snap Trap — immobilizes first enemy who walks into it for 2.5s and reveals them for 4s."><img src="https://www.wildriftfire.com/images/items/yordle-trap.png" loading="lazy"></div>
+    </div>
+    <div style="font-size:10px;color:#95a5a6;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">👟 BOOTS</div>
+    <div class="items-grid">
+
+      <div class="item-card" title="Boots of Mana | 900g | +300 Mana  +10 AH | Passive: Grants mana regeneration."><img src="https://www.wildriftfire.com/images/items/boots-of-mana.png" loading="lazy"></div>
+      <div class="item-card" title="Boots of Dynamism | 900g | +20 AH | Passive: Gain up to +15 AH based on your current non-boot AP items."><img src="https://www.wildriftfire.com/images/items/boots-of-dynamism.png" loading="lazy"></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
