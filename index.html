@@ -131,7 +131,7 @@
         .lvl-container {
             background: var(--bg-card);
             backdrop-filter: blur(10px);
-            padding: 12px 16px;
+            padding: 10px 16px 12px 16px;
             border-radius: 15px;
             border: 2px solid var(--border);
             margin-top: 0;
@@ -1698,6 +1698,7 @@ window.hideT = function() {
     // ══════════════ DAMAGE CALCULATOR ══════════════
     window.openCalc = function() {
         document.getElementById('calcMask').classList.add('active');
+        switchCalcTab('dmg');
         document.getElementById('cDmg').focus();
     };
 
@@ -1818,11 +1819,12 @@ window.hideT = function() {
 
     // ══════════════ EFFECTIVE HP CALCULATOR ══════════════
     window.openEhp = function() {
-        document.getElementById('ehpMask').classList.add('active');
+        document.getElementById('calcMask').classList.add('active');
+        switchCalcTab('ehp');
         document.getElementById('ehpHp').focus();
     };
     window.closeEhp = function() {
-        document.getElementById('ehpMask').classList.remove('active');
+        document.getElementById('calcMask').classList.remove('active');
     };
     window.calcEhp = function() {
         const hp    = parseFloat(document.getElementById('ehpHp').value)    || 0;
@@ -2697,7 +2699,7 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 <!-- ═══════════════ DAMAGE CALCULATOR MODAL ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
-  <div class="m-win" style="max-width:420px;height:auto;max-height:90vh;padding:28px 24px 24px;">
+  <div class="m-win" style="max-width:462px;height:auto;max-height:90vh;padding:28px 26px 26px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
     <div style="display:flex;gap:8px;margin-bottom:18px;">
       <button id="calcTabDmg" onclick="switchCalcTab('dmg')" style="flex:1;padding:8px;border-radius:10px;border:1.5px solid #b96fff;background:rgba(109,63,245,0.3);color:#fff;font-weight:900;font-size:13px;cursor:pointer;">⚔️ Урон</button>
@@ -2739,7 +2741,39 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
     </div>
     </div><!-- end calcPanelDmg -->
 
-</div>
+    <!-- EHP TAB inside calc modal -->
+    <div id="calcPanelEhp" style="display:none;flex-direction:column;gap:14px;">
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px;line-height:1.5;">Формула: eHP = HP × (1 + Armor/100)</div>
+      <div class="calc-field">
+        <label class="calc-label">HP</label>
+        <input type="number" id="ehpHp" placeholder="например: 2000" min="1" class="calc-input" oninput="calcEhp()">
+      </div>
+      <div class="calc-field">
+        <label class="calc-label">Броня (Armor)</label>
+        <input type="number" id="ehpArmor" placeholder="например: 80" min="0" class="calc-input" oninput="calcEhp()">
+      </div>
+      <div class="calc-field">
+        <label class="calc-label">Маг. сопротивление (MR)</label>
+        <input type="number" id="ehpMr" placeholder="например: 50" min="0" class="calc-input" oninput="calcEhp()">
+      </div>
+      <div id="ehpResult" style="display:none;margin-top:8px;">
+        <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:14px;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(231,76,60,0.1);border-color:rgba(231,76,60,0.3);">
+            <div class="calc-stat-label">🛡 Эфф. HP vs Физ. урон</div>
+            <div class="calc-stat-val" id="ehpPhys" style="color:#e07820;font-size:22px;"></div>
+          </div>
+          <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(93,173,226,0.1);border-color:rgba(93,173,226,0.3);">
+            <div class="calc-stat-label">🔮 Эфф. HP vs Маг. урон</div>
+            <div class="calc-stat-val" id="ehpMagic" style="color:#5dade2;font-size:22px;"></div>
+          </div>
+        </div>
+        <div id="ehpFormula" style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;line-height:1.7;"></div>
+      </div>
+    </div><!-- end calcPanelEhp -->
+
+  </div><!-- end m-win -->
+</div><!-- end calcMask -->
 
 <!-- ═══════════════ CHAMPION GROWTH CHART POPUP ═══════════════ -->
 <div class="m-mask" id="chartMask" onclick="if(event.target===this)closeChart()">
@@ -2753,44 +2787,7 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 
 
-<!-- ═══════════════ EFFECTIVE HP CALCULATOR ═══════════════ -->
-<div class="m-mask" id="ehpMask" onclick="if(event.target===this)closeEhp()">
-  <div class="m-win" style="max-width:420px;height:auto;max-height:90vh;padding:28px 24px 24px;">
-    <button class="btn-close-x" onclick="closeEhp()">✕</button>
-    <div style="font-size:17px;font-weight:900;color:#b96fff;margin-bottom:6px;letter-spacing:1px;">🛡 ЭФФЕКТИВНЫЙ HP</div>
-    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:18px;line-height:1.5;">Чем равномернее HP и броня — тем выше эфф. HP.<br>Формула: eHP = HP × (1 + Armor/100)</div>
-    <div style="display:flex;flex-direction:column;gap:14px;">
-      <div class="calc-field">
-        <label class="calc-label">HP</label>
-        <input type="number" id="ehpHp" placeholder="например: 2000" min="1" class="calc-input" oninput="calcEhp()">
-      </div>
-      <div class="calc-field">
-        <label class="calc-label">
-          <img src="https://raw.communitydragon.org/latest/game/assets/ux/gauges/masteries/crestofinsight_icon.png" style="width:14px;height:14px;vertical-align:middle;border-radius:3px;margin-right:4px;" onerror="this.style.display='none'">
-          Броня (Armor)
-        </label>
-        <input type="number" id="ehpArmor" placeholder="например: 80" min="0" class="calc-input" oninput="calcEhp()">
-      </div>
-      <div class="calc-field">
-        <label class="calc-label">
-          <img src="https://raw.communitydragon.org/latest/game/assets/ux/gauges/masteries/legendofdepthsicon.png" style="width:14px;height:14px;vertical-align:middle;border-radius:3px;margin-right:4px;" onerror="this.style.display='none'">
-          Маг. сопротивление (MR)
-        </label>
-        <input type="number" id="ehpMr" placeholder="например: 50" min="0" class="calc-input" oninput="calcEhp()">
-      </div>
-    </div>
-    <div id="ehpResult" style="margin-top:20px;display:none;">
-      <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:16px;"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(231,76,60,0.12);border-color:rgba(231,76,60,0.3);">
-          <div class="calc-stat-label">🛡 Эфф. HP vs Физ. урон</div>
-          <div class="calc-stat-val" id="ehpPhys" style="color:#e07820;font-size:22px;"></div>
-        </div>
-        <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(93,173,226,0.12);border-color:rgba(93,173,226,0.3);">
-          <div class="calc-stat-label">🔮 Эфф. HP vs Маг. урон</div>
-          <div class="calc-stat-val" id="ehpMagic" style="color:#5dade2;font-size:22px;"></div>
-        </div>
-      </div>
+
       <div id="ehpFormula" style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;line-height:1.7;"></div>
     </div>
   </div>
