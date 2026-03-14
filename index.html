@@ -1173,31 +1173,6 @@
             z-index: 2;
         }
         .item-card img { width: 38px; height: 38px; border-radius: 6px; display: block; }
-        /* Item tooltip on hover */
-        .item-card { position: relative; }
-        .item-card::after {
-            content: attr(title);
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(15,5,32,0.98);
-            border: 1px solid rgba(155,89,182,0.6);
-            color: rgba(255,255,255,0.9);
-            font-size: 12px;
-            line-height: 1.6;
-            padding: 12px 14px;
-            border-radius: 10px;
-            white-space: pre-wrap;
-            width: min(280px, 80vw);
-            z-index: 10000;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.15s;
-            word-break: break-word;
-        }
-        .item-card:hover::after { opacity: 1; }
-        @media (max-width: 768px) { .item-card::after { display: none; } }
         .item-cost { font-size: 8px; color: #C9A800; margin-top: 2px; font-weight: 700; }
         /* ── Calculator buttons row ── */
         .calc-btns-row {
@@ -1789,6 +1764,22 @@ window.hideT = function() {
         document.getElementById('calcMask').classList.add('active');
         setTimeout(() => { const el = document.getElementById('cDmg'); if(el) el.focus(); }, 80);
     };
+
+    window.selectCalcItem = function(item) {
+        _activeCalcItem = item;
+        document.querySelectorAll('.calc-item-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.getElementById('item' + item.charAt(0).toUpperCase() + item.slice(1));
+        if(btn) btn.classList.add('active');
+        const hints = {
+            'none': '',
+            'thornmail': '🛡 Шипы: 20 + 6% бонусной брони + 2% бонусного HP — магический урон при ударе по тебе. Нужно: твой HP и броня.',
+            'botrk': '⚔ Смертоносные удары: 8.5% текущего HP цели физ. урона за удар (ближний бой 10%). Мин. 15. Нужно: текущий HP врага.',
+            'sunfire': '🔥 Самовозгорание: 16–30 + 1% бонусного HP/сек магии. Макс. стаки ×1.42. Нужно: твой HP.',
+            'liandry': '🔥 Мучения: 0.5% макс. HP цели/сек за 3 сек на каждую способность. Нужно: макс. HP врага.',
+        };
+        document.getElementById('calcItemHint').textContent = hints[item] || '';
+        calcDmg();
+    };
     window.closeCalc = function() {
         document.getElementById('calcMask').classList.remove('active');
     };
@@ -1939,7 +1930,33 @@ window.hideT = function() {
 
     window.openItems = function() {
         document.getElementById('itemsMask').classList.add('active');
+        // Init tooltips after modal opens
+        setTimeout(() => {
+            const tip = document.getElementById('itemTooltip');
+            if(!tip) return;
+            document.querySelectorAll('#itemsMask .item-card[data-tip]').forEach(card => {
+                if(card._tipInit) return; card._tipInit = true;
+                card.addEventListener('mouseenter', e => {
+                    const p = card.dataset.tip.split('|');
+                    tip.innerHTML = '<b style="color:#b96fff;">'+(p[0]||'')+'</b><br>'+
+                        '<span style="color:#C9A800;">'+(p[1]||'')+'</span><br>'+
+                        '<span style="color:rgba(255,255,255,0.6);">'+(p[2]||'')+'</span><br>'+
+                        '<span style="font-size:11px;color:rgba(255,255,255,0.42);">'+(p[3]||'')+'</span>';
+                    tip.style.display='block'; _posT(e);
+                });
+                card.addEventListener('mousemove', _posT);
+                card.addEventListener('mouseleave', () => { tip.style.display='none'; });
+            });
+        }, 50);
     };
+    function _posT(e) {
+        const tip=document.getElementById('itemTooltip'); if(!tip) return;
+        const vw=window.innerWidth,vh=window.innerHeight,tw=tip.offsetWidth||260,th=tip.offsetHeight||80;
+        let x=e.clientX+14,y=e.clientY+14;
+        if(x+tw>vw-10) x=e.clientX-tw-10;
+        if(y+th>vh-10) y=e.clientY-th-10;
+        tip.style.left=x+'px'; tip.style.top=y+'px';
+    }
     window.closeItems = function() {
         document.getElementById('itemsMask').classList.remove('active');
     };
@@ -1956,24 +1973,38 @@ window.hideT = function() {
 
     window.addAbilityRow = function() {
         abilityRowCount++;
-        const rowId = 'arow_' + abilityRowCount;
+        const rid = 'arow_' + abilityRowCount;
         const row = document.createElement('div');
-        row.id = rowId;
-        row.style.cssText = 'display:flex;gap:6px;align-items:center;flex-wrap:wrap;';
-        row.innerHTML = `
-          <input type="number" class="calc-input ability-base" placeholder="Base dmg" style="flex:2;min-width:80px;" oninput="calcAbility()">
-          <select class="calc-input ability-scale-type" onchange="calcAbility()" style="flex:2;min-width:90px;padding:8px 6px;">
-            <option value="none">+ flat</option>
-            <option value="myHp">+ % My HP</option>
-            <option value="myAd">+ % My AD</option>
-            <option value="myArmor">+ % My Armor</option>
-            <option value="enemyHpMax">+ % Enemy Max HP</option>
-            <option value="enemyHpCur">+ % Enemy Cur HP</option>
-            <option value="enemyArmor">+ % Enemy Armor</option>
-          </select>
-          <input type="number" class="calc-input ability-scale-val" placeholder="%" min="0" step="0.1" style="flex:1;min-width:55px;" oninput="calcAbility()">
-          <button onclick="document.getElementById('${rowId}').remove();calcAbility();" style="background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;">✕</button>
-        `;
+        row.id = rid;
+        row.style.cssText = 'display:grid;grid-template-columns:1fr 1.2fr 0.7fr auto;gap:6px;align-items:center;';
+
+        const baseIn = document.createElement('input');
+        baseIn.type = 'number'; baseIn.className = 'calc-input ability-base';
+        baseIn.placeholder = 'Базовый'; baseIn.min = '0';
+        baseIn.style.cssText = 'padding:7px 6px;font-size:12px;';
+        baseIn.oninput = calcAbility;
+
+        const sel = document.createElement('select');
+        sel.className = 'calc-input ability-scale-type';
+        sel.style.cssText = 'padding:7px 4px;font-size:11px;';
+        sel.onchange = calcAbility;
+        [['none','+ фиксированный'],['myHp','+ % от моего HP'],['myAd','+ % от AD'],
+         ['myArmor','+ % от моей брони'],['enemyHpMax','+ % от макс. HP врага'],
+         ['enemyHpCur','+ % от тек. HP врага'],['enemyArmor','+ % от брони врага']
+        ].forEach(([v,t]) => { const o = document.createElement('option'); o.value=v; o.textContent=t; sel.appendChild(o); });
+
+        const pctIn = document.createElement('input');
+        pctIn.type = 'number'; pctIn.className = 'calc-input ability-scale-val';
+        pctIn.placeholder = '%'; pctIn.min = '0'; pctIn.step = '0.1';
+        pctIn.style.cssText = 'padding:7px 6px;font-size:12px;';
+        pctIn.oninput = calcAbility;
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button'; delBtn.textContent = '✕';
+        delBtn.style.cssText = 'background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px;';
+        delBtn.onclick = () => { document.getElementById(rid).remove(); calcAbility(); };
+
+        row.appendChild(baseIn); row.appendChild(sel); row.appendChild(pctIn); row.appendChild(delBtn);
         document.getElementById('abilityRows').appendChild(row);
         calcAbility();
     };
@@ -2876,123 +2907,117 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 <!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
-  <div class="m-win" style="max-width:min(560px,92vw);height:auto;max-height:92vh;overflow-y:auto;padding:24px 20px 20px;">
+  <div class="m-win" style="width:90vw;max-width:620px;max-height:90vh;overflow-y:auto;padding:22px 18px 18px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
-    <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:18px;letter-spacing:1px;">⚔ Damage Calculator</div>
+    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:16px;">⚔ Калькулятор урона</div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+    <!-- Два столбца: твои статы + статы врага -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
       <div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">YOUR STATS</div>
-        <div class="calc-field" style="margin-bottom:10px;">
-          <label class="calc-label">AD</label>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;">ТВОИ СТАТЫ</div>
+        <div class="calc-field" style="margin-bottom:8px;">
+          <label class="calc-label">AD (физ. урон)</label>
           <input type="number" id="cDmg" placeholder="150" min="0" class="calc-input" oninput="calcDmg()">
         </div>
-        <div class="calc-field" style="margin-bottom:10px;">
-          <label class="calc-label">% Armor penetration</label>
+        <div class="calc-field" style="margin-bottom:8px;">
+          <label class="calc-label">% Пробивание брони</label>
           <input type="number" id="cPen" placeholder="0" min="0" max="100" value="0" class="calc-input" oninput="calcDmg()">
         </div>
-        <div class="calc-field" style="margin-bottom:10px;">
-          <label class="calc-label">Your HP (for Thornmail)</label>
+        <div class="calc-field" style="margin-bottom:8px;">
+          <label class="calc-label">Твой HP (для Thornmail)</label>
           <input type="number" id="cMyHp" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()">
         </div>
         <div class="calc-field">
-          <label class="calc-label">Your Armor (for Thornmail)</label>
+          <label class="calc-label">Твоя броня (для Thornmail)</label>
           <input type="number" id="cMyArmor" placeholder="80" min="0" class="calc-input" oninput="calcDmg()">
         </div>
       </div>
       <div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">ENEMY STATS</div>
-        <div class="calc-field" style="margin-bottom:10px;">
-          <label class="calc-label">Armor / Magic Resist</label>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;">СТАТЫ ВРАГА</div>
+        <div class="calc-field" style="margin-bottom:8px;">
+          <label class="calc-label">Броня / Сопротивление</label>
           <input type="number" id="cArmor" placeholder="100" min="-99" class="calc-input" oninput="calcDmg()">
         </div>
-        <div class="calc-field" style="margin-bottom:10px;">
-          <label class="calc-label">Max HP (Sunfire/Liandry)</label>
+        <div class="calc-field" style="margin-bottom:8px;">
+          <label class="calc-label">Макс. HP (Sunfire/Liandry)</label>
           <input type="number" id="cEnemyHpMax" placeholder="2500" min="0" class="calc-input" oninput="calcDmg()">
         </div>
         <div class="calc-field">
-          <label class="calc-label">Current HP (BotRK)</label>
+          <label class="calc-label">Текущий HP (BotRK)</label>
           <input type="number" id="cEnemyHpCur" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()">
         </div>
       </div>
     </div>
 
-    <!-- Item selector -->
-    <div style="margin-bottom:14px;">
-      <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">ITEM PROC</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="calc-item-btn active" id="itemNone" onclick="selectCalcItem('none')" title="Ability (no item proc)">
-          <span style="font-size:22px;line-height:32px;display:block;width:38px;height:38px;text-align:center;">⚡</span>
+    <!-- Предметы -->
+    <div style="margin-bottom:12px;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;">ПРЕДМЕТ</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <button class="calc-item-btn active" id="itemNone" onclick="selectCalcItem('none')" title="Без предмета">
+          <span style="font-size:20px;display:block;width:36px;height:36px;line-height:36px;text-align:center;">⚡</span>
         </button>
-        <button class="calc-item-btn" id="itemThornmail" onclick="selectCalcItem('thornmail')" title="Thorns: 20 + 6% bonus Armor + 2% bonus HP magic dmg when attacked">
-          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3075.png" onerror="this.style.display='none'" style="width:28px;height:28px;border-radius:5px;">
-          
+        <button class="calc-item-btn" id="itemThornmail" onclick="selectCalcItem('thornmail')" title="Шипованный доспех">
+          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3075.png" style="width:36px;height:36px;border-radius:6px;" onerror="this.style.background='#333'">
         </button>
-        <button class="calc-item-btn" id="itemBotrk" onclick="selectCalcItem('botrk')" title="Ruined Strikes: 9% current HP physical dmg/hit (melee), 6% ranged. Min 15.">
-          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3153.png" onerror="this.style.display='none'" style="width:28px;height:28px;border-radius:5px;">
-          
+        <button class="calc-item-btn" id="itemBotrk" onclick="selectCalcItem('botrk')" title="Клинок короля-разрушителя">
+          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3153.png" style="width:36px;height:36px;border-radius:6px;" onerror="this.style.background='#333'">
         </button>
-        <button class="calc-item-btn" id="itemSunfire" onclick="selectCalcItem('sunfire')" title="Immolate: 16–30 + 1% bonus HP/s magic, stacks ×1.42 at max">
-          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3068.png" onerror="this.style.display='none'" style="width:28px;height:28px;border-radius:5px;">
-          
+        <button class="calc-item-btn" id="itemSunfire" onclick="selectCalcItem('sunfire')" title="Эгида Солнечного огня">
+          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3068.png" style="width:36px;height:36px;border-radius:6px;" onerror="this.style.background='#333'">
         </button>
-        <button class="calc-item-btn" id="itemLiandry" onclick="selectCalcItem('liandry')" title="Torment: 0.5% max HP/s over 3s per ability (+ 0.5% per 100 AP)">
-          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6653.png" onerror="this.style.display='none'" style="width:28px;height:28px;border-radius:5px;">
-          
+        <button class="calc-item-btn" id="itemLiandry" onclick="selectCalcItem('liandry')" title="Мучения Лиандри">
+          <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6653.png" style="width:36px;height:36px;border-radius:6px;" onerror="this.style.background='#333'">
         </button>
       </div>
-      <div id="calcItemHint" style="font-size:11px;color:rgba(255,255,255,0.28);margin-top:8px;line-height:1.5;min-height:16px;"></div>
+      <div id="calcItemHint" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px;line-height:1.5;min-height:14px;"></div>
     </div>
 
-
-    <!-- ═══ Ability DMG Calculator ═══ -->
-    <div style="margin-bottom:14px;">
-      <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">⚡ ABILITY DAMAGE</div>
-      <div id="abilityScalings" style="display:flex;flex-direction:column;gap:8px;">
-        <div id="abilityRows"></div>
-        <button onclick="addAbilityRow()" style="background:rgba(109,63,245,0.15);border:1.5px dashed rgba(155,89,182,0.4);color:rgba(255,255,255,0.5);border-radius:8px;padding:7px;font-size:12px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='rgba(109,63,245,0.25)'" onmouseout="this.style.background='rgba(109,63,245,0.15)'">
-          + Add scaling
-        </button>
-      </div>
-      <div id="abilityResult" style="display:none;margin-top:10px;">
-        <div style="height:1px;background:rgba(155,89,182,0.2);margin-bottom:10px;"></div>
+    <!-- Урон способностей -->
+    <div style="margin-bottom:12px;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;">⚡ УРОН СПОСОБНОСТИ</div>
+      <div id="abilityRows" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <button onclick="addAbilityRow()" style="margin-top:6px;width:100%;background:rgba(109,63,245,0.12);border:1.5px dashed rgba(155,89,182,0.4);color:rgba(255,255,255,0.55);border-radius:8px;padding:7px;font-size:12px;cursor:pointer;">
+        + Добавить скейл
+      </button>
+      <div id="abilityResult" style="display:none;margin-top:8px;">
         <div class="calc-stat-box" style="background:rgba(93,173,226,0.1);border-color:rgba(93,173,226,0.3);">
-          <div class="calc-stat-label">⚡ Total ability damage (after resistances)</div>
+          <div class="calc-stat-label">⚡ Итого урона способности (после резистов)</div>
           <div class="calc-stat-val" id="abilityResultVal" style="color:#5dade2;font-size:22px;"></div>
         </div>
-        <div id="abilityFormula" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.28);font-family:monospace;line-height:1.6;"></div>
+        <div id="abilityFormula" style="margin-top:6px;font-size:11px;color:rgba(255,255,255,0.25);font-family:monospace;line-height:1.5;"></div>
       </div>
     </div>
 
-    <!-- Divider + Results -->
+    <!-- Результат -->
     <div id="calcResult" style="display:none;">
-      <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:14px;"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:12px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
         <div class="calc-stat-box">
-          <div class="calc-stat-label">Effective armor</div>
-          <div class="calc-stat-val" id="resEff" style="color:#5dade2;font-size:18px;"></div>
+          <div class="calc-stat-label">Эфф. броня</div>
+          <div class="calc-stat-val" id="resEff" style="color:#5dade2;font-size:17px;"></div>
         </div>
         <div class="calc-stat-box">
-          <div class="calc-stat-label">Dmg reduction</div>
-          <div class="calc-stat-val" id="resMit" style="color:#e74c3c;font-size:18px;"></div>
+          <div class="calc-stat-label">Снижение урона</div>
+          <div class="calc-stat-val" id="resMit" style="color:#e74c3c;font-size:17px;"></div>
         </div>
         <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.4);">
-          <div class="calc-stat-label">✅ Actual damage dealt</div>
+          <div class="calc-stat-label">✅ Реально нанесено урона</div>
           <div class="calc-stat-val" id="resDmg" style="color:#b96fff;font-size:26px;"></div>
         </div>
         <div id="calcItemResult" class="calc-stat-box" style="grid-column:1/-1;display:none;background:rgba(232,130,10,0.12);border-color:rgba(232,130,10,0.35);">
           <div class="calc-stat-label" id="calcItemResultLabel"></div>
-          <div class="calc-stat-val" id="calcItemResultVal" style="color:#e07820;font-size:20px;"></div>
+          <div class="calc-stat-val" id="calcItemResultVal" style="color:#e07820;font-size:18px;"></div>
         </div>
       </div>
-      <div id="calcFormula" style="margin-top:10px;font-size:11px;color:rgba(255,255,255,0.28);font-family:monospace;line-height:1.6;"></div>
+      <div id="calcFormula" style="margin-top:8px;font-size:11px;color:rgba(255,255,255,0.25);font-family:monospace;line-height:1.5;"></div>
     </div>
   </div>
 </div>
 
+
 <!-- ═══════════════ CHAMPION GROWTH CHART POPUP ═══════════════ -->
 <div class="m-mask" id="chartMask" onclick="if(event.target===this)closeChart()">
-  <div class="m-win" style="max-width:560px;height:auto;max-height:90vh;padding:28px 24px 24px;">
+  <div class="m-win" style="max-width:min(580px,94vw);height:auto;max-height:90vh;padding:24px 20px 20px;">
     <button class="btn-close-x" onclick="closeChart()">✕</button>
     <div id="chartTitle" style="font-size:17px;font-weight:900;color:#b96fff;margin-bottom:16px;letter-spacing:1px;"></div>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="chartStatBtns"></div>
@@ -3003,261 +3028,111 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 <!-- ═══════════════ ITEMS REFERENCE MODAL ═══════════════ -->
 <div class="m-mask" id="itemsMask" onclick="if(event.target===this)closeItems()">
-  <div class="m-win" style="max-width:min(600px,95vw);height:auto;max-height:94vh;overflow-y:auto;overflow-x:visible;padding:20px 16px 16px;">
+  <div class="m-win" style="max-width:min(700px,96vw);height:auto;max-height:94vh;overflow-y:auto;overflow-x:visible;padding:20px 16px 16px;">
     <button class="btn-close-x" onclick="closeItems()">✕</button>
-    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;letter-spacing:1px;">📦 Wild Rift Items</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Hover / tap icon for full stats</div>
-    <div style="font-size:10px;color:#e07820;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">⚔ PHYSICAL</div>
+    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;letter-spacing:1px;">📦 Предметы Wild Rift</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Наведи или нажми на иконку для описания</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">⚔ ФИЗИЧЕСКИЕ</div>
     <div class="items-grid">
-      <div class="item-card" title="Blade of the Ruined King&#10;3000g&#10;+25 AD  +35% AS  +10% Omni Vamp&#10;Ruined Strikes: 8.5% current HP phys/hit (melee 10%). Drain: 3rd hit deals 30-100 magic dmg + steals 25% MS 2s (60s CD)">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3153.png" alt="Blade of the Ruined King" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Infinity Edge&#10;3400g&#10;+60 AD  +25% Crit&#10;Infinity: Crits deal 205% dmg. Limit Break: excess crit% gives +0.6 bonus crit dmg per 1%.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3031.png" alt="Infinity Edge" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Bloodthirster&#10;3000g&#10;+55 AD  +250 HP  +25% Crit&#10;Bloody: +8% Physical Vamp. Crits gain extra +4% Vamp. Life Shield at <30% HP.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3072.png" alt="Bloodthirster" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Guardian Angel&#10;3400g&#10;+40 AD  +40 Armor&#10;Resurrect: Restore 50% HP + 30% Mana after 4s stasis on lethal dmg. (210s CD)">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3026.png" alt="Guardian Angel" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Runaan's Hurricane&#10;2900g&#10;+35% AS  +25% Crit&#10;Wind's Fury: Attacks hit 2 extra enemies for 55% AD. Wind Blade: +15 bonus phys on-hit.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3085.png" alt="Runaan's Hurricane" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Youmuu's Ghostblade&#10;3000g&#10;+55 AD  +15 AH  +15 Armor Pen&#10;Momentum: Moving builds up to +50 MS. Spectral Haste: attacks at max Momentum give 25% AS for 4s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3142.png" alt="Youmuu's Ghostblade" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Duskblade of Draktharr&#10;3000g&#10;+55 AD  +10 AH  +18 Armor Pen&#10;Nightstalker: First attack on champion deals 60-160 bonus phys + 99% slow 0.35s. (10s CD, resets on kill)">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3814.png" alt="Duskblade of Draktharr" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Black Cleaver&#10;3000g&#10;+400 HP  +40 AD  +20 AH&#10;Sunder: Phys dmg reduces enemy Armor 6% per hit, max 4 stacks (24% total). Rage: +20 MS on phys dmg.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3071.png" alt="Black Cleaver" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Trinity Force&#10;3333g&#10;+25 AD  +30% AS  +300 HP  +15 AH&#10;Spellblade: After ability, next attack deals 200% base AD bonus phys dmg.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3078.png" alt="Trinity Force" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Divine Sunderer&#10;3300g&#10;+40 AD  +400 HP  +20 AH&#10;Spellblade: After ability, next attack deals 12% enemy max HP (9% ranged) bonus phys. Heals 50% of bonus.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6632.png" alt="Divine Sunderer" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Serylda's Grudge&#10;3200g&#10;+45 AD  +20 AH  +33% Armor Pen&#10;Bitter Cold: Abilities slow enemies 30% for 1s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6694.png" alt="Serylda's Grudge" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Lord Dominik's Regards&#10;3000g&#10;+30 AD  +25% Crit  +15% AS&#10;Last Whisper: +30% Armor Pen. Giant Slayer: up to +20% bonus dmg vs enemies with >1750 HP.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3033.png" alt="Lord Dominik's Regards" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Mortal Reminder&#10;3300g&#10;+25 AD  +25% Crit  +15% AS&#10;Last Whisper: +30% Armor Pen. Sepsis: phys dmg applies 50% Grievous Wounds 3s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3033.png" alt="Mortal Reminder" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Death's Dance&#10;3000g&#10;+50 AD  +15 AH  +15 Armor&#10;Ignore Pain: 30% of dmg taken stored as bleed. Defy: kills remove the bleed.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3812.png" alt="Death's Dance" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Maw of Malmortius&#10;3000g&#10;+50 AD  +15 AH  +10% Magic Pen&#10;Lifeline: At <30% HP gain a magic shield. Mawshield: if it holds, gain +10 AD and +15% Vamp for 5s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3156.png" alt="Maw of Malmortius" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Wit's End&#10;3100g&#10;+40% AS  +50 MR&#10;Fray: Attacks deal 15-80 magic dmg on-hit. At <50% HP, steal 20 MS. Feral: +15% Phys Vamp.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3091.png" alt="Wit's End" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Sterak's Gage&#10;3000g&#10;+450 HP  +20 AH&#10;Lifeline: At <30% HP gain a growing shield. Primal Instinct: shield decays over 4s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3053.png" alt="Sterak's Gage" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Stormrazor&#10;3000g&#10;+55 AD  +25% Crit  +5% MS&#10;Energized: Moving & attacking builds stacks. Paralyze: Energized attack slows 40%.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3095.png" alt="Stormrazor" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Phantom Dancer&#10;2800g&#10;+25% Crit  +25% AS  +7% MS&#10;Ghosting: Move through units. Spectral Waltz: Crits grant +10% AS for 2s. Life Drain: +10% PVamp.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3046.png" alt="Phantom Dancer" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Manamune&#10;2700g&#10;+25 AD  +300 Mana  +20 AH&#10;Awe: +1.5% AD from max Mana. Mana Charge: +18 per hit, cap 700. Transforms to Muramana.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3004.png" alt="Manamune" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Muramana&#10;2700g&#10;+35 AD  +700 Mana  +20 AH&#10;Awe: +3% AD from Mana. Shock: Single-target abilities deal 6% current Mana bonus phys dmg.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3004.png" alt="Muramana" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Edge of Night&#10;3000g&#10;+55 AD  +10 AH  +18 Armor Pen&#10;Night Edge: Channel 1.25s to gain a spell shield (25s CD, resets on kill).">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6693.png" alt="Edge of Night" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Essence Reaver&#10;3000g&#10;+45 AD  +20 AH  +25% Crit&#10;Spellblade: After ability, next attack restores 3% max Mana.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3508.png" alt="Essence Reaver" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Navori Quickblades&#10;3000g&#10;+65 AD  +20 AH  +20% Crit&#10;Transcendence: Crits reduce ability CDs by 15% of remaining. Requires ≥60% crit.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6672.png" alt="Navori Quickblades" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Hullbreaker&#10;3000g&#10;+60 AD  +400 HP&#10;Overwhelm: Solo = +20-60 bonus Armor/MR and +20% dmg vs structures.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3184.png" alt="Hullbreaker" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-    
-      <div class="item-card" title="Spear of Shojin | 3100g | +55 AD  +300 HP  +20 AH | Martial Cadence: Abilities reduce your current Basic Attack recharge."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3161.png" loading="lazy"></div>
-      <div class="item-card" title="Sundered Sky | 3200g | +55 AD  +450 HP  +15 AH | Lightshield Strike: First attack on champ deals 100% base AD bonus phys + heals 100% bonus. (8s CD)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6609.png" loading="lazy"></div>
-      <div class="item-card" title="Goredrinker | 3000g | +45 AD  +450 HP  +20 AH | Thirsting Slash (Active): Deal 100% AD in AoE + restore HP for each enemy hit. (30s CD)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6630.png" loading="lazy"></div>
-      <div class="item-card" title="Stridebreaker | 3000g | +50 AD  +400 HP  +20 AH | Halting Slash (Active): Deal AoE phys, slow 40% for 2s. Permafrost: Halting Slash root for 0.75s."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6631.png" loading="lazy"></div>
-      <div class="item-card" title="Navori Quickblades | 3200g | +65 AD  +15 AH  +25% Crit | Transcendence: Crits reduce ability cooldowns by 15% of max. Quick Strike: 1.25 attack time after ability."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6672.png" loading="lazy"></div>
-      <div class="item-card" title="Eclipse | 3000g | +55 AD  +15 AH  +18 Armor Pen | Ever Rising Moon: Hitting 2 abilities in 1.5s deals 6% max HP bonus phys + shield + 15% MS for 2s."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6692.png" loading="lazy"></div>
-      <div class="item-card" title="Terminus | 3000g | +40 AD  +20% AS | Light: On-hit adds +20 Magic Pen stack. Dark: On-hit adds +10 Armor stack. Switches between light and dark."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6698.png" loading="lazy"></div>
-      <div class="item-card" title="Titanic Hydra | 3000g | +500 HP  +30 AD  +20 AH | Cleave: Attacks deal 5 + 1% max HP to nearby. Crescent: Active — AoE in cone. Passive doubles."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3748.png" loading="lazy"></div>
-      <div class="item-card" title="Serpent's Fang | 3000g | +55 AD  +18 Armor Pen | Shield Reaver: Reduce enemy shields 50% (on you) or 35% (on allies)."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6676.png" loading="lazy"></div>
-      <div class="item-card" title="Hullbreaker | 3000g | +60 AD  +400 HP  +5% MS | Boarding Party: While alone or with minions, gain +30 Armor/MR. Minions gain Damage and Resist aura."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3184.png" loading="lazy"></div>
-      <div class="item-card" title="Galeforce | 3400g | +55 AD  +25% Crit  +15% AS | Cloudburst (Active): Dash in direction, firing 3 missiles each dealing 75-200 to lowest HP enemy. (90s CD)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6671.png" loading="lazy"></div>
-      <div class="item-card" title="Guinsoo's Rageblade | 2800g | +25% AS  +15% Crit | Wrath: Attacks deal your crit dmg as on-hit instead of critting. Guinsoo's Rage: Every 3rd hit triggers on-hit effects twice."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3124.png" loading="lazy"></div>
-      <div class="item-card" title="Chempunk Chainsword | 2700g | +55 AD  +300 HP  +20 AH | Hackshorn: Phys dmg applies 60% Grievous Wounds 3s."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6333.png" loading="lazy"></div>
+      <div class="item-card" title="Клинок короля-разрушителя | 3000z | +25 AD +35% AS +10% Вампиризм | Смертоносные удары: 8.5% тек. HP цели (ближний 10%) физ. урона. Мин. 15. Истощение: 3-й удар — 30-100 маг. урона + кража 25% скорости 2с (60с КД)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3153.png" alt="Клинок короля-разрушителя" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Грань бесконечности | 3400z | +60 AD +25% Крит | Бесконечность: Криты наносят 205% вместо 175%. Предел: каждый 1% крита сверх 100% = +0.6 урона крита"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3031.png" alt="Грань бесконечности" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Жаждущий клинок | 3000z | +55 AD +250 HP +25% Крит | Кровожадность: +8% физ. вампиризм, криты +4%. Щит жизни: при HP<30% получаешь щит"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3072.png" alt="Жаждущий клинок" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ангел-хранитель | 3400g | +40 AD +40 Брони | Воскрешение: При смерти — восстановить 50% HP и 30% маны через 4с. (210с КД)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3026.png" alt="Ангел-хранитель" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ураган Рунаана | 2900z | +35% AS +25% Крит | Ярость ветра: Атаки бьют ещё 2 ближних цели за 55% AD. Ветряное лезвие: +15 физ. урона за удар"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3085.png" alt="Ураган Рунаана" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Призрачный клинок Юму | 3000z | +55 AD +15 AH +15 Пробивания | Импульс: Движение накапливает до +50 скорости. Призрачная ярость: атака на макс. импульсе = +25% скорости атаки 4с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3142.png" alt="Призрачный клинок Юму" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Сумеречный клинок Дракхарра | 3000z | +55 AD +10 AH +18 Пробивания | Ночной охотник: первая атака по чемпиону — 60-160 доп. физ. + замедление 99% на 0.35с (10с КД, сбрасывается на убийстве)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3814.png" alt="Сумеречный клинок Дракхарра" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Чёрный тесак | 3000z | +400 HP +40 AD +20 AH | Разрыв: Физ. урон снижает броню врага на 6% за стак, макс. 4 стака (24%). Ярость: +20 скорости при физ. уроне"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3071.png" alt="Чёрный тесак" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Сила Тринити | 3333z | +25 AD +30% AS +300 HP +15 AH | Чародейский удар: После способности — след. атака наносит 200% базового AD доп. физ. урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3078.png" alt="Сила Тринити" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Божественный раздробитель | 3300z | +40 AD +400 HP +20 AH | Чародейский удар: После способности — след. атака 12% макс. HP цели (9% дальний) физ. + лечит 50% от бонуса"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6632.png" alt="Божественный раздробитель" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Обида Серильды | 3200z | +45 AD +20 AH +33% Пробивания | Ледяной холод: Способности замедляют врагов на 30% на 1с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6694.png" alt="Обида Серильды" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Уважение лорда Доминика | 3000z | +30 AD +25% Крит +15% AS | Последний шёпот: +30% пробив. брони. Охотник на гигантов: до +20% урона врагам с >1750 HP"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3036.png" alt="Уважение лорда Доминика" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Смертное напоминание | 3300z | +25 AD +25% Крит +15% AS | Последний шёпот: +30% пробив. брони. Сепсис: физ. урон = 50% "Тяжкие раны" на 3с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3033.png" alt="Смертное напоминание" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Танец смерти | 3000z | +50 AD +15 AH +15 Брони | Невосприимчивость к боли: 30% урона откладывается как кровотечение. Воля: убийство снимает кровотечение"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3812.png" alt="Танец смерти" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Пасть Мальмортиуса | 3000z | +50 AD +15 AH +10% Маг. проникн. | Жизненная линия: при HP<30% получаешь маг. щит. Щит: если выдержит — +10 AD и +15% вампиризм 5с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3156.png" alt="Пасть Мальмортиуса" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Конец остроумия | 3100z | +40% AS +50 МС | Схватка: атаки наносят 15-80 доп. маг. урона. При HP<50% крадёшь 20 скорости. Дикарство: +15% физ. вампиризм"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3091.png" alt="Конец остроумия" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Удила Стерака | 3000z | +450 HP +20 AH | Жизненная линия: при HP<30% получаешь растущий щит на 4с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3053.png" alt="Удила Стерака" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Штормовой режущий вихрь | 3000z | +55 AD +25% Крит +5% Скорость | Заряженный: движение и атаки накапливают заряд. Паралич: заряженная атака замедляет на 40%"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3095.png" alt="Штормовой режущий вихрь" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Призрачный танцор | 2800z | +25% Крит +25% AS +7% Скорость | Призрак: движение сквозь юнитов. Призрачный вальс: криты дают +10% AS 2с. Вампиризм жизни: +10% физ."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3046.png" alt="Призрачный танцор" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Титаническая гидра | 3000z | +600 HP +30 AD +10 AH | Крушение: атаки наносят 1% макс. HP доп. физ. урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3748.png" alt="Титаническая гидра" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Манамуне | 2700z | +25 AD +300 Маны +20 AH | Благоговение: +1.5% AD от макс. маны. Заряд маны: +18 маны за удар, макс. 700. Трансф. в Мурамана"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3004.png" alt="Манамуне" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Мурамана | 2700z | +35 AD +700 Маны +20 AH | Благоговение: +3% AD от маны. Шок: способности одной цели наносят 6% тек. маны доп. физ. урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3042.png" alt="Мурамана" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Грань ночи | 3000z | +55 AD +10 AH +18 Пробивания | Ночное лезвие: 1.25с заряд даёт щит от заклинаний (25с КД, сброс на убийстве)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6693.png" alt="Грань ночи" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Похититель сущности | 3000z | +45 AD +20 AH +25% Крит | Чародейский удар: след. атака после способности восстанавливает 3% макс. маны"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3508.png" alt="Похититель сущности" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Быстрые клинки Навори | 3000z | +65 AD +20 AH +20% Крит | Запредельность: Криты снижают КД способностей на 15% остатка. Требует ≥60% крит"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6672.png" alt="Быстрые клинки Навори" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Разрушитель корпуса | 3000z | +60 AD +400 HP | Подавить: В одиночестве — +20-60 доп. брони/МС и +20% урона по строениям"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3184.png" alt="Разрушитель корпуса" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Жаждущий поглотитель | 3300z | +40 AD +400 HP +20 AH | Жажда: Убийства и добивания восстанавливают HP. Утоление: Активное исцеление"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6630.png" alt="Жаждущий поглотитель" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Разрубатель шагов | 3200z | +40 AD +400 HP +20 AH | Сокрушение: После способности след. атака замедляет врагов рядом на 40% и наносит 100 маг. урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6631.png" alt="Разрубатель шагов" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Затмение | 3200z | +55 AD +20 AH +10% Проникн. | Блестящее затмение: Через 2 удара по чемпиону получаешь щит и движение сквозь юнитов 2с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6692.png" alt="Затмение" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Копьё Шоджина | 3000z | +40 AD +400 HP +20 AH | Рвение: Снижение КД способностей на 12% при нанесении базового AD урона чемпиону"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3161.png" alt="Копьё Шоджина" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Пронзённое небо | 2900z | +35 AD +300 HP +15 AH | Удар небесного меча: Мощная атака на чемпиона = 12% макс. HP физ. урона (30с КД)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6609.png" alt="Пронзённое небо" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ярость Гинсо | 3000z | +25% AS | Призрачная атака: Атаки наносят физ. урон = 2.5% +2.5% Крит бонус маг. урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3124.png" alt="Ярость Гинсо" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
     </div>
-    <div style="font-size:10px;color:#9b59b6;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">🔮 MAGIC</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">🔮 МАГИЧЕСКИЕ</div>
     <div class="items-grid">
-      <div class="item-card" title="Liandry's Torment&#10;3000g&#10;+300 HP  +90 AP  +7% MPen&#10;Torment: 0.5% max HP magic/s over 3s per ability hit. Suffering: +2% dmg/s in combat (max 6%).">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6653.png" alt="Liandry's Torment" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Riftmaker&#10;3300g&#10;+150 HP  +80 AP  +7% MPen  +15 AH&#10;Assimilation: +2.5% magic dmg/s in combat (max 7.5%). At max, converts to true dmg. +11% Magic Vamp.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4635.png" alt="Riftmaker" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Rabadon's Deathcap&#10;3500g&#10;+120 AP&#10;Magical Opus: Increase total AP by 40%.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3089.png" alt="Rabadon's Deathcap" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Void Staff&#10;3000g&#10;+90 AP&#10;+40% Magic Penetration.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3165.png" alt="Void Staff" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Luden's Tempest&#10;3000g&#10;+80 AP  +20 AH  +7% MPen&#10;Echo: At 100 charges, next ability deals 60-160 bonus magic dmg to target + 4 nearby. +10% MS.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6655.png" alt="Luden's Tempest" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Hextech Rocketbelt&#10;3200g&#10;+80 AP  +300 HP  +20 AH&#10;Supersonic: Dash 300 units + deal 150 magic dmg nearby (40s CD). Gain 50 MS vs champions 5s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3152.png" alt="Hextech Rocketbelt" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Shadowflame&#10;3000g&#10;+100 AP  +200 HP&#10;Cinderbloom: Dmg to shielded or low HP enemies gains 10-20% magic pen.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4645.png" alt="Shadowflame" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Zhonya's Hourglass&#10;3000g&#10;+80 AP  +50 Armor  +10 AH&#10;Active: Invulnerable + untargetable 2.5s (120s CD). Serenity: take 10% less dmg.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3157.png" alt="Zhonya's Hourglass" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Cosmic Drive&#10;3000g&#10;+70 AP  +300 HP  +15 AH&#10;Spelldance: Hit champion with 3 abilities in 3s = +20% MS + 40 AP for 3s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4629.png" alt="Cosmic Drive" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Crown of the Shattered Queen&#10;3000g&#10;+75 AP  +250 HP  +15 AH&#10;Poise: After being hit by ability, gain a shield 1.5s. Blessing: while shielded, +75 AP.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4633.png" alt="Crown of the Shattered Queen" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Archangel's Staff&#10;3000g&#10;+80 AP  +600 Mana  +20 AH&#10;Awe: +1.5% AP from max Mana. Mana Charge: +24 Mana per ability, cap 700. Transforms to Seraph's.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3003.png" alt="Archangel's Staff" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Seraph's Embrace&#10;3000g&#10;+80 AP  +1300 Mana  +20 AH&#10;Awe: +3% AP from max Mana. Active: Consume 20% Mana for a shield = consumed Mana + 150.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3040.png" alt="Seraph's Embrace" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Nashor's Tooth&#10;3000g&#10;+80 AP  +50% AS  +10 AH&#10;Icathian Bite: Attacks deal 15+15% AP bonus magic dmg on-hit.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3115.png" alt="Nashor's Tooth" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Morellonomicon&#10;2500g&#10;+70 AP  +300 HP&#10;Affliction: Dealing magic dmg applies 40% Grievous Wounds 3s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3165.png" alt="Morellonomicon" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Fimbulwinter&#10;2700g&#10;+400 HP  +400 Mana  +10 AH&#10;Everlasting: +10 HP/15 Mana per ability, cap 1000. Frozen Colossus: near 2+ enemies gain 200-600 HP shield.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4642.png" alt="Fimbulwinter" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Abyssal Mask&#10;2800g&#10;+450 HP  +40 MR  +15 AH&#10;Eternity: 15% of dmg taken = Mana restore. Unmake: nearby enemies take +5-20% more magic dmg.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3001.png" alt="Abyssal Mask" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Horizon Focus&#10;3000g&#10;+100 AP  +15 AH&#10;Hypershot: Immobilizing or hitting enemies at long range reveals them. Marked enemies take +10% dmg.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4628.png" alt="Horizon Focus" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-    
-      <div class="item-card" title="Awakened Soulstealer | 3000g | +60 AP  +300 HP  +20 AH | Soulflare: Ability kills grant Soulflare charges. 10 stacks → consume all for 3 free ability casts within 5s."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4403.png" loading="lazy"></div>
-      <div class="item-card" title="Crown of the Shattered Queen | 3000g | +70 AP  +300 HP  +20 AH | Safeguard: Taking dmg grants Poise. At max Poise, gain 75% dmg reduction for 1.5s (15s CD)."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4633.png" loading="lazy"></div>
-      <div class="item-card" title="Infinity Orb | 2800g | +60 AP  +200 HP | Perfection: Abilities deal 20% more dmg to enemies below 35% HP. +10% Magic Pen."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3916.png" loading="lazy"></div>
-      <div class="item-card" title="Lich Bane | 3000g | +70 AP  +300 Mana  +20 AH | Spellblade: After ability, next attack deals 150% base AD + 35% AP bonus magic dmg."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3100.png" loading="lazy"></div>
-      <div class="item-card" title="Malignance | 2700g | +70 AP  +300 Mana  +20 AH | Haunt: Ult applies Haunt field for 4s; enemies in field take 15% more dmg from your abilities."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4646.png" loading="lazy"></div>
-      <div class="item-card" title="Bandle Fantasy | 3000g | +60 AP  +400 HP  +20 AH | Yordle Anima: Abilities create Yordle explosions around you dealing 30-100 magic dmg to nearby."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Psychic Projector | 3000g | +80 AP  +15 AH | Projector: Ability dmg marks enemy. Next attack detonates for 60-200 magic dmg."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
+      <div class="item-card" title="Мучения Лиандри | 3000z | +300 HP +90 AP +7% Маг. проникн. | Мучения: 0.5% макс. HP цели маг./сек за 3с при ударе способности. Страдание: +2% урона/сек в бою (макс 6%)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6653.png" alt="Мучения Лиандри" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Разломовластитель | 3300z | +150 HP +80 AP +7% Маг. пр. +15 AH | Ассимиляция: +2.5% маг. урона/сек в бою (макс 7.5%). На максе — истинный урон. +11% вампиризм маги"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4635.png" alt="Разломовластитель" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Смертная шапка Рабадона | 3500z | +120 AP | Магический опус: Увеличивает суммарный AP на 40%"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3089.png" alt="Смертная шапка Рабадона" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Посох пустоты | 3000z | +90 AP | +40% пробивания магических резистов"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3135.png" alt="Посох пустоты" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Буря Лудена | 3000z | +80 AP +20 AH +7% Маг. пр. | Эхо: 100 зарядов → след. способность 60-160 доп. маг. урона + 4 цели рядом. +10% скорости"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6655.png" alt="Буря Лудена" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ракетный пояс хекстека | 3200z | +80 AP +300 HP +20 AH | Сверхзвук: Рывок 300 ед. + 150 маг. урона рядом (40с КД). +50 скорости у чемпионов 5с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3152.png" alt="Ракетный пояс хекстека" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Призрачное пламя | 3000z | +100 AP +200 HP | Цветок пламени: Урон по зачарованным или врагам с низким HP = +10-20% маг. проникновения"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4645.png" alt="Призрачное пламя" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Песочные часы Жони | 3000z | +80 AP +50 Брони +10 AH | Активное: Неуязвимость 2.5с (120с КД). Безмятежность: получаемый урон -10%"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3157.png" alt="Песочные часы Жони" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Космический разгон | 3000z | +70 AP +300 HP +15 AH | Звёздный танец: Попадание 3 способностей в 3с = +20% скорости + 40 AP на 3с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4629.png" alt="Космический разгон" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Корона разбитой королевы | 3000z | +75 AP +250 HP +15 AH | Поза: После попадания способности — щит 1.5с. Благословение: в щите +75 AP"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4633.png" alt="Корона разбитой королевы" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Посох архангела | 3000z | +80 AP +600 Маны +20 AH | Благоговение: +1.5% AP от маны. Заряд маны: +24 маны за способность, макс 700. Трансф. в Объятие"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3003.png" alt="Посох архангела" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Объятие Серафины | 3000z | +80 AP +1300 Маны +20 AH | Благоговение: +3% AP от маны. Активное: потребить 20% тек. маны = щит = потраченная мана + 150"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3040.png" alt="Объятие Серафины" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Зуб Нашора | 3000z | +80 AP +50% AS +10 AH | Укус икатиана: Атаки наносят 15 +15% AP доп. маг. урона за удар"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3115.png" alt="Зуб Нашора" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Морелломиконом | 2500z | +70 AP +300 HP | Поражение: Маг. урон по чемпионам = 40% "Тяжкие раны" на 3с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3165.png" alt="Морелломиконом" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Зимний вихрь | 2700z | +400 HP +400 Маны +10 AH | Вечность: +10 HP/15 маны за способность, макс 1000. Ледяной колосс: рядом 2+ врагов — щит 200-600 HP"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4642.png" alt="Зимний вихрь" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Бездонная маска | 2800z | +450 HP +40 МС +15 AH | Вечность: 15% получ. урона → мана. Разрушение: ближние враги получают +5-20% доп. маг. урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3001.png" alt="Бездонная маска" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Горизонт сосредоточенности | 3000z | +100 AP +15 AH | Прицел: Обездвиживание/дальнее попадание раскрывает и помечает врагов. Помеченные — +10% урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4628.png" alt="Горизонт сосредоточенности" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Призрачное пламя теней | 3000z | +100 AP +200 HP | Сокрушение: Урон по щиту или малому HP = +10-20% маг. пр. Стат. скорость: +5%"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4646.png" alt="Призрачное пламя теней" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Лихорадка личей | 3000z | +80 AP +300 Маны +10 AH | Чародейский удар: После способности — след. атака 75% базового AD + 50% AP доп. маг. урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3100.png" alt="Лихорадка личей" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Пробудившийся похититель душ | 3000z | +75 AP +350 Маны +25 AH | Воровство душ: Добивания и убийства дают стаки, снижающие КД"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4403.png" alt="Пробудившийся похититель душ" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
     </div>
-    <div style="font-size:10px;color:#5dade2;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">🛡 DEFENSE</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">🛡 ЗАЩИТНЫЕ</div>
     <div class="items-grid">
-      <div class="item-card" title="Thornmail&#10;2700g&#10;+75 Armor  +200 HP&#10;Thorns: On-hit reflects 20 + 6% bonus Armor + 2% bonus HP magic dmg. Inflicts Grievous Wounds 3s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3075.png" alt="Thornmail" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Sunfire Aegis&#10;3000g&#10;+500 HP  +15 AH&#10;Immolate: 16–30 + 1% bonus HP magic/s. Each champ hit stacks +7% for 5s (max ×1.42). +15% vs minions.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3068.png" alt="Sunfire Aegis" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Warmog's Armor&#10;3000g&#10;+800 HP  +200% HP Regen&#10;Warmog's Heart: Restore 5% max HP/s if out of combat 5s and HP >1000.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3083.png" alt="Warmog's Armor" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Frozen Heart&#10;2700g&#10;+80 Armor  +400 HP  +20 AH&#10;Winter's Caress: Reduces attack speed of nearby enemies by 20%. Consumes: reduces phys dmg taken 5%.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3110.png" alt="Frozen Heart" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Spirit Visage&#10;2900g&#10;+450 HP  +60 MR  +150% HP Regen&#10;Blessed: Increases shields and healing received by 25%.">
-        <img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" alt="Spirit Visage" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Gargoyle Stoneplate&#10;3200g&#10;+60 Armor  +60 MR  +200 HP&#10;Stone Skin: Near 2+ enemies gain 6 Armor + 6 MR. Active: +100 Armor/MR for 4s (90s CD).">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3193.png" alt="Gargoyle Stoneplate" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Randuin's Omen&#10;2800g&#10;+350 HP  +80 Armor&#10;Cold Steel: Reduces AS of attackers by 15%. Active: Slow nearby enemies 55% for 2s (60s CD).">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3143.png" alt="Randuin's Omen" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Dead Man's Plate&#10;2800g&#10;+300 HP  +50 Armor&#10;Momentum: Build 50 MS. Crushing Blow: Fully charged attack deals 100 bonus phys + slow.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3742.png" alt="Dead Man's Plate" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Force of Nature&#10;3000g&#10;+350 HP  +60 MR  +5% MS&#10;Absorb: Magic dmg charges stacks. At 6+, gain 20 MR + 6% MS for 5s. Dissipate: -10% magic dmg taken.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4401.png" alt="Force of Nature" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Iceborn Gauntlet&#10;2800g&#10;+250 HP  +75 Armor  +15 AH&#10;Spellblade: After ability, next attack deals 100% base AD bonus phys + slows nearby 30%.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3022.png" alt="Iceborn Gauntlet" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Banshee's Veil&#10;2500g&#10;+350 HP  +60 MR&#10;Annul: Gain a spell shield every 40s blocking 1 enemy ability. Blessed: +10% Heal/Shield Power.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3102.png" alt="Banshee's Veil" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Knight's Vow&#10;2200g&#10;+250 HP  +150% HP Regen  +20 AH&#10;Sacrifice: Link to ally. Redirect 12% of their dmg to you. When they kill, you heal 8% max HP.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3109.png" alt="Knight's Vow" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-    
-      <div class="item-card" title="Kaenic Rookern | 3000g | +400 HP  +70 MR | Null Field: Taking magic dmg builds Null stacks. At max, gain a magic shield for 3s (30s CD)."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Hollow Radiance | 3000g | +500 HP  +20 AH | Immolate: 16-30 + 1% bonus HP magic/s. Void: Deals 50% bonus dmg and inflicts Grievous Wounds."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Amaranth's Twinguard | 3200g | +400 HP  +50 Armor  +50 MR | Resolve: Each second in combat gains +4 Armor and +4 MR, stacking up to 8 times (32 each)."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Heartsteel | 2700g | +800 HP  +15% HP Regen | Colossal Consumption: Charges up over 3s on nearby champion. On hit: deal 125 + 6% bonus HP magic dmg + permanently gain 10 HP."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Force of Nature | 2900g | +350 HP  +60 MR | Steadfast: Taking magic dmg builds Steadfast stacks (max 8) granting +4 MR each. At max, gain +10% MS."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4401.png" loading="lazy"></div>
-      <div class="item-card" title="Gargoyle | 2700g | +450 HP  +40 Armor  +40 MR | Stoneplate (Active): Gain +100% bonus HP as a shield for 3.5s but reduce size and reduce dmg dealt 60%. (90s CD)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3193.png" loading="lazy"></div>
-      <div class="item-card" title="Iceborn Gauntlet | 2700g | +400 HP  +20 AH  +20 Armor | Spellblade: After ability, next attack creates AoE slow zone 35% for 2s."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3022.png" loading="lazy"></div>
-      <div class="item-card" title="Soul Transfer | 3000g | +400 HP  +40 Armor  +40 MR | Transcendence: Upon taking lethal dmg, become invincible for 2s and cast abilities for free. (240s CD)"><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
+      <div class="item-card" title="Шипованный доспех | 2700z | +75 Брони +200 HP | Шипы: При ударе отражает 20 + 6% бонусной брони + 2% бонусного HP маг. урона. "Тяжкие раны" 3с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3075.png" alt="Шипованный доспех" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Эгида Солнечного огня | 3000z | +500 HP +15 AH | Самовозгорание: 16–30 + 1% бонусного HP маг./сек. +7% за удар по чемп., макс ×1.42. +15% по крипам"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3068.png" alt="Эгида Солнечного огня" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Броня Уормога | 3000z | +800 HP +200% Реген HP | Сердце Уормога: Восстанавливает 5% макс. HP/сек вне боя 5с и при HP>1000"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3083.png" alt="Броня Уормога" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ледяное сердце | 2700z | +80 Брони +400 HP +20 AH | Ледяная ласка: Снижает скорость атаки ближних врагов на 20%. Потребление: физ. урон -5%"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3110.png" alt="Ледяное сердце" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Духовный оплот | 2900z | +450 HP +60 МС +150% Реген HP | Благословение: Щиты и исцеление, получаемые вами, увеличены на 25%"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3065.png" alt="Духовный оплот" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Плита каменного горгульи | 3200z | +60 Брони +60 МС +200 HP | Каменная кожа: Рядом 2+ врагов — +6 брони/МС. Активное: +100 брони/МС на 4с (90с КД)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3193.png" alt="Плита каменного горгульи" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Омен Рандуина | 2800z | +350 HP +80 Брони | Хладная сталь: Скорость атаки бьющих по тебе врагов -15%. Активное: Замедление 55% рядом 2с (60с КД)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3143.png" alt="Омен Рандуина" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Плита мертвеца | 2800z | +300 HP +50 Брони | Импульс: Накапливать до +50 скорости при движении. Сокрушающий удар: на максе атака наносит 100 физ. + замедление"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3742.png" alt="Плита мертвеца" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Сила природы | 3000z | +350 HP +60 МС +5% Скорость | Поглощение: 6+ стаков от маг. урона = +20 МС + 6% скорости 5с. Рассеивание: -10% получаемого маг. урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4401.png" alt="Сила природы" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ледяной кулак | 2800z | +250 HP +75 Брони +15 AH | Чародейский удар: После способности — след. атака наносит 100% базового AD + замедляет ближних 30%"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3022.png" alt="Ледяной кулак" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Вуаль Банши | 2500z | +350 HP +60 МС | Отмена: Щит от заклинаний каждые 40с. Благословение: +10% эффективность щитов/исцеления"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3102.png" alt="Вуаль Банши" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Обет рыцаря | 2200z | +250 HP +150% Реген +20 AH | Жертва: Привязка к союзнику. Перенаправляешь 12% их урона на себя. При их убийстве — +8% макс. HP"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3109.png" alt="Обет рыцаря" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Титаническая гидра | 3000z | +600 HP +30 AD +10 AH | Крушение: Атаки наносят 1% макс. HP бонусного физ. урона. Рассечение: Активное рывок-атака с уроном"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3748.png" alt="Титаническая гидра" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Даже-тень | 2500z | +200 HP +40 МС +15 AH | Мерцание: Обездвиживание раскрывает + помечает врагов на 4с. Помеченные получают +12% урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/6656.png" alt="Даже-тень" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Вечный зимний пояс | 2700z | +400 HP +400 Маны +10 AH | Вечная сила: Стаки от способностей и ударов дают HP и ману. Ледяной колосс: щит рядом с 2+ врагами"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3632.png" alt="Вечный зимний пояс" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Сердце стали | 3200z | +800 HP +50% Реген HP | Сталь сердца: Накапливает стаки HP от убийств/добиваний. Активное: временное усиление"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/4401.png" alt="Сердце стали" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
     </div>
-    <div style="font-size:10px;color:#2ecc71;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">💛 SUPPORTS & MISC</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">💛 ПОДДЕРЖКА</div>
     <div class="items-grid">
-      <div class="item-card" title="Mikael's Blessing&#10;2000g&#10;+250 HP  +40 MR  +10 AH&#10;Active: Remove CC from ally and grant 40-70% MS for 1.5s (90s CD). Revive Blessing: +10% Heal/Shield.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3222.png" alt="Mikael's Blessing" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Zeke's Convergence&#10;2200g&#10;+250 HP  +50 MR  +10 AH&#10;Conduit: Link to ally. When you CC an enemy, surround linked ally in fire, dealing 20 magic dmg/attack 6s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3050.png" alt="Zeke's Convergence" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Chemtech Putrifier&#10;2300g&#10;+250 HP  +40 AP  +10 AH&#10;Puffcap Toxin: Healing/shielding an ally causes their next attack to apply 60% Grievous Wounds 3s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3011.png" alt="Chemtech Putrifier" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Redemption&#10;2300g&#10;+300 HP  +150% HP Regen  +20 AH&#10;Active: Target an area. After 2.5s, allies in area are healed 200-470 HP and enemies take 10% max HP magic dmg.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3107.png" alt="Redemption" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Locket of the Iron Solari&#10;2200g&#10;+300 HP  +30 MR  +10 AH&#10;Active: Grant nearby allies a 80-160 HP shield for 2.5s (90s CD).">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3190.png" alt="Locket of the Iron Solari" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Ardent Censer&#10;2100g&#10;+250 HP  +30 AP  +10 AH&#10;Sanctify: Healing/shielding an ally grants them +15-30% AS and 20-30 on-hit magic dmg for 6s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3114.png" alt="Ardent Censer" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      </div>
-      <div class="item-card" title="Shurelya's Battlesong&#10;2200g&#10;+300 HP  +30 AP  +10 AH&#10;Motivate: Active: Nearby allies gain 40% MS for 3s (60s CD). Inspire: healing/shielding allies grants 15% MS 1.5s.">
-        <img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/2065.png" alt="Shurelya's Battlesong" loading="lazy" onerror="this.style.cssText='width:34px;height:34px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'">
-      
-      <div class="item-card" title="Zeke's Convergence | 2200g | +300 HP  +250 Mana  +15 AH | Conduit: Bind to ally. Your slows/immobilizes in their AoE deal 20% bonus magic dmg from their next ability."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3050.png" loading="lazy"></div>
-      <div class="item-card" title="Radiant Virtue | 2700g | +400 HP  +20 AH | Guiding Light (Active): Pulses light to nearby ally → both gain 20% max HP as temporary HP + 20 AH for 6s. (90s CD)"><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Dawnshroud | 2400g | +300 HP  +250 Mana  +20 AH | Sentry: Moving through brushes reveals nearby enemy area 8s. Empowers nearby ally abilities."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Dream Maker | 2400g | +300 HP  +200 Mana  +20 AH | Dream Catcher: Heals/shields on allies apply Dreaming. At 3 stacks: next ally ability restores 10% max HP."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Searing Crown | 2700g | +400 HP  +40 Armor | Scorched Earth: After immobilizing enemy champion, nearby area burns for 4s dealing magic dmg."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
+      <div class="item-card" title="Благословение Микаэля | 2000z | +250 HP +40 МС +10 AH | Активное: Снять КК с союзника + 40-70% скорости 1.5с (90с КД). Возрождающее благословение: +10% исцеление/щит"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3222.png" alt="Благословение Микаэля" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Схождение Зика | 2200z | +250 HP +50 МС +10 AH | Проводник: Привязка к союзнику. Обездвиживание врага — союзник окружён огнём, 20 маг. урона/атаку 6с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3050.png" alt="Схождение Зика" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Химпанковый секатор | 2300z | +250 HP +40 AP +10 AH | Токсин: Исцеление/щит союзника — его след. атака применяет 60% "Тяжкие раны" 3с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3011.png" alt="Химпанковый секатор" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Искупление | 2300z | +300 HP +150% Реген +20 AH | Активное: Через 2.5с — союзники в зоне получают 200-470 HP, враги — 10% макс. HP маг. урона"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3107.png" alt="Искупление" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Медальон Железной Солари | 2200z | +300 HP +30 МС +10 AH | Активное: Щит 80-160 HP союзникам рядом на 2.5с (90с КД)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3190.png" alt="Медальон Железной Солари" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ревностный кадильщик | 2100z | +250 HP +30 AP +10 AH | Освящение: Исцеление/щит союзника = +15-30% скорости атаки и 20-30 маг. урона за атаку 6с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3114.png" alt="Ревностный кадильщик" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Боевая песнь Шурелья | 2200z | +300 HP +30 AP +10 AH | Мотивация: Активное: союзники рядом +40% скорости 3с. Вдохновение: исцеление/щит = +15% скорости 1.5с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/2065.png" alt="Боевая песнь Шурелья" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
     </div>
-    </div>
-
-    <div style="font-size:10px;color:#f39c12;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">✨ ENCHANTMENTS</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">👟 БОТИНКИ</div>
     <div class="items-grid">
-
-      <div class="item-card" title="Stasis (Enchantment) | 650g | Active: Become invulnerable and untargetable for 2.5s. Cannot act. (180s CD)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3157.png" loading="lazy"></div>
-      <div class="item-card" title="Quicksilver (Enchantment) | 650g | Active: Remove all CC debuffs and gain 50% bonus MS for 1.5s. (90s CD)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3140.png" loading="lazy"></div>
-      <div class="item-card" title="Glorious (Enchantment) | 650g | Active: Gain Glorious aura for 6s — allies in range gain +15% MS and +10 AD / +15 AP. (90s CD)"><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Veil (Enchantment) | 650g | Passive: Gain a spell shield every 40s that blocks the next enemy ability."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-      <div class="item-card" title="Yordle Trap (Enchantment) | 650g | Active: Deploy a Yordle Snap Trap — immobilizes first enemy who walks into it for 2.5s and reveals them for 4s."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
+      <div class="item-card" title="Ботинки стойкости | 900z | +20 Брони | Пассивное: Снижает урон от базовых атак на 8%. Скорость передвижения +35"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3047.png" alt="Ботинки стойкости" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ртутные сапоги воина | 1100z | +40 МС +10% КД исцеления | Легконогость: При применении КК — снижает его длительность на 30%. Скорость +35"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3111.png" alt="Ртутные сапоги воина" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Обувь мощности заклинаний | 900z | +10 AH | Скорость +35"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3158.png" alt="Обувь мощности заклинаний" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ботинки быстрого шага | 900z | +45 Скорость передвижения | Пассивное: Повышенная скорость движения"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3009.png" alt="Ботинки быстрого шага" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Обувь мобильности | 900z | +115 Скорости вне боя / +35 в бою | Иономия: Вне боя сильно ускоряешься"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3117.png" alt="Обувь мобильности" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Обувь чародея | 900z | +18% Маг. проникновения | Скорость +35"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3020.png" alt="Обувь чародея" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Берцы берсерка | 900z | +35% Скорости атаки | Скорость +35. Урон с атаки увеличен"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3006.png" alt="Берцы берсерка" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Ботинки охраны | 900z | +30 МС +200 HP | Скорость +35. Охрана: ауры щитов для рядом стоящих"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3001.png" alt="Ботинки охраны" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
     </div>
-    <div style="font-size:10px;color:#95a5a6;letter-spacing:1px;font-weight:700;margin:12px 0 6px;">👟 BOOTS</div>
-    <div class="items-grid">
-
-      <div class="item-card" title="Boots of Mana | 900g | +300 Mana  +10 AH | Passive: Grants mana regeneration."><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3020.png" loading="lazy"></div>
-      <div class="item-card" title="Boots of Dynamism | 900g | +20 AH | Passive: Gain up to +15 AH based on your current non-boot AP items."><img src="" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.25);border-radius:6px;display:block;'" loading="lazy"></div>
-    </div>
-    </div><!-- close last items-grid -->
   </div>
 </div>
 
+    </div><!-- balance fix -->
 </body>
 </html>
