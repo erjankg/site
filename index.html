@@ -1063,10 +1063,18 @@ html, body{ overflow-x: hidden !important; }
 
         /* Row tap highlight */
         #statTable tbody tr {
-            transition: background 0.15s ease;
+            transition: background 0.25s ease;
+            cursor: pointer;
+        }
+        #statTable tbody tr:hover {
+            background: rgba(109, 63, 245, 0.08);
+        }
+        @keyframes rowFlashAnim {
+            0%   { background: rgba(109,63,245,0.35); }
+            100% { background: transparent; }
         }
         #statTable tbody tr.row-flash {
-            background: rgba(109, 63, 245, 0.18) !important;
+            animation: rowFlashAnim 0.5s ease forwards;
         }
         /* Skeleton loader */
         .skeleton-wrap { padding: 8px; }
@@ -1091,27 +1099,57 @@ html, body{ overflow-x: hidden !important; }
             100% { transform: scale(1);    color: inherit; }
         }
         .num-anim { animation: numPop 0.32s ease; }
-        /* Fadeout gradient at bottom */
-        .table-wrap-outer {
-            position: relative;
-        }
-        .table-wrap-outer::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 60px;
-            background: linear-gradient(to bottom, transparent, rgba(15,5,32,0.85));
-            pointer-events: none;
-            border-radius: 0 0 13px 13px;
-            z-index: 5;
-        }
+        /* Table outer wrapper */
+        .table-wrap-outer { position: relative; }
 
         /* Pinned icon ring */
         .champ-icon.icon-pinned {
             border: 2px solid #b96fff !important;
             box-shadow: 0 0 6px rgba(185,111,255,0.6);
         }
+
+        /* ── Damage Calculator ── */
+        .calc-field { display:flex; flex-direction:column; gap:5px; }
+        .calc-label { font-size:12px; color:rgba(255,255,255,0.5); font-weight:600; letter-spacing:0.5px; }
+        .calc-input {
+            background: rgba(255,255,255,0.06);
+            border: 1.5px solid rgba(155,89,182,0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            padding: 10px 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .calc-input:focus { border-color: #b96fff; }
+        .calc-input::placeholder { color: rgba(255,255,255,0.2); }
+        .calc-stat-box {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(155,89,182,0.2);
+            border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .calc-stat-label { font-size:11px; color:rgba(255,255,255,0.4); margin-bottom:4px; font-weight:600; }
+        .calc-stat-val { font-size:20px; font-weight:900; }
+        /* ── Chart stat buttons ── */
+        .chart-stat-btn {
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1.5px solid rgba(155,89,182,0.35);
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px; font-weight: 700;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .chart-stat-btn.active {
+            background: rgba(109,63,245,0.3);
+            border-color: #b96fff;
+            color: #fff;
+        }
 </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -1144,6 +1182,7 @@ html, body{ overflow-x: hidden !important; }
                 <tr>
                     <th>
                         <button class="btn-champ-cfg" onclick="openM()">Champions</button>
+                        <button class="btn-champ-cfg btn-calc" onclick="openCalc()" title="Калькулятор урона" style="margin-left:4px;">🧮</button>
                     </th>
                     <th data-short="AD" onclick="doSort('ad')">AD<span id="ar-ad"></span></th>
                     <th data-short="HP" onclick="doSort('hp')">HP<span id="ar-hp"></span></th>
@@ -1399,6 +1438,8 @@ async function start() {
             nameSpan.className = 'name-tag ' + (isP ? 'pinned' : '');
             nameSpan.textContent = item.name;
             nameSpan.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
+            // Double-click → open growth chart
+            nameSpan.addEventListener('dblclick', (ev) => { ev.stopPropagation(); openChart(item.name); });
             const champImg = document.createElement('img');
             champImg.alt = ''; champImg.className = 'champ-icon';
             const _sp = {'Norra':'https://static.wikia.nocookie.net/leagueoflegends/images/e/ee/Norra_OriginalCentered.jpg','Mel':'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg'};
@@ -1408,6 +1449,11 @@ async function start() {
             champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
             if(isP) champImg.classList.add('icon-pinned');
             champImg.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
+    // Long press on icon → open chart (mobile-friendly)
+    let _lpTimer;
+    champImg.addEventListener('pointerdown', () => { _lpTimer = setTimeout(() => openChart(item.name), 600); });
+    champImg.addEventListener('pointerup',   () => clearTimeout(_lpTimer));
+    champImg.addEventListener('pointerleave',() => clearTimeout(_lpTimer));
             tdChamp.appendChild(btnX); tdChamp.appendChild(champImg); tdChamp.appendChild(nameSpan);
             tr.appendChild(tdChamp);
             ['ad','hp','mana','armor','mrez'].forEach(k => {
@@ -1577,6 +1623,112 @@ window.hideT = function() {
             updateRuler();
             renderUpdate(); // fast path — only update numbers
         };
+    }
+
+
+    // ══════════════ DAMAGE CALCULATOR ══════════════
+    window.openCalc = function() {
+        document.getElementById('calcMask').classList.add('active');
+        document.getElementById('cDmg').focus();
+    };
+    window.closeCalc = function() {
+        document.getElementById('calcMask').classList.remove('active');
+    };
+    window.calcDmg = function() {
+        const dmg   = parseFloat(document.getElementById('cDmg').value)   || 0;
+        const armor = parseFloat(document.getElementById('cArmor').value)  || 0;
+        const pen   = parseFloat(document.getElementById('cPen').value)    || 0;
+        const res   = document.getElementById('calcResult');
+        if(!dmg || dmg <= 0) { res.style.display = 'none'; return; }
+        // LoL formula: effective armor after % pen
+        const effArmor = armor > 0 ? armor * (1 - pen / 100) : armor;
+        const mult     = 100 / (100 + effArmor);
+        const finalDmg = dmg * mult;
+        const mitigated = dmg - finalDmg;
+        const mitPct   = (mitigated / dmg * 100);
+        document.getElementById('resEff').textContent  = Math.round(effArmor * 10) / 10;
+        document.getElementById('resMit').textContent  = mitPct.toFixed(1) + '%';
+        document.getElementById('resDmg').textContent  = Math.round(finalDmg);
+        document.getElementById('calcFormula').innerHTML =
+            dmg + ' × 100 / (100 + ' + Math.round(effArmor*10)/10 + ') = ' + Math.round(finalDmg) + '<br>' +
+            (pen > 0 ? 'Пробивание ' + pen + '% → броня ' + armor + ' → ' + (Math.round(effArmor*10)/10) + '<br>' : '') +
+            'Броня поглотила: ' + Math.round(mitigated) + ' урона (' + mitPct.toFixed(1) + '%)';
+        res.style.display = 'block';
+    };
+
+    // ══════════════ CHAMPION GROWTH CHART ══════════════
+    let growthChartObj = null;
+    let chartStat = 'hp';
+    let chartChamp = null;
+
+    window.openChart = function(champName) {
+        const champ = raw.find(x => x.name === champName);
+        if(!champ) return;
+        chartChamp = champ;
+        document.getElementById('chartTitle').textContent = '📈 ' + champName + ' — рост статов';
+        document.getElementById('chartMask').classList.add('active');
+        buildChartBtns();
+        renderGrowthChart();
+    };
+    window.closeChart = function() {
+        document.getElementById('chartMask').classList.remove('active');
+    };
+    window.setChartStat = function(k) {
+        chartStat = k;
+        document.querySelectorAll('.chart-stat-btn').forEach(b => b.classList.toggle('active', b.dataset.k === k));
+        renderGrowthChart();
+    };
+
+    function buildChartBtns() {
+        const stats = [{k:'hp',l:'HP'},{k:'ad',l:'AD'},{k:'mana',l:'MANA'},{k:'armor',l:'ARMOR'},{k:'mrez',l:'MREZ'}];
+        const wrap = document.getElementById('chartStatBtns');
+        wrap.innerHTML = '';
+        stats.forEach(s => {
+            const b = document.createElement('button');
+            b.className = 'chart-stat-btn' + (s.k === chartStat ? ' active' : '');
+            b.textContent = s.l; b.dataset.k = s.k;
+            b.onclick = () => setChartStat(s.k);
+            wrap.appendChild(b);
+        });
+    }
+
+    function renderGrowthChart() {
+        const c = chartChamp;
+        const statMap = { hp:[c.hp_b,c.hp_g], ad:[c.ad_b,c.ad_g], mana:[c.mn_b,c.mn_g], armor:[c.ar_b,c.ar_g], mrez:[c.mr_b,c.mr_g] };
+        const [base, growth] = statMap[chartStat];
+        const labels = Array.from({length:15},(_,i)=>i+1);
+        const vals   = labels.map(l => Math.round(base + (l-1)*growth));
+        const colorMap = { hp:'#e74c3c', ad:'#e8820a', mana:'#5dade2', armor:'#f1c40f', mrez:'#9b59b6' };
+        const col = colorMap[chartStat] || '#b96fff';
+        const ctx = document.getElementById('growthChart').getContext('2d');
+        if(growthChartObj) growthChartObj.destroy();
+        growthChartObj = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets:[{
+                    label: chartStat.toUpperCase(),
+                    data: vals,
+                    borderColor: col,
+                    backgroundColor: col.replace(')',',0.12)').replace('rgb','rgba'),
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    pointBackgroundColor: col,
+                    borderWidth: 2.5,
+                }]
+            },
+            options:{
+                responsive:true,
+                animation:{ duration:350 },
+                plugins:{ legend:{ display:false } },
+                scales:{
+                    x:{ ticks:{ color:'rgba(255,255,255,0.45)', font:{size:11} }, grid:{ color:'rgba(255,255,255,0.06)' } },
+                    y:{ ticks:{ color:'rgba(255,255,255,0.45)', font:{size:11} }, grid:{ color:'rgba(255,255,255,0.06)' } }
+                }
+            }
+        });
     }
 
     start();
@@ -2646,6 +2798,57 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 </style>
 
 
+
+
+<!-- ═══════════════ DAMAGE CALCULATOR MODAL ═══════════════ -->
+<div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
+  <div class="m-win" style="max-width:420px;height:auto;max-height:90vh;padding:28px 24px 24px;">
+    <button class="btn-close-x" onclick="closeCalc()">✕</button>
+    <div style="font-size:17px;font-weight:900;color:#b96fff;margin-bottom:20px;letter-spacing:1px;">🧮 КАЛЬКУЛЯТОР УРОНА</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="calc-field">
+        <label class="calc-label">Урон (до применения брони)</label>
+        <input type="number" id="cDmg" placeholder="например: 1000" min="0" class="calc-input" oninput="calcDmg()">
+      </div>
+      <div class="calc-field">
+        <label class="calc-label">Броня / Сопротивление цели</label>
+        <input type="number" id="cArmor" placeholder="например: 100" min="-99" class="calc-input" oninput="calcDmg()">
+      </div>
+      <div class="calc-field">
+        <label class="calc-label">Пробивание (%, например Serylda = 33)</label>
+        <input type="number" id="cPen" placeholder="0" min="0" max="100" value="0" class="calc-input" oninput="calcDmg()">
+      </div>
+    </div>
+    <div id="calcResult" style="margin-top:20px;display:none;">
+      <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:16px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="calc-stat-box">
+          <div class="calc-stat-label">Эффективная броня</div>
+          <div class="calc-stat-val" id="resEff" style="color:#5dade2;"></div>
+        </div>
+        <div class="calc-stat-box">
+          <div class="calc-stat-label">Снижение урона</div>
+          <div class="calc-stat-val" id="resMit" style="color:#e74c3c;"></div>
+        </div>
+        <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.4);">
+          <div class="calc-stat-label">✅ Реально нанесено урона</div>
+          <div class="calc-stat-val" id="resDmg" style="color:#b96fff;font-size:26px;"></div>
+        </div>
+      </div>
+      <div id="calcFormula" style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;line-height:1.7;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CHAMPION GROWTH CHART POPUP ═══════════════ -->
+<div class="m-mask" id="chartMask" onclick="if(event.target===this)closeChart()">
+  <div class="m-win" style="max-width:560px;height:auto;max-height:90vh;padding:28px 24px 24px;">
+    <button class="btn-close-x" onclick="closeChart()">✕</button>
+    <div id="chartTitle" style="font-size:17px;font-weight:900;color:#b96fff;margin-bottom:16px;letter-spacing:1px;"></div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="chartStatBtns"></div>
+    <canvas id="growthChart" style="width:100%;max-height:280px;"></canvas>
+  </div>
+</div>
 
 </body>
 </html>
