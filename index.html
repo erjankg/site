@@ -274,9 +274,9 @@
         .btn-champ-cfg {
             background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
             color: #fff;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 10px;
+            padding: 8px 13px;
+            border-radius: 7px;
+            font-size: 12px;
             border: none;
             font-weight: 900;
             cursor: pointer;
@@ -1125,6 +1125,8 @@
         }
         .calc-input:focus { border-color: #b96fff; }
         .calc-input::placeholder { color: rgba(255,255,255,0.2); }
+        select.calc-input { background: #1a0d2e; color: #fff; cursor: pointer; }
+        select.calc-input option { background: #1a0d2e; color: #fff; padding: 6px; }
         .calc-stat-box {
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(155,89,182,0.2);
@@ -1173,6 +1175,7 @@
             z-index: 2;
         }
         .item-card img { width: 38px; height: 38px; border-radius: 6px; display: block; }
+
         .item-cost { font-size: 8px; color: #C9A800; margin-top: 2px; font-weight: 700; }
         /* ── Calculator buttons row ── */
         .calc-btns-row {
@@ -1832,8 +1835,8 @@ window.hideT = function() {
             valEl.textContent = Math.round(finalItem);
             itemRes.style.display = 'block';
         } else if(_activeCalcItem === 'botrk' && eHpCur) {
-            // WR BotRK: melee 9%, ranged 6%. Min 15.
-            const rawDmg   = Math.max(15, eHpCur * 0.09);
+            // WR BotRK: melee 10%, ranged 8.5%. Min 15.
+            const rawDmg   = Math.max(15, eHpCur * 0.10);
             const finalItem = rawDmg * 100 / (100 + Math.max(0, effArmor));
             lblEl.textContent = '⚔ BotRK Ruined Strikes 9% cur HP (melee) after armor';
             valEl.textContent = Math.round(finalItem);
@@ -2049,7 +2052,119 @@ window.hideT = function() {
         document.getElementById('abilityResult').style.display = 'block';
     };
 
-        start();
+    
+    // ══════════════ i18n — Auto language detection ══════════════
+    const I18N = {
+        ru: {
+            level: 'Level',
+            champions: 'Чемпионы',
+            support: '💎 ПОДДЕРЖАТЬ',
+            dmgCalc: '⚔ Урон',
+            itemsBtn: '📦 Предметы',
+            effHp: '➕ Эфф. HP',
+            sortAsc: '▲', sortDesc: '▼',
+            dmgCalcTitle: '⚔ Калькулятор урона',
+            myStats: 'МОИ СТАТЫ', enemyStats: 'СТАТЫ ВРАГА',
+            item: 'ПРЕДМЕТ', abilityDmg: '⚡ УРОН СПОСОБНОСТИ',
+            adLabel: 'AD (атака)', penLabel: '% пробивания',
+            myHpLabel: 'Мой HP (Шипованный)',
+            myArmorLabel: 'Моя броня (Шипованный)',
+            enemyArmorLabel: 'Броня/МС врага',
+            enemyHpMaxLabel: 'Макс. HP врага',
+            enemyHpCurLabel: 'Тек. HP врага',
+            effArmor: 'Эфф. броня', dmgRed: 'Снижение урона',
+            actualDmg: '✅ Нанесено урона',
+            addScaling: '+ Добавить скейл',
+            abilityTotal: '⚡ Итого урона (после резистов)',
+            effHpTitle: '➕ Эффективный HP',
+            effHpDesc: 'eHP = HP × (1 + Броня/100)',
+            hp: 'HP', armor: 'Броня', mr: 'МС', 
+            effPhys: '🛡 Эфф. HP против физ.', effMag: '🔮 Эфф. HP против маг.',
+            itemsTitle: '📦 Предметы Wild Rift', itemsHint: 'Наведи для описания',
+            flatOpt: '+ фиксированный', myHpOpt: '+ % от моего HP',
+            adOpt: '+ % от AD', myArmorOpt: '+ % от моей брони',
+            enemyHpMaxOpt: '+ % от макс. HP врага', enemyHpCurOpt: '+ % от тек. HP врага',
+            enemyArmorOpt: '+ % от брони врага',
+        },
+        en: {
+            level: 'Level',
+            champions: 'Champions',
+            support: '💎 SUPPORT',
+            dmgCalc: '⚔ Damage',
+            itemsBtn: '📦 Items',
+            effHp: '➕ Eff. HP',
+            sortAsc: '▲', sortDesc: '▼',
+            dmgCalcTitle: '⚔ Damage Calculator',
+            myStats: 'YOUR STATS', enemyStats: 'ENEMY STATS',
+            item: 'ITEM', abilityDmg: '⚡ ABILITY DAMAGE',
+            adLabel: 'AD', penLabel: '% Armor Pen',
+            myHpLabel: 'My HP (Thornmail)',
+            myArmorLabel: 'My Armor (Thornmail)',
+            enemyArmorLabel: 'Enemy Armor / MR',
+            enemyHpMaxLabel: 'Enemy Max HP',
+            enemyHpCurLabel: 'Enemy Current HP',
+            effArmor: 'Eff. Armor', dmgRed: 'Dmg Reduction',
+            actualDmg: '✅ Actual Damage',
+            addScaling: '+ Add scaling',
+            abilityTotal: '⚡ Total ability dmg (after resists)',
+            effHpTitle: '➕ Effective HP',
+            effHpDesc: 'eHP = HP × (1 + Armor/100)',
+            hp: 'HP', armor: 'Armor', mr: 'MR',
+            effPhys: '🛡 Eff. HP vs Physical', effMag: '🔮 Eff. HP vs Magic',
+            itemsTitle: '📦 Wild Rift Items', itemsHint: 'Hover for full description',
+            flatOpt: '+ flat', myHpOpt: '+ % My HP',
+            adOpt: '+ % AD', myArmorOpt: '+ % My Armor',
+            enemyHpMaxOpt: '+ % Enemy Max HP', enemyHpCurOpt: '+ % Enemy Cur HP',
+            enemyArmorOpt: '+ % Enemy Armor',
+        }
+    };
+
+    // Detect language: use browser language, default to Russian
+    const userLang = (navigator.language || navigator.userLanguage || 'ru').toLowerCase();
+    const LANG = userLang.startsWith('ru') || userLang.startsWith('uk') || userLang.startsWith('kk') || userLang.startsWith('ky') ? I18N.ru : I18N.en;
+
+    function applyI18n() {
+        // Buttons outside modals
+        const champBtn = document.querySelector('.btn-champ-cfg');
+        if(champBtn) champBtn.textContent = LANG.champions;
+        const suppBtn = document.querySelector('.btn-support');
+        if(suppBtn && suppBtn.textContent.includes('ПОДДЕРЖАТЬ')) suppBtn.textContent = LANG.support;
+        // Calc buttons
+        document.querySelectorAll('.btn-calc-main').forEach((b, i) => {
+            if(i === 0) b.textContent = LANG.dmgCalc;
+        });
+        // Level label
+        const lvlSpan = document.querySelector('.lvl-info span:first-child');
+        if(lvlSpan) lvlSpan.textContent = LANG.level;
+        // Calc modal labels
+        const labelMap = {
+            'cDmg': 'adLabel', 'cPen': 'penLabel', 'cMyHp': 'myHpLabel',
+            'cMyArmor': 'myArmorLabel', 'cArmor': 'enemyArmorLabel',
+            'cEnemyHpMax': 'enemyHpMaxLabel', 'cEnemyHpCur': 'enemyHpCurLabel',
+            'ehpHp': 'hp', 'ehpArmor': 'armor', 'ehpMr': 'mr',
+        };
+        Object.entries(labelMap).forEach(([inputId, langKey]) => {
+            const inp = document.getElementById(inputId);
+            if(inp) {
+                const lbl = inp.previousElementSibling;
+                if(lbl && lbl.tagName === 'LABEL') lbl.textContent = LANG[langKey] || lbl.textContent;
+            }
+        });
+        // Section headers
+        document.querySelectorAll('.i18n').forEach(el => {
+            const key = el.dataset.i18n;
+            if(key && LANG[key]) el.textContent = LANG[key];
+        });
+        // Add scaling button
+        const addScaleBtn = document.querySelector('[onclick="addAbilityRow()"]');
+        if(addScaleBtn) addScaleBtn.textContent = LANG.addScaling;
+        // Items modal
+        const itemsTitle = document.querySelector('#itemsMask .m-win > div:first-of-type');
+        if(itemsTitle && itemsTitle.style.fontSize) itemsTitle.textContent = LANG.itemsTitle;
+    }
+
+        applyI18n();
+    start();
 })();
 </script>
 
@@ -2907,7 +3022,7 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 <!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
-  <div class="m-win" style="width:90vw;max-width:620px;max-height:90vh;overflow-y:auto;padding:22px 18px 18px;">
+  <div class="m-win" style="width:92vw;max-width:720px;max-height:93vh;overflow-y:auto;padding:22px 20px 20px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
     <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:16px;">⚔ Калькулятор урона</div>
 
@@ -2933,7 +3048,7 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
         </div>
       </div>
       <div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;">СТАТЫ ВРАГА</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;" class="i18n" data-i18n="enemyStats">СТАТЫ ВРАГА</div>
         <div class="calc-field" style="margin-bottom:8px;">
           <label class="calc-label">Броня / Сопротивление</label>
           <input type="number" id="cArmor" placeholder="100" min="-99" class="calc-input" oninput="calcDmg()">
@@ -2951,7 +3066,7 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
     <!-- Предметы -->
     <div style="margin-bottom:12px;">
-      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;">ПРЕДМЕТ</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;" class="i18n" data-i18n="item">ПРЕДМЕТ</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
         <button class="calc-item-btn active" id="itemNone" onclick="selectCalcItem('none')" title="Без предмета">
           <span style="font-size:20px;display:block;width:36px;height:36px;line-height:36px;text-align:center;">⚡</span>
@@ -2974,7 +3089,7 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
     <!-- Урон способностей -->
     <div style="margin-bottom:12px;">
-      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;">⚡ УРОН СПОСОБНОСТИ</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;margin-bottom:6px;" class="i18n" data-i18n="abilityDmg">⚡ УРОН СПОСОБНОСТИ</div>
       <div id="abilityRows" style="display:flex;flex-direction:column;gap:6px;"></div>
       <button onclick="addAbilityRow()" style="margin-top:6px;width:100%;background:rgba(109,63,245,0.12);border:1.5px dashed rgba(155,89,182,0.4);color:rgba(255,255,255,0.55);border-radius:8px;padding:7px;font-size:12px;cursor:pointer;">
         + Добавить скейл
@@ -3093,8 +3208,8 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
     <div style="font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">🛡 ЗАЩИТНЫЕ</div>
     <div class="items-grid">
       <div class="item-card" title="Шипованный доспех | 2700z | +75 Брони +200 HP | Шипы: При ударе отражает 20 + 6% бонусной брони + 2% бонусного HP маг. урона. "Тяжкие раны" 3с"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3075.png" alt="Шипованный доспех" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" title="Эгида Солнечного огня | 3000z | +500 HP +15 AH | Самовозгорание: 16–30 + 1% бонусного HP маг./сек. +7% за удар по чемп., макс ×1.42. +15% по крипам"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3068.png" alt="Эгида Солнечного огня" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" title="Броня Уормога | 3000z | +800 HP +200% Реген HP | Сердце Уормога: Восстанавливает 5% макс. HP/сек вне боя 5с и при HP>1000"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3083.png" alt="Броня Уормога" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Эгида Солнечного огня | 3000z | +500 HP +15 AH | Самовозгорание: 16–25 + 0.8% бонусного HP маг./сек. +11% за удар по чемп., макс 4 стака. 130% по монстрам"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3068.png" alt="Эгида Солнечного огня" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" title="Броня Уормога | 3000z | +800 HP +200% Реген HP | Сердце Уормога: Восстанавливает 3.5% макс. HP/сек вне боя 5с при бонусном HP ≥950"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3083.png" alt="Броня Уормога" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" title="Ледяное сердце | 2700z | +80 Брони +400 HP +20 AH | Ледяная ласка: Снижает скорость атаки ближних врагов на 20%. Потребление: физ. урон -5%"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3110.png" alt="Ледяное сердце" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" title="Духовный оплот | 2900z | +450 HP +60 МС +150% Реген HP | Благословение: Щиты и исцеление, получаемые вами, увеличены на 25%"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3065.png" alt="Духовный оплот" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" title="Плита каменного горгульи | 3200z | +60 Брони +60 МС +200 HP | Каменная кожа: Рядом 2+ врагов — +6 брони/МС. Активное: +100 брони/МС на 4с (90с КД)"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/3193.png" alt="Плита каменного горгульи" loading="lazy" onerror="this.style.cssText='width:38px;height:38px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
