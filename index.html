@@ -32,10 +32,10 @@
             --accent-glow: rgba(109, 63, 245, 0.45);
             --bg-card: rgba(26, 13, 46, 0.85);
             --border: rgba(155, 89, 182, 0.3);
-            --tier-s: #E8413A;
-            --tier-a: #E8820A;
-            --tier-b: #C9A800;
-            --tier-c: #27AE60;
+            --tier-s: #FF3B3B;
+            --tier-a: #FF8C00;
+            --tier-b: #FFD700;
+            --tier-c: #2ECC71;
         }
 
         @keyframes fadeIn {
@@ -53,6 +53,7 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 15px;
+            padding-bottom: 90px;
             overflow-x: hidden;
         }
 
@@ -374,10 +375,10 @@
         }
 
         /* TIERS */
-        .s { background: var(--tier-s); color: #fff; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 4px rgba(0,0,0,0.5); letter-spacing: 0.5px; }
-        .a { background: var(--tier-a); color: #fff; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.4); letter-spacing: 0.5px; }
-        .b { background: var(--tier-b); color: #4a3200; font-weight: 900; border-radius: 5px; letter-spacing: 0.5px; }
-        .c { background: var(--tier-c); color: #fff; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); letter-spacing: 0.5px; }
+        .s { background: #E03030 !important; color: #fff !important; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+        .a { background: #E07820 !important; color: #fff !important; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+        .b { background: #D4AC00 !important; color: #3a2800 !important; font-weight: 900; border-radius: 5px; }
+        .c { background: #229954 !important; color: #fff !important; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 
         /* TOOLTIP */
         #uiTip {
@@ -620,7 +621,7 @@
 
         /* MOBILE */
         @media (max-width: 768px) {
-            .app-wrapper { padding: 12px; }
+            .app-wrapper { padding: 12px; padding-bottom: 88px; }
             .logo { font-size: 18px; }
             .twitch-btn { font-size: 11px; padding: 7px 14px; }
             .btn-support { font-size: 13px; padding: 12px; }
@@ -1092,13 +1093,7 @@ html, body{ overflow-x: hidden !important; }
         .sk-icon { width: 32px; height: 32px; flex-shrink:0; }
         .sk-name { width: 70px; height: 14px; }
         .sk-stat { flex:1; height: 14px; }
-        /* Number pop animation on level change */
-        @keyframes numPop {
-            0%   { transform: scale(1);    color: inherit; }
-            35%  { transform: scale(1.18); color: #b96fff; }
-            100% { transform: scale(1);    color: inherit; }
-        }
-        .num-anim { animation: numPop 0.32s ease; }
+
         /* Table outer wrapper */
         .table-wrap-outer { position: relative; }
 
@@ -1182,13 +1177,13 @@ html, body{ overflow-x: hidden !important; }
                 <tr>
                     <th>
                         <button class="btn-champ-cfg" onclick="openM()">Champions</button>
-                        <button class="btn-champ-cfg btn-calc" onclick="openCalc()" title="Калькулятор урона" style="margin-left:4px;">🧮</button>
+
                     </th>
-                    <th data-short="AD" onclick="doSort('ad')">AD<span id="ar-ad"></span></th>
-                    <th data-short="HP" onclick="doSort('hp')">HP<span id="ar-hp"></span></th>
-                    <th data-short="MN" onclick="doSort('mana')">MANA<span id="ar-mana"></span></th>
-                    <th data-short="AR" onclick="doSort('armor')">ARMOR<span id="ar-armor"></span></th>
-                    <th data-short="MR" onclick="doSort('mrez')">MREZ<span id="ar-mrez"></span></th>
+                    <th data-short="AD" onclick="doSort('ad')"><span class="stat-icon" style="color:#E07820;">⚔</span>AD<span id="ar-ad"></span></th>
+                    <th data-short="HP" onclick="doSort('hp')"><span class="stat-icon" style="color:#E03030;">♥</span>HP<span id="ar-hp"></span></th>
+                    <th data-short="MN" onclick="doSort('mana')"><span class="stat-icon" style="color:#5dade2;">💧</span>MN<span id="ar-mana"></span></th>
+                    <th data-short="AR" onclick="doSort('armor')"><span class="stat-icon" style="color:#D4AC00;">🛡</span>AR<span id="ar-armor"></span></th>
+                    <th data-short="MR" onclick="doSort('mrez')"><span class="stat-icon" style="color:#9b59b6;">✦</span>MR<span id="ar-mrez"></span></th>
                 </tr>
             </thead>
             <tbody id="statBody"></tbody>
@@ -1301,7 +1296,13 @@ async function start() {
             };
         }).filter(x => x.name);
         
-        selected = new Set(raw.map(x => x.name));
+        // Default: ADC only on first load (unless saved state exists)
+        const _hasSaved = (() => { try { return !!localStorage.getItem('sel'); } catch(e){ return false; } })();
+        if(_hasSaved) {
+            try { const s = localStorage.getItem('sel'); if(s) selected = new Set(JSON.parse(s)); else selected = new Set(raw.filter(x=>x.is.ADC).map(x=>x.name)); } catch(e) { selected = new Set(raw.filter(x=>x.is.ADC).map(x=>x.name)); }
+        } else {
+            selected = new Set(raw.filter(x => x.is.ADC).map(x => x.name));
+        }
         initApp();
         createRuler();
         render();
@@ -1398,12 +1399,7 @@ async function start() {
                 td.textContent = txt;
             });
         });
-        // Pop animation
-        requestAnimationFrame(() => {
-            document.querySelectorAll('#statTable tbody td:not(:first-child)').forEach(td => {
-                td.classList.remove('num-anim'); void td.offsetWidth; td.classList.add('num-anim');
-            });
-        });
+
     }
 
     // FULL RENDER — rebuilds DOM from scratch
@@ -1534,13 +1530,13 @@ window.hideT = function() {
     }
 
     window.selectAll = function() {
-        selected = new Set(raw.map(x => x.name));        drawM();
-        render();
+        selected = new Set(raw.map(x => x.name)); drawM(); render();
+        try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e){}
     }
 
     window.clearAll = function() {
-        selected = new Set([...pinned]);        drawM();
-        render();
+        selected = new Set([...pinned]); drawM(); render();
+        try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e){}
     }
 
     function drawM() {
@@ -1626,11 +1622,43 @@ window.hideT = function() {
     }
 
 
+
+    // ══════════════ FAB MENU ══════════════
+    window.toggleFab = function() {
+        const actions = document.getElementById('fabActions');
+        const main = document.getElementById('fabMain');
+        const open = actions.style.display === 'flex';
+        actions.style.display = open ? 'none' : 'flex';
+        main.style.transform = open ? '' : 'rotate(45deg)';
+    };
+    // Close FAB on outside click
+    document.addEventListener('click', (e) => {
+        const fab = document.getElementById('fabMenu');
+        if(fab && !fab.contains(e.target)) {
+            document.getElementById('fabActions').style.display = 'none';
+            document.getElementById('fabMain').style.transform = '';
+        }
+    });
     // ══════════════ DAMAGE CALCULATOR ══════════════
     window.openCalc = function() {
         document.getElementById('calcMask').classList.add('active');
         document.getElementById('cDmg').focus();
     };
+
+    window.switchCalcTab = function(tab) {
+        const isDmg = tab === 'dmg';
+        document.getElementById('calcPanelDmg').style.display = isDmg ? 'flex' : 'none';
+        document.getElementById('calcPanelEhp').style.display = isDmg ? 'none' : 'flex';
+        document.getElementById('calcTabDmg').style.background = isDmg ? 'rgba(109,63,245,0.3)' : 'transparent';
+        document.getElementById('calcTabDmg').style.color = isDmg ? '#fff' : 'rgba(255,255,255,0.5)';
+        document.getElementById('calcTabDmg').style.borderColor = isDmg ? '#b96fff' : 'rgba(155,89,182,0.3)';
+        document.getElementById('calcTabEhp').style.background = isDmg ? 'transparent' : 'rgba(109,63,245,0.3)';
+        document.getElementById('calcTabEhp').style.color = isDmg ? 'rgba(255,255,255,0.5)' : '#fff';
+        document.getElementById('calcTabEhp').style.borderColor = isDmg ? 'rgba(155,89,182,0.3)' : '#b96fff';
+        document.getElementById('calcPanelDmg').style.flexDirection = 'column';
+        document.getElementById('calcPanelEhp').style.flexDirection = 'column';
+    };
+
     window.closeCalc = function() {
         document.getElementById('calcMask').classList.remove('active');
     };
@@ -1731,6 +1759,30 @@ window.hideT = function() {
         });
     }
 
+
+    // ══════════════ EFFECTIVE HP CALCULATOR ══════════════
+    window.openEhp = function() {
+        document.getElementById('ehpMask').classList.add('active');
+        document.getElementById('ehpHp').focus();
+    };
+    window.closeEhp = function() {
+        document.getElementById('ehpMask').classList.remove('active');
+    };
+    window.calcEhp = function() {
+        const hp    = parseFloat(document.getElementById('ehpHp').value)    || 0;
+        const armor = parseFloat(document.getElementById('ehpArmor').value) || 0;
+        const mr    = parseFloat(document.getElementById('ehpMr').value)    || 0;
+        const res   = document.getElementById('ehpResult');
+        if(!hp || hp <= 0) { res.style.display = 'none'; return; }
+        const ehpPhys  = Math.round(hp * (1 + armor / 100));
+        const ehpMagic = Math.round(hp * (1 + mr / 100));
+        document.getElementById('ehpPhys').textContent  = ehpPhys.toLocaleString();
+        document.getElementById('ehpMagic').textContent = ehpMagic.toLocaleString();
+        document.getElementById('ehpFormula').innerHTML =
+            'Физ: ' + hp + ' × (1 + ' + armor + '/100) = ' + ehpPhys + '<br>' +
+            'Маг: ' + hp + ' × (1 + ' + mr + '/100) = ' + ehpMagic;
+        res.style.display = 'block';
+    };
     start();
 })();
 </script>
@@ -1839,108 +1891,7 @@ window.hideT = function() {
   .lvl-stepper button:active{ transform: scale(1.06); }
 }
 
-/* ===== Stronger rank separation (darker = higher) + 3D for all stat cells ===== */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){
-  position: relative !important;
-  overflow: hidden;
-  --shade: 0.20;     /* mid */
-  --alpha: 0.62;
-  --rimA: 0.10;
-  --sparkA: 0.14;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  border-bottom-color: rgba(0,0,0,0.60) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.20),
-    inset 0 -2px 0 rgba(0,0,0,0.52),
-    0 6px 14px rgba(0,0,0,0.20) !important;
-  outline: 1px solid rgba(255,255,255,var(--rimA)) !important;
-}
-/* Top10 */
-#statTable td.a:nth-child(2),
-#statTable td.a:nth-child(3),
-#statTable td.a:nth-child(4),
-#statTable td.a:nth-child(5),
-#statTable td.a:nth-child(6){
-  --shade: 0.38;
-  --rimA: 0.18;
-  --sparkA: 0.18;
-}
-/* Top3 */
-#statTable td.s:nth-child(2),
-#statTable td.s:nth-child(3),
-#statTable td.s:nth-child(4),
-#statTable td.s:nth-child(5),
-#statTable td.s:nth-child(6){
-  --shade: 0.62;
-  --rimA: 0.26;
-  --sparkA: 0.22;
-}
-/* Bottom10 */
-#statTable td.c:nth-child(2),
-#statTable td.c:nth-child(3),
-#statTable td.c:nth-child(4),
-#statTable td.c:nth-child(5),
-#statTable td.c:nth-child(6){
-  --shade: 0.08;
-  --rimA: 0.08;
-  --sparkA: 0.12;
-}
-
-/* Rim + sparkle for all */
-#statTable td:nth-child(2)::before,
-#statTable td:nth-child(3)::before,
-#statTable td:nth-child(4)::before,
-#statTable td:nth-child(5)::before,
-#statTable td:nth-child(6)::before{
-  content:"";
-  position:absolute;
-  left: 3px; right: 3px; top: 3px;
-  height: 44%;
-  border-radius: 10px;
-  background: linear-gradient(to bottom, rgba(255,255,255,var(--sparkA)), rgba(255,255,255,0.00));
-  pointer-events:none;
-}
-
-/* Background layers per column */
-#statTable td:nth-child(2){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-ad), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(3){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-hp), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(4){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-mana), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(5){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-armor), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(6){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-mr), calc(var(--alpha) + 0.04)) !important;
-  color:#fff !important;
-}
+/* Column colors replaced by heatmap tier system */
 </style>
 
 <script id="v33-js">
@@ -2055,110 +2006,7 @@ html, body { overflow-y: auto !important; }
   #statTable th:not(:first-child), #statTable td:not(:first-child){ width:12% !important; }
 }
 
-/* ===== 2) Restore stat colors on ALL devices ===== */
-:root{
-  --col-ad:    255,140,0;
-  --col-hp:    0,180,85;
-  --col-mana:  70,135,255;
-  --col-armor: 170,105,55;
-  --col-mr:    35,65,170;
-}
-
-/* Apply our 3D+rank system to stat columns */
-#statTable td:nth-child(2),
-#statTable td:nth-child(3),
-#statTable td:nth-child(4),
-#statTable td:nth-child(5),
-#statTable td:nth-child(6){
-  position: relative !important;
-  overflow: hidden;
-  --shade: 0.20;     /* mid */
-  --alpha: 0.62;
-  --rimA: 0.10;
-  --sparkA: 0.14;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  border-bottom-color: rgba(0,0,0,0.60) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.20),
-    inset 0 -2px 0 rgba(0,0,0,0.52),
-    0 6px 14px rgba(0,0,0,0.20) !important;
-  outline: 1px solid rgba(255,255,255,var(--rimA)) !important;
-}
-#statTable td.a:nth-child(2),
-#statTable td.a:nth-child(3),
-#statTable td.a:nth-child(4),
-#statTable td.a:nth-child(5),
-#statTable td.a:nth-child(6){
-  --shade: 0.38;
-  --rimA: 0.18;
-  --sparkA: 0.18;
-}
-#statTable td.s:nth-child(2),
-#statTable td.s:nth-child(3),
-#statTable td.s:nth-child(4),
-#statTable td.s:nth-child(5),
-#statTable td.s:nth-child(6){
-  --shade: 0.62;
-  --rimA: 0.26;
-  --sparkA: 0.22;
-}
-#statTable td.c:nth-child(2),
-#statTable td.c:nth-child(3),
-#statTable td.c:nth-child(4),
-#statTable td.c:nth-child(5),
-#statTable td.c:nth-child(6){
-  --shade: 0.08;
-  --rimA: 0.08;
-  --sparkA: 0.12;
-}
-#statTable td:nth-child(2)::before,
-#statTable td:nth-child(3)::before,
-#statTable td:nth-child(4)::before,
-#statTable td:nth-child(5)::before,
-#statTable td:nth-child(6)::before{
-  content:"";
-  position:absolute;
-  left: 3px; right: 3px; top: 3px;
-  height: 44%;
-  border-radius: 10px;
-  background: linear-gradient(to bottom, rgba(255,255,255,var(--sparkA)), rgba(255,255,255,0.00));
-  pointer-events:none;
-}
-#statTable td:nth-child(2){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-ad), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(3){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-hp), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(4){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-mana), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(5){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-armor), var(--alpha)) !important;
-  color:#fff !important;
-}
-#statTable td:nth-child(6){
-  background:
-    linear-gradient(to bottom, rgba(255,255,255,0.10), rgba(255,255,255,0.02)),
-    linear-gradient(rgba(0,0,0,var(--shade)), rgba(0,0,0,var(--shade))),
-    rgba(var(--col-mr), calc(var(--alpha) + 0.04)) !important;
-  color:#fff !important;
-}
+/* Column color system removed — using heatmap tier colors */
 
 /* ===== 3) Mobile: NO level pills (hide ruler entirely) ===== */
 @media (max-width: 768px){
@@ -2511,15 +2359,6 @@ html, body { overflow-y: auto !important; }
   70%  { opacity: 0; }
   100% { transform: translateX(220%) rotate(10deg); opacity: 0; }
 }
-
-/* 4) Adjust column base colors to be more distinct:
-   AD -> lighter orange, HP -> brighter green, MANA -> more cyan/blue */
-:root{
-  --col-ad:    255,165,60;   /* lighter orange */
-  --col-hp:    0,210,105;    /* brighter green */
-  --col-mana:  70,190,255;   /* cyan-blue */
-  /* armor and mr remain the same as in v34+; keep if already defined */
-}
 </style>
 
 <script id="v37-js">
@@ -2804,14 +2643,19 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
   <div class="m-win" style="max-width:420px;height:auto;max-height:90vh;padding:28px 24px 24px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
-    <div style="font-size:17px;font-weight:900;color:#b96fff;margin-bottom:20px;letter-spacing:1px;">🧮 КАЛЬКУЛЯТОР УРОНА</div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;">
+      <button id="calcTabDmg" onclick="switchCalcTab('dmg')" style="flex:1;padding:8px;border-radius:10px;border:1.5px solid #b96fff;background:rgba(109,63,245,0.3);color:#fff;font-weight:900;font-size:13px;cursor:pointer;">⚔️ Урон</button>
+      <button id="calcTabEhp" onclick="switchCalcTab('ehp')" style="flex:1;padding:8px;border-radius:10px;border:1.5px solid rgba(155,89,182,0.3);background:transparent;color:rgba(255,255,255,0.5);font-weight:900;font-size:13px;cursor:pointer;">🛡 Эфф. HP</button>
+    </div>
+    <!-- DMG TAB -->
+    <div id="calcPanelDmg">
     <div style="display:flex;flex-direction:column;gap:14px;">
       <div class="calc-field">
         <label class="calc-label">Урон (до применения брони)</label>
         <input type="number" id="cDmg" placeholder="например: 1000" min="0" class="calc-input" oninput="calcDmg()">
       </div>
       <div class="calc-field">
-        <label class="calc-label">Броня / Сопротивление цели</label>
+        <label class="calc-label">Броня / Сопротивление магии</label>
         <input type="number" id="cArmor" placeholder="например: 100" min="-99" class="calc-input" oninput="calcDmg()">
       </div>
       <div class="calc-field">
@@ -2837,7 +2681,8 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
       </div>
       <div id="calcFormula" style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;line-height:1.7;"></div>
     </div>
-  </div>
+    </div><!-- end calcPanelDmg -->
+
 </div>
 
 <!-- ═══════════════ CHAMPION GROWTH CHART POPUP ═══════════════ -->
@@ -2850,5 +2695,57 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
   </div>
 </div>
 
+
+<!-- ═══ FAB ═══ -->
+<div id="fabMenu" style="position:fixed;bottom:24px;right:20px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+  <div id="fabActions" style="display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:4px;">
+    <button class="fab-action" onclick="openCalc();toggleFab()">🧮 Урон</button>
+    <button class="fab-action" onclick="openEhp();toggleFab()">🛡 Эфф. HP</button>
+  </div>
+  <button id="fabMain" onclick="toggleFab()" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6D3FF5,#9b59b6);border:none;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 20px rgba(109,63,245,0.6);transition:transform 0.2s,box-shadow 0.2s;" title="Калькуляторы">🧮</button>
+</div>
+
+<!-- ═══════════════ EFFECTIVE HP CALCULATOR ═══════════════ -->
+<div class="m-mask" id="ehpMask" onclick="if(event.target===this)closeEhp()">
+  <div class="m-win" style="max-width:420px;height:auto;max-height:90vh;padding:28px 24px 24px;">
+    <button class="btn-close-x" onclick="closeEhp()">✕</button>
+    <div style="font-size:17px;font-weight:900;color:#b96fff;margin-bottom:6px;letter-spacing:1px;">🛡 ЭФФЕКТИВНЫЙ HP</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:18px;line-height:1.5;">Чем равномернее HP и броня — тем выше эфф. HP.<br>Формула: eHP = HP × (1 + Armor/100)</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="calc-field">
+        <label class="calc-label">HP</label>
+        <input type="number" id="ehpHp" placeholder="например: 2000" min="1" class="calc-input" oninput="calcEhp()">
+      </div>
+      <div class="calc-field">
+        <label class="calc-label">
+          <img src="https://raw.communitydragon.org/latest/game/assets/ux/gauges/masteries/crestofinsight_icon.png" style="width:14px;height:14px;vertical-align:middle;border-radius:3px;margin-right:4px;" onerror="this.style.display='none'">
+          Броня (Armor)
+        </label>
+        <input type="number" id="ehpArmor" placeholder="например: 80" min="0" class="calc-input" oninput="calcEhp()">
+      </div>
+      <div class="calc-field">
+        <label class="calc-label">
+          <img src="https://raw.communitydragon.org/latest/game/assets/ux/gauges/masteries/legendofdepthsicon.png" style="width:14px;height:14px;vertical-align:middle;border-radius:3px;margin-right:4px;" onerror="this.style.display='none'">
+          Маг. сопротивление (MR)
+        </label>
+        <input type="number" id="ehpMr" placeholder="например: 50" min="0" class="calc-input" oninput="calcEhp()">
+      </div>
+    </div>
+    <div id="ehpResult" style="margin-top:20px;display:none;">
+      <div style="height:1px;background:rgba(155,89,182,0.3);margin-bottom:16px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(231,76,60,0.12);border-color:rgba(231,76,60,0.3);">
+          <div class="calc-stat-label">🛡 Эфф. HP vs Физ. урон</div>
+          <div class="calc-stat-val" id="ehpPhys" style="color:#e07820;font-size:22px;"></div>
+        </div>
+        <div class="calc-stat-box" style="grid-column:1/-1;background:rgba(93,173,226,0.12);border-color:rgba(93,173,226,0.3);">
+          <div class="calc-stat-label">🔮 Эфф. HP vs Маг. урон</div>
+          <div class="calc-stat-val" id="ehpMagic" style="color:#5dade2;font-size:22px;"></div>
+        </div>
+      </div>
+      <div id="ehpFormula" style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;line-height:1.7;"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
