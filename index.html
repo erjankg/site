@@ -61,10 +61,11 @@
         /* HEADER */
         header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             margin-bottom: 20px;
             animation: fadeIn 0.5s ease;
+            position: relative;
         }
 
         .logo {
@@ -74,18 +75,25 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         .twitch-btn {
             background: linear-gradient(135deg, #9146ff 0%, #772ce8 100%);
             color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
+            padding: 8px 16px;
+            border-radius: 20px;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 900;
             animation: glow 2s infinite;
             transition: transform 0.2s;
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 2999;
         }
 
         .twitch-btn:active {
@@ -131,7 +139,7 @@
         .lvl-container {
             background: var(--bg-card);
             backdrop-filter: blur(10px);
-            padding: 7px 16px 18px 16px;
+            padding: 5px 16px 7px 16px;
             border-radius: 15px;
             border: 2px solid var(--border);
             margin-top: 0;
@@ -521,7 +529,7 @@
         .m-grid {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
             gap: 12px;
             padding: 0 15px 15px;
             overflow-y: auto;
@@ -577,30 +585,28 @@
 
         /* CHAMPION */
         .m-item {
-            background: linear-gradient(135deg, #1e0f2e 0%, #0f0520 100%);
-            padding: 10px 4px;
-            border-radius: 10px;
+            background: transparent;
+            padding: 2px;
+            border-radius: 0;
             font-size: 12px;
             text-align: center;
             color: #a689c4;
             cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid rgba(155, 89, 182, 0.15);
+            transition: all 0.18s;
+            border: 2px solid transparent;
             line-height: 1.4;
             font-weight: 700;
         }
 
         .m-item:hover {
-            background: linear-gradient(135deg, #2a1d3e 0%, #1e0f2e 100%);
-            transform: translateY(-2px);
+            border-color: #b96fff;
+            transform: scale(1.08);
         }
 
         .m-item.on {
-            background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
-            color: #fff;
-            font-weight: 900;
-            border-color: var(--accent);
-            box-shadow: 0 0 15px var(--accent-glow);
+            border-color: #b96fff;
+            box-shadow: 0 0 12px rgba(185,111,255,0.6);
+            background: rgba(109,63,245,0.15);
         }
 
         /* SCROLLBAR */
@@ -1046,9 +1052,9 @@
             .row-num { font-size: 8px; min-width: 10px; }
         }
         /* Modal champion items with icons */
-        .m-item { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 4px !important; }
-        .m-item img { width: 46px; height: 46px; border-radius: 8px; object-fit: cover; display: block; }
-        @media (max-width: 768px) { .m-item img { width: 38px; height: 38px; border-radius: 7px; } }
+        .m-item { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 2px !important; }
+        .m-item img { width: 50px; height: 50px; border-radius: 9px; object-fit: cover; display: block; }
+        @media (max-width: 768px) { .m-item img { width: 42px; height: 42px; border-radius: 8px; } }
 
         /* Mobile: force sort arrows visible under header text */
         @media (max-width: 768px) {
@@ -1259,6 +1265,102 @@
         }
         .fab-action:hover { background: rgba(109,63,245,0.35); transform: scale(1.04); }
 
+
+        /* ══ SIDEBAR ══ */
+        #sideOverlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 8000; display: none;
+        }
+        #sideOverlay.open { display: block; }
+        #sidePanel {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: 240px; background: linear-gradient(180deg,#13062b 0%,#0a0318 100%);
+            border-right: 1px solid rgba(155,89,182,0.3);
+            z-index: 8001; transform: translateX(-100%);
+            transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+            display: flex; flex-direction: column; padding: 0 0 20px;
+            box-shadow: 4px 0 32px rgba(0,0,0,0.5);
+        }
+        #sidePanel.open { transform: translateX(0); }
+        #sideHeader {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid rgba(155,89,182,0.2);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .side-logo { font-size: 22px; }
+        .side-title { font-size: 14px; font-weight: 900; color: #b96fff; letter-spacing: 0.5px; }
+        .side-subtitle { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 1px; }
+        #sidePanel .side-close {
+            margin-left: auto; background: none; border: none;
+            color: rgba(255,255,255,0.4); font-size: 18px; cursor: pointer; padding: 2px 6px;
+        }
+        #sidePanel .side-close:hover { color: #fff; }
+        .side-section {
+            padding: 10px 10px 4px;
+            font-size: 9px; color: rgba(255,255,255,0.25);
+            font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+        }
+        .side-btn {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 16px; margin: 0 8px; border-radius: 10px;
+            background: none; border: none; color: rgba(255,255,255,0.75);
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            transition: all 0.15s; width: calc(100% - 16px); text-align: left;
+        }
+        .side-btn:hover { background: rgba(109,63,245,0.2); color: #fff; }
+        .side-btn:active { transform: scale(0.97); }
+        .side-btn .side-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+        .side-btn.side-support {
+            background: linear-gradient(90deg,rgba(109,63,245,0.3),rgba(142,68,173,0.3));
+            border: 1px solid rgba(155,89,182,0.4); color: #e0bfff; margin-top: 6px;
+        }
+        .side-btn.side-support:hover { background: linear-gradient(90deg,rgba(109,63,245,0.5),rgba(142,68,173,0.5)); }
+        /* Hamburger button */
+        #menuBtn {
+            position: fixed; top: 12px; left: 12px; z-index: 3000;
+            background: rgba(109,63,245,0.85); border: 1.5px solid rgba(185,111,255,0.5);
+            border-radius: 10px; padding: 8px 10px; cursor: pointer;
+            display: flex; flex-direction: column; gap: 4px;
+            transition: all 0.15s; box-shadow: 0 2px 12px rgba(109,63,245,0.4);
+        }
+        #menuBtn:hover { background: rgba(109,63,245,1); transform: scale(1.06); }
+        #menuBtn span { display: block; width: 18px; height: 2px; background: #fff; border-radius: 2px; }
+
+        /* Rune card grid */
+        .rune-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(56px,1fr)); gap: 8px; margin-bottom: 4px; }
+        .rune-card {
+            background: rgba(255,255,255,0.03); border: 1.5px solid rgba(155,89,182,0.18);
+            border-radius: 10px; padding: 6px; text-align: center; cursor: pointer;
+            transition: all 0.15s; position: relative;
+        }
+        .rune-card:hover { border-color: #b96fff; background: rgba(109,63,245,0.22); transform: translateY(-2px) scale(1.07); z-index: 2; }
+        .rune-card img { width: 40px; height: 40px; border-radius: 50%; display: block; margin: 0 auto; }
+        .rune-card-name { font-size: 8px; color: rgba(255,255,255,0.5); margin-top: 4px; line-height: 1.2; }
+        #runeTooltip {
+            display: none; position: fixed; z-index: 99999;
+            background: rgba(10,3,20,0.97); border: 1px solid rgba(185,111,255,0.6);
+            color: rgba(255,255,255,0.9); font-size: 12px; line-height: 1.6;
+            padding: 10px 13px; border-radius: 10px; max-width: 280px;
+            pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+
+        /* Tier list placeholder */
+        .tierlist-section { margin-bottom: 20px; }
+        .tierlist-row { display: flex; align-items: stretch; margin-bottom: 6px; gap: 6px; }
+        .tierlist-label {
+            width: 48px; min-width: 48px; border-radius: 8px; display: flex; align-items: center;
+            justify-content: center; font-size: 18px; font-weight: 900; flex-shrink: 0;
+        }
+        .tierlist-champs { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; align-items: center;
+            background: rgba(255,255,255,0.03); border-radius: 8px; padding: 6px; min-height: 54px; }
+        .tierlist-champ-icon { width: 44px; height: 44px; border-radius: 8px; object-fit: cover;
+            border: 2px solid transparent; transition: all 0.15s; cursor: default; }
+        .tierlist-champ-icon:hover { transform: scale(1.12); z-index: 2; position: relative; }
+        .tier-S { background: linear-gradient(135deg,#ff4444,#c30000); }
+        .tier-A { background: linear-gradient(135deg,#ff8c00,#c85a00); }
+        .tier-B { background: linear-gradient(135deg,#d4a017,#9a7200); }
+        .tier-C { background: linear-gradient(135deg,#2e8b57,#1a5c38); }
+
         /* ── Item tooltip ── */
         #itemTooltip {
             display: none;
@@ -1292,13 +1394,6 @@
         <div class="logo"><a id="nickname" href="#" aria-label="ERjanKG">ERjanKG</a> STATS</div>
         <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">🎮 TWITCH</a>
     </header>
-
-    <a href="https://www.donationalerts.com/r/erjankg" class="btn-support" target="_blank">💎 ПОДДЕРЖАТЬ</a>
-
-    <div class="calc-btns-row">
-        <button class="btn-calc-main" onclick="openCalc()">⚔ Damage Calc</button>
-        <button class="btn-calc-main btn-calc-items" onclick="openItems()">📦 Items</button>
-    </div>
 
     <div class="lvl-container">
         <div class="lvl-info">
@@ -1411,8 +1506,18 @@ async function start() {
         if(skEl) skEl.style.display = 'block';
         document.getElementById('statTable').style.visibility = 'hidden';
 
-        const r = await fetch(G_URL);
-        const t = await r.text();
+        let t;
+        try {
+            const r = await fetch(G_URL);
+            t = await r.text();
+        } catch(fetchErr) {
+            console.error('Fetch failed:', fetchErr);
+            const skEl = document.getElementById('skeletonOverlay');
+            if(skEl) skEl.style.display = 'none';
+            document.getElementById('statTable').style.visibility = 'visible';
+            document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">Не удалось загрузить данные. Проверь подключение к интернету.</td></tr>';
+            return;
+        }
         const lines = t.trim().split('\n');
         const heads = lines[0].split('\t').map(h => h.trim());
         
@@ -1960,10 +2065,10 @@ window.hideT = function() {
         setTimeout(() => {
             const tip = document.getElementById('itemTooltip');
             if(!tip) return;
-            document.querySelectorAll('#itemsMask .item-card[title]').forEach(card => {
+            document.querySelectorAll('#itemsMask .item-card[data-tip]').forEach(card => {
                 if(card._tipInit) return; card._tipInit = true;
                 card.addEventListener('mouseenter', e => {
-                    const p = (card.getAttribute('title')||'').split('|');
+                    const p = (card.getAttribute('data-tip')||'').split('|');
                     const n=p[0]?.trim()||'', co=p[1]?.trim()||'', st=p[2]?.trim()||'', de=p[3]?.trim()||'';
                     tip.innerHTML =
                         '<div style="font-size:13px;font-weight:900;color:#b96fff;margin-bottom:4px;">'+n+'</div>'+
@@ -2330,7 +2435,188 @@ window.hideT = function() {
         document.getElementById('itemSubResult').style.display = 'block';
     };
 
-        start();
+    
+    // ══ SIDEBAR ══
+    window.toggleSidebar = function() {
+        const panel = document.getElementById('sidePanel');
+        const overlay = document.getElementById('sideOverlay');
+        const isOpen = panel.classList.contains('open');
+        panel.classList.toggle('open', !isOpen);
+        overlay.classList.toggle('open', !isOpen);
+        document.body.style.overflow = isOpen ? '' : 'hidden';
+    };
+    window.closeSidebar = function() {
+        document.getElementById('sidePanel').classList.remove('open');
+        document.getElementById('sideOverlay').classList.remove('open');
+        document.body.style.overflow = '';
+    };
+
+    // ══ RUNES MODAL ══
+    window.openRunes = function() {
+        document.getElementById('runesMask').classList.add('active');
+        setTimeout(() => {
+            const tip = document.getElementById('runeTooltip');
+            if(!tip) return;
+            document.querySelectorAll('#runesMask .rune-card[data-tip]').forEach(card => {
+                if(card._tipInit) return; card._tipInit = true;
+                const p = (card.getAttribute('data-tip')||'').split('|');
+                const [name, cat, desc] = p;
+                card.addEventListener('mouseenter', () => {
+                    tip.innerHTML = '<b style="color:#b96fff;font-size:13px;display:block;margin-bottom:3px;">' + name + '</b>'
+                        + '<span style="color:#FFD700;font-size:10px;">' + cat + '</span><br>'
+                        + '<span style="color:rgba(255,255,255,0.85);font-size:11px;">' + (desc||'') + '</span>';
+                    tip.style.display = 'block';
+                });
+                card.addEventListener('mousemove', e => {
+                    const vw = window.innerWidth, vh = window.innerHeight;
+                    const tw = tip.offsetWidth||260, th = tip.offsetHeight||80;
+                    let x = e.clientX + 14, y = e.clientY;
+                    if(x + tw > vw - 10) x = e.clientX - tw - 10;
+                    if(y + th > vh - 10) y = e.clientY - th - 10;
+                    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+                });
+                card.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+                card.addEventListener('click', e => {
+                    if(tip.style.display === 'block') { tip.style.display='none'; return; }
+                    tip.innerHTML = '<b style="color:#b96fff;font-size:13px;display:block;margin-bottom:3px;">' + name + '</b>'
+                        + '<span style="color:#FFD700;font-size:10px;">' + cat + '</span><br>'
+                        + '<span style="color:rgba(255,255,255,0.85);font-size:11px;">' + (desc||'') + '</span>';
+                    tip.style.display = 'block';
+                    const r = card.getBoundingClientRect();
+                    tip.style.left = Math.min(r.right+8, window.innerWidth-285) + 'px';
+                    tip.style.top = Math.max(10, r.top) + 'px';
+                });
+            });
+        }, 80);
+    };
+    window.closeRunes = function() {
+        document.getElementById('runesMask').classList.remove('active');
+        const tip = document.getElementById('runeTooltip');
+        if(tip) tip.style.display = 'none';
+    };
+
+    // ══ TIER LIST ══
+    window.closeTierlist = function() {
+        document.getElementById('tierlistMask').classList.remove('active');
+    };
+
+    
+    // ══ WELCOME POPUP ══
+    window.closeWelcome = function() {
+        const el = document.getElementById('welcomeOverlay');
+        if(el) { el.classList.remove('active'); }
+        try { localStorage.setItem('wr_welcomed','1'); } catch(e){}
+    };
+    (function showWelcome() {
+        let seen = false;
+        try { seen = !!localStorage.getItem('wr_welcomed'); } catch(e){}
+        if(!seen) {
+            const el = document.getElementById('welcomeOverlay');
+            if(el) { el.classList.add('active'); }
+        }
+    })();
+
+    // ══ SIDEBAR SUPPORT TOOLTIP ══
+    (function() {
+        const btn = document.getElementById('sideSupport');
+        if(!btn) return;
+        let tip = null;
+        btn.addEventListener('mouseenter', e => {
+            tip = document.createElement('div');
+            tip.style.cssText = 'position:fixed;z-index:99999;background:rgba(10,3,20,0.97);border:1px solid rgba(185,111,255,0.6);color:rgba(255,255,255,0.9);font-size:12px;line-height:1.6;padding:12px 14px;border-radius:10px;max-width:260px;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.6);';
+            tip.textContent = btn.getAttribute('title') || '';
+            document.body.appendChild(tip);
+            const r = btn.getBoundingClientRect();
+            tip.style.left = (r.right + 10) + 'px';
+            tip.style.top = Math.max(10, r.top - tip.offsetHeight/2) + 'px';
+        });
+        btn.addEventListener('mouseleave', () => { if(tip){ tip.remove(); tip=null; } });
+    })();
+
+    // ══ TIERLIST ROLE TABS ══
+    const ROLES = [
+        {key:'all',   label:'Все',     icon:'🌍'},
+        {key:'adc',   label:'ADC',     icon:'🏹'},
+        {key:'mid',   label:'Мид',     icon:'⚡'},
+        {key:'top',   label:'Топ',     icon:'🛡'},
+        {key:'jungle',label:'Лес',     icon:'🌿'},
+        {key:'sup',   label:'Сапорт',  icon:'💛'},
+    ];
+    // Tier data: fill with champion keys (DataDragon names) when ready
+    // Format: { all: {S:[...], A:[...], B:[...], C:[]}, adc: {...}, ... }
+    const TIER_DATA = {
+        all:    { S:[], A:[], B:[], C:[] },
+        adc:    { S:[], A:[], B:[], C:[] },
+        mid:    { S:[], A:[], B:[], C:[] },
+        top:    { S:[], A:[], B:[], C:[] },
+        jungle: { S:[], A:[], B:[], C:[] },
+        sup:    { S:[], A:[], B:[], C:[] },
+    };
+    let _tierRole = 'all';
+    let _tierType = 'champs'; // 'champs', 'items', 'runes'
+
+    function buildTierlistTabs() {
+        const tabsEl = document.getElementById('tierlistTabs');
+        if(!tabsEl) return;
+        if(_tierType !== 'champs') { tabsEl.innerHTML = ''; return; }
+        tabsEl.innerHTML = '';
+        ROLES.forEach(r => {
+            const b = document.createElement('button');
+            b.style.cssText = 'padding:7px 13px;border-radius:20px;border:1.5px solid rgba(155,89,182,'+(r.key===_tierRole?'0.8':'0.25')+');background:rgba(109,63,245,'+(r.key===_tierRole?'0.35':'0.08')+');color:'+(r.key===_tierRole?'#fff':'rgba(255,255,255,0.55)')+';font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;display:flex;gap:5px;align-items:center;';
+            b.innerHTML = r.icon + ' ' + r.label;
+            b.onclick = () => { _tierRole = r.key; buildTierlistTabs(); renderTierlist(); };
+            tabsEl.appendChild(b);
+        });
+    }
+
+    function renderTierlist() {
+        const el = document.getElementById('tierlistContent');
+        if(!el) return;
+        if(_tierType !== 'champs') {
+            el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.3);"><div style="font-size:40px;margin-bottom:12px;">📋</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);">Скоро будет!</div><div style="font-size:11px;margin-top:8px;">Скинь скриншот тир-листа — я добавлю данные.</div></div>';
+            return;
+        }
+        const data = TIER_DATA[_tierRole] || TIER_DATA.all;
+        const tiers = [{key:'S',color:'#C43A3A'},{key:'A',color:'#C46A1C'},{key:'B',color:'#BC9800'},{key:'C',color:'#1E8848'}];
+        const DD = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
+        el.innerHTML = '';
+        tiers.forEach(t => {
+            const row = document.createElement('div');
+            row.className = 'tierlist-row';
+            const lbl = document.createElement('div');
+            lbl.className = 'tierlist-label tier-' + t.key;
+            lbl.style.background = 'linear-gradient(135deg,' + t.color + 'cc,' + t.color + '88)';
+            lbl.textContent = t.key;
+            const champDiv = document.createElement('div');
+            champDiv.className = 'tierlist-champs';
+            (data[t.key] || []).forEach(name => {
+                const img = document.createElement('img');
+                img.className = 'tierlist-champ-icon';
+                img.src = DD + name + '.png';
+                img.alt = img.title = name;
+                img.onerror = function(){ this.style.display='none'; };
+                champDiv.appendChild(img);
+            });
+            if(!(data[t.key]||[]).length) {
+                const ph = document.createElement('span');
+                ph.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.2);padding:4px;';
+                ph.textContent = '—';
+                champDiv.appendChild(ph);
+            }
+            row.appendChild(lbl); row.appendChild(champDiv);
+            el.appendChild(row);
+        });
+    }
+
+    window.openTierlist = function(type) {
+        _tierType = type;
+        document.getElementById('tierlistTitle').textContent = {champs:'🏆 Тир-лист чемпионов',items:'⚙ Тир-лист предметов',runes:'✨ Тир-лист рун'}[type] || 'Тир-лист';
+        document.getElementById('tierlistMask').classList.add('active');
+        buildTierlistTabs();
+        renderTierlist();
+    };
+
+    start();
 })();
 </script>
 
@@ -3435,6 +3721,159 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 </div>
 
 </div>
+
+<!-- ══ WELCOME POPUP ══ -->
+<div id="welcomeOverlay" class="m-mask" onclick="if(event.target===this)closeWelcome()" style="z-index:9500;">
+  <div class="m-win" style="max-width:440px;width:92vw;padding:28px 24px 22px;position:relative;">
+    <button onclick="closeWelcome()" class="btn-close-x">✕</button>
+    <div style="font-size:20px;font-weight:900;color:#b96fff;margin-bottom:12px;">👋 Привет!</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.82);line-height:1.75;margin-bottom:20px;">Ребята, сайт абсолютно бесплатен для всех. Буду очень благодарен за поддержку — для меня это мощная мотивация развивать проект. В планах: добавить характеристики HP реген, winrate/pickrate, мана реген, особый столбец для лесников (фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа), изображения чемпов и регулярно обновлять сайт до актуальности.</div>
+    <a href="https://www.donationalerts.com/r/erjankg" target="_blank" onclick="closeWelcome()"
+       style="display:block;text-align:center;background:linear-gradient(135deg,#6d3ff5,#8e44ad);color:#fff;text-decoration:none;padding:12px;border-radius:12px;font-weight:900;font-size:14px;">
+      💎 Поддержать проект
+    </a>
+    <div style="text-align:center;margin-top:10px;">
+      <button onclick="closeWelcome()" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HAMBURGER BUTTON ══ -->
+<button id="menuBtn" onclick="toggleSidebar()" aria-label="Menu">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- ══ SIDEBAR OVERLAY + PANEL ══ -->
+<div id="sideOverlay" onclick="closeSidebar()"></div>
+<div id="sidePanel">
+  <div id="sideHeader">
+    <span class="side-logo">🎮</span>
+    <div>
+      <div class="side-title">Wild Rift Stats</div>
+      <div class="side-subtitle">справочник чемпионов</div>
+    </div>
+    <button class="side-close" onclick="closeSidebar()">✕</button>
+  </div>
+
+  <div class="side-section">Инструменты</div>
+  <button class="side-btn" onclick="closeSidebar();openCalc()"><span class="side-icon">⚔</span>Калькулятор урона</button>
+  <button class="side-btn" onclick="closeSidebar();openItems()"><span class="side-icon">📦</span>Предметы</button>
+  <button class="side-btn" onclick="closeSidebar();openRunes()"><span class="side-icon">💎</span>Руны</button>
+
+  <div class="side-section" style="margin-top:8px;">Тир-листы</div>
+  <button class="side-btn" onclick="closeSidebar();openTierlist('champs')"><span class="side-icon">🏆</span>Тир-лист чемпионов</button>
+  <button class="side-btn" onclick="closeSidebar();openTierlist('items')"><span class="side-icon">⚙</span>Тир-лист предметов</button>
+  <button class="side-btn" onclick="closeSidebar();openTierlist('runes')"><span class="side-icon">✨</span>Тир-лист рун</button>
+
+  <div style="flex:1;"></div>
+  <div style="padding: 0 8px;">
+    <a href="https://www.donationalerts.com/r/erjankg" target="_blank" class="side-btn side-support" style="text-decoration:none;display:flex;" id="sideSupport" title="Ребята, сайт абсолютно бесплатен для всех. Буду очень благодарен за поддержку — для меня это мощная мотивация развивать проект. В планах: добавить характеристики HP реген, winrate/pickrate, мана реген, особый столбец для лесников (фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа), изображения чемпов и регулярно обновлять сайт до актуальности.">
+      <span class="side-icon">💎</span>Поддержать проект
+    </a>
+  </div>
+</div>
+
+<!-- ══ RUNES MODAL ══ -->
+<div class="m-mask" id="runesMask" onclick="if(event.target===this)closeRunes()">
+  <div class="m-win" style="width:96vw;max-width:780px;max-height:94vh;overflow-y:auto;overflow-x:visible;padding:20px 16px 16px;">
+    <button class="btn-close-x" onclick="closeRunes()">✕</button>
+    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;">💎 Руны Wild Rift</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Наведи — описание</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">⭐ Ключевые</div>
+    <div class="rune-grid">
+      <div class="rune-card" data-tip="Хватка нежити|Resolve|Каждые 4с в бою — следующая атака наносит 4% макс. HP маг. урона + исцеляет на 4 HP/2% макс. HP и увеличивает HP. Дальн.: урон 1.5%, исцеление 1.5%."><img src="https://www.wildriftfire.com/images/runes/grasp-of-the-undying.png" alt="Хватка нежити" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Хватка нежити</div></div>
+      <div class="rune-card" data-tip="Лёгкая поступь|Precision|Движение и атаки накапливают Энергию. На 100% — Заряженная атака: 5-100 доп. маг. урона + 10-200 HP исцеление + 20% скор. 1с."><img src="https://www.wildriftfire.com/images/runes/fleet-footwork.png" alt="Лёгкая поступь" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Лёгкая поступь</div></div>
+      <div class="rune-card" data-tip="Завоеватель|Precision|Атаки и способности стакают 2 стака Завоевателя на 6с (макс. 12). Стак = +2 AD или AP. На 12 стаках: +15% урона → +10% вамп."><img src="https://www.wildriftfire.com/images/runes/conqueror.png" alt="Завоеватель" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Завоеватель</div></div>
+      <div class="rune-card" data-tip="Смертоносный темп|Precision|Атаки дают +30-100% AS на 6с. На 6 зарядах — бонус постоянный. +100 дальности атаки в этом состоянии."><img src="https://www.wildriftfire.com/images/runes/lethal-tempo.png" alt="Смертоносный темп" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Смертоносный темп</div></div>
+      <div class="rune-card" data-tip="Электрокут|Domination|3 удара/способности за 3с = 30-184 + 40% AD + 25% AP доп. маг. урона (25с КД)."><img src="https://www.wildriftfire.com/images/runes/electrocute.png" alt="Электрокут" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Электрокут</div></div>
+      <div class="rune-card" data-tip="Звёздный осколок|Inspiration|Попадание способностью призывает комету: 20-100 + 20% AP + 10% AD доп. маг. урона (6с КД)."><img src="https://www.wildriftfire.com/images/runes/arcane-comet.png" alt="Звёздный осколок" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Звёздный осколок</div></div>
+      <div class="rune-card" data-tip="Тёмная жатва|Domination|Убийство врага <50% HP поглощает его душу: 10-50 + 5% AD + 2.5% AP доп. маг. урона за атаку. Стакается навсегда."><img src="https://www.wildriftfire.com/images/runes/dark-harvest.png" alt="Тёмная жатва" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Тёмная жатва</div></div>
+      <div class="rune-card" data-tip="Стремительное наступление|Precision|3 удара за 3с = +25-60% скор. + неизмедл. 1с. Дальние = 2 удара."><img src="https://www.wildriftfire.com/images/runes/phase-rush.png" alt="Стремительное наступление" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Стремительное наступление</div></div>
+      <div class="rune-card" data-tip="Послеудар|Resolve|После CC на чемпа: +40-110 брони/МС + AoE маг. урон при окончании. (20с КД)"><img src="https://www.wildriftfire.com/images/runes/aftershock.png" alt="Послеудар" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Послеудар</div></div>
+      <div class="rune-card" data-tip="Ледяная настройка|Inspiration|Базовые атаки по чемп. замедляют на 15-40% 1с + создают ледяной путь."><img src="https://www.wildriftfire.com/images/runes/glacial-augment.png" alt="Ледяная настройка" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Ледяная настройка</div></div>
+      <div class="rune-card" data-tip="Аэри|Precision|Атаки/способности на врага = Аэри атакует: 10-60 + 15% AP + 10% AD. Союзник = щит 35-80 + 25% AP."><img src="https://www.wildriftfire.com/images/runes/aery.png" alt="Аэри" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Аэри</div></div>
+      <div class="rune-card" data-tip="Стойкость Колосса|Resolve|После CC на чемпа: щит 7-115 HP + 7 HP за ближн. врага на 4с (30с КД)."><img src="https://www.wildriftfire.com/images/runes/courage-of-the-colossus.png" alt="Стойкость Колосса" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Стойкость Колосса</div></div>
+      <div class="rune-card" data-tip="Первый удар|Inspiration|Первая атака/способность в бою наносит 10% доп. урона + 100% прибыли золотом с этого урона (15с КД между боями)."><img src="https://www.wildriftfire.com/images/runes/first-strike.png" alt="Первый удар" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Первый удар</div></div>
+      <div class="rune-card" data-tip="Цепная атака|Precision|После 2 ударов по чемп. рядом с союзником — burst скорости + усиленная атака с АоЕ эффектом."><img src="https://www.wildriftfire.com/images/runes/chain-assault.png" alt="Цепная атака" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Цепная атака</div></div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">🗡 Доминация</div>
+    <div class="rune-grid">
+      <div class="rune-card" data-tip="Внезапный удар|Domination|После прыжка/телепорта: +9 проб. брони / +7% маг. проникн. на 5с."><img src="https://www.wildriftfire.com/images/runes/sudden-impact.png" alt="Внезапный удар" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Внезапный удар</div></div>
+      <div class="rune-card" data-tip="Варды-зомби|Domination|Уничтожение варда = зомби-вард на его месте на 120с. +5 AP/AD за 10 зомби-вардов."><img src="https://www.wildriftfire.com/images/runes/zombie-ward.png" alt="Варды-зомби" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Варды-зомби</div></div>
+      <div class="rune-card" data-tip="Собиратель глаз|Domination|Убийство = +1.5 AD или AP (макс. 20 стаков = +30). При максе: +6 AD или +10 AP бонус."><img src="https://www.wildriftfire.com/images/runes/eyeball-collector.png" alt="Собиратель глаз" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Собиратель глаз</div></div>
+      <div class="rune-card" data-tip="Подлый выстрел|Domination|Урон по чемп. с замедлением/обездвиживанием: +13-78 доп. физ. урона (4с КД)."><img src="https://www.wildriftfire.com/images/runes/cheap-shot.png" alt="Подлый выстрел" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Подлый выстрел</div></div>
+      <div class="rune-card" data-tip="Хитрый охотник|Domination|Уникальные убийства снижают КД активных предметов: -5% базово + -5% за стак."><img src="https://www.wildriftfire.com/images/runes/ingenious-hunter.png" alt="Хитрый охотник" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Хитрый охотник</div></div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">✨ Вдохновение</div>
+    <div class="rune-grid">
+      <div class="rune-card" data-tip="Сластёна|Inspiration|Сбор ягод или мёда: +20 HP или +20 маны + 5 доп. золота. Постепенный +8% эффект лечения."><img src="https://www.wildriftfire.com/images/runes/sweet-tooth.png" alt="Сластёна" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Сластёна</div></div>
+      <div class="rune-card" data-tip="Хекстех-прыжок|Inspiration|Заряжает Flash пассивно за 20с. Заряженный Flash телепортирует через стены."><img src="https://www.wildriftfire.com/images/runes/hextech-flashtraption.png" alt="Хекстех-прыжок" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Хекстех-прыжок</div></div>
+      <div class="rune-card" data-tip="Семенная банка Икстали|Inspiration|Пассивное: нахождение рядом с чемп.-растением лечит за 3% HP/с. Растения рядом живут дольше."><img src="https://www.wildriftfire.com/images/runes/ixtali-seedjar.png" alt="Семенная банка Икстали" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Семенная банка Икстали</div></div>
+      <div class="rune-card" data-tip="Биржа будущего|Inspiration|Можно покупать предметы в кредит (до -150-300 золота). Долг погашается при возврате."><img src="https://www.wildriftfire.com/images/runes/futures-market.png" alt="Биржа будущего" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Биржа будущего</div></div>
+      <div class="rune-card" data-tip="Создание предметов|Inspiration|Предметы продаются за 100% цены в первые 3 минуты игры. После смерти — защита предметов."><img src="https://www.wildriftfire.com/images/runes/item-crafting.png" alt="Создание предметов" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Создание предметов</div></div>
+      <div class="rune-card" data-tip="Психоволна|Inspiration|Аура: союзники восстанавливают 5-12 маны/с рядом с тобой."><img src="https://www.wildriftfire.com/images/runes/psychic-wave.png" alt="Психоволна" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Психоволна</div></div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">⚔ Точность</div>
+    <div class="rune-grid">
+      <div class="rune-card" data-tip="Беспощадный|Precision|+7 AD или +14 AP + 2% проб. брони / 2% маг. проникн."><img src="https://www.wildriftfire.com/images/runes/brutal.png" alt="Беспощадный" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Беспощадный</div></div>
+      <div class="rune-card" data-tip="Триумф|Precision|Убийство/добивание = 5% пропущенного HP + 15 золота."><img src="https://www.wildriftfire.com/images/runes/triumph.png" alt="Триумф" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Триумф</div></div>
+      <div class="rune-card" data-tip="Легенда: Скорость|Precision|+3% AS базово + 1.5% AS за каждое убийство/добивание (макс. 5 стаков = +10.5% AS)."><img src="https://www.wildriftfire.com/images/runes/legend-alacrity.png" alt="Легенда: Скорость" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Легенда: Скорость</div></div>
+      <div class="rune-card" data-tip="Легенда: Кровная линия|Precision|+2% физ. вамп базово + 0.6% за убийство (макс. 5 стаков = +5% физ. вамп)."><img src="https://www.wildriftfire.com/images/runes/legend-bloodline.png" alt="Легенда: Кровная линия" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Легенда: Кровная линия</div></div>
+      <div class="rune-card" data-tip="Легенда: Стойкость|Precision|+5% стойкости базово + 2.5% за убийство (макс. 5 стаков = +17.5%)."><img src="https://www.wildriftfire.com/images/runes/legend-tenacity.png" alt="Легенда: Стойкость" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Легенда: Стойкость</div></div>
+      <div class="rune-card" data-tip="Контрольный удар|Precision|+8% урона по врагам <35% HP."><img src="https://www.wildriftfire.com/images/runes/coup-de-grace.png" alt="Контрольный удар" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Контрольный удар</div></div>
+      <div class="rune-card" data-tip="Последний бой|Precision|+6-15% урона, когда твой HP ниже 60% (максимум при 30% HP)."><img src="https://www.wildriftfire.com/images/runes/last-stand.png" alt="Последний бой" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Последний бой</div></div>
+      <div class="rune-card" data-tip="Усиленная атака|Precision|Каждая 3-я атака: +15-100 доп. физ. урона."><img src="https://www.wildriftfire.com/images/runes/empowered-attack.png" alt="Усиленная атака" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Усиленная атака</div></div>
+      <div class="rune-card" data-tip="Запредельность|Precision|Смерть сбрасывает КД способностей на 25%."><img src="https://www.wildriftfire.com/images/runes/transcendence.png" alt="Запредельность" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Запредельность</div></div>
+      <div class="rune-card" data-tip="Сбор бурь|Precision|Каждые 3 минуты: +4 AD или +8 AP (стакуется бесконечно)."><img src="https://www.wildriftfire.com/images/runes/gathering-storm.png" alt="Сбор бурь" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Сбор бурь</div></div>
+      <div class="rune-card" data-tip="Обжигание|Precision|Раз в 10с попадание способностью наносит 14-30 доп. маг. урона через 1с."><img src="https://www.wildriftfire.com/images/runes/scorch.png" alt="Обжигание" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Обжигание</div></div>
+      <div class="rune-card" data-tip="Кольцо потока маны|Precision|Попадание способностью (15с КД): +30 маны. Макс. +300 маны → +1% маны → мана."><img src="https://www.wildriftfire.com/images/runes/manaflow-band.png" alt="Кольцо потока маны" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Кольцо потока маны</div></div>
+      <div class="rune-card" data-tip="Нимбовый плащ|Precision|Использование заклинания призывателя = +15-35% скор. на 2.5с."><img src="https://www.wildriftfire.com/images/runes/nimbus-cloak.png" alt="Нимбовый плащ" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Нимбовый плащ</div></div>
+      <div class="rune-card" data-tip="Живость|Precision|+1-8% скорости в зависимости от базовой скорости. +1% AD / +1.5% AP от бонусной скор."><img src="https://www.wildriftfire.com/images/runes/celerity.png" alt="Живость" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Живость</div></div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">🛡 Решимость</div>
+    <div class="rune-grid">
+      <div class="rune-card" data-tip="Второе дыхание|Resolve|После урона от чемпа: +6 HP/с 10с + 1% макс. HP."><img src="https://www.wildriftfire.com/images/runes/second-wind.png" alt="Второе дыхание" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Второе дыхание</div></div>
+      <div class="rune-card" data-tip="Костяная броня|Resolve|После урона от чемп.: след. 3 атаки/способности наносят -15-60 HP. (30с КД)"><img src="https://www.wildriftfire.com/images/runes/bone-plating.png" alt="Костяная броня" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Костяная броня</div></div>
+      <div class="rune-card" data-tip="Отменяющая сфера|Resolve|При HP<30% от маг. урона — щит 40-120 HP. (30с КД)"><img src="https://www.wildriftfire.com/images/runes/nullifying-orb.png" alt="Отменяющая сфера" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Отменяющая сфера</div></div>
+      <div class="rune-card" data-tip="Разрастание|Resolve|Каждые 135 крипов/монстров рядом: +3.5% HP. При максе: +3.5% HP ещё."><img src="https://www.wildriftfire.com/images/runes/overgrowth.png" alt="Разрастание" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Разрастание</div></div>
+      <div class="rune-card" data-tip="Оздоровление|Resolve|Щиты и исцеление +5%. При HP<40% — эффект +10%."><img src="https://www.wildriftfire.com/images/runes/revitalize.png" alt="Оздоровление" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Оздоровление</div></div>
+      <div class="rune-card" data-tip="Упорство|Resolve|После КК или 3+ атак: +40% HP реген на 8с (12с КД)."><img src="https://www.wildriftfire.com/images/runes/perseverance.png" alt="Упорство" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Упорство</div></div>
+      <div class="rune-card" data-tip="Источник жизни|Resolve|Замедление/обездвиживание чемп. = метка. Союзник, атакующий меченого, исцеляется на 5-22 HP."><img src="https://www.wildriftfire.com/images/runes/font-of-life.png" alt="Источник жизни" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Источник жизни</div></div>
+      <div class="rune-card" data-tip="Щитовой удар|Resolve|Щит = +5-10 брони/МС, след. атака наносит 5-60 доп. физ. урона."><img src="https://www.wildriftfire.com/images/runes/shield-bash.png" alt="Щитовой удар" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Щитовой удар</div></div>
+      <div class="rune-card" data-tip="Снос|Resolve|Рядом со строением: заряд за 3с → атака = +35-100 + 25% макс. HP доп. физ. урона строению."><img src="https://www.wildriftfire.com/images/runes/demolish.png" alt="Снос" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Снос</div></div>
+      <div class="rune-card" data-tip="Охотник на великанов|Resolve|Бонус 1-15% урона против врагов с большим HP."><img src="https://www.wildriftfire.com/images/runes/giant-slayer.png" alt="Охотник на великанов" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Охотник на великанов</div></div>
+      <div class="rune-card" data-tip="Непоколебимый|Resolve|При получении КК: щит 80-160 HP на 2с. (30с КД)"><img src="https://www.wildriftfire.com/images/runes/unshakeable.png" alt="Непоколебимый" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Непоколебимый</div></div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">🌀 Особые</div>
+    <div class="rune-grid">
+      <div class="rune-card" data-tip="Лояльность|Special|+2 брони + 5 HP тебе и ближн. союзникам — или +4 брони + 10 HP."><img src="https://www.wildriftfire.com/images/runes/loyalty.png" alt="Лояльность" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Лояльность</div></div>
+      <div class="rune-card" data-tip="Тиран|Special|Убийство чемпа = +2% урона (макс. 3 стака = +6%)."><img src="https://www.wildriftfire.com/images/runes/tyrant.png" alt="Тиран" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Тиран</div></div>
+      <div class="rune-card" data-tip="Аксиома арканиста|Special|При убийстве/добивании — -25% КД ультимейта."><img src="https://www.wildriftfire.com/images/runes/axiom-arcanist.png" alt="Аксиома арканиста" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Аксиома арканиста</div></div>
+      <div class="rune-card" data-tip="Усиление|Special|После ультимейта — +10% урона способностями на 6с."><img src="https://www.wildriftfire.com/images/runes/empowerment.png" alt="Усиление" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Усиление</div></div>
+      <div class="rune-card" data-tip="Сластёна|Inspiration|Ягоды/мёд дают +20 HP или +20 маны + 5 золота."><img src="https://www.wildriftfire.com/images/runes/sweet-tooth.png" alt="Сластёна" loading="lazy" onerror="this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;';this.src=''"><div class="rune-card-name">Сластёна</div></div>
+    </div>
+  </div>
+</div>
+<div id="runeTooltip"></div>
+
+<!-- ══ TIER LIST MODAL ══ -->
+<div class="m-mask" id="tierlistMask" onclick="if(event.target===this)closeTierlist()">
+  <div class="m-win" style="width:96vw;max-width:820px;max-height:94vh;overflow-y:auto;padding:20px 16px 16px;">
+    <button class="btn-close-x" onclick="closeTierlist()">✕</button>
+    <div id="tierlistTitle" style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;"></div>
+    <!-- Role tabs -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;" id="tierlistTabs"></div>
+    <!-- Tier rows -->
+    <div id="tierlistContent" style="margin-top:4px;">
+      <div style="text-align:center;padding:60px 20px;color:rgba(255,255,255,0.3);">
+        <div style="font-size:40px;margin-bottom:12px;">📋</div>
+        <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);">Тир-лист появится скоро</div>
+        <div style="font-size:11px;margin-top:8px;line-height:1.6;">Скинь скриншот из тирмейкера — я добавлю всех чемпионов по ролям и тирам.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="itemTooltip"></div>
 </body>
 </html>
