@@ -1189,6 +1189,7 @@
             z-index: 2;
         }
         .item-card img { width: 44px; height: 44px; border-radius: 7px; display: block; }
+
         .item-cost { font-size: 8px; color: #C9A800; margin-top: 2px; font-weight: 700; }
         /* ── Calculator buttons row ── */
         .calc-btns-row {
@@ -1486,9 +1487,9 @@
 <script>
 (() => {
 
-    // ═══════════════════════════════════════════════════════════════
-    // MODAL SYSTEM — only one modal at a time
-    // ═══════════════════════════════════════════════════════════════
+    // =========================================
+    // MODAL SYSTEM - only one modal at a time
+    // =========================================
     const MODAL_IDS = ['mMask','calcMask','chartMask','itemsMask','runesMask',
         'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','welcomeOverlay'];
 
@@ -1803,69 +1804,7 @@ async function start() {
     function render() { renderFull(); }
 
     
-window.showT = function(e, v) {
-    const t = document.getElementById('uiTip');
-    t.style.display = 'block';
-    const rounded = typeof v === 'number' ? (Math.round(v*10)/10) : v;
-    t.innerText = "Прирост/уровень: +" + rounded;
-    moveT(e);
-}
-
-window.moveT = function(e) {
-    const t = document.getElementById('uiTip');
-    if (t.style.display !== 'block') return;
-    const x = e.pageX;
-    const y = e.pageY;
-    t.style.top = (y - 18) + 'px';
-    t.style.left = x + 'px';
-}
-
-window.hideT = function() {
-    const t = document.getElementById('uiTip');
-    t.style.display = 'none';
-}
-
-    window.doSort = function(k) {
-        colFocus = true;
-        if (sK === k) sD = sD === 'desc' ? 'asc' : 'desc';
-        else { sK = k; sD = 'desc'; }
-        render();
-    }
-
-    window.toggleP = function(n) {
-        pinned.has(n) ? pinned.delete(n) : pinned.add(n);
-        try { localStorage.setItem('p', JSON.stringify([...pinned])); } catch(e) {}
-        render();
-    }
-
     // Remove champion from table (only from selection, NOT from data)
-    window.removeC = function(n) {
-        selected.delete(n);
-        pinned.delete(n);
-        try { localStorage.setItem('p', JSON.stringify([...pinned])); } catch(e) {}
-        drawM();
-        render();
-    }
-
-    window.openM = function() { 
-        openModal('mMask'); 
-        drawM(); 
-    }
-    
-    window.closeM = function() { 
-        closeModal('mMask'); 
-    }
-
-    window.selectAll = function() {
-        selected = new Set(raw.map(x => x.name)); drawM(); render();
-        try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e){}
-    }
-
-    window.clearAll = function() {
-        selected = new Set([...pinned]); drawM(); render();
-        try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e){}
-    }
-
     function drawM() {
         const grid = document.getElementById('mGrid');
         const qRaw = (document.getElementById('mSearch').value || '');
@@ -1950,15 +1889,7 @@ window.hideT = function() {
 
 
 
-    // ══════════════ FAB MENU ══════════════
-    window.toggleFab = function() {
-        const actions = document.getElementById('fabActions');
-        const main = document.getElementById('fabMain');
-        const open = actions.style.display === 'flex';
-        actions.style.display = open ? 'none' : 'flex';
-        main.style.transform = open ? '' : 'rotate(45deg)';
-    };
-    // Close FAB on outside click
+    // =========================================
     document.addEventListener('click', (e) => {
         const fab = document.getElementById('fabMenu');
         if(fab && !fab.contains(e.target)) {
@@ -1966,7 +1897,7 @@ window.hideT = function() {
             document.getElementById('fabMain').style.transform = '';
         }
     });
-    // ══════════════ DAMAGE CALCULATOR + ITEMS ══════════════
+    // =========================================
     let _activeCalcItem = 'none';
 
 
@@ -1974,128 +1905,9 @@ window.hideT = function() {
     let _calcLvl = 1;
     let _calcRange = 'melee'; // 'melee' or 'ranged'
 
-    window.setCalcLvl = function(lvl) {
-        _calcLvl = lvl;
-        document.querySelectorAll('.calc-lvl-btn').forEach(b => {
-            b.classList.toggle('active', +b.dataset.lvl === lvl);
-        });
-        calcDmg();
-    };
-    window.setCalcRange = function(type) {
-        _calcRange = type;
-        document.getElementById('btnMelee').classList.toggle('active', type==='melee');
-        document.getElementById('btnRanged').classList.toggle('active', type==='ranged');
-        calcDmg();
-    };;
-        window.openCalc = function() {
-        openModal('calcMask');
-        setTimeout(() => { const el = document.getElementById('cDmg'); if(el) el.focus(); }, 80);
-    };
-
-    window.selectCalcItem = function(item) {
-        _activeCalcItem = item;
-        document.querySelectorAll('.calc-item-btn').forEach(b => b.classList.remove('active'));
-        const _btnMap = {none:'itemNone',thornmail:'itemThornmail',botrk:'itemBotrk',sunfire:'itemSunfire',liandry:'itemLiandry',sunderer:'itemDivSunderer'};
-        const btn = document.getElementById(_btnMap[item] || 'item'+item.charAt(0).toUpperCase()+item.slice(1));
-        if(btn) btn.classList.add('active');
-        const hints = {
-            'none': '',
-            'thornmail': '🛡',
-            'botrk': function(){
-            const drain = Math.round(30 + (100-30)*(_calcLvl-1)/14);
-            return '⚔ Смертоносные удары: ' + (_calcRange==='melee'?'10%':'8.5%') + ' тек.HP.\nИстощение: ' + drain + ' маг. урона (уровень '+_calcLvl+')';
-        }(),
-            'sunfire': '🔥',
-            'liandry': '🔥',
-            'sunderer': '⚔',
-        };
-        document.getElementById('calcItemHint').textContent = hints[item] || '';
-        calcDmg();
-    };
-    window.closeCalc = function() {
-        closeModal('calcMask');
-        closeModal('itemSubModal');
-    };
-
-    window.calcDmg = function() {
-        const dmg     = parseFloat(document.getElementById('cDmg').value)    || 0;
-        const armor   = parseFloat(document.getElementById('cArmor').value)   || 0;
-        const pen     = parseFloat(document.getElementById('cPen').value)     || 0;
-        const myHp    = parseFloat(document.getElementById('cMyHp').value)    || 0;
-        const myArmor = parseFloat(document.getElementById('cMyArmor').value) || 0;
-        const eHpMax  = parseFloat(document.getElementById('cEnemyHpMax').value) || 0;
-        const eHpCur  = parseFloat(document.getElementById('cEnemyHpCur').value) || 0;
-        const res     = document.getElementById('calcResult');
-
-        if(!dmg && !eHpMax && !eHpCur && !myHp) { res.style.display = 'none'; return; }
-
-        // Base damage calc
-        const effArmor  = armor > 0 ? armor * (1 - pen / 100) : armor;
-        const finalDmg  = dmg > 0 ? dmg * 100 / (100 + effArmor) : 0;
-        const mitigated = dmg - finalDmg;
-        const mitPct    = dmg > 0 ? (mitigated / dmg * 100) : 0;
-
-        if(dmg > 0) {
-            document.getElementById('resEff').textContent = Math.round(effArmor * 10) / 10;
-            document.getElementById('resMit').textContent = mitPct.toFixed(1) + '%';
-            document.getElementById('resDmg').textContent = Math.round(finalDmg);
-            document.getElementById('calcFormula').innerHTML =
-                dmg + ' × 100/(100+' + (Math.round(effArmor*10)/10) + ') = ' + Math.round(finalDmg) +
-                (pen > 0 ? '  |  pen ' + pen + '% → armor ' + armor + '→' + (Math.round(effArmor*10)/10) : '') +
-                '<br>Absorbed: ' + Math.round(mitigated) + ' (' + mitPct.toFixed(1) + '%)';
-        } else {
-            document.getElementById('resEff').textContent = '--';
-            document.getElementById('resMit').textContent = '--';
-            document.getElementById('resDmg').textContent = '--';
-            document.getElementById('calcFormula').textContent = '';
-        }
-        res.style.display = 'flex';
-
-        // Item proc
-        const itemRes = document.getElementById('calcItemResult');
-        const lblEl   = document.getElementById('calcItemResultLabel');
-        const valEl   = document.getElementById('calcItemResultVal');
-
-        if(_activeCalcItem === 'thornmail' && (myArmor || myHp)) {
-            const bonusArmor = Math.max(0, myArmor - 30);
-            const bonusHp    = Math.max(0, myHp - 600);
-            const rawDmg     = 20 + 0.06 * bonusArmor + 0.02 * bonusHp;
-            const finalItem  = rawDmg * 100 / (100 + Math.max(0, armor));
-            lblEl.textContent = '🛡 Thornmail Thorns dmg/hit (after enemy MR)';
-            valEl.textContent = Math.round(finalItem);
-            itemRes.style.display = 'block';
-        } else if(_activeCalcItem === 'botrk' && eHpCur) {
-            // WR BotRK: melee 10%, ranged 8.5%. Min 15.
-            const rawDmg   = Math.max(15, eHpCur * (_calcRange === 'melee' ? 0.10 : 0.085));
-            const finalItem = rawDmg * 100 / (100 + Math.max(0, effArmor));
-            lblEl.textContent = '⚔ BotRK Ruined Strikes 9% cur HP (melee) after armor';
-            valEl.textContent = Math.round(finalItem);
-            itemRes.style.display = 'block';
-        } else if(_activeCalcItem === 'sunfire' && (myHp || eHpMax)) {
-            // WR Sunfire: 16-30 + 1% bonus HP/s, max stacks ×1.42
-            const bonusHp  = Math.max(0, myHp - 600);
-            const rawBase  = 23 + 0.01 * bonusHp; // avg base 23
-            const rawStack = rawBase * 1.42;
-            const mit      = 100 / (100 + Math.max(0, armor));
-            lblEl.textContent = '🔥 Sunfire Immolate/s  base → max stacked (after MR)';
-            valEl.innerHTML = Math.round(rawBase*mit) + '/s → <b>' + Math.round(rawStack*mit) + '/s</b>';
-            itemRes.style.display = 'block';
-        } else if(_activeCalcItem === 'liandry' && eHpMax) {
-            // WR Liandry: 0.5% max HP per second over 3s (no AP bonus in WR)
-            const rawPerSec  = eHpMax * 0.005;
-            const rawTotal   = rawPerSec * 3;
-            const mit        = 100 / (100 + Math.max(0, armor));
-            lblEl.textContent = "🔥 Liandry's Torment dmg/s → total 3s (after MR)";
-            valEl.innerHTML = Math.round(rawPerSec*mit) + '/s → <b>' + Math.round(rawTotal*mit) + ' total</b>';
-            itemRes.style.display = 'block';
-        } else {
-            itemRes.style.display = 'none';
-        }
-    };
 
 
-
-        // ══════════════ CHAMPION GROWTH CHART ══════════════
+        // =========================================
     let growthChartObj = null;
     let chartStat = 'hp';
     let chartChamp = null;
@@ -2161,541 +1973,449 @@ window.hideT = function() {
 
 
 
-    window.openItems = function() {
+    window.openItemDetail = function(name, cost, stats, desc, imgSrc) {
+        var modal = document.getElementById('itemDetailModal');
+        var box   = document.getElementById('itemDetailContent');
+        if(!modal || !box) return;
+        box.innerHTML = '';
+
+        // Header: icon + name + cost
+        var hdr = document.createElement('div');
+        hdr.style.cssText = 'display:flex;align-items:center;gap:14px;margin-bottom:16px;';
+        if(imgSrc) {
+            var img = document.createElement('img');
+            img.src = imgSrc; img.style.cssText = 'width:64px;height:64px;border-radius:10px;flex-shrink:0;';
+            img.onerror = function(){ this.style.display='none'; };
+            hdr.appendChild(img);
+        }
+        var nameCol = document.createElement('div');
+        var nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-size:20px;font-weight:900;color:#fff;margin-bottom:6px;';
+        nameEl.textContent = name;
+        var costEl = document.createElement('span');
+        costEl.style.cssText = 'background:rgba(201,168,0,0.18);border:1px solid rgba(201,168,0,0.5);color:#FFD700;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;';
+        costEl.textContent = cost;
+        nameCol.appendChild(nameEl); nameCol.appendChild(costEl);
+        hdr.appendChild(nameCol); box.appendChild(hdr);
+
+        // Stats block
+        if(stats) {
+            var statsBox = document.createElement('div');
+            statsBox.style.cssText = 'margin-bottom:14px;background:rgba(255,255,255,0.03);border-radius:10px;padding:4px 10px;';
+            stats.split('  |  ').filter(Boolean).forEach(function(s) {
+                var row = document.createElement('div');
+                row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);';
+                row.innerHTML = '<span style="color:#7ec8e3;font-weight:700;font-size:14px;">' + s.trim() + '</span>';
+                statsBox.appendChild(row);
+            });
+            box.appendChild(statsBox);
+        }
+
+        // Description block
+        if(desc) {
+            var descBox = document.createElement('div');
+            desc.split('\n').filter(Boolean).forEach(function(line) {
+                var m = line.match(/^([^:]+?):\s*(.+)/);
+                var el = document.createElement('div');
+                el.style.marginBottom = '10px';
+                if(m) {
+                    el.innerHTML = '<div style="color:#b96fff;font-weight:800;font-size:13px;margin-bottom:3px;">' + m[1] + '</div>'
+                                 + '<div style="color:rgba(255,255,255,0.82);font-size:13px;line-height:1.65;">' + m[2] + '</div>';
+                } else {
+                    el.style.cssText = 'color:rgba(255,255,255,0.7);font-size:13px;line-height:1.65;margin-bottom:8px;';
+                    el.textContent = line;
+                }
+                descBox.appendChild(el);
+            });
+            box.appendChild(descBox);
+        }
+
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+    };
+
+    
+    window.closeItemDetail = function() {
+        var modal = document.getElementById('itemDetailModal');
+        if(modal) modal.classList.remove('active');
+        // Items modal stays open
+    };
+
+    // =========================================
+    // MODAL SYSTEM - only one modal at a time
+    // =========================================
+    // MODAL_IDS already declared above
+
+    function closeAllModals(except) {
+        MODAL_IDS.forEach(function(id) {
+            if(id === except) return;
+            var el = document.getElementById(id);
+            if(!el) return;
+            el.classList.remove('active');
+            // Also clear any inline display style
+            el.style.display = '';
+        });
+        if(!except) document.body.classList.remove('modal-open');
+    }
+
+    function openModal(id) {
+        // Close all others first
+        closeAllModals(id);
+        var el = document.getElementById(id);
+        if(el) el.classList.add('active');
+        document.body.classList.add('modal-open');
+    }
+
+    function closeModal(id) {
+        var el = document.getElementById(id);
+        if(el) { el.classList.remove('active'); el.style.display = ''; }
+        // Remove modal-open if no other modal is active
+        var anyActive = MODAL_IDS.some(function(mid) {
+            var mel = document.getElementById(mid);
+            return mel && mel.classList.contains('active');
+        });
+        if(!anyActive) document.body.classList.remove('modal-open');
+    }
+
+    // WR level scaling helpers (15 levels)
+    function wrScaleByLevel(minVal, maxVal, lvl) {
+        return Math.round(minVal + (maxVal - minVal) * (lvl - 1) / 14);
+        window.openItems = function() {
         openModal('itemsMask');
-        // Init tooltips after modal opens
-        setTimeout(() => {
-            const tip = document.getElementById('itemTooltip');
-            if(!tip) return;
-            document.querySelectorAll('#itemsMask .item-card[data-tip]').forEach(card => {
-                if(card._tipInit) return; card._tipInit = true;
-                card.addEventListener('mouseenter', e => {
-                    const p = (card.getAttribute('data-tip')||'').split('¦');
-                    const n=p[0]?.trim()||'', co=p[1]?.trim()||'', st=p[2]?.trim()||'', de=p[3]?.trim()||'';
-                    tip.innerHTML =
-                        '<div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:8px;border-bottom:1px solid rgba(185,111,255,0.25);padding-bottom:8px;">'+n+'</div>'+
-                        (co?'<div style="display:inline-block;background:rgba(201,168,0,0.18);border:1px solid rgba(201,168,0,0.5);color:#FFD700;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-bottom:10px;">'+co+'</div>':'') +
-                        (st?'<div style="margin-bottom:10px;">'+
-                            st.split('  |  ').map(function(s){
-                                var s=s.trim();
-                                return s?'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><span style="color:#7ec8e3;font-size:13px;font-weight:700;">'+s+'</span></div>':'';
-                            }).join('')+
-                        '</div>':'') +
-                        (de?'<div style="border-top:1px solid rgba(185,111,255,0.2);padding-top:8px;">'+
-                            de.split('\n').filter(Boolean).map(function(line){
-                                var m=line.match(/^([^:：]+)[:\s：]\s*(.+)/);
-                                if(m) return '<div style="margin-bottom:6px;"><span style="color:#c084fc;font-weight:800;font-size:12px;">'+m[1].trim()+':</span> <span style="color:rgba(255,255,255,0.88);font-size:12px;line-height:1.6;">'+m[2].trim()+'</span></div>';
-                                return '<div style="color:rgba(255,255,255,0.75);font-size:12px;line-height:1.6;margin-bottom:4px;">'+line+'</div>';
-                            }).join('')+
-                        '</div>':'');
-                    tip.style.display = 'block';
-                });
-                card.addEventListener('mousemove', e => {
-                    const vw = window.innerWidth, vh = window.innerHeight;
-                    const tw = tip.offsetWidth||260, th = tip.offsetHeight||80;
-                    let x = e.clientX + 14, y = e.clientY;
-                    if(x + tw > vw - 10) x = e.clientX - tw - 10;
-                    if(y + th > vh - 10) y = e.clientY - th - 10;
-                    tip.style.left = x + 'px'; tip.style.top = y + 'px';
-                });
-                card.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
-                card.addEventListener('click', e => {
-                    if(tip.style.display === 'block') { tip.style.display='none'; return; }
-                    tip.innerHTML = 
-                        '<div style="font-weight:900;font-size:14px;color:#fff;margin-bottom:6px;">' + name + '</div>'
-                        + '<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">'
-                        + '<span style="background:rgba(201,168,0,0.2);border:1px solid #C9A800;color:#FFD700;font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;">' + (p[1]||'') + '</span>'
-                        + '</div>'
-                        + '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px;">'
-                        + (p[2]||'').split('  |  ').map(s => '<div style="font-size:12px;color:rgba(255,255,255,0.8);">⬥ ' + s.trim() + '</div>').join('')
-                        + '</div>'
-                        + '<div style="border-top:1px solid rgba(155,89,182,0.3);padding-top:8px;">'
-                        + (p[3]||'').split('\n').filter(Boolean).map((line,i) => {
-                            const m = line.match(/^([^:]+):\s*(.+)/);
-                            if(m) return '<div style="margin-bottom:5px;"><span style="color:#b96fff;font-weight:700;font-size:11px;">' + m[1] + ': </span><span style="color:rgba(255,255,255,0.82);font-size:11px;">' + m[2] + '</span></div>';
-                            return '<div style="color:rgba(255,255,255,0.7);font-size:11px;line-height:1.5;">' + line + '</div>';
-                          }).join('')
-                        + '</div>';
-                    tip.style.display = 'block';
-                    const r = card.getBoundingClientRect();
-                    tip.style.left = Math.min(r.right+8, window.innerWidth-285) + 'px';
-                    tip.style.top = Math.max(10, r.top) + 'px';
+        setTimeout(function() {
+            document.querySelectorAll('#itemsMask .item-card[data-tip]').forEach(function(card) {
+                if(card._initDone) return;
+                card._initDone = true;
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', function() {
+                    var parts = (card.getAttribute('data-tip') || '').split('\u00A6');
+                    var imgSrc = card.querySelector('img') ? card.querySelector('img').src : '';
+                    openItemDetail(parts[0]||'', parts[1]||'', parts[2]||'', parts[3]||'', imgSrc);
                 });
             });
         }, 80);
     };
+
+
+
+    // MODAL SYSTEM
+    const MODAL_IDS = ['mMask','calcMask','chartMask','itemsMask','runesMask',
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','welcomeOverlay'];
+    function closeAllModals(except) {
+        MODAL_IDS.forEach(function(id) {
+            if(id === except) return;
+            var el = document.getElementById(id);
+            if(!el) return;
+            el.classList.remove('active');
+            el.style.display = '';
+        });
+        if(!except) document.body.classList.remove('modal-open');
+    }
+    function openModal(id) {
+        closeAllModals(id);
+        var el = document.getElementById(id);
+        if(el) el.classList.add('active');
+        document.body.classList.add('modal-open');
+    }
+    function closeModal(id) {
+        var el = document.getElementById(id);
+        if(el) { el.classList.remove('active'); el.style.display = ''; }
+        var anyOpen = MODAL_IDS.some(function(mid) {
+            var mel = document.getElementById(mid);
+            return mel && mel.classList.contains('active');
+        });
+        if(!anyOpen) document.body.classList.remove('modal-open');
+    }
+
+    // WELCOME
+    window.closeWelcome = function() {
+        closeModal('welcomeOverlay');
+        try { localStorage.setItem('wr_welcomed','1'); } catch(e) {}
+    };
+    (function() {
+        setTimeout(function() { openModal('welcomeOverlay'); }, 400);
+    })();
+
+    // SIDEBAR
+    window.toggleSidebar = function() {
+        var panel = document.getElementById('sidePanel');
+        var overlay = document.getElementById('sideOverlay');
+        if(!panel) return;
+        var isOpen = panel.classList.contains('open');
+        panel.classList.toggle('open', !isOpen);
+        if(overlay) overlay.classList.toggle('open', !isOpen);
+        document.body.classList.toggle('sidebar-open', !isOpen);
+        document.body.style.overflow = isOpen ? '' : 'hidden';
+    };
+    window.closeSidebar = function() {
+        var panel = document.getElementById('sidePanel');
+        var overlay = document.getElementById('sideOverlay');
+        if(panel) panel.classList.remove('open');
+        if(overlay) overlay.classList.remove('open');
+        document.body.classList.remove('sidebar-open');
+        document.body.style.overflow = '';
+    };
+
+    // CALC
+    window.openCalc = function() {
+        openModal('calcMask');
+        setTimeout(function() { var e=document.getElementById('cDmg'); if(e) e.focus(); }, 80);
+    };
+    window.closeCalc = function() { closeModal('calcMask'); closeModal('itemSubModal'); };
+    window.calcDmg = function() {
+        var dmg   = parseFloat((document.getElementById('cDmg')||{}).value) || 0;
+        var armor = parseFloat((document.getElementById('cArmor')||{}).value) || 0;
+        var pen   = parseFloat((document.getElementById('cPen')||{}).value) || 0;
+        var res   = document.getElementById('calcResult');
+        if(!res) return;
+        if(!dmg) { res.style.display='none'; return; }
+        var effArmor = armor > 0 ? armor*(1-pen/100) : armor;
+        var finalDmg = dmg * 100/(100+effArmor);
+        var mit = ((dmg-finalDmg)/dmg*100);
+        var e = function(id){ return document.getElementById(id); };
+        if(e('resEff')) e('resEff').textContent = Math.round(effArmor*10)/10;
+        if(e('resMit')) e('resMit').textContent = mit.toFixed(1)+'%';
+        if(e('resDmg')) e('resDmg').textContent = Math.round(finalDmg);
+        if(e('calcFormula')) e('calcFormula').textContent = dmg+' x 100/(100+'+Math.round(effArmor*10)/10+') = '+Math.round(finalDmg);
+        res.style.display = 'flex';
+    };
+    window.addAbilityRow = function() {
+        var rows = document.getElementById('abilityRows');
+        if(!rows) return;
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;gap:6px;align-items:center;';
+        row.innerHTML = '<input type="number" placeholder="AD/AP" class="calc-input" style="flex:1;padding:6px;" oninput="calcDmg()">'
+            + '<input type="number" placeholder="%" class="calc-input" style="width:60px;padding:6px;" oninput="calcDmg()">'
+            + '<button onclick="this.parentElement.remove();calcDmg()" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px;">x</button>';
+        rows.appendChild(row);
+    };
+    var _calcLvl = 1;
+    var _calcRange = 'melee';
+    window.setCalcLvl = function(lvl) {
+        _calcLvl = lvl;
+        document.querySelectorAll('.calc-lvl-btn').forEach(function(b){
+            b.classList.toggle('active', +b.dataset.lvl===lvl);
+        });
+        calcDmg();
+    };
+    window.setCalcRange = function(type) {
+        _calcRange = type;
+        var m=document.getElementById('btnMelee'), r=document.getElementById('btnRanged');
+        if(m) m.classList.toggle('active', type==='melee');
+        if(r) r.classList.toggle('active', type==='ranged');
+        calcDmg();
+    };
+    window.selectCalcItem = function(item) {
+        document.querySelectorAll('.calc-item-btn').forEach(function(b){ b.classList.remove('active'); });
+        var map={none:'itemNone',thornmail:'itemThornmail',botrk:'itemBotrk',
+                 sunfire:'itemSunfire',liandry:'itemLiandry',sunderer:'itemDivSunderer'};
+        var btn = document.getElementById(map[item]);
+        if(btn) btn.classList.add('active');
+    };
+    window.openItemCalc = function(key) { openModal('itemSubModal'); };
+    window.closeItemCalc = function() { closeModal('itemSubModal'); };
+    window.runItemCalc = function() {};
+
+    // ITEMS
+    window.closeItems = function() {
+        closeModal('itemsMask');
+        var tip=document.getElementById('itemTooltip');
+        if(tip) tip.style.display='none';
+    };
+
+    // RUNES
     window.openRunes = function() {
         openModal('runesMask');
-        setTimeout(() => {
-            const tip = document.getElementById('runeTooltip');
+        setTimeout(function() {
+            var tip = document.getElementById('runeTooltip');
             if(!tip) return;
-            document.querySelectorAll('#runesMask .rune-card[data-tip]').forEach(card => {
-                if(card._tipInit) return; card._tipInit = true;
-                const p = (card.getAttribute('data-tip')||'').split('¦');
-                const [name, cat, , desc] = p;
-                card.addEventListener('mouseenter', e => {
-                    tip.innerHTML = '<b style="color:#b96fff;font-size:13px;display:block;margin-bottom:3px;">'+name+'</b>'
-                        +'<span style="color:#FFD700;font-size:10px;">'+cat+'</span><br>'
-                        +'<span style="color:rgba(255,255,255,0.85);font-size:11px;">'+(desc||'')+'</span>';
-                    tip.style.display='block';
+            document.querySelectorAll('#runesMask .rune-card[data-tip]').forEach(function(card) {
+                if(card._tipInit) return;
+                card._tipInit = true;
+                var parts = (card.getAttribute('data-tip')||'').split('\xA6');
+                card.addEventListener('mouseenter', function(e) {
+                    tip.innerHTML = '<b style="color:#b96fff;">'+(parts[0]||'')+'</b><br>'
+                        + '<span style="color:#FFD700;font-size:10px;">'+(parts[1]||'')+'</span><br>'
+                        + '<span style="font-size:11px;">'+(parts[3]||parts[2]||'')+'</span>';
+                    tip.style.display = 'block';
                 });
-                card.addEventListener('mousemove', e => {
-                    const vw=window.innerWidth,vh=window.innerHeight,tw=tip.offsetWidth||260,th=tip.offsetHeight||80;
-                    let x=e.clientX+14,y=e.clientY;
-                    if(x+tw>vw-10) x=e.clientX-tw-10;
-                    if(y+th>vh-10) y=e.clientY-th-10;
+                card.addEventListener('mousemove', function(e) {
+                    var tw=tip.offsetWidth||240, th=tip.offsetHeight||60;
+                    var x=e.clientX+12, y=e.clientY;
+                    if(x+tw>window.innerWidth-8) x=e.clientX-tw-8;
+                    if(y+th>window.innerHeight-8) y=e.clientY-th-8;
                     tip.style.left=x+'px'; tip.style.top=y+'px';
                 });
-                card.addEventListener('mouseleave', ()=>{ tip.style.display='none'; });
+                card.addEventListener('mouseleave', function(){ tip.style.display='none'; });
             });
         }, 80);
     };
     window.closeRunes = function() {
         closeModal('runesMask');
-        const tip = document.getElementById('runeTooltip');
-        if(tip) tip.style.display = 'none';
+        var tip=document.getElementById('runeTooltip'); if(tip) tip.style.display='none';
     };
 
-    // ══ TIER LIST ══
-    window.closeTierlist = function() {
-        closeModal('tierlistMask');
+    // TIER LIST
+    var _tierType = 'champs';
+    var _tierRole = 'all';
+    var TIER_DATA = {
+        all:{S:[],A:[],B:[],C:[]},adc:{S:[],A:[],B:[],C:[]},
+        mid:{S:[],A:[],B:[],C:[]},top:{S:[],A:[],B:[],C:[]},
+        jungle:{S:[],A:[],B:[],C:[]},sup:{S:[],A:[],B:[],C:[]}
     };
-
-    
-    // ══ WELCOME POPUP ══
-    // ═══ WELCOME POPUP: always show on first load ═══
-    window.closeWelcome = function() {
-        closeModal('welcomeOverlay');
-        try { localStorage.setItem('wr_welcomed', '1'); } catch(e) {}
-    };
-    (function() {
-        setTimeout(function() {
-            openModal('welcomeOverlay');
-        }, 300);
-    })();
-    // ══ SIDEBAR SUPPORT TOOLTIP ══
-    (function() {
-        const btn = document.getElementById('sideSupport');
-        if(!btn) return;
-        let tip = null;
-        btn.addEventListener('mouseenter', e => {
-            tip = document.createElement('div');
-            tip.style.cssText = 'position:fixed;z-index:99999;background:rgba(10,3,20,0.97);border:1px solid rgba(185,111,255,0.6);color:rgba(255,255,255,0.9);font-size:12px;line-height:1.6;padding:12px 14px;border-radius:10px;max-width:260px;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.6);';
-            tip.textContent = btn.getAttribute('title') || '';
-            document.body.appendChild(tip);
-            const r = btn.getBoundingClientRect();
-            tip.style.left = (r.right + 10) + 'px';
-            tip.style.top = Math.max(10, r.top - tip.offsetHeight/2) + 'px';
-        });
-        btn.addEventListener('mouseleave', () => { if(tip){ tip.remove(); tip=null; } });
-    })();
-
-    // ══ TIERLIST ROLE TABS ══
-    const ROLES = [
-        {key:'all',   label:'Все',     icon:'🌍'},
-        {key:'adc',   label:'ADC',     icon:'🏹'},
-        {key:'mid',   label:'Мид',     icon:'⚡'},
-        {key:'top',   label:'Топ',     icon:'🛡'},
-        {key:'jungle',label:'Лес',     icon:'🌿'},
-        {key:'sup',   label:'Сапорт',  icon:'💛'},
+    var ROLES = [
+        {key:'all',label:'\u0412\u0441\u0435',icon:'\uD83C\uDF0D'},
+        {key:'adc',label:'ADC',icon:'\uD83C\uDFF9'},
+        {key:'mid',label:'\u041c\u0438\u0434',icon:'\u26A1'},
+        {key:'top',label:'\u0422\u043e\u043f',icon:'\uD83D\uDEE1'},
+        {key:'jungle',label:'\u041b\u0435\u0441',icon:'\uD83C\uDF3F'},
+        {key:'sup',label:'\u0421\u0430\u043f',icon:'\uD83D\uDC9B'}
     ];
-    // Tier data: fill with champion keys (DataDragon names) when ready
-    // Format: { all: {S:[...], A:[...], B:[...], C:[]}, adc: {...}, ... }
-    const TIER_DATA = {
-        all:    { S:[], A:[], B:[], C:[] },
-        adc:    { S:[], A:[], B:[], C:[] },
-        mid:    { S:[], A:[], B:[], C:[] },
-        top:    { S:[], A:[], B:[], C:[] },
-        jungle: { S:[], A:[], B:[], C:[] },
-        sup:    { S:[], A:[], B:[], C:[] },
-    };
-    let _tierRole = 'all';
-    let _tierType = 'champs'; // 'champs', 'items', 'runes'
-
-    function buildTierlistTabs() {
-        const tabsEl = document.getElementById('tierlistTabs');
-        if(!tabsEl) return;
-        if(_tierType !== 'champs') { tabsEl.innerHTML = ''; return; }
-        tabsEl.innerHTML = '';
-        ROLES.forEach(r => {
-            const b = document.createElement('button');
-            b.style.cssText = 'padding:7px 13px;border-radius:20px;border:1.5px solid rgba(155,89,182,'+(r.key===_tierRole?'0.8':'0.25')+');background:rgba(109,63,245,'+(r.key===_tierRole?'0.35':'0.08')+');color:'+(r.key===_tierRole?'#fff':'rgba(255,255,255,0.55)')+';font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;display:flex;gap:5px;align-items:center;';
-            b.innerHTML = r.icon + ' ' + r.label;
-            b.onclick = () => { _tierRole = r.key; buildTierlistTabs(); renderTierlist(); };
-            tabsEl.appendChild(b);
-        });
-    }
-
-    function renderTierlist() {
-        const el = document.getElementById('tierlistContent');
-        if(!el) return;
-        if(_tierType !== 'champs') {
-            el.innerHTML = '<div style="text-align:center;padding:40px 20px;color:rgba(255,255,255,0.3);"><div style="font-size:40px;margin-bottom:12px;">📋</div><div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);">Скоро будет!</div><div style="font-size:11px;margin-top:8px;">Скинь скриншот тир-листа — я добавлю данные.</div></div>';
-            return;
-        }
-        const data = TIER_DATA[_tierRole] || TIER_DATA.all;
-        const tiers = [{key:'S',color:'#C43A3A'},{key:'A',color:'#C46A1C'},{key:'B',color:'#BC9800'},{key:'C',color:'#1E8848'}];
-        const DD = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
-        el.innerHTML = '';
-        tiers.forEach(t => {
-            const row = document.createElement('div');
-            row.className = 'tierlist-row';
-            const lbl = document.createElement('div');
-            lbl.className = 'tierlist-label tier-' + t.key;
-            lbl.style.background = 'linear-gradient(135deg,' + t.color + 'cc,' + t.color + '88)';
-            lbl.textContent = t.key;
-            const champDiv = document.createElement('div');
-            champDiv.className = 'tierlist-champs';
-            (data[t.key] || []).forEach(name => {
-                const img = document.createElement('img');
-                img.className = 'tierlist-champ-icon';
-                img.src = DD + name + '.png';
-                img.alt = img.title = name;
-                img.onerror = function(){ this.style.display='none'; };
-                champDiv.appendChild(img);
-            });
-            if(!(data[t.key]||[]).length) {
-                const ph = document.createElement('span');
-                ph.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.2);padding:4px;';
-                ph.textContent = '—';
-                champDiv.appendChild(ph);
-            }
-            row.appendChild(lbl); row.appendChild(champDiv);
-            el.appendChild(row);
-        });
-    }
-
     window.openTierlist = function(type) {
-        closeAllModals();
-        _tierType = type;
-        document.getElementById('tierlistTitle').textContent = {champs:'🏆 Тир-лист чемпионов',items:'⚙ Тир-лист предметов',runes:'✨ Тир-лист рун'}[type] || 'Тир-лист';
+        _tierType = type||'champs';
+        var titles={champs:'\uD83C\uDFC6 \u0422\u0438\u0440-\u043b\u0438\u0441\u0442 \u0447\u0435\u043c\u043f\u0438\u043e\u043d\u043e\u0432',
+                    items:'\u2699 \u0422\u0438\u0440-\u043b\u0438\u0441\u0442 \u043f\u0440\u0435\u0434\u043c\u0435\u0442\u043e\u0432',
+                    runes:'\u2728 \u0422\u0438\u0440-\u043b\u0438\u0441\u0442 \u0440\u0443\u043d'};
+        var t=document.getElementById('tierlistTitle');
+        if(t) t.textContent=titles[_tierType]||'\u0422\u0438\u0440-\u043b\u0438\u0441\u0442';
         openModal('tierlistMask');
         buildTierlistTabs();
         renderTierlist();
     };
+    window.closeTierlist = function() { closeModal('tierlistMask'); };
+    function buildTierlistTabs() {
+        var el=document.getElementById('tierlistTabs'); if(!el) return;
+        if(_tierType!=='champs'){el.innerHTML='';return;}
+        el.innerHTML='';
+        ROLES.forEach(function(r) {
+            var b=document.createElement('button');
+            var active=r.key===_tierRole;
+            b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid rgba(155,89,182,'+(active?'0.8':'0.25')+');background:rgba(109,63,245,'+(active?'0.35':'0.08')+');color:'+(active?'#fff':'rgba(255,255,255,0.55)')+';font-size:12px;font-weight:700;cursor:pointer;';
+            b.textContent=r.icon+' '+r.label;
+            b.onclick=function(){_tierRole=r.key;buildTierlistTabs();renderTierlist();};
+            el.appendChild(b);
+        });
+    }
+    function renderTierlist() {
+        var el=document.getElementById('tierlistContent'); if(!el) return;
+        if(_tierType!=='champs'){
+            el.innerHTML='<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);"><div style="font-size:40px;margin-bottom:12px;">\uD83D\uDCCB</div><div style="font-size:14px;font-weight:700;">\u0421\u043a\u043e\u0440\u043e \u0431\u0443\u0434\u0435\u0442!</div></div>';
+            return;
+        }
+        var data=TIER_DATA[_tierRole]||TIER_DATA.all;
+        var tiers=[{k:'S',c:'#C43A3A'},{k:'A',c:'#C46A1C'},{k:'B',c:'#BC9800'},{k:'C',c:'#1E8848'}];
+        var DD='https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
+        el.innerHTML='';
+        tiers.forEach(function(t) {
+            var row=document.createElement('div'); row.className='tierlist-row';
+            var lbl=document.createElement('div'); lbl.className='tierlist-label tier-'+t.k;
+            lbl.style.background='linear-gradient(135deg,'+t.c+'cc,'+t.c+'88)'; lbl.textContent=t.k;
+            var cd=document.createElement('div'); cd.className='tierlist-champs';
+            (data[t.k]||[]).forEach(function(name){
+                var img=document.createElement('img');
+                img.className='tierlist-champ-icon'; img.src=DD+name+'.png'; img.alt=img.title=name;
+                img.onerror=function(){this.style.display='none';}; cd.appendChild(img);
+            });
+            if(!(data[t.k]||[]).length){var ph=document.createElement('span');ph.style.cssText='font-size:11px;color:rgba(255,255,255,0.2);padding:4px;';ph.textContent='--';cd.appendChild(ph);}
+            row.appendChild(lbl);row.appendChild(cd);el.appendChild(row);
+        });
+    }
 
-
-    // ══ SIDE CHAMPIONS MODAL ══
-    const SC_ROLES = [
-        {key:'all', label:'Все', icon:'🌍'},
-        {key:'ADC', label:'ADC', icon:'🏹'},
-        {key:'Mid', label:'Мид', icon:'⚡'},
-        {key:'Top', label:'Топ', icon:'🛡'},
-        {key:'Jungle', label:'Лес', icon:'🌿'},
-        {key:'Support', label:'Сап', icon:'💛'},
-    ];
-    let _scRole = 'all';
-
+    // SIDE CHAMPIONS
+    var SC_ROLES=[{key:'all',label:'\u0412\u0441\u0435'},{key:'ADC',label:'ADC'},{key:'Mid',label:'\u041c\u0438\u0434'},{key:'Top',label:'\u0422\u043e\u043f'},{key:'Jungle',label:'\u041b\u0435\u0441'},{key:'Support',label:'\u0421\u0430\u043f'}];
+    var _scRole='all';
     window.openSideChamps = function() {
         openModal('sideChampsMask');
-        // Build role tabs once
-        const rf = document.getElementById('scRoleFilter');
-        if(rf && !rf.children.length) {
-            SC_ROLES.forEach(r => {
-                const b = document.createElement('button');
-                b.style.cssText = 'padding:6px 12px;border-radius:18px;border:1.5px solid rgba(155,89,182,0.3);background:rgba(109,63,245,0.08);color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;';
-                b.textContent = r.icon + ' ' + r.label;
-                b.dataset.key = r.key;
-                b.onclick = () => { _scRole = r.key; scHighlightRole(); scFilter(); };
+        var rf=document.getElementById('scRoleFilter');
+        if(rf&&!rf.children.length){
+            SC_ROLES.forEach(function(r){
+                var b=document.createElement('button');
+                b.style.cssText='padding:6px 12px;border-radius:18px;border:1.5px solid rgba(155,89,182,0.3);background:rgba(109,63,245,0.08);color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:4px;';
+                b.textContent=r.label; b.dataset.key=r.key;
+                b.onclick=function(){_scRole=r.key;scHighlightRole();scBuildGrid();};
                 rf.appendChild(b);
             });
         }
-        scHighlightRole();
-        scBuildGrid();
+        scHighlightRole(); scBuildGrid();
     };
-
-    function scHighlightRole() {
-        const rf = document.getElementById('scRoleFilter');
-        if(!rf) return;
-        Array.from(rf.children).forEach(b => {
-            const active = b.dataset.key === _scRole;
-            b.style.borderColor = active ? '#b96fff' : 'rgba(155,89,182,0.3)';
-            b.style.background = active ? 'rgba(109,63,245,0.35)' : 'rgba(109,63,245,0.08)';
-            b.style.color = active ? '#fff' : 'rgba(255,255,255,0.6)';
+    function scHighlightRole(){
+        var rf=document.getElementById('scRoleFilter'); if(!rf) return;
+        Array.from(rf.children).forEach(function(b){
+            var a=b.dataset.key===_scRole;
+            b.style.borderColor=a?'#b96fff':'rgba(155,89,182,0.3)';
+            b.style.background=a?'rgba(109,63,245,0.35)':'rgba(109,63,245,0.08)';
+            b.style.color=a?'#fff':'rgba(255,255,255,0.6)';
         });
     }
-
-    function scBuildGrid() {
-        const grid = document.getElementById('scGrid');
-        if(!grid || !raw.length) return;
-        const q = (document.getElementById('scSearch')?.value || '').toLowerCase();
-        const filtered = raw.filter(c => {
-            if(q && !c.name.toLowerCase().includes(q)) return false;
-            if(_scRole !== 'all' && !c.is[_scRole]) return false;
+    function scBuildGrid(){
+        var grid=document.getElementById('scGrid'); if(!grid||!raw.length) return;
+        var q=((document.getElementById('scSearch')||{}).value||'').toLowerCase();
+        var filtered=raw.filter(function(c){
+            if(q&&!c.name.toLowerCase().includes(q)) return false;
+            if(_scRole!=='all'&&!c.is[_scRole]) return false;
             return true;
         });
-        grid.innerHTML = '';
-        const DD = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
-        filtered.forEach(ch => {
-            const div = document.createElement('div');
-            div.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px;border-radius:10px;border:2px solid transparent;transition:all 0.15s;';
-            div.onmouseenter = () => { div.style.borderColor = '#b96fff'; div.style.background = 'rgba(109,63,245,0.2)'; };
-            div.onmouseleave = () => { div.style.borderColor = 'transparent'; div.style.background = ''; };
-            const img = document.createElement('img');
-            img.src = DD + champKey(ch.name) + '.png';
-            img.style.cssText = 'width:54px;height:54px;border-radius:10px;object-fit:cover;';
-            img.onerror = function(){ this.src=''; this.style.background='rgba(109,63,245,0.3)'; };
-            img.title = ch.name;
-            const lbl = document.createElement('div');
-            lbl.style.cssText = 'font-size:9px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.2;max-width:60px;word-break:break-word;';
-            lbl.textContent = ch.name;
-            div.appendChild(img);
-            div.appendChild(lbl);
-            div.onclick = () => openChampDetail(ch.name);
+        grid.innerHTML='';
+        var DD='https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
+        filtered.forEach(function(ch){
+            var div=document.createElement('div');
+            div.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px;border-radius:10px;border:2px solid transparent;transition:all 0.15s;';
+            div.onmouseenter=function(){div.style.borderColor='#b96fff';div.style.background='rgba(109,63,245,0.2)';};
+            div.onmouseleave=function(){div.style.borderColor='transparent';div.style.background='';};
+            var img=document.createElement('img');
+            img.src=DD+champKey(ch.name)+'.png';
+            img.style.cssText='width:54px;height:54px;border-radius:10px;object-fit:cover;';
+            img.onerror=function(){this.src='';this.style.background='rgba(109,63,245,0.3)';};
+            var lbl=document.createElement('div');
+            lbl.style.cssText='font-size:9px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.2;max-width:60px;';
+            lbl.textContent=ch.name;
+            div.appendChild(img); div.appendChild(lbl);
+            div.onclick=function(){openChampDetail(ch.name);};
             grid.appendChild(div);
         });
-        if(!filtered.length) {
-            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:rgba(255,255,255,0.3);font-size:13px;">Ничего не найдено</div>';
-        }
+        if(!filtered.length) grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:rgba(255,255,255,0.3);">\u041d\u0438\u0447\u0435\u0433\u043e \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e</div>';
     }
-
-    window.scFilter = function() { scBuildGrid(); };
-
-    window.closeSideChamps = function() {
-        closeModal('sideChampsMask');
-    };
-
-    window.openChampDetail = function(name) {
-        const el = document.getElementById('champDetailContent');
-        const DD = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
-        el.innerHTML = '';
-        const ci = document.createElement('img');
-        ci.src = DD + champKey(name) + '.png';
-        ci.style.cssText = 'width:80px;height:80px;border-radius:14px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;';
-        ci.onerror = function(){ this.style.display='none'; };
+    window.scFilter=function(){scBuildGrid();};
+    window.closeSideChamps=function(){closeModal('sideChampsMask');};
+    window.openChampDetail=function(name){
+        var el=document.getElementById('champDetailContent');
+        var DD='https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
+        el.innerHTML='';
+        var ci=document.createElement('img');
+        ci.src=DD+champKey(name)+'.png';
+        ci.style.cssText='width:80px;height:80px;border-radius:14px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;';
+        ci.onerror=function(){this.style.display='none';};
         el.appendChild(ci);
-        const cn = document.createElement('div');
-        cn.style.cssText = 'font-size:20px;font-weight:900;color:#b96fff;margin-bottom:6px;';
-        cn.textContent = name;
-        el.appendChild(cn);
-        const cs = document.createElement('div');
-        cs.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.3);margin-top:10px;';
-        cs.textContent = 'Подробная информация появится скоро';
+        var cn=document.createElement('div');
+        cn.style.cssText='font-size:20px;font-weight:900;color:#b96fff;margin-bottom:6px;';
+        cn.textContent=name; el.appendChild(cn);
+        var cs=document.createElement('div');
+        cs.style.cssText='font-size:11px;color:rgba(255,255,255,0.3);margin-top:10px;';
+        cs.textContent='\u041f\u043e\u0434\u0440\u043e\u0431\u043d\u0430\u044f \u0438\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f \u0441\u043a\u043e\u0440\u043e';
         el.appendChild(cs);
         openModal('champDetailMask');
     };
+    window.closeChampDetail=function(){closeModal('champDetailMask');};
 
-    window.closeChampDetail = function() {
-        closeModal('champDetailMask');
-    };
-    // BotRK Drain: 30 at lvl1 → 100 at lvl15
-    function botrkDrainDmg(lvl) { return Math.round(30 + (100-30)*(lvl-1)/14); }
-
-
-
-    // ══ ITEM SUB-MODAL CALC (WR-accurate) ══
-    let _currentItemKey = null;
-
-    const ITEM_DEFS = {
-        thornmail: {
-            name: '🛡 Шипованный доспех',
-            formula: 'Шипы: 20 + 6% бонусной брони + 2% бонусного HP → маг. урон/удар',
-            myFields: [
-                {id:'itMyHp', label:'Мой HP (всего)', ph:'2000'},
-                {id:'itMyArmor', label:'Моя броня (всего)', ph:'120'},
-            ],
-            enemyFields: [
-                {id:'itEnemyMR', label:'Маг. резист врага', ph:'60'},
-            ],
-            calc(f) {
-                const bonusArmor = Math.max(0, f.itMyArmor - 30);
-                const bonusHp    = Math.max(0, f.itMyHp - 600);
-                const raw  = 20 + 0.06*bonusArmor + 0.02*bonusHp;
-                const fin  = raw * 100 / (100 + Math.max(0, f.itEnemyMR));
-                return {
-                    val: Math.round(fin),
-                    formula: '20 + 6%×' + Math.round(bonusArmor) + 'бон.брони + 2%×' + Math.round(bonusHp) + 'бон.HP = ' + Math.round(raw) + ' → после МС: ' + Math.round(fin)
-                };
-            }
-        },
-        botrk: {
-            name: '⚔ Клинок короля-разрушителя',
-            formula: 'Смертоносные удары: ближний 10% / дальний 8.5% тек. HP. Мин. 15.',
-            myFields: [],
-            enemyFields: [
-                {id:'itECurHp', label:'Тек. HP врага', ph:'2500'},
-                {id:'itEArmor', label:'Броня врага', ph:'80'},
-            ],
-            calc(f) {
-                const pct = _calcRange === 'ranged' ? 0.085 : 0.10;
-                const raw = Math.max(15, f.itECurHp * pct);
-                const effArmor = Math.max(0, f.itEArmor * (1 - (_calcLvl > 0 ? 0 : 0)));
-                const fin = raw * 100 / (100 + effArmor);
-                const type = _calcRange === 'ranged' ? 'дальний 8.5%' : 'ближний 10%';
-                return {
-                    val: Math.round(fin),
-                    formula: type + ' × ' + f.itECurHp + ' = ' + Math.round(raw) + ' → после ' + f.itEArmor + ' брони: ' + Math.round(fin)
-                };
-            }
-        },
-        sunfire: {
-            name: '🔥 Эгида Солнечного огня',
-            formula: 'Самовозгорание: 16-25 + 0.8% бонусного HP/с. Макс стаки ×1.44.',
-            myFields: [
-                {id:'itMyHpSF', label:'Мой HP (всего)', ph:'2500'},
-            ],
-            enemyFields: [
-                {id:'itEMR_SF', label:'МС врага', ph:'50'},
-            ],
-            calc(f) {
-                const bonusHp = Math.max(0, f.itMyHpSF - 600);
-                const base = 20.5 + 0.008 * bonusHp;
-                const stacked = base * 1.44;
-                const mit = 100 / (100 + Math.max(0, f.itEMR_SF));
-                return {
-                    val: Math.round(base*mit) + '/с → ' + Math.round(stacked*mit) + '/с',
-                    formula: '20.5 + 0.8%×' + Math.round(bonusHp) + 'бон.HP = ' + Math.round(base) + '/с. Стаки ×1.44 = ' + Math.round(stacked) + '/с. После МС: ×' + mit.toFixed(2)
-                };
-            }
-        },
-        liandry: {
-            name: '🔥 Мучения Лиандри',
-            formula: 'Мучения: 0.5% макс. HP/с за 3с на каждую способность.',
-            myFields: [],
-            enemyFields: [
-                {id:'itEHpMax_L', label:'Макс. HP врага', ph:'3000'},
-                {id:'itEMR_L', label:'МС врага', ph:'50'},
-            ],
-            calc(f) {
-                const rawSec = f.itEHpMax_L * 0.005;
-                const rawTot = rawSec * 3;
-                const mit = 100 / (100 + Math.max(0, f.itEMR_L));
-                return {
-                    val: Math.round(rawSec*mit) + '/с → ' + Math.round(rawTot*mit) + ' за 3с',
-                    formula: '0.5% × ' + f.itEHpMax_L + ' = ' + Math.round(rawSec) + '/с. За 3с: ' + Math.round(rawTot) + '. После МС: ' + Math.round(rawTot*mit)
-                };
-            }
-        },
-        sunderer: {
-            name: '⚔ Божественный раздробитель',
-            formula: 'Чародейский удар: ближний 12% / дальний 9% макс. HP врага (физ.).',
-            myFields: [],
-            enemyFields: [
-                {id:'itEHpMax_S', label:'Макс. HP врага', ph:'3000'},
-                {id:'itEArmor_S', label:'Броня/МС врага', ph:'80'},
-            ],
-            calc(f) {
-                const pct = _calcRange === 'ranged' ? 0.09 : 0.12;
-                const raw = f.itEHpMax_S * pct;
-                const pen = parseFloat(document.getElementById('cPen')?.value) || 0;
-                const effArmor = Math.max(0, f.itEArmor_S * (1 - pen/100));
-                const fin = raw * 100 / (100 + effArmor);
-                const type = _calcRange === 'ranged' ? 'дальний 9%' : 'ближний 12%';
-                return {
-                    val: Math.round(fin),
-                    formula: type + ' × ' + f.itEHpMax_S + ' = ' + Math.round(raw) + ' → после ' + Math.round(effArmor) + ' брони: ' + Math.round(fin)
-                };
-            }
-        },
-        sunderer: {
-            name: '⚔ Раздробитель (Ближн. 12% / Дальн. 9%)',
-            formula: 'Чародейский удар: [12%/9%] макс. HP врага физ. после способности',
-            myFields: [],
-            enemyFields: [
-                {id:'itEHpMax_S', label:'Макс. HP врага', ph:'3000'},
-                {id:'itEArmor_S', label:'Броня/МС врага', ph:'80'},
-            ],
-            calc(f) {
-                const pct = _calcRange === 'melee' ? 0.12 : 0.09;
-                const pen = parseFloat(document.getElementById('cPen')?.value)||0;
-                const raw = f.itEHpMax_S * pct;
-                const ea = Math.max(0, f.itEArmor_S*(1-pen/100));
-                const fin = raw * 100/(100+ea);
-                const t = _calcRange==='melee' ? 'ближн. 12%' : 'дальн. 9%';
-                return {val:Math.round(fin), formula:t+' × '+f.itEHpMax_S+' = '+Math.round(raw)+' → после '+Math.round(ea)+' брони: '+Math.round(fin)};
-            }
-        },
-        duskblade: {
-            name: '🗡 Сумеречный клинок (ур. 1→60 / ур. 15→160)',
-            formula: 'Ночной охотник: первая атака = 60-160 физ. (по уровню WR)',
-            myFields: [],
-            enemyFields: [
-                {id:'itEArmor_D', label:'Броня/МС врага', ph:'80'},
-            ],
-            calc(f) {
-                const raw = Math.round(60+(160-60)*(_calcLvl-1)/14);
-                const pen = parseFloat(document.getElementById('cPen')?.value)||0;
-                const ea = Math.max(0, f.itEArmor_D*(1-pen/100));
-                const fin = raw*100/(100+ea);
-                return {val:Math.round(fin), formula:'Ур. '+_calcLvl+': '+raw+' физ. → после '+Math.round(ea)+' брони: '+Math.round(fin)};
-            }
-        },
-        ludens: {
-            name: '🔮 Эхо Лудена (ур. 1→60 / ур. 15→160)',
-            formula: 'Эхо: 60-160 маг. по цели + 4 рядом (по уровню WR)',
-            myFields: [],
-            enemyFields: [
-                {id:'itEMR_Lu', label:'МС врага', ph:'50'},
-            ],
-            calc(f) {
-                const raw = Math.round(60+(160-60)*(_calcLvl-1)/14);
-                const fin = raw*100/(100+Math.max(0,f.itEMR_Lu));
-                return {val:Math.round(fin)+' (×5)',formula:'Ур. '+_calcLvl+': '+raw+' маг. → после '+f.itEMR_Lu+' МС: '+Math.round(fin)+'. Всего ×5 целей: '+Math.round(fin*5)};
-            }
-        }};
-
-    window.openItemCalc = function(key) {
-        const def = ITEM_DEFS[key];
-        if(!def) return;
-        _currentItemKey = key;
-        document.getElementById('itemSubTitle').textContent = def.name;
-        const makeField = (f) => '<div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">' + f.label + '</label><input type="number" id="' + f.id + '" placeholder="' + f.ph + '" class="calc-input" style="padding:8px;" oninput="runItemCalc()"></div>';
-        const myDiv = document.getElementById('itemSubMyFields');
-        myDiv.innerHTML = def.myFields.length ? def.myFields.map(makeField).join('') : '<div style="color:rgba(255,255,255,0.3);font-size:11px;padding:8px 0;">—</div>';
-        const enDiv = document.getElementById('itemSubEnemyFields');
-        enDiv.innerHTML = def.enemyFields.map(makeField).join('');
-        document.getElementById('itemSubResult').style.display = 'none';
-        document.getElementById('itemSubModal').classList.add('active');
-        document.body.classList.add('modal-open');
-        document.querySelectorAll('.calc-item-btn').forEach(b => b.classList.remove('active'));
-        const bMap = {none:'itemNone',thornmail:'itemThornmail',botrk:'itemBotrk',sunfire:'itemSunfire',liandry:'itemLiandry',sunderer:'itemDivSunderer'};
-        document.getElementById(bMap[key])?.classList.add('active');
-    };
-
-    window.runItemCalc = function() {
-        const def = ITEM_DEFS[_currentItemKey];
-        if(!def) return;
-        const vals = {};
-        [...def.myFields,...def.enemyFields].forEach(f => {
-            vals[f.id] = parseFloat(document.getElementById(f.id)?.value) || 0;
+    // Sidebar support tooltip
+    (function(){
+        var btn=document.getElementById('sideSupport'); if(!btn) return;
+        var tip=null;
+        btn.addEventListener('mouseenter',function(){
+            tip=document.createElement('div');
+            tip.style.cssText='position:fixed;z-index:99999;background:rgba(10,3,20,0.97);border:1px solid rgba(185,111,255,0.6);color:rgba(255,255,255,0.9);font-size:12px;line-height:1.6;padding:12px 14px;border-radius:10px;max-width:260px;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.6);';
+            tip.textContent=btn.getAttribute('title')||'';
+            document.body.appendChild(tip);
+            var r=btn.getBoundingClientRect();
+            tip.style.left=(r.right+10)+'px';
+            tip.style.top=Math.max(10,r.top)+'px';
         });
-        if(!Object.values(vals).some(v => v > 0)) { document.getElementById('itemSubResult').style.display='none'; return; }
-        const result = def.calc(vals);
-        document.getElementById('itemSubResultLabel').textContent = def.formula;
-        document.getElementById('itemSubResultVal').textContent = String(result.val);
-        document.getElementById('itemSubFormula').textContent = result.formula;
-        document.getElementById('itemSubResult').style.display = 'block';
-    };
+        btn.addEventListener('mouseleave',function(){if(tip){tip.remove();tip=null;}});
+    })();
 
-    window.closeItemCalc = function() {
-        closeModal('itemSubModal');
-        _currentItemKey = null;
-        document.querySelectorAll('.calc-item-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('itemNone')?.classList.add('active');
-        if(!document.querySelector('.m-mask.active')) document.body.classList.remove('modal-open');
-    };
 
-    
-    // ══ CLOSE ALL MODALS (only one at a time) ══
-    // ══ MODAL MANAGER: only one modal open at a time ══
+}
 
-        window.toggleSidebar = function() {
-        const panel = document.getElementById('sidePanel');
-        const overlay = document.getElementById('sideOverlay');
-        const isOpen = panel.classList.contains('open');
-        panel.classList.toggle('open', !isOpen);
-        overlay.classList.toggle('open', !isOpen);
-        document.body.classList.toggle('sidebar-open', !isOpen);
-        document.body.style.overflow = isOpen ? '' : 'hidden';
-    };
-    window.closeSidebar = function() {
-        document.getElementById('sidePanel')?.classList.remove('open');
-        document.getElementById('sideOverlay')?.classList.remove('open');
-        document.body.classList.remove('sidebar-open');
-        document.body.style.overflow = '';
-    };
-
-            start();
 })();
 </script>
 
@@ -3685,36 +3405,82 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
     <button class="btn-close-x" onclick="closeItems()">✕</button>
     <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;">📦 Предметы Wild Rift</div>
     <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Наведи — появится полное описание</div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">⚔ Физические</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">⚔ Физические</div>
     <div class="items-grid">
-      <div class="item-card" data-tip="Жаждущий клинок¦3000 г¦+55 AD  |  +250 HP  |  +25% Крит¦Кровожадность: +8% Физ. Вамп. Криты: +4% доп. Физ. Вамп. \nЩит жизни: при HP<30% получаешь щит силой 200-630 HP."><img src="https://www.wildriftfire.com/images/items/bloodthirster.png" alt="Жаждущий клинок" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Клинок короля-разрушителя¦3000 г¦+25 AD  |  +35% AS  |  +10% Омни Вамп¦Жажда: +10% Омни Вамп.\nСмертоносные удары: атаки наносят 8,5% (ближ. 10%) текущего HP цели физ. урона за удар. Минимум 15. По монстрам: макс. 60.\nИстощение: 3-й удар/способность наносит 30-100 маг. урона и крадёт 25% скорости на 2с. (60с КД)"><img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" alt="Клинок короля-разрушителя" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Ангел-хранитель¦3400 г¦+40 AD  |  +40 Брони¦Воскрешение: при смерти восстанавливает 50% HP и 30% Маны через 4с стазиса. (210с КД)"><img src="https://www.wildriftfire.com/images/items/guardian-angel.png" alt="Ангел-хранитель" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Грань бесконечности¦3400 г¦+60 AD  |  +25% Крит¦Бесконечность: Критические удары наносят 205% урона вместо 175%.\nПредел: если суммарный Крит от предметов >100%, каждый 1% сверх 100% даёт +0,6 Урона крита."><img src="https://www.wildriftfire.com/images/items/infinity-edge.png" alt="Грань бесконечности" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Ураган Рунаана¦2900 г¦+35% AS  |  +25% Крит¦Ярость ветра: атаки поражают 2 доп. ближайших цели, нанося 55% AD. Могут критовать и применять эффекты на удар.\nВетряное лезвие: атаки наносят +15 доп. физ. урона за удар.\nТолько для дальнобойных чемпионов."><img src="https://www.wildriftfire.com/images/items/runaans-hurricane.png" alt="Ураган Рунаана" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Призрачный клинок Юму¦3000 г¦+55 AD  |  +15 Уск. Ум.  |  +15 Проб. Брони¦Фрагмент: +15 Пробивания Брони.\nИмпульс: движение накапливает до +50 Скорости (100 зарядов). Атака сбрасывает все заряды. Заряды убывают при КК.\nПризрачный раж: атака при максимальном импульсе даёт +25% AS на 4с."><img src="https://www.wildriftfire.com/images/items/youmuus-ghostblade.png" alt="Призрачный клинок Юму" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Сумеречный клинок Дракхарра¦3000 г¦+55 AD  |  +10 Уск. Ум.  |  +18 Проб. Брони¦Бритва: +18 Пробивания Брони.\nНочной охотник: первая атака по чемпиону наносит 60-160 доп. физ. урона и замедляет на 99% 0,35с. Убийство сбрасывает КД. (10с КД)"><img src="https://www.wildriftfire.com/images/items/duskblade-of-draktharr.png" alt="Сумеречный клинок Дракхарра" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Смертное напоминание¦3300 г¦+25 AD  |  +25% Крит  |  +15% AS¦Последний шёпот: +30% Пробивания Брони. Критические атаки дают доп. +6% Пробивания.\nСепсис: физ. урон по чемпионам применяет 50% Тяжкие раны на 3с. Тяжкие раны снижают эффект Исцеления и Регенерации."><img src="https://www.wildriftfire.com/images/items/mortal-reminder.png" alt="Смертное напоминание" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Чёрный тесак¦3000 г¦+400 HP  |  +40 AD  |  +20 Уск. Ум.¦Разрыв: физ. урон по чемпионам снижает их Броню на 6% за стак на 6с. Макс. 4 стака (24%). Стаки не стакируются.\nЯрость: +20 Скорости при нанесении физ. урона. +40 Скорости при движении к чемпиону с 4 стаками. Дальние: половина значений."><img src="https://www.wildriftfire.com/images/items/black-cleaver.png" alt="Чёрный тесак" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Манамуне¦2700 г¦+25 AD  |  +300 Маны  |  +20 Уск. Ум.¦Благоговение: +1,5% AD от макс. Маны. Возвращает 15% потраченной Маны.\nЗаряд маны: +18 Маны за атаку или трату Маны. Макс. 700 бонусной Маны. Превращается в Мурамана. Срабатывает до 3 раз за 10с. Только 1 предмет Слезы Богини."><img src="https://www.wildriftfire.com/images/items/manamune.png" alt="Манамуне" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Мурамана¦2700 г¦+25 AD  |  +1000 Маны  |  +20 Уск. Ум.¦Благоговение: +2% AD от макс. Маны. Возвращает 15% потраченной Маны.\nШок: атаки тратят 2,5% текущей Маны и наносят столько же физ. урона. Способности тратят 4% Маны и наносят это + 6% AD физ. урона. Срабатывает только при Мане >20%. Одна атака/способность — одно срабатывание."><img src="https://www.wildriftfire.com/images/items/muramana.png" alt="Мурамана" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Сила Тринити¦3333 г¦+250 HP  |  +30 AD  |  +30% AS  |  +25 Уск. Ум.¦Фервор: +5% Скорость.\nЧародейский удар: способность заряжает следующую атаку на 200% базового AD доп. физ. урона (1,5с КД). Снижен по строениям.\nДоблесть: атаки дают +20 Скорости, убийства +60 Скорости на 2с. Не стакируются. Дальние: половина значений."><img src="https://www.wildriftfire.com/images/items/trinity-force.png" alt="Сила Тринити" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Пасть Мальмортиуса¦3000 г¦+55 AD  |  +45 МС  |  +10 Уск. Ум.¦Линия жизни: маг. урон, снижающий HP ниже 35%, даёт +10% Омни Вамп до конца боя и маг. щит 220-530 HP на 5с. (60с КД между боями)"><img src="https://www.wildriftfire.com/images/items/maw-of-malmortius.png" alt="Пасть Мальмортиуса" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Обида Серильды¦3200 г¦+45 AD  |  +20 Уск. Ум.  |  +33% Проб. Брони¦Горькая стужа: +33% Пробивания Брони.\nЛедяной холод: способности замедляют врагов на 30% на 1с."><img src="https://www.wildriftfire.com/images/items/seryldas-grudge.png" alt="Обида Серильды" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Танец смерти¦3000 г¦+50 AD  |  +15 Уск. Ум.  |  +15 Брони¦Невосприимчивость: 30% полученного физ. урона превращается в кровотечение (наносится за 3с). Ближние: 30% всего урона.\nВоля: убийство снимает всё кровотечение."><img src="https://www.wildriftfire.com/images/items/deaths-dance.png" alt="Танец смерти" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Копьё Шоджина¦3000 г¦+40 AD  |  +400 HP  |  +20 Уск. Ум.¦Рвение: нанесение базового AD физ. урона чемпиону снижает КД способностей на 12%."><img src="https://www.wildriftfire.com/images/items/spear-of-shojin.png" alt="Копьё Шоджина" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Затмение¦3200 г¦+55 AD  |  +20 Уск. Ум.  |  +10% Проб. Брони¦Блестящее затмение: два удара по чемпиону за 1,5с дают щит 50-150 HP на 2с + движение сквозь юнитов 2с. (6с КД)"><img src="https://www.wildriftfire.com/images/items/eclipse.png" alt="Затмение" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Грань ночи¦3000 г¦+55 AD  |  +10 Уск. Ум.  |  +18 Проб. Брони¦Ночное лезвие: канализация 1,25с у строения или за пределами боя даёт щит от заклинаний. (25с КД, сброс на убийстве)"><img src="https://www.wildriftfire.com/images/items/edge-of-night.png" alt="Грань ночи" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Быстрые клинки Навори¦3000 г¦+65 AD  |  +20 Уск. Ум.  |  +20% Крит¦Запредельность: критические атаки снижают КД способностей на 15% остатка. Требует ≥60% Крита для полного эффекта."><img src="https://www.wildriftfire.com/images/items/navori-quickblades.png" alt="Быстрые клинки Навори" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Порыв ветра¦3400 г¦+65 AD  |  +20 Уск. Ум.  |  +20% Крит¦Воздушный поток: +8% Скорости.\nОпустошение (актив): рывок + 3 снаряда по ближайшим врагам (100 физ. урона каждый). (90с КД)"><img src="https://www.wildriftfire.com/images/items/galeforce.png" alt="Порыв ветра" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Похититель сущности¦3000 г¦+45 AD  |  +20 Уск. Ум.  |  +25% Крит¦Чародейский удар: способность заряжает следующую атаку. Заряженная атака восстанавливает 3% макс. Маны. Иссушение: критические атаки восстанавливают доп. 1,5% макс. Маны."><img src="https://www.wildriftfire.com/images/items/essence-reaver.png" alt="Похититель сущности" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Магнитный взрыватель¦3000 г¦+25% Крит  |  +35% AS  |  +5% Скорость¦Фервор: +5% Скорости.\nЗаряженный: движение и атаки накапливают Заряженную атаку.\nСиловой удар: Заряженные атаки получают 100 дальности (50 для ближних), наносят 40-100 доп. маг. урона и дают +60 Скорости 0,75с. Рикошет по 5 врагам. Может критовать. (50-80% доп. урона по крипам)"><img src="https://www.wildriftfire.com/images/items/magnetic-blaster.png" alt="Магнитный взрыватель" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Химпанковая цепная пила¦2300 г¦+40 AD  |  +15 Уск. Ум.¦Жестокость: физ. урон по чемпионам с >50% HP применяет 25% Тяжкие раны 3с. При <50% HP: 50% Тяжкие раны 3с."><img src="https://www.wildriftfire.com/images/items/chempunk-chainsword.png" alt="Химпанковая цепная пила" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Клык змеи¦2600 г¦+55 AD  |  +18 Проб. Брони¦Отравленный клинок: атаки по щитам снижают щит на 50%. Все щиты на вражеских чемпионах в твоём присутствии ослаблены на 35%."><img src="https://www.wildriftfire.com/images/items/serpents-fang.png" alt="Клык змеи" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Титаническая гидра¦3000 г¦+600 HP  |  +30 AD  |  +10 Уск. Ум.¦Крушение: атаки наносят 1% макс. HP доп. физ. урона ближним врагам (+ 0,5% HP базового AD).\nРассечение (актив): атака с конусным уроном перед тобой. (10с КД)"><img src="https://www.wildriftfire.com/images/items/titanic-hydra.png" alt="Титаническая гидра" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Разрушитель корпуса¦3000 г¦+60 AD  |  +400 HP  |  +150% Реген HP¦Подавить: без ближайших союзников получаешь +20-60 доп. Брони/МС и наносишь +20% урона по строениям. Союзники в радиусе 900 ед. получают 60% бонусов к Броне/МС."><img src="https://www.wildriftfire.com/images/items/hullbreaker.png" alt="Разрушитель корпуса" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Чёрный тесак¦3000 г¦+40 Урон от атаки  |  +20 Ускорение способностей  |  +400 Здоровье¦Раскол: Нанесение физического урона вражескому чемпиону снижает броню на 6% в течение 6 секунд, эффект обновляется при последующих попаданиях и суммируется до 4 раз, снижая броню на 24%.
+Преследование: Базовые атаки при попадании дают (20/10) бонус к скорости передвижения на 2 секунды. Вы также получаете (40/20) бонус к скорости передвижения по врагам с максимальным количеством стаков «Раскола»."><img src="https://www.wildriftfire.com/images/items/black-cleaver.png" alt="Чёрный тесак" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Клинок Погибшего Короля¦3200 г¦+25 Урон от атаки  |  +35% Скорость атаки¦Жажда: +10% всестороннего вампиризма.
+Испорченные удары: Базовые атаки наносят дополнительный физический урон, равный (10%/7%) текущему здоровью цели, минимум 15, максимум 60 по монстрам.
+Истощение: Если нанести чемпиону 3 базовых удара или использовать способности за 2 секунды — он получит 30–100 (зависит от уровня) магического урона и замедлится на 25% на 2 секунды, а вы получите 25% бонуса к скорости передвижения на тот же период (перезарядка 60 секунд)."><img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" alt="Клинок Погибшего Короля" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Кровожадный¦3100 г¦+55 Урон от атаки  |  +25% Критический удар  |  +250 Здоровье¦Кровавый: +8% физического вампиризма. Критические удары получают 4% физического вампиризма."><img src="https://www.wildriftfire.com/images/items/bloodthirster.png" alt="Кровожадный" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Цепной меч в стиле хемпанк¦2800 г¦+45 Урон от атаки  |  +15 Ускорение способностей  |  +250 Здоровье¦Наказание: Нанесение физического урона вражеским чемпионам наносит 50% Тяжких ран на 3 секунды."><img src="https://www.wildriftfire.com/images/items/chempunk-chainsword.png" alt="Цепной меч в стиле хемпанк" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Танец смерти¦3000 г¦+35 Урон от атаки  |  +15 Ускорение способностей  |  +40 Броня¦Прижигание: (27%/12%) физического и магического урона от чемпионов превращается в чистый урон в течение 3 секунд (треть каждую секунду).
+Defy: Убийства чемпионов снимают весь накопленный урон от Прижигания и восстанавливают 10% от максимального здоровья за 2 секунды."><img src="https://www.wildriftfire.com/images/items/deaths-dance.png" alt="Танец смерти" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Божественный Разрушитель¦3400 г¦+25 Урон от атаки  |  +25 Ускорение способностей  |  +425 Здоровье¦Заклинатель: После способности следующая базовая атака за 10 секунд наносит доп. физ. урон, равный (10%/7%) макс. здоровья цели, минимум 125% базового AD, максимум по монстрам 225% базового AD (перезарядка 1,5 с). Против чемпионов восстанавливает (6%/2,5%) макс. здоровья цели, минимум (90%/50%) базового AD. Урон по строениям снижен на 50%."><img src="https://www.wildriftfire.com/images/items/divine-sunderer.png" alt="Божественный Разрушитель" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Сумеречный клинок Драктарра¦3000 г¦+55 Урон от атаки  |  +10 Ускорение способностей¦Бритва: +18 к пробиваемости брони.
+Ночной охотник: Следующая базовая атака по вражескому чемпиону наносит 60–160 (зависит от уровня) доп. физ. урона и замедляет на 99% на 0,35 секунды (перезарядка 10 секунд). Убийство чемпиона сбрасывает перезарядку."><img src="https://www.wildriftfire.com/images/items/duskblade-of-draktharr.png" alt="Сумеречный клинок Драктарра" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Затмение¦3000 г¦+65 Урон от атаки  |  +20 Ускорение способностей¦Вечная восходящая луна: При попадании по вражескому чемпиону накладывается стак на 1,8 секунды (не чаще 1 раза за атаку/способность на каждого чемпиона). При 2 стаках: наносит доп. физ. урон (6%/3%) макс. здоровья цели, даёт щит (140/70) + (35%/18%) бонусного AD на 2 секунды (перезарядка 6 секунд). Учитываются атаки, способности, предметы, КК и периодический урон."><img src="https://www.wildriftfire.com/images/items/eclipse.png" alt="Затмение" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Край ночи¦3150 г¦+50 Урон от атаки  |  +250 Здоровье¦Пробитие брони: +8 к бронепробиваемости.
+Аннулирование: Даёт магический щит, блокирующий следующую вражескую способность."><img src="https://www.wildriftfire.com/images/items/edge-of-night.png" alt="Край ночи" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Похититель Сущности¦3000 г¦+35 Урон от атаки  |  +20 Ускорение способностей  |  +25% Критический удар¦Заклинатель: Применение способностей генерирует заряд на 10 секунд (обновляется, макс. 3 стака, каждая уникальная способность раз в 2 секунды). Базовые атаки расходуют заряд: наносят 90% бонусного AD физ. урона и дают 40 скорости передвижения на 2 секунды. Урон зависит от критического удара.
+Поглощение маны: Базовые атаки восстанавливают 3% недостающей маны."><img src="https://www.wildriftfire.com/images/items/essence-reaver.png" alt="Похититель Сущности" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Экспериментальная Гексплатина¦3000 г¦+400 Здоровье  |  +35 Урон от атаки  |  +20% Скорость атаки¦Заряженный: Получите 20 единиц ускорения ультимативной способности.
+Перегрузка: После ультимативной способности получаете 40% (20% для дальнего боя) скорости атаки и 20% (10% для дальнего боя) скорости передвижения на 8 секунд (перезарядка 30 секунд)."><img src="https://www.wildriftfire.com/images/items/experimental-hexplate.png" alt="Экспериментальная Гексплатина" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Ангел-хранитель¦3400 г¦+40 Урон от атаки  |  +40 Броня¦Воскрешение: После получения смертельного урона переходите в состояние стазиса на 4 секунды (перезарядка 210 секунд). После этого восстанавливаете 50% от базового здоровья и 30% от максимального запаса маны."><img src="https://www.wildriftfire.com/images/items/guardian-angel.png" alt="Ангел-хранитель" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Клинок ярости Гинсу¦3100 г¦+30% Скорость атаки¦Всплеск: +5% к скорости передвижения.
+Хаос: Получите 25 Урона от атаки или 50 Силы умений (адаптивно).
+Гнев: Атаки наносят на 30% больше магического урона, но больше не являются критическими. За каждый 1% шанса крита от предметов — магический урон увеличивается на 1,5 (макс. +75 при 50% крита).
+Кипящий удар: Атаки дают 8% к скорости атаки (макс. 4 стака = 32%). При максимуме каждые 3 атаки дополнительно активируют эффекты при попадании."><img src="https://www.wildriftfire.com/images/items/guinsoos-rageblade.png" alt="Клинок ярости Гинсу" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Разрушитель корпуса¦3100 г¦+55 Урон от атаки  |  +325 Здоровье¦Отправляйтесь в плавание: +5% бонус к скорости передвижения.
+Шкипер: Базовые атаки генерируют до 4 зарядов, расходуемых на доп. физ. урон (40% для стрелков). По чемпионам/эпическим монстрам: 160% базового AD + 5% макс. здоровья. По башням: 240% базового AD + 9% макс. здоровья.
+Абордажная группа: Пока нет союзных чемпионов рядом — получаете (4–50/2–25) бонусной брони, (4–20/2–10) МС и наносите на 20% больше урона по башням. Ближайшие осадные и суперминьоны получают (40–170/20–80) брони, (20–85/10–40) МС, +10% размера и +200% урона по башням."><img src="https://www.wildriftfire.com/images/items/hullbreaker.png" alt="Разрушитель корпуса" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Бессмертный Щитовой Лук¦3000 г¦+40 Урон от атаки  |  +15% Скорость атаки  |  +25% Критический удар  |  +5% Физический вампир¦Спасательная линия: При получении урона, снижающего здоровье ниже 35% от максимального, сначала получаете щит 250–550 единиц (зависит от уровня) на 5 секунд (перезарядка 90 секунд).
+Боевая ярость: Активация «Ловушки жизни» даёт 8% физического вампиризма на 8 секунд."><img src="https://www.wildriftfire.com/images/items/immortal-shieldbow.png" alt="Бессмертный Щитовой Лук" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Грань Бесконечности¦3400 г¦+60 Урон от атаки  |  +25% Критический удар¦Бесконечность: +30% к урону от критических ударов.
+Предел прорыва: Каждый 1% шанса крита свыше 100% преобразуется в 0,6% урона от критического удара."><img src="https://www.wildriftfire.com/images/items/infinity-edge.png" alt="Грань Бесконечности" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Убийца Кракена¦3000 г¦+40 Урон от атаки  |  +30% Скорость атаки¦Облачная походка: +5% к скорости передвижения.
+Сокруши его: Каждая третья атака наносит 120–160 (110–150 для дальнего боя) доп. физ. урона (зависит от уровня), увеличивающегося до 50% от недостающего здоровья цели."><img src="https://www.wildriftfire.com/images/items/kraken-slayer.png" alt="Убийца Кракена" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Магнитный бластер¦3000 г¦+25 Урон от атаки  |  +25% Скорость атаки  |  +25% Критический удар¦Овердрайв: +5% к скорости передвижения.
+Мощный взрыв: Перемещение и атака генерируют Энергетические атаки. Они увеличивают дальность на 100 единиц (50 для ближнего боя), наносят 40–100 доп. маг. урона и дают 60 единиц скорости передвижения на 0,75 секунды. Урон отражается от 5 ближайших врагов, может быть критическим. (50%–80% доп. урона миньонам)"><img src="https://www.wildriftfire.com/images/items/magnetic-blaster.png" alt="Магнитный бластер" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Манамуне¦2700 г¦+25 Урон от атаки  |  +20 Ускорение способностей  |  +300 Мана¦Благоговение: Бонус к урону от атаки = 1,5% от макс. маны. Возвращает 15% потраченной маны.
+Заряд маны: Генерирует заряд каждые 3,3 секунды (макс. 3 заряда). Базовая атака или расход маны потребляет заряд и даёт +18 маны (макс. 700 маны). Превращается в Мурамана при +700 маны."><img src="https://www.wildriftfire.com/images/items/manamune.png" alt="Манамуне" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Пасть Мальмортиуса¦3000 г¦+55 Урон от атаки  |  +10 Ускорение способностей  |  +45 Сопротивление магии¦Спасательная линия: При получении магического урона, снижающего здоровье ниже 35%, получаете 10% всестороннего вампиризма до конца боя и магический щит 220–530 единиц на 3 секунды (перезарядка 90 секунд)."><img src="https://www.wildriftfire.com/images/items/maw-of-malmortius.png" alt="Пасть Мальмортиуса" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Смертельное напоминание¦3300 г¦+25 Урон от атаки  |  +15% Скорость атаки  |  +25% Критический удар¦Последний шёпот: +30% к пробиванию брони. Критические удары получают +6% к пробиванию брони.
+Сепсис: Нанесение физического урона вражеским чемпионам вызывает 50% Тяжких ран на 3 секунды."><img src="https://www.wildriftfire.com/images/items/mortal-reminder.png" alt="Смертельное напоминание" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Мурамана¦2700 г¦+25 Урон от атаки  |  +20 Ускорение способностей  |  +1000 Мана¦Благоговение: Бонус к урону от атаки = 2% от макс. маны. Возвращает 15% потраченной маны.
+Шок: Базовые атаки по чемпионам наносят доп. физ. урон = 2,5% текущей маны и расходуют ту же ману. Урон способностей по чемпионам наносит доп. физ. урон = 4% текущей маны + 6% AD и расходует ту же ману. Срабатывает раз за сеанс при мане >20%."><img src="https://www.wildriftfire.com/images/items/muramana.png" alt="Мурамана" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Зуб Нашора¦3000 г¦+20 Ускорение способностей  |  +45% Скорость атаки¦Волшебный клык: +25 Урона от атаки или +50 Силы умений (адаптивно).
+Грызение: Базовые атаки по чемпионам наносят 15 (+ 25% бонусного AD) (+ 25% AP) доп. магического урона."><img src="https://www.wildriftfire.com/images/items/nashors-tooth.png" alt="Зуб Нашора" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Навори Квикблейдс¦3000 г¦+40 Урон от атаки  |  +15% Скорость атаки  |  +25% Критический удар¦Ловкие удары: Критические удары базовыми атаками уменьшают оставшееся время восстановления базовых способностей на 15%.
+Непостоянство: Ваши способности наносят от 0% до 9% доп. урона (в зависимости от шанса крита)."><img src="https://www.wildriftfire.com/images/items/navori-quickblades.png" alt="Навори Квикблейдс" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Призрачный Танцор¦2900 г¦+20 Урон от атаки  |  +40% Скорость атаки  |  +25% Критический удар¦Быстрые ноги: +5% к скорости передвижения.
+Призрачный вальс: При попадании атаки дают 25% к скорости атаки и 7% к скорости передвижения на 6 секунд (эффекты не суммируются; перезарядка 10 секунд, уменьшается на 1 секунду при каждом попадании)."><img src="https://www.wildriftfire.com/images/items/phantom-dancer.png" alt="Призрачный Танцор" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Ураган Рунаана¦3000 г¦+35% Скорость атаки  |  +25% Критический удар¦Ярость Ветра: Базовые атаки при попадании выпускают доп. снаряды по двум врагам перед вами, каждый наносит 55% физ. урона от AD, накладывает эффекты при попадании со 100% эффективностью и подвержен модификаторам крита.
+Клинок Ветра: Базовые атаки наносят 15 доп. физ. урона при попадании."><img src="https://www.wildriftfire.com/images/items/runaans-hurricane.png" alt="Ураган Рунаана" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Змеиный клык¦2800 г¦+50 Урон от атаки  |  +10 Ускорение способностей¦Колющий удар: +15 к пробиваемости брони.
+Похититель щитов: Нанесение урона вражескому чемпиону накладывает эффект на 3 секунды, уменьшая силу его активного щита и щитов, которые он получает. Ближний бой: 40% (+ 10% за каждые 100 бонусного AD), макс. 60%. Дальний бой: 25% (+ 10% за каждые 100 бонусного AD), макс. 45%."><img src="https://www.wildriftfire.com/images/items/serpents-fang.png" alt="Змеиный клык" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Обида Серильды¦3300 г¦+40 Урон от атаки  |  +15 Ускорение способностей¦Последний шёпот: +33% пробивания брони.
+Ледяной: Урон от способностей и усиленные атаки замедляют на 30% на 1 секунду.
+Ледяной укус: Ледяной эффект накладывает стак на 6 секунд (макс. 3 стака). При 3 стаках расходуется: наносит 12–40 (зависит от уровня) (+40% бонусного AD) физ. урона каждые 0,25 секунды в течение 2 секунд и 50% Тяжких ран на 3 секунды (перезарядка 5 секунд)."><img src="https://www.wildriftfire.com/images/items/seryldas-grudge.png" alt="Обида Серильды" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Передача души¦3200 г¦+25 Урон от атаки  |  +30% Скорость атаки  |  +25% Критический удар¦Танец теней: Критические удары по чемпиону или эпическому монстру призывают Тень на 4 секунды, атакующую ближайших врагов. Она наследует 20% AD и 30% шанса крита как скорость атаки. Можно иметь до двух Теней. Тени на расстоянии >600 единиц исчезают."><img src="https://www.wildriftfire.com/images/items/soul-transfer.png" alt="Передача души" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Копьё Сёдзина¦3100 г¦+45 Урон от атаки  |  +450 Здоровье¦Драконья сила: Получите 25 единиц ускорения базовых способностей.
+Сфокусированная воля: Нанесение урона монстрам или врагам способностями увеличивает урон от способностей и пассивных умений на 3% на 6 секунд (суммируется 4 раза)."><img src="https://www.wildriftfire.com/images/items/spear-of-shojin.png" alt="Копьё Сёдзина" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Штормрейзор¦3000 г¦+40 Урон от атаки  |  +20% Скорость атаки  |  +25% Критический удар¦Заряд энергии: Движения и базовые атаки генерируют заряды энергии (макс. 100).
+Stormarrow: При максимальных зарядах следующая базовая атака расходует их: наносит 65–135 (зависит от уровня) доп. маг. урона, замедляет на 50% на 0,75 секунды и даёт 45 доп. скорости передвижения на 0,75 секунды."><img src="https://www.wildriftfire.com/images/items/stormrazor.png" alt="Штормрейзор" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Расколотое небо¦2900 г¦+40 Урон от атаки  |  +15 Ускорение способностей  |  +300 Здоровье¦Удар светового щита: Следующая базовая атака по чемпиону наносит крит-урон = 160% базового урона и восстанавливает здоровье = 125% базового AD + 5% недостающего здоровья (перезарядка 6 секунд на каждую цель)."><img src="https://www.wildriftfire.com/images/items/sundered-sky.png" alt="Расколотое небо" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Терминал¦3400 г¦+35 Урон от атаки  |  +30% Скорость атаки¦Тень: Базовая атака наносит 35 доп. магического урона при попадании.
+Сопоставление: Базовые атаки по чемпионам чередуются между ударами Света и Тьмы (бонус 5 секунд, макс. 3 стака). Удары Света: 5–8 (зависит от уровня) брони и МС. Удары Тьмы: 11% пробивания брони и МС. При максимуме обоих — 15–24 брони/МС и 33% пробивания. Бонус к пробиванию ограничен 40%."><img src="https://www.wildriftfire.com/images/items/terminus.png" alt="Терминал" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Коллекционер¦2900 г¦+45 Урон от атаки  |  +25% Критический удар¦Убийца: +10 к пробиваемости брони.
+Смерть и налоги: Урон, снижающий здоровье чемпиона ниже 4% от максимального (+2% от шанса крита) — казнит его. За убийство чемпиона получаете +25 золота и навсегда увеличиваете порог казни на 0,1%."><img src="https://www.wildriftfire.com/images/items/the-collector.png" alt="Коллекционер" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Тринити Форс¦3333 г¦+30 Урон от атаки  |  +25 Ускорение способностей  |  +30% Скорость атаки  |  +250 Здоровье¦Рвение: +5% к скорости передвижения.
+Заклинатель клинков: После способности следующая базовая атака за 10 секунд наносит доп. физ. урон = 200% базового AD (перезарядка 1,5 с). Урон снижен до 50% по строениям.
+Доблесть: Базовые атаки дают (20/10) скорости передвижения на 2 секунды. Убийство юнита даёт (60/30) скорости. Бонусы не суммируются."><img src="https://www.wildriftfire.com/images/items/trinity-force.png" alt="Тринити Форс" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Конец остроумия¦2800 г¦+45 Сопротивление магии  |  +45% Скорость атаки¦На грани отчаяния: Базовые атаки наносят 10–55 (зависит от уровня) доп. магического урона при попадании. Пока здоровье ниже 50% от максимального, восстанавливаете (100%/33%) урона, который вражеские чемпионы получают от этого эффекта."><img src="https://www.wildriftfire.com/images/items/wits-end.png" alt="Конец остроумия" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Призрачный клинок Йомуу¦3000 г¦+55 Урон от атаки  |  +15 Ускорение способностей¦Срез: +15 к пробиванию брони.
+Импульс: Движение генерирует заряды Импульса (расходуются базовыми атаками; исчезают при замедлении). Каждый заряд = 0,4 скорости передвижения (макс. 100 зарядов = 40 скорости).
+Призрачная скорость: Атаки при максимальном Импульсе дают 25% к скорости атаки на 4 секунды."><img src="https://www.wildriftfire.com/images/items/youmuus-ghostblade.png" alt="Призрачный клинок Йомуу" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
     </div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">🔮 Магические</div>
+<div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">🔮 Магические</div>
     <div class="items-grid">
       <div class="item-card" data-tip="Мучения Лиандри¦3000 г¦+250 HP  |  +75 AP  |  +7% Маг. Проникн.¦Мучения: способности поджигают цели на 3с, нанося 0,5% макс. HP маг. урона за секунду.\nСтрадание: в бою наносишь +2% доп. урона каждую секунду, макс. до +6%."><img src="https://www.wildriftfire.com/images/items/liandrys-torment.png" alt="Мучения Лиандри" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Разломовластитель¦3300 г¦+150 HP  |  +80 AP  |  +7% Маг. Проникн.  |  +15 Уск. Ум.¦Ассимиляция: в бою получаешь +2,5% маг. урона каждую секунду (макс. +7,5%). На максе — весь твой маг. урон становится Истинным.\n+11% Вамп от заклинаний."><img src="https://www.wildriftfire.com/images/items/riftmaker.png" alt="Разломовластитель" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
@@ -3931,6 +3697,14 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
       <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);">Информация о чемпионе</div>
       <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px;">Скоро будет!</div>
     </div>
+  </div>
+</div>
+
+<!-- ══ ITEM DETAIL MODAL ══ -->
+<div id="itemDetailModal" style="position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;" onclick="if(event.target===this)closeItemDetail()">
+  <div style="background:linear-gradient(135deg,#160930 0%,#0d051f 100%);border:1.5px solid rgba(185,111,255,0.45);border-radius:18px;padding:24px 22px 20px;max-width:420px;width:92vw;max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.8);">
+    <button onclick="closeItemDetail()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:20px;cursor:pointer;line-height:1;z-index:1;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">✕</button>
+    <div id="itemDetailContent"></div>
   </div>
 </div>
 
