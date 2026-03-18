@@ -60,14 +60,13 @@
 
         /* HEADER */
         header {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 44px 1fr 44px;
             align-items: center;
             margin-bottom: 20px;
             animation: fadeIn 0.5s ease;
-            position: relative;
-            padding-left: 52px;
             min-height: 44px;
+            gap: 8px;
         }
 
         .logo {
@@ -79,23 +78,23 @@
             background-clip: text;
             white-space: nowrap;
             line-height: 1;
+            text-align: center;
         }
 
         .twitch-btn {
             background: linear-gradient(135deg, #9146ff 0%, #772ce8 100%);
             color: white;
-            padding: 7px 14px;
-            border-radius: 20px;
-            white-space: nowrap;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             text-decoration: none;
-            font-size: 13px;
-            font-weight: 900;
-            animation: glow 2s infinite;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
             transition: transform 0.2s;
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            z-index: 2999;
+            box-shadow: 0 2px 12px rgba(145,70,255,0.45);
         }
 
         .twitch-btn:active {
@@ -158,10 +157,17 @@
         }
 
         .lvl-num {
-            font-size: 32px;
+            font-size: 48px;
             color: var(--accent);
             font-weight: 900;
-            text-shadow: 0 0 10px var(--accent-glow);
+            text-shadow: 0 0 18px var(--accent-glow);
+            line-height: 1;
+            min-width: 64px;
+            text-align: center;
+            transition: transform 0.1s ease;
+        }
+        .lvl-num.pop {
+            transform: scale(1.25);
         }
 
         .slider-wrapper {
@@ -419,8 +425,8 @@
         .m-mask {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(6px);
             display: none;
             z-index: 2000;
             padding: 0;
@@ -430,48 +436,51 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.25s ease;
         }
 
         .m-win {
             background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
-            width: 95%;
-            max-width: 900px;
-            height: 85vh;
+            width: 96vw;
+            max-width: 920px;
+            max-height: 92vh;
             border-radius: 20px;
             border: 2px solid var(--border);
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            box-shadow: 0 24px 70px rgba(0,0,0,0.85);
             overflow: hidden;
         }
 
-        /* CLOSE BTN */
+        /* CLOSE BTN — всегда фиксирован к viewport внутри открытой модалки */
+        .m-mask.active .btn-close-x {
+            position: fixed !important;
+            top: 18px !important;
+            right: 18px !important;
+            z-index: 9999 !important;
+        }
+
         .btn-close-x {
-            position: absolute;
-            top: 12px;
-            right: 12px;
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: #fff;
-            border: 4px solid #0f0520;
+            border: 3px solid #0f0520;
             border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            font-size: 22px;
+            width: 44px;
+            height: 44px;
+            font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(231, 76, 60, 0.6);
-            z-index: 10;
+            box-shadow: 0 4px 18px rgba(231, 76, 60, 0.55);
             font-weight: 900;
-            transition: transform 0.2s;
+            transition: transform 0.15s, filter 0.15s;
+            flex-shrink: 0;
         }
 
-        .btn-close-x:active {
-            transform: scale(0.9);
-        }
+        .btn-close-x:hover { filter: brightness(1.15); transform: scale(1.07); }
+        .btn-close-x:active { transform: scale(0.9); }
 
         /* CONTROLS */
         .m-controls {
@@ -642,7 +651,6 @@
             .app-wrapper {
             overflow-x: hidden; padding: 12px; padding-bottom: 88px; }
             .logo { font-size: 18px; }
-            .twitch-btn { font-size: 11px; padding: 7px 14px; }
             .btn-support { font-size: 13px; padding: 12px; }
             .lvl-container { padding: 14px; }
             .lvl-num { font-size: 26px; }
@@ -1016,15 +1024,8 @@
   outline-offset: 2px;
 }
 
-/* Twitch button: subtle animated glow */
-@keyframes twitchPulse {
-  0% { transform: translateY(0); filter: drop-shadow(0 0 0 rgba(145,70,255,0)); }
-  50% { transform: translateY(-1px); filter: drop-shadow(0 0 10px rgba(145,70,255,0.55)); }
-  100% { transform: translateY(0); filter: drop-shadow(0 0 0 rgba(145,70,255,0)); }
-}
-.twitch-btn {
-  animation: twitchPulse 2.4s ease-in-out infinite;
-}
+/* Twitch button hover */
+.twitch-btn:hover { filter: brightness(1.15); transform: scale(1.06); }
 
 
         /* CHAMPION ICONS (Data Dragon) */
@@ -1189,7 +1190,6 @@
             z-index: 2;
         }
         .item-card img { width: 44px; height: 44px; border-radius: 7px; display: block; }
-}
         .item-cost { font-size: 8px; color: #C9A800; margin-top: 2px; font-weight: 700; }
         /* ── Calculator buttons row ── */
         .calc-btns-row {
@@ -1338,11 +1338,12 @@
         .side-btn.side-support:hover { background: linear-gradient(90deg,rgba(109,63,245,0.5),rgba(142,68,173,0.5)); }
         /* Hamburger button */
         #menuBtn {
-            position: fixed; top: 12px; left: 12px; z-index: 9600;
+            position: static;
             background: rgba(109,63,245,0.85); border: 1.5px solid rgba(185,111,255,0.5);
             border-radius: 10px; padding: 8px 10px; cursor: pointer;
             display: flex; flex-direction: column; gap: 4px;
             transition: all 0.15s; box-shadow: 0 2px 12px rgba(109,63,245,0.4);
+            flex-shrink: 0; width: 44px; height: 44px; align-items: center; justify-content: center;
         }
         #menuBtn:hover { background: rgba(109,63,245,1); transform: scale(1.06); }
         #menuBtn span { display: block; width: 18px; height: 2px; background: #fff; border-radius: 2px; }
@@ -1389,36 +1390,10 @@
         }
         .calc-lvl-btn.active { border-color: #b96fff; background: rgba(109,63,245,0.35); color: #fff; }
         .calc-lvl-btn:hover:not(.active) { background: rgba(109,63,245,0.2); color: #fff; }
-        /* ── Item tooltip ── */
-        #itemTooltip {
-            display: none;
-            position: fixed;
-            z-index: 99999;
-            background: linear-gradient(135deg, #160930 0%, #0d051f 100%);
-            border: 1.5px solid rgba(185,111,255,0.6);
-            color: #e8e0f0;
-            font-size: 12.5px;
-            line-height: 1.7;
-            padding: 14px 16px;
-            border-radius: 12px;
-            max-width: 320px;
-            pointer-events: none;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.7);
-        }
-        #itemTooltip { font-family: var(--font-sans,sans-serif); }
-        #itemTooltip b { color: #b96fff; font-size: 13px; display: block; margin-bottom: 3px; }
-        #itemTooltip .tip-cost { color: #C9A800; font-weight: 700; }
-        #itemTooltip .tip-stats { color: rgba(255,255,255,0.6); font-size: 11px; display:block; margin-top:2px; }
-        #itemTooltip .tip-desc { color: rgba(255,255,255,0.9); display:block; margin-top:5px; }
+        /* ── Item tooltip REMOVED (replaced by click modal) ── */
 
-        /* Hide header when any modal is open (modals are fixed overlay) */
         /* Hide menuBtn when sidebar open */
-        body.sidebar-open #menuBtn { display: none; }
-        body.modal-open header,
-        body.modal-open #menuBtn {
-            visibility: hidden;
-            pointer-events: none;
-        }
+        body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
         </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1429,18 +1404,23 @@
 
 <div class="app-wrapper">
     <header>
-        <div style="flex:1;min-width:0;"></div>
-        <div class="logo" style="white-space:nowrap;flex-shrink:0;"><a id="nickname" href="#" aria-label="ERjanKG">ERjanKG</a>&nbsp;STATS</div>
-        <div style="flex:1;display:flex;justify-content:flex-end;align-items:center;min-width:0;"><a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank">🎮 TWITCH</a></div>
+        <button id="menuBtn" onclick="toggleSidebar()" aria-label="Меню">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="logo"><a id="nickname" href="#" aria-label="ERjanKG">ERjanKG</a>&nbsp;STATS</div>
+        <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank" aria-label="Twitch">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M4.265 3L3 6.236v13.223h4.488V21l2.75-2.541H13.5L20 12.318V3H4.265zm14.382 8.709l-3.256 3.012H12L9.5 17.115v-2.394H5.709V4.588h12.938v7.121zM15.5 7.559v3.883h-1.588V7.559H15.5zm-4.223 0v3.883H9.688V7.559h1.589z"/></svg>
+        </a>
     </header>
 
     <div class="lvl-container">
         <div class="lvl-info">
-            <span style="font-size:14px;">Level</span>
+            <span style="font-size:14px;color:rgba(255,255,255,0.5);font-weight:700;">УРОВЕНЬ</span>
             <span id="lvlLabel" class="lvl-num">10</span>
         </div>
         <div class="slider-wrapper">
-            <input type="range" id="lvlRange" min="1" max="15" value="10">
+            <input type="range" id="lvlRange" min="1" max="15" value="10"
+                oninput="document.getElementById('lvlLabel').textContent=this.value;">
             <div class="ruler" id="ruler"></div>
         </div>
     </div>
@@ -1467,19 +1447,16 @@
     </div>
 </div>
 
-<div class="m-mask" id="mMask">
-    <div class="m-win">
+<div class="m-mask" id="mMask" onclick="if(event.target===this)closeM()">
+    <div class="m-win" style="width:96vw;max-width:920px;height:88vh;">
         <button class="btn-close-x" onclick="closeM()">✕</button>
-        
         <div class="m-controls">
             <button class="m-btn m-btn-all" onclick="selectAll()">✓ ALL</button>
             <button class="m-btn m-btn-clear" onclick="clearAll()">✕ CLEAR</button>
         </div>
-
         <div class="m-search">
             <input type="text" id="mSearch" placeholder="🔍 Поиск..." oninput="drawM()">
         </div>
-
         <div class="m-grid" id="mGrid"></div>
     </div>
 </div>
@@ -1491,7 +1468,7 @@
     // MODAL SYSTEM - only one modal at a time
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','chartMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','welcomeOverlay'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','welcomeOverlay'];
 
     function closeAllModals(except) {
         MODAL_IDS.forEach(function(id) {
@@ -1508,6 +1485,10 @@
     function openModal(id) {
         // Close all others first
         closeAllModals(id);
+        // Закон: скрываем все тултипы и посторонние оверлеи
+        ['itemTooltip','runeTooltip','uiTip'].forEach(function(tid){
+            var t=document.getElementById(tid); if(t) t.style.display='none';
+        });
         var el = document.getElementById(id);
         if(el) el.classList.add('active');
         document.body.classList.add('modal-open');
@@ -1847,9 +1828,7 @@ async function start() {
                 mImg.title = c.name;
                 btn.appendChild(mImg);
                 btn.onclick = () => {
-                    selected.has(c.name) ? selected.delete(c.name) : selected.add(c.name);
-                    drawM();
-                    render();
+                    openChampDetail(c.name);
                 };
                 container.appendChild(btn);
             });
@@ -1881,9 +1860,14 @@ async function start() {
     function initApp() {
         document.getElementById('lvlRange').oninput = (e) => {
             lvl = +e.target.value;
-            document.getElementById('lvlLabel').innerText = lvl;
+            const lbl = document.getElementById('lvlLabel');
+            lbl.textContent = lvl;
+            lbl.classList.remove('pop');
+            void lbl.offsetWidth; // reflow
+            lbl.classList.add('pop');
+            setTimeout(() => lbl.classList.remove('pop'), 150);
             updateRuler();
-            renderUpdate(); // fast path — only update numbers
+            renderUpdate();
         };
     }
 
@@ -2036,51 +2020,11 @@ async function start() {
 
     
     window.closeItemDetail = function() {
-        var modal = document.getElementById('itemDetailModal');
-        if(modal) modal.classList.remove('active');
-        // Items modal stays open
+        closeModal('itemDetailModal');
     };
 
-    // =========================================
-    // MODAL SYSTEM - only one modal at a time
-    // =========================================
-    // MODAL_IDS already declared above
-
-    function closeAllModals(except) {
-        MODAL_IDS.forEach(function(id) {
-            if(id === except) return;
-            var el = document.getElementById(id);
-            if(!el) return;
-            el.classList.remove('active');
-            // Also clear any inline display style
-            el.style.display = '';
-        });
-        if(!except) document.body.classList.remove('modal-open');
-    }
-
-    function openModal(id) {
-        // Close all others first
-        closeAllModals(id);
-        var el = document.getElementById(id);
-        if(el) el.classList.add('active');
-        document.body.classList.add('modal-open');
-    }
-
-    function closeModal(id) {
-        var el = document.getElementById(id);
-        if(el) { el.classList.remove('active'); el.style.display = ''; }
-        // Remove modal-open if no other modal is active
-        var anyActive = MODAL_IDS.some(function(mid) {
-            var mel = document.getElementById(mid);
-            return mel && mel.classList.contains('active');
-        });
-        if(!anyActive) document.body.classList.remove('modal-open');
-    }
-
-    // WR level scaling helpers (15 levels)
-    function wrScaleByLevel(minVal, maxVal, lvl) {
-        return Math.round(minVal + (maxVal - minVal) * (lvl - 1) / 14);
-        window.openItems = function() {
+    // window.openItems — открыть модалку предметов
+    window.openItems = function() {
         openModal('itemsMask');
         setTimeout(function() {
             document.querySelectorAll('#itemsMask .item-card[data-tip]').forEach(function(card) {
@@ -2095,37 +2039,6 @@ async function start() {
             });
         }, 80);
     };
-
-
-
-    // MODAL SYSTEM
-    const MODAL_IDS = ['mMask','calcMask','chartMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','welcomeOverlay'];
-    function closeAllModals(except) {
-        MODAL_IDS.forEach(function(id) {
-            if(id === except) return;
-            var el = document.getElementById(id);
-            if(!el) return;
-            el.classList.remove('active');
-            el.style.display = '';
-        });
-        if(!except) document.body.classList.remove('modal-open');
-    }
-    function openModal(id) {
-        closeAllModals(id);
-        var el = document.getElementById(id);
-        if(el) el.classList.add('active');
-        document.body.classList.add('modal-open');
-    }
-    function closeModal(id) {
-        var el = document.getElementById(id);
-        if(el) { el.classList.remove('active'); el.style.display = ''; }
-        var anyOpen = MODAL_IDS.some(function(mid) {
-            var mel = document.getElementById(mid);
-            return mel && mel.classList.contains('active');
-        });
-        if(!anyOpen) document.body.classList.remove('modal-open');
-    }
 
     // WELCOME
     window.closeWelcome = function() {
@@ -2189,8 +2102,6 @@ async function start() {
             + '<button onclick="this.parentElement.remove();calcDmg()" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px;">x</button>';
         rows.appendChild(row);
     };
-    var _calcLvl = 1;
-    var _calcRange = 'melee';
     window.setCalcLvl = function(lvl) {
         _calcLvl = lvl;
         document.querySelectorAll('.calc-lvl-btn').forEach(function(b){
@@ -2378,21 +2289,67 @@ async function start() {
     window.scFilter=function(){scBuildGrid();};
     window.closeSideChamps=function(){closeModal('sideChampsMask');};
     window.openChampDetail=function(name){
+        var champ=raw.find(function(x){return x.name===name;});
         var el=document.getElementById('champDetailContent');
-        var DD='https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
+        var _sp={'Norra':'https://static.wikia.nocookie.net/leagueoflegends/images/e/ee/Norra_OriginalCentered.jpg','Mel':'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg'};
         el.innerHTML='';
+        // Иконка
         var ci=document.createElement('img');
-        ci.src=DD+champKey(name)+'.png';
-        ci.style.cssText='width:80px;height:80px;border-radius:14px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;';
+        ci.src=_sp[name]||(DD_URL+champKey(name)+'.png');
+        ci.style.cssText='width:90px;height:90px;border-radius:16px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto;border:2px solid rgba(185,111,255,0.45);box-shadow:0 0 18px rgba(109,63,245,0.4);object-fit:cover;';
         ci.onerror=function(){this.style.display='none';};
         el.appendChild(ci);
+        // Имя
         var cn=document.createElement('div');
-        cn.style.cssText='font-size:20px;font-weight:900;color:#b96fff;margin-bottom:6px;';
+        cn.style.cssText='font-size:22px;font-weight:900;color:#b96fff;margin-bottom:4px;text-align:center;';
         cn.textContent=name; el.appendChild(cn);
-        var cs=document.createElement('div');
-        cs.style.cssText='font-size:11px;color:rgba(255,255,255,0.3);margin-top:10px;';
-        cs.textContent='\u041f\u043e\u0434\u0440\u043e\u0431\u043d\u0430\u044f \u0438\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f \u0441\u043a\u043e\u0440\u043e';
-        el.appendChild(cs);
+        if(champ){
+            // Роли
+            var roles=[]; if(champ.is.Top)roles.push('Top'); if(champ.is.Jungle)roles.push('Jungle'); if(champ.is.Mid)roles.push('Mid'); if(champ.is.ADC)roles.push('ADC'); if(champ.is.Support)roles.push('Support');
+            var rd=document.createElement('div');
+            rd.style.cssText='font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;text-align:center;';
+            rd.textContent=roles.join(' · ')||'—'; el.appendChild(rd);
+            // Уровень
+            var lvlNote=document.createElement('div');
+            lvlNote.style.cssText='font-size:10px;color:rgba(185,111,255,0.7);text-align:center;margin-bottom:10px;font-weight:700;letter-spacing:0.5px;';
+            lvlNote.textContent='Статы на уровне '+lvl; el.appendChild(lvlNote);
+            // Статы
+            var f=function(b,g){return Math.round(b+(lvl-1)*g);};
+            var stats=[
+                {label:'⚔ AD',val:f(champ.ad_b,champ.ad_g),color:'#e8820a'},
+                {label:'✚ HP',val:f(champ.hp_b,champ.hp_g),color:'#2ecc71'},
+                {label:'💧 '+(champ.res==='Energy'?'Energy':'Mana'),val:champ.res==='Energy'?'150':String(f(champ.mn_b,champ.mn_g)),color:'#5dade2'},
+                {label:'🛡 Броня',val:f(champ.ar_b,champ.ar_g),color:'#f1c40f'},
+                {label:'✦ МС',val:f(champ.mr_b,champ.mr_g),color:'#9b59b6'}
+            ];
+            var sg=document.createElement('div');
+            sg.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;';
+            stats.forEach(function(s){
+                var box=document.createElement('div');
+                box.style.cssText='background:rgba(255,255,255,0.04);border:1px solid rgba(155,89,182,0.2);border-radius:10px;padding:8px 12px;';
+                box.innerHTML='<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:3px;">'+s.label+'</div>'+'<div style="font-size:20px;font-weight:900;color:'+s.color+';">'+s.val+'</div>';
+                sg.appendChild(box);
+            });
+            el.appendChild(sg);
+            // Кнопка добавить/убрать
+            var isIn=selected.has(name);
+            var tbtn=document.createElement('button');
+            tbtn.style.cssText='width:100%;padding:13px;border-radius:12px;border:none;font-weight:900;font-size:14px;cursor:pointer;transition:all 0.15s;margin-bottom:8px;'+(isIn?'background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;':'background:linear-gradient(135deg,#6D3FF5,#8e44ad);color:#fff;');
+            tbtn.textContent=isIn?'✕ Убрать из таблицы':'✓ Добавить в таблицу';
+            tbtn.onclick=function(){
+                if(selected.has(name)){selected.delete(name);tbtn.textContent='✓ Добавить в таблицу';tbtn.style.background='linear-gradient(135deg,#6D3FF5,#8e44ad)';}
+                else{selected.add(name);tbtn.textContent='✕ Убрать из таблицы';tbtn.style.background='linear-gradient(135deg,#e74c3c,#c0392b)';}
+                try{localStorage.setItem('sel',JSON.stringify([...selected]));}catch(e){}
+                render();
+            };
+            el.appendChild(tbtn);
+            // Кнопка график
+            var gbtn=document.createElement('button');
+            gbtn.style.cssText='width:100%;padding:10px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.1);color:rgba(255,255,255,0.6);font-weight:700;font-size:13px;cursor:pointer;transition:all 0.15s;';
+            gbtn.textContent='📈 График роста';
+            gbtn.onclick=function(){openChart(name);};
+            el.appendChild(gbtn);
+        }
         openModal('champDetailMask');
     };
     window.closeChampDetail=function(){closeModal('champDetailMask');};
@@ -2413,6 +2370,86 @@ async function start() {
         btn.addEventListener('mouseleave',function(){if(tip){tip.remove();tip=null;}});
     })();
 
+    // ── Expose all global functions needed by inline onclick handlers ──
+    window.openM = function() { openModal('mMask'); drawM(); };
+    window.closeM = function() { closeModal('mMask'); };
+
+    window.doSort = function(k) {
+        if(sK === k) {
+            sD = sD === 'desc' ? 'asc' : 'desc';
+        } else {
+            sK = k;
+            sD = 'desc';
+            colFocus = true;
+        }
+        render();
+    };
+
+    window.selectAll = function() {
+        raw.forEach(x => selected.add(x.name));
+        try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e) {}
+        drawM(); render();
+    };
+
+    window.clearAll = function() {
+        selected.clear();
+        try { localStorage.setItem('sel', JSON.stringify([])); } catch(e) {}
+        drawM(); render();
+    };
+
+    window.removeC = function(name) {
+        selected.delete(name);
+        try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e) {}
+        render();
+    };
+
+    window.toggleP = function(name) {
+        if(pinned.has(name)) pinned.delete(name);
+        else pinned.add(name);
+        try { localStorage.setItem('p', JSON.stringify([...pinned])); } catch(e) {}
+        render();
+    };
+
+    window.openChart = function(name) {
+        const c = raw.find(x => x.name === name);
+        if(!c) return;
+        chartChamp = c;
+        chartStat = 'hp';
+        const titleEl = document.getElementById('chartTitle');
+        if(titleEl) titleEl.textContent = '📈 ' + name + ' — рост статов';
+        openModal('chartMask');
+        buildChartBtns();
+        renderGrowthChart();
+    };
+
+    window.closeChart = function() { closeModal('chartMask'); };
+
+    window.setChartStat = function(k) {
+        chartStat = k;
+        buildChartBtns();
+        renderGrowthChart();
+    };
+
+    // Growth tooltip for stat cells
+    const _uiTip = document.getElementById('uiTip');
+    window.showT = function(ev, growthVal) {
+        if(!_uiTip) return;
+        _uiTip.textContent = '+' + (Math.round(growthVal * 10) / 10) + ' за уровень';
+        _uiTip.style.display = 'block';
+        _uiTip.style.left = ev.clientX + 'px';
+        _uiTip.style.top = ev.clientY + 'px';
+    };
+    window.moveT = function(ev) {
+        if(!_uiTip) return;
+        _uiTip.style.left = ev.clientX + 'px';
+        _uiTip.style.top = (ev.clientY - 10) + 'px';
+    };
+    window.hideT = function() {
+        if(_uiTip) _uiTip.style.display = 'none';
+    };
+
+    // Start loading data
+    start();
 
 }
 
@@ -2959,12 +2996,12 @@ html, body { overflow-y: auto !important; }
   }
 }
 
-/* 3) Support + Twitch: strong glow + moving shine */
-.btn-support, .support-btn, .twitch-btn{
+/* Support button shine effect */
+.btn-support, .support-btn{
   position: relative;
   overflow: hidden;
 }
-.btn-support::before, .support-btn::before, .twitch-btn::before{
+.btn-support::before, .support-btn::before{
   content:"";
   position:absolute;
   inset:-60%;
@@ -2973,7 +3010,7 @@ html, body { overflow-y: auto !important; }
 }
 @keyframes v37Glow{ to { transform: rotate(360deg); } }
 
-.btn-support::after, .support-btn::after, .twitch-btn::after{
+.btn-support::after, .support-btn::after{
   content:"";
   position:absolute;
   top:-40%;
@@ -3273,7 +3310,7 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 <!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
-  <div class="m-win" style="width:97vw;max-width:900px;max-height:96vh;overflow-y:auto;padding:20px 18px 18px;">
+  <div class="m-win" style="width:96vw;max-width:920px;max-height:92vh;overflow-y:auto;padding:20px 18px 18px;padding-right:70px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
     <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;">⚔ Калькулятор урона</div>
 
@@ -3390,7 +3427,7 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 <!-- ═══════════════ CHAMPION GROWTH CHART POPUP ═══════════════ -->
 <div class="m-mask" id="chartMask" onclick="if(event.target===this)closeChart()">
-  <div class="m-win" style="max-width:min(580px,94vw);height:auto;max-height:90vh;padding:24px 20px 20px;">
+  <div class="m-win" style="width:96vw;max-width:620px;max-height:88vh;padding:24px 20px 20px;padding-right:70px;overflow-y:auto;">
     <button class="btn-close-x" onclick="closeChart()">✕</button>
     <div id="chartTitle" style="font-size:17px;font-weight:900;color:#b96fff;margin-bottom:16px;letter-spacing:1px;"></div>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="chartStatBtns"></div>
@@ -3401,10 +3438,9 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
 
 <!-- ═══════════════ ITEMS REFERENCE MODAL ═══════════════ -->
 <div class="m-mask" id="itemsMask" onclick="if(event.target===this)closeItems()">
-  <div class="m-win" style="width:98vw;max-width:860px;max-height:96vh;overflow-y:auto;overflow-x:visible;padding:20px 16px 16px;">
+  <div class="m-win" style="width:96vw;max-width:920px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;padding-right:70px;">
     <button class="btn-close-x" onclick="closeItems()">✕</button>
-    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;">📦 Предметы Wild Rift</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Наведи — появится полное описание</div>
+    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;">📦 Предметы Wild Rift</div>
         <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">⚔ Физические</div>
     <div class="items-grid">
       <div class="item-card" data-tip="Чёрный тесак¦3000 г¦+40 Урон от атаки  |  +20 Ускорение способностей  |  +400 Здоровье¦Раскол: Нанесение физического урона вражескому чемпиону снижает броню на 6% в течение 6 секунд, эффект обновляется при последующих попаданиях и суммируется до 4 раз, снижая броню на 24%.
@@ -3539,11 +3575,6 @@ Stormarrow: При максимальных зарядах следующая б
     </div>
   </div>
 </div>
-<!-- ══ HAMBURGER BUTTON ══ -->
-<button id="menuBtn" onclick="toggleSidebar()" aria-label="Меню">
-  <span></span><span></span><span></span>
-</button>
-
 <!-- ══ SIDEBAR OVERLAY ══ -->
 <div id="sideOverlay" onclick="closeSidebar()"></div>
 
@@ -3582,24 +3613,50 @@ Stormarrow: При максимальных зарядах следующая б
 </div>
 
 <!-- ══ WELCOME POPUP ══ -->
-<div id="welcomeOverlay" class="m-mask" onclick="if(event.target===this)closeWelcome()" style="z-index:9500;">
-  <div class="m-win" style="max-width:600px;width:94vw;padding:32px 28px 26px;position:relative;">
-    <button onclick="closeWelcome()" class="btn-close-x">✕</button>
-    <div style="font-size:20px;font-weight:900;color:#b96fff;margin-bottom:12px;">👋 Привет!</div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.82);line-height:1.75;margin-bottom:20px;">Ребята, сайт абсолютно бесплатен для всех. Буду очень благодарен за поддержку — для меня это мощная мотивация развивать проект. В планах: добавить характеристики HP реген, winrate/pickrate, мана реген, особый столбец для лесников (фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа), изображения чемпов и регулярно обновлять сайт до актуальности.</div>
+<div id="welcomeOverlay" class="m-mask" style="z-index:9500;background:rgba(10,4,24,0.97);backdrop-filter:blur(12px);">
+  <div style="max-width:540px;width:92vw;padding:0 16px;text-align:center;animation:fadeIn 0.6s ease;">
+
+    <!-- Логотип/эмблема -->
+    <div style="font-size:56px;margin-bottom:16px;filter:drop-shadow(0 0 24px rgba(109,63,245,0.8));">⚔️</div>
+
+    <!-- Заголовок -->
+    <div style="font-size:28px;font-weight:900;background:linear-gradient(135deg,#b96fff,#6D3FF5,#e74c3c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px;line-height:1.1;">WILD RIFT STATS</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:2px;margin-bottom:28px;">by ERjanKG</div>
+
+    <!-- Описание -->
+    <div style="background:rgba(109,63,245,0.1);border:1px solid rgba(155,89,182,0.25);border-radius:16px;padding:20px 22px;margin-bottom:20px;text-align:left;">
+      <div style="font-size:14px;font-weight:900;color:#b96fff;margin-bottom:12px;">📊 Что это?</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.75;">
+        Справочник базовых характеристик всех чемпионов Wild Rift.<br>
+        Сравни <b style="color:#e8820a;">AD</b>, <b style="color:#2ecc71;">HP</b>, <b style="color:#5dade2;">Мана</b>, <b style="color:#f1c40f;">Броню</b> и <b style="color:#9b59b6;">МС</b> на любом уровне от 1 до 15.
+      </div>
+    </div>
+
+    <div style="background:rgba(109,63,245,0.1);border:1px solid rgba(155,89,182,0.25);border-radius:16px;padding:16px 22px;margin-bottom:24px;text-align:left;">
+      <div style="font-size:14px;font-weight:900;color:#b96fff;margin-bottom:10px;">🎮 Как пользоваться?</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.85;">
+        🎚 <b style="color:#fff;">Слайдер</b> — выбери уровень 1–15<br>
+        ⚔ <b style="color:#fff;">Champions</b> — выбери кого сравнивать<br>
+        📊 <b style="color:#fff;">Столбцы</b> — нажми чтобы отсортировать<br>
+        🔲 <b style="color:#fff;">Иконка чемпа</b> — полная инфа и график роста
+      </div>
+    </div>
+
+    <!-- Кнопки -->
     <a href="https://www.donationalerts.com/r/erjankg" target="_blank" onclick="closeWelcome()"
-       style="display:block;text-align:center;background:linear-gradient(135deg,#6d3ff5,#8e44ad);color:#fff;text-decoration:none;padding:12px;border-radius:12px;font-weight:900;font-size:14px;">
+       style="display:block;text-align:center;background:linear-gradient(135deg,#6d3ff5,#8e44ad);color:#fff;text-decoration:none;padding:14px;border-radius:14px;font-weight:900;font-size:15px;margin-bottom:10px;box-shadow:0 4px 20px rgba(109,63,245,0.45);">
       💎 Поддержать проект
     </a>
-    <div style="text-align:center;margin-top:10px;">
-      <button onclick="closeWelcome()" style="background:none;border:none;color:rgba(255,255,255,0.3);font-size:12px;cursor:pointer;">Закрыть</button>
-    </div>
+    <button onclick="closeWelcome()" style="width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);font-size:13px;font-weight:700;padding:12px;border-radius:14px;cursor:pointer;">
+      Понятно, начать →
+    </button>
+
   </div>
 </div>
 
 <!-- ══ RUNES MODAL ══ -->
 <div class="m-mask" id="runesMask" onclick="if(event.target===this)closeRunes()">
-  <div class="m-win" style="width:96vw;max-width:780px;max-height:94vh;overflow-y:auto;overflow-x:visible;padding:20px 16px 16px;">
+  <div class="m-win" style="width:96vw;max-width:860px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;padding-right:70px;">
     <button class="btn-close-x" onclick="closeRunes()">✕</button>
     <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;">💎 Руны Wild Rift</div>
     <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Наведи — описание</div>
@@ -3667,7 +3724,7 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ TIER LIST MODAL ══ -->
 <div class="m-mask" id="tierlistMask" onclick="if(event.target===this)closeTierlist()">
-  <div class="m-win" style="width:96vw;max-width:820px;max-height:94vh;overflow-y:auto;padding:20px 16px 16px;">
+  <div class="m-win" style="width:96vw;max-width:880px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;padding-right:70px;">
     <button class="btn-close-x" onclick="closeTierlist()">✕</button>
     <div id="tierlistTitle" style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:8px;"></div>
     <div id="tierlistTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
@@ -3677,7 +3734,7 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ SIDE CHAMPIONS MODAL ══ -->
 <div class="m-mask" id="sideChampsMask" onclick="if(event.target===this)closeSideChamps()">
-  <div class="m-win" style="width:96vw;max-width:700px;max-height:95vh;display:flex;flex-direction:column;padding:20px 16px 16px;">
+  <div class="m-win" style="width:96vw;max-width:780px;max-height:92vh;display:flex;flex-direction:column;padding:20px 16px 16px;padding-right:70px;">
     <button class="btn-close-x" onclick="closeSideChamps()">✕</button>
     <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:12px;">👥 Чемпионы</div>
     <!-- Role filter -->
@@ -3690,7 +3747,7 @@ Stormarrow: При максимальных зарядах следующая б
 </div>
 <!-- ══ CHAMPION DETAIL MODAL ══ -->
 <div class="m-mask" id="champDetailMask" onclick="if(event.target===this)closeChampDetail()">
-  <div class="m-win" style="width:92vw;max-width:480px;max-height:90vh;overflow-y:auto;padding:24px 20px 20px;">
+  <div class="m-win" style="width:92vw;max-width:500px;max-height:92vh;overflow-y:auto;padding:24px 20px 20px;padding-right:70px;">
     <button class="btn-close-x" onclick="closeChampDetail()">✕</button>
     <div id="champDetailContent" style="text-align:center;padding:30px 0;">
       <div style="font-size:40px;margin-bottom:12px;">⚔</div>
@@ -3701,20 +3758,20 @@ Stormarrow: При максимальных зарядах следующая б
 </div>
 
 <!-- ══ ITEM DETAIL MODAL ══ -->
-<div id="itemDetailModal" style="position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;" onclick="if(event.target===this)closeItemDetail()">
-  <div style="background:linear-gradient(135deg,#160930 0%,#0d051f 100%);border:1.5px solid rgba(185,111,255,0.45);border-radius:18px;padding:24px 22px 20px;max-width:420px;width:92vw;max-height:88vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.8);">
-    <button onclick="closeItemDetail()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:20px;cursor:pointer;line-height:1;z-index:1;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">✕</button>
+<div id="itemDetailModal" class="m-mask" onclick="if(event.target===this)closeItemDetail()">
+  <div class="m-win" style="width:92vw;max-width:480px;max-height:88vh;overflow-y:auto;padding:24px 20px 20px;padding-right:70px;">
+    <button onclick="closeItemDetail()" class="btn-close-x">✕</button>
     <div id="itemDetailContent"></div>
   </div>
 </div>
 
 
-<div id="itemTooltip"></div>
+
 </div><!-- balance -->
 
 <!-- ══ ITEM CALC SUB-MODAL ══ -->
 <div id="itemSubModal" class="m-mask" style="z-index:8000;" onclick="if(event.target===this)closeItemCalc()">
-  <div class="m-win" style="width:92vw;max-width:480px;max-height:85vh;overflow-y:auto;padding:24px 20px 20px;position:relative;">
+  <div class="m-win" style="width:92vw;max-width:520px;max-height:88vh;overflow-y:auto;padding:24px 20px 20px;padding-right:70px;position:relative;">
     <button class="btn-close-x" onclick="closeItemCalc()">✕</button>
     <div id="itemSubTitle" style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:16px;padding-right:36px;"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
