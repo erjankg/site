@@ -541,22 +541,27 @@
             color: #6c5788;
         }
 
-        /* GRID */
+        /* GRID — 5 role columns, fill full width */
         .m-grid {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
-            gap: 8px;
-            padding: 8px 8px 15px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            padding: 8px 12px 15px;
             overflow-y: auto;
-            justify-items: center;
+            align-items: start;
         }
 
         /* ROLE COLUMN */
         .m-role-container {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .m-role-header {
+            display: none;
         }
 
         .m-role {
@@ -603,16 +608,29 @@
         /* CHAMPION */
         .m-item {
             background: transparent;
-            padding: 2px;
-            border-radius: 0;
-            font-size: 12px;
+            padding: 3px;
+            border-radius: 8px;
+            font-size: 9px;
             text-align: center;
             color: #a689c4;
             cursor: pointer;
             transition: all 0.18s;
             border: 2px solid transparent;
-            line-height: 1.4;
+            line-height: 1.3;
             font-weight: 700;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .m-item img {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            object-fit: cover;
+            display: block;
         }
 
         .m-item:hover {
@@ -1061,9 +1079,7 @@
             .row-num { font-size: 8px; min-width: 10px; }
         }
         /* Modal champion items with icons */
-        .m-item { display: flex; flex-direction: column; align-items: center; gap: 0; padding: 2px !important; width: 100%; justify-content: center; }
-        .m-item img { width: 50px; height: 50px; border-radius: 9px; object-fit: cover; display: block; }
-        @media (max-width: 768px) { .m-item img { width: 42px; height: 42px; border-radius: 8px; } }
+        /* m-item uses width:100% and aspect-ratio:1 for icons — see .m-item CSS above */
 
         /* Mobile: force sort arrows visible under header text */
         @media (max-width: 768px) {
@@ -1225,6 +1241,24 @@
 
 
 
+        /* ── Calc range buttons ── */
+        .calc-range-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1.5px solid rgba(155,89,182,0.3);
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .calc-range-btn.active {
+            border-color: #b96fff;
+            background: rgba(109,63,245,0.3);
+            color: #fff;
+        }
+        .calc-range-btn:hover { background: rgba(109,63,245,0.15); color: #fff; }
         /* ── Calc level / type buttons ── */
         .calc-lvl-btn, .calc-type-btn {
             padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 700;
@@ -1468,7 +1502,7 @@
     // MODAL SYSTEM - only one modal at a time
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','chartMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','welcomeOverlay'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','draftMask','welcomeOverlay'];
 
     function closeAllModals(except) {
         MODAL_IDS.forEach(function(id) {
@@ -1752,7 +1786,7 @@ async function start() {
             champImg.style.cursor = 'pointer';
             champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
             if(isP) champImg.classList.add('icon-pinned');
-            champImg.addEventListener('click', (ev) => { ev.stopPropagation(); openChampDetail(item.name); });
+            champImg.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
     // Long press on icon → open chart (mobile-friendly)
     let _lpTimer;
     champImg.addEventListener('pointerdown', () => { _lpTimer = setTimeout(() => openChart(item.name), 600); });
@@ -1796,22 +1830,17 @@ async function start() {
 
         roles.forEach(role => {
             const allChampsInRole = raw.filter(x => x.is[role]);
-
-            // фильтр поиска (если пусто — показываем всех)
             const champs = (q
                 ? allChampsInRole.filter(x => x.name.toLowerCase().includes(q))
                 : allChampsInRole
             ).slice().sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }));
 
-            // если идёт поиск и в роли ничего не найдено — не рисуем пустую колонку
             if (q && champs.length === 0) return;
 
             const container = document.createElement('div');
             container.className = 'm-role-container';
 
-            // ALL для роли считаем по всем чемпам роли (не по фильтру поиска)
             const isAll = allChampsInRole.length > 0 && allChampsInRole.every(x => selected.has(x.name));
-
             const roleDiv = document.createElement('div');
             roleDiv.className = 'm-role ' + (isAll ? 'on' : '');
             roleDiv.innerHTML = '<img src="' + roleIcons[role] + '" alt="' + role + '">';
@@ -1820,15 +1849,27 @@ async function start() {
 
             champs.forEach(c => {
                 const btn = document.createElement('div');
-                btn.className = 'm-item ' + (selected.has(c.name) ? 'on' : '');
+                const isOn = selected.has(c.name);
+                btn.className = 'm-item ' + (isOn ? 'on' : '');
+
                 const mImg = document.createElement('img');
                 mImg.src = DD_URL + champKey(c.name) + '.png';
-                mImg.alt = '';
-                mImg.onerror = function(){ this.style.display='none'; };
-                mImg.title = c.name;
+                mImg.alt = c.name;
+                mImg.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; this.src=''; };
+
+                const nm = document.createElement('div');
+                nm.style.cssText = 'font-size:8px;color:'+(isOn?'#fff':'rgba(255,255,255,0.5)')+';text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
+                nm.textContent = c.name;
+
                 btn.appendChild(mImg);
+                btn.appendChild(nm);
+
                 btn.onclick = () => {
-                    openChampDetail(c.name);
+                    if(selected.has(c.name)) selected.delete(c.name);
+                    else selected.add(c.name);
+                    try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e) {}
+                    drawM();
+                    render();
                 };
                 container.appendChild(btn);
             });
@@ -1836,13 +1877,9 @@ async function start() {
             grid.appendChild(container);
         });
 
-        // если поиск активен и вообще ничего не найдено — покажем подсказку
         if (q && grid.children.length === 0) {
             const empty = document.createElement('div');
-            empty.style.opacity = '0.8';
-            empty.style.fontSize = '14px';
-            empty.style.textAlign = 'center';
-            empty.style.padding = '20px';
+            empty.style.cssText = 'grid-column:1/-1;opacity:0.8;font-size:14px;text-align:center;padding:20px;';
             empty.innerText = 'Ничего не найдено';
             grid.appendChild(empty);
         }
@@ -2044,12 +2081,10 @@ async function start() {
     // WELCOME
     window.closeWelcome = function() {
         closeModal('welcomeOverlay');
-        try { localStorage.setItem('wr_welcomed','1'); } catch(e) {}
     };
+    // Показываем приветствие каждый раз при открытии сайта
     (function() {
-        var seen = false;
-        try { seen = !!localStorage.getItem('wr_welcomed'); } catch(e) {}
-        if(!seen) setTimeout(function() { openModal('welcomeOverlay'); }, 400);
+        setTimeout(function() { openModal('welcomeOverlay'); }, 400);
     })();
 
     // SIDEBAR
@@ -2080,8 +2115,13 @@ async function start() {
     window.closeCalc = function() { closeModal('calcMask'); closeModal('itemSubModal'); };
     window.calcDmg = function() {
         var dmg   = parseFloat((document.getElementById('cDmg')||{}).value) || 0;
-        var armor = parseFloat((document.getElementById('cArmor')||{}).value) || 0;
+        var bonusArmor = parseFloat((document.getElementById('cBonusArmor')||{}).value) || 0;
+        var bonusMR    = parseFloat((document.getElementById('cBonusMR')||{}).value) || 0;
+        var bonusHp    = parseFloat((document.getElementById('cBonusHp')||{}).value) || 0;
+        var armor = (parseFloat((document.getElementById('cArmor')||{}).value) || 0) + bonusArmor;
         var pen   = parseFloat((document.getElementById('cPen')||{}).value) || 0;
+        var enemyHpMax = (parseFloat((document.getElementById('cEnemyHpMax')||{}).value) || 0) + bonusHp;
+        var enemyHpCur = parseFloat((document.getElementById('cEnemyHpCur')||{}).value) || enemyHpMax;
         var res   = document.getElementById('calcResult');
         if(!res) return;
         if(!dmg) { res.style.display='none'; return; }
@@ -2092,9 +2132,109 @@ async function start() {
         if(e('resEff')) e('resEff').textContent = Math.round(effArmor*10)/10;
         if(e('resMit')) e('resMit').textContent = mit.toFixed(1)+'%';
         if(e('resDmg')) e('resDmg').textContent = Math.round(finalDmg);
-        if(e('calcFormula')) e('calcFormula').textContent = dmg+' x 100/(100+'+Math.round(effArmor*10)/10+') = '+Math.round(finalDmg);
+        if(e('calcFormula')) e('calcFormula').textContent = dmg+' × 100/(100+'+Math.round(effArmor*10)/10+') = '+Math.round(finalDmg);
+        // HP bar: show % of enemy hp
+        if(enemyHpMax > 0 && e('calcHpBar')) {
+            var pct = Math.min(100, (finalDmg / enemyHpMax * 100));
+            e('calcHpBar').style.display = 'block';
+            e('calcHpBarFill').style.width = pct.toFixed(1)+'%';
+            e('calcHpPct').textContent = pct.toFixed(1)+'% HP';
+        }
         res.style.display = 'flex';
     };
+    // ── TARGET CARD SYSTEM ──
+    var _targetMode = 'mannequin'; // 'mannequin' | 'champ'
+    var _targetChamp = null;
+
+    window.setTargetMode = function(mode) {
+        _targetMode = mode;
+        var btnM = document.getElementById('targetModeMannequin');
+        var btnC = document.getElementById('targetModeChamp');
+        var picker = document.getElementById('targetChampPicker');
+        if(btnM) {
+            btnM.style.background = mode==='mannequin' ? 'rgba(231,76,60,0.25)' : 'transparent';
+            btnM.style.borderColor = mode==='mannequin' ? 'rgba(231,76,60,0.5)' : 'rgba(155,89,182,0.3)';
+            btnM.style.color = mode==='mannequin' ? '#fff' : 'rgba(255,255,255,0.5)';
+        }
+        if(btnC) {
+            btnC.style.background = mode==='champ' ? 'rgba(109,63,245,0.25)' : 'transparent';
+            btnC.style.borderColor = mode==='champ' ? 'rgba(185,111,255,0.6)' : 'rgba(155,89,182,0.3)';
+            btnC.style.color = mode==='champ' ? '#fff' : 'rgba(255,255,255,0.5)';
+        }
+        if(picker) picker.style.display = mode==='champ' ? 'block' : 'none';
+        if(mode === 'champ') buildTargetChampGrid('');
+        if(mode === 'mannequin') {
+            _targetChamp = null;
+            clearTargetInputs();
+        }
+    };
+
+    window.filterTargetChamps = function() {
+        var q = (document.getElementById('targetChampSearch')||{}).value || '';
+        buildTargetChampGrid(q.toLowerCase());
+    };
+
+    function buildTargetChampGrid(q) {
+        var grid = document.getElementById('targetChampGrid');
+        if(!grid || !raw.length) return;
+        grid.innerHTML = '';
+        var filtered = raw.filter(function(c){ return !q || c.name.toLowerCase().includes(q); }).slice(0, 40);
+        filtered.forEach(function(c) {
+            var img = document.createElement('img');
+            img.src = DD_URL + champKey(c.name) + '.png';
+            img.title = c.name;
+            img.style.cssText = 'width:36px;height:36px;border-radius:6px;object-fit:cover;cursor:pointer;border:2px solid transparent;transition:all 0.12s;';
+            img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
+            img.onclick = function() { selectTargetChamp(c.name); };
+            img.onmouseenter = function(){ this.style.borderColor='#b96fff'; this.style.transform='scale(1.1)'; };
+            img.onmouseleave = function(){ this.style.borderColor='transparent'; this.style.transform=''; };
+            grid.appendChild(img);
+        });
+    }
+
+    window.selectTargetChamp = function(name) {
+        _targetChamp = raw.find(function(x){ return x.name===name; });
+        if(!_targetChamp) return;
+        // Fill inputs from real stats at current calc level
+        var lvlC = _calcLvl || 1;
+        var f = function(b,g){ return Math.round(b + (lvlC-1)*g); };
+        var armor = f(_targetChamp.ar_b, _targetChamp.ar_g);
+        var hp    = f(_targetChamp.hp_b, _targetChamp.hp_g);
+        var setVal = function(id, val) {
+            var el = document.getElementById(id); if(el){ el.value = val; }
+        };
+        setVal('cArmor', armor);
+        setVal('cEnemyHpMax', hp);
+        setVal('cEnemyHpCur', hp);
+        // Show selected champ badge
+        var badge = document.getElementById('targetChampSelected');
+        if(badge) badge.style.display = 'flex';
+        var icon = document.getElementById('targetChampIcon');
+        if(icon) { icon.src = DD_URL + champKey(name) + '.png'; icon.style.display='block'; }
+        var nm = document.getElementById('targetChampName');
+        if(nm) nm.textContent = name + ' (ур. '+lvlC+')';
+        // Hide grid
+        var grid = document.getElementById('targetChampGrid');
+        if(grid) grid.style.display = 'none';
+        calcDmg();
+    };
+
+    window.clearTargetChamp = function() {
+        _targetChamp = null;
+        var badge = document.getElementById('targetChampSelected');
+        if(badge) badge.style.display = 'none';
+        var grid = document.getElementById('targetChampGrid');
+        if(grid) grid.style.display = 'grid';
+        clearTargetInputs();
+    };
+
+    function clearTargetInputs() {
+        ['cArmor','cEnemyHpMax','cEnemyHpCur','cBonusArmor','cBonusHp','cBonusMR'].forEach(function(id){
+            var el = document.getElementById(id); if(el) el.value = '';
+        });
+        calcDmg();
+    }
+
     window.addAbilityRow = function() {
         var rows = document.getElementById('abilityRows');
         if(!rows) return;
@@ -2110,7 +2250,9 @@ async function start() {
         document.querySelectorAll('.calc-lvl-btn').forEach(function(b){
             b.classList.toggle('active', +b.dataset.lvl===lvl);
         });
-        calcDmg();
+        // Refresh target champ stats at new level
+        if(_targetChamp) selectTargetChamp(_targetChamp.name);
+        else calcDmg();
     };
     window.setCalcRange = function(type) {
         _calcRange = type;
@@ -2126,9 +2268,221 @@ async function start() {
         var btn = document.getElementById(map[item]);
         if(btn) btn.classList.add('active');
     };
-    window.openItemCalc = function(key) { openModal('itemSubModal'); };
+    window.openItemCalc = function(key) {
+        // Item definitions
+        var ITEMS = {
+            thornmail: {
+                name: '🛡 Шипованный доспех',
+                desc: 'Отражает урон атакующему + Тяжкие раны',
+                myFields: [
+                    {id:'si_myArmor', label:'Моя броня', ph:'100'},
+                    {id:'si_myBonusHp', label:'Мой бонусный HP', ph:'0'}
+                ],
+                enemyFields: [
+                    {id:'si_eDmg', label:'Урон врага (атака)', ph:'150'},
+                    {id:'si_eArmor', label:'Броня врага', ph:'50'}
+                ],
+                calc: function() {
+                    var myArmor = +v('si_myArmor')||100;
+                    var myBHp   = +v('si_myBonusHp')||0;
+                    var eDmg    = +v('si_eDmg')||150;
+                    // Thornmail: reflect = 20 + 6% bonus armor + 2% bonus HP
+                    var reflect = 20 + myArmor*0.06 + myBHp*0.02;
+                    return {label:'Отражённый урон', val: Math.round(reflect), formula:'20 + '+Math.round(myArmor)+'×6% + '+Math.round(myBHp)+'×2% = '+Math.round(reflect)};
+                }
+            },
+            botrk: {
+                name: '⚔ Клинок Погибшего Короля',
+                desc: 'Испорченные удары: урон = % текущего HP врага',
+                myFields: [
+                    {id:'si_myAD', label:'Мой AD', ph:'150'}
+                ],
+                enemyFields: [
+                    {id:'si_eHpCur', label:'Текущий HP врага', ph:'2500'},
+                    {id:'si_eHpMax', label:'Макс. HP врага', ph:'3000'}
+                ],
+                calc: function() {
+                    var eHpCur = +v('si_eHpCur')||2500;
+                    var eHpMax = +v('si_eHpMax')||3000;
+                    // BotRK: 10% current HP (min 15, max 60 vs monsters)
+                    var dmg = Math.max(15, eHpCur * 0.10);
+                    var slow = 25; // 25% slow
+                    return {label:'Урон Испорченных ударов', val: Math.round(dmg), formula:'10% × '+eHpCur+' HP = '+Math.round(dmg)+' (мин. 15). Замедление: '+slow+'%'};
+                }
+            },
+            sunfire: {
+                name: '🔥 Эгида Солнечного огня',
+                desc: 'Самовозгорание: урон/с рядом с врагами',
+                myFields: [
+                    {id:'si_myBonusHp2', label:'Мой бонусный HP', ph:'1000'},
+                    {id:'si_stacks', label:'Стаки (0-4)', ph:'4'}
+                ],
+                enemyFields: [
+                    {id:'si_eLevel', label:'Уровень врага (1-15)', ph:'10'}
+                ],
+                calc: function() {
+                    var bHp    = +v('si_myBonusHp2')||1000;
+                    var stacks = Math.min(4, +v('si_stacks')||4);
+                    var lvl    = +v('si_eLevel')||10;
+                    // Sunfire: base 16-30 + 1% bonus HP per sec, stacks +11% each
+                    var base = Math.round(16 + (30-16)*(lvl-1)/14);
+                    var dps = (base + bHp*0.01) * (1 + stacks*0.11);
+                    return {label:'Урон/сек ('+stacks+' стака)', val: Math.round(dps), formula:'('+base+' + '+Math.round(bHp*0.01)+') × '+(1+stacks*0.11).toFixed(2)+' = '+Math.round(dps)};
+                }
+            },
+            liandry: {
+                name: '🔮 Мучения Лиандри',
+                desc: 'Поджигает цель: 0.5% макс. HP/с + бонус в бою',
+                myFields: [
+                    {id:'si_myAP', label:'Мой AP', ph:'250'},
+                    {id:'si_combatSec', label:'Секунд в бою', ph:'3'}
+                ],
+                enemyFields: [
+                    {id:'si_eHpMaxL', label:'Макс. HP врага', ph:'3000'}
+                ],
+                calc: function() {
+                    var eHpMax = +v('si_eHpMaxL')||3000;
+                    var secs   = Math.min(3, +v('si_combatSec')||3);
+                    // Liandry: 0.5% max HP per sec × 3 sec; Suffering: +2% dmg/sec up to +6%
+                    var burnDmg = eHpMax * 0.005 * 3;
+                    var bonus = 1 + Math.min(3, secs) * 0.02;
+                    var total = burnDmg * bonus;
+                    return {label:'Урон за 3с (с бонусом)', val: Math.round(total), formula:eHpMax+'×0.5%×3с × '+bonus.toFixed(2)+' = '+Math.round(total)};
+                }
+            },
+            sunderer: {
+                name: '⚡ Божественный Разрушитель',
+                desc: 'Заклинатель: доп. удар после способности',
+                myFields: [
+                    {id:'si_myAD2', label:'Мой базовый AD', ph:'120'},
+                    {id:'si_myRange', label:'Тип (0=ближний,1=дальний)', ph:'0'}
+                ],
+                enemyFields: [
+                    {id:'si_eHpMaxS', label:'Макс. HP врага', ph:'3000'}
+                ],
+                calc: function() {
+                    var myAD   = +v('si_myAD2')||120;
+                    var ranged = (+v('si_myRange')||0) >= 1;
+                    var eHpMax = +v('si_eHpMaxS')||3000;
+                    // Sunderer: melee 10%/ranged 7% max HP + min 125% base AD
+                    var pctDmg = eHpMax * (ranged ? 0.07 : 0.10);
+                    var minDmg = myAD * 1.25;
+                    var dmg = Math.max(pctDmg, minDmg);
+                    // Heals: 6%/2.5% max HP
+                    var heal = eHpMax * (ranged ? 0.025 : 0.06);
+                    var healMin = myAD * (ranged ? 0.5 : 0.9);
+                    heal = Math.max(heal, healMin);
+                    return {label:(ranged?'Дальний':'Ближний')+' удар Заклинателя', val: Math.round(dmg), formula:(ranged?'7':'10')+'% × '+eHpMax+' = '+Math.round(pctDmg)+'. Лечение: '+Math.round(heal)};
+                }
+            }
+        };
+
+        function v(id) { var el=document.getElementById(id); return el ? el.value : ''; }
+
+        var item = ITEMS[key];
+        if(!item) return;
+
+        // Set title
+        var titleEl = document.getElementById('itemSubTitle');
+        if(titleEl) titleEl.innerHTML = item.name + '<div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:400;margin-top:3px;">'+item.desc+'</div>';
+
+        // Build my fields
+        var myDiv = document.getElementById('itemSubMyFields');
+        if(myDiv) {
+            myDiv.innerHTML = '';
+            item.myFields.forEach(function(f) {
+                myDiv.innerHTML += '<div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">'+f.label+'</label>'
+                    +'<input type="number" id="'+f.id+'" placeholder="'+f.ph+'" class="calc-input" style="padding:8px 10px;" oninput="runItemCalc(\''+key+'\')"></div>';
+            });
+        }
+
+        // Build enemy fields
+        var enDiv = document.getElementById('itemSubEnemyFields');
+        if(enDiv) {
+            enDiv.innerHTML = '';
+            item.enemyFields.forEach(function(f) {
+                enDiv.innerHTML += '<div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">'+f.label+'</label>'
+                    +'<input type="number" id="'+f.id+'" placeholder="'+f.ph+'" class="calc-input" style="padding:8px 10px;" oninput="runItemCalc(\''+key+'\')"></div>';
+            });
+        }
+
+        // Add calculate button
+        var resDiv = document.getElementById('itemSubResult');
+        if(resDiv) resDiv.style.display = 'none';
+
+        // Store current key
+        document.getElementById('itemSubModal')._calcKey = key;
+
+        openModal('itemSubModal');
+
+        // Auto-calculate with placeholder values
+        setTimeout(function(){ runItemCalc(key); }, 100);
+    };
+
     window.closeItemCalc = function() { closeModal('itemSubModal'); };
-    window.runItemCalc = function() {};
+
+    window.runItemCalc = function(key) {
+        // Re-run calc for stored key if not passed
+        if(!key) {
+            var modal = document.getElementById('itemSubModal');
+            key = modal ? modal._calcKey : null;
+        }
+        if(!key) return;
+
+        var ITEMS_CALC = {
+            thornmail: function() {
+                var myArmor = +getV('si_myArmor')||100;
+                var myBHp   = +getV('si_myBonusHp')||0;
+                var reflect = 20 + myArmor*0.06 + myBHp*0.02;
+                return {label:'Отражённый урон', val: Math.round(reflect), formula:'20 + '+Math.round(myArmor)+'×6% + '+Math.round(myBHp)+'×2% = '+Math.round(reflect)+'. Также: Тяжкие раны 60% на 3с'};
+            },
+            botrk: function() {
+                var eHpCur = +getV('si_eHpCur')||2500;
+                var dmg = Math.max(15, eHpCur * 0.10);
+                return {label:'Урон Испорченных ударов', val: Math.round(dmg), formula:'10% × '+eHpCur+' = '+Math.round(dmg)+' (мин. 15). +25% замедление 2с'};
+            },
+            sunfire: function() {
+                var bHp = +getV('si_myBonusHp2')||1000;
+                var stacks = Math.min(4, +getV('si_stacks')||4);
+                var lvl = +getV('si_eLevel')||10;
+                var base = Math.round(16 + (30-16)*(lvl-1)/14);
+                var dps = (base + bHp*0.01) * (1 + stacks*0.11);
+                return {label:'Урон/сек ('+stacks+' стак.)', val: Math.round(dps), formula:'('+base+' + '+Math.round(bHp*0.01)+') × '+(1+stacks*0.11).toFixed(2)+' = '+Math.round(dps)};
+            },
+            liandry: function() {
+                var eHpMax = +getV('si_eHpMaxL')||3000;
+                var secs = Math.min(3, +getV('si_combatSec')||3);
+                var burnDmg = eHpMax * 0.005 * 3;
+                var bonus = 1 + Math.min(3, secs) * 0.02;
+                var total = burnDmg * bonus;
+                return {label:'Ожог за 3с', val: Math.round(total), formula:eHpMax+'×0.5%×3с × '+bonus.toFixed(2)+' = '+Math.round(total)};
+            },
+            sunderer: function() {
+                var myAD = +getV('si_myAD2')||120;
+                var ranged = (+getV('si_myRange')||0) >= 1;
+                var eHpMax = +getV('si_eHpMaxS')||3000;
+                var pctDmg = eHpMax * (ranged ? 0.07 : 0.10);
+                var minDmg = myAD * 1.25;
+                var dmg = Math.max(pctDmg, minDmg);
+                var heal = Math.max(eHpMax*(ranged?0.025:0.06), myAD*(ranged?0.5:0.9));
+                return {label:(ranged?'Дальн.':'Ближн.')+' удар', val: Math.round(dmg), formula:(ranged?'7':'10')+'% HP = '+Math.round(pctDmg)+'. Лечение ≈ '+Math.round(heal)};
+            }
+        };
+
+        function getV(id) { var el=document.getElementById(id); return el ? el.value : '0'; }
+
+        var fn = ITEMS_CALC[key];
+        if(!fn) return;
+        var res = fn();
+        var resDiv = document.getElementById('itemSubResult');
+        var lbl = document.getElementById('itemSubResultLabel');
+        var val = document.getElementById('itemSubResultVal');
+        var frm = document.getElementById('itemSubFormula');
+        if(resDiv) resDiv.style.display = 'block';
+        if(lbl) lbl.textContent = res.label;
+        if(val) val.textContent = res.val;
+        if(frm) frm.textContent = res.formula || '';
+    };
 
     // ITEMS
     window.closeItems = function() {
@@ -2363,18 +2717,20 @@ async function start() {
                 sg.appendChild(box);
             });
             el.appendChild(sg);
-            // Кнопка добавить/убрать
-            var isIn=selected.has(name);
-            var tbtn=document.createElement('button');
-            tbtn.style.cssText='width:100%;padding:13px;border-radius:12px;border:none;font-weight:900;font-size:14px;cursor:pointer;transition:all 0.15s;margin-bottom:8px;'+(isIn?'background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;':'background:linear-gradient(135deg,#6D3FF5,#8e44ad);color:#fff;');
-            tbtn.textContent=isIn?'✕ Убрать из таблицы':'✓ Добавить в таблицу';
-            tbtn.onclick=function(){
-                if(selected.has(name)){selected.delete(name);tbtn.textContent='✓ Добавить в таблицу';tbtn.style.background='linear-gradient(135deg,#6D3FF5,#8e44ad)';}
-                else{selected.add(name);tbtn.textContent='✕ Убрать из таблицы';tbtn.style.background='linear-gradient(135deg,#e74c3c,#c0392b)';}
-                try{localStorage.setItem('sel',JSON.stringify([...selected]));}catch(e){}
-                render();
+            // Кнопка пин
+            var isPinned = pinned.has(name);
+            var pbtn=document.createElement('button');
+            pbtn.style.cssText='width:100%;padding:10px;border-radius:12px;border:1.5px solid rgba(185,111,255,'+(isPinned?'0.7':'0.3')+');background:rgba(109,63,245,'+(isPinned?'0.25':'0.06')+');color:'+(isPinned?'#b96fff':'rgba(255,255,255,0.5)')+';font-weight:700;font-size:13px;cursor:pointer;transition:all 0.15s;margin-bottom:8px;';
+            pbtn.textContent=isPinned?'📌 Закреплён':'📌 Закрепить вверху';
+            pbtn.onclick=function(){
+                toggleP(name);
+                var nowPinned=pinned.has(name);
+                pbtn.textContent=nowPinned?'📌 Закреплён':'📌 Закрепить вверху';
+                pbtn.style.borderColor=nowPinned?'rgba(185,111,255,0.7)':'rgba(185,111,255,0.3)';
+                pbtn.style.background=nowPinned?'rgba(109,63,245,0.25)':'rgba(109,63,245,0.06)';
+                pbtn.style.color=nowPinned?'#b96fff':'rgba(255,255,255,0.5)';
             };
-            el.appendChild(tbtn);
+            el.appendChild(pbtn);
             // Кнопка график
             var gbtn=document.createElement('button');
             gbtn.style.cssText='width:100%;padding:10px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.1);color:rgba(255,255,255,0.6);font-weight:700;font-size:13px;cursor:pointer;transition:all 0.15s;';
@@ -2479,6 +2835,237 @@ async function start() {
     window.hideT = function() {
         if(_uiTip) _uiTip.style.display = 'none';
     };
+
+    // ══════════════════════════════════════════
+    // DRAFT SYSTEM
+    // ══════════════════════════════════════════
+
+    // Counter-pick & synergy data — Wild Rift
+    // stars: 3=сильный контр/комбо, 2=хороший, 1=лёгкий перевес
+    // ══════════════════════════════════════════
+    // DRAFT SYSTEM — new slot-based layout
+    // ══════════════════════════════════════════
+    var DRAFT_DATA = {
+        'Garen':    { counters:[{n:'Darius',s:3},{n:'Fiora',s:3},{n:'Vayne',s:2},{n:'Teemo',s:2},{n:'Irelia',s:1}],
+                      synergies:[{n:'Lux',s:3},{n:'Sona',s:2},{n:'Nami',s:2}] },
+        'Darius':   { counters:[{n:'Vayne',s:3},{n:'Fiora',s:3},{n:'Quinn',s:2},{n:'Teemo',s:2}],
+                      synergies:[{n:'Jarvan IV',s:3},{n:'Malphite',s:3},{n:'Amumu',s:2}] },
+        'Malphite': { counters:[{n:'Vayne',s:2},{n:'Garen',s:1}],
+                      synergies:[{n:'Yasuo',s:3},{n:'Orianna',s:3},{n:'Miss Fortune',s:2}] },
+        'Yasuo':    { counters:[{n:'Annie',s:3},{n:'Gragas',s:2},{n:'Pantheon',s:2}],
+                      synergies:[{n:'Malphite',s:3},{n:'Orianna',s:2},{n:'Diana',s:2}] },
+        'Lux':      { counters:[{n:'Zed',s:3},{n:'Talon',s:3},{n:'Fizz',s:2}],
+                      synergies:[{n:'Garen',s:3},{n:'Miss Fortune',s:2},{n:'Jinx',s:2}] },
+        'Miss Fortune':{ counters:[{n:'Draven',s:2},{n:'Caitlyn',s:2}],
+                         synergies:[{n:'Lux',s:3},{n:'Seraphine',s:3},{n:'Amumu',s:2}] },
+        'Jinx':     { counters:[{n:'Draven',s:2},{n:'Lucian',s:2},{n:'Caitlyn',s:1}],
+                      synergies:[{n:'Thresh',s:3},{n:'Nami',s:2},{n:'Lulu',s:2}] },
+        'Thresh':   { counters:[{n:'Blitzcrank',s:2},{n:'Morgana',s:2}],
+                      synergies:[{n:'Jinx',s:3},{n:'Caitlyn',s:3},{n:'Lucian',s:2}] },
+        'Amumu':    { counters:[{n:'Hecarim',s:2}],
+                      synergies:[{n:'Miss Fortune',s:3},{n:'Orianna',s:3},{n:'Jarvan IV',s:2}] },
+        'Jarvan IV':{ counters:[{n:'Fizz',s:2},{n:'Hecarim',s:1}],
+                      synergies:[{n:'Darius',s:3},{n:'Malphite',s:2},{n:'Miss Fortune',s:2}] }
+    };
+
+    var _draftRoleFilter = 'all';
+    var _draftSlotsL = [null,null,null,null,null];
+    var _draftSlotsR = [null,null,null,null,null];
+    var _draftActiveSlot = null;
+
+    window.openDraft = function() {
+        _draftSlotsL = [null,null,null,null,null];
+        _draftSlotsR = [null,null,null,null,null];
+        _draftActiveSlot = null;
+        _draftRoleFilter = 'all';
+        openModal('draftMask');
+        draftBuildRoleFilter();
+        draftBuildGrid('');
+        draftBuildSlots();
+        draftRenderPanels();
+    };
+    window.closeDraft = function() { closeModal('draftMask'); };
+
+    function draftBuildRoleFilter() {
+        var el = document.getElementById('draftRoleFilter');
+        if(!el) return;
+        var roles = [{k:'all',l:'Все'},{k:'Top',l:'Top'},{k:'Jungle',l:'Лес'},{k:'Mid',l:'Mid'},{k:'ADC',l:'ADC'},{k:'Support',l:'Сап'}];
+        el.innerHTML = '';
+        roles.forEach(function(r) {
+            var b = document.createElement('button');
+            var active = r.k === _draftRoleFilter;
+            b.style.cssText = 'padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;border:1px solid rgba(155,89,182,'+(active?'0.7':'0.25')+');background:rgba(109,63,245,'+(active?'0.3':'0.06')+');color:'+(active?'#fff':'rgba(255,255,255,0.5)')+';';
+            b.textContent = r.l;
+            b.onclick = function(){ _draftRoleFilter = r.k; draftBuildRoleFilter(); draftBuildGrid((document.getElementById('draftSearch')||{}).value||''); };
+            el.appendChild(b);
+        });
+    }
+
+    window.draftFilterGrid = function() {
+        var q = (document.getElementById('draftSearch')||{}).value || '';
+        draftBuildGrid(q.toLowerCase());
+    };
+
+    function draftBuildGrid(q) {
+        var grid = document.getElementById('draftGrid');
+        if(!grid || !raw.length) return;
+        grid.innerHTML = '';
+        var allPicked = _draftSlotsL.concat(_draftSlotsR).filter(Boolean);
+        var list = raw.filter(function(c) {
+            if(q && !c.name.toLowerCase().includes(q)) return false;
+            if(_draftRoleFilter !== 'all' && !c.is[_draftRoleFilter]) return false;
+            return true;
+        });
+        list.forEach(function(c) {
+            var isPicked = allPicked.includes(c.name);
+            var isActiveChamp = false;
+            if(_draftActiveSlot) {
+                var arr = _draftActiveSlot.side==='left' ? _draftSlotsL : _draftSlotsR;
+                isActiveChamp = arr[_draftActiveSlot.idx] === c.name;
+            }
+            var wrap = document.createElement('div');
+            wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;cursor:'+(isPicked?'default':'pointer')+';padding:3px;border-radius:8px;border:2px solid '+(isActiveChamp?'#b96fff':'transparent')+';background:'+(isActiveChamp?'rgba(109,63,245,0.2)':'transparent')+';opacity:'+(isPicked&&!isActiveChamp?'0.28':'1')+';transition:all 0.12s;';
+            var img = document.createElement('img');
+            img.src = DD_URL + champKey(c.name) + '.png';
+            img.style.cssText = 'width:48px;height:48px;border-radius:8px;object-fit:cover;';
+            img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
+            var nm = document.createElement('div');
+            nm.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.45);text-align:center;line-height:1.1;width:52px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
+            nm.textContent = c.name;
+            wrap.appendChild(img); wrap.appendChild(nm);
+            if(!isPicked) {
+                wrap.onmouseenter = function(){ this.style.borderColor='#b96fff'; this.style.background='rgba(109,63,245,0.15)'; };
+                wrap.onmouseleave = function(){ this.style.borderColor='transparent'; this.style.background=''; };
+                wrap.onclick = function() { draftPickChamp(c.name); };
+            }
+            grid.appendChild(wrap);
+        });
+    }
+
+    function draftBuildSlots() {
+        function buildSide(slotsArr, side) {
+            var elId = side==='left' ? 'draftSlotsLeft' : 'draftSlotsRight';
+            var el = document.getElementById(elId);
+            if(!el) return;
+            el.innerHTML = '';
+            var teamColor = side==='left' ? 'rgba(93,173,226,0.6)' : 'rgba(231,76,60,0.6)';
+            for(var i=0;i<5;i++) {
+                (function(idx){
+                    var champ = slotsArr[idx];
+                    var isActive = _draftActiveSlot && _draftActiveSlot.side === side && _draftActiveSlot.idx === idx;
+                    var slot = document.createElement('div');
+                    slot.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:9px;cursor:pointer;border:2px solid '+(isActive?'#b96fff':(champ?teamColor:'rgba(155,89,182,0.12)'))+';background:'+(isActive?'rgba(109,63,245,0.2)':(champ?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.02)'))+';transition:all 0.12s;min-height:42px;position:relative;';
+                    if(champ) {
+                        var img = document.createElement('img');
+                        img.src = DD_URL + champKey(champ) + '.png';
+                        img.style.cssText = 'width:30px;height:30px;border-radius:6px;object-fit:cover;flex-shrink:0;';
+                        img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
+                        var nm = document.createElement('div');
+                        nm.style.cssText = 'font-size:11px;font-weight:700;color:#fff;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
+                        nm.textContent = champ;
+                        var x = document.createElement('button');
+                        x.textContent = '×';
+                        x.style.cssText = 'background:none;border:none;color:rgba(255,255,255,0.3);font-size:15px;cursor:pointer;padding:0 2px;flex-shrink:0;line-height:1;';
+                        x.onclick = function(e){ e.stopPropagation(); draftClearSlot(side, idx); };
+                        slot.appendChild(img); slot.appendChild(nm); slot.appendChild(x);
+                    } else {
+                        var numBadge = document.createElement('div');
+                        numBadge.style.cssText = 'width:22px;height:22px;border-radius:50%;background:'+(isActive?'rgba(109,63,245,0.5)':'rgba(255,255,255,0.06)')+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:'+(isActive?'#fff':'rgba(255,255,255,0.25)')+';flex-shrink:0;';
+                        numBadge.textContent = idx+1;
+                        var ph = document.createElement('div');
+                        ph.style.cssText = 'font-size:10px;color:'+(isActive?'#b96fff':'rgba(255,255,255,0.2)')+';font-weight:'+(isActive?'700':'400')+';font-style:'+(isActive?'normal':'italic')+';';
+                        ph.textContent = isActive ? '← выбери чемпиона' : 'пусто';
+                        slot.appendChild(numBadge); slot.appendChild(ph);
+                    }
+                    slot.onclick = function() { draftSetActiveSlot(side, idx); };
+                    el.appendChild(slot);
+                })(i);
+            }
+        }
+        buildSide(_draftSlotsL, 'left');
+        buildSide(_draftSlotsR, 'right');
+    }
+
+    function draftSetActiveSlot(side, idx) {
+        if(_draftActiveSlot && _draftActiveSlot.side===side && _draftActiveSlot.idx===idx) {
+            _draftActiveSlot = null; // deselect if clicking same slot
+        } else {
+            _draftActiveSlot = {side:side, idx:idx};
+        }
+        draftBuildSlots();
+    }
+
+    function draftPickChamp(name) {
+        if(!_draftActiveSlot) {
+            for(var i=0;i<5;i++){ if(!_draftSlotsL[i]){ _draftActiveSlot={side:'left',idx:i}; break; } }
+            if(!_draftActiveSlot){
+                for(var j=0;j<5;j++){ if(!_draftSlotsR[j]){ _draftActiveSlot={side:'right',idx:j}; break; } }
+            }
+            if(!_draftActiveSlot) return;
+        }
+        var side = _draftActiveSlot.side, idx = _draftActiveSlot.idx;
+        if(side==='left') _draftSlotsL[idx]=name;
+        else _draftSlotsR[idx]=name;
+        // Advance to next empty slot same side, else other side
+        _draftActiveSlot = null;
+        function findNext(arr, startIdx, s) {
+            for(var k=startIdx+1;k<5;k++){ if(!arr[k]) return {side:s,idx:k}; }
+            return null;
+        }
+        var arr = side==='left' ? _draftSlotsL : _draftSlotsR;
+        _draftActiveSlot = findNext(arr, idx, side);
+        if(!_draftActiveSlot) {
+            var otherSide = side==='left'?'right':'left';
+            var otherArr = side==='left'?_draftSlotsR:_draftSlotsL;
+            for(var m=0;m<5;m++){ if(!otherArr[m]){ _draftActiveSlot={side:otherSide,idx:m}; break; } }
+        }
+        draftBuildSlots();
+        draftBuildGrid((document.getElementById('draftSearch')||{}).value||'');
+        draftRenderPanels();
+    }
+
+    window.draftClearAll = function() {
+        _draftSlotsL=[null,null,null,null,null]; _draftSlotsR=[null,null,null,null,null]; _draftActiveSlot=null;
+        draftBuildSlots(); draftBuildGrid(''); draftRenderPanels();
+    };
+
+    function draftClearSlot(side, idx) {
+        if(side==='left') _draftSlotsL[idx]=null;
+        else _draftSlotsR[idx]=null;
+        _draftActiveSlot={side:side,idx:idx};
+        draftBuildSlots(); draftBuildGrid((document.getElementById('draftSearch')||{}).value||''); draftRenderPanels();
+    }
+
+    function draftRenderPanels() {
+        function compute(slots) {
+            var picked = slots.filter(Boolean);
+            var cm={}, sm={};
+            picked.forEach(function(n){
+                var d=DRAFT_DATA[n]; if(!d) return;
+                (d.counters||[]).forEach(function(c){ if(picked.includes(c.n)) return; if(!cm[c.n]) cm[c.n]={stars:0,from:[]}; cm[c.n].stars=Math.max(cm[c.n].stars,c.s); cm[c.n].from.push(n); });
+                (d.synergies||[]).forEach(function(s){ if(picked.includes(s.n)) return; if(!sm[s.n]) sm[s.n]={stars:0,from:[]}; sm[s.n].stars=Math.max(sm[s.n].stars,s.s); sm[s.n].from.push(n); });
+            });
+            return {cm:cm,sm:sm,picked:picked};
+        }
+        function html(map, isCounter) {
+            var e=Object.keys(map).map(function(n){return{name:n,stars:map[n].stars,from:map[n].from};});
+            e.sort(function(a,b){return b.stars-a.stars||b.from.length-a.from.length;});
+            if(!e.length) return '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">—</div>';
+            return e.slice(0,8).map(function(x){
+                var sc = isCounter?(x.stars===3?'#e74c3c':x.stars===2?'#e8820a':'#f1c40f'):(x.from.length>=2?'#b96fff':'#2ecc71');
+                var st=Array(x.stars).fill('<span style="color:'+sc+'">★</span>').join('')+Array(3-x.stars).fill('<span style="color:rgba(255,255,255,0.1)">☆</span>').join('');
+                return '<div style="display:flex;align-items:center;gap:6px;padding:5px 6px;background:rgba(255,255,255,0.03);border-radius:7px;margin-bottom:3px;"><img src="'+DD_URL+champKey(x.name)+'.png" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;" onerror="this.style.background=&quot;rgba(109,63,245,0.3)&quot;"><div style="flex:1;min-width:0;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.name+'</div><div style="font-size:11px;flex-shrink:0;">'+st+'</div></div>';
+            }).join('');
+        }
+        var L=compute(_draftSlotsL), R=compute(_draftSlotsR);
+        var empty='<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">—</div>';
+        ['Left','Right'].forEach(function(side){
+            var data = side==='Left'?L:R;
+            var cEl=document.getElementById('draftCounters'+side), sEl=document.getElementById('draftSynergies'+side);
+            if(cEl) cEl.innerHTML = data.picked.length ? html(data.cm,true) : empty;
+            if(sEl) sEl.innerHTML = data.picked.length ? html(data.sm,false) : empty;
+        });
+    }
 
     // Start loading data
     start();
@@ -3412,15 +3999,66 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
         </div>
       </div>
 
-      <!-- COL 3: ENEMY red -->
+      <!-- COL 3: TARGET CARD -->
       <div style="background:rgba(231,76,60,0.08);border:1.5px solid rgba(231,76,60,0.4);border-radius:12px;padding:12px 13px;">
-        <div style="font-size:9px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🔴 СТАТЫ ВРАГА</div>
-        <div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">Броня / МС</label>
-          <input type="number" id="cArmor" placeholder="100" min="-99" class="calc-input" oninput="calcDmg()"></div>
-        <div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">Макс. HP</label>
-          <input type="number" id="cEnemyHpMax" placeholder="2500" min="0" class="calc-input" oninput="calcDmg()"></div>
-        <div class="calc-field"><label class="calc-label">Тек. HP</label>
-          <input type="number" id="cEnemyHpCur" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()"></div>
+        <div style="font-size:9px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🎯 ЦЕЛЬ</div>
+
+        <!-- Toggle: Mannequin vs Champion -->
+        <div style="display:flex;gap:5px;margin-bottom:10px;">
+          <button id="targetModeMannequin" onclick="setTargetMode('mannequin')"
+            style="flex:1;padding:5px 4px;border-radius:8px;border:1.5px solid rgba(231,76,60,0.5);background:rgba(231,76,60,0.25);color:#fff;font-size:10px;font-weight:700;cursor:pointer;">
+            🪆 Манекен
+          </button>
+          <button id="targetModeChamp" onclick="setTargetMode('champ')"
+            style="flex:1;padding:5px 4px;border-radius:8px;border:1.5px solid rgba(155,89,182,0.3);background:transparent;color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;cursor:pointer;">
+            ⚔ Чемпион
+          </button>
+        </div>
+
+        <!-- Champion picker (hidden by default) -->
+        <div id="targetChampPicker" style="display:none;margin-bottom:10px;">
+          <input id="targetChampSearch" type="text" placeholder="🔍 Имя чемпиона..." class="calc-input"
+            style="font-size:12px;padding:7px 10px;margin-bottom:6px;"
+            oninput="filterTargetChamps()">
+          <div id="targetChampGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:4px;max-height:100px;overflow-y:auto;"></div>
+          <!-- Selected champ display -->
+          <div id="targetChampSelected" style="display:none;margin-top:8px;display:flex;align-items:center;gap:8px;background:rgba(231,76,60,0.1);border-radius:8px;padding:6px 8px;">
+            <img id="targetChampIcon" style="width:32px;height:32px;border-radius:6px;object-fit:cover;" src="" onerror="this.style.display='none'">
+            <span id="targetChampName" style="font-size:12px;font-weight:700;color:#fff;"></span>
+            <button onclick="clearTargetChamp()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.35);font-size:14px;cursor:pointer;">✕</button>
+          </div>
+        </div>
+
+        <!-- Base stats (auto-filled for champ, manual for mannequin) -->
+        <div class="calc-field" style="margin-bottom:7px;">
+          <label class="calc-label">Броня / МС</label>
+          <input type="number" id="cArmor" placeholder="100" min="-99" class="calc-input" oninput="calcDmg()">
+        </div>
+        <div class="calc-field" style="margin-bottom:7px;">
+          <label class="calc-label">Макс. HP</label>
+          <input type="number" id="cEnemyHpMax" placeholder="2500" min="0" class="calc-input" oninput="calcDmg()">
+        </div>
+        <div class="calc-field" style="margin-bottom:7px;">
+          <label class="calc-label">Тек. HP</label>
+          <input type="number" id="cEnemyHpCur" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()">
+        </div>
+
+        <!-- Bonus stats block -->
+        <div style="margin-top:10px;border-top:1px solid rgba(231,76,60,0.2);padding-top:10px;">
+          <div style="font-size:9px;color:rgba(255,200,100,0.8);font-weight:700;letter-spacing:1px;margin-bottom:7px;">➕ ДОППРЕДМЕТЫ</div>
+          <div class="calc-field" style="margin-bottom:6px;">
+            <label class="calc-label">Доп. HP</label>
+            <input type="number" id="cBonusHp" placeholder="0" min="0" class="calc-input" oninput="calcDmg()">
+          </div>
+          <div class="calc-field" style="margin-bottom:6px;">
+            <label class="calc-label">Доп. броня</label>
+            <input type="number" id="cBonusArmor" placeholder="0" min="0" class="calc-input" oninput="calcDmg()">
+          </div>
+          <div class="calc-field">
+            <label class="calc-label">Доп. МС</label>
+            <input type="number" id="cBonusMR" placeholder="0" min="0" class="calc-input" oninput="calcDmg()">
+          </div>
+        </div>
       </div>
 
       <!-- COL 4: RESULTS -->
@@ -3449,6 +4087,14 @@ document.getElementById('nickname')?.addEventListener('click', e => e.preventDef
           </div>
         </div>
         <div id="calcFormula" style="font-size:10px;color:rgba(255,255,255,0.25);font-family:monospace;line-height:1.4;"></div>
+        <!-- HP damage bar -->
+        <div id="calcHpBar" style="display:none;margin-top:6px;">
+          <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:4px;font-weight:700;">УРОН ОТ HP ЦЕЛИ</div>
+          <div style="background:rgba(255,255,255,0.08);border-radius:6px;height:14px;overflow:hidden;position:relative;">
+            <div id="calcHpBarFill" style="height:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);border-radius:6px;width:0%;transition:width 0.3s ease;"></div>
+          </div>
+          <div id="calcHpPct" style="font-size:11px;color:#e74c3c;font-weight:700;margin-top:3px;text-align:right;"></div>
+        </div>
       </div>
 
     </div>
@@ -3625,6 +4271,7 @@ Stormarrow: При максимальных зарядах следующая б
   <button class="side-btn" onclick="closeSidebar();openCalc()"><span class="side-icon">⚔</span>Калькулятор урона</button>
   <button class="side-btn" onclick="closeSidebar();openItems()"><span class="side-icon">📦</span>Предметы</button>
   <button class="side-btn" onclick="closeSidebar();openRunes()"><span class="side-icon">💎</span>Руны</button>
+  <button class="side-btn" onclick="closeSidebar();openDraft()" style="background:rgba(109,63,245,0.15);border-left:3px solid #b96fff;"><span class="side-icon">📋</span>Драфт-помощник</button>
 
   <div class="side-section" style="margin-top:8px;">Тир-листы</div>
   <button class="side-btn" onclick="closeSidebar();openTierlist('champs')"><span class="side-icon">🏆</span>Тир-лист чемпионов</button>
@@ -3829,6 +4476,81 @@ Stormarrow: При максимальных зарядах следующая б
         <div class="calc-stat-val" id="itemSubResultVal" style="color:#b96fff;font-size:26px;"></div>
       </div>
       <div id="itemSubFormula" style="margin-top:8px;font-size:10px;color:rgba(255,255,255,0.3);font-family:monospace;line-height:1.5;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DRAFT MODAL ══ -->
+<div class="m-mask" id="draftMask" onclick="if(event.target===this)closeDraft()">
+  <div style="width:100vw;height:100vh;background:linear-gradient(135deg,#1a0d2e 0%,#0f0520 100%);display:flex;flex-direction:column;overflow:hidden;position:relative;">
+
+    <!-- X button -->
+    <button class="btn-close-x" onclick="closeDraft()" style="position:fixed;top:14px;right:14px;z-index:9999;">✕</button>
+
+    <!-- Header -->
+    <div style="padding:12px 60px 10px 20px;border-bottom:1px solid rgba(155,89,182,0.2);flex-shrink:0;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:16px;font-weight:900;color:#b96fff;">📋 Драфт-помощник</div>
+      <!-- Search + role filter in header -->
+      <input id="draftSearch" type="text" placeholder="🔍 Поиск чемпиона..." class="calc-input"
+        style="font-size:12px;padding:6px 12px;max-width:200px;" oninput="draftFilterGrid()">
+      <div id="draftRoleFilter" style="display:flex;gap:4px;flex-wrap:nowrap;"></div>
+    </div>
+
+    <!-- Main 3-column body -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;flex:1;overflow:hidden;min-height:0;gap:0;">
+
+      <!-- ═══ LEFT TEAM ═══ -->
+      <div style="display:flex;flex-direction:column;border-right:1px solid rgba(155,89,182,0.15);overflow:hidden;">
+        <!-- Counter-picks panel TOP -->
+        <div style="flex:1;overflow-y:auto;padding:10px 12px;border-bottom:1px solid rgba(155,89,182,0.12);">
+          <div style="font-size:9px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:6px;">🔴 КОНТР-ПИКИ</div>
+          <div id="draftCountersLeft" style="display:flex;flex-direction:column;gap:4px;">
+            <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
+          </div>
+        </div>
+        <!-- 5 pick slots -->
+        <div style="padding:8px 12px;display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
+          <div style="font-size:9px;color:rgba(93,173,226,0.8);font-weight:700;letter-spacing:1px;margin-bottom:2px;">🔵 СИНЯЯ КОМАНДА</div>
+          <div id="draftSlotsLeft" style="display:flex;flex-direction:column;gap:5px;"></div>
+        </div>
+        <!-- Synergies panel BOTTOM -->
+        <div style="flex:1;overflow-y:auto;padding:10px 12px;border-top:1px solid rgba(155,89,182,0.12);">
+          <div style="font-size:9px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:6px;">🟢 КОМБО</div>
+          <div id="draftSynergiesLeft" style="display:flex;flex-direction:column;gap:4px;">
+            <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ CENTER: Champion picker ═══ -->
+      <div style="display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(155,89,182,0.15);">
+        <div style="font-size:9px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;padding:8px 12px 6px;flex-shrink:0;">⚔ ВСЕ ЧЕМПИОНЫ</div>
+        <div id="draftGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:5px;overflow-y:auto;flex:1;padding:4px 10px 10px;align-content:start;"></div>
+      </div>
+
+      <!-- ═══ RIGHT TEAM ═══ -->
+      <div style="display:flex;flex-direction:column;overflow:hidden;">
+        <!-- Counter-picks panel TOP -->
+        <div style="flex:1;overflow-y:auto;padding:10px 12px;border-bottom:1px solid rgba(155,89,182,0.12);">
+          <div style="font-size:9px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:6px;">🔴 КОНТР-ПИКИ</div>
+          <div id="draftCountersRight" style="display:flex;flex-direction:column;gap:4px;">
+            <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
+          </div>
+        </div>
+        <!-- 5 pick slots -->
+        <div style="padding:8px 12px;display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
+          <div style="font-size:9px;color:rgba(231,76,60,0.8);font-weight:700;letter-spacing:1px;margin-bottom:2px;">🔴 КРАСНАЯ КОМАНДА</div>
+          <div id="draftSlotsRight" style="display:flex;flex-direction:column;gap:5px;"></div>
+        </div>
+        <!-- Synergies panel BOTTOM -->
+        <div style="flex:1;overflow-y:auto;padding:10px 12px;border-top:1px solid rgba(155,89,182,0.12);">
+          <div style="font-size:9px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:6px;">🟢 КОМБО</div>
+          <div id="draftSynergiesRight" style="display:flex;flex-direction:column;gap:4px;">
+            <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
