@@ -541,13 +541,13 @@
             color: #6c5788;
         }
 
-        /* GRID — 5 role columns, fill full width */
+        /* GRID — 10 columns: 2 per role × 5 roles */
         .m-grid {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-            padding: 8px 12px 15px;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 4px;
+            padding: 6px 10px 12px;
             overflow-y: auto;
             align-items: start;
         }
@@ -556,7 +556,7 @@
         .m-role-container {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             align-items: center;
         }
 
@@ -608,29 +608,40 @@
         /* CHAMPION */
         .m-item {
             background: transparent;
-            padding: 3px;
-            border-radius: 8px;
-            font-size: 9px;
+            padding: 2px;
+            border-radius: 6px;
+            font-size: 8px;
             text-align: center;
             color: #a689c4;
             cursor: pointer;
-            transition: all 0.18s;
+            transition: all 0.15s;
             border: 2px solid transparent;
-            line-height: 1.3;
+            line-height: 1.2;
             font-weight: 700;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            gap: 1px;
         }
 
         .m-item img {
             width: 100%;
             aspect-ratio: 1;
-            border-radius: 8px;
+            border-radius: 6px;
             object-fit: cover;
             display: block;
+        }
+
+        /* Role container spans 2 columns */
+        .m-role-container { grid-column: span 2; }
+
+        /* Inner grid: 2 champ columns */
+        .m-role-champs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3px;
+            width: 100%;
         }
 
         .m-item:hover {
@@ -1875,6 +1886,10 @@
             roleDiv.onclick = () => roleT(role, isAll);
             container.appendChild(roleDiv);
 
+            // 2-column inner grid
+            const champGrid = document.createElement('div');
+            champGrid.className = 'm-role-champs';
+
             champs.forEach(c => {
                 const btn = document.createElement('div');
                 const isOn = selected.has(c.name);
@@ -1883,10 +1898,11 @@
                 const mImg = document.createElement('img');
                 mImg.src = DD_URL + champKey(c.name) + '.png';
                 mImg.alt = c.name;
+                mImg.title = c.name;
                 mImg.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; this.src=''; };
 
                 const nm = document.createElement('div');
-                nm.style.cssText = 'font-size:8px;color:'+(isOn?'#fff':'rgba(255,255,255,0.5)')+';text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
+                nm.style.cssText = 'font-size:7px;color:'+(isOn?'#fff':'rgba(255,255,255,0.45)')+';text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
                 nm.textContent = c.name;
 
                 btn.appendChild(mImg);
@@ -1899,15 +1915,16 @@
                     drawM();
                     render();
                 };
-                container.appendChild(btn);
+                champGrid.appendChild(btn);
             });
 
+            container.appendChild(champGrid);
             grid.appendChild(container);
         });
 
         if (q && grid.children.length === 0) {
             const empty = document.createElement('div');
-            empty.style.cssText = 'grid-column:1/-1;opacity:0.8;font-size:14px;text-align:center;padding:20px;';
+            empty.style.cssText = 'grid-column:1/-1;opacity:0.8;font-size:14px;text-align:center;padding:20px;color:rgba(255,255,255,0.4);';
             empty.innerText = 'Ничего не найдено';
             grid.appendChild(empty);
         }
@@ -3364,12 +3381,20 @@
 
 
 <style id="v34-overrides">
-/* ===== 0) Table has its own scroll area, page scrolls naturally ===== */
+/* ===== Sticky thead — работает всегда ===== */
 .table-hold {
   max-height: 72vh !important;
   height: auto !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
+  position: relative; /* Required for sticky to work */
+}
+#statTable thead th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 30 !important;
+  background: var(--bg-card, #1a0d2e) !important;
+  backdrop-filter: blur(8px) !important;
 }
 html, body { overflow-y: auto !important; }
 
@@ -4300,8 +4325,8 @@ Stormarrow: При максимальных зарядах следующая б
       <div class="item-card" data-tip="Сфера Бесконечности¦2900 г¦+80 Сила способностей  |  +7% Маг. Проникновение¦Судьба: +5% скорости. Баланс: +15 пробивания магии. Неизбежная гибель: Способности крит по врагам с < 35% HP (+20% урона). Громовой удар: Если чемпион умер в течение 3с после «Неизбежной гибели» — молния 50–75 (+ 10% AP) маг. урона врагам рядом."><img src="https://www.wildriftfire.com/images/items/infinity-orb.png" alt="Сфера Бесконечности" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Похититель душ Меджая¦1800 г¦+25 Сила способностей  |  +7% Маг. Проникновение  |  +70 Здоровье¦Слава: убийство чемпиона = 3/4 стака, помощь = 2 стака, макс. 30. При смерти -10 стаков. Страх: +5 AP за стак Славы (макс. +150). При 10+ стаках +10% скорости."><img src="https://www.wildriftfire.com/images/items/mejais-soulstealer.png" alt="Похититель душ Меджая" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Пробуждённый Похититель Душ¦3000 г¦+65 Сила способностей  |  +20 Ускорение способностей  |  +7% Маг. Проникновение  |  +150 Здоровье¦Охота за душами: +15 к пробиванию магии. Блуждающая душа: Убийство чемпиона в течение 3с после нанесения урона снижает КД на 25% и даёт 10% базовой скорости + 50% скорости восстановления способностей цели до её возрождения."><img src="https://www.wildriftfire.com/images/items/awakened-soulstealer.png" alt="Пробуждённый Похититель Душ" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Бандл Фэнтези¦3000 г¦+85 Сила способностей  |  +20 Ускорение способностей  |  +7% Маг. Проникновение  |  +300 Мана¦Огненный цветок: Урон способностей по чемпионам вызывает отложенный взрыв, наносящий 105 (+ 15% AP) маг. урона. Последующие удары по цели наносят 20% урона."><img src="https://www.wildriftfire.com/images/items/fated-ashes.png" alt="Бандл Фэнтези" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Трезубец Океаниды¦2600 г¦+75 Сила способностей  |  +7% Маг. Проникновение  |  +200 Здоровье¦Смертельное оружие: Урон способностями по чемпиону снижает его щиты. Одиночные способности -40% (+ 5% за 100 AP, макс. 60%). Способности АОЕ -25% (+ 5% за 100 AP, макс. 45%)."><img src="https://www.wildriftfire.com/images/items/oceanid-trident.png" alt="Трезубец Океаниды" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Бандл Фэнтези¦3000 г¦+85 Сила способностей  |  +20 Ускорение способностей  |  +7% Маг. Проникновение  |  +300 Мана¦Огненный цветок: Урон способностей по чемпионам вызывает отложенный взрыв, наносящий 105 (+ 15% AP) маг. урона. Последующие удары по цели наносят 20% урона."><img src="https://www.wildriftfire.com/images/items/bandle-fantasy.png" alt="Бандл Фэнтези" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Трезубец Океаниды¦2600 г¦+75 Сила способностей  |  +7% Маг. Проникновение  |  +200 Здоровье¦Смертельное оружие: Урон способностями по чемпиону снижает его щиты. Одиночные способности -40% (+ 5% за 100 AP, макс. 60%). Способности АОЕ -25% (+ 5% за 100 AP, макс. 45%)."><img src="https://www.wildriftfire.com/images/items/oceanids-trident.png" alt="Трезубец Океаниды" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Психический проектор¦3100 г¦+60 Сила способностей  |  +15 Ускорение способностей  |  +7% Маг. Проникновение  |  +300 Здоровье¦Преобразование: +5% AP от бонусного HP. Прогноз: При 950+ бонусного HP — +20% AP в виде брони и +10% AP в виде магрез (макс. при 400 AP)."><img src="https://www.wildriftfire.com/images/items/psychic-projector.png" alt="Психический проектор" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
     </div>
     <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">🛡 Защитные</div>
@@ -4313,14 +4338,14 @@ Stormarrow: При максимальных зарядах следующая б
       <div class="item-card" data-tip="Плита каменного горгульи¦3200 г¦+60 Брони  |  +60 МС  |  +200 HP¦Каменная кожа: рядом с 2+ вражескими чемпионами +6 Брони/МС.\nОкаменение (актив): +100 Брони/МС + увеличение размера на 4с. (90с КД)"><img src="https://www.wildriftfire.com/images/items/gargoyle-stoneplate.png" alt="Плита каменного горгульи" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Броня мертвеца¦2800 г¦+70 Броня  |  +350 Здоровье¦Неумолимый: +5% скорости. Импульс: Движение генерирует заряды (до 100 = +40 скорости). Сокрушительный удар: Атаки расходуют Импульс нанося маг. урон = потраченному Импульсу. При макс. импульсе ближние атаки замедляют на 75% на 1с."><img src="https://www.wildriftfire.com/images/items/dead-mans-plate.png" alt="Плита мертвеца" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Сила природы¦2750 г¦+60 Магрез  |  +350 Здоровье¦Шторм: +5% скорости. Поглощение: Получение урона от способностей генерирует заряд «Непоколебимости» (до 4, 7с). Последующие попадания обновляют заряды. При 4 зарядах: +10% скорости и -25% получаемого маг. урона."><img src="https://www.wildriftfire.com/images/items/force-of-nature.png" alt="Сила природы" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Рассветная завеса¦2700 г¦+50 Броня  |  +30 Магрез  |  +250 Здоровье¦Рассветный вестник: В радиусе 400 от врага при обездвиживании — 40 (+ 2,5% бонусного HP) маг. урона врагам рядом и раскрываешь их на 3с. Получаешь +20% брони и магрез на 3с (перезарядка 3с)."><img src="https://www.wildriftfire.com/images/items/dawncore.png" alt="Рассветная завеса" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Рассветная завеса¦2700 г¦+50 Броня  |  +30 Магрез  |  +250 Здоровье¦Рассветный вестник: В радиусе 400 от врага при обездвиживании — 40 (+ 2,5% бонусного HP) маг. урона врагам рядом и раскрываешь их на 3с. Получаешь +20% брони и магрез на 3с (перезарядка 3с)."><img src="https://www.wildriftfire.com/images/items/dawnshroud.png" alt="Рассветная завеса" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Фимбулвинтер¦2600 г¦+15 Ускорение способностей  |  +350 Здоровье  |  +1200 Мана¦Благоговение: +10% HP от макс. маны. Возвращает 15% маны. Замороженный Колосс: Обездвиживание/замедление чемпиона тратит 3% маны → щит 90–180 (+ 4,5% маны) на 3с. При 2+ врагах рядом щит × 180%. Перезарядка 8с. Отключается при < 20% маны."><img src="https://www.wildriftfire.com/images/items/fimbulwinter.png" alt="Фимбулвинтер" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Сердце стали¦2800 г¦+25 Ускорение способностей  |  +700 Здоровье  |  +150% Восстановление HP¦Колоссальное поглощение: Враги в радиусе 700 ед. накапливают заряды (до 6) за 2,5с. Атака по цели с макс. зарядами: 140 (+ 3,5% макс. HP) физ. урона + постоянный бонус HP (15% макс. HP). Перезарядка 20с/цель."><img src="https://www.wildriftfire.com/images/items/sterak.png" alt="Сердце стали" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Сердце стали¦2800 г¦+25 Ускорение способностей  |  +700 Здоровье  |  +150% Восстановление HP¦Колоссальное поглощение: Враги в радиусе 700 ед. накапливают заряды (до 6) за 2,5с. Атака по цели с макс. зарядами: 140 (+ 3,5% макс. HP) физ. урона + постоянный бонус HP (15% макс. HP). Перезарядка 20с/цель."><img src="https://www.wildriftfire.com/images/items/heartsteel.png" alt="Сердце стали" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Кровавая почта Повелителя¦3200 г¦+30 Урон от атаки  |  +450 Здоровье¦Тирания: +AD = 2,5% от бонусного HP. Возмездие: +AD до 9% в зависимости от недостающего HP (макс. при HP < 30%)."><img src="https://www.wildriftfire.com/images/items/overlords-bloodmail.png" alt="Кровавая почта Повелителя" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Сияющая Добродетель¦2850 г¦+15 Ускорение способностей  |  +45 Броня  |  +300 Здоровье¦Путеводный свет: После ультимейта «Превосходство» на 6с: +10% макс. HP. Каждую секунду ты и союзники рядом восстанавливают 2,5%/1,25% макс. HP (до 17,5%/8,75%). Перезарядка 30с, дальность 1200."><img src="https://www.wildriftfire.com/images/items/radiant-virtue.png" alt="Сияющая Добродетель" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Стерак¦3200 г¦+400 Здоровье¦Тяжёлая рука: +AD = 50% базового AD. Спасательная линия: При HP < 35% — щит 75% бонусного HP на 3с. Перезарядка 90с. Ярость Стерака: Активация щита → +размер и +30% стойкости на 8с."><img src="https://www.wildriftfire.com/images/items/steraks-gage.png" alt="Стерак" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Титаник Гидра¦3000 г¦+40 Урон от атаки  |  +450 Здоровье¦Рассечение: Следующая атака наносит 25 (+ 3% бонусного HP) физ. урона цели + 80 (+ 10% бонусного HP) физ. урона в конусе 550. Дальние: 75%. Перезарядка 1,75с."><img src="https://www.wildriftfire.com/images/items/titanic-hydra.png" alt="Титаник Гидра" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Вестник зимы¦2600 г¦+15 Ускорение способностей  |  +350 Здоровье  |  +500 Мана¦Благоговение: +8% HP от макс. маны. Возвращает 15% маны. Заряд маны: +12 маны за атаку/расход маны (до 700). Превращается в Фимбулвинтер."><img src="https://www.wildriftfire.com/images/items/winter-herald.png" alt="Вестник зимы" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Вестник зимы¦2600 г¦+15 Ускорение способностей  |  +350 Здоровье  |  +500 Мана¦Благоговение: +8% HP от макс. маны. Возвращает 15% маны. Заряд маны: +12 маны за атаку/расход маны (до 700). Превращается в Фимбулвинтер."><img src="https://www.wildriftfire.com/images/items/winters-approach.png" alt="Вестник зимы" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Ловушка йордла¦2500 г¦+15 Ускорение способностей  |  +40 Броня  |  +350 Здоровье¦Ловец: Попадание способностью движения даёт +30% скорости на 3с и метит цель на 5с (-5–12 броня/магрез). Если помеченный умирает — ты и союзники рядом получают 200–300 золота (раз в 10с)."><img src="https://www.wildriftfire.com/images/items/yordle-trap.png" alt="Ловушка йордла" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Вуаль Банши¦2500 г¦+350 HP  |  +60 МС¦Отмена: каждые 40с получаешь щит, поглощающий 1 вражескую способность.\nБлагословение: +10% эффективность щитов и исцеления."><img src="https://www.wildriftfire.com/images/items/banshees-veil.png" alt="Вуаль Банши" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Двойная стража Амаранта¦3100 г¦+60 Броня  |  +60 Магрез¦Выносливость: В бою накапливает 1 стак/с (макс. 5). При 5 стаках: +20% размера, +20% стойкости, +30% к бонусной броне и магрезу. Стаки сбрасываются вне боя."><img src="https://www.wildriftfire.com/images/items/amaranths-twinguard.png" alt="Двойная защита Амарант" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
@@ -4330,7 +4355,7 @@ Stormarrow: При максимальных зарядах следующая б
     <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">💛 Поддержка</div>
     <div class="items-grid">
       <div class="item-card" data-tip="Пылающая кадильница¦2700 г¦+35 Сила способностей  |  +20 Ускорение способностей  |  +5% Исцеление и Защита  |  +250 Здоровье¦Пылкий: +5% скорости. Кадило: Исцеление/щит союзника усиливает его на 6с: +15–40% скорости атаки и 16–30 доп. маг. урона при базовых атаках."><img src="https://www.wildriftfire.com/images/items/ardent-censer.png" alt="Пылающая кадильница" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Гармоническое эхо¦2600 г¦+50 Сила способностей  |  +10 Ускорение способностей  |  +8% Исцеление и Защита  |  +100 Здоровье  |  +300 Мана¦Гармоничное эхо: Движение и способности генерируют заряды (до 100). При максимуме следующее исцеление/щит на союзника восстанавливает ему 120–180 (+ 15% AP). Если HP цели < 30% — исцеление × 150%."><img src="https://www.wildriftfire.com/images/items/moonstone-renewer.png" alt="Гармоническое эхо" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Гармоническое эхо¦2600 г¦+50 Сила способностей  |  +10 Ускорение способностей  |  +8% Исцеление и Защита  |  +100 Здоровье  |  +300 Мана¦Гармоничное эхо: Движение и способности генерируют заряды (до 100). При максимуме следующее исцеление/щит на союзника восстанавливает ему 120–180 (+ 15% AP). Если HP цели < 30% — исцеление × 150%."><img src="https://www.wildriftfire.com/images/items/harmonic-echo.png" alt="Гармоническое эхо" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Имперский мандат¦2500 г¦+40 Сила способностей  |  +20 Ускорение способностей  |  +200 Здоровье¦Скоординированный огонь: Замедление/обездвиживание чемпиона наносит 47–75 доп. маг. урона и метит его на 4с (перезарядка 6с/цель). Союзник, атакующий метку, расходует её: 94–150 доп. маг. урона + оба получают +20% скорости на 2с."><img src="https://www.wildriftfire.com/images/items/imperial-mandate.png" alt="Имперский мандат" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Рыцарский обет¦2600 г¦+40 Броня  |  +400 Здоровье  |  +10 Ускорение способностей¦Клятва: При покупке назначаешь достойного союзника. Жертва: Рядом с Достойным — 12% его урона перенаправляется на тебя, ты восстанавливаешь 10% HP от урона, нанесённого им чемпионам."><img src="https://www.wildriftfire.com/images/items/knights-vow.png" alt="Рыцарский обет" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Искупление¦2600 г¦+15 Ускорение способностей  |  +400 Здоровье  |  +300 Мана¦Вечность: 15% получаемого урона от чемпионов → мана. 20% потраченной маны → HP (до 15 HP/раз). Спасение: Каждые 8с восстанавливает 40 (+ 7% бонусного HP) HP всем союзникам в радиусе 350."><img src="https://www.wildriftfire.com/images/items/redemption.png" alt="Искупление" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
@@ -4353,16 +4378,16 @@ Stormarrow: При максимальных зарядах следующая б
     <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:16px 0 6px;">✨ Зачарования ботинок</div>
     <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:10px;">Можно добавить к любым ботинкам</div>
     <div class="items-grid">
-      <div class="item-card" data-tip="Гейлфорс¦500 г¦—¦Облачный взрыв: Рывок к цели (325), затем 3 снаряда по самому раненому врагу (600). Каждый наносит 13–40 (+ 45% бонусного AD) физ. урона. Итого 40–120 (зависит от уровня) (+ 45% бонусного AD). Перезарядка 50с."><img src="https://www.wildriftfire.com/images/items/galeforce-enchant.png" alt="Гейлфорс" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Великолепное очарование¦500 г¦—¦Слава: +30% скорости передвижения на 4с. При достижении врага — ударная волна замедляет на 60% на 2с. Также +20% стойкости и +20% сопротивления замедлению. Перезарядка 45с, дальность 250."><img src="https://www.wildriftfire.com/images/items/glorious-enchant.png" alt="Великолепное очарование" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Горедринкер¦500 г¦—¦Жаждущий удар: Наносит 230% базового AD ближайшим врагам, восстанавливая 20% AD (+12% недостающего HP) за каждого пораженного чемпиона. Перезарядка 15с, дальность 400."><img src="https://www.wildriftfire.com/images/items/goredrinker-enchant.png" alt="Горедринкер" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Зачарование медальона¦500 г¦—¦Амулет: Защищает тебя и ближайших союзных чемпионов щитом 60–330 (зависит от уровня цели) на 2,5с (дальность 1000). Эффект снижается до 50%, если цель уже была защищена Амулетом в течение 20с. Перезарядка 60с."><img src="https://www.wildriftfire.com/images/items/locket-enchant.png" alt="Зачарование медальона" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Проторемень¦500 г¦—¦Протопояс: Рывок вперёд + конус снарядов, каждый снижает магрез на 12% на 3с и наносит 70 маг. урона. По прибытии +20% скорости на 3с. Перезарядка 50с, дальность 325."><img src="https://www.wildriftfire.com/images/items/hextech-protobelt-enchant.png" alt="Проторемень" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Ртутное зачарование¦800 г¦—¦Ртуть: Снимает все эффекты КК (кроме Воздушного), иммунитет к КК на 0,75с. Перезарядка 60с.\nСтойкость: Длительность КК снижается на 25%. После Ртути — +30% стойкости и +30% сопротивления замедлению на 1,5с."><img src="https://www.wildriftfire.com/images/items/quicksilver-enchant.png" alt="Ртутное зачарование" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Зачарование стазиса¦1000 г¦—¦Стазис: Впадаешь в стазис на 2,5с — неуязвим и неуязвим для атак, теряешь управление. Перезарядка 120с."><img src="https://www.wildriftfire.com/images/items/stasis-enchant.png" alt="Зачарование стазиса" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Каменная гаргулья¦500 г¦—¦Каменная броня: Щит 15% макс. HP на 4с, урон -40% пока щит активен. +0,1% макс. HP за каждый бонус к броне/магрезу (макс. 28%). Доп. +5/10/15% HP в зависимости от числа врагов рядом. Перезарядка 60с."><img src="https://www.wildriftfire.com/images/items/gargoyle-enchant.png" alt="Каменная гаргулья" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Костолом¦500 г¦—¦Сокрушительная ударная волна: Рывок к цели (200), 120% физ. урона от AD, замедление 30% на 3с. Перезарядка 35с, дальность 400."><img src="https://www.wildriftfire.com/images/items/cosmic-drive-enchant.png" alt="Костолом" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Зачарование Баньши¦500 г¦—¦Завеса: Накладывает магический щит на союзника на 3с. Перезарядка 45с."><img src="https://www.wildriftfire.com/images/items/banshees-veil-enchant.png" alt="Зачарование Баньши" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Гейлфорс¦500 г¦—¦Облачный взрыв: Рывок к цели (325), затем 3 снаряда по самому раненому врагу (600). Каждый наносит 13–40 (+ 45% бонусного AD) физ. урона. Итого 40–120 (зависит от уровня) (+ 45% бонусного AD). Перезарядка 50с."><img src="https://www.wildriftfire.com/images/items/galeforce.png" alt="Гейлфорс" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Великолепное очарование¦500 г¦—¦Слава: +30% скорости передвижения на 4с. При достижении врага — ударная волна замедляет на 60% на 2с. Также +20% стойкости и +20% сопротивления замедлению. Перезарядка 45с, дальность 250."><img src="https://www.wildriftfire.com/images/items/glorious.png" alt="Великолепное очарование" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Горедринкер¦500 г¦—¦Жаждущий удар: Наносит 230% базового AD ближайшим врагам, восстанавливая 20% AD (+12% недостающего HP) за каждого пораженного чемпиона. Перезарядка 15с, дальность 400."><img src="https://www.wildriftfire.com/images/items/goredrinker.png" alt="Горедринкер" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Зачарование медальона¦500 г¦—¦Амулет: Защищает тебя и ближайших союзных чемпионов щитом 60–330 (зависит от уровня цели) на 2,5с (дальность 1000). Эффект снижается до 50%, если цель уже была защищена Амулетом в течение 20с. Перезарядка 60с."><img src="https://www.wildriftfire.com/images/items/locket.png" alt="Зачарование медальона" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Проторемень¦500 г¦—¦Протопояс: Рывок вперёд + конус снарядов, каждый снижает магрез на 12% на 3с и наносит 70 маг. урона. По прибытии +20% скорости на 3с. Перезарядка 50с, дальность 325."><img src="https://www.wildriftfire.com/images/items/protobelt.png" alt="Проторемень" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Ртутное зачарование¦800 г¦—¦Ртуть: Снимает все эффекты КК (кроме Воздушного), иммунитет к КК на 0,75с. Перезарядка 60с.\nСтойкость: Длительность КК снижается на 25%. После Ртути — +30% стойкости и +30% сопротивления замедлению на 1,5с."><img src="https://www.wildriftfire.com/images/items/quicksilver.png" alt="Ртутное зачарование" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Зачарование стазиса¦1000 г¦—¦Стазис: Впадаешь в стазис на 2,5с — неуязвим и неуязвим для атак, теряешь управление. Перезарядка 120с."><img src="https://www.wildriftfire.com/images/items/stasis.png" alt="Зачарование стазиса" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Каменная гаргулья¦500 г¦—¦Каменная броня: Щит 15% макс. HP на 4с, урон -40% пока щит активен. +0,1% макс. HP за каждый бонус к броне/магрезу (макс. 28%). Доп. +5/10/15% HP в зависимости от числа врагов рядом. Перезарядка 60с."><img src="https://www.wildriftfire.com/images/items/gargoyle.png" alt="Каменная гаргулья" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Костолом¦500 г¦—¦Сокрушительная ударная волна: Рывок к цели (200), 120% физ. урона от AD, замедление 30% на 3с. Перезарядка 35с, дальность 400."><img src="https://www.wildriftfire.com/images/items/stridebreaker.png" alt="Костолом" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
+      <div class="item-card" data-tip="Зачарование Баньши¦500 г¦—¦Завеса: Накладывает магический щит на союзника на 3с. Перезарядка 45с."><img src="https://www.wildriftfire.com/images/items/veil.png" alt="Зачарование Баньши" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
     </div>
   </div>
 </div>
