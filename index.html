@@ -241,7 +241,7 @@
         
 
 /* === Mobile-first table sizing (no horizontal scroll) === */
-#statTable { width: 100%; table-layout: fixed; }
+/* Table sizing handled by consolidated section */
 #statTable th, #statTable td { padding: 8px 4px; font-size: 13px; }
 /* First column (Champs) takes more space; other 5 columns share remaining width */
 #statTable th:first-child, #statTable td:first-child { width: 40%; }
@@ -253,15 +253,13 @@
 
 /* Prevent any click/tap focus highlight from changing row look */
 #statTable td, #statTable th { outline: none; }
-@media (max-width: 560px){
-    /* table-hold: no card, full page scroll */
-    #statTable th, #statTable td{ padding: 6px 2px; font-size: 11px; }
+
     #statTable th:first-child, #statTable td:first-child{ width: 44%; }
     #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 11.2%; }
 
     .x-btn{ width: 20px; height: 20px; border-radius: 7px; font-size: 14px; }
     .name-tag{ padding: 5px 6px; border-radius: 8px; font-size: 11px; }
-}
+
 
         th {
             background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
@@ -392,7 +390,7 @@
 
         /* TIERS */
         /* Tier cells with inner border so same-color neighbours separate */
-        td.s, td.a, td.b, td.c { padding: 0 !important; }
+        td.s, td.a, td.b, td.c { padding: 0; }
         td.s > *, td.a > *, td.b > *, td.c > * { display:block; }
         .s { background: #C43A3A !important; color: #fff !important; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 4px rgba(0,0,0,0.5); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.22); margin: 3px; padding: 7px 3px; }
         .a { background: #C46A1C !important; color: #fff !important; font-weight: 900; border-radius: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.4); box-shadow: inset 0 0 0 2px rgba(0,0,0,0.18); margin: 3px; padding: 7px 3px; }
@@ -719,355 +717,6 @@
             .m-role img { max-width: 38px; }
         }
     
-/* ===========================
-   FINAL TABLE FIXES (v13)
-   =========================== */
-
-/* 1) Убираем подсветку/затемнение при тапе/фокусе (не ломая цветные клетки) */
-#statTable, #statTable *{
-  -webkit-tap-highlight-color: transparent !important;
-}
-#statTable td, #statTable th{
-  outline: none !important;
-  -webkit-user-select: none;
-  user-select: none;
-}
-#statTable td:focus, #statTable th:focus,
-#statTable td:active, #statTable th:active{
-  outline: none !important;
-  filter: none !important;
-  box-shadow: none !important;
-  opacity: 1 !important;
-}
-
-/* 2) Таблица никогда не скроллится горизонтально */
-/* table-hold overflow handled by v34-overrides */
-/* overflow-x hidden removed — breaks position:fixed FAB */
-
-/* 3) Разные ширины для ПК и телефона (фикс не влияет друг на друга) */
-#statTable{
-  width: 100% !important;
-  table-layout: fixed !important; /* всегда влезает */
-}
-
-/* DESKTOP (ПК) */
-@media (min-width: 769px){
-  #statTable th:first-child, #statTable td:first-child{ width: 30% !important; }
-  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 14% !important; }
-
-  .btn-champ-cfg{
-    font-size: 12px !important;
-    padding: 8px 14px !important;
-    border-radius: 10px !important;
-  }
-
-  /* Champs cell fills — no "half empty" look */
-  .champ-cell{ gap: 10px; }
-  .name-tag{ font-size: 12px; padding: 7px 10px; }
-}
-
-/* MOBILE (телефон) */
-@media (max-width: 768px){
-  /* ширины колонок (влезает без скролла) */
-  #statTable th:first-child, #statTable td:first-child{ width: 42% !important; }
-  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 11.6% !important; }
-
-  /* чуть тоньше ползунок (~15%) */
-  input[type="range"]{ height: 3px !important; }
-
-  /* кнопка Champs чуть больше */
-  .btn-champ-cfg{
-    font-size: 11px !important;
-    padding: 7px 12px !important;
-    border-radius: 10px !important;
-  }
-
-  /* имя чемпа видно полностью насколько возможно: 2 строки, без ... */
-  .champ-cell .name-tag{
-    white-space: normal !important;
-    overflow: hidden !important;
-    text-overflow: clip !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 2 !important;
-    -webkit-box-orient: vertical !important;
-    line-height: 1.05 !important;
-    padding: 6px 8px !important;
-  }
-}
-
-/* 4) Champs cell: X + имя заполняют ширину без пустот */
-.champ-cell{
-  display: flex;
-  align-items: center;
-  width: 100% !important;
-  max-width: 100% !important;
-}
-.champ-cell .name-tag{
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-/* 5) Лёгкое затемнение только стат-столбцов при выборе (Champs не трогаем) */
-#statTable.focus-mode td:not(:first-child):not(.active-col){
-  opacity: 0.55;
-  filter: brightness(0.72) saturate(0.5);
-  transition: opacity 0.2s ease, filter 0.2s ease;
-}
-#statTable td.active-col{
-  opacity: 1 !important;
-  filter: none !important;
-  transition: opacity 0.3s ease, filter 0.3s ease;
-}
-#statTable.focus-mode td:first-child {
-  opacity: 1 !important;
-  filter: none !important;
-}
-
-/* 6) Убираем любые row-hover эффекты (только для мышки, и без изменения фона) */
-@media (hover: hover) and (pointer: fine){
-  #statTable tbody tr:hover td{
-    filter: none !important;
-    opacity: 1 !important;
-  }
-}
-
-/* 7) Modal role icons: одинаковый размер, аккуратно */
-.m-role img{
-  width: 42px !important;
-  height: 42px !important;
-  object-fit: contain !important;
-  display: block !important;
-}
-
-
-
-
-/* ===========================
-   v15 mobile fit + champ column fix
-   =========================== */
-
-/* Remove the "divider" look inside Champs column */
-#statTable th:first-child,
-#statTable td:first-child{
-  border-right: none !important;
-}
-
-/* Stronger column-focus dim (20%) */
-#statTable.focus-mode td:not(:first-child):not(.active-col){
-  opacity: 0.55;
-  filter: brightness(0.72) saturate(0.5);
-  transition: opacity 0.2s ease, filter 0.2s ease;
-}
-#statTable td.active-col{ opacity: 1 !important; filter: none !important; }
-
-/* MOBILE: make Champs wider, stats narrower (still no horizontal scroll) */
-@media (max-width: 768px){
-  #statTable th:first-child, #statTable td:first-child{ width: 55% !important; }
-  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 9% !important; }
-
-  /* Smaller header text + no clipping */
-  #statTable th{ padding: 7px 1px !important; font-size: 10px !important; }
-
-  /* Abbreviate stat headers on mobile to avoid clipping (keeps layout stable) */
-  #statTable th:not(:first-child){
-    color: transparent !important; /* hide original text */
-    position: relative;
-  }
-  #statTable th:not(:first-child)::after{
-    content: attr(data-short);
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    color: #fff;
-    font-weight: 900;
-    font-size: 10px;
-    pointer-events: none;
-  }
-
-  /* Champ name: show full name (wrap if needed), no clamp/ellipsis */
-  .champ-cell{ gap: 6px !important; }
-  .champ-cell .name-tag{
-    display: block !important;
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-    line-height: 1.1 !important;
-    padding: 6px 8px !important;
-  }
-
-  /* Slightly bigger Champs button */
-  .btn-champ-cfg{
-    font-size: 12px !important;
-    padding: 8px 14px !important;
-    border-radius: 12px !important;
-  }
-
-  /* Slider thinner (~15%) */
-  input[type="range"]{ height: 3.4px !important; }
-}
-
-/* DESKTOP: tighten Champs column so it doesn't look half-empty */
-@media (min-width: 769px){
-  #statTable th:first-child, #statTable td:first-child{ width: 26% !important; }
-  #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 14.8% !important; }
-
-  /* Bigger Champs button on PC too */
-  .btn-champ-cfg{
-    font-size: 13px !important;
-    padding: 9px 16px !important;
-    border-radius: 12px !important;
-  }
-}
-
-
-/* ===========================
-   v16 overrides: adaptive pills, separate mobile/desktop sizing
-   (do not delete old rules; these override them)
-   =========================== */
-
-/* Champ cell: X + pill should not create empty half */
-#statTable td.champ-cell{
-  display:flex !important;
-  align-items:center !important;
-  gap:8px !important;
-  width:100% !important;
-  min-width:0 !important;
-}
-
-/* X button: fixed, no shrink */
-#statTable .champ-cell .x-btn{
-  flex:0 0 auto !important;
-  width:32px !important;
-  height:32px !important;
-  min-width:32px !important;
-}
-
-/* Pill: size by content (no fixed width), single line */
-#statTable .champ-cell .name-tag{
-  flex:0 0 auto !important;      /* don't stretch to full cell */
-  width:auto !important;         /* pill fits text */
-  max-width:none !important;      /* do not clamp */
-  white-space:nowrap !important;  /* no 2 lines */
-  overflow:visible !important;    /* don't cut on desktop */
-  text-overflow:clip !important;  /* never "..." */
-  padding:6px 14px !important;
-  border-radius:999px !important;
-}
-
-/* Mobile: table proportions (Champion 40%, others equal 12%) */
-@media (max-width: 768px){
-  #statTable{
-    width:100% !important;
-    table-layout:fixed !important;
-  }
-  #statTable th:first-child,
-  #statTable td:first-child{ width:40% !important; }
-  #statTable th:not(:first-child),
-  #statTable td:not(:first-child){ width:12% !important; }
-
-  /* Slightly smaller pill text on mobile to ensure fit */
-  #statTable .champ-cell .name-tag{
-    font-size: clamp(11px, 3.2vw, 13px) !important;
-  }
-}
-
-/* Desktop: make champ pills + X about 30% bigger */
-@media (min-width: 769px){
-  #statTable .champ-cell .name-tag{
-    font-size: 1.3em !important;
-    padding: 8px 18px !important;
-  }
-  #statTable .champ-cell .x-btn{
-    width:42px !important;
-    height:42px !important;
-    min-width:42px !important;
-  }
-}
-
-/* Column dimming strength (if present): 20% dim */
-#statTable.dim-cols td.dimmed{
-  opacity: 0.80 !important;
-}
-
-
-/* =========================
-   v17 mobile + ruler + twitch
-   (overrides only; no deletions)
-   ========================= */
-
-/* Mobile: sticky table headers inside scroll container */
-@media (max-width: 768px) {
-  /* table-hold: page scroll */
-  #statTable thead th {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: var(--bg-card);
-    backdrop-filter: blur(10px);
-  }
-
-  /* Mobile column widths: Champions 50%, stats share remaining equally */
-  #statTable { table-layout: fixed; width: 100%; }
-  #statTable th:first-child, #statTable td:first-child { width: 50% !important; }
-  #statTable th:not(:first-child), #statTable td:not(:first-child) { width: 10% !important; }
-
-  /* Mobile: shrink X by 30% */
-  .champ-cell .btn-x,
-  .champ-cell .remove-btn,
-  .champ-cell .xbtn {
-    width: 24px !important;
-    min-width: 24px !important;
-    height: 24px !important;
-    border-radius: 8px !important;
-    font-size: 12px !important;
-    line-height: 24px !important;
-    padding: 0 !important;
-  }
-}
-
-/* Remove any divider line effect in Champions column */
-#statTable th:first-child,
-#statTable td:first-child {
-  border-right: none !important;
-  box-shadow: none !important;
-}
-
-/* Ruler numbers: 2x size, pill style */
-#ruler {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-#ruler .lvl-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;            /* bigger */
-  min-width: 44px;
-  border-radius: 999px;
-  background: rgba(124, 77, 255, 0.85);
-  border: 1px solid rgba(255,255,255,0.18);
-  color: #fff;
-  font-weight: 800;
-  font-size: 20px;               /* ~2x */
-  cursor: pointer;
-  user-select: none;
-}
-#ruler .lvl-pill.active {
-  background: rgba(255,255,255,0.92);
-  color: #2a0c4f;
-}
-#ruler .lvl-pill:focus {
-  outline: 2px solid rgba(124,77,255,0.9);
-  outline-offset: 2px;
-}
-
-/* Twitch button hover */
-.twitch-btn:hover { filter: brightness(1.15); transform: scale(1.06); }
 
 
         /* CHAMPION ICONS (Data Dragon) */
@@ -1084,10 +733,10 @@
             .champ-icon { width: 32px; height: 32px; border-radius: 6px; }
             .champ-cell .name-tag { display: none !important; }
             .champ-cell {
-                justify-content: flex-start !important;
-                gap: 3px !important;
-                padding-left: 4px !important;
-                overflow: hidden !important;
+                justify-content: flex-start;
+                gap: 3px;
+                padding-left: 4px;
+                overflow: hidden;
             }
         }
         /* Row number badge */
@@ -1108,8 +757,8 @@
         /* Mobile: force sort arrows visible under header text */
         @media (max-width: 768px) {
             #statTable thead th span[id^="ar-"] {
-                display: block !important;
-                visibility: visible !important;
+                display: block;
+                visibility: visible;
                 font-size: 9px !important;
                 line-height: 1 !important;
                 margin-top: 3px !important;
@@ -1262,7 +911,6 @@
             .mana-label-short { display: inline; }
             .mana-label-full  { display: none; }
         }
-
 
 
         /* ── Calc range buttons ── */
@@ -1453,7 +1101,180 @@
         /* Hide menuBtn when sidebar open */
         body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
-        </style>
+        
+
+/* ═══════════════════════════════════════════
+   CONSOLIDATED LAYOUT RULES (replaces v13-v43)
+   ═══════════════════════════════════════════ */
+
+/* Table: always fixed layout, no horizontal scroll */
+/* Table sizing handled by consolidated section */
+#statTable, #statTable * { -webkit-tap-highlight-color: transparent; }
+#statTable td, #statTable th { outline: none; user-select: none; -webkit-user-select: none; }
+#statTable td:focus, #statTable td:active,
+#statTable th:focus, #statTable th:active { outline: none; filter: none; box-shadow: none; opacity: 1; }
+
+/* Remove divider in Champions column */
+#statTable th:first-child, #statTable td:first-child { border-right: none; box-shadow: none; }
+
+/* Sticky header */
+.table-hold { max-height: none; overflow-y: visible; overflow-x: auto; }
+#statTable thead th {
+    position: sticky; top: 0; z-index: 30;
+    background: var(--bg-card); backdrop-filter: blur(8px);
+    display: table-cell; vertical-align: middle;
+}
+#statTable tbody tr:first-child td { padding-top: 6px; }
+html, body { overflow-y: auto; }
+
+/* Column focus mode */
+#statTable.focus-mode td:not(:first-child):not(.active-col) {
+    opacity: 0.55; filter: brightness(0.72) saturate(0.5);
+    transition: opacity 0.2s ease, filter 0.2s ease;
+}
+#statTable td.active-col { opacity: 1; filter: none; transition: opacity 0.3s ease, filter 0.3s ease; }
+#statTable.focus-mode td:first-child { opacity: 1; filter: none; }
+
+/* Sort arrows under headers */
+#statTable thead th span[id^="ar-"] {
+    display: block; font-size: 11px; line-height: 1;
+    margin-top: 10px; text-align: center; opacity: 0.92; min-height: 12px;
+}
+#statTable thead th span[id^="ar-"]:empty::before { content: "▼"; }
+
+/* Champion cell layout */
+.champ-cell { display: flex; align-items: center; width: 100%; max-width: 100%; }
+.champ-cell .name-tag { flex: 0 0 auto; width: auto; max-width: none; white-space: nowrap;
+    overflow: visible; text-overflow: clip; padding: 6px 14px; border-radius: 999px; }
+.champ-cell .x-btn { flex: 0 0 auto; width: 32px; height: 32px; min-width: 32px; }
+
+/* ── DESKTOP ── */
+@media (min-width: 769px) {
+    #statTable th:first-child, #statTable td:first-child { width: 26%; }
+    #statTable th:not(:first-child), #statTable td:not(:first-child) { width: 14.8%; }
+    .btn-champ-cfg { font-size: 13px; padding: 9px 16px; border-radius: 12px; }
+    .champ-cell .name-tag { font-size: 1.3em; padding: 8px 18px; }
+    .champ-cell .x-btn { width: 42px; height: 42px; min-width: 42px; }
+    .champ-cell { justify-content: flex-start; gap: 10px; }
+    .champ-cell .name-tag { display: inline-flex; justify-content: center; text-align: center; flex: 1 1 auto; }
+    .champ-cell .x-btn { margin-right: 6px; }
+}
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+    /* Table sizing handled by consolidated section */
+    #statTable th:first-child, #statTable td:first-child { width: 40%; }
+    #statTable th:not(:first-child), #statTable td:not(:first-child) { width: 12%; }
+    #statTable th { padding: 7px 1px; font-size: 10px; }
+    /* Abbreviate stat headers on mobile */
+    #statTable th:not(:first-child) { color: transparent; position: relative; }
+    #statTable th:not(:first-child)::after {
+        content: attr(data-short); position: absolute; inset: 0;
+        display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 10px; pointer-events: none;
+    }
+    .champ-icon { width: 32px; height: 32px; border-radius: 6px; }
+    .champ-cell .name-tag { display: none; }
+    .champ-cell { justify-content: flex-start; gap: 3px; padding-left: 4px; overflow: hidden; }
+    .row-num { font-size: 8px; min-width: 10px; }
+    .btn-champ-cfg { font-size: 12px; padding: 8px 14px; border-radius: 12px; }
+    input[type="range"] { height: 3.4px; }
+    #ruler { display: none; }
+    /* Sort arrows on mobile */
+    #statTable thead th span[id^="ar-"] {
+        display: block; visibility: visible; font-size: 10px;
+        margin-top: 4px; line-height: 1; min-height: 12px; color: var(--accent);
+    }
+    /* Slider with +/- buttons */
+    .slider-wrapper { display: flex; align-items: center; gap: 10px; }
+    #lvlRange { flex: 1 1 auto; }
+    .lvl-stepper {
+        display: inline-flex; gap: 8px; align-items: center;
+    }
+    .lvl-stepper button {
+        appearance: none; border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(124,77,255,0.95); color: #fff;
+        border-radius: 999px; padding: 6px 12px; font-weight: 900; line-height: 1;
+    }
+    .lvl-stepper button:active { transform: scale(1.06); }
+    /* Ensure table visibility */
+    #statTable, #statTable thead, #statTable tbody, #statTable tr, #statTable td, #statTable th { visibility: visible; }
+    #statTable tbody { display: table-row-group; }
+    #statTable td:first-child { overflow: visible; }
+}
+
+/* ── RULER (Desktop only) ── */
+@media (min-width: 769px) {
+    #ruler { position: absolute; height: 36px; pointer-events: auto; z-index: 4; }
+    #ruler .lvl-pill {
+        position: absolute; transform: translateX(-50%);
+        display: inline-flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 12px; padding: 4px 10px; min-width: 28px;
+        border-radius: 999px; background: rgba(124,77,255,0.95); color: #fff;
+        border: 1px solid rgba(255,255,255,0.18);
+        box-shadow: 0 10px 22px rgba(124,77,255,0.22);
+        user-select: none; z-index: 1; white-space: nowrap;
+        transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+    }
+    #ruler .lvl-pill:active {
+        transform: translateX(-50%) scale(0.92); filter: brightness(1.08);
+        box-shadow: 0 6px 14px rgba(124,77,255,0.28);
+    }
+    /* Hide any pills NOT inside ruler */
+    .lvl-pill { display: none; }
+    #ruler .lvl-pill { display: inline-flex; }
+}
+
+/* ── SUPPORT TEXT ── */
+#support-panel-text {
+    width: 100%; max-width: none; box-sizing: border-box;
+    margin-top: 14px; padding: 9px 10px; font-size: 11.2px; line-height: 1.35;
+    border-radius: 12px; border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(124,77,255,0.12);
+}
+
+/* ── NICKNAME ANIMATION ── */
+#nickname {
+    position: relative; display: inline-block; padding: 0; border-radius: 0;
+    text-decoration: none; font-weight: 900; letter-spacing: 0.3px;
+    background: linear-gradient(90deg,
+        rgba(255,255,255,0.95), rgba(124,77,255,1), rgba(70,190,255,1),
+        rgba(124,77,255,1), rgba(255,255,255,0.95));
+    background-size: 300% 100%;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 8px rgba(124,77,255,0.65)) drop-shadow(0 0 18px rgba(70,190,255,0.35));
+    animation: nickTextFlow 1.6s linear infinite;
+}
+@keyframes nickTextFlow { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+#nickname:active { transform: scale(0.96); }
+
+/* ── SUPPORT BUTTON EFFECTS ── */
+.btn-support, .support-btn { position: relative; overflow: hidden; }
+.btn-support::before, .support-btn::before {
+    content: ""; position: absolute; inset: -60%;
+    background: radial-gradient(circle at center, rgba(124,77,255,0.55), transparent 60%);
+    animation: supportGlow 3.2s linear infinite;
+}
+@keyframes supportGlow { to { transform: rotate(360deg); } }
+.btn-support::after, .support-btn::after {
+    content: ""; position: absolute; top: -40%; left: -60%; width: 60%; height: 180%;
+    background: linear-gradient(110deg, transparent, rgba(255,255,255,0.22), transparent);
+    transform: rotate(10deg); animation: supportShine 2.8s ease-in-out infinite;
+}
+@keyframes supportShine {
+    0% { transform: translateX(0) rotate(10deg); opacity: 0; }
+    20% { opacity: 1; }
+    50% { transform: translateX(220%) rotate(10deg); opacity: 1; }
+    70% { opacity: 0; }
+    100% { transform: translateX(220%) rotate(10deg); opacity: 0; }
+}
+
+/* Twitch button hover */
+.twitch-btn:hover { filter: brightness(1.15); transform: scale(1.06); }
+
+/* Hide menuBtn when sidebar open */
+body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
+
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 <body>
@@ -1974,7 +1795,6 @@
     }
 
 
-
     // =========================================
     document.addEventListener('click', (e) => {
         const fab = document.getElementById('fabMenu');
@@ -1994,14 +1814,10 @@
     let _calcRange = 'melee'; // 'melee' or 'ranged'
 
 
-
         // =========================================
     let growthChartObj = null;
     let chartStat = 'hp';
     let chartChamp = null;
-
-
-
 
 
     function buildChartBtns() {
@@ -2055,10 +1871,6 @@
             }
         });
     }
-
-
-
-
 
 
     window.openItemDetail = function(name, cost, stats, desc, imgSrc) {
@@ -3194,873 +3006,115 @@
     // Start loading data
     start();
 
-})();
-</script>
 
+    // ═══ CONSOLIDATED FEATURES (from v33-v41) ═══
 
+    // Nickname link prevention
+    document.getElementById('nickname')?.addEventListener('click', e => e.preventDefault());
 
-
-
-
-
-
-
-<style id="v33-overrides">
-/* ===== RULER (PC) ===== */
-@media (min-width: 769px){
-  /* keep ruler under slider, no wrap, no duplicates */
-  #ruler{
-    position: absolute !important;
-    height: 36px !important;
-    pointer-events: auto;
-    z-index: 4;
-  }
-  #ruler .lvl-pill{
-    position: absolute !important;
-    transform: translateX(-50%) !important;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-    font-weight: 800;
-    font-size: 12px;
-    padding: 4px 10px;
-    min-width: 28px;
-    border-radius: 999px;
-    background: rgba(124,77,255,0.95);
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.18);
-    box-shadow: 0 10px 22px rgba(124,77,255,0.22);
-    user-select: none;
-    z-index: 1;
-    white-space: nowrap;
-  }
-  #ruler .lvl-pill:active{ transform: translateX(-50%) scale(1.1); }
-}
-
-/* Hide any pills that are NOT inside #ruler (prevents ghost duplicates) */
-@media (min-width: 769px){
-  .lvl-pill{ display:none !important; }
-  #ruler .lvl-pill{ display:inline-flex !important; }
-}
-
-/* ===== Champion name alignment (PC) ===== */
-@media (min-width: 769px){
-  .champ-cell{
-    display:flex !important;
-    align-items:center !important;
-    justify-content:flex-start !important;
-    gap: 10px !important;
-  }
-  .champ-cell .x-btn, .champ-cell .btn-x, .champ-cell .remove-btn, .champ-cell .xbtn{
-    flex: 0 0 auto !important;
-    margin-right: 6px !important;
-  }
-  .champ-cell .name-tag, .champ-cell .champ-pill{
-    flex: 1 1 auto !important;
-    display: inline-flex !important;
-    justify-content: center !important;
-    text-align: center !important;
-  }
-}
-
-/* ===== Header arrows: tiny triangle UNDER text without breaking layout ===== */
-#statTable thead th{ display: table-cell !important; vertical-align: middle !important; }
-#statTable thead th span[id^="ar-"]{
-  display:block !important;
-  font-size: 11px !important;
-  line-height: 1 !important;
-  margin-top: 12px !important; /* under header */
-  text-align:center !important;
-  opacity: .95 !important;
-  min-height: 12px !important;
-}
-#statTable thead th span[id^="ar-"]:empty::before{ content:"▼"; }
-
-/* ===== Mobile +/- buttons: right side, not covering slider ===== */
-@media (max-width: 768px){
-  .lvl-stepper{
-    position: relative;
-    top: 25px;
-    display: inline-flex;
-    gap: 8px;
-    align-items: center;
-    margin-left: 10px;
-    margin-right: 0;
-  }
-  .lvl-stepper button{
-    appearance:none;
-    border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(124,77,255,0.95);
-    color: #fff;
-    border-radius: 999px;
-    padding: 6px 12px;
-    font-weight: 900;
-    line-height: 1;
-  }
-  .lvl-stepper button:active{ transform: scale(1.06); }
-}
-
-/* Column colors replaced by heatmap tier system */
-</style>
-
-<script id="v33-js">
-/* ===== Desktop ruler: rebuild exactly once and align to slider thumb ===== */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if (isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const ruler  = document.getElementById('ruler');
-  if(!slider || !ruler) return;
-
-  // hard rebuild once
-  const min0 = Number(slider.min || 1);
-  const max0 = Number(slider.max || 15);
-  const min = Math.min(min0, max0);
-  const max = Math.max(min0, max0);
-
-  ruler.innerHTML = '';
-  for(let i=min;i<=max;i++){
-    const span = document.createElement('span');
-    span.className = 'lvl-pill';
-    span.dataset.value = String(i);
-    span.textContent = String(i);
-    span.addEventListener('click', ()=>{
-      slider.value = String(i);
-      slider.dispatchEvent(new Event('input', { bubbles:true }));
-    });
-    ruler.appendChild(span);
-  }
-
-  function layout(){
-    const parent = slider.parentElement;
-    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
-
-    const sRect = slider.getBoundingClientRect();
-    const pRect = parent.getBoundingClientRect();
-
-    ruler.style.left = (sRect.left - pRect.left) + 'px';
-    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
-    ruler.style.width = sRect.width + 'px';
-
-    const thumb = 18;
-    const usable = Math.max(1, sRect.width - thumb);
-    const leftPad = thumb/2;
-
-    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
-      const v = Number(p.dataset.value);
-      const pct = (v - min) / (max - min);
-      p.style.left = (leftPad + pct * usable) + 'px';
-    });
-  }
-
-  window.addEventListener('resize', layout);
-  setTimeout(layout, 0);
-  setTimeout(layout, 150);
-  setTimeout(layout, 350);
-})();
-
-/* ===== Mobile +/- buttons: keep on the right (after slider), not overlapping ===== */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  if(!slider) return;
-
-  if (document.querySelector('.lvl-stepper')) return;
-
-  const wrap = document.createElement('div');
-  wrap.className = 'lvl-stepper';
-
-  const minus = document.createElement('button');
-  minus.type = 'button';
-  minus.textContent = '−';
-
-  const plus = document.createElement('button');
-  plus.type = 'button';
-  plus.textContent = '+';
-
-  function step(delta){
-    const min = Number(slider.min || 1);
-    const max = Number(slider.max || 15);
-    const v = Math.min(max, Math.max(min, Number(slider.value) + delta));
-    slider.value = String(v);
-    slider.dispatchEvent(new Event('input', { bubbles:true }));
-  }
-  minus.addEventListener('click', ()=>step(-1));
-  plus.addEventListener('click', ()=>step(1));
-
-  wrap.appendChild(minus);
-  wrap.appendChild(plus);
-
-  slider.insertAdjacentElement('afterend', wrap); /* right side */
-})();
-</script>
-
-
-<style id="v34-overrides">
-/* ===== Sticky thead — page-level scroll ===== */
-.table-hold {
-  max-height: none !important;
-  overflow-y: visible !important;
-  overflow-x: auto !important;
-}
-#statTable thead th {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 30 !important;
-  background: var(--bg-main, #0f0520) !important;
-  backdrop-filter: blur(8px) !important;
-}
-/* Prevent first row hiding under sticky header */
-#statTable tbody tr:first-child td {
-  padding-top: 6px !important;
-}
-@media (max-width: 768px) {
-  #statTable thead th { top: 0 !important; }
-}
-html, body { overflow-y: auto !important; }
-
-/* ===== 1) Mobile table proportions: Champions 40%, others equal ===== */
-@media (max-width: 768px){
-  #statTable{ width:100% !important; table-layout: fixed !important; }
-  #statTable th:first-child, #statTable td:first-child{ width:40% !important; }
-  #statTable th:not(:first-child), #statTable td:not(:first-child){ width:12% !important; }
-}
-
-/* Column color system removed — using heatmap tier colors */
-
-/* ===== 3) Mobile: NO level pills (hide ruler entirely) ===== */
-@media (max-width: 768px){
-  #ruler{ display:none !important; }
-}
-
-/* ===== 4) Support text panel: full width, visible, boxed ===== */
-#support-panel-text{
-  width: 100% !important;
-  max-width: none !important;
-  box-sizing: border-box !important;
-  margin-top: 14px !important;
-  padding: 9px 10px !important;
-  font-size: 11.2px !important;
-  line-height: 1.35 !important;
-  border-radius: 12px !important;
-  border: 1px solid rgba(255,255,255,0.18) !important;
-  background: rgba(124,77,255,0.12) !important;
-}
-
-/* ===== 5) Mobile +/- buttons: right side, below slider (no overlap) ===== */
-@media (max-width: 768px){
-  .lvl-stepper{
-    position: relative;
-    top: 25px;
-    display: inline-flex;
-    gap: 8px;
-    align-items: center;
-    margin-left: 10px;
-    margin-right: 0;
-  }
-}
-</style>
-
-<script id="v34-js">
-/* Ensure support text exists under the support button */
-(function(){
-  if (document.getElementById('support-panel-text')) return;
-  const btn = document.querySelector('.btn-support') || document.querySelector('.support-btn');
-  if(!btn) return;
-  const block = document.createElement('div');
-  block.id = 'support-panel-text';
-  block.innerHTML = `
+    // Support text block
+    (function(){
+        if (document.getElementById('support-panel-text')) return;
+        const btn = document.querySelector('.btn-support') || document.querySelector('.support-btn');
+        if(!btn) return;
+        const block = document.createElement('div');
+        block.id = 'support-panel-text';
+        block.innerHTML = `
 Ребята, сайт абсолютно бесплатен для всех.<br><br>
 Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
 В планах: добавить характеристики HP реген, winrate/pickrate, мана реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)
-  `.trim();
-  btn.insertAdjacentElement('afterend', block);
-})();
+        `.trim();
+        btn.insertAdjacentElement('afterend', block);
+    })();
 
-/* Mobile: remove any ruler pills if some script created them */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
-  const ruler = document.getElementById('ruler');
-  if (ruler) ruler.innerHTML = '';
-})();
+    // Mobile +/- stepper (created once)
+    (function(){
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if(!isMobile) return;
+        const slider = document.getElementById('lvlRange');
+        if(!slider || document.querySelector('.lvl-stepper')) return;
+        const stepper = document.createElement('div');
+        stepper.className = 'lvl-stepper';
+        const minus = document.createElement('button');
+        minus.type = 'button'; minus.textContent = '\u2212';
+        const plus = document.createElement('button');
+        plus.type = 'button'; plus.textContent = '+';
+        function step(delta){
+            const min = Number(slider.min||1), max = Number(slider.max||15);
+            const v = Math.min(max, Math.max(min, Number(slider.value)+delta));
+            slider.value = String(v);
+            slider.dispatchEvent(new Event('input', {bubbles:true}));
+        }
+        minus.addEventListener('click', ()=>step(-1));
+        plus.addEventListener('click', ()=>step(1));
+        stepper.appendChild(minus);
+        stepper.appendChild(plus);
+        slider.insertAdjacentElement('afterend', stepper);
+    })();
 
-/* Mobile: ensure +/- exists and is placed to the RIGHT (after slider) */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
+    // Desktop ruler: rebuild and align to slider
+    (function(){
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if(isMobile) return;
+        const slider = document.getElementById('lvlRange');
+        const ruler = document.getElementById('ruler');
+        if(!slider || !ruler) return;
+        const min = Number(slider.min || 1);
+        const max = Number(slider.max || 15);
 
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  if(!slider) return;
+        function rebuild(){
+            ruler.innerHTML = '';
+            for(let i=min;i<=max;i++){
+                const span = document.createElement('span');
+                span.className = 'lvl-pill';
+                span.dataset.value = String(i);
+                span.textContent = String(i);
+                span.addEventListener('click', ()=>{
+                    slider.value = String(i);
+                    slider.dispatchEvent(new Event('input', {bubbles:true}));
+                });
+                ruler.appendChild(span);
+            }
+        }
 
-  // remove old stepper if it exists before slider (wrong placement)
-  const existing = document.querySelector('.lvl-stepper');
-  if (existing && slider.previousElementSibling === existing){
-    existing.remove();
-  }
-  if (document.querySelector('.lvl-stepper')) return;
+        function layout(){
+            const parent = slider.parentElement;
+            if(getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
+            const sRect = slider.getBoundingClientRect();
+            const pRect = parent.getBoundingClientRect();
+            ruler.style.position = 'absolute';
+            ruler.style.left = (sRect.left - pRect.left) + 'px';
+            ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
+            ruler.style.width = sRect.width + 'px';
+            ruler.style.height = '36px';
+            const thumb = 18;
+            const usable = Math.max(1, sRect.width - thumb);
+            const leftPad = thumb/2;
+            ruler.querySelectorAll('.lvl-pill').forEach(p=>{
+                const v = Number(p.dataset.value);
+                if(!Number.isFinite(v)) return;
+                const pct = (v - min) / (max - min);
+                p.style.left = (leftPad + pct * usable) + 'px';
+            });
+        }
 
-  const wrap = document.createElement('div');
-  wrap.className = 'lvl-stepper';
+        rebuild();
+        layout();
+        window.addEventListener('resize', layout);
+        setTimeout(layout, 100);
+        setTimeout(layout, 400);
+    })();
 
-  const minus = document.createElement('button');
-  minus.type = 'button';
-  minus.textContent = '−';
+    // Mobile: hide ruler pills and clean up duplicates
+    (function(){
+        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        if(!isMobile) return;
+        const ruler = document.getElementById('ruler');
+        if(ruler) ruler.innerHTML = '';
+    })();
 
-  const plus = document.createElement('button');
-  plus.type = 'button';
-  plus.textContent = '+';
-
-  function step(delta){
-    const min = Number(slider.min || 1);
-    const max = Number(slider.max || 15);
-    const v = Math.min(max, Math.max(min, Number(slider.value) + delta));
-    slider.value = String(v);
-    slider.dispatchEvent(new Event('input', { bubbles:true }));
-  }
-  minus.addEventListener('click', ()=>step(-1));
-  plus.addEventListener('click', ()=>step(1));
-
-  wrap.appendChild(minus);
-  wrap.appendChild(plus);
-
-  slider.insertAdjacentElement('afterend', wrap);
-})();
-</script>
-
-
-<style id="v35-overrides">
-/* ===== Mobile: ensure champions table content is visible ===== */
-@media (max-width: 768px){
-  #statTable, #statTable thead, #statTable tbody, #statTable tr, #statTable td, #statTable th{
-    visibility: visible !important;
-  }
-  #statTable tbody{ display: table-row-group !important; }
-  #statTable td:first-child{ overflow: visible !important; }
-  .champ-cell{ overflow: visible !important; }
-}
-
-/* ===== Mobile +/-: mirror to LEFT side (no vertical move) ===== */
-@media (max-width: 768px){
-  .lvl-stepper{
-    top: 0 !important;             /* cancel earlier down shift */
-    margin-left: 0 !important;
-    margin-right: 10px !important; /* space between +/- and slider */
-  }
-}
-
-/* ===== Desktop: kill ANY duplicate lvl-pill not inside #ruler ===== */
-@media (min-width: 769px){
-  .lvl-pill{ display:none !important; }
-  #ruler .lvl-pill{ display:inline-flex !important; }
-}
-</style>
-
-<script id="v35-js">
-/* Mobile: place +/- to the LEFT of slider (mirror) */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  if(!slider) return;
-
-  const stepper = document.querySelector('.lvl-stepper');
-  if(!stepper) return;
-
-  // Put stepper immediately before slider
-  if (slider.previousElementSibling !== stepper){
-    slider.insertAdjacentElement('beforebegin', stepper);
-  }
-})();
-
-/* Desktop: remove duplicate 15 (and any duplicates) anywhere + ensure only 1..15 in #ruler */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(isMobile) return;
-
-  const ruler = document.getElementById('ruler');
-  if(!ruler) return;
-
-  function cleanRuler(){
-    const seen = new Set();
-    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
-      const v = p.dataset.value || p.textContent.trim();
-      if (seen.has(v)) p.remove();
-      else seen.add(v);
-    });
-  }
-
-  // Remove any lvl-pill elements not inside ruler
-  function cleanGlobal(){
-    document.querySelectorAll('.lvl-pill').forEach(p=>{
-      if (!ruler.contains(p)) p.remove();
-    });
-  }
-
-  cleanGlobal();
-  cleanRuler();
-
-  const obs = new MutationObserver(()=>{
-    cleanGlobal();
-    cleanRuler();
-  });
-  obs.observe(document.body, {childList:true, subtree:true});
 })();
 </script>
-
-
-<style id="v36-overrides">
-/* Mobile +/- should be on the RIGHT side, no vertical shift */
-@media (max-width: 768px){
-  .lvl-stepper{
-    top: 0 !important;
-    margin-left: 10px !important;
-    margin-right: 0 !important;
-  }
-}
-</style>
-
-<script id="v36-js">
-/* Mobile: move +/- to RIGHT (after slider) */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const stepper = document.querySelector('.lvl-stepper');
-  if(!slider || !stepper) return;
-  if (slider.nextElementSibling !== stepper){
-    slider.insertAdjacentElement('afterend', stepper);
-  }
-})();
-
-/* Desktop: enforce ruler pills = exactly 1..15 always (kills duplicate 15 that appears on load) */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const ruler  = document.getElementById('ruler');
-  if(!slider || !ruler) return;
-
-  const min0 = Number(slider.min || 1);
-  const max0 = Number(slider.max || 15);
-  const min = Math.min(min0, max0);
-  const max = Math.max(min0, max0);
-  const expectedCount = max - min + 1;
-
-  function rebuild(){
-    ruler.innerHTML = '';
-    for(let i=min;i<=max;i++){
-      const span = document.createElement('span');
-      span.className = 'lvl-pill';
-      span.dataset.value = String(i);
-      span.textContent = String(i);
-      span.addEventListener('click', ()=>{
-        slider.value = String(i);
-        slider.dispatchEvent(new Event('input', { bubbles:true }));
-      });
-      ruler.appendChild(span);
-    }
-  }
-
-  function layout(){
-    const parent = slider.parentElement;
-    if (getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
-
-    const sRect = slider.getBoundingClientRect();
-    const pRect = parent.getBoundingClientRect();
-
-    ruler.style.position = 'absolute';
-    ruler.style.left = (sRect.left - pRect.left) + 'px';
-    ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
-    ruler.style.width = sRect.width + 'px';
-    ruler.style.height = '36px';
-
-    const thumb = 18;
-    const usable = Math.max(1, sRect.width - thumb);
-    const leftPad = thumb/2;
-
-    ruler.querySelectorAll('.lvl-pill').forEach(p=>{
-      const v = Number(p.dataset.value);
-      if(!Number.isFinite(v)) return;
-      const pct = (v - min) / (max - min);
-      p.style.left = (leftPad + pct * usable) + 'px';
-    });
-  }
-
-  function enforce(){
-    // Remove any global pills not in ruler
-    document.querySelectorAll('.lvl-pill').forEach(p=>{
-      if (!ruler.contains(p)) p.remove();
-    });
-
-    const pills = Array.from(ruler.querySelectorAll('.lvl-pill'));
-
-    // Validate: correct count, unique values, in range
-    const seen = new Set();
-    let ok = (pills.length === expectedCount);
-    for (const p of pills){
-      const v = Number(p.dataset.value || p.textContent.trim());
-      if (!Number.isFinite(v) || v < min || v > max || seen.has(v)){
-        ok = false; break;
-      }
-      seen.add(v);
-    }
-
-    if (!ok) rebuild();
-    layout();
-  }
-
-  // Initial enforce after load
-  rebuild();
-  enforce();
-
-  // Keep enforcing during async data load (when duplicate 15 shows up)
-  const obs = new MutationObserver(enforce);
-  obs.observe(document.body, {childList:true, subtree:true});
-
-  window.addEventListener('resize', enforce);
-  setTimeout(enforce, 100);
-  setTimeout(enforce, 400);
-  setTimeout(enforce, 900);
-})();
-</script>
-
-
-<style id="v37-overrides">
-/* 1) Level pill press animation (fast pop) */
-#ruler .lvl-pill{
-  transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
-}
-#ruler .lvl-pill:active{
-  transform: translateX(-50%) scale(0.92) !important;
-  filter: brightness(1.08);
-  box-shadow: 0 6px 14px rgba(124,77,255,0.28);
-}
-
-/* 2) Mobile +/- must be on the RIGHT side */
-@media (max-width: 768px){
-  .lvl-stepper{
-    margin-left: 10px !important;
-    margin-right: 0 !important;
-  }
-}
-
-/* Support button shine effect */
-.btn-support, .support-btn{
-  position: relative;
-  overflow: hidden;
-}
-.btn-support::before, .support-btn::before{
-  content:"";
-  position:absolute;
-  inset:-60%;
-  background: radial-gradient(circle at center, rgba(124,77,255,0.55), transparent 60%);
-  animation: v37Glow 3.2s linear infinite;
-}
-@keyframes v37Glow{ to { transform: rotate(360deg); } }
-
-.btn-support::after, .support-btn::after{
-  content:"";
-  position:absolute;
-  top:-40%;
-  left:-60%;
-  width: 60%;
-  height: 180%;
-  background: linear-gradient(110deg, transparent, rgba(255,255,255,0.22), transparent);
-  transform: rotate(10deg);
-  animation: v37Shine 2.8s ease-in-out infinite;
-}
-@keyframes v37Shine{
-  0%   { transform: translateX(0) rotate(10deg); opacity: 0; }
-  20%  { opacity: 1; }
-  50%  { transform: translateX(220%) rotate(10deg); opacity: 1; }
-  70%  { opacity: 0; }
-  100% { transform: translateX(220%) rotate(10deg); opacity: 0; }
-}
-</style>
-
-<script id="v37-js">
-/* Ensure mobile +/- is after slider (right side) */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
-
-  const slider = document.getElementById('lvlRange') || document.querySelector('input[type="range"]');
-  const stepper = document.querySelector('.lvl-stepper');
-  if(!slider || !stepper) return;
-
-  if (slider.nextElementSibling !== stepper){
-    slider.insertAdjacentElement('afterend', stepper);
-  }
-})();
-</script>
-
-
-<style id="v38-overrides">
-/* ===================== */
-/* 1) Mobile +/- FORCE RIGHT (same row as slider) */
-/* ===================== */
-@media (max-width: 768px){
-  .lvl-stepper{
-    position: static !important;
-    margin-left: 12px !important;
-    margin-right: 0 !important;
-  }
-  .lvl-range-wrap,
-  .level-wrap,
-  .lvl-wrap{
-    display:flex !important;
-    align-items:center !important;
-  }
-}
-
-/* ===================== */
-/* 2) Restore rating arrows under headers */
-/* ===================== */
-#statTable thead th span[id^="ar-"]{
-  display:block !important;
-  font-size: 11px !important;
-  margin-top: 10px !important;
-  opacity: 0.9 !important;
-}
-#statTable thead th span[id^="ar-"]:empty::before{
-  content:"▼";
-}
-
-/* ===================== */
-/* 3) GOD-TIER animation for nickname */
-/* ===================== */
-.nick-btn, .btn-nick, .user-nick, .nickname{
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  animation: v38Pulse 2.4s ease-in-out infinite;
-  box-shadow:
-    0 0 0 rgba(124,77,255,0.0),
-    0 0 0 rgba(124,77,255,0.0);
-}
-
-@keyframes v38Pulse{
-  0%{
-    box-shadow:
-      0 0 0 rgba(124,77,255,0.0),
-      0 0 0 rgba(124,77,255,0.0);
-  }
-  50%{
-    box-shadow:
-      0 0 18px rgba(124,77,255,0.65),
-      0 0 42px rgba(124,77,255,0.35);
-  }
-  100%{
-    box-shadow:
-      0 0 0 rgba(124,77,255,0.0),
-      0 0 0 rgba(124,77,255,0.0);
-  }
-}
-
-.nick-btn::before,
-.btn-nick::before,
-.user-nick::before,
-.nickname::before{
-  content:"";
-  position:absolute;
-  inset:-120%;
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent,
-      rgba(255,255,255,0.9),
-      transparent,
-      rgba(124,77,255,0.9),
-      transparent
-    );
-  animation: v38Rotate 3.2s linear infinite;
-  mix-blend-mode: screen;
-  z-index: -1;
-}
-
-@keyframes v38Rotate{
-  to{ transform: rotate(360deg); }
-}
-
-.nick-btn::after,
-.btn-nick::after,
-.user-nick::after,
-.nickname::after{
-  content:"";
-  position:absolute;
-  inset:2px;
-  border-radius: inherit;
-  background:
-    linear-gradient(
-      120deg,
-      rgba(255,255,255,0.35),
-      transparent 40%,
-      transparent 60%,
-      rgba(255,255,255,0.25)
-    );
-  animation: v38Sweep 1.8s ease-in-out infinite;
-}
-
-@keyframes v38Sweep{
-  0%{ transform: translateX(-120%); opacity:0; }
-  30%{ opacity:1; }
-  60%{ transform: translateX(120%); opacity:1; }
-  100%{ transform: translateX(120%); opacity:0; }
-}
-</style>
-
-<!-- doSort arrow logic handled by main render() -->
-
-
-<style id="v41-overrides">
-/* ===== Nick animation (ONLY ERjanKG in header) ===== */
-#nickname{
-  position: relative;
-  display: inline-block;
-  padding: 0;               /* no card/pill — only text */
-  border-radius: 0;
-  text-decoration: none;
-  font-weight: 900;
-  letter-spacing: 0.3px;
-
-  /* animated gradient INSIDE the text */
-  background: linear-gradient(
-    90deg,
-    rgba(255,255,255,0.95),
-    rgba(124,77,255,1),
-    rgba(70,190,255,1),
-    rgba(124,77,255,1),
-    rgba(255,255,255,0.95)
-  );
-  background-size: 300% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  /* subtle glow around the letters (not a box) */
-  filter: drop-shadow(0 0 8px rgba(124,77,255,0.65))
-          drop-shadow(0 0 18px rgba(70,190,255,0.35));
-
-  animation: nickTextFlow 1.6s linear infinite;
-}
-
-@keyframes nickTextFlow{
-  0%{ background-position: 0% 50%; }
-  100%{ background-position: 100% 50%; }
-}
-
-#nickname:active{ transform: scale(0.96); }
-
-/* ===== Triangles UNDER headers (mobile + desktop) ===== */
-#statTable thead th span[id^="ar-"]{
-  display:block !important;
-  font-size: 11px !important;
-  line-height: 1 !important;
-  margin-top: 10px !important;
-  text-align: center !important;
-  opacity: .92 !important;
-  min-height: 12px !important;
-}
-#statTable thead th span[id^="ar-"]:empty::before{ content:"▼"; }
-
-/* ===== Mobile +/- on the RIGHT of slider, same row ===== */
-@media (max-width: 768px){
-  .slider-wrapper{
-    display:flex !important;
-    align-items:center !important;
-    gap: 10px !important;
-  }
-  #lvlRange{ flex: 1 1 auto !important; }
-  .lvl-stepper{
-    display:inline-flex !important;
-    gap: 8px !important;
-    align-items:center !important;
-    margin-left: 0 !important;
-  }
-  .lvl-stepper button{
-    appearance:none;
-    border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(124,77,255,0.95);
-    color: #fff;
-    border-radius: 999px;
-    padding: 6px 12px;
-    font-weight: 900;
-    line-height: 1;
-  }
-  .lvl-stepper button:active{ transform: scale(1.06); }
-}
-</style>
-
-<script id="v41-js">
-// prevent nickname link jump
-document.getElementById('nickname')?.addEventListener('click', e => e.preventDefault());
-
-/* Create +/- on mobile and place AFTER slider (right side) */
-(function(){
-  const isMobile = window.matchMedia('(max-width: 768px)').matches;
-  if(!isMobile) return;
-
-  const slider = document.getElementById('lvlRange');
-  if(!slider) return;
-
-  // ensure stepper exists once
-  let stepper = document.querySelector('.lvl-stepper');
-  if(!stepper){
-    stepper = document.createElement('div');
-    stepper.className = 'lvl-stepper';
-    const minus = document.createElement('button');
-    minus.type='button'; minus.textContent='−';
-    const plus = document.createElement('button');
-    plus.type='button'; plus.textContent='+';
-
-    function step(delta){
-      const min = Number(slider.min||1), max = Number(slider.max||15);
-      const v = Math.min(max, Math.max(min, Number(slider.value)+delta));
-      slider.value = String(v);
-      slider.dispatchEvent(new Event('input', {bubbles:true}));
-    }
-    minus.addEventListener('click', ()=>step(-1));
-    plus.addEventListener('click', ()=>step(1));
-
-    stepper.appendChild(minus);
-    stepper.appendChild(plus);
-  }
-
-  // Place it right after slider (same row due to CSS flex)
-  if (slider.nextElementSibling !== stepper){
-    slider.insertAdjacentElement('afterend', stepper);
-  }
-})();
-</script>
-
-
-<style id="v43-arrows-mobile">
-/* FORCE rating arrows visible on MOBILE */
-@media (max-width:768px){
-  #statTable thead th{
-    display: table-cell !important;
-    vertical-align: middle !important;
-  }
-  #statTable thead th span[id^="ar-"]{
-    display:block !important;
-    visibility: visible !important;
-    opacity: 0.95 !important;
-    font-size: 10px !important;
-    margin-top: 4px !important;
-    line-height: 1 !important;
-    min-height: 12px !important;
-  }
-}
-</style>
-
-
 
 
 <!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
@@ -4614,7 +3668,6 @@ Stormarrow: При максимальных зарядах следующая б
     <div id="itemDetailContent"></div>
   </div>
 </div>
-
 
 
 </div><!-- balance -->
