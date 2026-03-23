@@ -1490,12 +1490,18 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     function wrScaleByLevel(minVal, maxVal, lvl) {
         return Math.round(minVal + (maxVal - minVal) * (lvl - 1) / 14);
     }
-        // ✅ Paste your published Google Sheet TSV/CSV URL here (File → Share → Publish to web)123
-    // ✅ Patch notes sheet URL (File → Share → Publish to web → TSV)
-    // Columns: Champion | Patch | Change | Type (buff/nerf)
-    const PATCH_URL = window.PATCH_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=1129379769&single=true&output=tsv';
-
+    // ═══════════════════════════════════════════════════════════════
+    // 📊 ЛИСТ 1: Основные данные чемпионов (статы, роли, рост)
+    // Чтобы поменять: File → Share → Publish to web → выбери Лист 1 → TSV
+    // ═══════════════════════════════════════════════════════════════
     const G_URL = window.G_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
+
+    // ═══════════════════════════════════════════════════════════════
+    // 🔄 ЛИСТ 2: Патч-ноты (бафф/нерф кружочки на иконках)
+    // Столбцы: Champion | Patch | Change | Type (buff или nerf)
+    // Чтобы поменять: File → Share → Publish to web → выбери Лист 2 → TSV
+    // ═══════════════════════════════════════════════════════════════
+    const PATCH_URL = window.PATCH_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=1129379769&single=true&output=tsv';
 
 
     // Map champion names to Data Dragon keys
@@ -1567,13 +1573,11 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">Не удалось загрузить данные. Проверь подключение к интернету.</td></tr>';
             return;
         }
-        // Fetch patch notes (non-blocking)
+        // Fetch patch notes — truly non-blocking, don't wait for it
         if(PATCH_URL) {
-            try {
-                const pr = await fetch(PATCH_URL);
-                const pt = await pr.text();
-                const pLines = pt.trim().split('\n');
-                const pHeads = pLines[0].split('\t').map(h => h.trim());
+            fetch(PATCH_URL).then(function(pr){ return pr.text(); }).then(function(pt){
+                var pLines = pt.trim().split('\n');
+                var pHeads = pLines[0].split('\t').map(function(h){ return h.trim(); });
                 pLines.slice(1).forEach(function(line) {
                     var cols = line.split('\t');
                     var obj = {};
@@ -1590,7 +1594,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                     }
                 });
                 console.log('Patch data loaded:', Object.keys(patchMap).length, 'champions');
-            } catch(e) { console.warn('Patch notes not loaded:', e); }
+            }).catch(function(e){ console.warn('Patch notes not loaded:', e); });
         }
 
         const lines = t.trim().split('\n');
@@ -3002,7 +3006,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             return e.slice(0,8).map(function(x){
                 var sc = isCounter?(x.stars===3?'#e74c3c':x.stars===2?'#e8820a':'#f1c40f'):(x.from.length>=2?'#b96fff':'#2ecc71');
                 var st=Array(x.stars).fill('<span style="color:'+sc+'">★</span>').join('')+Array(3-x.stars).fill('<span style="color:rgba(255,255,255,0.1)">☆</span>').join('');
-                return '<div style="display:flex;align-items:center;gap:6px;padding:5px 6px;background:rgba(255,255,255,0.03);border-radius:7px;margin-bottom:3px;"><img src="'+DD_URL+champKey(x.name)+'.png" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;" onerror="this.style.background=&quot;rgba(109,63,245,0.3)&quot;"><div style="flex:1;min-width:0;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.name+'</div><div style="font-size:11px;flex-shrink:0;">'+st+'</div></div>';
+                return '<div style="display:flex;align-items:center;gap:6px;padding:5px 6px;background:rgba(255,255,255,0.03);border-radius:7px;margin-bottom:3px;"><img src="'+champIcon(x.name)+'" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;" onerror="this.style.background=&quot;rgba(109,63,245,0.3)&quot;"><div style="flex:1;min-width:0;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.name+'</div><div style="font-size:11px;flex-shrink:0;">'+st+'</div></div>';
             }).join('');
         }
         var L=compute(_draftSlotsL), R=compute(_draftSlotsR);
