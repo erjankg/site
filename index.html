@@ -172,7 +172,7 @@
 
         .slider-wrapper {
             position: relative;
-            padding-bottom: 25px;
+            padding-bottom: 45px;
         }
 
         input[type="range"] {
@@ -202,8 +202,7 @@
 
         /* RULER */
         .ruler {
-            display: flex;
-            justify-content: space-between;
+            position: relative;
             margin-top: 8px;
             padding: 0 2px;
         }
@@ -666,25 +665,9 @@
             background: rgba(109,63,245,0.15);
         }
 
-        /* SCROLLBAR */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(135deg, #8e44ad 0%, var(--accent) 100%);
-        }
+        /* SCROLLBAR — hidden */
+        ::-webkit-scrollbar { display: none; }
+        * { scrollbar-width: none; -ms-overflow-style: none; }
 
         /* MOBILE */
         @media (max-width: 768px) {
@@ -1185,7 +1168,7 @@ html, body { overflow-y: auto; }
         margin-top: 4px; line-height: 1; min-height: 12px; color: var(--accent);
     }
     /* Slider with +/- buttons */
-    .slider-wrapper { display: flex; align-items: center; gap: 10px; }
+    .slider-wrapper { display: flex; align-items: center; gap: 10px; padding-bottom: 10px; }
     #lvlRange { flex: 1 1 auto; }
     .lvl-stepper {
         display: inline-flex; gap: 8px; align-items: center;
@@ -1218,6 +1201,10 @@ html, body { overflow-y: auto; }
     #ruler .lvl-pill:active {
         transform: translateX(-50%) scale(0.92); filter: brightness(1.08);
         box-shadow: 0 6px 14px rgba(124,77,255,0.28);
+    }
+    #ruler .lvl-pill.active {
+        background: rgba(255,255,255,0.92); color: #2a0c4f;
+        box-shadow: 0 4px 16px rgba(124,77,255,0.45);
     }
     /* Hide any pills NOT inside ruler */
     .lvl-pill { display: none; }
@@ -3052,7 +3039,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         slider.insertAdjacentElement('afterend', stepper);
     })();
 
-    // Desktop ruler: rebuild and align to slider
+    // Desktop ruler: position pills under slider thumb positions
     (function(){
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         if(isMobile) return;
@@ -3062,22 +3049,9 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         const min = Number(slider.min || 1);
         const max = Number(slider.max || 15);
 
-        function rebuild(){
-            ruler.innerHTML = '';
-            for(let i=min;i<=max;i++){
-                const span = document.createElement('span');
-                span.className = 'lvl-pill';
-                span.dataset.value = String(i);
-                span.textContent = String(i);
-                span.addEventListener('click', ()=>{
-                    slider.value = String(i);
-                    slider.dispatchEvent(new Event('input', {bubbles:true}));
-                });
-                ruler.appendChild(span);
-            }
-        }
-
-        function layout(){
+        function layoutRuler(){
+            const pills = ruler.querySelectorAll('.lvl-pill');
+            if(!pills.length) return;
             const parent = slider.parentElement;
             if(getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
             const sRect = slider.getBoundingClientRect();
@@ -3090,19 +3064,22 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             const thumb = 18;
             const usable = Math.max(1, sRect.width - thumb);
             const leftPad = thumb/2;
-            ruler.querySelectorAll('.lvl-pill').forEach(p=>{
-                const v = Number(p.dataset.value);
-                if(!Number.isFinite(v)) return;
+            pills.forEach(p => {
+                // Support both data-value and id-based value
+                const v = Number(p.dataset.value || p.textContent.trim());
+                if(!Number.isFinite(v) || v < min || v > max) return;
+                p.dataset.value = String(v);
                 const pct = (v - min) / (max - min);
                 p.style.left = (leftPad + pct * usable) + 'px';
             });
         }
 
-        rebuild();
-        layout();
-        window.addEventListener('resize', layout);
-        setTimeout(layout, 100);
-        setTimeout(layout, 400);
+        window.addEventListener('resize', layoutRuler);
+        // Wait for createRuler() to populate, then position
+        setTimeout(layoutRuler, 50);
+        setTimeout(layoutRuler, 200);
+        setTimeout(layoutRuler, 500);
+        setTimeout(layoutRuler, 1000);
     })();
 
     // Mobile: hide ruler pills and clean up duplicates
@@ -3388,9 +3365,6 @@ Stormarrow: При максимальных зарядах следующая б
       <div class="item-card" data-tip="Посох пустоты¦3000 г¦+90 AP¦Пробивание пустоты: +40% Пробивания Магии."><img src="https://www.wildriftfire.com/images/items/void-staff.png" alt="Посох пустоты" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Эхо Людена¦3000 г¦+85 Сила умений  |  +20 Ускорение умений  |  +7% Маг. Проникновение  |  +300 Мана¦Эхо раздора: Перемещение и способности генерируют заряды (до 100). При максимуме следующая атакующая способность расходует их, нанося 110 (+ 10% AP) доп. маг. урона цели и до 3 врагам рядом."><img src="https://www.wildriftfire.com/images/items/ludens-echo.png" alt="Эхо Лудена" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Корона Разрушенной Королевы¦3000 г¦+60 Сила умений  |  +20 Ускорение умений  |  +7% Маг. Проникновение  |  +200 Мана¦Защита: Даёт щит, блокирующий следующую вражескую способность. При пробитии — -40% входящего урона на 1с (перезарядка 40с). Уверенность: Пока Защита не на перезарядке — +20 силы умений. Активные способности урона по чемпионам снижают КД Защиты на 4с."><img src="https://www.wildriftfire.com/images/items/crown-of-the-shattered-queen.png" alt="Корона разбитой королевы" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Ракетный пояс хекстека¦3200 г¦+80 AP  |  +300 HP  |  +20 Уск. Ум.¦Сверхзвук (актив): рывок на 300 ед. с взрывом 150 маг. урона по врагам рядом. Получаешь +50 Скорости к ближайшим чемпионам на 5с. (40с КД)"><img src="https://www.wildriftfire.com/images/items/hextech-rocketbelt.png" alt="Ракетный пояс хекстека" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Призрачное пламя¦3000 г¦+100 AP  |  +200 HP¦Цветок пламени: нанесение урона щиту или врагу с <35% HP даёт +10-20% Маг. Проникновения. +5% Скорости."><img src="https://www.wildriftfire.com/images/items/shadowflame.png" alt="Призрачное пламя" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Песочные часы Жони¦3000 г¦+80 AP  |  +50 Брони  |  +10 Уск. Ум.¦Безмятежность: снижает получаемый урон на 10%.\nЗамораживание (актив): становишься Неуязвимым и Невыбираемым 2,5с. (120с КД)"><img src="https://www.wildriftfire.com/images/items/zhonyas-hourglass.png" alt="Песочные часы Жони" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Космический привод¦2800 г¦+75 Сила умений  |  +30 Ускорение умений  |  +7% Маг. Проникновение¦Гипердвигатель: +5% скорости передвижения. Плетение заклинаний: Урон способностями или усиленными атаками по чемпиону даёт бонус скорости 30 (+ 70% от Уск. Умений от предметов), спадающий 2с (перезарядка 1с за источник)."><img src="https://www.wildriftfire.com/images/items/cosmic-drive.png" alt="Космический разгон" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Посох Архангела¦2950 г¦+35 Сила умений  |  +20 Ускорение умений  |  +7% Маг. Проникновение  |  +500 Мана¦Благоговение: +1% AP от макс. маны. Возвращает 25% потраченной маны. Заряд маны: генерирует заряд каждые 3,3с (макс. 3). Трата маны → +18 маны (макс. 700). Превращается в Объятия Серафима при +700 маны."><img src="https://www.wildriftfire.com/images/items/archangels-staff.png" alt="Посох архангела" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Зуб Нашора¦3000 г¦+80 AP  |  +50% AS  |  +10 Уск. Ум.¦Укус икатиана: атаки наносят (15 + 15% AP) доп. маг. урона за удар."><img src="https://www.wildriftfire.com/images/items/nashors-tooth.png" alt="Зуб Нашора" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
@@ -3412,9 +3386,7 @@ Stormarrow: При максимальных зарядах следующая б
     <div class="items-grid">
       <div class="item-card" data-tip="Шипованный доспех¦2700 г¦+75 Броня  |  +200 Здоровье¦Шипы: При атаке по тебе наносит (20 + 6% бонусной Брони + 2% бонусного HP) маг. урона атакующему. Сплетение: Наносит 50% Тяжкие раны на 3с при получении атак или нанесении урона."><img src="https://www.wildriftfire.com/images/items/thornmail.png" alt="Шипованный доспех" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Эгида Солнечного огня¦2900 г¦+15 Ускорение умений  |  +20 Броня  |  +425 Здоровье¦Испепеление: В бою наносит (16–25 + 0,8% бонусного HP) маг. урона/с ближайшим врагам. Урон по чемпионам/монстрам стакирует +11% на 5с (макс. 4 стака = 44%). Огненное касание: При максимуме стаков атаки поджигают врагов вокруг, нанося 50% Испепеления на 3с. 130% урона монстрам, 175–250% миньонам."><img src="https://www.wildriftfire.com/images/items/sunfire-aegis.png" alt="Эгида Солнечного огня" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Горгулья¦3200 г¦+60 Брони  |  +60 Магрез  |  +200 HP¦Каменная кожа: рядом с 2+ вражескими чемпионами получаешь +6 Брони и +6 Магрез.\nОкаменение (актив): +100 Брони и +100 Магрез на 4с. Твой размер увеличивается. (90с КД)"><img src="https://www.wildriftfire.com/images/items/gargoyle.png" alt="Горгулья" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Замороженное сердце¦2700 г¦+25 Ускорение умений  |  +80 Броня  |  +200 Мана¦Ласка Зимы: Базовые атаки и урон способностями накладывают «Озноб» на 3с (до 4 стаков, 1с КД/умение). Каждый стак -9% скорости атаки цели (макс. -36%)."><img src="https://www.wildriftfire.com/images/items/frozen-heart.png" alt="Ледяное сердце" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Плита каменного горгульи¦3200 г¦+60 Брони  |  +60 Магрез  |  +200 HP¦Каменная кожа: рядом с 2+ вражескими чемпионами +6 Брони/МС.\nОкаменение (актив): +100 Брони/МС + увеличение размера на 4с. (90с КД)"><img src="https://www.wildriftfire.com/images/items/gargoyle-stoneplate.png" alt="Плита каменного горгульи" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Броня мертвеца¦2800 г¦+70 Броня  |  +350 Здоровье¦Неумолимый: +5% скорости. Импульс: Движение генерирует заряды (до 100 = +40 скорости). Сокрушительный удар: Атаки расходуют Импульс нанося маг. урон = потраченному Импульсу. При макс. импульсе ближние атаки замедляют на 75% на 1с."><img src="https://www.wildriftfire.com/images/items/dead-mans-plate.png" alt="Плита мертвеца" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Сила природы¦2750 г¦+60 Магрез  |  +350 Здоровье¦Шторм: +5% скорости. Поглощение: Получение урона от способностей генерирует заряд «Непоколебимости» (до 4, 7с). Последующие попадания обновляют заряды. При 4 зарядах: +10% скорости и -25% получаемого маг. урона."><img src="https://www.wildriftfire.com/images/items/force-of-nature.png" alt="Сила природы" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Рассветная завеса¦2700 г¦+50 Броня  |  +30 Магрез  |  +250 Здоровье¦Рассветный вестник: В радиусе 400 от врага при обездвиживании — 40 (+ 2,5% бонусного HP) маг. урона врагам рядом и раскрываешь их на 3с. Получаешь +20% брони и магрез на 3с (перезарядка 3с)."><img src="https://www.wildriftfire.com/images/items/dawnshroud.png" alt="Рассветная завеса" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
@@ -3426,7 +3398,6 @@ Stormarrow: При максимальных зарядах следующая б
       <div class="item-card" data-tip="Титаник Гидра¦3000 г¦+40 Сила атаки  |  +450 Здоровье¦Рассечение: Следующая атака наносит 25 (+ 3% бонусного HP) физ. урона цели + 80 (+ 10% бонусного HP) физ. урона в конусе 550. Дальние: 75%. Перезарядка 1,75с."><img src="https://www.wildriftfire.com/images/items/titanic-hydra.png" alt="Титаник Гидра" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Вестник зимы¦2600 г¦+15 Ускорение умений  |  +350 Здоровье  |  +500 Мана¦Благоговение: +8% HP от макс. маны. Возвращает 15% маны. Заряд маны: +12 маны за атаку/расход маны (до 700). Превращается в Фимбулвинтер."><img src="https://www.wildriftfire.com/images/items/winters-approach.png" alt="Вестник зимы" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Ловушка йордла¦2500 г¦+15 Ускорение умений  |  +40 Броня  |  +350 Здоровье¦Ловец: Попадание способностью движения даёт +30% скорости на 3с и метит цель на 5с (-5–12 броня/магрез). Если помеченный умирает — ты и союзники рядом получают 200–300 золота (раз в 10с)."><img src="https://www.wildriftfire.com/images/items/yordle-trap.png" alt="Ловушка йордла" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Вуаль Банши¦2500 г¦+350 HP  |  +60 Магрез¦Отмена: каждые 40с получаешь щит, поглощающий 1 вражескую способность.\nБлагословение: +10% эффективность щитов и исцеления."><img src="https://www.wildriftfire.com/images/items/banshees-veil.png" alt="Вуаль Банши" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Двойная стража Амаранта¦3100 г¦+60 Броня  |  +60 Магрез¦Выносливость: В бою накапливает 1 стак/с (макс. 5). При 5 стаках: +20% размера, +20% стойкости, +30% к бонусной броне и магрезу. Стаки сбрасываются вне боя."><img src="https://www.wildriftfire.com/images/items/amaranths-twinguard.png" alt="Двойная защита Амарант" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Каэник Рукерн¦2900 г¦+350 HP  |  +60 Магрез¦Накопление: получая маг. урон (10с КД), накапливаешь щит = 25% нанесённого маг. урона. Щит активируется через 10с вне боя. Не работает при получении КК."><img src="https://www.wildriftfire.com/images/items/kaenic-rookern.png" alt="Каэник Рукерн" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Полое сияние¦3000 г¦+350 HP  |  +60 Магрез¦Свечение: +10% маг. урона по тебе отражается по ближайшим врагам после КК. +10% снижения маг. урона."><img src="https://www.wildriftfire.com/images/items/hollow-radiance.png" alt="Полое сияние" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:rgba(109,63,245,0.3);border-radius:6px;display:block;'"></div>
@@ -3558,10 +3529,10 @@ Stormarrow: При максимальных зарядах следующая б
     <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Наведи — описание</div>
     <div class="side-section" style="padding:0;margin-bottom:8px;">⭐ КЛЮЧЕВЫЕ</div>
     <div class="rune-grid" id="runeGridKeystone">
-<div class="rune-card" data-tip="Хватка нежити¦Resolve — Ключевая¦¦Каждые 4с в бою: следующая атака наносит 4% макс. HP маг. урона, исцеляет на 4 HP и увеличивает HP на 2% от нанесённого урона. Дальнобойные: 1.5%."><img src="https://www.wildriftfire.com/images/runes/grasp-of-the-undying.png" alt="Хватка нежити" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Хватка нежити</div></div>
-<div class="rune-card" data-tip="Лёгкая поступь¦Precision — Ключевая¦¦Движение и атаки накапливают Энергию. На 100% — Заряженная атака: +5-100 маг. урона + 10-200 HP восстановления + 20% скорости на 1с. Значения зависят от уровня (1→15)."><img src="https://www.wildriftfire.com/images/runes/fleet-footwork.png" alt="Лёгкая поступь" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Лёгкая поступь</div></div>
-<div class="rune-card" data-tip="Завоеватель¦Precision — Ключевая¦¦Атаки и способности по чемпионам дают 2 стака (макс. 12). Каждый стак = +2 AD или +2 AP. При 12 стаках: +15% к урону по чемпионам и +10% Омни Вамп. Стаки теряются, если 3с не атаковать чемпиона."><img src="https://www.wildriftfire.com/images/runes/conqueror.png" alt="Завоеватель" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Завоеватель</div></div>
-<div class="rune-card" data-tip="Смертоносный темп¦Precision — Ключевая¦¦Атака по чемпиону даёт +30-100% AS на 6с (нарастающий). При 6 зарядах — бонус постоянный и добавляется +100 к дальности атаки."><img src="https://www.wildriftfire.com/images/runes/lethal-tempo.png" alt="Смертоносный темп" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Смертоносный темп</div></div>
+<div class="rune-card" data-tip="Хватка нежити¦Resolve — Ключевая¦¦Каждые 4с в бою: следующая атака наносит 3% макс. HP маг. урон и лечит на 2.5% макс. HP. Постоянно увеличивает макс. HP на 10. Дальнобойные: эффективность снижена на 40%."><img src="https://www.wildriftfire.com/images/runes/grasp-of-the-undying.png" alt="Хватка нежити" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Хватка нежити</div></div>
+<div class="rune-card" data-tip="Лёгкая поступь¦Precision — Ключевая¦¦Движение и атаки копят Энергию (макс. 100). При 100: следующая атака лечит на 15-85 (+30% бон. AD)(+30% AP) и даёт +20% скорости на 1с. +100% AS на эту атаку. Против чемпионов: +8% пропущ. маны/энергии. Против миньонов/монстров: 35%/15% эффективности."><img src="https://www.wildriftfire.com/images/runes/fleet-footwork.png" alt="Лёгкая поступь" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Лёгкая поступь</div></div>
+<div class="rune-card" data-tip="Завоеватель¦Precision — Ключевая¦¦Атаки и способности по чемпионам дают стаки (макс. 6). Каждый стак: +3-7 AD или +4-11 AP (по уровню). При макс. стаках: +9% Омни Вамп (ближний) / +5% (дальний). Стаки угасают по 1 каждые 0.5с."><img src="https://www.wildriftfire.com/images/runes/conqueror.png" alt="Завоеватель" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Завоеватель</div></div>
+<div class="rune-card" data-tip="Смертоносный темп¦Precision — Ключевая¦¦Атака по чемпиону даёт стак на 6с (макс. 6). Каждый стак: +8-16% AS (ближний) / +3-12% AS (дальний) по уровню. При макс. стаках: +50 дальности (дальний: +75). Можно превысить лимит AS."><img src="https://www.wildriftfire.com/images/runes/lethal-tempo.png" alt="Смертоносный темп" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Смертоносный темп</div></div>
 <div class="rune-card" data-tip="Электрокут¦Domination — Ключевая¦¦3 удара или способности по одному чемпиону за 3с наносят 30-184 + 40% AD + 25% AP маг. урона. (25с КД)"><img src="https://www.wildriftfire.com/images/runes/electrocute.png" alt="Электрокут" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Электрокут</div></div>
 <div class="rune-card" data-tip="Звёздный осколок¦Inspiration — Ключевая¦¦Попадание способностью по чемпиону призывает комету, наносящую 20-100 + 20% AP + 10% AD маг. урона. Стоп-эффекты продлевают время полёта. (6с КД после попадания)"><img src="https://www.wildriftfire.com/images/runes/arcane-comet.png" alt="Звёздный осколок" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Звёздный осколок</div></div>
 <div class="rune-card" data-tip="Тёмная жатва¦Domination — Ключевая¦¦Убийство чемпиона с HP<50% поглощает душу: +2 AD или AP за стак (стаки навсегда). Урон: 10-50 + 5% AD + 2.5% AP. Стак = +0.5 AD/AP по врагам <50% HP. (45с КД, сброс на убийстве)"><img src="https://www.wildriftfire.com/images/runes/dark-harvest.png" alt="Тёмная жатва" loading="lazy" onerror="this.src='';this.style.cssText='width:40px;height:40px;background:rgba(109,63,245,0.3);border-radius:50%;display:block;'"><div class="rune-card-name">Тёмная жатва</div></div>
