@@ -198,6 +198,35 @@
             transform: scale(1.2);
         }
 
+
+        /* ── PATCH DOT ── */
+        .patch-dot {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid #0f0520;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .patch-dot.buff { background: #2ecc71; box-shadow: 0 0 6px rgba(46,204,113,0.6); }
+        .patch-dot.nerf { background: #e74c3c; box-shadow: 0 0 6px rgba(231,76,60,0.6); }
+
+        .patch-tooltip {
+            position: fixed;
+            z-index: 99999;
+            background: rgba(10,3,20,0.97);
+            border: 1px solid rgba(185,111,255,0.5);
+            border-radius: 10px;
+            padding: 10px 14px;
+            max-width: 260px;
+            font-size: 12px;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+            pointer-events: auto;
+        }
         /* RULER */
         .ruler {
             display: flex;
@@ -715,7 +744,7 @@
         }
         /* Mobile: hide name, show number inside cell */
         @media (max-width: 768px) {
-            .champ-icon { width: 38px; height: 38px; border-radius: 7px; }
+            .champ-icon { width: 42px; height: 42px; border-radius: 8px; }
             .champ-cell .name-tag { display: none !important; }
             .champ-cell {
                 justify-content: flex-start;
@@ -1138,8 +1167,8 @@ html, body { overflow-y: auto; }
 /* ── MOBILE ── */
 @media (max-width: 768px) {
     /* Table sizing handled by consolidated section */
-    #statTable th:first-child, #statTable td:first-child { width: 40%; }
-    #statTable th:not(:first-child), #statTable td:not(:first-child) { width: 12%; }
+    #statTable th:first-child, #statTable td:first-child { width: 35%; }
+    #statTable th:not(:first-child), #statTable td:not(:first-child) { width: 13%; }
     #statTable th { padding: 7px 1px; font-size: 10px; }
     /* Abbreviate stat headers on mobile */
     #statTable th:not(:first-child) { color: transparent; position: relative; }
@@ -1147,7 +1176,7 @@ html, body { overflow-y: auto; }
         content: attr(data-short); position: absolute; inset: 0;
         display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 10px; pointer-events: none;
     }
-    .champ-icon { width: 38px; height: 38px; border-radius: 7px; }
+    .champ-icon { width: 42px; height: 42px; border-radius: 8px; }
     .champ-cell .name-tag { display: none; }
     .champ-cell { justify-content: flex-start; gap: 3px; padding-left: 4px; overflow: hidden; }
     .row-num { font-size: 8px; min-width: 10px; }
@@ -1311,6 +1340,14 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     .rune-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
 }
 
+/* ── PC GRIDS — auto-fill, many per row ── */
+@media (min-width: 769px) {
+    #scGrid { grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)) !important; gap: 6px !important; }
+    #champPickerGrid { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)) !important; gap: 5px !important; }
+    .items-grid { grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)) !important; gap: 6px !important; }
+    .rune-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important; gap: 6px !important; }
+}
+
     </style>
 
 </head>
@@ -1454,6 +1491,10 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         return Math.round(minVal + (maxVal - minVal) * (lvl - 1) / 14);
     }
         // ✅ Paste your published Google Sheet TSV/CSV URL here (File → Share → Publish to web)123
+    // ✅ Patch notes sheet URL (File → Share → Publish to web → TSV)
+    // Columns: Champion | Patch | Change | Type (buff/nerf)
+    const PATCH_URL = window.PATCH_URL || '<iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pubhtml?gid=1129379769&amp;single=true&amp;widget=true&amp;headers=false"></iframe>';
+
     const G_URL = window.G_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
 
 
@@ -1478,6 +1519,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     const DD_URL = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
 
     let raw = [];
+    let patchMap = {}; // {champName: {patch, change, type}}
     let selected = new Set();
     let pinned = new Set();
     let lvl = 10;
@@ -1523,6 +1565,29 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">Не удалось загрузить данные. Проверь подключение к интернету.</td></tr>';
             return;
         }
+        // Fetch patch notes (non-blocking)
+        if(PATCH_URL) {
+            try {
+                const pr = await fetch(PATCH_URL);
+                const pt = await pr.text();
+                const pLines = pt.trim().split('\n');
+                const pHeads = pLines[0].split('\t').map(h => h.trim());
+                pLines.slice(1).forEach(function(line) {
+                    var cols = line.split('\t');
+                    var obj = {};
+                    pHeads.forEach(function(h, i) { obj[h] = (cols[i]||'').trim(); });
+                    if(obj['Champion']) {
+                        patchMap[obj['Champion']] = {
+                            patch: obj['Patch'] || '',
+                            change: obj['Change'] || '',
+                            type: (obj['Type']||'').toLowerCase()
+                        };
+                    }
+                });
+                console.log('Patch data loaded:', Object.keys(patchMap).length, 'champions');
+            } catch(e) { console.warn('Patch notes not loaded:', e); }
+        }
+
         const lines = t.trim().split('\n');
         const heads = lines[0].split('\t').map(h => h.trim());
         
@@ -1698,7 +1763,40 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             if(isP) champImg.classList.add('icon-pinned');
             champImg.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
 
-            tdChamp.appendChild(btnX); tdChamp.appendChild(champImg); tdChamp.appendChild(nameSpan);
+            // Patch indicator
+            const pInfo = patchMap[item.name];
+            const champWrap = document.createElement('div');
+            champWrap.style.cssText = 'position:relative;display:inline-block;flex-shrink:0;';
+            champWrap.appendChild(champImg);
+            if(pInfo) {
+                const dot = document.createElement('div');
+                dot.className = 'patch-dot ' + pInfo.type;
+                dot.dataset.patch = pInfo.patch;
+                dot.dataset.change = pInfo.change;
+                dot.dataset.type = pInfo.type;
+                champWrap.appendChild(dot);
+                // Tooltip on hover (PC) / click (mobile)
+                function showPatchTip(e) {
+                    e.stopPropagation();
+                    var old = document.getElementById('patchTip');
+                    if(old) old.remove();
+                    var tip = document.createElement('div');
+                    tip.id = 'patchTip';
+                    tip.className = 'patch-tooltip';
+                    var typeLabel = pInfo.type === 'buff' ? '🟢 БАФФ' : '🔴 НЕРФ';
+                    tip.innerHTML = '<div style="font-weight:900;margin-bottom:4px;">' + typeLabel + ' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Патч ' + pInfo.patch + '</span></div>' + '<div style="font-size:11px;line-height:1.4;color:rgba(255,255,255,0.8);">' + pInfo.change + '</div>';
+                    var rect = champWrap.getBoundingClientRect();
+                    tip.style.top = (rect.bottom + 6) + 'px';
+                    tip.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 260)) + 'px';
+                    document.body.appendChild(tip);
+                    setTimeout(function() {
+                        document.addEventListener('click', function rm() { tip.remove(); document.removeEventListener('click', rm); }, {once:true});
+                    }, 10);
+                }
+                champWrap.addEventListener('mouseenter', showPatchTip);
+                champWrap.addEventListener('click', showPatchTip);
+            }
+            tdChamp.appendChild(btnX); tdChamp.appendChild(champWrap); tdChamp.appendChild(nameSpan);
             tr.appendChild(tdChamp);
             ['ad','hp','mana','armor','mrez'].forEach(k => {
                 const v = item[k];
@@ -1968,7 +2066,6 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         _calcMyChamp = raw.find(function(x){ return x.name===c.name; });
         if(!_calcMyChamp) return;
         _calcMyLvl = +document.getElementById('calcMyLvlSlider').value || 1;
-        document.getElementById('calcMyChampRow').style.display = 'none';
         document.getElementById('calcMyBadge').style.display = 'flex';
         document.getElementById('calcMyIcon').src = DD_URL + champKey(c.name) + '.png';
         document.getElementById('calcMyName').textContent = c.name;
@@ -1977,10 +2074,11 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     };
     window.calcClearMy = function() {
         _calcMyChamp = null;
-        document.getElementById('calcMyChampRow').style.display = 'block';
-        document.getElementById('calcMyBadge').style.display = 'none';
+        document.getElementById('calcMyBadge').style.display = 'flex';
+        document.getElementById('calcMyIcon').src = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png';
+        document.getElementById('calcMyName').innerHTML = '🪆 Манекен';
         document.getElementById('calcMyLvlWrap').style.display = 'none';
-        document.getElementById('cMyAD').value = '';
+        document.getElementById('cMyAD').value = '100';
         document.getElementById('cMyAD').readOnly = false;
         calcRun();
     };
@@ -2510,13 +2608,22 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             div.onmouseleave=function(){div.style.borderColor='transparent';div.style.background='';};
             var img=document.createElement('img');
             img.src=DD+champKey(ch.name)+'.png';
-            img.style.cssText='width:100%;aspect-ratio:1;border-radius:10px;object-fit:cover;';
+            img.style.cssText='width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;';
             img.onerror=function(){this.src='';this.style.background='rgba(109,63,245,0.3)';};
             var lbl=document.createElement('div');
-            lbl.style.cssText='font-size:9px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.2;max-width:60px;';
+            lbl.style.cssText='font-size:8px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.15;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
             lbl.textContent=ch.name;
             div.appendChild(img); div.appendChild(lbl);
             div.onclick=function(){openChampDetail(ch.name);};
+            // Patch dot in champ list
+            var pI = patchMap[ch.name];
+            if(pI) {
+                img.parentElement.style.position = 'relative';
+                var dt = document.createElement('div');
+                dt.className = 'patch-dot ' + pI.type;
+                div.style.position = 'relative';
+                div.appendChild(dt);
+            }
             grid.appendChild(div);
         });
         if(!filtered.length) grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:30px;color:rgba(255,255,255,0.3);">\u041d\u0438\u0447\u0435\u0433\u043e \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e</div>';
@@ -2971,10 +3078,10 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border-radius:9px;border:2px solid transparent;transition:all 0.12s;';
             var img = document.createElement('img');
             img.src = DD_URL + champKey(c.name) + '.png';
-            img.style.cssText = 'width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;';
+            img.style.cssText = 'width:100%;aspect-ratio:1;border-radius:7px;object-fit:cover;';
             img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
             var nm = document.createElement('div');
-            nm.style.cssText = 'font-size:8px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
+            nm.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
             nm.textContent = c.name;
             wrap.appendChild(img); wrap.appendChild(nm);
             wrap.onmouseenter = function(){ this.style.borderColor='#b96fff'; this.style.background='rgba(109,63,245,0.15)'; };
@@ -3052,7 +3159,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
 <!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
-  <div class="m-win" style="width:98vw;max-width:1200px;max-height:94vh;overflow-y:auto;padding:18px;padding-right:56px;">
+  <div class="m-win" style="width:98vw;max-width:1400px;max-height:94vh;overflow-y:auto;padding:18px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
     <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:14px;">⚔ Калькулятор урона</div>
 
@@ -3061,13 +3168,10 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
       <!-- ══ COL 1: МОЙ ЧЕМПИОН ══ -->
       <div style="background:rgba(39,174,96,0.06);border:1.5px solid rgba(39,174,96,0.3);border-radius:12px;padding:12px 14px;">
         <div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🟢 МОЙ ЧЕМПИОН</div>
-        <div id="calcMyChampRow" style="margin-bottom:8px;">
-          <button onclick="openChampPicker('🟢 Мой чемпион',window._calcPickMy)" style="width:100%;padding:7px;border-radius:9px;border:1.5px dashed rgba(39,174,96,0.4);background:rgba(39,174,96,0.06);color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;">⚔ Выбрать чемпиона</button>
-        </div>
-        <div id="calcMyBadge" style="display:none;align-items:center;gap:8px;background:rgba(39,174,96,0.1);border-radius:9px;border:1px solid rgba(39,174,96,0.3);padding:5px 10px;margin-bottom:8px;">
-          <img id="calcMyIcon" style="width:28px;height:28px;border-radius:6px;object-fit:cover;">
-          <span id="calcMyName" style="font-size:11px;font-weight:700;color:#fff;flex:1;"></span>
-          <button onclick="calcClearMy()" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:13px;cursor:pointer;">✕</button>
+        <div id="calcMyBadge" style="display:flex;align-items:center;gap:8px;background:rgba(39,174,96,0.08);border-radius:9px;border:1px solid rgba(39,174,96,0.2);padding:5px 10px;margin-bottom:8px;">
+          <img id="calcMyIcon" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png">
+          <span id="calcMyName" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);flex:1;">🪆 Манекен</span>
+          <button onclick="openChampPicker('🟢 Мой чемпион',window._calcPickMy)" style="background:rgba(109,63,245,0.15);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;cursor:pointer;">Сменить</button>
         </div>
         <div id="calcMyLvlWrap" style="display:none;margin-bottom:8px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
@@ -3159,7 +3263,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
 <!-- ═══════════════ ITEMS REFERENCE MODAL ═══════════════ -->
 <div class="m-mask" id="itemsMask" onclick="if(event.target===this)closeItems()">
-  <div class="m-win" style="width:96vw;max-width:920px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;padding-right:70px;">
+  <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;">
     <button class="btn-close-x" onclick="closeItems()">✕</button>
     <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;">📦 Предметы Wild Rift</div>
         <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">⚔ Физические</div>
@@ -3403,7 +3507,7 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ RUNES MODAL ══ -->
 <div class="m-mask" id="runesMask" onclick="if(event.target===this)closeRunes()">
-  <div class="m-win" style="width:96vw;max-width:860px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;padding-right:70px;">
+  <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;">
     <button class="btn-close-x" onclick="closeRunes()">✕</button>
     <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;">💎 Руны Wild Rift</div>
     <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Наведи — описание</div>
@@ -3492,7 +3596,7 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ SIDE CHAMPIONS MODAL ══ -->
 <div class="m-mask" id="sideChampsMask" onclick="if(event.target===this)closeSideChamps()">
-  <div class="m-win" style="width:96vw;max-width:780px;max-height:92vh;display:flex;flex-direction:column;padding:20px 16px 16px;padding-right:70px;">
+  <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;display:flex;flex-direction:column;padding:20px 16px 16px;">
     <button class="btn-close-x" onclick="closeSideChamps()">✕</button>
     <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:12px;">👥 Чемпионы</div>
     <!-- Role filter -->
@@ -3715,7 +3819,7 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ UNIVERSAL CHAMPION PICKER MODAL ══ -->
 <div class="m-mask" id="champPickerModal" onclick="if(event.target===this)closeChampPicker()">
-  <div class="m-win" style="width:92vw;max-width:560px;max-height:88vh;display:flex;flex-direction:column;padding:16px;padding-right:70px;overflow:hidden;">
+  <div class="m-win" style="width:96vw;max-width:900px;max-height:92vh;display:flex;flex-direction:column;padding:16px;overflow:hidden;">
     <button class="btn-close-x" onclick="closeChampPicker()">✕</button>
     <div style="font-size:14px;font-weight:900;color:#b96fff;margin-bottom:10px;" id="champPickerTitle">⚔ Выбери чемпиона</div>
     <input id="champPickerSearch" type="text" placeholder="🔍 Поиск..." class="calc-input"
