@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
+    <meta name="google-site-verification" content="kB5_q7ETdmSfFYn1Zg6cxi35po6oB_NlRXGVkL9NPhc" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>Wild Rift Stats — Статы чемпионов, руны, предметы, калькулятор</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%236D3FF5'/><text x='16' y='23' font-size='18' text-anchor='middle' font-family='Arial'>⚔️</text></svg>">
@@ -1528,20 +1529,60 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         return m[n] || n.replace(/[\s\'\.\#&]/g,'');
     }
     const DD_URL = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
-    var _sp={'Norra':'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Norra_0.jpg','Mel':'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Mel_0.jpg'};
+    var _sp={'Norra':'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/norra.png','Mel':'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Mel_0.jpg'};
     function champIcon(name){ return _sp[name] || (DD_URL + champKey(name) + '.png'); }
-    // Fallback for WR-exclusive champs: if main icon fails, try wildriftfire
-    var _spFallback = {'Norra':'https://www.wildriftfire.com/images/champions/norra.png','Mel':'https://www.wildriftfire.com/images/champions/mel.png'};
+    // Fallback URLs for WR-exclusive champs
+    var _spFallback = {
+        'Norra':['https://www.wildriftfire.com/images/champions/norra.png','https://cdn.communitydragon.org/latest/champion/norra/square','https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Norra.png'],
+        'Mel':['https://www.wildriftfire.com/images/champions/mel.png']
+    };
     function champImgError(img, name) {
-        if(_spFallback[name] && img.src !== _spFallback[name]) {
-            img.src = _spFallback[name];
+        if(!img._fallbackIdx) img._fallbackIdx = 0;
+        var fb = _spFallback[name];
+        if(fb && img._fallbackIdx < fb.length) {
+            img.src = fb[img._fallbackIdx++];
         } else {
-            img.style.cssText = 'width:100%;aspect-ratio:1;background:rgba(109,63,245,0.3);border-radius:8px;display:block;';
+            img.style.cssText = 'width:100%;aspect-ratio:1;background:linear-gradient(135deg,rgba(109,63,245,0.4),rgba(185,111,255,0.2));border-radius:8px;display:block;';
+            img.alt = name;
         }
     }
 
     let raw = [];
-    let patchMap = {}; // {champName: {patch, change, type}}
+    let patchMap = {};
+
+    // ═══ MATCHUP DATA (localStorage) ═══
+    function getMatchups() {
+        try { return JSON.parse(localStorage.getItem('matchups') || '{}'); } catch(e) { return {}; }
+    }
+    function saveMatchups(data) {
+        try { localStorage.setItem('matchups', JSON.stringify(data)); } catch(e) {}
+    }
+    function getCounters(name) { var m = getMatchups(); return (m[name] && m[name].counters) || []; }
+    function getCombos(name) { var m = getMatchups(); return (m[name] && m[name].combos) || []; }
+    function addCounter(name, counter) {
+        var m = getMatchups();
+        if(!m[name]) m[name] = {counters:[], combos:[]};
+        if(m[name].counters.indexOf(counter) === -1) m[name].counters.push(counter);
+        saveMatchups(m);
+    }
+    function removeCounter(name, counter) {
+        var m = getMatchups();
+        if(!m[name]) return;
+        m[name].counters = m[name].counters.filter(function(c){ return c !== counter; });
+        saveMatchups(m);
+    }
+    function addCombo(name, combo) {
+        var m = getMatchups();
+        if(!m[name]) m[name] = {counters:[], combos:[]};
+        if(m[name].combos.indexOf(combo) === -1) m[name].combos.push(combo);
+        saveMatchups(m);
+    }
+    function removeCombo(name, combo) {
+        var m = getMatchups();
+        if(!m[name]) return;
+        m[name].combos = m[name].combos.filter(function(c){ return c !== combo; });
+        saveMatchups(m);
+    } // {champName: {patch, change, type}}
     let selected = new Set();
     let pinned = new Set();
     let lvl = 10;
@@ -1815,7 +1856,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             const champImg = document.createElement('img');
             champImg.alt = ''; champImg.className = 'champ-icon';
             champImg.src = champIcon(item.name);
-            champImg.onerror = function(){ this.style.display='none'; };
+            champImg.onerror = function(){ champImgError(this, item.name); };
             champImg.style.cursor = 'pointer';
             champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
             if(isP) champImg.classList.add('icon-pinned');
@@ -2777,6 +2818,86 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 }
             }
             updateCardStats(champ, _cardLvl);
+
+            // ═══ КОНТР-ПИКИ И КОМБО ═══
+            var matchupWrap = document.createElement('div');
+            matchupWrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;';
+
+            // Контр-пики (слева)
+            var counterBox = document.createElement('div');
+            counterBox.style.cssText = 'background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.25);border-radius:10px;padding:10px;';
+            counterBox.innerHTML = '<div style="font-size:10px;color:#e74c3c;font-weight:800;letter-spacing:0.5px;margin-bottom:8px;">🔴 КОНТР-ПИКИ</div>';
+            var counterList = document.createElement('div');
+            counterList.id = 'cdCounters';
+            counterList.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;';
+            counterBox.appendChild(counterList);
+            var counterAddBtn = document.createElement('button');
+            counterAddBtn.style.cssText = 'width:100%;padding:5px;border-radius:7px;border:1px dashed rgba(231,76,60,0.3);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;';
+            counterAddBtn.textContent = '+ Добавить';
+            counterAddBtn.onclick = function() {
+                openChampPicker('🔴 Контр-пик для ' + name, function(c) {
+                    addCounter(name, c.name);
+                    renderMatchups(name);
+                });
+            };
+            counterBox.appendChild(counterAddBtn);
+            matchupWrap.appendChild(counterBox);
+
+            // Комбо (справа)
+            var comboBox = document.createElement('div');
+            comboBox.style.cssText = 'background:rgba(39,174,96,0.06);border:1px solid rgba(39,174,96,0.25);border-radius:10px;padding:10px;';
+            comboBox.innerHTML = '<div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:0.5px;margin-bottom:8px;">🟢 КОМБО</div>';
+            var comboList = document.createElement('div');
+            comboList.id = 'cdCombos';
+            comboList.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;';
+            comboBox.appendChild(comboList);
+            var comboAddBtn = document.createElement('button');
+            comboAddBtn.style.cssText = 'width:100%;padding:5px;border-radius:7px;border:1px dashed rgba(39,174,96,0.3);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;';
+            comboAddBtn.textContent = '+ Добавить';
+            comboAddBtn.onclick = function() {
+                openChampPicker('🟢 Комбо с ' + name, function(c) {
+                    addCombo(name, c.name);
+                    renderMatchups(name);
+                });
+            };
+            comboBox.appendChild(comboAddBtn);
+            matchupWrap.appendChild(comboBox);
+            el.appendChild(matchupWrap);
+
+            // Render matchup icons
+            function renderMatchups(n) {
+                var cList = document.getElementById('cdCounters');
+                var bList = document.getElementById('cdCombos');
+                if(cList) {
+                    cList.innerHTML = '';
+                    getCounters(n).forEach(function(cn) {
+                        var chip = document.createElement('div');
+                        chip.style.cssText = 'display:flex;align-items:center;gap:3px;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.25);border-radius:6px;padding:2px 5px 2px 2px;';
+                        chip.innerHTML = '<img src="'+champIcon(cn)+'" style="width:22px;height:22px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'"><span style="font-size:9px;color:#fff;">'+cn+'</span>';
+                        var xBtn = document.createElement('span');
+                        xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;margin-left:2px;';
+                        xBtn.textContent = '×';
+                        xBtn.onclick = function(e) { e.stopPropagation(); removeCounter(n, cn); renderMatchups(n); };
+                        chip.appendChild(xBtn);
+                        cList.appendChild(chip);
+                    });
+                }
+                if(bList) {
+                    bList.innerHTML = '';
+                    getCombos(n).forEach(function(cn) {
+                        var chip = document.createElement('div');
+                        chip.style.cssText = 'display:flex;align-items:center;gap:3px;background:rgba(39,174,96,0.12);border:1px solid rgba(39,174,96,0.25);border-radius:6px;padding:2px 5px 2px 2px;';
+                        chip.innerHTML = '<img src="'+champIcon(cn)+'" style="width:22px;height:22px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'"><span style="font-size:9px;color:#fff;">'+cn+'</span>';
+                        var xBtn = document.createElement('span');
+                        xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;margin-left:2px;';
+                        xBtn.textContent = '×';
+                        xBtn.onclick = function(e) { e.stopPropagation(); removeCombo(n, cn); renderMatchups(n); };
+                        chip.appendChild(xBtn);
+                        bList.appendChild(chip);
+                    });
+                }
+            }
+            renderMatchups(name);
         }
         openModal('champDetailMask');
     };
@@ -2880,8 +3001,15 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         _origCloseModal(id);
         // Only reopen sidebar if closing the MAIN modal that was opened from sidebar
         if(_sidebarModalId && id === _sidebarModalId) {
+            var savedId = _sidebarModalId;
             _sidebarModalId = null;
-            toggleSidebar();
+            // Delay: check if another modal opened right after (e.g. item sub-modal)
+            setTimeout(function() {
+                var anyOpen = _modalStack && _modalStack.length > 0;
+                if(!anyOpen) {
+                    toggleSidebar();
+                }
+            }, 100);
         }
     };
 
