@@ -1493,7 +1493,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         // ✅ Paste your published Google Sheet TSV/CSV URL here (File → Share → Publish to web)123
     // ✅ Patch notes sheet URL (File → Share → Publish to web → TSV)
     // Columns: Champion | Patch | Change | Type (buff/nerf)
-    const PATCH_URL = window.PATCH_URL || '<iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pubhtml?gid=1129379769&amp;single=true&amp;widget=true&amp;headers=false"></iframe>';
+    const PATCH_URL = window.PATCH_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=1129379769&single=true&output=tsv';
 
     const G_URL = window.G_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
 
@@ -1517,6 +1517,8 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         return m[n] || n.replace(/[\s\'\.\#&]/g,'');
     }
     const DD_URL = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
+    var _sp={'Norra':'https://static.wikia.nocookie.net/leagueoflegends/images/e/ee/Norra_OriginalCentered.jpg','Mel':'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg'};
+    function champIcon(name){ return _sp[name] || (DD_URL + champKey(name) + '.png'); }
 
     let raw = [];
     let patchMap = {}; // {champName: {patch, change, type}}
@@ -1576,12 +1578,15 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                     var cols = line.split('\t');
                     var obj = {};
                     pHeads.forEach(function(h, i) { obj[h] = (cols[i]||'').trim(); });
-                    if(obj['Champion']) {
-                        patchMap[obj['Champion']] = {
-                            patch: obj['Patch'] || '',
-                            change: obj['Change'] || '',
-                            type: (obj['Type']||'').toLowerCase()
-                        };
+                    if(obj['Champion'] && obj['Type']) {
+                        var pType = (obj['Type']||'').toLowerCase().trim();
+                        if(pType === 'buff' || pType === 'nerf') {
+                            patchMap[obj['Champion']] = {
+                                patch: obj['Patch'] || '',
+                                change: obj['Change'] || '',
+                                type: pType
+                            };
+                        }
                     }
                 });
                 console.log('Patch data loaded:', Object.keys(patchMap).length, 'champions');
@@ -1755,8 +1760,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
             const champImg = document.createElement('img');
             champImg.alt = ''; champImg.className = 'champ-icon';
-            const _sp = {'Norra':'https://static.wikia.nocookie.net/leagueoflegends/images/e/ee/Norra_OriginalCentered.jpg','Mel':'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg'};
-            champImg.src = _sp[item.name] || (DD_URL + champKey(item.name) + '.png');
+            champImg.src = champIcon(item.name);
             champImg.onerror = function(){ this.style.display='none'; };
             champImg.style.cursor = 'pointer';
             champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
@@ -1861,7 +1865,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 btn.className = 'm-item ' + (isOn ? 'on' : '');
 
                 const mImg = document.createElement('img');
-                mImg.src = DD_URL + champKey(c.name) + '.png';
+                mImg.src = champIcon(c.name);
                 mImg.alt = c.name;
                 mImg.title = c.name;
                 mImg.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; this.src=''; };
@@ -2067,7 +2071,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         if(!_calcMyChamp) return;
         _calcMyLvl = +document.getElementById('calcMyLvlSlider').value || 1;
         document.getElementById('calcMyBadge').style.display = 'flex';
-        document.getElementById('calcMyIcon').src = DD_URL + champKey(c.name) + '.png';
+        document.getElementById('calcMyIcon').src = champIcon(c.name);
         document.getElementById('calcMyName').textContent = c.name;
         document.getElementById('calcMyLvlWrap').style.display = 'block';
         calcMyLvlChange();
@@ -2099,7 +2103,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         if(!_calcTgtChamp) return;
         _calcTgtLvl = +document.getElementById('calcTgtLvlSlider').value || 1;
         document.getElementById('calcTgtBadge').style.display = 'flex';
-        document.getElementById('calcTgtIcon').src = DD_URL + champKey(c.name) + '.png';
+        document.getElementById('calcTgtIcon').src = champIcon(c.name);
         document.getElementById('calcTgtName').textContent = c.name;
         document.getElementById('calcTgtLvlWrap').style.display = 'block';
         calcTgtLvlChange();
@@ -2537,7 +2541,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             var cd=document.createElement('div'); cd.className='tierlist-champs';
             (data[t.k]||[]).forEach(function(name){
                 var img=document.createElement('img');
-                img.className='tierlist-champ-icon'; img.src=DD+name+'.png'; img.alt=img.title=name;
+                img.className='tierlist-champ-icon'; img.src=champIcon(name); img.alt=img.title=name;
                 img.onerror=function(){this.style.display='none';}; cd.appendChild(img);
             });
             if(!(data[t.k]||[]).length){var ph=document.createElement('span');ph.style.cssText='font-size:11px;color:rgba(255,255,255,0.2);padding:4px;';ph.textContent='--';cd.appendChild(ph);}
@@ -2607,7 +2611,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             div.onmouseenter=function(){div.style.borderColor='#b96fff';div.style.background='rgba(109,63,245,0.2)';};
             div.onmouseleave=function(){div.style.borderColor='transparent';div.style.background='';};
             var img=document.createElement('img');
-            img.src=DD+champKey(ch.name)+'.png';
+            img.src=champIcon(ch.name);
             img.style.cssText='width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;';
             img.onerror=function(){this.src='';this.style.background='rgba(109,63,245,0.3)';};
             var lbl=document.createElement('div');
@@ -2633,11 +2637,10 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     window.openChampDetail=function(name){
         var champ=raw.find(function(x){return x.name===name;});
         var el=document.getElementById('champDetailContent');
-        var _sp={'Norra':'https://static.wikia.nocookie.net/leagueoflegends/images/e/ee/Norra_OriginalCentered.jpg','Mel':'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg'};
         el.innerHTML='';
         // Иконка
         var ci=document.createElement('img');
-        ci.src=_sp[name]||(DD_URL+champKey(name)+'.png');
+        ci.src=champIcon(name);
         ci.style.cssText='width:90px;height:90px;border-radius:16px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto;border:2px solid rgba(185,111,255,0.45);box-shadow:0 0 18px rgba(109,63,245,0.4);object-fit:cover;';
         ci.onerror=function(){this.style.display='none';};
         el.appendChild(ci);
@@ -2871,7 +2874,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             var wrap = document.createElement('div');
             wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;cursor:'+(isPicked?'default':'pointer')+';padding:3px;border-radius:8px;border:2px solid '+(isActiveChamp?'#b96fff':'transparent')+';background:'+(isActiveChamp?'rgba(109,63,245,0.2)':'transparent')+';opacity:'+(isPicked&&!isActiveChamp?'0.28':'1')+';transition:all 0.12s;';
             var img = document.createElement('img');
-            img.src = DD_URL + champKey(c.name) + '.png';
+            img.src = champIcon(c.name);
             img.style.cssText = 'width:48px;height:48px;border-radius:8px;object-fit:cover;';
             img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
             var nm = document.createElement('div');
@@ -2902,7 +2905,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                     slot.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:9px;cursor:pointer;border:2px solid '+(isActive?'#b96fff':(champ?teamColor:'rgba(155,89,182,0.12)'))+';background:'+(isActive?'rgba(109,63,245,0.2)':(champ?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.02)'))+';transition:all 0.12s;min-height:42px;position:relative;';
                     if(champ) {
                         var img = document.createElement('img');
-                        img.src = DD_URL + champKey(champ) + '.png';
+                        img.src = champIcon(champ);
                         img.style.cssText = 'width:30px;height:30px;border-radius:6px;object-fit:cover;flex-shrink:0;';
                         img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
                         var nm = document.createElement('div');
@@ -3077,7 +3080,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             var wrap = document.createElement('div');
             wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border-radius:9px;border:2px solid transparent;transition:all 0.12s;';
             var img = document.createElement('img');
-            img.src = DD_URL + champKey(c.name) + '.png';
+            img.src = champIcon(c.name);
             img.style.cssText = 'width:100%;aspect-ratio:1;border-radius:7px;object-fit:cover;';
             img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
             var nm = document.createElement('div');
