@@ -170,7 +170,7 @@
 
         .slider-wrapper {
             position: relative;
-            padding-bottom: 45px;
+            padding-bottom: 12px;
         }
 
         input[type="range"] {
@@ -200,13 +200,10 @@
 
         /* RULER */
         .ruler {
-            position: relative;
-            margin-top: 8px;
-            padding: 0 2px;
-            visibility: hidden;
-        }
-        .ruler.positioned {
-            visibility: visible;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 0;
         }
 
         .ruler span {
@@ -245,8 +242,7 @@
 /* Table sizing handled by consolidated section */
 #statTable th, #statTable td { padding: 8px 4px; font-size: 13px; }
 /* First column (Champs) takes more space; other 5 columns share remaining width */
-#statTable th:first-child, #statTable td:first-child { width: 40%; }
-#statTable th:not(:first-child), #statTable td:not(:first-child) { width: 12%; }
+/* table widths: see consolidated section */
 
 /* Champ cell content fills full width (X + name) */
 #statTable td:first-child { text-align: left; }
@@ -255,8 +251,7 @@
 /* Prevent any click/tap focus highlight from changing row look */
 #statTable td, #statTable th { outline: none; }
 
-    #statTable th:first-child, #statTable td:first-child{ width: 44%; }
-    #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 11.2%; }
+    /* table widths: see consolidated section */
 
     .x-btn{ width: 20px; height: 20px; border-radius: 7px; font-size: 14px; }
     .name-tag{ padding: 5px 6px; border-radius: 8px; font-size: 11px; }
@@ -429,10 +424,14 @@
 
         .m-mask.active {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
-            padding-top: 4vh;
             animation: fadeIn 0.25s ease;
+        }
+        /* Champions modal — pinned to top */
+        #sideChampsMask.active {
+            align-items: flex-start;
+            padding-top: 4vh;
             overflow-y: auto;
             overscroll-behavior: contain;
         }
@@ -831,21 +830,7 @@
         }
         .calc-stat-label { font-size:11px; color:rgba(255,255,255,0.4); margin-bottom:4px; font-weight:600; }
         .calc-stat-val { font-size:20px; font-weight:900; }
-        /* ── Chart stat buttons ── */
-        .chart-stat-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1.5px solid rgba(155,89,182,0.35);
-            background: transparent;
-            color: rgba(255,255,255,0.5);
-            font-size: 12px; font-weight: 700;
-            cursor: pointer; transition: all 0.15s;
-        }
-        .chart-stat-btn.active {
-            background: rgba(109,63,245,0.3);
-            border-color: #b96fff;
-            color: #fff;
-        }
+
 
 
         /* ── Items reference modal ── */
@@ -1144,7 +1129,8 @@ html, body { overflow-y: auto; }
     #statTable th:first-child, #statTable td:first-child { width: 26%; }
     #statTable th:not(:first-child), #statTable td:not(:first-child) { width: 14.8%; }
     .btn-champ-cfg { font-size: 13px; padding: 9px 16px; border-radius: 12px; }
-    .champ-cell .name-tag { font-size: 14px; padding: 6px 16px; }
+    .champ-cell .name-tag { font-size: 16px; padding: 7px 18px; }
+    .champ-icon { width: 55px; height: 55px; border-radius: 10px; }
     .champ-cell .x-btn { width: 20px; height: 20px; min-width: 20px; font-size: 11px; }
     .champ-cell { justify-content: flex-start; gap: 10px; }
     .champ-cell .name-tag { display: inline-block; text-align: center; flex: 0 0 auto; }
@@ -1195,28 +1181,21 @@ html, body { overflow-y: auto; }
 
 /* ── RULER (Desktop only) ── */
 @media (min-width: 769px) {
-    #ruler { position: absolute; height: 36px; pointer-events: auto; z-index: 4; }
     #ruler .lvl-pill {
-        position: absolute; transform: translateX(-50%);
         display: inline-flex; align-items: center; justify-content: center;
-        font-weight: 800; font-size: 12px; padding: 4px 10px; min-width: 28px;
+        font-weight: 800; font-size: 12px; padding: 4px 8px; min-width: 24px;
         border-radius: 999px; background: rgba(124,77,255,0.95); color: #fff;
         border: 1px solid rgba(255,255,255,0.18);
-        box-shadow: 0 10px 22px rgba(124,77,255,0.22);
-        user-select: none; z-index: 1; white-space: nowrap;
-        transition: transform 140ms ease, filter 140ms ease, box-shadow 140ms ease;
+        user-select: none; cursor: pointer;
+        transition: transform 140ms ease, background 140ms ease;
     }
     #ruler .lvl-pill:active {
-        transform: translateX(-50%) scale(0.92); filter: brightness(1.08);
-        box-shadow: 0 6px 14px rgba(124,77,255,0.28);
+        transform: scale(0.92); filter: brightness(1.08);
     }
     #ruler .lvl-pill.active {
         background: rgba(255,255,255,0.92); color: #2a0c4f;
-        box-shadow: 0 4px 16px rgba(124,77,255,0.45);
+        box-shadow: 0 2px 10px rgba(124,77,255,0.45);
     }
-    /* Hide any pills NOT inside ruler */
-    .lvl-pill { display: none; }
-    #ruler .lvl-pill { display: inline-flex; }
 }
 
 
@@ -1279,7 +1258,7 @@ html, body { overflow-y: auto; }
 body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
 </head>
 <body>
 
@@ -1350,7 +1329,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     // =========================================
     // MODAL SYSTEM - only one modal at a time
     // =========================================
-    const MODAL_IDS = ['mMask','calcMask','chartMask','itemsMask','runesMask',
+    const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
         'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','draftMask','champPickerModal','welcomeOverlay'];
 
     function closeAllModals(except) {
@@ -1654,7 +1633,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             nameSpan.textContent = item.name;
             nameSpan.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
             // Double-click → open growth chart
-            nameSpan.addEventListener('dblclick', (ev) => { ev.stopPropagation(); openChart(item.name); });
+
             const champImg = document.createElement('img');
             champImg.alt = ''; champImg.className = 'champ-icon';
             const _sp = {'Norra':'https://static.wikia.nocookie.net/leagueoflegends/images/e/ee/Norra_OriginalCentered.jpg','Mel':'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg'};
@@ -1664,11 +1643,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
             if(isP) champImg.classList.add('icon-pinned');
             champImg.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
-    // Long press on icon → open chart (mobile-friendly)
-    let _lpTimer;
-    champImg.addEventListener('pointerdown', () => { _lpTimer = setTimeout(() => openChart(item.name), 600); });
-    champImg.addEventListener('pointerup',   () => clearTimeout(_lpTimer));
-    champImg.addEventListener('pointerleave',() => clearTimeout(_lpTimer));
+
             tdChamp.appendChild(btnX); tdChamp.appendChild(champImg); tdChamp.appendChild(nameSpan);
             tr.appendChild(tdChamp);
             ['ad','hp','mana','armor','mrez'].forEach(k => {
@@ -1807,71 +1782,12 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         }
     });
     // =========================================
-    let _activeCalcItem = 'none';
 
 
-    // ══ CALC LEVEL + MELEE/RANGED ══
-    let _calcLvl = 1;
-    let _calcRange = 'melee'; // 'melee' or 'ranged'
 
 
-        // =========================================
-    let growthChartObj = null;
-    let chartStat = 'hp';
-    let chartChamp = null;
 
 
-    function buildChartBtns() {
-        const stats = [{k:'hp',l:'HP'},{k:'ad',l:'AD'},{k:'mana',l:'MANA'},{k:'armor',l:'ARMOR'},{k:'mrez',l:'MREZ'}];
-        const wrap = document.getElementById('chartStatBtns');
-        wrap.innerHTML = '';
-        stats.forEach(s => {
-            const b = document.createElement('button');
-            b.className = 'chart-stat-btn' + (s.k === chartStat ? ' active' : '');
-            b.textContent = s.l; b.dataset.k = s.k;
-            b.onclick = () => setChartStat(s.k);
-            wrap.appendChild(b);
-        });
-    }
-
-    function renderGrowthChart() {
-        const c = chartChamp;
-        const statMap = { hp:[c.hp_b,c.hp_g], ad:[c.ad_b,c.ad_g], mana:[c.mn_b,c.mn_g], armor:[c.ar_b,c.ar_g], mrez:[c.mr_b,c.mr_g] };
-        const [base, growth] = statMap[chartStat];
-        const labels = Array.from({length:15},(_,i)=>i+1);
-        const vals   = labels.map(l => Math.round(base + (l-1)*growth));
-        const colorMap = { hp:'#e74c3c', ad:'#e8820a', mana:'#5dade2', armor:'#f1c40f', mrez:'#9b59b6' };
-        const col = colorMap[chartStat] || '#b96fff';
-        const ctx = document.getElementById('growthChart').getContext('2d');
-        if(growthChartObj) growthChartObj.destroy();
-        growthChartObj = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels,
-                datasets:[{
-                    label: chartStat.toUpperCase(),
-                    data: vals,
-                    borderColor: col,
-                    backgroundColor: col.replace(')',',0.12)').replace('rgb','rgba'),
-                    fill: true,
-                    tension: 0.35,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: col,
-                    borderWidth: 2.5,
-                }]
-            },
-            options:{
-                responsive:true,
-                animation:{ duration:350 },
-                plugins:{ legend:{ display:false } },
-                scales:{
-                    x:{ ticks:{ color:'rgba(255,255,255,0.45)', font:{size:11} }, grid:{ color:'rgba(255,255,255,0.06)' } },
-                    y:{ ticks:{ color:'rgba(255,255,255,0.45)', font:{size:11} }, grid:{ color:'rgba(255,255,255,0.06)' } }
-                }
-            }
-        });
-    }
 
 
     window.openItemDetail = function(name, cost, stats, desc, imgSrc) {
@@ -1985,299 +1901,178 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         document.body.style.overflow = '';
     };
 
-    // CALC
-    window.openCalc = function() {
-        openModal('calcMask');
-        setTimeout(function() { var e=document.getElementById('cDmg'); if(e) e.focus(); }, 80);
-    };
-    window.closeCalc = function() { closeModal('calcMask'); closeModal('itemSubModal'); };
-    window.calcDmg = function() {
-        var dmg   = parseFloat((document.getElementById('cDmg')||{}).value) || 0;
-        var bonusArmor = parseFloat((document.getElementById('cBonusArmor')||{}).value) || 0;
-        var bonusMR    = parseFloat((document.getElementById('cBonusMR')||{}).value) || 0;
-        var bonusHp    = parseFloat((document.getElementById('cBonusHp')||{}).value) || 0;
-        var armor = (parseFloat((document.getElementById('cArmor')||{}).value) || 0) + bonusArmor;
-        var mr    = armor + bonusMR; // MR field reuses cArmor; bonus MR stacks on top
-        var pen   = parseFloat((document.getElementById('cPen')||{}).value) || 0;
-        var enemyHpMax = (parseFloat((document.getElementById('cEnemyHpMax')||{}).value) || 0) + bonusHp;
-        var enemyHpCur = parseFloat((document.getElementById('cEnemyHpCur')||{}).value) || enemyHpMax;
-        var res   = document.getElementById('calcResult');
-        if(!res) return;
-        if(!dmg) { res.style.display='none'; return; }
+    // ═══ NEW CALCULATOR ═══
+    var _calcMyChamp = null, _calcMyLvl = 1;
+    var _calcTgtChamp = null, _calcTgtLvl = 1;
+    var _calcRange = 'melee';
 
-        // Physical damage formula
+    window.openCalc = function() { openModal('calcMask'); };
+    window.closeCalc = function() { closeModal('calcMask'); };
+
+    // Pick my champ
+    window._calcPickMy = function(c) {
+        _calcMyChamp = raw.find(function(x){ return x.name===c.name; });
+        if(!_calcMyChamp) return;
+        _calcMyLvl = +document.getElementById('calcMyLvlSlider').value || 1;
+        document.getElementById('calcMyChampRow').style.display = 'none';
+        document.getElementById('calcMyBadge').style.display = 'flex';
+        document.getElementById('calcMyIcon').src = DD_URL + champKey(c.name) + '.png';
+        document.getElementById('calcMyName').textContent = c.name;
+        document.getElementById('calcMyLvlWrap').style.display = 'block';
+        calcMyLvlChange();
+    };
+    window.calcClearMy = function() {
+        _calcMyChamp = null;
+        document.getElementById('calcMyChampRow').style.display = 'block';
+        document.getElementById('calcMyBadge').style.display = 'none';
+        document.getElementById('calcMyLvlWrap').style.display = 'none';
+        document.getElementById('cMyAD').value = '';
+        document.getElementById('cMyAD').readOnly = false;
+        calcRun();
+    };
+    window.calcMyLvlChange = function() {
+        _calcMyLvl = +document.getElementById('calcMyLvlSlider').value;
+        document.getElementById('calcMyLvlNum').textContent = _calcMyLvl;
+        if(_calcMyChamp) {
+            var f = function(b,g){ return Math.round(b+(_calcMyLvl-1)*g); };
+            document.getElementById('cMyAD').value = f(_calcMyChamp.ad_b, _calcMyChamp.ad_g);
+            document.getElementById('cMyAD').readOnly = true;
+        }
+        calcRun();
+    };
+
+    // Pick target champ
+    window._calcPickTgt = function(c) {
+        _calcTgtChamp = raw.find(function(x){ return x.name===c.name; });
+        if(!_calcTgtChamp) return;
+        _calcTgtLvl = +document.getElementById('calcTgtLvlSlider').value || 1;
+        document.getElementById('calcTgtChampRow').style.display = 'none';
+        document.getElementById('calcTgtBadge').style.display = 'flex';
+        document.getElementById('calcTgtIcon').src = DD_URL + champKey(c.name) + '.png';
+        document.getElementById('calcTgtName').textContent = c.name;
+        document.getElementById('calcTgtLvlWrap').style.display = 'block';
+        calcTgtLvlChange();
+    };
+    window.calcClearTgt = function() {
+        _calcTgtChamp = null;
+        document.getElementById('calcTgtChampRow').style.display = 'block';
+        document.getElementById('calcTgtBadge').style.display = 'none';
+        document.getElementById('calcTgtLvlWrap').style.display = 'none';
+        ['cTgtArmor','cTgtHpMax','cTgtHpCur'].forEach(function(id){ document.getElementById(id).value=''; });
+        calcRun();
+    };
+    window.calcTgtLvlChange = function() {
+        _calcTgtLvl = +document.getElementById('calcTgtLvlSlider').value;
+        document.getElementById('calcTgtLvlNum').textContent = _calcTgtLvl;
+        if(_calcTgtChamp) {
+            var f = function(b,g){ return Math.round(b+(_calcTgtLvl-1)*g); };
+            document.getElementById('cTgtArmor').value = f(_calcTgtChamp.ar_b, _calcTgtChamp.ar_g);
+            var hp = f(_calcTgtChamp.hp_b, _calcTgtChamp.hp_g);
+            document.getElementById('cTgtHpMax').value = hp;
+            document.getElementById('cTgtHpCur').value = hp;
+        }
+        calcRun();
+    };
+
+    // Main calc
+    window.calcRun = function() {
+        var ad = (+document.getElementById('cMyAD').value||0) + (+document.getElementById('cMyADBonus').value||0);
+        var pen = +document.getElementById('cMyPen').value || 0;
+        var armor = (+document.getElementById('cTgtArmor').value||0) + (+document.getElementById('cTgtArmorBonus').value||0);
+        var hpMax = (+document.getElementById('cTgtHpMax').value||0) + (+document.getElementById('cTgtHpBonus').value||0);
+        var res = document.getElementById('calcRes');
+        if(!ad) { res.style.display='none'; return; }
         var effArmor = armor > 0 ? armor*(1-pen/100) : armor;
-        var finalDmg = dmg * 100/(100+effArmor);
-        var mit = dmg > 0 ? ((dmg-finalDmg)/dmg*100) : 0;
-
-        // Ability scaling bonus damage
-        var abilityExtra = 0;
-        var rows = document.querySelectorAll('#abilityRows .ability-row');
-        rows.forEach(function(row) {
-            var base = parseFloat(row.querySelector('.ab-base')||{value:0}).value || 0;
-            var pct  = parseFloat(row.querySelector('.ab-pct')||{value:0}).value || 0;
-            // ability scaling inputs: stat value × pct
-            if(base && pct) abilityExtra += base * (pct/100);
-        });
-
-        var e = function(id){ return document.getElementById(id); };
-        if(e('resEff')) e('resEff').textContent = Math.round(effArmor*10)/10;
-        if(e('resMit')) e('resMit').textContent = mit.toFixed(1)+'%';
-        if(e('resDmg')) e('resDmg').textContent = Math.round(finalDmg);
-        if(e('calcFormula')) e('calcFormula').textContent = dmg+' × 100/(100+'+Math.round(effArmor*10)/10+') = '+Math.round(finalDmg);
-
-        // Ability result
-        if(abilityExtra > 0 && e('abilityResult') && e('abilityResultVal')) {
-            e('abilityResult').style.display = 'block';
-            e('abilityResultVal').textContent = Math.round(abilityExtra);
-        } else if(e('abilityResult')) {
-            e('abilityResult').style.display = 'none';
-        }
-
-        // HP bar
-        if(enemyHpMax > 0 && e('calcHpBar')) {
-            var pct2 = Math.min(100, (finalDmg / enemyHpMax * 100));
-            e('calcHpBar').style.display = 'block';
-            e('calcHpBarFill').style.width = pct2.toFixed(1)+'%';
-            e('calcHpPct').textContent = pct2.toFixed(1)+'% HP';
-        }
-        res.style.display = 'flex';
-    };
-    // ── TARGET CARD SYSTEM ──
-    var _targetMode = 'mannequin'; // 'mannequin' | 'champ'
-    var _targetChamp = null;
-
-    window.setTargetMode = function(mode) {
-        _targetMode = mode;
-        var btnM = document.getElementById('targetModeMannequin');
-        var btnC = document.getElementById('targetModeChamp');
-        var picker = document.getElementById('targetChampPicker');
-        var levelBlock = document.getElementById('calcLevelBlock');
-        if(btnM) {
-            btnM.style.background = mode==='mannequin' ? 'rgba(231,76,60,0.25)' : 'transparent';
-            btnM.style.borderColor = mode==='mannequin' ? 'rgba(231,76,60,0.5)' : 'rgba(155,89,182,0.3)';
-            btnM.style.color = mode==='mannequin' ? '#fff' : 'rgba(255,255,255,0.5)';
-        }
-        if(btnC) {
-            btnC.style.background = mode==='champ' ? 'rgba(109,63,245,0.25)' : 'transparent';
-            btnC.style.borderColor = mode==='champ' ? 'rgba(185,111,255,0.6)' : 'rgba(155,89,182,0.3)';
-            btnC.style.color = mode==='champ' ? '#fff' : 'rgba(255,255,255,0.5)';
-        }
-        if(picker) picker.style.display = mode==='champ' ? 'block' : 'none';
-        // Level block only shown when champion is selected
-        if(levelBlock) levelBlock.style.display = (mode==='champ' && _targetChamp) ? 'block' : 'none';
-        if(mode === 'mannequin') {
-            _targetChamp = null;
-            clearTargetInputs();
-        }
+        var finalDmg = ad * 100/(100+effArmor);
+        var mit = ad > 0 ? ((ad-finalDmg)/ad*100) : 0;
+        document.getElementById('rEff').textContent = Math.round(effArmor*10)/10;
+        document.getElementById('rMit').textContent = mit.toFixed(1)+'%';
+        document.getElementById('rDmg').textContent = Math.round(finalDmg);
+        document.getElementById('rFormula').textContent = ad+' × 100/(100+'+Math.round(effArmor*10)/10+') = '+Math.round(finalDmg);
+        if(hpMax > 0) {
+            var pct = Math.min(100, finalDmg/hpMax*100);
+            document.getElementById('rHpBar').style.display = 'block';
+            document.getElementById('rHpFill').style.width = pct.toFixed(1)+'%';
+            document.getElementById('rHpPct').textContent = pct.toFixed(1)+'% HP';
+        } else { document.getElementById('rHpBar').style.display = 'none'; }
+        res.style.display = 'block';
     };
 
-    // selectTargetChamp accepts champion object from universal picker
-    window.selectTargetChamp = function(champObj) {
-        var name = champObj ? champObj.name : null;
-        if(!name) return;
-        _targetChamp = raw.find(function(x){ return x.name===name; });
-        if(!_targetChamp) return;
-        var lvlC = _calcLvl || 1;
-        var f = function(b,g){ return Math.round(b + (lvlC-1)*g); };
-        var armor = f(_targetChamp.ar_b, _targetChamp.ar_g);
-        var hp    = f(_targetChamp.hp_b, _targetChamp.hp_g);
-        var setVal = function(id, val) { var el = document.getElementById(id); if(el){ el.value = val; } };
-        setVal('cArmor', armor);
-        setVal('cEnemyHpMax', hp);
-        setVal('cEnemyHpCur', hp);
-        // Show champ badge, hide pick button
-        var badge = document.getElementById('targetChampSelected');
-        var pickBtn = document.getElementById('targetChampPickBtn');
-        if(badge) badge.style.display = 'flex';
-        if(pickBtn) pickBtn.style.display = 'none';
-        var icon = document.getElementById('targetChampIcon');
-        if(icon) { icon.src = DD_URL + champKey(name) + '.png'; icon.style.display='block'; }
-        var nm = document.getElementById('targetChampName');
-        if(nm) nm.textContent = name + ' (ур. '+lvlC+')';
-        // Show level block now that champ is selected
-        var levelBlock = document.getElementById('calcLevelBlock');
-        if(levelBlock) levelBlock.style.display = 'block';
-        calcDmg();
-    };
-
-    window.clearTargetChamp = function() {
-        _targetChamp = null;
-        var badge = document.getElementById('targetChampSelected');
-        var pickBtn = document.getElementById('targetChampPickBtn');
-        if(badge) badge.style.display = 'none';
-        if(pickBtn) pickBtn.style.display = 'flex';
-        // Hide level block
-        var levelBlock = document.getElementById('calcLevelBlock');
-        if(levelBlock) levelBlock.style.display = 'none';
-        clearTargetInputs();
-    };
-
-    function clearTargetInputs() {
-        ['cArmor','cEnemyHpMax','cEnemyHpCur','cBonusArmor','cBonusHp','cBonusMR'].forEach(function(id){
-            var el = document.getElementById(id); if(el) el.value = '';
-        });
-        calcDmg();
-    }
-
-    window.addAbilityRow = function() {
-        var rows = document.getElementById('abilityRows');
-        if(!rows) return;
-        var row = document.createElement('div');
-        row.className = 'ability-row';
-        row.style.cssText = 'display:flex;gap:6px;align-items:center;';
-        row.innerHTML = '<input type="number" placeholder="Стат (AD/AP)" class="calc-input ab-base" style="flex:1;padding:6px;" oninput="calcDmg()">'
-            + '<input type="number" placeholder="%" class="calc-input ab-pct" style="width:60px;padding:6px;" oninput="calcDmg()">'
-            + '<button onclick="this.parentElement.remove();calcDmg()" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px;line-height:1;">×</button>';
-        rows.appendChild(row);
-    };
-    window.setCalcLvl = function(lvl) {
-        _calcLvl = lvl;
-        document.querySelectorAll('.calc-lvl-btn').forEach(function(b){
-            b.classList.toggle('active', +b.dataset.lvl===lvl);
-        });
-        // Refresh target champ stats at new level
-        if(_targetChamp) selectTargetChamp(_targetChamp.name);
-        else calcDmg();
-    };
-    window.setCalcRange = function(type) {
-        _calcRange = type;
-        var m=document.getElementById('btnMelee'), r=document.getElementById('btnRanged');
-        if(m) m.classList.toggle('active', type==='melee');
-        if(r) r.classList.toggle('active', type==='ranged');
-        calcDmg();
-    };
-    window.selectCalcItem = function(item) {
-        document.querySelectorAll('.calc-item-btn').forEach(function(b){ b.classList.remove('active'); });
-        var map={none:'itemNone',thornmail:'itemThornmail',botrk:'itemBotrk',
-                 sunfire:'itemSunfire',liandry:'itemLiandry',sunderer:'itemDivSunderer'};
-        var btn = document.getElementById(map[item]);
-        if(btn) btn.classList.add('active');
-    };
+    // ═══ ITEM CALC MODALS ═══
     window.openItemCalc = function(key) {
-        // Items that need melee/ranged toggle
-        var NEEDS_RANGE = ['botrk','sunderer'];
-        var rangeBlock = document.getElementById('calcRangeBlock');
-        if(rangeBlock) rangeBlock.style.display = NEEDS_RANGE.includes(key) ? 'block' : 'none';
-
         var ITEMS = {
             thornmail: {
-                name: '🛡 Шипованный доспех',
-                desc: 'Отражает маг. урон атакующему + Тяжкие раны',
-                myFields: [
-                    {id:'si_myArmor', label:'Моя броня', ph:'80'},
-                    {id:'si_myBonusHp', label:'Мой бонусный HP', ph:'500'}
+                name:'🛡 Шипованный доспех', desc:'Отражает маг. урон + Тяжкие раны',
+                needsRange: false,
+                fields: [
+                    {id:'ic_myArmor',label:'Моя броня',ph:'80',side:'my'},
+                    {id:'ic_myBonusHp',label:'Мой бонусный HP',ph:'500',side:'my'}
                 ],
-                enemyFields: [],
-                calc: function() {
-                    var myArmor = +v('si_myArmor')||80;
-                    var myBHp   = +v('si_myBonusHp')||500;
-                    var reflect = 20 + myArmor*0.06 + myBHp*0.02;
-                    return {label:'Отражённый маг. урон', val: Math.round(reflect), formula:'20 + '+myArmor+'×6% + '+myBHp+'×2% = '+Math.round(reflect)+'. Тяжкие раны 60% на 3с'};
-                }
+                calc: function(v){ var a=+v('ic_myArmor')||80,h=+v('ic_myBonusHp')||500; var r=20+a*0.06+h*0.02; return {label:'Отражённый маг. урон',val:Math.round(r),formula:'20+'+a+'×6%+'+h+'×2%='+Math.round(r)+'. Тяжкие раны 60% 3с'}; }
             },
             botrk: {
-                name: '⚔ Клинок Погибшего Короля',
-                desc: 'Испорченные удары: % текущего HP',
-                myFields: [],
-                enemyFields: [
-                    {id:'si_eHpCur', label:'Текущий HP цели', ph:'2500'}
-                ],
-                calc: function() {
-                    var eHpCur = +v('si_eHpCur')||2500;
-                    var ranged = _calcRange === 'ranged';
-                    var pct = ranged ? 0.07 : 0.10;
-                    var dmg = Math.max(15, eHpCur * pct);
-                    return {label:(ranged?'Дальний (7%)':'Ближний (10%)'), val: Math.round(dmg), formula:eHpCur+'×'+(ranged?'7%':'10%')+' = '+Math.round(dmg)+' (мин. 15). Замедление 25%'};
-                }
+                name:'⚔ Клинок Погибшего Короля', desc:'% текущего HP врага',
+                needsRange: true,
+                fields: [{id:'ic_eHpCur',label:'Текущий HP цели',ph:'2500',side:'enemy'}],
+                calc: function(v){ var hp=+v('ic_eHpCur')||2500; var rng=_calcRange==='ranged'; var pct=rng?0.07:0.10; var dmg=Math.max(15,hp*pct); return {label:(rng?'Дальний 7%':'Ближний 10%'),val:Math.round(dmg),formula:hp+'×'+(rng?'7%':'10%')+'='+Math.round(dmg)+' (мин. 15)'}; }
             },
             sunfire: {
-                name: '🔥 Эгида Солнечного огня',
-                desc: 'Самовозгорание: маг. урон/с рядом с врагами',
-                myFields: [
-                    {id:'si_myBonusHp2', label:'Мой бонусный HP', ph:'1000'},
-                    {id:'si_stacks', label:'Стаки (0-4)', ph:'4'}
+                name:'🔥 Эгида Солнечного огня', desc:'Маг. урон/с рядом с врагами',
+                needsRange: false,
+                fields: [
+                    {id:'ic_myBHp2',label:'Мой бонусный HP',ph:'1000',side:'my'},
+                    {id:'ic_stacks',label:'Стаки (0-4)',ph:'4',side:'my'},
+                    {id:'ic_eLvl',label:'Уровень врага (1-15)',ph:'10',side:'enemy'}
                 ],
-                enemyFields: [
-                    {id:'si_eLevel', label:'Уровень (1-15)', ph:'10'}
-                ],
-                calc: function() {
-                    var bHp = +v('si_myBonusHp2')||1000;
-                    var stacks = Math.min(4, +v('si_stacks')||4);
-                    var lvl = +v('si_eLevel')||10;
-                    var base = Math.round(16 + (30-16)*(lvl-1)/14);
-                    var dps = (base + bHp*0.01) * (1 + stacks*0.11);
-                    return {label:'Маг. урон/сек ('+stacks+' стак.)', val: Math.round(dps), formula:'('+base+' + '+Math.round(bHp*0.01)+') × '+(1+stacks*0.11).toFixed(2)+' = '+Math.round(dps)};
-                }
+                calc: function(v){ var bHp=+v('ic_myBHp2')||1000,st=Math.min(4,+v('ic_stacks')||4),lv=+v('ic_eLvl')||10; var base=Math.round(16+(30-16)*(lv-1)/14); var dps=(base+bHp*0.01)*(1+st*0.11); return {label:'Маг. урон/сек ('+st+' стак.)',val:Math.round(dps),formula:'('+base+'+'+Math.round(bHp*0.01)+')×'+(1+st*0.11).toFixed(2)+'='+Math.round(dps)}; }
             },
             liandry: {
-                name: '🔮 Мучения Лиандри',
-                desc: 'Ожог: 0.5% макс. HP/с (маг. урон)',
-                myFields: [
-                    {id:'si_combatSec', label:'Секунд в бою (макс. 3)', ph:'3'}
+                name:'🔮 Мучения Лиандри', desc:'0.5% макс. HP/с маг. ожог',
+                needsRange: false,
+                fields: [
+                    {id:'ic_combatSec',label:'Секунд в бою (макс 3)',ph:'3',side:'my'},
+                    {id:'ic_eHpMaxL',label:'Макс HP цели',ph:'3000',side:'enemy'}
                 ],
-                enemyFields: [
-                    {id:'si_eHpMaxL', label:'Макс. HP цели', ph:'3000'}
-                ],
-                calc: function() {
-                    var eHpMax = +v('si_eHpMaxL')||3000;
-                    var secs = Math.min(3, +v('si_combatSec')||3);
-                    var burnDmg = eHpMax * 0.005 * 3;
-                    var bonus = 1 + Math.min(3, secs) * 0.02;
-                    var total = burnDmg * bonus;
-                    return {label:'Маг. ожог за 3с', val: Math.round(total), formula:eHpMax+'×0.5%×3с × '+bonus.toFixed(2)+' = '+Math.round(total)};
-                }
+                calc: function(v){ var hp=+v('ic_eHpMaxL')||3000,sec=Math.min(3,+v('ic_combatSec')||3); var burn=hp*0.005*3; var bonus=1+Math.min(3,sec)*0.02; var total=burn*bonus; return {label:'Маг. ожог за 3с',val:Math.round(total),formula:hp+'×0.5%×3с×'+bonus.toFixed(2)+'='+Math.round(total)}; }
             },
             sunderer: {
-                name: '⚡ Божественный Разрушитель',
-                desc: 'Заклинатель: физ. удар после способности',
-                myFields: [
-                    {id:'si_myAD2', label:'Мой базовый AD', ph:'120'}
+                name:'⚡ Божественный Разрушитель', desc:'Физ. удар после способности',
+                needsRange: true,
+                fields: [
+                    {id:'ic_myAD2',label:'Мой базовый AD',ph:'120',side:'my'},
+                    {id:'ic_eHpMaxS',label:'Макс HP цели',ph:'3000',side:'enemy'}
                 ],
-                enemyFields: [
-                    {id:'si_eHpMaxS', label:'Макс. HP цели', ph:'3000'}
-                ],
-                calc: function() {
-                    var myAD = +v('si_myAD2')||120;
-                    var ranged = _calcRange === 'ranged';
-                    var eHpMax = +v('si_eHpMaxS')||3000;
-                    var pctDmg = eHpMax * (ranged ? 0.07 : 0.10);
-                    var minDmg = myAD * 1.25;
-                    var dmg = Math.max(pctDmg, minDmg);
-                    var heal = Math.max(eHpMax*(ranged?0.025:0.06), myAD*(ranged?0.5:0.9));
-                    return {label:(ranged?'Дальн.':'Ближн.')+' удар (физ.)', val: Math.round(dmg), formula:(ranged?'7':'10')+'% HP = '+Math.round(pctDmg)+' (мин '+Math.round(minDmg)+'). Лечение ≈ '+Math.round(heal)};
-                }
+                calc: function(v){ var ad=+v('ic_myAD2')||120,rng=_calcRange==='ranged',hp=+v('ic_eHpMaxS')||3000; var pctDmg=hp*(rng?0.07:0.10); var minDmg=ad*1.25; var dmg=Math.max(pctDmg,minDmg); var heal=Math.max(hp*(rng?0.025:0.06),ad*(rng?0.5:0.9)); return {label:(rng?'Дальн.':'Ближн.')+' удар',val:Math.round(dmg),formula:(rng?'7':'10')+'% HP='+Math.round(pctDmg)+' (мин '+Math.round(minDmg)+'). Лечение≈'+Math.round(heal)}; }
             }
         };
+        var item = ITEMS[key]; if(!item) return;
+        function v(id){ var el=document.getElementById(id); return el?el.value:'0'; }
 
-        function v(id) { var el=document.getElementById(id); return el ? el.value : ''; }
-        var item = ITEMS[key];
-        if(!item) return;
+        var box = document.getElementById('itemSubTitle');
+        box.innerHTML = item.name+'<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:3px;">'+item.desc+'</div>';
 
-        var titleEl = document.getElementById('itemSubTitle');
-        if(titleEl) titleEl.innerHTML = item.name + '<div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:400;margin-top:3px;">'+item.desc+'</div>';
+        // Range toggle
+        var rangeEl = document.getElementById('icRangeBlock');
+        if(rangeEl) rangeEl.style.display = item.needsRange ? 'flex' : 'none';
 
-        var myDiv = document.getElementById('itemSubMyFields');
-        if(myDiv) {
-            myDiv.innerHTML = item.myFields.length ? '' : '<div style="font-size:11px;color:rgba(255,255,255,0.3);padding:4px 0;">—</div>';
-            item.myFields.forEach(function(f) {
-                myDiv.innerHTML += '<div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">'+f.label+'</label>'
-                    +'<input type="number" id="'+f.id+'" placeholder="'+f.ph+'" class="calc-input" style="padding:8px 10px;" oninput="runItemCalc(\''+key+'\')"></div>';
-            });
-        }
-
-        var enDiv = document.getElementById('itemSubEnemyFields');
-        if(enDiv) {
-            enDiv.innerHTML = item.enemyFields.length ? '' : '<div style="font-size:11px;color:rgba(255,255,255,0.3);padding:4px 0;">—</div>';
-            item.enemyFields.forEach(function(f) {
-                enDiv.innerHTML += '<div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">'+f.label+'</label>'
-                    +'<input type="number" id="'+f.id+'" placeholder="'+f.ph+'" class="calc-input" style="padding:8px 10px;" oninput="runItemCalc(\''+key+'\')"></div>';
-            });
-        }
+        // Build fields
+        var myDiv=document.getElementById('itemSubMyFields');
+        var enDiv=document.getElementById('itemSubEnemyFields');
+        myDiv.innerHTML=''; enDiv.innerHTML='';
+        var hasMy=false, hasEn=false;
+        item.fields.forEach(function(f){
+            var target = f.side==='my' ? myDiv : enDiv;
+            if(f.side==='my') hasMy=true; else hasEn=true;
+            target.innerHTML += '<div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">'+f.label+'</label>'
+                +'<input type="number" id="'+f.id+'" placeholder="'+f.ph+'" class="calc-input" style="padding:8px 10px;" oninput="runItemCalc(\''+key+'\')"></div>';
+        });
+        document.getElementById('icMySection').style.display = hasMy ? 'block' : 'none';
+        document.getElementById('icEnSection').style.display = hasEn ? 'block' : 'none';
 
         var resDiv = document.getElementById('itemSubResult');
         if(resDiv) resDiv.style.display = 'none';
         document.getElementById('itemSubModal')._calcKey = key;
+        document.getElementById('itemSubModal')._calcFn = item.calc;
         openModal('itemSubModal');
         setTimeout(function(){ runItemCalc(key); }, 100);
     };
@@ -2285,76 +2080,27 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     window.closeItemCalc = function() { closeModal('itemSubModal'); };
 
     window.runItemCalc = function(key) {
-        if(!key) {
-            var modal = document.getElementById('itemSubModal');
-            key = modal ? modal._calcKey : null;
-        }
-        if(!key) return;
-
-        function getV(id) { var el=document.getElementById(id); return el ? el.value : '0'; }
-
-        var ITEMS_CALC = {
-            thornmail: function() {
-                var myArmor = +getV('si_myArmor')||80;
-                var myBHp   = +getV('si_myBonusHp')||500;
-                var reflect = 20 + myArmor*0.06 + myBHp*0.02;
-                return {label:'Отражённый маг. урон', val: Math.round(reflect),
-                    formula:'20 + '+myArmor+'×6% + '+myBHp+'×2% = '+Math.round(reflect)+'. Тяжкие раны 60% на 3с'};
-            },
-            botrk: function() {
-                var eHpCur = +getV('si_eHpCur')||2500;
-                var ranged = _calcRange === 'ranged';
-                var pct = ranged ? 0.07 : 0.10;
-                var dmg = Math.max(15, eHpCur * pct);
-                return {label:(ranged?'Дальний (7%)':'Ближний (10%)'),
-                    val: Math.round(dmg),
-                    formula:eHpCur+'×'+(ranged?'7%':'10%')+' = '+Math.round(dmg)+' (мин. 15). Замедление 25%'};
-            },
-            sunfire: function() {
-                var bHp = +getV('si_myBonusHp2')||1000;
-                var stacks = Math.min(4, +getV('si_stacks')||4);
-                var lvl = +getV('si_eLevel')||10;
-                var base = Math.round(16 + (30-16)*(lvl-1)/14);
-                var dps = (base + bHp*0.01) * (1 + stacks*0.11);
-                return {label:'Маг. урон/сек ('+stacks+' стак.)', val: Math.round(dps),
-                    formula:'('+base+' + '+Math.round(bHp*0.01)+') × '+(1+stacks*0.11).toFixed(2)+' = '+Math.round(dps)};
-            },
-            liandry: function() {
-                var eHpMax = +getV('si_eHpMaxL')||3000;
-                var secs = Math.min(3, +getV('si_combatSec')||3);
-                var burnDmg = eHpMax * 0.005 * 3;
-                var bonus = 1 + Math.min(3, secs) * 0.02;
-                var total = burnDmg * bonus;
-                return {label:'Маг. ожог за 3с', val: Math.round(total),
-                    formula:eHpMax+'×0.5%×3с × '+bonus.toFixed(2)+' = '+Math.round(total)};
-            },
-            sunderer: function() {
-                var myAD = +getV('si_myAD2')||120;
-                var ranged = _calcRange === 'ranged';
-                var eHpMax = +getV('si_eHpMaxS')||3000;
-                var pctDmg = eHpMax * (ranged ? 0.07 : 0.10);
-                var minDmg = myAD * 1.25;
-                var dmg = Math.max(pctDmg, minDmg);
-                var heal = Math.max(eHpMax*(ranged?0.025:0.06), myAD*(ranged?0.5:0.9));
-                return {label:(ranged?'Дальн.':'Ближн.')+' удар (физ.)', val: Math.round(dmg),
-                    formula:(ranged?'7':'10')+'% HP = '+Math.round(pctDmg)+' (мин '+Math.round(minDmg)+'). Лечение ≈ '+Math.round(heal)};
-            }
-        };
-
-        var fn = ITEMS_CALC[key];
-        if(!fn) return;
-        var res = fn();
-        var resDiv = document.getElementById('itemSubResult');
-        var lbl = document.getElementById('itemSubResultLabel');
-        var val = document.getElementById('itemSubResultVal');
-        var frm = document.getElementById('itemSubFormula');
-        if(resDiv) resDiv.style.display = 'block';
-        if(lbl) lbl.textContent = res.label;
-        if(val) val.textContent = res.val;
-        if(frm) frm.textContent = res.formula || '';
+        var modal = document.getElementById('itemSubModal');
+        var calcFn = modal ? modal._calcFn : null;
+        if(!calcFn) return;
+        function gv(id){ var el=document.getElementById(id); return el?el.value:'0'; }
+        var res = calcFn(gv);
+        document.getElementById('itemSubResult').style.display = 'block';
+        document.getElementById('itemSubResultLabel').textContent = res.label;
+        document.getElementById('itemSubResultVal').textContent = res.val;
+        document.getElementById('itemSubFormula').textContent = res.formula||'';
     };
 
-    // ITEMS
+    window.setCalcRange = function(type) {
+        _calcRange = type;
+        document.querySelectorAll('.ic-range-btn').forEach(function(b){ b.classList.remove('active'); });
+        var btn = document.getElementById('icBtn'+type.charAt(0).toUpperCase()+type.slice(1));
+        if(btn) btn.classList.add('active');
+        var modal = document.getElementById('itemSubModal');
+        if(modal && modal._calcKey) runItemCalc(modal._calcKey);
+    };
+
+        // ITEMS
     window.closeItems = function() {
         closeModal('itemsMask');
         var tip=document.getElementById('itemTooltip');
@@ -2564,49 +2310,56 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             var roles=[]; if(champ.is.Top)roles.push('Top'); if(champ.is.Jungle)roles.push('Jungle'); if(champ.is.Mid)roles.push('Mid'); if(champ.is.ADC)roles.push('ADC'); if(champ.is.Support)roles.push('Support');
             var rd=document.createElement('div');
             rd.style.cssText='font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;text-align:center;';
-            rd.textContent=roles.join(' · ')||'—'; el.appendChild(rd);
-            // Уровень
-            var lvlNote=document.createElement('div');
-            lvlNote.style.cssText='font-size:10px;color:rgba(185,111,255,0.7);text-align:center;margin-bottom:10px;font-weight:700;letter-spacing:0.5px;';
-            lvlNote.textContent='Статы на уровне '+lvl; el.appendChild(lvlNote);
-            // Статы
-            var f=function(b,g){return Math.round(b+(lvl-1)*g);};
-            var stats=[
-                {label:'⚔ AD',val:f(champ.ad_b,champ.ad_g),color:'#e8820a'},
-                {label:'✚ HP',val:f(champ.hp_b,champ.hp_g),color:'#2ecc71'},
-                {label:'💧 '+(champ.res==='Energy'?'Energy':'Mana'),val:champ.res==='Energy'?'150':String(f(champ.mn_b,champ.mn_g)),color:'#5dade2'},
-                {label:'🛡 Броня',val:f(champ.ar_b,champ.ar_g),color:'#f1c40f'},
-                {label:'✦ МС',val:f(champ.mr_b,champ.mr_g),color:'#9b59b6'}
-            ];
-            var sg=document.createElement('div');
-            sg.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;';
-            stats.forEach(function(s){
-                var box=document.createElement('div');
-                box.style.cssText='background:rgba(255,255,255,0.04);border:1px solid rgba(155,89,182,0.2);border-radius:10px;padding:8px 12px;';
-                box.innerHTML='<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:3px;">'+s.label+'</div>'+'<div style="font-size:20px;font-weight:900;color:'+s.color+';">'+s.val+'</div>';
-                sg.appendChild(box);
-            });
-            el.appendChild(sg);
-            // Кнопка пин
-            var isPinned = pinned.has(name);
-            var pbtn=document.createElement('button');
-            pbtn.style.cssText='width:100%;padding:10px;border-radius:12px;border:1.5px solid rgba(185,111,255,'+(isPinned?'0.7':'0.3')+');background:rgba(109,63,245,'+(isPinned?'0.25':'0.06')+');color:'+(isPinned?'#b96fff':'rgba(255,255,255,0.5)')+';font-weight:700;font-size:13px;cursor:pointer;transition:all 0.15s;margin-bottom:8px;';
-            pbtn.textContent=isPinned?'📌 Закреплён':'📌 Закрепить вверху';
-            pbtn.onclick=function(){
-                toggleP(name);
-                var nowPinned=pinned.has(name);
-                pbtn.textContent=nowPinned?'📌 Закреплён':'📌 Закрепить вверху';
-                pbtn.style.borderColor=nowPinned?'rgba(185,111,255,0.7)':'rgba(185,111,255,0.3)';
-                pbtn.style.background=nowPinned?'rgba(109,63,245,0.25)':'rgba(109,63,245,0.06)';
-                pbtn.style.color=nowPinned?'#b96fff':'rgba(255,255,255,0.5)';
+            rd.textContent=roles.join(' \u00b7 ')||'\u2014'; el.appendChild(rd);
+            // Ползунок уровня
+            var _cardLvl = lvl;
+            var lvlWrap=document.createElement('div');
+            lvlWrap.style.cssText='margin-bottom:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(155,89,182,0.2);border-radius:12px;padding:10px 14px;';
+            var lvlRow=document.createElement('div');
+            lvlRow.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;';
+            lvlRow.innerHTML='<span style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:700;">УРОВЕНЬ</span><span id="cdLvlNum" style="font-size:28px;font-weight:900;color:var(--accent);">'+_cardLvl+'</span>';
+            lvlWrap.appendChild(lvlRow);
+            var slider=document.createElement('input');
+            slider.type='range'; slider.min='1'; slider.max='15'; slider.value=String(_cardLvl);
+            slider.style.cssText='width:100%;height:4px;appearance:none;background:linear-gradient(90deg,#2d1b4e,var(--accent));border-radius:10px;outline:none;';
+            slider.oninput=function(){
+                _cardLvl=+this.value;
+                document.getElementById('cdLvlNum').textContent=_cardLvl;
+                updateCardStats(champ, _cardLvl);
             };
-            el.appendChild(pbtn);
-            // Кнопка график
-            var gbtn=document.createElement('button');
-            gbtn.style.cssText='width:100%;padding:10px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.1);color:rgba(255,255,255,0.6);font-weight:700;font-size:13px;cursor:pointer;transition:all 0.15s;';
-            gbtn.textContent='📈 График роста';
-            gbtn.onclick=function(){openChart(name);};
-            el.appendChild(gbtn);
+            lvlWrap.appendChild(slider);
+            el.appendChild(lvlWrap);
+            // Статы
+            var sg=document.createElement('div');
+            sg.id='cdStatsGrid';
+            sg.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;';
+            el.appendChild(sg);
+            // Рендер статов
+            function updateCardStats(c, l){
+                var f=function(b,g){return Math.round(b+(l-1)*g);};
+                var stats=[
+                    {id:'cd_ad',label:'\u2694 AD',val:f(c.ad_b,c.ad_g),color:'#e8820a'},
+                    {id:'cd_hp',label:'\u271a HP',val:f(c.hp_b,c.hp_g),color:'#2ecc71'},
+                    {id:'cd_mn',label:'\ud83d\udca7 '+(c.res==='Energy'?'Energy':'Mana'),val:c.res==='Energy'?'150':String(f(c.mn_b,c.mn_g)),color:'#5dade2'},
+                    {id:'cd_ar',label:'\ud83d\udee1 \u0411\u0440\u043e\u043d\u044f',val:f(c.ar_b,c.ar_g),color:'#f1c40f'},
+                    {id:'cd_mr',label:'\u2726 \u041c\u0421',val:f(c.mr_b,c.mr_g),color:'#9b59b6'}
+                ];
+                var grid=document.getElementById('cdStatsGrid');
+                if(!grid.children.length){
+                    stats.forEach(function(s){
+                        var box=document.createElement('div');
+                        box.style.cssText='background:rgba(255,255,255,0.04);border:1px solid rgba(155,89,182,0.2);border-radius:10px;padding:8px 12px;';
+                        box.innerHTML='<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:3px;">'+s.label+'</div><div id="'+s.id+'" style="font-size:20px;font-weight:900;color:'+s.color+';">'+s.val+'</div>';
+                        grid.appendChild(box);
+                    });
+                } else {
+                    stats.forEach(function(s){
+                        var v=document.getElementById(s.id);
+                        if(v) v.textContent=s.val;
+                    });
+                }
+            }
+            updateCardStats(champ, _cardLvl);
         }
         openModal('champDetailMask');
     };
@@ -2668,25 +2421,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         render();
     };
 
-    window.openChart = function(name) {
-        const c = raw.find(x => x.name === name);
-        if(!c) return;
-        chartChamp = c;
-        chartStat = 'hp';
-        const titleEl = document.getElementById('chartTitle');
-        if(titleEl) titleEl.textContent = '📈 ' + name + ' — рост статов';
-        openModal('chartMask');
-        buildChartBtns();
-        renderGrowthChart();
-    };
 
-    window.closeChart = function() { closeModal('chartMask'); };
-
-    window.setChartStat = function(k) {
-        chartStat = k;
-        buildChartBtns();
-        renderGrowthChart();
-    };
 
     // Growth tooltip for stat cells
     const _uiTip = document.getElementById('uiTip');
@@ -3053,50 +2788,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         slider.insertAdjacentElement('afterend', stepper);
     })();
 
-    // Desktop ruler: position pills under slider thumb positions
-    (function(){
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        if(isMobile) return;
-        const slider = document.getElementById('lvlRange');
-        const ruler = document.getElementById('ruler');
-        if(!slider || !ruler) return;
-        const min = Number(slider.min || 1);
-        const max = Number(slider.max || 15);
-
-        function layoutRuler(){
-            const pills = ruler.querySelectorAll('.lvl-pill');
-            if(!pills.length) return;
-            const parent = slider.parentElement;
-            if(getComputedStyle(parent).position === 'static') parent.style.position = 'relative';
-            const sRect = slider.getBoundingClientRect();
-            const pRect = parent.getBoundingClientRect();
-            ruler.style.position = 'absolute';
-            ruler.style.left = (sRect.left - pRect.left) + 'px';
-            ruler.style.top  = (slider.offsetTop + slider.offsetHeight + 10) + 'px';
-            ruler.style.width = sRect.width + 'px';
-            ruler.style.height = '36px';
-            const thumb = 18;
-            const usable = Math.max(1, sRect.width - thumb);
-            const leftPad = thumb/2;
-            pills.forEach(p => {
-                // Support both data-value and id-based value
-                const v = Number(p.dataset.value || p.textContent.trim());
-                if(!Number.isFinite(v) || v < min || v > max) return;
-                p.dataset.value = String(v);
-                const pct = (v - min) / (max - min);
-                p.style.left = (leftPad + pct * usable) + 'px';
-            });
-        }
-
-        function layoutAndShow() {
-            layoutRuler();
-            ruler.classList.add('positioned');
-        }
-        window.addEventListener('resize', layoutRuler);
-        setTimeout(layoutAndShow, 50);
-        setTimeout(layoutAndShow, 200);
-        setTimeout(layoutAndShow, 500);
-    })();
+    // Ruler positioning handled by CSS flexbox
 
     // Mobile: hide ruler pills and clean up duplicates
     (function(){
@@ -3112,186 +2804,121 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
 <!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
-  <div class="m-win" style="width:96vw;max-width:920px;max-height:92vh;overflow-y:auto;padding:20px 18px 18px;padding-right:70px;">
+  <div class="m-win" style="width:94vw;max-width:480px;max-height:92vh;overflow-y:auto;padding:20px 18px 20px;padding-right:50px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
-    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;">⚔ Калькулятор урона</div>
+    <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:16px;">⚔ Калькулятор урона</div>
 
-    <!-- Level block — shown only when target is a champion -->
-    <div id="calcLevelBlock" style="display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(155,89,182,0.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;">
-      <div style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">УРОВЕНЬ ЦЕЛИ (WR: 1-15)</div>
-      <div style="display:flex;gap:6px;" id="calcLevelBtns">
-        <button class="calc-lvl-btn active" data-lvl="1" onclick="setCalcLvl(1)">1</button>
-        <button class="calc-lvl-btn" data-lvl="5" onclick="setCalcLvl(5)">5</button>
-        <button class="calc-lvl-btn" data-lvl="9" onclick="setCalcLvl(9)">9</button>
-        <button class="calc-lvl-btn" data-lvl="13" onclick="setCalcLvl(13)">13</button>
-        <button class="calc-lvl-btn" data-lvl="15" onclick="setCalcLvl(15)">15</button>
+    <!-- ══ МОЙ ЧЕМПИОН ══ -->
+    <div style="background:rgba(39,174,96,0.06);border:1.5px solid rgba(39,174,96,0.3);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🟢 МОЙ ЧЕМПИОН</div>
+      <div id="calcMyChampRow" style="margin-bottom:10px;">
+        <button onclick="openChampPicker('🟢 Мой чемпион',window._calcPickMy)" style="width:100%;padding:8px;border-radius:9px;border:1.5px dashed rgba(39,174,96,0.4);background:rgba(39,174,96,0.06);color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;">⚔ Выбрать чемпиона</button>
+      </div>
+      <div id="calcMyBadge" style="display:none;align-items:center;gap:8px;background:rgba(39,174,96,0.1);border-radius:9px;border:1px solid rgba(39,174,96,0.3);padding:6px 10px;margin-bottom:10px;">
+        <img id="calcMyIcon" style="width:32px;height:32px;border-radius:7px;object-fit:cover;">
+        <span id="calcMyName" style="font-size:12px;font-weight:700;color:#fff;flex:1;"></span>
+        <button onclick="calcClearMy()" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:14px;cursor:pointer;">✕</button>
+      </div>
+      <!-- Level -->
+      <div id="calcMyLvlWrap" style="display:none;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;">УРОВЕНЬ</span>
+          <span id="calcMyLvlNum" style="font-size:18px;font-weight:900;color:var(--accent);"></span>
+        </div>
+        <input type="range" id="calcMyLvlSlider" min="1" max="15" value="1" style="width:100%;height:3px;" oninput="calcMyLvlChange()">
+      </div>
+      <!-- Stats -->
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">AD</span>
+          <input type="number" id="cMyAD" placeholder="0" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()" readonly>
+          <span style="font-size:10px;color:rgba(39,174,96,0.6);">+</span>
+          <input type="number" id="cMyADBonus" placeholder="0" class="calc-input" style="width:55px;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">% Проб.</span>
+          <input type="number" id="cMyPen" placeholder="0" min="0" max="100" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+        </div>
       </div>
     </div>
 
-    <!-- Melee/Ranged block — shown only when item needs it (BotRK, Sunderer) -->
-    <div id="calcRangeBlock" style="display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(155,89,182,0.25);border-radius:10px;padding:10px 14px;margin-bottom:12px;">
-      <div style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">ТИП УРОНА</div>
-      <div style="display:flex;gap:6px;">
-        <button class="calc-range-btn active" id="btnMelee" onclick="setCalcRange('melee')">⚔ Ближний</button>
-        <button class="calc-range-btn" id="btnRanged" onclick="setCalcRange('ranged')">🏹 Дальний</button>
+    <!-- ══ ЦЕЛЬ ══ -->
+    <div style="background:rgba(231,76,60,0.06);border:1.5px solid rgba(231,76,60,0.3);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:10px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🔴 ЦЕЛЬ</div>
+      <div id="calcTgtChampRow" style="margin-bottom:10px;">
+        <button onclick="openChampPicker('🔴 Цель',window._calcPickTgt)" style="width:100%;padding:8px;border-radius:9px;border:1.5px dashed rgba(231,76,60,0.4);background:rgba(231,76,60,0.06);color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;">🎯 Выбрать цель</button>
+      </div>
+      <div id="calcTgtBadge" style="display:none;align-items:center;gap:8px;background:rgba(231,76,60,0.1);border-radius:9px;border:1px solid rgba(231,76,60,0.3);padding:6px 10px;margin-bottom:10px;">
+        <img id="calcTgtIcon" style="width:32px;height:32px;border-radius:7px;object-fit:cover;">
+        <span id="calcTgtName" style="font-size:12px;font-weight:700;color:#fff;flex:1;"></span>
+        <button onclick="calcClearTgt()" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:14px;cursor:pointer;">✕</button>
+      </div>
+      <!-- Level -->
+      <div id="calcTgtLvlWrap" style="display:none;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;">УРОВЕНЬ</span>
+          <span id="calcTgtLvlNum" style="font-size:18px;font-weight:900;color:var(--accent);"></span>
+        </div>
+        <input type="range" id="calcTgtLvlSlider" min="1" max="15" value="1" style="width:100%;height:3px;" oninput="calcTgtLvlChange()">
+      </div>
+      <!-- Stats -->
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">Броня</span>
+          <input type="number" id="cTgtArmor" placeholder="0" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+          <span style="font-size:10px;color:rgba(231,76,60,0.5);">+</span>
+          <input type="number" id="cTgtArmorBonus" placeholder="0" class="calc-input" style="width:55px;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">Макс HP</span>
+          <input type="number" id="cTgtHpMax" placeholder="0" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+          <span style="font-size:10px;color:rgba(231,76,60,0.5);">+</span>
+          <input type="number" id="cTgtHpBonus" placeholder="0" class="calc-input" style="width:55px;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">Тек. HP</span>
+          <input type="number" id="cTgtHpCur" placeholder="0" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+        </div>
       </div>
     </div>
 
-    <!-- Row 2: Stats grid — Items | My stats (green) | Enemy stats (red) | Results -->
-    <div style="display:grid;grid-template-columns:52px 1fr 1fr 1fr;gap:10px;align-items:start;">
-
-      <!-- COL 1: item icons -->
-      <div style="display:flex;flex-direction:column;gap:5px;align-items:center;">
-        <div style="font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:1px;font-weight:700;margin-bottom:2px;text-align:center;">ПРЕДМЕТ</div>
-        <button class="calc-item-btn" id="itemThornmail" onclick="openItemCalc('thornmail')" title="Шипованный доспех">
-          <img src="https://www.wildriftfire.com/images/items/thornmail.png" style="width:44px;height:44px;border-radius:7px;" onerror="this.style.display='none'">
-        </button>
-        <button class="calc-item-btn" id="itemBotrk" onclick="openItemCalc('botrk')" title="Клинок Погибшего Короля">
-          <img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" style="width:44px;height:44px;border-radius:7px;" onerror="this.style.display='none'">
-        </button>
-        <button class="calc-item-btn" id="itemSunfire" onclick="openItemCalc('sunfire')" title="Эгида Солнечного огня">
-          <img src="https://www.wildriftfire.com/images/items/sunfire-aegis.png" style="width:44px;height:44px;border-radius:7px;" onerror="this.style.display='none'">
-        </button>
-        <button class="calc-item-btn" id="itemLiandry" onclick="openItemCalc('liandry')" title="Мучения Лиандри">
-          <img src="https://www.wildriftfire.com/images/items/liandrys-torment.png" style="width:44px;height:44px;border-radius:7px;" onerror="this.style.display='none'">
-        </button>
-        <button class="calc-item-btn" id="itemDivSunderer" onclick="openItemCalc('sunderer')" title="Божественный Разрушитель">
-          <img src="https://www.wildriftfire.com/images/items/divine-sunderer.png" style="width:44px;height:44px;border-radius:7px;" onerror="this.style.display='none'">
-        </button>
+    <!-- ══ РЕЗУЛЬТАТ ══ -->
+    <div id="calcRes" style="display:none;background:rgba(109,63,245,0.08);border:1.5px solid rgba(109,63,245,0.3);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+      <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">📊 РЕЗУЛЬТАТ</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div class="calc-stat-box"><div class="calc-stat-label">Эфф. броня</div><div class="calc-stat-val" id="rEff" style="color:#5dade2;font-size:16px;"></div></div>
+        <div class="calc-stat-box"><div class="calc-stat-label">Снижение</div><div class="calc-stat-val" id="rMit" style="color:#e74c3c;font-size:16px;"></div></div>
+        <div class="calc-stat-box" style="background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.5);"><div class="calc-stat-label">Нанесено</div><div class="calc-stat-val" id="rDmg" style="color:#b96fff;font-size:22px;"></div></div>
       </div>
-
-      <!-- COL 2: MY STATS green -->
-      <div style="background:rgba(39,174,96,0.08);border:1.5px solid rgba(39,174,96,0.4);border-radius:12px;padding:12px 13px;">
-        <div style="font-size:9px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🟢 МОИ СТАТЫ</div>
-        <div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">AD</label>
-          <input type="number" id="cDmg" placeholder="150" min="0" class="calc-input" oninput="calcDmg()"></div>
-        <div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">% Пробив. брони</label>
-          <input type="number" id="cPen" placeholder="0" min="0" max="100" value="0" class="calc-input" oninput="calcDmg()"></div>
-        <div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">Мой HP</label>
-          <input type="number" id="cMyHp" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()"></div>
-        <div class="calc-field"><label class="calc-label">Моя броня</label>
-          <input type="number" id="cMyArmor" placeholder="80" min="0" class="calc-input" oninput="calcDmg()"></div>
-        <!-- ABILITY SCALING -->
-        <div style="margin-top:10px;border-top:1px solid rgba(39,174,96,0.2);padding-top:10px;">
-          <div style="font-size:9px;color:rgba(185,111,255,0.8);font-weight:800;letter-spacing:1px;margin-bottom:6px;">⚡ УРОН СПОСОБНОСТИ</div>
-          <div id="abilityRows" style="display:flex;flex-direction:column;gap:5px;"></div>
-          <button onclick="addAbilityRow()" style="margin-top:6px;width:100%;background:rgba(109,63,245,0.1);border:1.5px dashed rgba(155,89,182,0.35);color:rgba(255,255,255,0.45);border-radius:7px;padding:5px;font-size:11px;cursor:pointer;">+ Скейл</button>
+      <div id="rHpBar" style="display:none;">
+        <div style="background:rgba(255,255,255,0.08);border-radius:6px;height:12px;overflow:hidden;">
+          <div id="rHpFill" style="height:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);border-radius:6px;width:0%;transition:width 0.3s;"></div>
         </div>
+        <div id="rHpPct" style="font-size:10px;color:#e74c3c;font-weight:700;margin-top:2px;text-align:right;"></div>
       </div>
-
-      <!-- COL 3: TARGET CARD -->
-      <div style="background:rgba(231,76,60,0.08);border:1.5px solid rgba(231,76,60,0.4);border-radius:12px;padding:12px 13px;">
-        <div style="font-size:9px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🎯 ЦЕЛЬ</div>
-
-        <!-- Toggle: Mannequin vs Champion -->
-        <div style="display:flex;gap:5px;margin-bottom:10px;">
-          <button id="targetModeMannequin" onclick="setTargetMode('mannequin')"
-            style="flex:1;padding:5px 4px;border-radius:8px;border:1.5px solid rgba(231,76,60,0.5);background:rgba(231,76,60,0.25);color:#fff;font-size:10px;font-weight:700;cursor:pointer;">
-            🪆 Манекен
-          </button>
-          <button id="targetModeChamp" onclick="setTargetMode('champ')"
-            style="flex:1;padding:5px 4px;border-radius:8px;border:1.5px solid rgba(155,89,182,0.3);background:transparent;color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;cursor:pointer;">
-            ⚔ Чемпион
-          </button>
-        </div>
-
-        <!-- Champion selector button (shown in champ mode) -->
-        <div id="targetChampPicker" style="display:none;margin-bottom:10px;">
-          <!-- When no champ selected: pick button -->
-          <button id="targetChampPickBtn" onclick="openChampPicker('⚔ Выбери цель',selectTargetChamp)"
-            style="width:100%;padding:8px;border-radius:9px;border:1.5px dashed rgba(231,76,60,0.4);background:rgba(231,76,60,0.06);color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
-            ＋ Выбрать чемпиона
-          </button>
-          <!-- Selected champ display -->
-          <div id="targetChampSelected" style="display:none;align-items:center;gap:8px;background:rgba(231,76,60,0.1);border-radius:9px;border:1.5px solid rgba(231,76,60,0.35);padding:6px 10px;">
-            <img id="targetChampIcon" style="width:34px;height:34px;border-radius:7px;object-fit:cover;" src="" onerror="this.style.display='none'">
-            <span id="targetChampName" style="font-size:12px;font-weight:700;color:#fff;flex:1;"></span>
-            <button onclick="clearTargetChamp()" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:15px;cursor:pointer;line-height:1;">✕</button>
-          </div>
-        </div>
-
-        <!-- Base stats -->
-        <div class="calc-field" style="margin-bottom:7px;">
-          <label class="calc-label">Броня/Магрез</label>
-          <input type="number" id="cArmor" placeholder="100" min="-99" class="calc-input" oninput="calcDmg()">
-        </div>
-        <div class="calc-field" style="margin-bottom:7px;">
-          <label class="calc-label">Макс. HP</label>
-          <input type="number" id="cEnemyHpMax" placeholder="2500" min="0" class="calc-input" oninput="calcDmg()">
-        </div>
-        <div class="calc-field" style="margin-bottom:7px;">
-          <label class="calc-label">Тек. HP</label>
-          <input type="number" id="cEnemyHpCur" placeholder="2000" min="0" class="calc-input" oninput="calcDmg()">
-        </div>
-
-        <!-- Bonus stats -->
-        <div style="margin-top:10px;border-top:1px solid rgba(231,76,60,0.2);padding-top:10px;">
-          <div style="font-size:9px;color:rgba(255,200,100,0.8);font-weight:700;letter-spacing:1px;margin-bottom:7px;">➕ ДОП. ПРЕДМЕТЫ</div>
-          <div class="calc-field" style="margin-bottom:6px;">
-            <label class="calc-label">Доп. HP</label>
-            <input type="number" id="cBonusHp" placeholder="0" min="0" class="calc-input" oninput="calcDmg()">
-          </div>
-          <div class="calc-field" style="margin-bottom:6px;">
-            <label class="calc-label">Доп. броня</label>
-            <input type="number" id="cBonusArmor" placeholder="0" min="0" class="calc-input" oninput="calcDmg()">
-          </div>
-          <div class="calc-field">
-            <label class="calc-label">Доп. магрез</label>
-            <input type="number" id="cBonusMR" placeholder="0" min="0" class="calc-input" oninput="calcDmg()">
-          </div>
-        </div>
-      </div>
-
-      <!-- COL 4: RESULTS -->
-      <div id="calcResult" style="display:none;flex-direction:column;gap:8px;">
-        <div style="font-size:9px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:2px;">📊 РЕЗУЛЬТАТ</div>
-        <div class="calc-stat-box">
-          <div class="calc-stat-label">Эфф. броня</div>
-          <div class="calc-stat-val" id="resEff" style="color:#5dade2;font-size:18px;"></div>
-        </div>
-        <div class="calc-stat-box">
-          <div class="calc-stat-label">Снижение урона</div>
-          <div class="calc-stat-val" id="resMit" style="color:#e74c3c;font-size:18px;"></div>
-        </div>
-        <div class="calc-stat-box" style="background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.5);">
-          <div class="calc-stat-label">✅ Нанесено урона</div>
-          <div class="calc-stat-val" id="resDmg" style="color:#b96fff;font-size:28px;"></div>
-        </div>
-        <div id="calcItemResult" class="calc-stat-box" style="display:none;background:rgba(232,130,10,0.12);border-color:rgba(232,130,10,0.4);">
-          <div class="calc-stat-label" id="calcItemResultLabel"></div>
-          <div class="calc-stat-val" id="calcItemResultVal" style="color:#e07820;font-size:20px;"></div>
-        </div>
-        <div id="abilityResult" style="display:none;">
-          <div class="calc-stat-box" style="background:rgba(93,173,226,0.1);border-color:rgba(93,173,226,0.3);">
-            <div class="calc-stat-label">⚡ Урон способности</div>
-            <div class="calc-stat-val" id="abilityResultVal" style="color:#5dade2;font-size:20px;"></div>
-          </div>
-        </div>
-        <div id="calcFormula" style="font-size:10px;color:rgba(255,255,255,0.25);font-family:monospace;line-height:1.4;"></div>
-        <!-- HP damage bar -->
-        <div id="calcHpBar" style="display:none;margin-top:6px;">
-          <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:4px;font-weight:700;">УРОН ОТ HP ЦЕЛИ</div>
-          <div style="background:rgba(255,255,255,0.08);border-radius:6px;height:14px;overflow:hidden;position:relative;">
-            <div id="calcHpBarFill" style="height:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);border-radius:6px;width:0%;transition:width 0.3s ease;"></div>
-          </div>
-          <div id="calcHpPct" style="font-size:11px;color:#e74c3c;font-weight:700;margin-top:3px;text-align:right;"></div>
-        </div>
-      </div>
-
+      <div id="rFormula" style="font-size:9px;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:4px;"></div>
     </div>
+
+    <!-- ══ ПРЕДМЕТЫ ══ -->
+    <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">🛡 КАЛЬКУЛЯТОР ПРЕДМЕТОВ</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="calc-item-btn" onclick="openItemCalc('thornmail')" title="Шипованный доспех"><img src="https://www.wildriftfire.com/images/items/thornmail.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
+      <button class="calc-item-btn" onclick="openItemCalc('botrk')" title="Клинок Погибшего Короля"><img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
+      <button class="calc-item-btn" onclick="openItemCalc('sunfire')" title="Эгида Солнечного огня"><img src="https://www.wildriftfire.com/images/items/sunfire-aegis.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
+      <button class="calc-item-btn" onclick="openItemCalc('liandry')" title="Мучения Лиандри"><img src="https://www.wildriftfire.com/images/items/liandrys-torment.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
+      <button class="calc-item-btn" onclick="openItemCalc('sunderer')" title="Божественный Разрушитель"><img src="https://www.wildriftfire.com/images/items/divine-sunderer.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
+    </div>
+
+  </div>
+</div>
+
+</div>
   </div>
 </div>
 
 
 <!-- ═══════════════ CHAMPION GROWTH CHART POPUP ═══════════════ -->
-<div class="m-mask" id="chartMask" onclick="if(event.target===this)closeChart()">
-  <div class="m-win" style="width:96vw;max-width:620px;max-height:88vh;padding:24px 20px 20px;padding-right:70px;overflow-y:auto;">
-    <button class="btn-close-x" onclick="closeChart()">✕</button>
-    <div id="chartTitle" style="font-size:17px;font-weight:900;color:#b96fff;margin-bottom:16px;letter-spacing:1px;"></div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="chartStatBtns"></div>
-    <canvas id="growthChart" style="width:100%;max-height:280px;"></canvas>
-  </div>
-</div>
+<!-- chart modal removed -->
 
 
 <!-- ═══════════════ ITEMS REFERENCE MODAL ═══════════════ -->
@@ -3672,25 +3299,31 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ ITEM CALC SUB-MODAL ══ -->
 <div id="itemSubModal" class="m-mask" style="z-index:8000;" onclick="if(event.target===this)closeItemCalc()">
-  <div class="m-win" style="width:92vw;max-width:520px;max-height:88vh;overflow-y:auto;padding:24px 20px 20px;padding-right:70px;position:relative;">
+  <div class="m-win" style="width:92vw;max-width:440px;max-height:88vh;overflow-y:auto;padding:20px 18px 18px;padding-right:50px;position:relative;">
     <button class="btn-close-x" onclick="closeItemCalc()">✕</button>
-    <div id="itemSubTitle" style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:16px;padding-right:36px;"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-      <div>
-        <div style="font-size:10px;color:#2ecc71;font-weight:700;letter-spacing:1px;margin-bottom:8px;">🟢 МОИ ДАННЫЕ</div>
-        <div id="itemSubMyFields"></div>
-      </div>
-      <div>
-        <div style="font-size:10px;color:#e74c3c;font-weight:700;letter-spacing:1px;margin-bottom:8px;">🔴 ДАННЫЕ ВРАГА</div>
-        <div id="itemSubEnemyFields"></div>
-      </div>
+    <div id="itemSubTitle" style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;"></div>
+    <!-- Range toggle -->
+    <div id="icRangeBlock" style="display:none;gap:6px;margin-bottom:12px;">
+      <button class="ic-range-btn active" id="icBtnMelee" onclick="setCalcRange('melee')" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid rgba(155,89,182,0.4);background:rgba(109,63,245,0.25);color:#fff;font-size:11px;font-weight:700;cursor:pointer;">⚔ Ближний</button>
+      <button class="ic-range-btn" id="icBtnRanged" onclick="setCalcRange('ranged')" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid rgba(155,89,182,0.25);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;cursor:pointer;">🏹 Дальний</button>
     </div>
-    <div id="itemSubResult" style="display:none;border-top:1px solid rgba(155,89,182,0.3);padding-top:14px;">
+    <!-- My fields -->
+    <div id="icMySection" style="margin-bottom:10px;">
+      <div style="font-size:10px;color:#2ecc71;font-weight:700;letter-spacing:1px;margin-bottom:6px;">🟢 МОИ ДАННЫЕ</div>
+      <div id="itemSubMyFields"></div>
+    </div>
+    <!-- Enemy fields -->
+    <div id="icEnSection" style="margin-bottom:10px;">
+      <div style="font-size:10px;color:#e74c3c;font-weight:700;letter-spacing:1px;margin-bottom:6px;">🔴 ДАННЫЕ ВРАГА</div>
+      <div id="itemSubEnemyFields"></div>
+    </div>
+    <!-- Result -->
+    <div id="itemSubResult" style="display:none;border-top:1px solid rgba(155,89,182,0.3);padding-top:12px;">
       <div class="calc-stat-box" style="background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.4);">
         <div class="calc-stat-label" id="itemSubResultLabel"></div>
         <div class="calc-stat-val" id="itemSubResultVal" style="color:#b96fff;font-size:26px;"></div>
       </div>
-      <div id="itemSubFormula" style="margin-top:8px;font-size:10px;color:rgba(255,255,255,0.3);font-family:monospace;line-height:1.5;"></div>
+      <div id="itemSubFormula" style="margin-top:6px;font-size:9px;color:rgba(255,255,255,0.25);font-family:monospace;line-height:1.4;"></div>
     </div>
   </div>
 </div>
