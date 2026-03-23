@@ -221,7 +221,7 @@
 
         .patch-tooltip {
             position: fixed;
-            z-index: 99999;
+            z-index: 999999;
             background: rgba(10,3,20,0.97);
             border: 1px solid rgba(185,111,255,0.5);
             border-radius: 10px;
@@ -1528,7 +1528,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         return m[n] || n.replace(/[\s\'\.\#&]/g,'');
     }
     const DD_URL = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
-    var _sp={'Norra':'https://www.wildriftfire.com/images/champions/norra.png','Mel':'https://www.wildriftfire.com/images/champions/mel.png'};
+    var _sp={'Norra':'https://cdn.communitydragon.org/latest/champion/norra/square','Mel':'https://cdn.communitydragon.org/latest/champion/mel/square'};
     function champIcon(name){ return _sp[name] || (DD_URL + champKey(name) + '.png'); }
 
     let raw = [];
@@ -2199,6 +2199,13 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
 
     // ═══ ITEM CALC MODALS ═══
+    // Clamp input to min/max
+    window.clampInput = function(el) {
+        var v = +el.value;
+        if(el.min !== '' && v < +el.min) el.value = el.min;
+        if(el.max !== '' && v > +el.max) el.value = el.max;
+    };
+
     window.openItemCalc = function(key) {
         var ITEMS = {
             thornmail: {
@@ -2224,7 +2231,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 fields: [
                     {id:'ic_eHpCur',label:'Текущий HP цели',ph:'2500',side:'enemy'},
                     {id:'ic_eArmor',label:'Броня врага',ph:'100',side:'enemy'},
-                    {id:'ic_ePen',label:'% пробив. брони',ph:'0',side:'enemy'}
+                    {id:'ic_ePen',label:'% пробив. брони',ph:'0',side:'enemy',min:0,max:100}
                 ],
                 calc: function(v){
                     var hp=+v('ic_eHpCur')||2500, ar=+v('ic_eArmor')||100, pen=+v('ic_ePen')||0;
@@ -2243,8 +2250,8 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 needsRange: false,
                 fields: [
                     {id:'ic_myBHp2',label:'Мой бонусный HP',ph:'1000',side:'my'},
-                    {id:'ic_stacks',label:'Стаки (0-4)',ph:'4',side:'my'},
-                    {id:'ic_eLvl',label:'Уровень врага',ph:'10',side:'enemy'},
+                    {id:'ic_stacks',label:'Стаки (0-4)',ph:'4',side:'my',min:0,max:4},
+                    {id:'ic_eLvl',label:'Уровень врага',ph:'10',side:'enemy',min:1,max:15},
                     {id:'ic_eMR2',label:'МС врага',ph:'40',side:'enemy'}
                 ],
                 calc: function(v){
@@ -2280,7 +2287,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                     {id:'ic_myAD2',label:'Мой базовый AD',ph:'120',side:'my'},
                     {id:'ic_eHpMaxS',label:'Макс HP цели',ph:'3000',side:'enemy'},
                     {id:'ic_eArmorS',label:'Броня врага',ph:'100',side:'enemy'},
-                    {id:'ic_ePenS',label:'% пробив. брони',ph:'0',side:'enemy'}
+                    {id:'ic_ePenS',label:'% пробив. брони',ph:'0',side:'enemy',min:0,max:100}
                 ],
                 calc: function(v){
                     var ad=+v('ic_myAD2')||120, rng=_calcRange==='ranged', hp=+v('ic_eHpMaxS')||3000, ar=+v('ic_eArmorS')||100, pen=+v('ic_ePenS')||0;
@@ -2314,8 +2321,10 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         item.fields.forEach(function(f){
             var target = f.side==='my' ? myDiv : enDiv;
             if(f.side==='my') hasMy=true; else hasEn=true;
+            var minAttr = f.min !== undefined ? ' min="'+f.min+'"' : ' min="0"';
+            var maxAttr = f.max !== undefined ? ' max="'+f.max+'"' : '';
             target.innerHTML += '<div class="calc-field" style="margin-bottom:8px;"><label class="calc-label">'+f.label+'</label>'
-                +'<input type="number" id="'+f.id+'" placeholder="'+f.ph+'" class="calc-input" style="padding:8px 10px;" oninput="runItemCalc(\''+key+'\')"></div>';
+                +'<input type="number" id="'+f.id+'" placeholder="'+f.ph+'" class="calc-input" style="padding:8px 10px;"'+minAttr+maxAttr+' oninput="clampInput(this);runItemCalc(\''+key+'\')"></div>';
         });
         document.getElementById('icMySection').style.display = hasMy ? 'block' : 'none';
         document.getElementById('icEnSection').style.display = hasEn ? 'block' : 'none';
@@ -2801,17 +2810,28 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     // Move champion to top of table (sticky - not removed by Clear)
     var _movedToTop = new Set();
     window.moveToTop = function(name) {
-        _movedToTop.add(name);
-        if(!selected.has(name)) selected.add(name);
+        if(_movedToTop.has(name)) {
+            _movedToTop.delete(name);
+        } else {
+            _movedToTop.add(name);
+            if(!selected.has(name)) selected.add(name);
+        }
         try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e) {}
         render();
     };
 
     // Sidebar → modal → close modal → sidebar reopens
-    var _openedFromSidebar = false;
+    var _sidebarModalId = null; // which MAIN modal was opened from sidebar
+    var _mainSidebarModals = ['sideChampsMask','calcMask','itemCalcMenuMask','itemsMask','runesMask','draftMask','tierlistMask'];
+
     window.sidebarOpen = function(what) {
-        _openedFromSidebar = true;
         closeSidebar();
+        var modalMap = {
+            'sideChamps':'sideChampsMask', 'calc':'calcMask', 'itemCalcMenu':'itemCalcMenuMask',
+            'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask',
+            'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask'
+        };
+        _sidebarModalId = modalMap[what] || null;
         switch(what) {
             case 'sideChamps': openSideChamps(); break;
             case 'calc': openCalc(); break;
@@ -2825,17 +2845,14 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         }
     };
 
-    // Hook into closeModal to reopen sidebar
+    // Hook into closeModal to reopen sidebar ONLY for main modals
     var _origCloseModal = closeModal;
     closeModal = function(id) {
         _origCloseModal(id);
-        if(_openedFromSidebar) {
-            // Check if any modal is still open
-            var anyOpen = _modalStack && _modalStack.length > 0;
-            if(!anyOpen) {
-                _openedFromSidebar = false;
-                toggleSidebar();
-            }
+        // Only reopen sidebar if closing the MAIN modal that was opened from sidebar
+        if(_sidebarModalId && id === _sidebarModalId) {
+            _sidebarModalId = null;
+            toggleSidebar();
         }
     };
 
@@ -3268,13 +3285,13 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         <div style="display:flex;flex-direction:column;gap:5px;">
           <div style="display:flex;align-items:center;gap:5px;">
             <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">AD</span>
-            <input type="number" id="cMyAD" placeholder="100" value="100" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <input type="number" id="cMyAD" placeholder="100" value="100" min="0" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
             <span style="font-size:9px;color:rgba(39,174,96,0.5);">+</span>
-            <input type="number" id="cMyADBonus" placeholder="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <input type="number" id="cMyADBonus" placeholder="0" min="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
           </div>
           <div style="display:flex;align-items:center;gap:5px;">
             <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">% Проб.</span>
-            <input type="number" id="cMyPen" placeholder="0" min="0" max="100" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <input type="number" id="cMyPen" placeholder="0" min="0" max="100" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="clampInput(this);calcRun()">
           </div>
         </div>
       </div>
@@ -3298,19 +3315,19 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         <div style="display:flex;flex-direction:column;gap:5px;">
           <div style="display:flex;align-items:center;gap:5px;">
             <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">Броня</span>
-            <input type="number" id="cTgtArmor" placeholder="100" value="100" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <input type="number" id="cTgtArmor" placeholder="100" value="100" min="0" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
             <span style="font-size:9px;color:rgba(231,76,60,0.5);">+</span>
-            <input type="number" id="cTgtArmorBonus" placeholder="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <input type="number" id="cTgtArmorBonus" placeholder="0" min="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
           </div>
           <div style="display:flex;align-items:center;gap:5px;">
             <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">HP</span>
-            <input type="number" id="cTgtHpMax" placeholder="2000" value="2000" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <input type="number" id="cTgtHpMax" placeholder="2000" value="2000" min="0" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
             <span style="font-size:9px;color:rgba(231,76,60,0.5);">+</span>
-            <input type="number" id="cTgtHpBonus" placeholder="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <input type="number" id="cTgtHpBonus" placeholder="0" min="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
           </div>
           <div style="display:flex;align-items:center;gap:5px;">
             <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">Тек. HP</span>
-            <input type="number" id="cTgtHpCur" placeholder="2000" value="2000" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <input type="number" id="cTgtHpCur" placeholder="2000" value="2000" min="0" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
           </div>
         </div>
       </div>
