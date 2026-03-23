@@ -166,9 +166,7 @@
             text-align: center;
             transition: transform 0.1s ease;
         }
-        .lvl-num.pop {
-            transform: scale(1.25);
-        }
+        /* pop animation removed */
 
         .slider-wrapper {
             position: relative;
@@ -205,6 +203,10 @@
             position: relative;
             margin-top: 8px;
             padding: 0 2px;
+            visibility: hidden;
+        }
+        .ruler.positioned {
+            visibility: visible;
         }
 
         .ruler span {
@@ -427,9 +429,12 @@
 
         .m-mask.active {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
+            padding-top: 4vh;
             animation: fadeIn 0.25s ease;
+            overflow-y: auto;
+            overscroll-behavior: contain;
         }
 
         .m-win {
@@ -664,6 +669,10 @@
             box-shadow: 0 0 12px rgba(185,111,255,0.6);
             background: rgba(109,63,245,0.15);
         }
+
+        /* BODY SCROLL LOCK */
+        body.modal-open { overflow: hidden !important; height: 100vh; }
+        body.sidebar-open { overflow: hidden !important; }
 
         /* SCROLLBAR — hidden */
         ::-webkit-scrollbar { display: none; }
@@ -1216,11 +1225,7 @@ html, body { overflow-y: auto; }
     position: sticky;
     top: 0;
     z-index: 40;
-}
-#statTable thead th {
-    position: sticky;
-    top: 0;
-    z-index: 30;
+    background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
 }
 
 /* ── SUPPORT TEXT ── */
@@ -1784,10 +1789,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             lvl = +e.target.value;
             const lbl = document.getElementById('lvlLabel');
             lbl.textContent = lvl;
-            lbl.classList.remove('pop');
-            void lbl.offsetWidth; // reflow
-            lbl.classList.add('pop');
-            setTimeout(() => lbl.classList.remove('pop'), 150);
+            /* animation removed */
             updateRuler();
             renderUpdate();
         };
@@ -3086,12 +3088,14 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             });
         }
 
+        function layoutAndShow() {
+            layoutRuler();
+            ruler.classList.add('positioned');
+        }
         window.addEventListener('resize', layoutRuler);
-        // Wait for createRuler() to populate, then position
-        setTimeout(layoutRuler, 50);
-        setTimeout(layoutRuler, 200);
-        setTimeout(layoutRuler, 500);
-        setTimeout(layoutRuler, 1000);
+        setTimeout(layoutAndShow, 50);
+        setTimeout(layoutAndShow, 200);
+        setTimeout(layoutAndShow, 500);
     })();
 
     // Mobile: hide ruler pills and clean up duplicates
