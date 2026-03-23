@@ -224,17 +224,13 @@
         /* TABLE */
         .table-hold {
             width: 100%;
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            border: 2px solid var(--border);
-            overflow: hidden;
-            max-height: 65vh;
-            overflow-y: auto;
-            overflow-x: hidden;
+            background: transparent;
+            overflow: visible;
+            max-height: none;
+            overflow-y: visible;
+            overflow-x: auto;
             isolation: isolate;
             animation: fadeIn 0.8s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
         table {
@@ -258,7 +254,7 @@
 /* Prevent any click/tap focus highlight from changing row look */
 #statTable td, #statTable th { outline: none; }
 @media (max-width: 560px){
-    .table-hold{ overflow-x: hidden; }
+    /* table-hold: no card, full page scroll */
     #statTable th, #statTable td{ padding: 6px 2px; font-size: 11px; }
     #statTable th:first-child, #statTable td:first-child{ width: 44%; }
     #statTable th:not(:first-child), #statTable td:not(:first-child){ width: 11.2%; }
@@ -541,12 +537,12 @@
             color: #6c5788;
         }
 
-        /* GRID — 10 columns: 2 per role × 5 roles */
+        /* GRID — PC: 5 role groups × 2 cols + spacers; Mobile: 5 single cols */
         .m-grid {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 4px;
+            grid-template-columns: 1fr 1fr 5px 1fr 1fr 5px 1fr 1fr 5px 1fr 1fr 5px 1fr 1fr;
+            gap: 4px 2px;
             padding: 6px 10px 12px;
             overflow-y: auto;
             align-items: start;
@@ -560,8 +556,18 @@
             align-items: center;
         }
 
-        .m-role-header {
-            display: none;
+        .m-role-header { display: none; }
+        .m-role-spacer { display: block; grid-row: 1 / 999; width: 5px; }
+
+        /* Mobile: revert to 5 single columns */
+        @media (max-width: 600px) {
+            .m-grid {
+                grid-template-columns: repeat(5, 1fr) !important;
+                gap: 4px !important;
+            }
+            .m-role-container { grid-column: span 1 !important; }
+            .m-role-spacer { display: none !important; }
+            .m-role-champs { grid-template-columns: 1fr !important; }
         }
 
         .m-role {
@@ -728,7 +734,7 @@
 }
 
 /* 2) Таблица никогда не скроллится горизонтально */
-.table-hold{ overflow-x: hidden !important; }
+/* table-hold overflow handled by v34-overrides */
 /* overflow-x hidden removed — breaks position:fixed FAB */
 
 /* 3) Разные ширины для ПК и телефона (фикс не влияет друг на друга) */
@@ -987,7 +993,7 @@
 
 /* Mobile: sticky table headers inside scroll container */
 @media (max-width: 768px) {
-  .table-hold { overflow-y: auto; }
+  /* table-hold: page scroll */
   #statTable thead th {
     position: sticky;
     top: 0;
@@ -1920,6 +1926,13 @@
 
             container.appendChild(champGrid);
             grid.appendChild(container);
+
+            // Spacer between role groups (not after last)
+            if(roles.indexOf(role) < roles.length - 1) {
+                const spacer = document.createElement('div');
+                spacer.className = 'm-role-spacer';
+                grid.appendChild(spacer);
+            }
         });
 
         if (q && grid.children.length === 0) {
@@ -3381,20 +3394,21 @@
 
 
 <style id="v34-overrides">
-/* ===== Sticky thead — работает всегда ===== */
+/* ===== Sticky thead — page-level scroll ===== */
 .table-hold {
-  max-height: 72vh !important;
-  height: auto !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  position: relative; /* Required for sticky to work */
+  max-height: none !important;
+  overflow-y: visible !important;
+  overflow-x: auto !important;
 }
 #statTable thead th {
   position: sticky !important;
-  top: 0 !important;
+  top: 56px !important; /* below fixed header */
   z-index: 30 !important;
-  background: var(--bg-card, #1a0d2e) !important;
+  background: var(--bg-main, #0f0520) !important;
   backdrop-filter: blur(8px) !important;
+}
+@media (max-width: 768px) {
+  #statTable thead th { top: 48px !important; }
 }
 html, body { overflow-y: auto !important; }
 
