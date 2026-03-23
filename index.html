@@ -3,11 +3,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <title>WILD RIFT STATS</title>
+    <title>Wild Rift Stats — Статы чемпионов, руны, предметы, калькулятор</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%236D3FF5'/><text x='16' y='23' font-size='18' text-anchor='middle' font-family='Arial'>⚔️</text></svg>">
-    <meta name="description" content="Wild Rift champion base stats by level — AD, HP, Mana, Armor, Magic Resist. Compare all champions at every level 1-15.">
-    <meta property="og:title" content="Wild Rift Stats — Champion Base Stats">
-    <meta property="og:description" content="Compare AD, HP, Mana, Armor and MR for all Wild Rift champions at any level.">
+    <meta name="description" content="Полный справочник Wild Rift: базовые статы всех чемпионов по уровням 1-15, калькулятор урона, руны, предметы, патч-ноты и тир-листы. Обновляется каждый патч.">
+    <meta name="keywords" content="wild rift, stats, champion, базовые статы, калькулятор урона, руны, предметы, тир-лист, патч, бафф, нерф, wild rift guide, WR stats, erjankg">
+    <meta property="og:title" content="Wild Rift Stats — Статы, руны, калькулятор, тир-листы">
+    <meta property="og:description" content="Все чемпионы Wild Rift: статы по уровням, калькулятор урона, руны, предметы, патч-ноты.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://erjankg.github.io/">
+    <meta property="og:locale" content="ru_RU">
+    <link rel="canonical" href="https://erjankg.github.io/">
     <meta name="theme-color" content="#6D3FF5">
     <style>
         * {
@@ -1693,7 +1698,12 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             armor:f(x.ar_b, x.ar_g),
             mrez: f(x.mr_b, x.mr_g),
             g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g}
-        })).sort((a,b) => sD === 'desc' ? b[sK] - a[sK] : a[sK] - b[sK]);
+        })).sort((a,b) => {
+            var aTop = _movedToTop.has(a.name) || pinned.has(a.name) ? 1 : 0;
+            var bTop = _movedToTop.has(b.name) || pinned.has(b.name) ? 1 : 0;
+            if(aTop !== bTop) return bTop - aTop;
+            return sD === 'desc' ? b[sK] - a[sK] : a[sK] - b[sK];
+        });
         const getT = (k) => {
             const s = data.map(i => i[k]).sort((a,b) => a-b);
             return { s: s[Math.floor(s.length*0.95)], a: s[Math.floor(s.length*0.8)], c: s[Math.floor(s.length*0.2)] };
@@ -1753,7 +1763,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         body.innerHTML = '';
         data.forEach((item, idx) => {
             const tr = document.createElement('tr');
-            const isP = pinned.has(item.name);
+            const isP = pinned.has(item.name) || _movedToTop.has(item.name);
             tr.addEventListener('click', () => {
                 tr.classList.add('row-flash');
                 setTimeout(() => tr.classList.remove('row-flash'), 400);
@@ -1771,7 +1781,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             const nameSpan = document.createElement('span');
             nameSpan.className = 'name-tag ' + (isP ? 'pinned' : '');
             nameSpan.textContent = item.name;
-            nameSpan.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
+            nameSpan.addEventListener('click', (ev) => { ev.stopPropagation(); moveToTop(item.name); });
             // Double-click → open growth chart
 
             const champImg = document.createElement('img');
@@ -1781,7 +1791,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             champImg.style.cursor = 'pointer';
             champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
             if(isP) champImg.classList.add('icon-pinned');
-            champImg.addEventListener('click', (ev) => { ev.stopPropagation(); toggleP(item.name); });
+            champImg.addEventListener('click', (ev) => { ev.stopPropagation(); moveToTop(item.name); });
 
             // Patch indicator
             const pInfo = patchMap[item.name];
@@ -1814,6 +1824,10 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                     }, 10);
                 }
                 champWrap.addEventListener('mouseenter', showPatchTip);
+                champWrap.addEventListener('mouseleave', function() {
+                    var old = document.getElementById('patchTip');
+                    if(old) old.remove();
+                });
                 champWrap.addEventListener('click', showPatchTip);
             }
             tdChamp.appendChild(btnX); tdChamp.appendChild(champWrap); tdChamp.appendChild(nameSpan);
@@ -1890,6 +1904,14 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 nm.style.cssText = 'font-size:7px;color:'+(isOn?'#fff':'rgba(255,255,255,0.45)')+';text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
                 nm.textContent = c.name;
 
+                // Patch dot in modal
+                var pI2 = patchMap[c.name];
+                if(pI2) {
+                    btn.style.position = 'relative';
+                    var dt2 = document.createElement('div');
+                    dt2.className = 'patch-dot ' + pI2.type;
+                    btn.appendChild(dt2);
+                }
                 btn.appendChild(mImg);
                 btn.appendChild(nm);
 
@@ -2763,14 +2785,58 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
     window.clearAll = function() {
         selected.clear();
-        try { localStorage.setItem('sel', JSON.stringify([])); } catch(e) {}
+        // Re-add champions that were moved to top (they survive clear)
+        _movedToTop.forEach(function(n){ selected.add(n); });
+        try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e) {}
         drawM(); render();
     };
 
     window.removeC = function(name) {
         selected.delete(name);
+        _movedToTop.delete(name); // X button removes from moved-to-top too
         try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e) {}
         render();
+    };
+
+    // Move champion to top of table (sticky - not removed by Clear)
+    var _movedToTop = new Set();
+    window.moveToTop = function(name) {
+        _movedToTop.add(name);
+        if(!selected.has(name)) selected.add(name);
+        try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e) {}
+        render();
+    };
+
+    // Sidebar → modal → close modal → sidebar reopens
+    var _openedFromSidebar = false;
+    window.sidebarOpen = function(what) {
+        _openedFromSidebar = true;
+        closeSidebar();
+        switch(what) {
+            case 'sideChamps': openSideChamps(); break;
+            case 'calc': openCalc(); break;
+            case 'itemCalcMenu': openItemCalcMenu(); break;
+            case 'items': openItems(); break;
+            case 'runes': openRunes(); break;
+            case 'draft': openDraft(); break;
+            case 'tierChamps': openTierlist('champs'); break;
+            case 'tierItems': openTierlist('items'); break;
+            case 'tierRunes': openTierlist('runes'); break;
+        }
+    };
+
+    // Hook into closeModal to reopen sidebar
+    var _origCloseModal = closeModal;
+    closeModal = function(id) {
+        _origCloseModal(id);
+        if(_openedFromSidebar) {
+            // Check if any modal is still open
+            var anyOpen = _modalStack && _modalStack.length > 0;
+            if(!anyOpen) {
+                _openedFromSidebar = false;
+                toggleSidebar();
+            }
+        }
     };
 
     window.toggleP = function(name) {
@@ -3458,17 +3524,17 @@ Stormarrow: При максимальных зарядах следующая б
   </div>
 
   <div class="side-section">Инструменты</div>
-  <button class="side-btn" onclick="closeSidebar();openSideChamps()"><span class="side-icon">👥</span>Чемпионы</button>
-  <button class="side-btn" onclick="closeSidebar();openCalc()"><span class="side-icon">⚔</span>Калькулятор урона</button>
-  <button class="side-btn" onclick="closeSidebar();openItemCalcMenu()"><span class="side-icon">🧮</span>Калькулятор предметов</button>
-  <button class="side-btn" onclick="closeSidebar();openItems()"><span class="side-icon">📦</span>Предметы</button>
-  <button class="side-btn" onclick="closeSidebar();openRunes()"><span class="side-icon">💎</span>Руны</button>
-  <button class="side-btn" onclick="closeSidebar();openDraft()" style="background:rgba(109,63,245,0.15);border-left:3px solid #b96fff;"><span class="side-icon">📋</span>Драфт-помощник</button>
+  <button class="side-btn" onclick="sidebarOpen('sideChamps')"><span class="side-icon">👥</span>Чемпионы</button>
+  <button class="side-btn" onclick="sidebarOpen('calc')"><span class="side-icon">⚔</span>Калькулятор урона</button>
+  <button class="side-btn" onclick="sidebarOpen('itemCalcMenu')"><span class="side-icon">🧮</span>Калькулятор предметов</button>
+  <button class="side-btn" onclick="sidebarOpen('items')"><span class="side-icon">📦</span>Предметы</button>
+  <button class="side-btn" onclick="sidebarOpen('runes')"><span class="side-icon">💎</span>Руны</button>
+  <button class="side-btn" onclick="sidebarOpen('draft')" style="background:rgba(109,63,245,0.15);border-left:3px solid #b96fff;"><span class="side-icon">📋</span>Драфт-помощник</button>
 
   <div class="side-section" style="margin-top:8px;">Тир-листы</div>
-  <button class="side-btn" onclick="closeSidebar();openTierlist('champs')"><span class="side-icon">🏆</span>Тир-лист чемпионов</button>
-  <button class="side-btn" onclick="closeSidebar();openTierlist('items')"><span class="side-icon">⚙</span>Тир-лист предметов</button>
-  <button class="side-btn" onclick="closeSidebar();openTierlist('runes')"><span class="side-icon">✨</span>Тир-лист рун</button>
+  <button class="side-btn" onclick="sidebarOpen('tierChamps')"><span class="side-icon">🏆</span>Тир-лист чемпионов</button>
+  <button class="side-btn" onclick="sidebarOpen('tierItems')"><span class="side-icon">⚙</span>Тир-лист предметов</button>
+  <button class="side-btn" onclick="sidebarOpen('tierRunes')"><span class="side-icon">✨</span>Тир-лист рун</button>
 
   <div style="flex:1;"></div>
   <div style="padding:0 8px;">
