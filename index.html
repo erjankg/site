@@ -1563,14 +1563,20 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
         let t;
         try {
+            console.log('Fetching champions from:', G_URL);
             const r = await fetch(G_URL);
+            console.log('Fetch response status:', r.status);
             t = await r.text();
+            console.log('Data received, length:', t.length, 'first 100 chars:', t.substring(0, 100));
+            if(t.trim().startsWith('<!') || t.trim().startsWith('<html')) {
+                throw new Error('Google Sheet вернул HTML вместо TSV — лист не опубликован! Открой Google Sheets → File → Share → Publish to web');
+            }
         } catch(fetchErr) {
             console.error('Fetch failed:', fetchErr);
             const skEl = document.getElementById('skeletonOverlay');
             if(skEl) skEl.style.display = 'none';
             document.getElementById('statTable').style.visibility = 'visible';
-            document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">Не удалось загрузить данные. Проверь подключение к интернету.</td></tr>';
+            document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">Ошибка: ' + (fetchErr.message || 'Не удалось загрузить данные') + '</td></tr>';
             return;
         }
         // Fetch patch notes — truly non-blocking, don't wait for it
@@ -1621,6 +1627,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 }
             };
         }).filter(x => x.name);
+        console.log('Champions loaded:', raw.length);
         
         // Default: ADC only on first load (unless saved state exists)
         const _hasSaved = (() => { try { return !!localStorage.getItem('sel'); } catch(e){ return false; } })();
