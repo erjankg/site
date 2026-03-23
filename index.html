@@ -3049,28 +3049,16 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     // ══════════════════════════════════════════
     // DRAFT SYSTEM — new slot-based layout
     // ══════════════════════════════════════════
-    var DRAFT_DATA = {
-        'Garen':    { counters:[{n:'Darius',s:3},{n:'Fiora',s:3},{n:'Vayne',s:2},{n:'Teemo',s:2},{n:'Irelia',s:1}],
-                      synergies:[{n:'Lux',s:3},{n:'Sona',s:2},{n:'Nami',s:2}] },
-        'Darius':   { counters:[{n:'Vayne',s:3},{n:'Fiora',s:3},{n:'Quinn',s:2},{n:'Teemo',s:2}],
-                      synergies:[{n:'Jarvan IV',s:3},{n:'Malphite',s:3},{n:'Amumu',s:2}] },
-        'Malphite': { counters:[{n:'Vayne',s:2},{n:'Garen',s:1}],
-                      synergies:[{n:'Yasuo',s:3},{n:'Orianna',s:3},{n:'Miss Fortune',s:2}] },
-        'Yasuo':    { counters:[{n:'Annie',s:3},{n:'Gragas',s:2},{n:'Pantheon',s:2}],
-                      synergies:[{n:'Malphite',s:3},{n:'Orianna',s:2},{n:'Diana',s:2}] },
-        'Lux':      { counters:[{n:'Zed',s:3},{n:'Talon',s:3},{n:'Fizz',s:2}],
-                      synergies:[{n:'Garen',s:3},{n:'Miss Fortune',s:2},{n:'Jinx',s:2}] },
-        'Miss Fortune':{ counters:[{n:'Draven',s:2},{n:'Caitlyn',s:2}],
-                         synergies:[{n:'Lux',s:3},{n:'Seraphine',s:3},{n:'Amumu',s:2}] },
-        'Jinx':     { counters:[{n:'Draven',s:2},{n:'Lucian',s:2},{n:'Caitlyn',s:1}],
-                      synergies:[{n:'Thresh',s:3},{n:'Nami',s:2},{n:'Lulu',s:2}] },
-        'Thresh':   { counters:[{n:'Blitzcrank',s:2},{n:'Morgana',s:2}],
-                      synergies:[{n:'Jinx',s:3},{n:'Caitlyn',s:3},{n:'Lucian',s:2}] },
-        'Amumu':    { counters:[{n:'Hecarim',s:2}],
-                      synergies:[{n:'Miss Fortune',s:3},{n:'Orianna',s:3},{n:'Jarvan IV',s:2}] },
-        'Jarvan IV':{ counters:[{n:'Fizz',s:2},{n:'Hecarim',s:1}],
-                      synergies:[{n:'Darius',s:3},{n:'Malphite',s:2},{n:'Miss Fortune',s:2}] }
-    };
+    // Draft data from localStorage (user's own counter-picks and combos)
+    function getDraftData(name) {
+        var m = getMatchups();
+        var d = m[name];
+        if(!d) return { counters: [], synergies: [] };
+        return {
+            counters: (d.counters || []).map(function(n){ return {n: n, s: 3}; }),
+            synergies: (d.combos || []).map(function(n){ return {n: n, s: 3}; })
+        };
+    }
 
     var _draftRoleFilter = 'all';
     var _draftSlotsL = [null,null,null,null,null];
@@ -3245,7 +3233,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             var picked = slots.filter(Boolean);
             var cm={}, sm={};
             picked.forEach(function(n){
-                var d=DRAFT_DATA[n]; if(!d) return;
+                var d=getDraftData(n); if(!d) return;
                 (d.counters||[]).forEach(function(c){ if(picked.includes(c.n)) return; if(!cm[c.n]) cm[c.n]={stars:0,from:[]}; cm[c.n].stars=Math.max(cm[c.n].stars,c.s); cm[c.n].from.push(n); });
                 (d.synergies||[]).forEach(function(s){ if(picked.includes(s.n)) return; if(!sm[s.n]) sm[s.n]={stars:0,from:[]}; sm[s.n].stars=Math.max(sm[s.n].stars,s.s); sm[s.n].from.push(n); });
             });
