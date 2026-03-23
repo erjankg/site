@@ -297,13 +297,7 @@
             transform: scale(0.95);
         }
 
-        table.focus-mode td:not(:first-child) {
-            opacity: 1;
-        }
-
-        table.focus-mode td.active-col {
-            opacity: 1 !important;
-        }
+        /* old focus-mode rules removed — handled by consolidated section */
 
         td {
             padding: 10px 3px;
@@ -721,7 +715,7 @@
         }
         /* Mobile: hide name, show number inside cell */
         @media (max-width: 768px) {
-            .champ-icon { width: 32px; height: 32px; border-radius: 6px; }
+            .champ-icon { width: 38px; height: 38px; border-radius: 7px; }
             .champ-cell .name-tag { display: none !important; }
             .champ-cell {
                 justify-content: flex-start;
@@ -838,6 +832,10 @@
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
             gap: 8px;
+        }
+        @media (max-width: 768px) {
+            .items-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+            .items-grid .item-card img { width: 100%; height: auto; }
         }
         .item-card {
             background: rgba(255,255,255,0.03);
@@ -1149,7 +1147,7 @@ html, body { overflow-y: auto; }
         content: attr(data-short); position: absolute; inset: 0;
         display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 10px; pointer-events: none;
     }
-    .champ-icon { width: 32px; height: 32px; border-radius: 6px; }
+    .champ-icon { width: 38px; height: 38px; border-radius: 7px; }
     .champ-cell .name-tag { display: none; }
     .champ-cell { justify-content: flex-start; gap: 3px; padding-left: 4px; overflow: hidden; }
     .row-num { font-size: 8px; min-width: 10px; }
@@ -1257,6 +1255,62 @@ html, body { overflow-y: auto; }
 /* Hide menuBtn when sidebar open */
 body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
+
+/* ── ITEMS GRID MOBILE: 5 cols ── */
+@media (max-width: 768px) {
+    .items-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 5px; }
+    .items-grid .item-card img { width: 38px; height: 38px; }
+}
+
+/* ── CALC MOBILE ── */
+@media (max-width: 768px) and (orientation: portrait) {
+    #calcMask .m-win {
+        max-width: 100vw; width: 100vw; border-radius: 0;
+        padding: 14px 12px; max-height: 100vh;
+    }
+    .calc-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+}
+/* Landscape phone: 3-col like PC */
+@media (max-height: 500px) and (orientation: landscape) {
+    #calcMask .m-win {
+        max-width: 98vw; width: 98vw; padding: 10px 14px; max-height: 98vh;
+    }
+    .calc-grid {
+        grid-template-columns: 1fr 1fr 1fr !important;
+        gap: 8px !important;
+    }
+}
+
+
+/* ── CALC LANDSCAPE (phone rotated) ── */
+@media (orientation: landscape) and (max-height: 500px) {
+    .calc-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr !important;
+        flex-direction: row !important;
+        gap: 8px !important;
+    }
+    .calc-grid > div:first-child {
+        flex-direction: column !important;
+    }
+    #calcMask .m-win {
+        max-height: 100vh; border-radius: 0;
+    }
+}
+/* ── MOBILE MODALS ── */
+@media (max-width: 768px) {
+    .m-win { padding-right: 16px !important; }
+    #champPickerGrid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
+    #scGrid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
+    .items-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
+    .items-grid .item-card img { width: 100%; height: auto; }
+    .rune-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
+}
+
     </style>
 
 </head>
@@ -1330,7 +1384,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     // MODAL SYSTEM - only one modal at a time
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','draftMask','champPickerModal','welcomeOverlay'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay'];
 
     function closeAllModals(except) {
         MODAL_IDS.forEach(function(id) {
@@ -1431,7 +1485,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
     
     let sD = 'desc';
-    let colFocus = false; // dim other stat columns only after user selects a stat column
+    let colFocus = true; // always show column focus
 
 
     const roleIcons = {
@@ -1906,7 +1960,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     var _calcTgtChamp = null, _calcTgtLvl = 1;
     var _calcRange = 'melee';
 
-    window.openCalc = function() { openModal('calcMask'); };
+    window.openCalc = function() { openModal('calcMask'); setTimeout(calcRun, 50); };
     window.closeCalc = function() { closeModal('calcMask'); };
 
     // Pick my champ
@@ -1946,7 +2000,6 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         _calcTgtChamp = raw.find(function(x){ return x.name===c.name; });
         if(!_calcTgtChamp) return;
         _calcTgtLvl = +document.getElementById('calcTgtLvlSlider').value || 1;
-        document.getElementById('calcTgtChampRow').style.display = 'none';
         document.getElementById('calcTgtBadge').style.display = 'flex';
         document.getElementById('calcTgtIcon').src = DD_URL + champKey(c.name) + '.png';
         document.getElementById('calcTgtName').textContent = c.name;
@@ -1955,10 +2008,13 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     };
     window.calcClearTgt = function() {
         _calcTgtChamp = null;
-        document.getElementById('calcTgtChampRow').style.display = 'block';
-        document.getElementById('calcTgtBadge').style.display = 'none';
+        document.getElementById('calcTgtBadge').style.display = 'flex';
+        document.getElementById('calcTgtIcon').src = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png';
+        document.getElementById('calcTgtName').innerHTML = '🪆 Манекен';
         document.getElementById('calcTgtLvlWrap').style.display = 'none';
-        ['cTgtArmor','cTgtHpMax','cTgtHpCur'].forEach(function(id){ document.getElementById(id).value=''; });
+        document.getElementById('cTgtArmor').value = '100';
+        document.getElementById('cTgtHpMax').value = '2000';
+        document.getElementById('cTgtHpCur').value = '2000';
         calcRun();
     };
     window.calcTgtLvlChange = function() {
@@ -1998,51 +2054,106 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         res.style.display = 'block';
     };
 
+    // ═══ ITEM CALC MENU ═══
+
+
+
     // ═══ ITEM CALC MODALS ═══
     window.openItemCalc = function(key) {
         var ITEMS = {
             thornmail: {
-                name:'🛡 Шипованный доспех', desc:'Отражает маг. урон + Тяжкие раны',
+                name:'\ud83d\udee1 Шипованный доспех', desc:'Отражает маг. урон атакующему + Тяжкие раны',
                 needsRange: false,
                 fields: [
-                    {id:'ic_myArmor',label:'Моя броня',ph:'80',side:'my'},
-                    {id:'ic_myBonusHp',label:'Мой бонусный HP',ph:'500',side:'my'}
+                    {id:'ic_myArmor',label:'Моя броня',ph:'100',side:'my'},
+                    {id:'ic_myBonusHp',label:'Мой бонусный HP',ph:'500',side:'my'},
+                    {id:'ic_eMR',label:'МС врага',ph:'40',side:'enemy'}
                 ],
-                calc: function(v){ var a=+v('ic_myArmor')||80,h=+v('ic_myBonusHp')||500; var r=20+a*0.06+h*0.02; return {label:'Отражённый маг. урон',val:Math.round(r),formula:'20+'+a+'×6%+'+h+'×2%='+Math.round(r)+'. Тяжкие раны 60% 3с'}; }
+                calc: function(v){
+                    var a=+v('ic_myArmor')||100, h=+v('ic_myBonusHp')||500, mr=+v('ic_eMR')||40;
+                    var raw=20+a*0.06+h*0.02;
+                    var real=raw*100/(100+mr);
+                    return {label:'Отражённый маг. урон (после МС)',val:Math.round(real),
+                        formula:'Сырой: '+Math.round(raw)+' \u2192 после '+mr+' МС: '+Math.round(real)+'. Тяжкие раны 60% 3с'};
+                }
             },
             botrk: {
-                name:'⚔ Клинок Погибшего Короля', desc:'% текущего HP врага',
+                name:'\u2694 Клинок Погибшего Короля', desc:'% текущего HP врага (физ.)',
                 needsRange: true,
-                fields: [{id:'ic_eHpCur',label:'Текущий HP цели',ph:'2500',side:'enemy'}],
-                calc: function(v){ var hp=+v('ic_eHpCur')||2500; var rng=_calcRange==='ranged'; var pct=rng?0.07:0.10; var dmg=Math.max(15,hp*pct); return {label:(rng?'Дальний 7%':'Ближний 10%'),val:Math.round(dmg),formula:hp+'×'+(rng?'7%':'10%')+'='+Math.round(dmg)+' (мин. 15)'}; }
+                hasHitBtn: true,
+                fields: [
+                    {id:'ic_eHpCur',label:'Текущий HP цели',ph:'2500',side:'enemy'},
+                    {id:'ic_eArmor',label:'Броня врага',ph:'100',side:'enemy'},
+                    {id:'ic_ePen',label:'% пробив. брони',ph:'0',side:'enemy'}
+                ],
+                calc: function(v){
+                    var hp=+v('ic_eHpCur')||2500, ar=+v('ic_eArmor')||100, pen=+v('ic_ePen')||0;
+                    var rng=_calcRange==='ranged';
+                    var pct=rng?0.07:0.10;
+                    var raw=Math.max(15, hp*pct);
+                    var effAr=ar>0?ar*(1-pen/100):ar;
+                    var real=raw*100/(100+effAr);
+                    return {label:(rng?'Дальний 7%':'Ближний 10%'),val:Math.round(real),
+                        formula:'Сырой: '+Math.round(raw)+' \u2192 эфф. броня '+Math.round(effAr)+' \u2192 урон: '+Math.round(real),
+                        rawDmg:Math.round(real), hpField:'ic_eHpCur'};
+                }
             },
             sunfire: {
-                name:'🔥 Эгида Солнечного огня', desc:'Маг. урон/с рядом с врагами',
+                name:'\ud83d\udd25 Эгида Солнечного огня', desc:'Маг. урон/с рядом с врагами',
                 needsRange: false,
                 fields: [
                     {id:'ic_myBHp2',label:'Мой бонусный HP',ph:'1000',side:'my'},
                     {id:'ic_stacks',label:'Стаки (0-4)',ph:'4',side:'my'},
-                    {id:'ic_eLvl',label:'Уровень врага (1-15)',ph:'10',side:'enemy'}
+                    {id:'ic_eLvl',label:'Уровень врага',ph:'10',side:'enemy'},
+                    {id:'ic_eMR2',label:'МС врага',ph:'40',side:'enemy'}
                 ],
-                calc: function(v){ var bHp=+v('ic_myBHp2')||1000,st=Math.min(4,+v('ic_stacks')||4),lv=+v('ic_eLvl')||10; var base=Math.round(16+(30-16)*(lv-1)/14); var dps=(base+bHp*0.01)*(1+st*0.11); return {label:'Маг. урон/сек ('+st+' стак.)',val:Math.round(dps),formula:'('+base+'+'+Math.round(bHp*0.01)+')×'+(1+st*0.11).toFixed(2)+'='+Math.round(dps)}; }
+                calc: function(v){
+                    var bHp=+v('ic_myBHp2')||1000, st=Math.min(4,+v('ic_stacks')||4), lv=+v('ic_eLvl')||10, mr=+v('ic_eMR2')||40;
+                    var base=Math.round(16+(30-16)*(lv-1)/14);
+                    var raw=(base+bHp*0.01)*(1+st*0.11);
+                    var real=raw*100/(100+mr);
+                    return {label:'Маг. урон/сек (после МС)',val:Math.round(real),
+                        formula:'Сырой: '+Math.round(raw)+' \u2192 после '+mr+' МС: '+Math.round(real)};
+                }
             },
             liandry: {
-                name:'🔮 Мучения Лиандри', desc:'0.5% макс. HP/с маг. ожог',
+                name:'\ud83d\udd2e Мучения Лиандри', desc:'% макс. HP/с маг. ожог (скейлится до 3%)',
                 needsRange: false,
+                hasLiandryPct: true,
                 fields: [
-                    {id:'ic_combatSec',label:'Секунд в бою (макс 3)',ph:'3',side:'my'},
-                    {id:'ic_eHpMaxL',label:'Макс HP цели',ph:'3000',side:'enemy'}
+                    {id:'ic_eHpMaxL',label:'Макс HP цели',ph:'3000',side:'enemy'},
+                    {id:'ic_eMR3',label:'МС врага',ph:'40',side:'enemy'}
                 ],
-                calc: function(v){ var hp=+v('ic_eHpMaxL')||3000,sec=Math.min(3,+v('ic_combatSec')||3); var burn=hp*0.005*3; var bonus=1+Math.min(3,sec)*0.02; var total=burn*bonus; return {label:'Маг. ожог за 3с',val:Math.round(total),formula:hp+'×0.5%×3с×'+bonus.toFixed(2)+'='+Math.round(total)}; }
+                calc: function(v){
+                    var hp=+v('ic_eHpMaxL')||3000, mr=+v('ic_eMR3')||40;
+                    var pct=window._liandryPct||0.5;
+                    var raw=hp*(pct/100)*3;
+                    var real=raw*100/(100+mr);
+                    return {label:'Ожог '+pct+'%/с за 3с (после МС)',val:Math.round(real),
+                        formula:hp+'\u00d7'+pct+'%\u00d73с = '+Math.round(raw)+' \u2192 после '+mr+' МС: '+Math.round(real)};
+                }
             },
             sunderer: {
-                name:'⚡ Божественный Разрушитель', desc:'Физ. удар после способности',
+                name:'\u26a1 Божественный Разрушитель', desc:'Физ. удар после способности + хил',
                 needsRange: true,
                 fields: [
                     {id:'ic_myAD2',label:'Мой базовый AD',ph:'120',side:'my'},
-                    {id:'ic_eHpMaxS',label:'Макс HP цели',ph:'3000',side:'enemy'}
+                    {id:'ic_eHpMaxS',label:'Макс HP цели',ph:'3000',side:'enemy'},
+                    {id:'ic_eArmorS',label:'Броня врага',ph:'100',side:'enemy'},
+                    {id:'ic_ePenS',label:'% пробив. брони',ph:'0',side:'enemy'}
                 ],
-                calc: function(v){ var ad=+v('ic_myAD2')||120,rng=_calcRange==='ranged',hp=+v('ic_eHpMaxS')||3000; var pctDmg=hp*(rng?0.07:0.10); var minDmg=ad*1.25; var dmg=Math.max(pctDmg,minDmg); var heal=Math.max(hp*(rng?0.025:0.06),ad*(rng?0.5:0.9)); return {label:(rng?'Дальн.':'Ближн.')+' удар',val:Math.round(dmg),formula:(rng?'7':'10')+'% HP='+Math.round(pctDmg)+' (мин '+Math.round(minDmg)+'). Лечение≈'+Math.round(heal)}; }
+                calc: function(v){
+                    var ad=+v('ic_myAD2')||120, rng=_calcRange==='ranged', hp=+v('ic_eHpMaxS')||3000, ar=+v('ic_eArmorS')||100, pen=+v('ic_ePenS')||0;
+                    var pctDmg=hp*(rng?0.07:0.10);
+                    var minDmg=ad*1.25;
+                    var raw=Math.max(pctDmg,minDmg);
+                    var effAr=ar>0?ar*(1-pen/100):ar;
+                    var real=raw*100/(100+effAr);
+                    var heal=Math.max(hp*(rng?0.025:0.06), ad*(rng?0.5:0.9));
+                    return {label:(rng?'Дальн.':'Ближн.')+' (после брони)',val:Math.round(real),
+                        formula:'Сырой: '+Math.round(raw)+' \u2192 эфф. броня '+Math.round(effAr)+' \u2192 урон: '+Math.round(real),
+                        healVal:Math.round(heal)};
+                }
             }
         };
         var item = ITEMS[key]; if(!item) return;
@@ -2069,6 +2180,24 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         document.getElementById('icMySection').style.display = hasMy ? 'block' : 'none';
         document.getElementById('icEnSection').style.display = hasEn ? 'block' : 'none';
 
+        // Show/hide Liandry % selector
+        var lpBlock = document.getElementById('icLiandryPct');
+        if(lpBlock) lpBlock.style.display = item.hasLiandryPct ? 'block' : 'none';
+        if(item.hasLiandryPct) { window._liandryPct = 0.5; }
+
+        // Show/hide BotRK hit button + reset combat state
+        var hitBlock = document.getElementById('icHitBtn');
+        if(hitBlock) hitBlock.style.display = item.hasHitBtn ? 'block' : 'none';
+        var combatBlock = document.getElementById('icCombatBlock');
+        if(combatBlock) combatBlock.style.display = 'none';
+        var combatLog = document.getElementById('icCombatLog');
+        if(combatLog) combatLog.innerHTML = '';
+        _hitCount = 0;
+
+        // Hide heal block initially
+        var healBlock = document.getElementById('icHealResult');
+        if(healBlock) healBlock.style.display = 'none';
+
         var resDiv = document.getElementById('itemSubResult');
         if(resDiv) resDiv.style.display = 'none';
         document.getElementById('itemSubModal')._calcKey = key;
@@ -2078,6 +2207,8 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     };
 
     window.closeItemCalc = function() { closeModal('itemSubModal'); };
+    window.openItemCalcMenu = function() { openModal('itemCalcMenuMask'); };
+    window.closeItemCalcMenu = function() { closeModal('itemCalcMenuMask'); };
 
     window.runItemCalc = function(key) {
         var modal = document.getElementById('itemSubModal');
@@ -2089,13 +2220,95 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         document.getElementById('itemSubResultLabel').textContent = res.label;
         document.getElementById('itemSubResultVal').textContent = res.val;
         document.getElementById('itemSubFormula').textContent = res.formula||'';
+        // Heal display (sunderer)
+        var healBlock = document.getElementById('icHealResult');
+        if(healBlock) {
+            if(res.healVal) { healBlock.style.display='block'; healBlock.querySelector('span').textContent='+'+res.healVal+' HP'; }
+            else healBlock.style.display='none';
+        }
+    };
+
+    // BotRK combat simulation
+    var _hitCount = 0;
+    var _hitStartHp = 0;
+
+    window.icHit = function() {
+        var modal = document.getElementById('itemSubModal');
+        if(!modal || !modal._calcFn) return;
+        function gv(id){ var el=document.getElementById(id); return el?el.value:'0'; }
+        var hpEl = document.getElementById('ic_eHpCur');
+        if(!hpEl) return;
+        var curHp = +hpEl.value || 0;
+        if(curHp <= 0) return;
+        // Save start HP on first hit
+        if(_hitCount === 0) _hitStartHp = curHp;
+        var res = modal._calcFn(gv);
+        if(!res.rawDmg) return;
+        var dmg = res.rawDmg;
+        var newHp = Math.max(0, curHp - dmg);
+        _hitCount++;
+        hpEl.value = Math.round(newHp);
+        runItemCalc(modal._calcKey);
+        // Update combat log
+        var log = document.getElementById('icCombatLog');
+        var hpBar = document.getElementById('icHpBarFill');
+        var hpText = document.getElementById('icHpText');
+        var hitNum = document.getElementById('icHitNum');
+        if(log) {
+            var entry = document.createElement('div');
+            entry.style.cssText='display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:11px;';
+            entry.innerHTML='<span style="color:rgba(255,255,255,0.4);">Удар #'+_hitCount+'</span><span style="color:#ff6b6b;font-weight:700;">-'+dmg+' HP</span><span style="color:rgba(255,255,255,0.5);">'+Math.round(newHp)+' HP</span>';
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+        if(hpBar && _hitStartHp > 0) {
+            var pct = Math.max(0, newHp / _hitStartHp * 100);
+            hpBar.style.width = pct + '%';
+            hpBar.style.background = pct > 60 ? '#2ecc71' : pct > 30 ? '#f1c40f' : '#e74c3c';
+        }
+        if(hpText) hpText.textContent = Math.round(newHp) + ' / ' + _hitStartHp + ' HP';
+        if(hitNum) hitNum.textContent = _hitCount + ' ударов';
+        // Show combat block
+        var cb = document.getElementById('icCombatBlock');
+        if(cb) cb.style.display = 'block';
+        // Dead?
+        if(newHp <= 0) {
+            var entry2 = document.createElement('div');
+            entry2.style.cssText='text-align:center;padding:6px 0;font-size:13px;font-weight:900;color:#e74c3c;';
+            entry2.textContent='\u2620 УБИТ за '+_hitCount+' ударов';
+            if(log) log.appendChild(entry2);
+        }
+    };
+
+    window.icResetHp = function() {
+        var hpEl = document.getElementById('ic_eHpCur');
+        if(hpEl && _hitStartHp > 0) hpEl.value = _hitStartHp;
+        _hitCount = 0;
+        var log = document.getElementById('icCombatLog');
+        if(log) log.innerHTML = '';
+        var cb = document.getElementById('icCombatBlock');
+        if(cb) cb.style.display = 'none';
+        runItemCalc(document.getElementById('itemSubModal')._calcKey);
+    };
+
+    // Liandry % selector
+    window.setLiandryPct = function(pct) {
+        window._liandryPct = pct;
+        document.querySelectorAll('.lp-btn').forEach(function(b){
+            var active = +b.dataset.pct === pct;
+            b.style.background = active ? 'rgba(109,63,245,0.3)' : 'transparent';
+            b.style.borderColor = active ? '#b96fff' : 'rgba(155,89,182,0.25)';
+            b.style.color = active ? '#fff' : 'rgba(255,255,255,0.5)';
+        });
+        var modal = document.getElementById('itemSubModal');
+        if(modal && modal._calcKey) runItemCalc(modal._calcKey);
     };
 
     window.setCalcRange = function(type) {
         _calcRange = type;
-        document.querySelectorAll('.ic-range-btn').forEach(function(b){ b.classList.remove('active'); });
-        var btn = document.getElementById('icBtn'+type.charAt(0).toUpperCase()+type.slice(1));
-        if(btn) btn.classList.add('active');
+        var m=document.getElementById('icBtnMelee'), r=document.getElementById('icBtnRanged');
+        if(m){ m.style.background=type==='melee'?'rgba(109,63,245,0.25)':'transparent'; m.style.borderColor=type==='melee'?'rgba(155,89,182,0.4)':'rgba(155,89,182,0.25)'; m.style.color=type==='melee'?'#fff':'rgba(255,255,255,0.5)'; }
+        if(r){ r.style.background=type==='ranged'?'rgba(109,63,245,0.25)':'transparent'; r.style.borderColor=type==='ranged'?'rgba(155,89,182,0.4)':'rgba(155,89,182,0.25)'; r.style.color=type==='ranged'?'#fff':'rgba(255,255,255,0.5)'; }
         var modal = document.getElementById('itemSubModal');
         if(modal && modal._calcKey) runItemCalc(modal._calcKey);
     };
@@ -2241,19 +2454,39 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         openModal('sideChampsMask');
         var rf=document.getElementById('scRoleFilter');
         if(rf&&!rf.children.length){
-            SC_ROLES.forEach(function(r){
+            // "Все" button on its own row
+            var allBtn=document.createElement('button');
+            allBtn.style.cssText='padding:7px 16px;border-radius:18px;border:1.5px solid rgba(155,89,182,0.3);background:rgba(109,63,245,0.08);color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;width:100%;';
+            allBtn.textContent=SC_ROLES[0].label; allBtn.dataset.key=SC_ROLES[0].key;
+            allBtn.onclick=function(){_scRole='all';scHighlightRole();scBuildGrid();};
+            rf.appendChild(allBtn);
+            // 5 roles in a row
+            var rolesRow=document.createElement('div');
+            rolesRow.style.cssText='display:flex;gap:5px;';
+            SC_ROLES.slice(1).forEach(function(r){
                 var b=document.createElement('button');
-                b.style.cssText='padding:6px 12px;border-radius:18px;border:1.5px solid rgba(155,89,182,0.3);background:rgba(109,63,245,0.08);color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:4px;';
+                b.style.cssText='flex:1;padding:7px 4px;border-radius:18px;border:1.5px solid rgba(155,89,182,0.3);background:rgba(109,63,245,0.08);color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;cursor:pointer;text-align:center;';
                 b.textContent=r.label; b.dataset.key=r.key;
                 b.onclick=function(){_scRole=r.key;scHighlightRole();scBuildGrid();};
-                rf.appendChild(b);
+                rolesRow.appendChild(b);
             });
+            rf.appendChild(rolesRow);
         }
         scHighlightRole(); scBuildGrid();
     };
     function scHighlightRole(){
         var rf=document.getElementById('scRoleFilter'); if(!rf) return;
-        Array.from(rf.children).forEach(function(b){
+        // Highlight "Все" button (first child)
+        var allB=rf.children[0];
+        if(allB&&allB.dataset){
+            var aa=allB.dataset.key===_scRole;
+            allB.style.borderColor=aa?'#b96fff':'rgba(155,89,182,0.3)';
+            allB.style.background=aa?'rgba(109,63,245,0.35)':'rgba(109,63,245,0.08)';
+            allB.style.color=aa?'#fff':'rgba(255,255,255,0.6)';
+        }
+        // Highlight role buttons (inside second child div)
+        var row=rf.children[1];
+        if(row) Array.from(row.children).forEach(function(b){
             var a=b.dataset.key===_scRole;
             b.style.borderColor=a?'#b96fff':'rgba(155,89,182,0.3)';
             b.style.background=a?'rgba(109,63,245,0.35)':'rgba(109,63,245,0.08)';
@@ -2277,7 +2510,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             div.onmouseleave=function(){div.style.borderColor='transparent';div.style.background='';};
             var img=document.createElement('img');
             img.src=DD+champKey(ch.name)+'.png';
-            img.style.cssText='width:54px;height:54px;border-radius:10px;object-fit:cover;';
+            img.style.cssText='width:100%;aspect-ratio:1;border-radius:10px;object-fit:cover;';
             img.onerror=function(){this.src='';this.style.background='rgba(109,63,245,0.3)';};
             var lbl=document.createElement('div');
             lbl.style.cssText='font-size:9px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.2;max-width:60px;';
@@ -2391,8 +2624,8 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         } else {
             sK = k;
             sD = 'desc';
-            colFocus = true;
         }
+        colFocus = true;
         render();
     };
 
@@ -2694,14 +2927,29 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         if(!el) return;
         var roles = [{k:'all',l:'Все'},{k:'Top',l:'Top'},{k:'Jungle',l:'Лес'},{k:'Mid',l:'Mid'},{k:'ADC',l:'ADC'},{k:'Support',l:'Сап'}];
         el.innerHTML = '';
-        roles.forEach(function(r) {
+        function mkBtn(r) {
             var b = document.createElement('button');
             var a = r.k === _champPickerRole;
-            b.style.cssText = 'padding:4px 9px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid rgba(155,89,182,'+(a?'0.7':'0.25')+');background:rgba(109,63,245,'+(a?'0.3':'0.06')+');color:'+(a?'#fff':'rgba(255,255,255,0.5)')+';';
+            b.style.cssText = 'padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(155,89,182,'+(a?'0.7':'0.25')+');background:rgba(109,63,245,'+(a?'0.3':'0.06')+');color:'+(a?'#fff':'rgba(255,255,255,0.5)')+';';
             b.textContent = r.l;
             b.onclick = function(){ _champPickerRole = r.k; champPickerBuildRoles(); champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||''); };
-            el.appendChild(b);
+            return b;
+        }
+        // "Все" full width
+        var allBtn = mkBtn(roles[0]);
+        allBtn.style.width = '100%';
+        allBtn.style.marginBottom = '5px';
+        el.appendChild(allBtn);
+        // 5 roles in one row
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;gap:4px;';
+        roles.slice(1).forEach(function(r) {
+            var b = mkBtn(r);
+            b.style.flex = '1';
+            b.style.textAlign = 'center';
+            row.appendChild(b);
         });
+        el.appendChild(row);
     }
 
     window.champPickerFilter = function() {
@@ -2723,10 +2971,10 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border-radius:9px;border:2px solid transparent;transition:all 0.12s;';
             var img = document.createElement('img');
             img.src = DD_URL + champKey(c.name) + '.png';
-            img.style.cssText = 'width:48px;height:48px;border-radius:8px;object-fit:cover;';
+            img.style.cssText = 'width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;';
             img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
             var nm = document.createElement('div');
-            nm.style.cssText = 'font-size:8px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.1;width:52px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
+            nm.style.cssText = 'font-size:8px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
             nm.textContent = c.name;
             wrap.appendChild(img); wrap.appendChild(nm);
             wrap.onmouseenter = function(){ this.style.borderColor='#b96fff'; this.style.background='rgba(109,63,245,0.15)'; };
@@ -2804,113 +3052,101 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
 <!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
-  <div class="m-win" style="width:94vw;max-width:480px;max-height:92vh;overflow-y:auto;padding:20px 18px 20px;padding-right:50px;">
+  <div class="m-win" style="width:98vw;max-width:1200px;max-height:94vh;overflow-y:auto;padding:18px;padding-right:56px;">
     <button class="btn-close-x" onclick="closeCalc()">✕</button>
-    <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:16px;">⚔ Калькулятор урона</div>
+    <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:14px;">⚔ Калькулятор урона</div>
 
-    <!-- ══ МОЙ ЧЕМПИОН ══ -->
-    <div style="background:rgba(39,174,96,0.06);border:1.5px solid rgba(39,174,96,0.3);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
-      <div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🟢 МОЙ ЧЕМПИОН</div>
-      <div id="calcMyChampRow" style="margin-bottom:10px;">
-        <button onclick="openChampPicker('🟢 Мой чемпион',window._calcPickMy)" style="width:100%;padding:8px;border-radius:9px;border:1.5px dashed rgba(39,174,96,0.4);background:rgba(39,174,96,0.06);color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;">⚔ Выбрать чемпиона</button>
-      </div>
-      <div id="calcMyBadge" style="display:none;align-items:center;gap:8px;background:rgba(39,174,96,0.1);border-radius:9px;border:1px solid rgba(39,174,96,0.3);padding:6px 10px;margin-bottom:10px;">
-        <img id="calcMyIcon" style="width:32px;height:32px;border-radius:7px;object-fit:cover;">
-        <span id="calcMyName" style="font-size:12px;font-weight:700;color:#fff;flex:1;"></span>
-        <button onclick="calcClearMy()" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:14px;cursor:pointer;">✕</button>
-      </div>
-      <!-- Level -->
-      <div id="calcMyLvlWrap" style="display:none;margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <span style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;">УРОВЕНЬ</span>
-          <span id="calcMyLvlNum" style="font-size:18px;font-weight:900;color:var(--accent);"></span>
-        </div>
-        <input type="range" id="calcMyLvlSlider" min="1" max="15" value="1" style="width:100%;height:3px;" oninput="calcMyLvlChange()">
-      </div>
-      <!-- Stats -->
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">AD</span>
-          <input type="number" id="cMyAD" placeholder="0" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()" readonly>
-          <span style="font-size:10px;color:rgba(39,174,96,0.6);">+</span>
-          <input type="number" id="cMyADBonus" placeholder="0" class="calc-input" style="width:55px;padding:6px 8px;font-size:13px;" oninput="calcRun()">
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">% Проб.</span>
-          <input type="number" id="cMyPen" placeholder="0" min="0" max="100" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()">
-        </div>
-      </div>
-    </div>
+    <div class="calc-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:start;">
 
-    <!-- ══ ЦЕЛЬ ══ -->
-    <div style="background:rgba(231,76,60,0.06);border:1.5px solid rgba(231,76,60,0.3);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
-      <div style="font-size:10px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🔴 ЦЕЛЬ</div>
-      <div id="calcTgtChampRow" style="margin-bottom:10px;">
-        <button onclick="openChampPicker('🔴 Цель',window._calcPickTgt)" style="width:100%;padding:8px;border-radius:9px;border:1.5px dashed rgba(231,76,60,0.4);background:rgba(231,76,60,0.06);color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;">🎯 Выбрать цель</button>
-      </div>
-      <div id="calcTgtBadge" style="display:none;align-items:center;gap:8px;background:rgba(231,76,60,0.1);border-radius:9px;border:1px solid rgba(231,76,60,0.3);padding:6px 10px;margin-bottom:10px;">
-        <img id="calcTgtIcon" style="width:32px;height:32px;border-radius:7px;object-fit:cover;">
-        <span id="calcTgtName" style="font-size:12px;font-weight:700;color:#fff;flex:1;"></span>
-        <button onclick="calcClearTgt()" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:14px;cursor:pointer;">✕</button>
-      </div>
-      <!-- Level -->
-      <div id="calcTgtLvlWrap" style="display:none;margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <span style="font-size:10px;color:rgba(255,255,255,0.4);font-weight:700;">УРОВЕНЬ</span>
-          <span id="calcTgtLvlNum" style="font-size:18px;font-weight:900;color:var(--accent);"></span>
+      <!-- ══ COL 1: МОЙ ЧЕМПИОН ══ -->
+      <div style="background:rgba(39,174,96,0.06);border:1.5px solid rgba(39,174,96,0.3);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🟢 МОЙ ЧЕМПИОН</div>
+        <div id="calcMyChampRow" style="margin-bottom:8px;">
+          <button onclick="openChampPicker('🟢 Мой чемпион',window._calcPickMy)" style="width:100%;padding:7px;border-radius:9px;border:1.5px dashed rgba(39,174,96,0.4);background:rgba(39,174,96,0.06);color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;">⚔ Выбрать чемпиона</button>
         </div>
-        <input type="range" id="calcTgtLvlSlider" min="1" max="15" value="1" style="width:100%;height:3px;" oninput="calcTgtLvlChange()">
-      </div>
-      <!-- Stats -->
-      <div style="display:flex;flex-direction:column;gap:6px;">
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">Броня</span>
-          <input type="number" id="cTgtArmor" placeholder="0" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()">
-          <span style="font-size:10px;color:rgba(231,76,60,0.5);">+</span>
-          <input type="number" id="cTgtArmorBonus" placeholder="0" class="calc-input" style="width:55px;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+        <div id="calcMyBadge" style="display:none;align-items:center;gap:8px;background:rgba(39,174,96,0.1);border-radius:9px;border:1px solid rgba(39,174,96,0.3);padding:5px 10px;margin-bottom:8px;">
+          <img id="calcMyIcon" style="width:28px;height:28px;border-radius:6px;object-fit:cover;">
+          <span id="calcMyName" style="font-size:11px;font-weight:700;color:#fff;flex:1;"></span>
+          <button onclick="calcClearMy()" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:13px;cursor:pointer;">✕</button>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">Макс HP</span>
-          <input type="number" id="cTgtHpMax" placeholder="0" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()">
-          <span style="font-size:10px;color:rgba(231,76,60,0.5);">+</span>
-          <input type="number" id="cTgtHpBonus" placeholder="0" class="calc-input" style="width:55px;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+        <div id="calcMyLvlWrap" style="display:none;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+            <span style="font-size:9px;color:rgba(255,255,255,0.4);font-weight:700;">УРОВЕНЬ</span>
+            <span id="calcMyLvlNum" style="font-size:16px;font-weight:900;color:var(--accent);"></span>
+          </div>
+          <input type="range" id="calcMyLvlSlider" min="1" max="15" value="1" style="width:100%;height:3px;" oninput="calcMyLvlChange()">
         </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:11px;color:rgba(255,255,255,0.4);width:60px;">Тек. HP</span>
-          <input type="number" id="cTgtHpCur" placeholder="0" class="calc-input" style="flex:1;padding:6px 8px;font-size:13px;" oninput="calcRun()">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">AD</span>
+            <input type="number" id="cMyAD" placeholder="100" value="100" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <span style="font-size:9px;color:rgba(39,174,96,0.5);">+</span>
+            <input type="number" id="cMyADBonus" placeholder="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">% Проб.</span>
+            <input type="number" id="cMyPen" placeholder="0" min="0" max="100" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ══ РЕЗУЛЬТАТ ══ -->
-    <div id="calcRes" style="display:none;background:rgba(109,63,245,0.08);border:1.5px solid rgba(109,63,245,0.3);border-radius:12px;padding:12px 14px;margin-bottom:12px;">
-      <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">📊 РЕЗУЛЬТАТ</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
-        <div class="calc-stat-box"><div class="calc-stat-label">Эфф. броня</div><div class="calc-stat-val" id="rEff" style="color:#5dade2;font-size:16px;"></div></div>
-        <div class="calc-stat-box"><div class="calc-stat-label">Снижение</div><div class="calc-stat-val" id="rMit" style="color:#e74c3c;font-size:16px;"></div></div>
-        <div class="calc-stat-box" style="background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.5);"><div class="calc-stat-label">Нанесено</div><div class="calc-stat-val" id="rDmg" style="color:#b96fff;font-size:22px;"></div></div>
-      </div>
-      <div id="rHpBar" style="display:none;">
-        <div style="background:rgba(255,255,255,0.08);border-radius:6px;height:12px;overflow:hidden;">
-          <div id="rHpFill" style="height:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);border-radius:6px;width:0%;transition:width 0.3s;"></div>
+      <!-- ══ COL 3: ЦЕЛЬ ══ -->
+      <div style="background:rgba(231,76,60,0.06);border:1.5px solid rgba(231,76,60,0.3);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:10px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:10px;">🔴 ЦЕЛЬ</div>
+        <!-- Default: mannequin badge -->
+        <div id="calcTgtBadge" style="display:flex;align-items:center;gap:8px;background:rgba(231,76,60,0.08);border-radius:9px;border:1px solid rgba(231,76,60,0.2);padding:5px 10px;margin-bottom:8px;">
+          <img id="calcTgtIcon" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png">
+          <span id="calcTgtName" style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);flex:1;">🪆 Манекен</span>
+          <button onclick="openChampPicker('🔴 Цель',window._calcPickTgt)" style="background:rgba(109,63,245,0.15);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;cursor:pointer;">Сменить</button>
         </div>
-        <div id="rHpPct" style="font-size:10px;color:#e74c3c;font-weight:700;margin-top:2px;text-align:right;"></div>
+        <div id="calcTgtLvlWrap" style="display:none;margin-bottom:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+            <span style="font-size:9px;color:rgba(255,255,255,0.4);font-weight:700;">УРОВЕНЬ</span>
+            <span id="calcTgtLvlNum" style="font-size:16px;font-weight:900;color:var(--accent);"></span>
+          </div>
+          <input type="range" id="calcTgtLvlSlider" min="1" max="15" value="1" style="width:100%;height:3px;" oninput="calcTgtLvlChange()">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">Броня</span>
+            <input type="number" id="cTgtArmor" placeholder="100" value="100" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <span style="font-size:9px;color:rgba(231,76,60,0.5);">+</span>
+            <input type="number" id="cTgtArmorBonus" placeholder="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">HP</span>
+            <input type="number" id="cTgtHpMax" placeholder="2000" value="2000" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+            <span style="font-size:9px;color:rgba(231,76,60,0.5);">+</span>
+            <input type="number" id="cTgtHpBonus" placeholder="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:10px;color:rgba(255,255,255,0.4);width:50px;">Тек. HP</span>
+            <input type="number" id="cTgtHpCur" placeholder="2000" value="2000" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
+          </div>
+        </div>
       </div>
-      <div id="rFormula" style="font-size:9px;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:4px;"></div>
-    </div>
 
-    <!-- ══ ПРЕДМЕТЫ ══ -->
-    <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">🛡 КАЛЬКУЛЯТОР ПРЕДМЕТОВ</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="calc-item-btn" onclick="openItemCalc('thornmail')" title="Шипованный доспех"><img src="https://www.wildriftfire.com/images/items/thornmail.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
-      <button class="calc-item-btn" onclick="openItemCalc('botrk')" title="Клинок Погибшего Короля"><img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
-      <button class="calc-item-btn" onclick="openItemCalc('sunfire')" title="Эгида Солнечного огня"><img src="https://www.wildriftfire.com/images/items/sunfire-aegis.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
-      <button class="calc-item-btn" onclick="openItemCalc('liandry')" title="Мучения Лиандри"><img src="https://www.wildriftfire.com/images/items/liandrys-torment.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
-      <button class="calc-item-btn" onclick="openItemCalc('sunderer')" title="Божественный Разрушитель"><img src="https://www.wildriftfire.com/images/items/divine-sunderer.png" style="width:40px;height:40px;border-radius:7px;" onerror="this.style.display='none'"></button>
-    </div>
+      <!-- ══ COL 4: РЕЗУЛЬТАТ ══ -->
+      <div id="calcRes" style="background:rgba(109,63,245,0.06);border:1.5px solid rgba(109,63,245,0.25);border-radius:12px;padding:12px 14px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:700;letter-spacing:1px;margin-bottom:8px;">📊 РЕЗУЛЬТАТ</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="calc-stat-box"><div class="calc-stat-label">Эфф. броня</div><div class="calc-stat-val" id="rEff" style="color:#5dade2;font-size:16px;">—</div></div>
+          <div class="calc-stat-box"><div class="calc-stat-label">Снижение урона</div><div class="calc-stat-val" id="rMit" style="color:#e74c3c;font-size:16px;">—</div></div>
+          <div class="calc-stat-box" style="background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.5);"><div class="calc-stat-label">✅ Нанесено урона</div><div class="calc-stat-val" id="rDmg" style="color:#b96fff;font-size:24px;">—</div></div>
+        </div>
+        <div id="rHpBar" style="display:none;margin-top:8px;">
+          <div style="background:rgba(255,255,255,0.08);border-radius:6px;height:12px;overflow:hidden;">
+            <div id="rHpFill" style="height:100%;background:linear-gradient(90deg,#e74c3c,#ff6b6b);border-radius:6px;width:0%;transition:width 0.3s;"></div>
+          </div>
+          <div id="rHpPct" style="font-size:10px;color:#e74c3c;font-weight:700;margin-top:2px;text-align:right;"></div>
+        </div>
+        <div id="rFormula" style="font-size:9px;color:rgba(255,255,255,0.2);font-family:monospace;margin-top:6px;"></div>
+      </div>
 
+    </div><!-- /grid -->
   </div>
 </div>
+
 
 </div>
   </div>
@@ -3101,6 +3337,7 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="side-section">Инструменты</div>
   <button class="side-btn" onclick="closeSidebar();openSideChamps()"><span class="side-icon">👥</span>Чемпионы</button>
   <button class="side-btn" onclick="closeSidebar();openCalc()"><span class="side-icon">⚔</span>Калькулятор урона</button>
+  <button class="side-btn" onclick="closeSidebar();openItemCalcMenu()"><span class="side-icon">🧮</span>Калькулятор предметов</button>
   <button class="side-btn" onclick="closeSidebar();openItems()"><span class="side-icon">📦</span>Предметы</button>
   <button class="side-btn" onclick="closeSidebar();openRunes()"><span class="side-icon">💎</span>Руны</button>
   <button class="side-btn" onclick="closeSidebar();openDraft()" style="background:rgba(109,63,245,0.15);border-left:3px solid #b96fff;"><span class="side-icon">📋</span>Драфт-помощник</button>
@@ -3259,11 +3496,11 @@ Stormarrow: При максимальных зарядах следующая б
     <button class="btn-close-x" onclick="closeSideChamps()">✕</button>
     <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:12px;">👥 Чемпионы</div>
     <!-- Role filter -->
-    <div id="scRoleFilter" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
+    <div id="scRoleFilter" style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:12px;"></div>
     <!-- Search -->
     <input id="scSearch" type="text" placeholder="🔍 Поиск чемпиона..." class="calc-input" style="margin-bottom:12px;font-size:14px;padding:10px 14px;" oninput="scFilter()">
     <!-- Grid -->
-    <div id="scGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px;overflow-y:auto;flex:1;padding:4px;"></div>
+    <div id="scGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;overflow-y:auto;flex:1;padding:4px;"></div>
   </div>
 </div>
 <!-- ══ CHAMPION DETAIL MODAL ══ -->
@@ -3317,6 +3554,44 @@ Stormarrow: При максимальных зарядах следующая б
       <div style="font-size:10px;color:#e74c3c;font-weight:700;letter-spacing:1px;margin-bottom:6px;">🔴 ДАННЫЕ ВРАГА</div>
       <div id="itemSubEnemyFields"></div>
     </div>
+    <!-- Liandry % selector -->
+    <div id="icLiandryPct" style="display:none;margin-bottom:10px;">
+      <div style="font-size:10px;color:#b96fff;font-weight:700;margin-bottom:6px;">% УРОНА ОТ МАКС HP / СЕК</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        <button class="lp-btn" data-pct="0.5" onclick="setLiandryPct(0.5)" style="padding:5px 10px;border-radius:7px;border:1.5px solid #b96fff;background:rgba(109,63,245,0.3);color:#fff;font-size:11px;font-weight:700;cursor:pointer;">0.5%</button>
+        <button class="lp-btn" data-pct="1" onclick="setLiandryPct(1)" style="padding:5px 10px;border-radius:7px;border:1.5px solid rgba(155,89,182,0.25);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;cursor:pointer;">1%</button>
+        <button class="lp-btn" data-pct="1.5" onclick="setLiandryPct(1.5)" style="padding:5px 10px;border-radius:7px;border:1.5px solid rgba(155,89,182,0.25);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;cursor:pointer;">1.5%</button>
+        <button class="lp-btn" data-pct="2" onclick="setLiandryPct(2)" style="padding:5px 10px;border-radius:7px;border:1.5px solid rgba(155,89,182,0.25);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;cursor:pointer;">2%</button>
+        <button class="lp-btn" data-pct="2.5" onclick="setLiandryPct(2.5)" style="padding:5px 10px;border-radius:7px;border:1.5px solid rgba(155,89,182,0.25);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;cursor:pointer;">2.5%</button>
+        <button class="lp-btn" data-pct="3" onclick="setLiandryPct(3)" style="padding:5px 10px;border-radius:7px;border:1.5px solid rgba(155,89,182,0.25);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;cursor:pointer;">3%</button>
+      </div>
+    </div>
+    <!-- Hit button + combat sim (BotRK) -->
+    <div id="icHitBtn" style="display:none;margin-bottom:10px;">
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <button onclick="icHit()" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid rgba(231,76,60,0.5);background:rgba(231,76,60,0.15);color:#ff6b6b;font-size:13px;font-weight:900;cursor:pointer;">⚔ Ударить</button>
+        <button onclick="icResetHp()" style="padding:10px 14px;border-radius:10px;border:1.5px solid rgba(155,89,182,0.3);background:transparent;color:rgba(255,255,255,0.4);font-size:11px;font-weight:700;cursor:pointer;">↺ Сброс</button>
+      </div>
+      <div id="icCombatBlock" style="display:none;">
+        <!-- HP bar -->
+        <div style="margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+            <span id="icHpText" style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700;">—</span>
+            <span id="icHitNum" style="font-size:10px;color:rgba(255,255,255,0.3);">0 ударов</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.08);border-radius:6px;height:14px;overflow:hidden;">
+            <div id="icHpBarFill" style="height:100%;background:#2ecc71;border-radius:6px;width:100%;transition:width 0.2s,background 0.3s;"></div>
+          </div>
+        </div>
+        <!-- Combat log -->
+        <div id="icCombatLog" style="max-height:100px;overflow-y:auto;background:rgba(0,0,0,0.2);border-radius:8px;padding:6px 8px;"></div>
+      </div>
+    </div>
+    <!-- Heal result (Sunderer) -->
+    <div id="icHealResult" style="display:none;margin-bottom:10px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.3);border-radius:8px;padding:8px 12px;">
+      <div style="font-size:10px;color:#2ecc71;font-weight:700;">💚 Исцеление</div>
+      <span style="font-size:18px;font-weight:900;color:#2ecc71;">—</span>
+    </div>
     <!-- Result -->
     <div id="itemSubResult" style="display:none;border-top:1px solid rgba(155,89,182,0.3);padding-top:12px;">
       <div class="calc-stat-box" style="background:rgba(109,63,245,0.15);border-color:rgba(109,63,245,0.4);">
@@ -3324,6 +3599,41 @@ Stormarrow: При максимальных зарядах следующая б
         <div class="calc-stat-val" id="itemSubResultVal" style="color:#b96fff;font-size:26px;"></div>
       </div>
       <div id="itemSubFormula" style="margin-top:6px;font-size:9px;color:rgba(255,255,255,0.25);font-family:monospace;line-height:1.4;"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ ITEM CALC MENU ══ -->
+
+
+
+<!-- ══ ITEM CALC MENU ══ -->
+<div class="m-mask" id="itemCalcMenuMask" onclick="if(event.target===this)closeItemCalcMenu()">
+  <div class="m-win" style="width:92vw;max-width:400px;padding:20px 18px;padding-right:50px;">
+    <button class="btn-close-x" onclick="closeItemCalcMenu()">✕</button>
+    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;">🧮 Калькулятор предметов</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button onclick="closeItemCalcMenu();openItemCalc('thornmail')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+        <img src="https://www.wildriftfire.com/images/items/thornmail.png" style="width:40px;height:40px;border-radius:8px;">
+        <div><div>Шипованный доспех</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">Отражённый маг. урон</div></div>
+      </button>
+      <button onclick="closeItemCalcMenu();openItemCalc('botrk')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+        <img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" style="width:40px;height:40px;border-radius:8px;">
+        <div><div>Клинок Погибшего Короля</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">% HP врага + симулятор боя</div></div>
+      </button>
+      <button onclick="closeItemCalcMenu();openItemCalc('sunfire')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+        <img src="https://www.wildriftfire.com/images/items/sunfire-aegis.png" style="width:40px;height:40px;border-radius:8px;">
+        <div><div>Эгида Солнечного огня</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">Маг. урон/с</div></div>
+      </button>
+      <button onclick="closeItemCalcMenu();openItemCalc('liandry')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+        <img src="https://www.wildriftfire.com/images/items/liandrys-torment.png" style="width:40px;height:40px;border-radius:8px;">
+        <div><div>Мучения Лиандри</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">% макс. HP ожог</div></div>
+      </button>
+      <button onclick="closeItemCalcMenu();openItemCalc('sunderer')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+        <img src="https://www.wildriftfire.com/images/items/divine-sunderer.png" style="width:40px;height:40px;border-radius:8px;">
+        <div><div>Божественный Разрушитель</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">Физ. удар + хил</div></div>
+      </button>
     </div>
   </div>
 </div>
@@ -3411,7 +3721,7 @@ Stormarrow: При максимальных зарядах следующая б
     <input id="champPickerSearch" type="text" placeholder="🔍 Поиск..." class="calc-input"
       style="font-size:13px;padding:8px 12px;margin-bottom:8px;" oninput="champPickerFilter()">
     <div id="champPickerRoles" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;"></div>
-    <div id="champPickerGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:6px;overflow-y:auto;flex:1;align-content:start;padding:2px;"></div>
+    <div id="champPickerGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;overflow-y:auto;flex:1;align-content:start;padding:2px;"></div>
   </div>
 </div>
 
