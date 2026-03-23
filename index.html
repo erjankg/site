@@ -202,17 +202,17 @@
         /* ── PATCH DOT ── */
         .patch-dot {
             position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 10px;
-            height: 10px;
+            top: -4px;
+            right: -4px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             border: 2px solid #0f0520;
             z-index: 5;
             pointer-events: none;
         }
-        .patch-dot.buff { background: #2ecc71; box-shadow: 0 0 6px rgba(46,204,113,0.6); }
-        .patch-dot.nerf { background: #e74c3c; box-shadow: 0 0 6px rgba(231,76,60,0.6); }
+        .patch-dot.buff { background: #2ecc71; box-shadow: 0 0 8px rgba(46,204,113,0.7); }
+        .patch-dot.nerf { background: #e74c3c; box-shadow: 0 0 8px rgba(231,76,60,0.7); }
 
         .patch-tooltip {
             position: fixed;
@@ -1523,7 +1523,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         return m[n] || n.replace(/[\s\'\.\#&]/g,'');
     }
     const DD_URL = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
-    var _sp={'Norra':'https://static.wikia.nocookie.net/leagueoflegends/images/e/ee/Norra_OriginalCentered.jpg','Mel':'https://static.wikia.nocookie.net/leagueoflegends/images/5/5d/Mel_OriginalCentered.jpg'};
+    var _sp={'Norra':'https://www.wildriftfire.com/images/champions/norra.png','Mel':'https://www.wildriftfire.com/images/champions/mel.png'};
     function champIcon(name){ return _sp[name] || (DD_URL + champKey(name) + '.png'); }
 
     let raw = [];
@@ -1564,12 +1564,40 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         let t;
         try {
             console.log('Fetching champions from:', G_URL);
-            const r = await fetch(G_URL);
-            console.log('Fetch response status:', r.status);
-            t = await r.text();
-            console.log('Data received, length:', t.length, 'first 100 chars:', t.substring(0, 100));
+            // Fetch both in parallel
+            var promises = [fetch(G_URL).then(function(r){ return r.text(); })];
+            if(PATCH_URL) promises.push(fetch(PATCH_URL).then(function(r){ return r.text(); }));
+            var results = await Promise.all(promises);
+            t = results[0];
+            console.log('Data received, length:', t.length);
             if(t.trim().startsWith('<!') || t.trim().startsWith('<html')) {
-                throw new Error('Google Sheet вернул HTML вместо TSV — лист не опубликован! Открой Google Sheets → File → Share → Publish to web');
+                throw new Error('Google Sheet вернул HTML вместо TSV — лист не опубликован!');
+            }
+            // Parse patch data if available
+            if(results[1]) {
+                try {
+                    var pt = results[1];
+                    if(!pt.trim().startsWith('<!')) {
+                        var pLines = pt.trim().split('\n');
+                        var pHeads = pLines[0].split('\t').map(function(h){ return h.trim(); });
+                        pLines.slice(1).forEach(function(line) {
+                            var cols = line.split('\t');
+                            var obj = {};
+                            pHeads.forEach(function(h, i) { obj[h] = (cols[i]||'').trim(); });
+                            if(obj['Champion'] && obj['Type']) {
+                                var pType = (obj['Type']||'').toLowerCase().trim();
+                                if(pType === 'buff' || pType === 'nerf') {
+                                    patchMap[obj['Champion']] = {
+                                        patch: obj['Patch'] || '',
+                                        change: obj['Change'] || '',
+                                        type: pType
+                                    };
+                                }
+                            }
+                        });
+                        console.log('Patch data loaded:', Object.keys(patchMap).length, 'champions');
+                    }
+                } catch(pe) { console.warn('Patch parse error:', pe); }
             }
         } catch(fetchErr) {
             console.error('Fetch failed:', fetchErr);
@@ -1578,29 +1606,6 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             document.getElementById('statTable').style.visibility = 'visible';
             document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">Ошибка: ' + (fetchErr.message || 'Не удалось загрузить данные') + '</td></tr>';
             return;
-        }
-        // Fetch patch notes — truly non-blocking, don't wait for it
-        if(PATCH_URL) {
-            fetch(PATCH_URL).then(function(pr){ return pr.text(); }).then(function(pt){
-                var pLines = pt.trim().split('\n');
-                var pHeads = pLines[0].split('\t').map(function(h){ return h.trim(); });
-                pLines.slice(1).forEach(function(line) {
-                    var cols = line.split('\t');
-                    var obj = {};
-                    pHeads.forEach(function(h, i) { obj[h] = (cols[i]||'').trim(); });
-                    if(obj['Champion'] && obj['Type']) {
-                        var pType = (obj['Type']||'').toLowerCase().trim();
-                        if(pType === 'buff' || pType === 'nerf') {
-                            patchMap[obj['Champion']] = {
-                                patch: obj['Patch'] || '',
-                                change: obj['Change'] || '',
-                                type: pType
-                            };
-                        }
-                    }
-                });
-                console.log('Patch data loaded:', Object.keys(patchMap).length, 'champions');
-            }).catch(function(e){ console.warn('Patch notes not loaded:', e); });
         }
 
         const lines = t.trim().split('\n');
