@@ -1362,32 +1362,93 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     .rune-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important; gap: 6px !important; }
 }
 
-    /* ── GLOBAL CHAT ── */
+    /* ══ TELEGRAM-STYLE CHAT SYSTEM ══ */
     @supports (height: 100dvh) {
-        #globalChatMask .m-win, #dmChatMask .m-win { height: 100dvh; max-height: 100dvh; }
+        #chatSystemMask .tg-chat-wrap { height: 100dvh; max-height: 100dvh; }
     }
+    .tg-chat-wrap {
+        width:100vw; max-width:100vw; height:100vh; max-height:100vh;
+        display:flex; flex-direction:row; padding:0; overflow:hidden; border-radius:0;
+        background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
+    }
+    /* ── Left sidebar (contacts/users) ── */
+    .tg-sidebar {
+        width:320px; min-width:280px; max-width:340px; display:flex; flex-direction:column;
+        border-right:1px solid rgba(155,89,182,0.15); background:rgba(10,3,20,0.6);
+        flex-shrink:0;
+    }
+    .tg-sidebar-header {
+        padding:12px 14px; border-bottom:1px solid rgba(155,89,182,0.15);
+        display:flex; align-items:center; gap:8px; flex-shrink:0;
+    }
+    .tg-sidebar-tabs {
+        display:flex; gap:4px; padding:8px 10px; flex-shrink:0; border-bottom:1px solid rgba(155,89,182,0.1);
+    }
+    .tg-tab {
+        flex:1; padding:7px 4px; border-radius:8px; border:1.5px solid rgba(155,89,182,0.2);
+        background:transparent; color:rgba(255,255,255,0.45); font-size:11px; font-weight:800;
+        cursor:pointer; transition:all 0.15s; text-align:center; position:relative;
+    }
+    .tg-tab:hover { background:rgba(109,63,245,0.12); color:#fff; }
+    .tg-tab.active { border-color:#b96fff; background:rgba(109,63,245,0.25); color:#fff; }
+    .tg-tab-badge {
+        position:absolute; top:-5px; right:-5px; min-width:16px; height:16px;
+        background:#ffd700; color:#000; border-radius:10px; font-size:9px; font-weight:900;
+        display:none; align-items:center; justify-content:center; padding:0 4px;
+    }
+    .tg-sidebar-content { flex:1; overflow-y:auto; padding:6px 8px; display:flex; flex-direction:column; gap:2px; }
+    /* ── Right chat panel ── */
+    .tg-chat-panel {
+        flex:1; display:flex; flex-direction:column; min-width:0;
+    }
+    .tg-chat-header {
+        padding:12px 16px; border-bottom:1px solid rgba(155,89,182,0.15);
+        display:flex; align-items:center; gap:10px; flex-shrink:0;
+    }
+    .tg-chat-title { font-size:15px; font-weight:900; color:#fff; flex:1; }
+    .tg-chat-subtitle { font-size:10px; color:rgba(255,255,255,0.3); margin-left:auto; }
+    .tg-back-btn {
+        display:none; background:none; border:1.5px solid rgba(155,89,182,0.3); color:#b96fff;
+        border-radius:8px; padding:4px 10px; font-size:12px; font-weight:700; cursor:pointer;
+    }
+    /* ── Chat messages ── */
     .chat-messages { flex:1; overflow-y:auto; padding:10px 14px; display:flex; flex-direction:column; gap:6px; overscroll-behavior:contain; }
-    .chat-msg { display:flex; gap:8px; align-items:flex-start; animation:fadeIn 0.2s ease; }
-    .chat-msg-av { width:32px; height:32px; border-radius:50%; flex-shrink:0; object-fit:cover; background:linear-gradient(135deg,#6d3ff5,#9b59b6); display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff; font-weight:900; overflow:hidden; }
-    .chat-msg-av img { width:100%; height:100%; object-fit:cover; }
-    .chat-msg-body { flex:1; min-width:0; }
-    .chat-msg-head { display:flex; align-items:center; gap:6px; margin-bottom:2px; }
-    .chat-msg-name { font-size:11px; font-weight:800; color:#b96fff; }
-    .chat-msg-name.admin { color:#ffd700; }
-    .chat-msg-time { font-size:9px; color:rgba(255,255,255,0.2); }
-    .chat-msg-text { font-size:12px; color:rgba(255,255,255,0.8); line-height:1.5; word-break:break-word; font-weight:400; }
-    .chat-msg-del { opacity:0; font-size:10px; color:rgba(255,255,255,0.2); cursor:pointer; margin-left:auto; padding:2px 4px; }
-    .chat-msg:hover .chat-msg-del { opacity:1; }
-    .chat-input-row { display:flex; gap:8px; padding:10px 14px; border-top:1px solid rgba(155,89,182,0.15); flex-shrink:0; }
-    .chat-input { flex:1; background:rgba(255,255,255,0.05); border:1.5px solid rgba(155,89,182,0.2); border-radius:10px; padding:8px 12px; color:#fff; font-size:13px; font-weight:600; outline:none; font-family:inherit; }
-    .chat-input:focus { border-color:#b96fff; }
-    .chat-send { background:linear-gradient(135deg,#6d3ff5,#9b59b6); border:none; color:#fff; padding:8px 16px; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer; flex-shrink:0; }
-    .chat-send:active { transform:scale(0.95); }
     .chat-login-msg { text-align:center; padding:20px; color:rgba(255,255,255,0.3); font-size:13px; }
-
-    /* ── USERS LIST ── */
-    .user-card { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; border:1px solid rgba(155,89,182,0.12); transition:background 0.15s; }
-    .user-card:hover { background:rgba(109,63,245,0.06); }
+    /* ── Bubble messages ── */
+    .chat-bubble-row { display:flex; align-items:flex-end; gap:6px; animation:fadeIn 0.2s ease; margin-bottom:2px; }
+    .chat-bubble-row.me { flex-direction:row-reverse; }
+    .chat-bubble-av { width:28px; height:28px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,#6d3ff5,#9b59b6); display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; font-weight:900; overflow:hidden; }
+    .chat-bubble-av img { width:100%; height:100%; object-fit:cover; }
+    .chat-bubble {
+        max-width:75%; padding:8px 12px; border-radius:16px; position:relative;
+        font-size:13px; line-height:1.45; word-break:break-word;
+    }
+    .chat-bubble-row:not(.me) .chat-bubble {
+        background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.88);
+        border-bottom-left-radius:4px;
+    }
+    .chat-bubble-row.me .chat-bubble {
+        background:linear-gradient(135deg,#6d3ff5,#8e44ad); color:#fff;
+        border-bottom-right-radius:4px;
+    }
+    .chat-bubble-name { font-size:10px; font-weight:800; color:#b96fff; margin-bottom:2px; }
+    .chat-bubble-name.admin { color:#ffd700; }
+    .chat-bubble-row.me .chat-bubble-name { display:none; }
+    .chat-bubble-meta { display:flex; align-items:center; gap:6px; margin-top:2px; justify-content:flex-end; }
+    .chat-bubble-time { font-size:9px; color:rgba(255,255,255,0.25); }
+    .chat-bubble-row.me .chat-bubble-time { color:rgba(255,255,255,0.5); }
+    .chat-bubble-del { font-size:10px; color:rgba(255,255,255,0.2); cursor:pointer; padding:2px; display:none; }
+    .chat-bubble-row:hover .chat-bubble-del { display:inline; }
+    /* ── Input row ── */
+    .chat-input-row { display:flex; gap:8px; padding:10px 14px; border-top:1px solid rgba(155,89,182,0.15); flex-shrink:0; }
+    .chat-input { flex:1; background:rgba(255,255,255,0.05); border:1.5px solid rgba(155,89,182,0.2); border-radius:20px; padding:9px 16px; color:#fff; font-size:13px; font-weight:600; outline:none; font-family:inherit; }
+    .chat-input:focus { border-color:#b96fff; }
+    .chat-send { background:linear-gradient(135deg,#6d3ff5,#9b59b6); border:none; color:#fff; width:38px; height:38px; border-radius:50%; font-size:16px; font-weight:800; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .chat-send:active { transform:scale(0.9); }
+    /* ── Contact cards ── */
+    .user-card { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; border:1px solid rgba(155,89,182,0.12); transition:background 0.15s; cursor:pointer; }
+    .user-card:hover { background:rgba(109,63,245,0.08); }
+    .user-card.active-contact { background:rgba(109,63,245,0.15); border-color:rgba(185,111,255,0.3); }
     .user-av-wrap { position:relative; flex-shrink:0; }
     .user-av { width:38px; height:38px; border-radius:50%; object-fit:cover; background:linear-gradient(135deg,#6d3ff5,#9b59b6); display:flex; align-items:center; justify-content:center; font-size:16px; color:#fff; font-weight:900; overflow:hidden; }
     .user-av img { width:100%; height:100%; object-fit:cover; }
@@ -1401,6 +1462,44 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     .user-actions { display:flex; gap:4px; flex-shrink:0; }
     .user-act-btn { background:rgba(109,63,245,0.15); border:1px solid rgba(155,89,182,0.25); color:#b96fff; border-radius:8px; padding:4px 10px; font-size:10px; font-weight:700; cursor:pointer; }
     .user-act-btn:hover { background:rgba(109,63,245,0.3); }
+    /* ── Mobile toggle button ── */
+    .tg-mobile-users-btn {
+        display:none; background:rgba(109,63,245,0.85); border:1.5px solid rgba(185,111,255,0.5);
+        color:#fff; border-radius:10px; padding:6px 12px; font-size:12px; font-weight:800; cursor:pointer;
+        position:relative;
+    }
+    .tg-mobile-users-btn .tg-mob-badge {
+        position:absolute; top:-5px; right:-5px; min-width:16px; height:16px;
+        background:#ffd700; color:#000; border-radius:10px; font-size:9px; font-weight:900;
+        display:none; align-items:center; justify-content:center; padding:0 4px;
+    }
+    /* ── MOBILE CHAT ── */
+    @media (max-width: 768px) {
+        .tg-sidebar { display:none; position:fixed; inset:0; z-index:100; max-width:100%; width:100%; border-right:none; background:linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%); }
+        .tg-sidebar.mobile-open { display:flex; }
+        .tg-back-btn { display:flex; align-items:center; gap:4px; }
+        .tg-mobile-users-btn { display:flex; align-items:center; gap:4px; }
+        .tg-chat-wrap { flex-direction:column; }
+        .chat-bubble { max-width:85%; }
+    }
+    /* ── CHAT MODAL OVERRIDES ── */
+    #chatSystemMask .btn-close-x {
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+        z-index: auto !important;
+    }
+    #chatSystemMask .tg-chat-wrap {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        padding-right: 0 !important;
+    }
+    @supports (height: 100dvh) {
+        #chatSystemMask .tg-chat-wrap { height: 100dvh !important; max-height: 100dvh !important; }
+    }
 
     /* ── PERFORMANCE: GPU acceleration for scrollable lists ── */
     #scGrid, #champPickerGrid, #draftGrid, .items-grid, .rune-grid,
@@ -1676,14 +1775,14 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','globalChatMask','usersListMask','dmChatMask','tierlistMenuMask'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask'];
 
     // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
     var _modalStack = [];
     var _baseZIndex = 6000;
 
     // Модалки которые ВСЕГДА открываются поверх (не закрывая родителя)
-    var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','dmChatMask','tierlistMask'];
+    var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask'];
 
     function closeAllModals(except) {
         MODAL_IDS.forEach(function(id) {
@@ -3258,8 +3357,8 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             'sideChamps':'sideChampsMask', 'calc':'calcMask', 'itemCalcMenu':'itemCalcMenuMask',
             'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask',
             'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask',
-            'tierMenu':'tierlistMenuMask', 'globalChat':'globalChatMask',
-            'users':'usersListMask', 'influencers':'influencerMask'
+            'tierMenu':'tierlistMenuMask', 'globalChat':'chatSystemMask',
+            'users':'chatSystemMask', 'influencers':'influencerMask'
         };
         _sidebarModalId = modalMap[what] || null;
         switch(what) {
@@ -3273,8 +3372,8 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             case 'tierItems': openTierlist('items'); break;
             case 'tierRunes': openTierlist('runes'); break;
             case 'tierMenu': openTierlistMenu(); break;
-            case 'globalChat': openGlobalChat(); break;
-            case 'users': openUsersList(); break;
+            case 'globalChat': openChatSystem(); break;
+            case 'users': openChatSystem('users'); break;
             case 'influencers': openInfluencers(); break;
         }
     };
@@ -3985,8 +4084,8 @@ Stormarrow: При максимальных зарядах следующая б
   <button class="side-btn" onclick="sidebarOpen('tierMenu')" style="background:rgba(255,215,0,0.06);border-left:3px solid rgba(255,215,0,0.5);"><span class="side-icon">🏆</span>Тир-лист</button>
 
   <div class="side-section" style="margin-top:8px;">Сообщество</div>
-  <button class="side-btn" onclick="sidebarOpen('globalChat')" style="background:rgba(46,204,113,0.08);border-left:3px solid #2ecc71;"><span class="side-icon">💬</span>Глобальный чат</button>
-  <button class="side-btn" onclick="sidebarOpen('users')"><span class="side-icon">🌐</span>Пользователи</button>
+  <button class="side-btn" onclick="sidebarOpen('globalChat')" style="background:rgba(46,204,113,0.08);border-left:3px solid #2ecc71;"><span class="side-icon">💬</span>Чат<span id="sidebarChatBadge" style="display:none;background:#ffd700;color:#000;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:900;margin-left:auto;"></span></button>
+
   <button class="side-btn" onclick="sidebarOpen('influencers')" style="background:rgba(255,0,0,0.08);border-left:3px solid #ff4444;"><span class="side-icon">🎬</span>Инфлюенсеры WR</button>
 
   <div style="flex:1;"></div>
@@ -4386,54 +4485,44 @@ Stormarrow: При максимальных зарядах следующая б
   </div>
 </div>
 
-<!-- ══ GLOBAL CHAT MODAL ══ -->
-<div class="m-mask" id="globalChatMask" onclick="if(event.target===this)closeGlobalChat()">
-  <div class="m-win" style="width:100vw;max-width:100vw;height:100vh;max-height:100vh;display:flex;flex-direction:column;padding:0;overflow:hidden;border-radius:0;">
-    <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(155,89,182,0.15);flex-shrink:0;display:flex;align-items:center;gap:10px;">
-      <button class="btn-close-x" onclick="closeGlobalChat()" style="position:static;width:28px;height:28px;font-size:14px;">✕</button>
-      <div style="font-size:15px;font-weight:900;color:#2ecc71;">💬 Глобальный чат</div>
-      <div id="chatOnlineCount" style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);"></div>
+<!-- ══ TELEGRAM-STYLE UNIFIED CHAT ══ -->
+<div class="m-mask" id="chatSystemMask" onclick="if(event.target===this)closeChatSystem()">
+  <div class="m-win tg-chat-wrap">
+    <!-- LEFT SIDEBAR: tabs + contacts -->
+    <div class="tg-sidebar" id="tgSidebar">
+      <div class="tg-sidebar-header">
+        <button class="btn-close-x" onclick="closeChatSystem()" style="position:static;width:28px;height:28px;font-size:14px;">✕</button>
+        <div style="font-size:15px;font-weight:900;color:#b96fff;">💬 Чат</div>
+        <div id="chatOnlineCount" style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);"></div>
+      </div>
+      <div class="tg-sidebar-tabs">
+        <button class="tg-tab active" id="tgTabGlobal" onclick="switchChatTab('global')">💬</button>
+        <button class="tg-tab" id="tgTabUsers" onclick="switchChatTab('users')">👥</button>
+        <button class="tg-tab" id="tgTabDm" onclick="switchChatTab('dm')">✉<span class="tg-tab-badge" id="tgDmBadge"></span></button>
+        <button class="tg-tab" id="tgTabReqs" onclick="switchChatTab('reqs')">📨<span class="tg-tab-badge" id="tgReqsBadge"></span></button>
+      </div>
+      <div class="tg-sidebar-content" id="tgSidebarContent">
+        <div class="chat-login-msg">Загрузка...</div>
+      </div>
     </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="chat-login-msg">Загрузка...</div>
-    </div>
-    <div id="chatInputArea" class="chat-input-row" style="display:none;">
-      <input class="chat-input" id="chatInput" type="text" placeholder="Написать сообщение..." maxlength="300" onkeydown="if(event.key==='Enter')sendChatMsg()">
-      <button class="chat-send" onclick="sendChatMsg()">→</button>
-    </div>
-    <div id="chatLoginPrompt" class="chat-login-msg" style="border-top:1px solid rgba(155,89,182,0.15);padding:12px;">
-      Войди через Google чтобы писать в чат
-    </div>
-  </div>
-</div>
-
-<!-- ══ USERS LIST MODAL ══ -->
-<div class="m-mask" id="usersListMask" onclick="if(event.target===this)closeUsersList()">
-  <div class="m-win" style="width:96vw;max-width:500px;max-height:85vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
-    <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(155,89,182,0.15);flex-shrink:0;display:flex;align-items:center;gap:10px;">
-      <button class="btn-close-x" onclick="closeUsersList()" style="position:static;width:28px;height:28px;font-size:14px;">✕</button>
-      <div style="font-size:15px;font-weight:900;color:#b96fff;">🌐 Пользователи</div>
-      <div id="usersCount" style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);"></div>
-    </div>
-    <div id="usersListContent" style="flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:6px;">
-      <div class="chat-login-msg">Загрузка...</div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ DM CHAT MODAL ══ -->
-<div class="m-mask" id="dmChatMask" onclick="if(event.target===this)closeDmChat()">
-  <div class="m-win" style="width:96vw;max-width:500px;height:75vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
-    <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(155,89,182,0.15);flex-shrink:0;display:flex;align-items:center;gap:10px;">
-      <button onclick="closeDmChat()" style="background:none;border:1.5px solid rgba(155,89,182,0.3);color:#b96fff;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">← Назад</button>
-      <div id="dmChatName" style="font-size:14px;font-weight:900;color:#fff;"></div>
-    </div>
-    <div class="chat-messages" id="dmMessages">
-      <div class="chat-login-msg">Загрузка...</div>
-    </div>
-    <div class="chat-input-row" id="dmInputArea">
-      <input class="chat-input" id="dmInput" type="text" placeholder="Личное сообщение..." maxlength="300" onkeydown="if(event.key==='Enter')sendDmMsg()">
-      <button class="chat-send" onclick="sendDmMsg()">→</button>
+    <!-- RIGHT CHAT PANEL -->
+    <div class="tg-chat-panel" id="tgChatPanel">
+      <div class="tg-chat-header" id="tgChatHeader">
+        <button class="tg-back-btn" id="tgBackBtn" onclick="tgMobileBack()">← Назад</button>
+        <button class="tg-mobile-users-btn" id="tgMobileUsersBtn" onclick="tgMobileShowSidebar()">👥 Контакты<span class="tg-mob-badge" id="tgMobBadge"></span></button>
+        <div class="tg-chat-title" id="tgChatTitle">💬 Глобальный чат</div>
+        <button class="btn-close-x" onclick="closeChatSystem()" style="position:static;width:28px;height:28px;font-size:14px;margin-left:auto;">✕</button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-login-msg">Загрузка...</div>
+      </div>
+      <div id="chatInputArea" class="chat-input-row" style="display:none;">
+        <input class="chat-input" id="chatInput" type="text" placeholder="Написать сообщение..." maxlength="300" onkeydown="if(event.key==='Enter')tgSendMsg()">
+        <button class="chat-send" onclick="tgSendMsg()">➤</button>
+      </div>
+      <div id="chatLoginPrompt" class="chat-login-msg" style="border-top:1px solid rgba(155,89,182,0.15);padding:12px;">
+        Войди через Google чтобы писать в чат
+      </div>
     </div>
   </div>
 </div>
@@ -4986,10 +5075,15 @@ Stormarrow: При максимальных зарядах следующая б
     }
 
     // ═══════════════════════════════════════
-    // GLOBAL CHAT (Firestore real-time, 100 msg limit)
+    // TELEGRAM-STYLE UNIFIED CHAT SYSTEM
     // ═══════════════════════════════════════
     var _chatListener = null;
     var _chatMessages = [];
+    var _currentChatTab = 'global'; // 'global' | 'dm' | 'reqs'
+    var _currentChatMode = 'global'; // 'global' | 'dm'
+    var _dmListener = null;
+    var _dmPartnerUid = null;
+    var _dmPartnerName = '';
 
     function updateChatUI(loggedIn) {
         var inputArea = document.getElementById('chatInputArea');
@@ -4998,6 +5092,143 @@ Stormarrow: При максимальных зарядах следующая б
         if (loginPrompt) loginPrompt.style.display = loggedIn ? 'none' : '';
     }
 
+    // ── Open unified chat system ──
+    window.openChatSystem = function(tab) {
+        openModal('chatSystemMask');
+        _currentChatTab = tab || 'global';
+        switchChatTab(_currentChatTab);
+        startChatListener();
+        // Fix mobile keyboard
+        fixMobileKeyboard();
+    };
+    window.openGlobalChat = function() { openChatSystem('global'); };
+
+    window.closeChatSystem = function() {
+        closeModal('chatSystemMask');
+        if (_chatListener) { _chatListener(); _chatListener = null; }
+        if (_dmListener) { _dmListener(); _dmListener = null; }
+        _dmPartnerUid = null;
+        // Close mobile sidebar
+        var sb = document.getElementById('tgSidebar');
+        if (sb) sb.classList.remove('mobile-open');
+    };
+    // Keep legacy names working
+    window.closeGlobalChat = window.closeChatSystem;
+    window.closeUsersList = function() {};
+    window.closeDmChat = function() {
+        if (_dmListener) { _dmListener(); _dmListener = null; }
+        _dmPartnerUid = null;
+        _currentChatMode = 'global';
+        switchChatTab(_currentChatTab);
+        renderGlobalChat();
+    };
+
+    // ── Tab switching ──
+    window.switchChatTab = function(tab) {
+        _currentChatTab = tab;
+        ['tgTabGlobal','tgTabDm','tgTabReqs','tgTabUsers'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.classList.remove('active');
+        });
+        var tabMap = {'global':'tgTabGlobal','dm':'tgTabDm','reqs':'tgTabReqs','users':'tgTabUsers'};
+        var activeTab = document.getElementById(tabMap[tab] || 'tgTabGlobal');
+        if (activeTab) activeTab.classList.add('active');
+
+        // Reset input
+        var input = document.getElementById('chatInput');
+        if (input) input.placeholder = 'Написать сообщение...';
+
+        if (tab === 'global') {
+            _currentChatMode = 'global';
+            if (_dmListener) { _dmListener(); _dmListener = null; }
+            _dmPartnerUid = null;
+            renderGlobalChat();
+            renderGlobalSidebar();
+        } else if (tab === 'users') {
+            _currentChatMode = 'global';
+            if (_dmListener) { _dmListener(); _dmListener = null; }
+            _dmPartnerUid = null;
+            renderAllUsersSidebar();
+            showUsersPanel();
+        } else if (tab === 'dm') {
+            _currentChatMode = _dmPartnerUid ? 'dm' : 'global';
+            renderDmContactsSidebar();
+            if (_dmPartnerUid) {
+                startDmListener();
+            } else {
+                showSelectContactPrompt();
+            }
+        } else if (tab === 'reqs') {
+            _currentChatMode = 'global';
+            renderFriendRequestsSidebar();
+            showFriendRequestsPanel();
+        }
+        updateChatHeaderTitle();
+    };
+
+    function updateChatHeaderTitle() {
+        var title = document.getElementById('tgChatTitle');
+        var backBtn = document.getElementById('tgBackBtn');
+        var usersBtn = document.getElementById('tgMobileUsersBtn');
+        if (!title) return;
+
+        if (_currentChatMode === 'dm' && _dmPartnerUid) {
+            title.textContent = '✉ ' + _dmPartnerName;
+            title.style.color = '#b96fff';
+            if (backBtn) backBtn.style.display = '';
+            if (usersBtn) usersBtn.style.display = 'none';
+        } else if (_currentChatTab === 'reqs') {
+            title.textContent = '📨 Запросы в друзья';
+            title.style.color = '#e74c3c';
+            if (backBtn) backBtn.style.display = 'none';
+            if (usersBtn) usersBtn.style.display = '';
+        } else if (_currentChatTab === 'users') {
+            title.textContent = '👥 Пользователи';
+            title.style.color = '#b96fff';
+            if (backBtn) backBtn.style.display = 'none';
+            if (usersBtn) usersBtn.style.display = '';
+        } else {
+            title.textContent = '💬 Глобальный чат';
+            title.style.color = '#2ecc71';
+            if (backBtn) backBtn.style.display = 'none';
+            if (usersBtn) usersBtn.style.display = '';
+        }
+    }
+
+    // ── Mobile sidebar toggle ──
+    window.tgMobileShowSidebar = function() {
+        var sb = document.getElementById('tgSidebar');
+        if (sb) sb.classList.add('mobile-open');
+    };
+    window.tgMobileBack = function() {
+        if (_currentChatMode === 'dm' && _dmPartnerUid) {
+            closeDmChat();
+        } else {
+            var sb = document.getElementById('tgSidebar');
+            if (sb) sb.classList.remove('mobile-open');
+        }
+    };
+    window.tgMobileCloseSidebar = function() {
+        var sb = document.getElementById('tgSidebar');
+        if (sb) sb.classList.remove('mobile-open');
+    };
+
+    // ── Fix mobile keyboard ──
+    function fixMobileKeyboard() {
+        if (!window.visualViewport) return;
+        var wrap = document.querySelector('.tg-chat-wrap');
+        if (!wrap) return;
+        function onResize() {
+            var vvh = window.visualViewport.height;
+            wrap.style.height = vvh + 'px';
+        }
+        window.visualViewport.addEventListener('resize', onResize);
+        window.visualViewport.addEventListener('scroll', onResize);
+    }
+
+    // ═══════════════════════════════════════
+    // GLOBAL CHAT
+    // ═══════════════════════════════════════
     function startChatListener() {
         if (_chatListener || !db) return;
         _chatListener = db.collection('globalChat')
@@ -5010,67 +5241,98 @@ Stormarrow: При максимальных зарядах следующая б
                     d._id = doc.id;
                     _chatMessages.push(d);
                 });
-                renderChatMessages();
+                if (_currentChatMode === 'global' && _currentChatTab === 'global') renderGlobalChat();
             }, function(err) {
                 console.warn('Chat listener error:', err);
             });
     }
 
-    function renderChatMessages() {
+    function renderGlobalChat() {
         var container = document.getElementById('chatMessages');
         if (!container) return;
         container.innerHTML = '';
+        var inputArea = document.getElementById('chatInputArea');
+        if (inputArea) inputArea.style.display = _currentUser ? 'flex' : 'none';
+        var loginPrompt = document.getElementById('chatLoginPrompt');
+        if (loginPrompt) loginPrompt.style.display = _currentUser ? 'none' : '';
+
         if (!_chatMessages.length) {
             container.innerHTML = '<div class="chat-login-msg">Пока нет сообщений. Напиши первым!</div>';
             return;
         }
         _chatMessages.forEach(function(msg) {
-            var div = document.createElement('div');
-            div.className = 'chat-msg';
-            // Avatar
-            var av = document.createElement('div');
-            av.className = 'chat-msg-av';
-            if (msg.photoURL) av.innerHTML = '<img src="' + msg.photoURL + '" onerror="this.style.display=\'none\'">';
-            else av.textContent = (msg.name || '?').charAt(0).toUpperCase();
-            div.appendChild(av);
-            // Body
-            var body = document.createElement('div');
-            body.className = 'chat-msg-body';
-            var head = document.createElement('div');
-            head.className = 'chat-msg-head';
-            var nameSpan = document.createElement('span');
-            nameSpan.className = 'chat-msg-name' + (msg.isAdmin ? ' admin' : '');
-            nameSpan.textContent = (msg.isAdmin ? '👑 ' : '') + (msg.name || 'Аноним');
-            head.appendChild(nameSpan);
-            var timeSpan = document.createElement('span');
-            timeSpan.className = 'chat-msg-time';
-            if (msg.ts) {
-                var d = msg.ts.toDate ? msg.ts.toDate() : new Date(msg.ts);
-                timeSpan.textContent = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-            }
-            head.appendChild(timeSpan);
-            // Delete button (admin or own message)
-            if (_currentUser && _isAdmin) {
-                var delBtn = document.createElement('span');
-                delBtn.className = 'chat-msg-del';
-                delBtn.textContent = '🗑';
-                delBtn.title = 'Удалить';
-                delBtn.onclick = function() { deleteChatMsg(msg._id); };
-                head.appendChild(delBtn);
-            }
-            body.appendChild(head);
-            var text = document.createElement('div');
-            text.className = 'chat-msg-text';
-            text.textContent = msg.text || '';
-            body.appendChild(text);
-            div.appendChild(body);
-            container.appendChild(div);
+            var isMe = _currentUser && msg.uid === _currentUser.uid;
+            renderBubble(container, msg, isMe, true);
         });
-        // Auto-scroll to bottom
         container.scrollTop = container.scrollHeight;
     }
 
-    window.sendChatMsg = function() {
+    function renderGlobalSidebar() {
+        var container = document.getElementById('tgSidebarContent');
+        if (!container) return;
+        container.innerHTML = '<div class="chat-login-msg" style="font-size:11px;">💬 Глобальный чат — общая комната<br>Все видят все сообщения</div>';
+    }
+
+    // ── Bubble renderer ──
+    function renderBubble(container, msg, isMe, showAdmin) {
+        var row = document.createElement('div');
+        row.className = 'chat-bubble-row' + (isMe ? ' me' : '');
+
+        // Avatar
+        var av = document.createElement('div');
+        av.className = 'chat-bubble-av';
+        if (msg.photoURL) av.innerHTML = '<img src="' + msg.photoURL + '" onerror="this.style.display=\'none\'">';
+        else av.textContent = (msg.name || '?').charAt(0).toUpperCase();
+        row.appendChild(av);
+
+        // Bubble
+        var bubble = document.createElement('div');
+        bubble.className = 'chat-bubble';
+
+        if (!isMe) {
+            var nameEl = document.createElement('div');
+            nameEl.className = 'chat-bubble-name' + (showAdmin && msg.isAdmin ? ' admin' : '');
+            nameEl.textContent = (showAdmin && msg.isAdmin ? '👑 ' : '') + (msg.name || 'Аноним');
+            bubble.appendChild(nameEl);
+        }
+
+        var textEl = document.createElement('div');
+        textEl.style.cssText = 'font-weight:400;';
+        textEl.textContent = msg.text || '';
+        bubble.appendChild(textEl);
+
+        var meta = document.createElement('div');
+        meta.className = 'chat-bubble-meta';
+        if (msg.ts) {
+            var d = msg.ts.toDate ? msg.ts.toDate() : new Date(msg.ts);
+            var timeEl = document.createElement('span');
+            timeEl.className = 'chat-bubble-time';
+            timeEl.textContent = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            meta.appendChild(timeEl);
+        }
+        if (_currentUser && _isAdmin && msg._id) {
+            var delBtn = document.createElement('span');
+            delBtn.className = 'chat-bubble-del';
+            delBtn.textContent = '🗑';
+            delBtn.title = 'Удалить';
+            delBtn.onclick = function() { deleteChatMsg(msg._id); };
+            meta.appendChild(delBtn);
+        }
+        bubble.appendChild(meta);
+        row.appendChild(bubble);
+        container.appendChild(row);
+    }
+
+    // ── Send message (unified) ──
+    window.tgSendMsg = function() {
+        if (_currentChatMode === 'dm' && _dmPartnerUid) {
+            sendDmMsg();
+        } else {
+            sendGlobalMsg();
+        }
+    };
+
+    function sendGlobalMsg() {
         if (!db || !_currentUser) return;
         var input = document.getElementById('chatInput');
         var text = (input.value || '').trim();
@@ -5084,7 +5346,6 @@ Stormarrow: При максимальных зарядах следующая б
             isAdmin: _isAdmin || false,
             ts: firebase.firestore.FieldValue.serverTimestamp()
         }).then(function() {
-            // Cleanup: keep only last 100
             db.collection('globalChat').orderBy('ts','asc').get().then(function(snap) {
                 if (snap.size > 100) {
                     var toDelete = snap.size - 100;
@@ -5097,162 +5358,232 @@ Stormarrow: При максимальных зарядах следующая б
                 }
             });
         });
-    };
+    }
+    window.sendChatMsg = sendGlobalMsg;
 
     function deleteChatMsg(docId) {
         if (!db) return;
         db.collection('globalChat').doc(docId).delete().catch(function(e) { console.warn('Delete error:', e); });
     }
 
-    window.openGlobalChat = function() {
-        if (typeof openModal==='function') { openModal('globalChatMask'); }
-        else { var el=document.getElementById('globalChatMask'); if(el){el.classList.add('active');el.style.zIndex='6000';} document.body.classList.add('modal-open'); }
-        startChatListener();
-        updateChatUI(!!_currentUser);
-        setTimeout(function() {
-            var inp = document.getElementById('chatInput');
-            if (inp && _currentUser) inp.focus();
-        }, 200);
-    };
-    window.closeGlobalChat = function() {
-        if (typeof closeModal==='function') { closeModal('globalChatMask'); }
-        else { var el=document.getElementById('globalChatMask'); if(el) el.classList.remove('active'); document.body.classList.remove('modal-open'); }
-    };
-
     // ═══════════════════════════════════════
-    // ADMIN SYSTEM
+    // DM (Direct Messages)
     // ═══════════════════════════════════════
-    var _isAdmin = false;
+    function getDmRoomId(uid1, uid2) {
+        return uid1 < uid2 ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
+    }
 
-    function checkAdmin() {
-        if (!db || !_currentUser) { _isAdmin = false; return; }
-        db.collection('admins').doc(_currentUser.uid).get().then(function(doc) {
-            _isAdmin = doc.exists;
-        }).catch(function() { _isAdmin = false; });
+    function openDmChat(partnerUid, partnerName) {
+        _dmPartnerUid = partnerUid;
+        _dmPartnerName = partnerName;
+        _currentChatMode = 'dm';
+        _currentChatTab = 'dm';
+        updateChatHeaderTitle();
+        startDmListener();
+        // On mobile, close sidebar when opening a DM
+        tgMobileCloseSidebar();
+        // Update input placeholder
+        var input = document.getElementById('chatInput');
+        if (input) input.placeholder = 'Личное сообщение...';
+        var inputArea = document.getElementById('chatInputArea');
+        if (inputArea && _currentUser) inputArea.style.display = 'flex';
+        var loginPrompt = document.getElementById('chatLoginPrompt');
+        if (loginPrompt) loginPrompt.style.display = 'none';
+        // Highlight active contact
+        document.querySelectorAll('#tgSidebarContent .user-card').forEach(function(c) { c.classList.remove('active-contact'); });
+        var cards = document.querySelectorAll('#tgSidebarContent .user-card');
+        cards.forEach(function(c) { if (c.dataset.uid === partnerUid) c.classList.add('active-contact'); });
+    }
+    window.openDmChat = openDmChat;
+
+    function startDmListener() {
+        if (_dmListener) { _dmListener(); _dmListener = null; }
+        if (!db || !_currentUser || !_dmPartnerUid) return;
+        var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
+        _dmListener = db.collection('dms').doc(roomId).collection('messages')
+            .orderBy('ts', 'asc')
+            .limitToLast(50)
+            .onSnapshot(function(snap) {
+                var msgs = [];
+                snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; msgs.push(d); });
+                renderDmMessages(msgs);
+            });
+    }
+
+    function renderDmMessages(msgs) {
+        var container = document.getElementById('chatMessages');
+        if (!container) return;
+        container.innerHTML = '';
+        if (!msgs.length) { container.innerHTML = '<div class="chat-login-msg">Начни разговор! 👋</div>'; return; }
+        msgs.forEach(function(msg) {
+            var isMe = _currentUser && msg.uid === _currentUser.uid;
+            renderBubble(container, msg, isMe, false);
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function sendDmMsg() {
+        if (!db || !_currentUser || !_dmPartnerUid) return;
+        var input = document.getElementById('chatInput');
+        var text = (input.value || '').trim();
+        if (!text) return;
+        input.value = '';
+        var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
+        db.collection('dms').doc(roomId).collection('messages').add({
+            text: text,
+            name: _currentUser.displayName || _currentUser.email || 'Аноним',
+            uid: _currentUser.uid,
+            photoURL: _currentUser.photoURL || '',
+            ts: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }
+    window.sendDmMsg = sendDmMsg;
+
+    function showSelectContactPrompt() {
+        var container = document.getElementById('chatMessages');
+        if (!container) return;
+        container.innerHTML = '<div class="chat-login-msg">👈 Выбери контакт слева<br>чтобы начать переписку</div>';
+        var inputArea = document.getElementById('chatInputArea');
+        if (inputArea) inputArea.style.display = 'none';
+        var loginPrompt = document.getElementById('chatLoginPrompt');
+        if (loginPrompt) loginPrompt.style.display = 'none';
+        // Restore input placeholder
+        var input = document.getElementById('chatInput');
+        if (input) input.placeholder = 'Написать сообщение...';
+    }
+
+    // ── DM contacts sidebar ──
+    function renderDmContactsSidebar() {
+        var container = document.getElementById('tgSidebarContent');
+        if (!container) return;
+        container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
+
+        if (!_currentUser) { container.innerHTML = '<div class="chat-login-msg">Войди чтобы писать ЛС</div>'; return; }
+
+        if (!_myFriends.length && !_isAdmin) {
+            container.innerHTML = '<div class="chat-login-msg">Добавь друзей чтобы писать ЛС</div>';
+            return;
+        }
+
+        var contactUids = _isAdmin ? _allUsers.map(function(u){return u._uid;}).filter(function(uid){return uid!==_currentUser.uid;}) : _myFriends;
+        if (!contactUids.length) {
+            container.innerHTML = '<div class="chat-login-msg">Нет контактов</div>';
+            return;
+        }
+
+        var promises = contactUids.map(function(uid) { return db.collection('users').doc(uid).get(); });
+        Promise.all(promises).then(function(docs) {
+            container.innerHTML = '';
+            docs.forEach(function(doc) {
+                if (!doc.exists) return;
+                var u = doc.data(); u._uid = doc.id;
+                var card = document.createElement('div');
+                card.className = 'user-card' + (_dmPartnerUid === u._uid ? ' active-contact' : '');
+                card.dataset.uid = u._uid;
+                card.onclick = function() { openDmChat(u._uid, u.displayName||u.email); };
+
+                var avWrap = document.createElement('div');
+                avWrap.className = 'user-av-wrap';
+                var av = document.createElement('div');
+                av.className = 'user-av';
+                if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
+                else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
+                avWrap.appendChild(av);
+                if (u.online) {
+                    var dot = document.createElement('div');
+                    dot.className = 'user-status-dot online';
+                    avWrap.appendChild(dot);
+                }
+                card.appendChild(avWrap);
+
+                var info = document.createElement('div');
+                info.className = 'user-info';
+                info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div><div class="user-email">Нажми чтобы написать</div>';
+                card.appendChild(info);
+
+                var arrow = document.createElement('div');
+                arrow.style.cssText = 'color:rgba(255,255,255,0.15);font-size:18px;flex-shrink:0;';
+                arrow.textContent = '›';
+                card.appendChild(arrow);
+                container.appendChild(card);
+            });
+        });
+    }
+
+    // ── Friend Requests sidebar ──
+    function renderFriendRequestsSidebar() {
+        var container = document.getElementById('tgSidebarContent');
+        if (!container) return;
+
+        if (!_currentUser) { container.innerHTML = '<div class="chat-login-msg">Войди для просмотра запросов</div>'; return; }
+        if (!_myFriendReqs.length) {
+            container.innerHTML = '<div class="chat-login-msg">Нет входящих запросов</div>';
+            return;
+        }
+
+        container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
+        var promises = _myFriendReqs.map(function(uid) { return db.collection('users').doc(uid).get(); });
+        Promise.all(promises).then(function(docs) {
+            container.innerHTML = '';
+            docs.forEach(function(doc) {
+                if (!doc.exists) return;
+                var u = doc.data(); u._uid = doc.id;
+                var card = document.createElement('div');
+                card.className = 'user-card';
+                card.style.cursor = 'default';
+
+                var avWrap = document.createElement('div');
+                avWrap.className = 'user-av-wrap';
+                var av = document.createElement('div');
+                av.className = 'user-av';
+                if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
+                else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
+                avWrap.appendChild(av);
+                card.appendChild(avWrap);
+
+                var info = document.createElement('div');
+                info.className = 'user-info';
+                info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div><div class="user-email">Хочет добавить в друзья</div>';
+                card.appendChild(info);
+
+                var actions = document.createElement('div');
+                actions.className = 'user-actions';
+                var accBtn = document.createElement('button');
+                accBtn.className = 'user-act-btn'; accBtn.style.color = '#2ecc71';
+                accBtn.textContent = '✓';
+                accBtn.onclick = function() { acceptFriendRequest(u._uid); };
+                actions.appendChild(accBtn);
+                var decBtn = document.createElement('button');
+                decBtn.className = 'user-act-btn'; decBtn.style.color = '#e74c3c';
+                decBtn.textContent = '✕';
+                decBtn.onclick = function() { declineFriendRequest(u._uid); };
+                actions.appendChild(decBtn);
+                card.appendChild(actions);
+                container.appendChild(card);
+            });
+        });
+    }
+
+    function showFriendRequestsPanel() {
+        var container = document.getElementById('chatMessages');
+        if (!container) return;
+        if (!_myFriendReqs.length) {
+            container.innerHTML = '<div class="chat-login-msg">📭 Нет входящих запросов в друзья</div>';
+        } else {
+            container.innerHTML = '<div class="chat-login-msg">📨 Выбери запрос слева для действия<br>Всего запросов: ' + _myFriendReqs.length + '</div>';
+        }
+        var inputArea = document.getElementById('chatInputArea');
+        if (inputArea) inputArea.style.display = 'none';
+        var loginPrompt = document.getElementById('chatLoginPrompt');
+        if (loginPrompt) loginPrompt.style.display = 'none';
     }
 
     // ═══════════════════════════════════════
-    // USERS LIST + FRIEND REQUESTS + DM + NOTIFICATIONS
+    // USERS LIST (used from sidebar menu)
     // ═══════════════════════════════════════
     var _allUsers = [];
-    var _myFriends = [];       // UIDs of confirmed friends
-    var _myFriendReqs = [];    // UIDs of incoming friend requests
-    var _mySentReqs = [];      // UIDs of sent requests
-    var _dmInboxListener = null;
-    var _unreadDmCount = 0;
 
-    // ── Helper: close user menu and open something ──
-    window.closeUserMenuAndOpen = function(what) {
-        var menu = document.getElementById('userMenu');
-        if (menu) menu.classList.remove('active');
-        if (what === 'dmInbox') openDmInbox();
-        else if (what === 'friendRequests') openFriendRequests();
-    };
-
-    // ── Load user data (friends, requests) ──
-    function loadFriends(cb) {
-        if (!db || !_currentUser) { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; if(cb) cb(); return; }
-        db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
-            if (doc.exists) {
-                var d = doc.data();
-                _myFriends = d.friends || [];
-                _myFriendReqs = d.friendRequests || [];
-                _mySentReqs = d.sentRequests || [];
-            } else {
-                _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[];
-            }
-            updateNotifDots();
-            if (cb) cb();
-        }).catch(function() { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; if(cb) cb(); });
-    }
-
-    // ── Notification dots ──
-    function updateNotifDots() {
-        var hasNotif = _myFriendReqs.length > 0 || _unreadDmCount > 0;
-        var dot = document.getElementById('authNotifDot');
-        if (dot) dot.style.display = hasNotif ? '' : 'none';
-        var frBadge = document.getElementById('frReqBadge');
-        if (frBadge) {
-            frBadge.style.display = _myFriendReqs.length > 0 ? '' : 'none';
-            frBadge.textContent = _myFriendReqs.length;
-        }
-        var dmBadge = document.getElementById('dmUnreadBadge');
-        if (dmBadge) {
-            dmBadge.style.display = _unreadDmCount > 0 ? '' : 'none';
-            dmBadge.textContent = _unreadDmCount;
-        }
-    }
-
-    // ── Send friend request ──
-    function sendFriendRequest(uid) {
-        if (!db || !_currentUser || uid === _currentUser.uid) return;
-        // Add to target's friendRequests
-        db.collection('users').doc(uid).set({
-            friendRequests: firebase.firestore.FieldValue.arrayUnion(_currentUser.uid)
-        }, { merge: true });
-        // Add to my sentRequests
-        if (!_mySentReqs.includes(uid)) _mySentReqs.push(uid);
-        db.collection('users').doc(_currentUser.uid).set({
-            sentRequests: firebase.firestore.FieldValue.arrayUnion(uid)
-        }, { merge: true }).then(function() { renderUsersList(); });
-    }
-
-    // ── Accept friend request ──
-    function acceptFriendRequest(uid) {
-        if (!db || !_currentUser) return;
-        var batch = db.batch();
-        var myRef = db.collection('users').doc(_currentUser.uid);
-        var theirRef = db.collection('users').doc(uid);
-        // Add each other as friends
-        batch.set(myRef, {
-            friends: firebase.firestore.FieldValue.arrayUnion(uid),
-            friendRequests: firebase.firestore.FieldValue.arrayRemove(uid)
-        }, { merge: true });
-        batch.set(theirRef, {
-            friends: firebase.firestore.FieldValue.arrayUnion(_currentUser.uid),
-            sentRequests: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
-        }, { merge: true });
-        batch.commit().then(function() {
-            _myFriendReqs = _myFriendReqs.filter(function(r) { return r !== uid; });
-            if (!_myFriends.includes(uid)) _myFriends.push(uid);
-            updateNotifDots();
-            renderFriendRequests();
-            renderUsersList();
-        });
-    }
-
-    // ── Decline friend request ──
-    function declineFriendRequest(uid) {
-        if (!db || !_currentUser) return;
-        db.collection('users').doc(_currentUser.uid).set({
-            friendRequests: firebase.firestore.FieldValue.arrayRemove(uid)
-        }, { merge: true }).then(function() {
-            _myFriendReqs = _myFriendReqs.filter(function(r) { return r !== uid; });
-            db.collection('users').doc(uid).set({
-                sentRequests: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
-            }, { merge: true });
-            updateNotifDots();
-            renderFriendRequests();
-        });
-    }
-
-    // ── Remove friend ──
-    function removeFriend(uid) {
-        if (!db || !_currentUser) return;
-        var batch = db.batch();
-        batch.set(db.collection('users').doc(_currentUser.uid), {
-            friends: firebase.firestore.FieldValue.arrayRemove(uid)
-        }, { merge: true });
-        batch.set(db.collection('users').doc(uid), {
-            friends: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
-        }, { merge: true });
-        batch.commit().then(function() {
-            _myFriends = _myFriends.filter(function(f) { return f !== uid; });
-            renderUsersList();
-        });
-    }
-
-    // ── Load all users ──
+    // ── Load all users from Firestore ──
     function loadAllUsers(cb) {
         if (!db) { if (cb) cb(); return; }
         db.collection('users').orderBy('displayName').get().then(function(snap) {
@@ -5274,313 +5605,274 @@ Stormarrow: При максимальных зарядах следующая б
         }).catch(function(e) { console.warn('Users load err:', e); if (cb) cb(); });
     }
 
-    // ── Render users list ──
-    function renderUsersList() {
-        var container = document.getElementById('usersListContent');
-        var countEl = document.getElementById('usersCount');
+    // ── Render all users in sidebar ──
+    function renderAllUsersSidebar() {
+        var container = document.getElementById('tgSidebarContent');
         if (!container) return;
-        container.innerHTML = '';
-        var onlineCount = _allUsers.filter(function(u) { return u._online; }).length;
-        if (countEl) countEl.textContent = onlineCount + ' онлайн / ' + _allUsers.length + ' всего';
-        if (!_allUsers.length) { container.innerHTML = '<div class="chat-login-msg">Пока нет пользователей</div>'; return; }
+        container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
+        loadFriends(function() {
+            loadAllUsers(function() {
+                container.innerHTML = '';
+                if (!_allUsers.length) { container.innerHTML = '<div class="chat-login-msg">Пока нет пользователей</div>'; return; }
+                _allUsers.forEach(function(u) {
+                    if (_currentUser && u._uid === _currentUser.uid) return;
+                    var card = document.createElement('div');
+                    card.className = 'user-card';
+                    card.style.cursor = 'default';
 
-        _allUsers.forEach(function(u) {
-            if (_currentUser && u._uid === _currentUser.uid) return;
-            var card = document.createElement('div');
-            card.className = 'user-card';
+                    var avWrap = document.createElement('div');
+                    avWrap.className = 'user-av-wrap';
+                    var av = document.createElement('div');
+                    av.className = 'user-av';
+                    if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
+                    else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
+                    avWrap.appendChild(av);
+                    var dot = document.createElement('div');
+                    dot.className = 'user-status-dot ' + (u._online ? 'online' : 'offline');
+                    avWrap.appendChild(dot);
+                    card.appendChild(avWrap);
 
-            var avWrap = document.createElement('div');
-            avWrap.className = 'user-av-wrap';
-            var av = document.createElement('div');
-            av.className = 'user-av';
-            if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
-            else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
-            avWrap.appendChild(av);
-            var dot = document.createElement('div');
-            dot.className = 'user-status-dot ' + (u._online ? 'online' : 'offline');
-            avWrap.appendChild(dot);
-            card.appendChild(avWrap);
+                    var info = document.createElement('div');
+                    info.className = 'user-info';
+                    info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div>'
+                        + '<div class="user-email">'+(u._online ? '🟢 Онлайн' : 'Оффлайн')+'</div>';
+                    card.appendChild(info);
 
-            var info = document.createElement('div');
-            info.className = 'user-info';
-            info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div>'
-                + '<div class="user-email">'+(u._online ? '🟢 Онлайн' : 'Оффлайн')+'</div>';
-            card.appendChild(info);
+                    if (_currentUser) {
+                        var actions = document.createElement('div');
+                        actions.className = 'user-actions';
+                        var isFriend = _myFriends.includes(u._uid);
+                        var reqSent = _mySentReqs.includes(u._uid);
+                        var reqReceived = _myFriendReqs.includes(u._uid);
 
-            if (_currentUser) {
-                var actions = document.createElement('div');
-                actions.className = 'user-actions';
-                var isFriend = _myFriends.includes(u._uid);
-                var reqSent = _mySentReqs.includes(u._uid);
-                var reqReceived = _myFriendReqs.includes(u._uid);
-
-                if (isFriend || _isAdmin) {
-                    var dmBtn = document.createElement('button');
-                    dmBtn.className = 'user-act-btn';
-                    dmBtn.textContent = '✉ ЛС';
-                    dmBtn.onclick = function() { openDmChat(u._uid, u.displayName||u.email); };
-                    actions.appendChild(dmBtn);
-                }
-                if (isFriend) {
-                    var rmBtn = document.createElement('button');
-                    rmBtn.className = 'user-act-btn'; rmBtn.style.color = '#e74c3c';
-                    rmBtn.textContent = '× Удалить';
-                    rmBtn.onclick = function() { removeFriend(u._uid); };
-                    actions.appendChild(rmBtn);
-                } else if (reqSent) {
-                    var pendBtn = document.createElement('button');
-                    pendBtn.className = 'user-act-btn'; pendBtn.style.opacity = '0.5';
-                    pendBtn.textContent = '⏳ Отправлено';
-                    pendBtn.disabled = true;
-                    actions.appendChild(pendBtn);
-                } else if (reqReceived) {
-                    var accBtn = document.createElement('button');
-                    accBtn.className = 'user-act-btn'; accBtn.style.color = '#2ecc71';
-                    accBtn.textContent = '✓ Принять';
-                    accBtn.onclick = function() { acceptFriendRequest(u._uid); };
-                    actions.appendChild(accBtn);
-                } else {
-                    var addBtn = document.createElement('button');
-                    addBtn.className = 'user-act-btn';
-                    addBtn.textContent = '+ Запрос';
-                    addBtn.onclick = function() { sendFriendRequest(u._uid); };
-                    actions.appendChild(addBtn);
-                }
-                card.appendChild(actions);
-            }
-            container.appendChild(card);
+                        if (isFriend || _isAdmin) {
+                            var dmBtn = document.createElement('button');
+                            dmBtn.className = 'user-act-btn';
+                            dmBtn.textContent = '✉';
+                            dmBtn.title = 'Личное сообщение';
+                            dmBtn.onclick = function() { switchChatTab('dm'); openDmChat(u._uid, u.displayName||u.email); };
+                            actions.appendChild(dmBtn);
+                        }
+                        if (isFriend) {
+                            var rmBtn = document.createElement('button');
+                            rmBtn.className = 'user-act-btn'; rmBtn.style.color = '#e74c3c';
+                            rmBtn.textContent = '×';
+                            rmBtn.title = 'Удалить из друзей';
+                            rmBtn.onclick = function() { removeFriend(u._uid); setTimeout(renderAllUsersSidebar, 300); };
+                            actions.appendChild(rmBtn);
+                        } else if (reqSent) {
+                            var pendBtn = document.createElement('button');
+                            pendBtn.className = 'user-act-btn'; pendBtn.style.opacity = '0.5';
+                            pendBtn.textContent = '⏳';
+                            pendBtn.title = 'Запрос отправлен';
+                            pendBtn.disabled = true;
+                            actions.appendChild(pendBtn);
+                        } else if (reqReceived) {
+                            var accBtn = document.createElement('button');
+                            accBtn.className = 'user-act-btn'; accBtn.style.color = '#2ecc71';
+                            accBtn.textContent = '✓';
+                            accBtn.title = 'Принять запрос';
+                            accBtn.onclick = function() { acceptFriendRequest(u._uid); setTimeout(renderAllUsersSidebar, 300); };
+                            actions.appendChild(accBtn);
+                        } else {
+                            var addBtn = document.createElement('button');
+                            addBtn.className = 'user-act-btn';
+                            addBtn.textContent = '+';
+                            addBtn.title = 'Отправить запрос в друзья';
+                            addBtn.onclick = function() { sendFriendRequest(u._uid); setTimeout(renderAllUsersSidebar, 300); };
+                            actions.appendChild(addBtn);
+                        }
+                        card.appendChild(actions);
+                    }
+                    container.appendChild(card);
+                });
+            });
         });
+    }
+
+    function showUsersPanel() {
+        var container = document.getElementById('chatMessages');
+        if (!container) return;
+        container.innerHTML = '<div class="chat-login-msg">👥 Список пользователей<br>Добавляй друзей и пиши ЛС</div>';
+        var inputArea = document.getElementById('chatInputArea');
+        if (inputArea) inputArea.style.display = 'none';
+        var loginPrompt = document.getElementById('chatLoginPrompt');
+        if (loginPrompt) loginPrompt.style.display = 'none';
+    }
+
+    function renderUsersList() {
+        if (_currentChatTab === 'dm') renderDmContactsSidebar();
+        else if (_currentChatTab === 'users') renderAllUsersSidebar();
     }
 
     window.openUsersList = function() {
-        openModal('usersListMask');
-        loadFriends(function() { loadAllUsers(function() { renderUsersList(); }); });
+        openChatSystem('users');
     };
-    window.closeUsersList = function() { closeModal('usersListMask'); };
 
-    // ═══════════════════════════════════════
-    // FRIEND REQUESTS MODAL
-    // ═══════════════════════════════════════
     function openFriendRequests() {
-        openModal('usersListMask');
-        loadFriends(function() {
-            var container = document.getElementById('usersListContent');
-            var countEl = document.getElementById('usersCount');
-            if (!container) return;
-            container.innerHTML = '';
-            if (countEl) countEl.textContent = _myFriendReqs.length + ' запросов';
-            // Change title temporarily
-            document.querySelector('#usersListMask .m-win div[style*="font-weight:900"]').textContent = '📨 Запросы в друзья';
-            if (!_myFriendReqs.length) {
-                container.innerHTML = '<div class="chat-login-msg">Нет входящих запросов</div>';
-                return;
-            }
-            // Need to load user data for each request
-            var promises = _myFriendReqs.map(function(uid) {
-                return db.collection('users').doc(uid).get();
-            });
-            Promise.all(promises).then(function(docs) {
-                renderFriendRequestsFromDocs(docs);
-            });
-        });
+        openChatSystem('reqs');
     }
 
-    function renderFriendRequests() {
-        // Re-render if modal is open
-        var el = document.getElementById('usersListMask');
-        if (el && el.classList.contains('active')) openFriendRequests();
-    }
-
-    function renderFriendRequestsFromDocs(docs) {
-        var container = document.getElementById('usersListContent');
-        if (!container) return;
-        container.innerHTML = '';
-        docs.forEach(function(doc) {
-            if (!doc.exists) return;
-            var u = doc.data(); u._uid = doc.id;
-            var card = document.createElement('div');
-            card.className = 'user-card';
-            var avWrap = document.createElement('div');
-            avWrap.className = 'user-av-wrap';
-            var av = document.createElement('div');
-            av.className = 'user-av';
-            if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
-            else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
-            avWrap.appendChild(av);
-            card.appendChild(avWrap);
-
-            var info = document.createElement('div');
-            info.className = 'user-info';
-            info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div><div class="user-email">Хочет добавить в друзья</div>';
-            card.appendChild(info);
-
-            var actions = document.createElement('div');
-            actions.className = 'user-actions';
-            var accBtn = document.createElement('button');
-            accBtn.className = 'user-act-btn'; accBtn.style.color = '#2ecc71';
-            accBtn.textContent = '✓ Принять';
-            accBtn.onclick = function() { acceptFriendRequest(u._uid); };
-            actions.appendChild(accBtn);
-            var decBtn = document.createElement('button');
-            decBtn.className = 'user-act-btn'; decBtn.style.color = '#e74c3c';
-            decBtn.textContent = '✕ Откл.';
-            decBtn.onclick = function() { declineFriendRequest(u._uid); };
-            actions.appendChild(decBtn);
-            card.appendChild(actions);
-            container.appendChild(card);
-        });
-    }
-
-    // ═══════════════════════════════════════
-    // DM INBOX (list of conversations)
-    // ═══════════════════════════════════════
     function openDmInbox() {
-        openModal('usersListMask');
-        var container = document.getElementById('usersListContent');
-        var countEl = document.getElementById('usersCount');
-        if (!container) return;
-        container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
-        if (countEl) countEl.textContent = '';
-        document.querySelector('#usersListMask .m-win div[style*="font-weight:900"]').textContent = '✉ Личные сообщения';
-
-        if (!_myFriends.length && !_isAdmin) {
-            container.innerHTML = '<div class="chat-login-msg">Добавь друзей чтобы писать ЛС</div>';
-            return;
-        }
-        // Show friends list as DM contacts
-        var contactUids = _isAdmin ? _allUsers.map(function(u){return u._uid;}).filter(function(uid){return uid!==_currentUser.uid;}) : _myFriends;
-        if (!contactUids.length) {
-            container.innerHTML = '<div class="chat-login-msg">Нет контактов</div>';
-            return;
-        }
-        var promises = contactUids.map(function(uid) { return db.collection('users').doc(uid).get(); });
-        Promise.all(promises).then(function(docs) {
-            container.innerHTML = '';
-            if (countEl) countEl.textContent = docs.filter(function(d){return d.exists;}).length + ' контактов';
-            docs.forEach(function(doc) {
-                if (!doc.exists) return;
-                var u = doc.data(); u._uid = doc.id;
-                var card = document.createElement('div');
-                card.className = 'user-card';
-                card.style.cursor = 'pointer';
-                card.onclick = function() { openDmChat(u._uid, u.displayName||u.email); };
-
-                var avWrap = document.createElement('div');
-                avWrap.className = 'user-av-wrap';
-                var av = document.createElement('div');
-                av.className = 'user-av';
-                if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
-                else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
-                avWrap.appendChild(av);
-                card.appendChild(avWrap);
-
-                var info = document.createElement('div');
-                info.className = 'user-info';
-                info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div><div class="user-email">Нажми чтобы написать</div>';
-                card.appendChild(info);
-
-                var arrow = document.createElement('div');
-                arrow.style.cssText = 'color:rgba(255,255,255,0.15);font-size:18px;flex-shrink:0;';
-                arrow.textContent = '›';
-                card.appendChild(arrow);
-                container.appendChild(card);
-            });
-        });
+        openChatSystem('dm');
     }
+
+    window.closeUsersList = function() {};
 
     // ═══════════════════════════════════════
-    // DM (Direct Messages)
+    // FRIEND SYSTEM
     // ═══════════════════════════════════════
-    var _dmListener = null;
-    var _dmPartnerUid = null;
-    var _dmPartnerName = '';
+    var _myFriends = [];
+    var _myFriendReqs = [];
+    var _mySentReqs = [];
+    var _dmInboxListener = null;
+    var _unreadDmCount = 0;
 
-    function getDmRoomId(uid1, uid2) {
-        return uid1 < uid2 ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
-    }
-
-    function openDmChat(partnerUid, partnerName) {
-        _dmPartnerUid = partnerUid;
-        _dmPartnerName = partnerName;
-        document.getElementById('dmChatName').textContent = '✉ ' + partnerName;
-        openModal('dmChatMask');
-        startDmListener();
-    }
-    window.openDmChat = openDmChat;
-
-    window.closeDmChat = function() {
-        closeModal('dmChatMask');
-        if (_dmListener) { _dmListener(); _dmListener = null; }
+    window.closeUserMenuAndOpen = function(what) {
+        var menu = document.getElementById('userMenu');
+        if (menu) menu.classList.remove('active');
+        if (what === 'dmInbox') openDmInbox();
+        else if (what === 'friendRequests') openFriendRequests();
     };
 
-    function startDmListener() {
-        if (_dmListener) { _dmListener(); _dmListener = null; }
-        if (!db || !_currentUser || !_dmPartnerUid) return;
-        var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
-        _dmListener = db.collection('dms').doc(roomId).collection('messages')
-            .orderBy('ts', 'asc')
-            .limitToLast(50)
-            .onSnapshot(function(snap) {
-                var msgs = [];
-                snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; msgs.push(d); });
-                renderDmMessages(msgs);
-            });
-    }
-
-    function renderDmMessages(msgs) {
-        var container = document.getElementById('dmMessages');
-        if (!container) return;
-        container.innerHTML = '';
-        if (!msgs.length) { container.innerHTML = '<div class="chat-login-msg">Начни разговор!</div>'; return; }
-        msgs.forEach(function(msg) {
-            var div = document.createElement('div');
-            div.className = 'chat-msg';
-            var isMe = _currentUser && msg.uid === _currentUser.uid;
-            var av = document.createElement('div');
-            av.className = 'chat-msg-av';
-            if (msg.photoURL) av.innerHTML = '<img src="'+msg.photoURL+'">';
-            else av.textContent = (msg.name||'?').charAt(0).toUpperCase();
-            div.appendChild(av);
-            var body = document.createElement('div');
-            body.className = 'chat-msg-body';
-            var head = document.createElement('div');
-            head.className = 'chat-msg-head';
-            head.innerHTML = '<span class="chat-msg-name" style="color:'+(isMe?'#5dade2':'#b96fff')+';">'+(msg.name||'')+'</span>';
-            if (msg.ts) {
-                var d = msg.ts.toDate ? msg.ts.toDate() : new Date(msg.ts);
-                head.innerHTML += '<span class="chat-msg-time">'+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})+'</span>';
+    function loadFriends(cb) {
+        if (!db || !_currentUser) { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; if(cb) cb(); return; }
+        db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+            if (doc.exists) {
+                var d = doc.data();
+                _myFriends = d.friends || [];
+                _myFriendReqs = d.friendRequests || [];
+                _mySentReqs = d.sentRequests || [];
+            } else {
+                _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[];
             }
-            body.appendChild(head);
-            var text = document.createElement('div');
-            text.className = 'chat-msg-text';
-            text.textContent = msg.text || '';
-            body.appendChild(text);
-            div.appendChild(body);
-            container.appendChild(div);
-        });
-        container.scrollTop = container.scrollHeight;
+            updateNotifDots();
+            if (cb) cb();
+        }).catch(function() { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; if(cb) cb(); });
     }
 
-    window.sendDmMsg = function() {
-        if (!db || !_currentUser || !_dmPartnerUid) return;
-        var input = document.getElementById('dmInput');
-        var text = (input.value || '').trim();
-        if (!text) return;
-        input.value = '';
-        var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
-        db.collection('dms').doc(roomId).collection('messages').add({
-            text: text,
-            name: _currentUser.displayName || _currentUser.email || 'Аноним',
-            uid: _currentUser.uid,
-            photoURL: _currentUser.photoURL || '',
-            ts: firebase.firestore.FieldValue.serverTimestamp()
-        });
-    };
+    function updateNotifDots() {
+        var hasNotif = _myFriendReqs.length > 0 || _unreadDmCount > 0;
+        // Auth button dot
+        var dot = document.getElementById('authNotifDot');
+        if (dot) dot.style.display = hasNotif ? '' : 'none';
+        // Profile menu badges
+        var frBadge = document.getElementById('frReqBadge');
+        if (frBadge) {
+            frBadge.style.display = _myFriendReqs.length > 0 ? '' : 'none';
+            frBadge.textContent = _myFriendReqs.length;
+        }
+        var dmBadge = document.getElementById('dmUnreadBadge');
+        if (dmBadge) {
+            dmBadge.style.display = _unreadDmCount > 0 ? '' : 'none';
+            dmBadge.textContent = _unreadDmCount;
+        }
+        // Sidebar chat button badge
+        var sideBadge = document.getElementById('sidebarChatBadge');
+        if (sideBadge) {
+            var total = _myFriendReqs.length + _unreadDmCount;
+            sideBadge.style.display = total > 0 ? '' : 'none';
+            sideBadge.textContent = total;
+        }
+        // Chat tabs badges
+        var tgReqsBadge = document.getElementById('tgReqsBadge');
+        if (tgReqsBadge) {
+            tgReqsBadge.style.display = _myFriendReqs.length > 0 ? 'flex' : 'none';
+            tgReqsBadge.textContent = _myFriendReqs.length;
+        }
+        var tgDmBadge = document.getElementById('tgDmBadge');
+        if (tgDmBadge) {
+            tgDmBadge.style.display = _unreadDmCount > 0 ? 'flex' : 'none';
+            tgDmBadge.textContent = _unreadDmCount;
+        }
+        // Mobile button badge
+        var mobBadge = document.getElementById('tgMobBadge');
+        if (mobBadge) {
+            var mobTotal = _myFriendReqs.length + _unreadDmCount;
+            mobBadge.style.display = mobTotal > 0 ? 'flex' : 'none';
+            mobBadge.textContent = mobTotal;
+        }
+    }
 
-    // ── DM notification listener ──
+    function sendFriendRequest(uid) {
+        if (!db || !_currentUser || uid === _currentUser.uid) return;
+        db.collection('users').doc(uid).set({
+            friendRequests: firebase.firestore.FieldValue.arrayUnion(_currentUser.uid)
+        }, { merge: true });
+        if (!_mySentReqs.includes(uid)) _mySentReqs.push(uid);
+        db.collection('users').doc(_currentUser.uid).set({
+            sentRequests: firebase.firestore.FieldValue.arrayUnion(uid)
+        }, { merge: true }).then(function() { renderUsersList(); });
+    }
+
+    function acceptFriendRequest(uid) {
+        if (!db || !_currentUser) return;
+        var batch = db.batch();
+        var myRef = db.collection('users').doc(_currentUser.uid);
+        var theirRef = db.collection('users').doc(uid);
+        batch.set(myRef, {
+            friends: firebase.firestore.FieldValue.arrayUnion(uid),
+            friendRequests: firebase.firestore.FieldValue.arrayRemove(uid)
+        }, { merge: true });
+        batch.set(theirRef, {
+            friends: firebase.firestore.FieldValue.arrayUnion(_currentUser.uid),
+            sentRequests: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
+        }, { merge: true });
+        batch.commit().then(function() {
+            _myFriendReqs = _myFriendReqs.filter(function(r) { return r !== uid; });
+            if (!_myFriends.includes(uid)) _myFriends.push(uid);
+            updateNotifDots();
+            if (_currentChatTab === 'reqs') {
+                renderFriendRequestsSidebar();
+                showFriendRequestsPanel();
+            }
+            renderUsersList();
+        });
+    }
+
+    function declineFriendRequest(uid) {
+        if (!db || !_currentUser) return;
+        db.collection('users').doc(_currentUser.uid).set({
+            friendRequests: firebase.firestore.FieldValue.arrayRemove(uid)
+        }, { merge: true }).then(function() {
+            _myFriendReqs = _myFriendReqs.filter(function(r) { return r !== uid; });
+            db.collection('users').doc(uid).set({
+                sentRequests: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
+            }, { merge: true });
+            updateNotifDots();
+            if (_currentChatTab === 'reqs') {
+                renderFriendRequestsSidebar();
+                showFriendRequestsPanel();
+            }
+        });
+    }
+
+    function removeFriend(uid) {
+        if (!db || !_currentUser) return;
+        var batch = db.batch();
+        batch.set(db.collection('users').doc(_currentUser.uid), {
+            friends: firebase.firestore.FieldValue.arrayRemove(uid)
+        }, { merge: true });
+        batch.set(db.collection('users').doc(uid), {
+            friends: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
+        }, { merge: true });
+        batch.commit().then(function() {
+            _myFriends = _myFriends.filter(function(f) { return f !== uid; });
+            renderUsersList();
+        });
+    }
+
+    // Keep renderFriendRequests for legacy calls
+    function renderFriendRequests() {
+        if (_currentChatTab === 'reqs') {
+            renderFriendRequestsSidebar();
+            showFriendRequestsPanel();
+        }
+    }
+
+    // DM notification listener
     function startDmNotifListener() {
         if (!db || !_currentUser) return;
-        // Listen to own user doc for friendRequests changes
         db.collection('users').doc(_currentUser.uid).onSnapshot(function(doc) {
             if (!doc.exists) return;
             var d = doc.data();
@@ -5590,8 +5882,6 @@ Stormarrow: При максимальных зарядах следующая б
             updateNotifDots();
         });
     }
-
-    // Admin check is handled in the main auth listener above
 
 })();
 </script>
