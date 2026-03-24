@@ -797,28 +797,25 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ TELEGRAM-STYLE UNIFIED CHAT ══ -->
 <div class="m-mask" id="chatSystemMask" onclick="if(event.target===this)closeChatSystem()">
   <div class="m-win tg-chat-wrap">
-    <!-- LEFT SIDEBAR: tabs + contacts -->
+    <!-- LEFT: Users list (PC only) -->
     <div class="tg-sidebar" id="tgSidebar">
       <div class="tg-sidebar-header">
         <button class="btn-close-x" onclick="closeChatSystem()" style="position:static;width:28px;height:28px;font-size:14px;">✕</button>
-        <div style="font-size:15px;font-weight:900;color:#b96fff;">💬 Чат</div>
+        <div style="font-size:14px;font-weight:900;color:#b96fff;">👥 Пользователи</div>
         <div id="chatOnlineCount" style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);"></div>
-      </div>
-      <div class="tg-sidebar-tabs">
-        <button class="tg-tab active" id="tgTabGlobal" onclick="switchChatTab('global')">💬</button>
-        <button class="tg-tab" id="tgTabUsers" onclick="switchChatTab('users')">👥</button>
-        <button class="tg-tab" id="tgTabDm" onclick="switchChatTab('dm')">✉<span class="tg-tab-badge" id="tgDmBadge"></span></button>
-        <button class="tg-tab" id="tgTabReqs" onclick="switchChatTab('reqs')">📨<span class="tg-tab-badge" id="tgReqsBadge"></span></button>
       </div>
       <div class="tg-sidebar-content" id="tgSidebarContent">
         <div class="chat-login-msg">Загрузка...</div>
       </div>
     </div>
-    <!-- RIGHT CHAT PANEL -->
+    <!-- RIGHT: Chat -->
     <div class="tg-chat-panel" id="tgChatPanel">
       <div class="tg-chat-header" id="tgChatHeader">
-        <button class="tg-back-btn" id="tgBackBtn" onclick="tgMobileBack()">←</button>
-        <div class="tg-chat-title" id="tgChatTitle">💬 Глобальный чат</div>
+        <button class="tg-back-btn" id="tgBackBtn" onclick="tgBackFromDm()">←</button>
+        <div class="tg-chat-tabs" id="tgChatTabs">
+          <button class="tg-chat-tab active" id="tgTabGlobal" onclick="switchToGlobal()">💬 Чат</button>
+          <button class="tg-chat-tab" id="tgTabDm" onclick="switchToDmList()">✉ ЛС<span class="tg-tab-badge" id="tgDmBadge"></span></button>
+        </div>
         <button class="tg-mobile-users-btn" id="tgMobileUsersBtn" onclick="tgMobileShowSidebar()">👥<span class="tg-mob-badge" id="tgMobBadge"></span></button>
         <button class="btn-close-x" onclick="closeChatSystem()" style="position:static;width:28px;height:28px;font-size:14px;">✕</button>
       </div>

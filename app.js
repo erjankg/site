@@ -2506,16 +2506,21 @@
         });
     }
 
+
     // ═══════════════════════════════════════
-    // TELEGRAM-STYLE UNIFIED CHAT SYSTEM
+    // CHAT SYSTEM (v2 — simplified)
     // ═══════════════════════════════════════
     var _chatListener = null;
     var _chatMessages = [];
-    var _currentChatTab = 'global'; // 'global' | 'dm' | 'reqs'
-    var _currentChatMode = 'global'; // 'global' | 'dm'
+    var _chatView = 'global'; // 'global' | 'dmList' | 'dm'
     var _dmListener = null;
     var _dmPartnerUid = null;
     var _dmPartnerName = '';
+    var _allUsers = [];
+    var _myFriends = [];
+    var _myFriendReqs = [];
+    var _mySentReqs = [];
+    var _unreadDmCount = 0;
 
     function updateChatUI(loggedIn) {
         var inputArea = document.getElementById('chatInputArea');
@@ -2524,159 +2529,270 @@
         if (loginPrompt) loginPrompt.style.display = loggedIn ? 'none' : '';
     }
 
-    // ── Open unified chat system ──
-    window.openChatSystem = function(tab) {
+    // ═══ OPEN / CLOSE ═══
+    window.openChatSystem = function() {
         openModal('chatSystemMask');
-        _currentChatTab = tab || 'global';
-        switchChatTab(_currentChatTab);
-        startChatListener();
-        // Fix mobile keyboard
+        switchToGlobal();
+        loadUsersToSidebar();
         fixMobileKeyboard();
     };
-    window.openGlobalChat = function() { openChatSystem('global'); };
+    window.openGlobalChat = window.openChatSystem;
 
     window.closeChatSystem = function() {
         closeModal('chatSystemMask');
         if (_chatListener) { _chatListener(); _chatListener = null; }
         if (_dmListener) { _dmListener(); _dmListener = null; }
         _dmPartnerUid = null;
-        // Close mobile sidebar
         var sb = document.getElementById('tgSidebar');
         if (sb) sb.classList.remove('mobile-open');
-        // Reset mobile keyboard styles
         var mask = document.getElementById('chatSystemMask');
         if (mask) { mask.style.height = ''; mask.style.maxHeight = ''; mask.style.top = ''; }
     };
-    // Keep legacy names working
     window.closeGlobalChat = window.closeChatSystem;
-    window.closeUsersList = function() {};
-    window.closeDmChat = function() {
+
+    // ═══ TAB SWITCHING (right panel) ═══
+    window.switchToGlobal = function() {
+        _chatView = 'global';
         if (_dmListener) { _dmListener(); _dmListener = null; }
         _dmPartnerUid = null;
-        _currentChatMode = 'global';
-        switchChatTab(_currentChatTab);
+        updateTabUI();
+        startChatListener();
         renderGlobalChat();
-    };
-
-    // ── Tab switching ──
-    window.switchChatTab = function(tab) {
-        _currentChatTab = tab;
-        ['tgTabGlobal','tgTabDm','tgTabReqs','tgTabUsers'].forEach(function(id) {
-            var el = document.getElementById(id);
-            if (el) el.classList.remove('active');
-        });
-        var tabMap = {'global':'tgTabGlobal','dm':'tgTabDm','reqs':'tgTabReqs','users':'tgTabUsers'};
-        var activeTab = document.getElementById(tabMap[tab] || 'tgTabGlobal');
-        if (activeTab) activeTab.classList.add('active');
-
-        // Reset input
         var input = document.getElementById('chatInput');
         if (input) input.placeholder = 'Написать сообщение...';
-
-        if (tab === 'global') {
-            _currentChatMode = 'global';
-            if (_dmListener) { _dmListener(); _dmListener = null; }
-            _dmPartnerUid = null;
-            renderGlobalChat();
-            renderGlobalSidebar();
-        } else if (tab === 'users') {
-            _currentChatMode = 'global';
-            if (_dmListener) { _dmListener(); _dmListener = null; }
-            _dmPartnerUid = null;
-            renderAllUsersSidebar();
-            showUsersPanel();
-        } else if (tab === 'dm') {
-            _currentChatMode = _dmPartnerUid ? 'dm' : 'global';
-            renderDmContactsSidebar();
-            if (_dmPartnerUid) {
-                startDmListener();
-            } else {
-                showSelectContactPrompt();
-            }
-        } else if (tab === 'reqs') {
-            _currentChatMode = 'global';
-            renderFriendRequestsSidebar();
-            showFriendRequestsPanel();
-        }
-        updateChatHeaderTitle();
+        // Show back btn on mobile only if needed
+        var backBtn = document.getElementById('tgBackBtn');
+        if (backBtn) backBtn.style.display = 'none';
     };
 
-    function updateChatHeaderTitle() {
-        var title = document.getElementById('tgChatTitle');
+    window.switchToDmList = function() {
+        _chatView = 'dmList';
+        if (_dmListener) { _dmListener(); _dmListener = null; }
+        _dmPartnerUid = null;
+        updateTabUI();
+        renderDmList();
         var backBtn = document.getElementById('tgBackBtn');
-        var usersBtn = document.getElementById('tgMobileUsersBtn');
-        if (!title) return;
+        if (backBtn) backBtn.style.display = 'none';
+    };
 
-        if (_currentChatMode === 'dm' && _dmPartnerUid) {
-            title.textContent = '✉ ' + _dmPartnerName;
-            title.style.color = '#b96fff';
+    window.tgBackFromDm = function() {
+        if (_chatView === 'dm') {
+            switchToDmList();
+        }
+    };
+
+    function updateTabUI() {
+        var gTab = document.getElementById('tgTabGlobal');
+        var dTab = document.getElementById('tgTabDm');
+        var tabs = document.getElementById('tgChatTabs');
+        if (gTab) gTab.classList.toggle('active', _chatView === 'global');
+        if (dTab) dTab.classList.toggle('active', _chatView === 'dmList' || _chatView === 'dm');
+        // Show tabs or back btn
+        if (_chatView === 'dm') {
+            if (tabs) tabs.style.display = 'none';
+            var backBtn = document.getElementById('tgBackBtn');
             if (backBtn) backBtn.style.display = '';
-            if (usersBtn) usersBtn.style.display = 'none';
-        } else if (_currentChatTab === 'reqs') {
-            title.textContent = '📨 Запросы в друзья';
-            title.style.color = '#e74c3c';
-            if (backBtn) backBtn.style.display = 'none';
-            if (usersBtn) usersBtn.style.display = '';
-        } else if (_currentChatTab === 'users') {
-            title.textContent = '👥 Пользователи';
-            title.style.color = '#b96fff';
-            if (backBtn) backBtn.style.display = 'none';
-            if (usersBtn) usersBtn.style.display = '';
         } else {
-            title.textContent = '💬 Глобальный чат';
-            title.style.color = '#2ecc71';
-            if (backBtn) backBtn.style.display = 'none';
-            if (usersBtn) usersBtn.style.display = '';
+            if (tabs) tabs.style.display = '';
         }
     }
 
-    // ── Mobile sidebar toggle ──
+    // ═══ MOBILE ═══
     window.tgMobileShowSidebar = function() {
         var sb = document.getElementById('tgSidebar');
         if (sb) sb.classList.add('mobile-open');
-    };
-    window.tgMobileBack = function() {
-        if (_currentChatMode === 'dm' && _dmPartnerUid) {
-            closeDmChat();
-        } else {
-            var sb = document.getElementById('tgSidebar');
-            if (sb) sb.classList.remove('mobile-open');
-        }
     };
     window.tgMobileCloseSidebar = function() {
         var sb = document.getElementById('tgSidebar');
         if (sb) sb.classList.remove('mobile-open');
     };
+    window.tgMobileBack = window.tgBackFromDm;
 
-    // ── Fix mobile keyboard ──
     function fixMobileKeyboard() {
         var vv = window.visualViewport;
         if (!vv) return;
         var mask = document.getElementById('chatSystemMask');
         if (!mask) return;
-
-        function onViewportChange() {
+        function onVV() {
             if (!mask.classList.contains('active')) return;
-            // Set mask height to visual viewport height (excludes keyboard)
             mask.style.height = vv.height + 'px';
-            mask.style.maxHeight = vv.height + 'px';
-            // Offset for any scroll the viewport does
             mask.style.top = vv.offsetTop + 'px';
-            // Scroll chat to bottom when keyboard opens
             var chatMsgs = document.getElementById('chatMessages');
-            if (chatMsgs) {
-                setTimeout(function() { chatMsgs.scrollTop = chatMsgs.scrollHeight; }, 100);
-            }
+            if (chatMsgs) setTimeout(function() { chatMsgs.scrollTop = chatMsgs.scrollHeight; }, 50);
         }
-        vv.addEventListener('resize', onViewportChange);
-        vv.addEventListener('scroll', onViewportChange);
-        // Initial call
-        onViewportChange();
+        vv.addEventListener('resize', onVV);
+        vv.addEventListener('scroll', onVV);
     }
 
-    // ═══════════════════════════════════════
-    // GLOBAL CHAT
-    // ═══════════════════════════════════════
+    // ═══ USERS SIDEBAR (always shows all users) ═══
+    function loadUsersToSidebar() {
+        var container = document.getElementById('tgSidebarContent');
+        if (!container) return;
+        container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
+        loadFriends(function() {
+            loadAllUsers(function() {
+                renderUsersSidebar();
+            });
+        });
+    }
+
+    function loadAllUsers(cb) {
+        if (!db) { if (cb) cb(); return; }
+        db.collection('users').orderBy('displayName').get().then(function(snap) {
+            _allUsers = [];
+            snap.forEach(function(doc) {
+                var d = doc.data(); d._uid = doc.id;
+                if (d.lastSeen && d.lastSeen.toDate) {
+                    var diff = Date.now() - d.lastSeen.toDate().getTime();
+                    d._online = d.online && diff < 120000;
+                } else { d._online = false; }
+                _allUsers.push(d);
+            });
+            _allUsers.sort(function(a, b) {
+                if (a._online && !b._online) return -1;
+                if (!a._online && b._online) return 1;
+                return (a.displayName || '').localeCompare(b.displayName || '');
+            });
+            // Update online count
+            var countEl = document.getElementById('chatOnlineCount');
+            if (countEl) {
+                var onl = _allUsers.filter(function(u) { return u._online; }).length;
+                countEl.textContent = onl + ' онлайн';
+            }
+            if (cb) cb();
+        }).catch(function(e) { console.warn('Users load err:', e); if (cb) cb(); });
+    }
+
+    function renderUsersSidebar() {
+        var container = document.getElementById('tgSidebarContent');
+        if (!container) return;
+        container.innerHTML = '';
+        if (!_allUsers.length) { container.innerHTML = '<div class="chat-login-msg">Нет пользователей</div>'; return; }
+
+        _allUsers.forEach(function(u) {
+            if (_currentUser && u._uid === _currentUser.uid) return;
+            var card = document.createElement('div');
+            card.className = 'user-card';
+            card.onclick = function(e) { showUserPopup(u, e); };
+
+            var avWrap = document.createElement('div');
+            avWrap.className = 'user-av-wrap';
+            var av = document.createElement('div');
+            av.className = 'user-av';
+            if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
+            else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
+            avWrap.appendChild(av);
+            var dot = document.createElement('div');
+            dot.className = 'user-status-dot ' + (u._online ? 'online' : 'offline');
+            avWrap.appendChild(dot);
+            card.appendChild(avWrap);
+
+            var info = document.createElement('div');
+            info.className = 'user-info';
+            info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div>'
+                + '<div class="user-email">'+(u._online ? '🟢 Онлайн' : 'Оффлайн')+'</div>';
+            card.appendChild(info);
+            container.appendChild(card);
+        });
+    }
+
+    // ═══ USER POPUP (click on user in sidebar) ═══
+    function showUserPopup(user, evt) {
+        // Remove existing popup
+        var old = document.getElementById('userPopup');
+        if (old) old.remove();
+
+        if (!_currentUser) return;
+        var isFriend = _myFriends.includes(user._uid);
+        var reqSent = _mySentReqs.includes(user._uid);
+        var reqReceived = _myFriendReqs.includes(user._uid);
+
+        var popup = document.createElement('div');
+        popup.id = 'userPopup';
+        popup.style.cssText = 'position:fixed;z-index:9999;background:rgba(20,8,40,0.97);border:1.5px solid rgba(185,111,255,0.4);border-radius:14px;padding:12px;min-width:180px;box-shadow:0 12px 40px rgba(0,0,0,0.7);animation:fadeIn 0.15s ease;';
+
+        // Position near click
+        var x = Math.min(evt.clientX, window.innerWidth - 200);
+        var y = Math.min(evt.clientY, window.innerHeight - 200);
+        popup.style.left = x + 'px';
+        popup.style.top = y + 'px';
+
+        // User name
+        var nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-size:13px;font-weight:900;color:#fff;margin-bottom:8px;';
+        nameEl.textContent = user.displayName || user.email || '???';
+        popup.appendChild(nameEl);
+
+        // Buttons
+        if (isFriend || _isAdmin) {
+            addPopupBtn(popup, '✉ Написать ЛС', '#b96fff', function() {
+                closePopup();
+                tgMobileCloseSidebar();
+                openDmWithUser(user._uid, user.displayName || user.email);
+            });
+        }
+        if (!isFriend && !reqSent && !reqReceived) {
+            addPopupBtn(popup, '+ Добавить в друзья', '#2ecc71', function() {
+                sendFriendRequest(user._uid);
+                closePopup();
+            });
+        }
+        if (reqSent) {
+            addPopupBtn(popup, '⏳ Запрос отправлен', 'rgba(255,255,255,0.3)', null);
+        }
+        if (reqReceived) {
+            addPopupBtn(popup, '✓ Принять запрос', '#2ecc71', function() {
+                acceptFriendRequest(user._uid);
+                closePopup();
+            });
+            addPopupBtn(popup, '✕ Отклонить', '#e74c3c', function() {
+                declineFriendRequest(user._uid);
+                closePopup();
+            });
+        }
+        if (isFriend) {
+            addPopupBtn(popup, '× Удалить из друзей', '#e74c3c', function() {
+                removeFriend(user._uid);
+                closePopup();
+                setTimeout(function() { loadUsersToSidebar(); }, 300);
+            });
+        }
+
+        document.body.appendChild(popup);
+
+        // Close on click outside
+        setTimeout(function() {
+            document.addEventListener('click', closePopupOnOutside);
+        }, 10);
+    }
+
+    function addPopupBtn(popup, text, color, onclick) {
+        var btn = document.createElement('button');
+        btn.style.cssText = 'display:block;width:100%;text-align:left;padding:8px 10px;border-radius:8px;border:none;background:none;color:'+color+';font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s;';
+        btn.textContent = text;
+        if (onclick) {
+            btn.onmouseover = function() { this.style.background = 'rgba(109,63,245,0.15)'; };
+            btn.onmouseout = function() { this.style.background = 'none'; };
+            btn.onclick = onclick;
+        } else {
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'default';
+        }
+        popup.appendChild(btn);
+    }
+
+    function closePopup() {
+        var p = document.getElementById('userPopup');
+        if (p) p.remove();
+        document.removeEventListener('click', closePopupOnOutside);
+    }
+
+    function closePopupOnOutside(e) {
+        var p = document.getElementById('userPopup');
+        if (p && !p.contains(e.target)) closePopup();
+    }
+
+    // ═══ GLOBAL CHAT ═══
     function startChatListener() {
         if (_chatListener || !db) return;
         _chatListener = db.collection('globalChat')
@@ -2684,28 +2800,19 @@
             .limitToLast(100)
             .onSnapshot(function(snap) {
                 _chatMessages = [];
-                snap.forEach(function(doc) {
-                    var d = doc.data();
-                    d._id = doc.id;
-                    _chatMessages.push(d);
-                });
-                if (_currentChatMode === 'global' && _currentChatTab === 'global') renderGlobalChat();
-            }, function(err) {
-                console.warn('Chat listener error:', err);
-            });
+                snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; _chatMessages.push(d); });
+                if (_chatView === 'global') renderGlobalChat();
+            }, function(err) { console.warn('Chat error:', err); });
     }
 
     function renderGlobalChat() {
         var container = document.getElementById('chatMessages');
         if (!container) return;
         container.innerHTML = '';
-        var inputArea = document.getElementById('chatInputArea');
-        if (inputArea) inputArea.style.display = _currentUser ? 'flex' : 'none';
-        var loginPrompt = document.getElementById('chatLoginPrompt');
-        if (loginPrompt) loginPrompt.style.display = _currentUser ? 'none' : '';
+        updateChatUI(!!_currentUser);
 
         if (!_chatMessages.length) {
-            container.innerHTML = '<div class="chat-login-msg">Пока нет сообщений. Напиши первым!</div>';
+            container.innerHTML = '<div class="chat-login-msg">Напиши первым! 💬</div>';
             return;
         }
         _chatMessages.forEach(function(msg) {
@@ -2715,27 +2822,19 @@
         container.scrollTop = container.scrollHeight;
     }
 
-    function renderGlobalSidebar() {
-        var container = document.getElementById('tgSidebarContent');
-        if (!container) return;
-        container.innerHTML = '<div class="chat-login-msg" style="font-size:11px;">💬 Глобальный чат — общая комната<br>Все видят все сообщения</div>';
-    }
-
-    // ── Bubble renderer ──
     function renderBubble(container, msg, isMe, showAdmin) {
         var row = document.createElement('div');
         row.className = 'chat-bubble-row' + (isMe ? ' me' : '');
 
-        // Avatar
         var av = document.createElement('div');
         av.className = 'chat-bubble-av';
         if (msg.photoURL) av.innerHTML = '<img src="' + msg.photoURL + '" onerror="this.style.display=\'none\'">';
         else av.textContent = (msg.name || '?').charAt(0).toUpperCase();
         row.appendChild(av);
 
-        // Bubble
         var bubble = document.createElement('div');
         bubble.className = 'chat-bubble';
+        if (msg.isSystem) bubble.style.cssText = 'background:rgba(255,215,0,0.1) !important;border:1px solid rgba(255,215,0,0.2);';
 
         if (!isMe) {
             var nameEl = document.createElement('div');
@@ -2745,7 +2844,7 @@
         }
 
         var textEl = document.createElement('div');
-        textEl.style.cssText = 'font-weight:400;';
+        textEl.style.fontWeight = '400';
         textEl.textContent = msg.text || '';
         bubble.appendChild(textEl);
 
@@ -2758,11 +2857,10 @@
             timeEl.textContent = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             meta.appendChild(timeEl);
         }
-        if (_currentUser && _isAdmin && msg._id) {
+        if (_currentUser && _isAdmin && msg._id && !msg.isSystem) {
             var delBtn = document.createElement('span');
             delBtn.className = 'chat-bubble-del';
             delBtn.textContent = '🗑';
-            delBtn.title = 'Удалить';
             delBtn.onclick = function() { deleteChatMsg(msg._id); };
             meta.appendChild(delBtn);
         }
@@ -2771,13 +2869,10 @@
         container.appendChild(row);
     }
 
-    // ── Send message (unified) ──
+    // ═══ SEND MESSAGE ═══
     window.tgSendMsg = function() {
-        if (_currentChatMode === 'dm' && _dmPartnerUid) {
-            sendDmMsg();
-        } else {
-            sendGlobalMsg();
-        }
+        if (_chatView === 'dm' && _dmPartnerUid) sendDmMsg();
+        else sendGlobalMsg();
     };
 
     function sendGlobalMsg() {
@@ -2799,9 +2894,7 @@
                     var toDelete = snap.size - 100;
                     var batch = db.batch();
                     var i = 0;
-                    snap.forEach(function(doc) {
-                        if (i < toDelete) { batch.delete(doc.ref); i++; }
-                    });
+                    snap.forEach(function(doc) { if (i < toDelete) { batch.delete(doc.ref); i++; } });
                     batch.commit();
                 }
             });
@@ -2811,46 +2904,138 @@
 
     function deleteChatMsg(docId) {
         if (!db) return;
-        db.collection('globalChat').doc(docId).delete().catch(function(e) { console.warn('Delete error:', e); });
+        db.collection('globalChat').doc(docId).delete().catch(function(e) { console.warn('Del err:', e); });
     }
 
-    // ═══════════════════════════════════════
-    // DM (Direct Messages)
-    // ═══════════════════════════════════════
+    // ═══ DM LIST ═══
+    function renderDmList() {
+        var container = document.getElementById('chatMessages');
+        if (!container) return;
+        container.innerHTML = '';
+        var inputArea = document.getElementById('chatInputArea');
+        if (inputArea) inputArea.style.display = 'none';
+        var loginPrompt = document.getElementById('chatLoginPrompt');
+        if (loginPrompt) loginPrompt.style.display = 'none';
+
+        if (!_currentUser) { container.innerHTML = '<div class="chat-login-msg">Войди чтобы видеть ЛС</div>'; return; }
+
+        // Show friend requests as cards at top
+        if (_myFriendReqs.length > 0) {
+            var reqHeader = document.createElement('div');
+            reqHeader.style.cssText = 'padding:8px 12px;font-size:11px;font-weight:800;color:#ffd700;letter-spacing:0.5px;';
+            reqHeader.textContent = '📨 ЗАПРОСЫ В ДРУЗЬЯ';
+            container.appendChild(reqHeader);
+
+            _myFriendReqs.forEach(function(uid) {
+                db.collection('users').doc(uid).get().then(function(doc) {
+                    if (!doc.exists) return;
+                    var u = doc.data(); u._uid = doc.id;
+                    var card = document.createElement('div');
+                    card.className = 'user-card';
+                    card.style.background = 'rgba(255,215,0,0.05)';
+                    card.style.borderColor = 'rgba(255,215,0,0.2)';
+
+                    var avWrap = document.createElement('div');
+                    avWrap.className = 'user-av-wrap';
+                    var av = document.createElement('div');
+                    av.className = 'user-av';
+                    if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
+                    else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
+                    avWrap.appendChild(av);
+                    card.appendChild(avWrap);
+
+                    var info = document.createElement('div');
+                    info.className = 'user-info';
+                    info.innerHTML = '<div class="user-name">'+(u.displayName||'???')+'</div><div class="user-email" style="color:#ffd700;">Хочет добавить в друзья</div>';
+                    card.appendChild(info);
+
+                    var actions = document.createElement('div');
+                    actions.className = 'user-actions';
+                    var accBtn = document.createElement('button');
+                    accBtn.className = 'user-act-btn'; accBtn.style.color = '#2ecc71';
+                    accBtn.textContent = '✓';
+                    accBtn.onclick = function(e) { e.stopPropagation(); acceptFriendRequest(u._uid); card.remove(); };
+                    actions.appendChild(accBtn);
+                    var decBtn = document.createElement('button');
+                    decBtn.className = 'user-act-btn'; decBtn.style.color = '#e74c3c';
+                    decBtn.textContent = '✕';
+                    decBtn.onclick = function(e) { e.stopPropagation(); declineFriendRequest(u._uid); card.remove(); };
+                    actions.appendChild(decBtn);
+                    card.appendChild(actions);
+                    container.insertBefore(card, container.children[1] || null);
+                });
+            });
+        }
+
+        // Show DM contacts (friends)
+        var contactUids = _isAdmin ? _allUsers.map(function(u){return u._uid;}).filter(function(uid){return uid!==_currentUser.uid;}) : _myFriends;
+        if (!contactUids.length && !_myFriendReqs.length) {
+            container.innerHTML = '<div class="chat-login-msg">Добавь друзей чтобы писать ЛС 👥</div>';
+            return;
+        }
+
+        if (contactUids.length > 0) {
+            var dmHeader = document.createElement('div');
+            dmHeader.style.cssText = 'padding:8px 12px;font-size:11px;font-weight:800;color:#b96fff;letter-spacing:0.5px;margin-top:6px;';
+            dmHeader.textContent = '✉ ДИАЛОГИ';
+            container.appendChild(dmHeader);
+
+            contactUids.forEach(function(uid) {
+                db.collection('users').doc(uid).get().then(function(doc) {
+                    if (!doc.exists) return;
+                    var u = doc.data(); u._uid = doc.id;
+                    var card = document.createElement('div');
+                    card.className = 'user-card';
+                    card.onclick = function() { openDmWithUser(u._uid, u.displayName || u.email); };
+
+                    var avWrap = document.createElement('div');
+                    avWrap.className = 'user-av-wrap';
+                    var av = document.createElement('div');
+                    av.className = 'user-av';
+                    if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
+                    else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
+                    avWrap.appendChild(av);
+                    card.appendChild(avWrap);
+
+                    var info = document.createElement('div');
+                    info.className = 'user-info';
+                    info.innerHTML = '<div class="user-name">'+(u.displayName||'???')+'</div><div class="user-email">Нажми чтобы написать</div>';
+                    card.appendChild(info);
+
+                    var arrow = document.createElement('div');
+                    arrow.style.cssText = 'color:rgba(255,255,255,0.15);font-size:18px;flex-shrink:0;';
+                    arrow.textContent = '›';
+                    card.appendChild(arrow);
+                    container.appendChild(card);
+                });
+            });
+        }
+    }
+
+    // ═══ DM CHAT ═══
     function getDmRoomId(uid1, uid2) {
         return uid1 < uid2 ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
     }
 
-    function openDmChat(partnerUid, partnerName) {
-        _dmPartnerUid = partnerUid;
-        _dmPartnerName = partnerName;
-        _currentChatMode = 'dm';
-        _currentChatTab = 'dm';
-        updateChatHeaderTitle();
+    function openDmWithUser(uid, name) {
+        _dmPartnerUid = uid;
+        _dmPartnerName = name;
+        _chatView = 'dm';
+        updateTabUI();
         startDmListener();
-        // On mobile, close sidebar when opening a DM
-        tgMobileCloseSidebar();
-        // Update input placeholder
         var input = document.getElementById('chatInput');
-        if (input) input.placeholder = 'Личное сообщение...';
+        if (input) input.placeholder = 'Сообщение для ' + name + '...';
         var inputArea = document.getElementById('chatInputArea');
         if (inputArea && _currentUser) inputArea.style.display = 'flex';
-        var loginPrompt = document.getElementById('chatLoginPrompt');
-        if (loginPrompt) loginPrompt.style.display = 'none';
-        // Highlight active contact
-        document.querySelectorAll('#tgSidebarContent .user-card').forEach(function(c) { c.classList.remove('active-contact'); });
-        var cards = document.querySelectorAll('#tgSidebarContent .user-card');
-        cards.forEach(function(c) { if (c.dataset.uid === partnerUid) c.classList.add('active-contact'); });
     }
-    window.openDmChat = openDmChat;
+    window.openDmChat = openDmWithUser;
 
     function startDmListener() {
         if (_dmListener) { _dmListener(); _dmListener = null; }
         if (!db || !_currentUser || !_dmPartnerUid) return;
         var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
         _dmListener = db.collection('dms').doc(roomId).collection('messages')
-            .orderBy('ts', 'asc')
-            .limitToLast(50)
+            .orderBy('ts', 'asc').limitToLast(50)
             .onSnapshot(function(snap) {
                 var msgs = [];
                 snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; msgs.push(d); });
@@ -2887,302 +3072,7 @@
     }
     window.sendDmMsg = sendDmMsg;
 
-    function showSelectContactPrompt() {
-        var container = document.getElementById('chatMessages');
-        if (!container) return;
-        container.innerHTML = '<div class="chat-login-msg">👈 Выбери контакт слева<br>чтобы начать переписку</div>';
-        var inputArea = document.getElementById('chatInputArea');
-        if (inputArea) inputArea.style.display = 'none';
-        var loginPrompt = document.getElementById('chatLoginPrompt');
-        if (loginPrompt) loginPrompt.style.display = 'none';
-        // Restore input placeholder
-        var input = document.getElementById('chatInput');
-        if (input) input.placeholder = 'Написать сообщение...';
-    }
-
-    // ── DM contacts sidebar ──
-    function renderDmContactsSidebar() {
-        var container = document.getElementById('tgSidebarContent');
-        if (!container) return;
-        container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
-
-        if (!_currentUser) { container.innerHTML = '<div class="chat-login-msg">Войди чтобы писать ЛС</div>'; return; }
-
-        if (!_myFriends.length && !_isAdmin) {
-            container.innerHTML = '<div class="chat-login-msg">Добавь друзей чтобы писать ЛС</div>';
-            return;
-        }
-
-        var contactUids = _isAdmin ? _allUsers.map(function(u){return u._uid;}).filter(function(uid){return uid!==_currentUser.uid;}) : _myFriends;
-        if (!contactUids.length) {
-            container.innerHTML = '<div class="chat-login-msg">Нет контактов</div>';
-            return;
-        }
-
-        var promises = contactUids.map(function(uid) { return db.collection('users').doc(uid).get(); });
-        Promise.all(promises).then(function(docs) {
-            container.innerHTML = '';
-            docs.forEach(function(doc) {
-                if (!doc.exists) return;
-                var u = doc.data(); u._uid = doc.id;
-                var card = document.createElement('div');
-                card.className = 'user-card' + (_dmPartnerUid === u._uid ? ' active-contact' : '');
-                card.dataset.uid = u._uid;
-                card.onclick = function() { openDmChat(u._uid, u.displayName||u.email); };
-
-                var avWrap = document.createElement('div');
-                avWrap.className = 'user-av-wrap';
-                var av = document.createElement('div');
-                av.className = 'user-av';
-                if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
-                else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
-                avWrap.appendChild(av);
-                if (u.online) {
-                    var dot = document.createElement('div');
-                    dot.className = 'user-status-dot online';
-                    avWrap.appendChild(dot);
-                }
-                card.appendChild(avWrap);
-
-                var info = document.createElement('div');
-                info.className = 'user-info';
-                info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div><div class="user-email">Нажми чтобы написать</div>';
-                card.appendChild(info);
-
-                var arrow = document.createElement('div');
-                arrow.style.cssText = 'color:rgba(255,255,255,0.15);font-size:18px;flex-shrink:0;';
-                arrow.textContent = '›';
-                card.appendChild(arrow);
-                container.appendChild(card);
-            });
-        });
-    }
-
-    // ── Friend Requests sidebar ──
-    function renderFriendRequestsSidebar() {
-        var container = document.getElementById('tgSidebarContent');
-        if (!container) return;
-
-        if (!_currentUser) { container.innerHTML = '<div class="chat-login-msg">Войди для просмотра запросов</div>'; return; }
-        if (!_myFriendReqs.length) {
-            container.innerHTML = '<div class="chat-login-msg">Нет входящих запросов</div>';
-            return;
-        }
-
-        container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
-        var promises = _myFriendReqs.map(function(uid) { return db.collection('users').doc(uid).get(); });
-        Promise.all(promises).then(function(docs) {
-            container.innerHTML = '';
-            docs.forEach(function(doc) {
-                if (!doc.exists) return;
-                var u = doc.data(); u._uid = doc.id;
-                var card = document.createElement('div');
-                card.className = 'user-card';
-                card.style.cursor = 'default';
-
-                var avWrap = document.createElement('div');
-                avWrap.className = 'user-av-wrap';
-                var av = document.createElement('div');
-                av.className = 'user-av';
-                if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
-                else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
-                avWrap.appendChild(av);
-                card.appendChild(avWrap);
-
-                var info = document.createElement('div');
-                info.className = 'user-info';
-                info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div><div class="user-email">Хочет добавить в друзья</div>';
-                card.appendChild(info);
-
-                var actions = document.createElement('div');
-                actions.className = 'user-actions';
-                var accBtn = document.createElement('button');
-                accBtn.className = 'user-act-btn'; accBtn.style.color = '#2ecc71';
-                accBtn.textContent = '✓';
-                accBtn.onclick = function() { acceptFriendRequest(u._uid); };
-                actions.appendChild(accBtn);
-                var decBtn = document.createElement('button');
-                decBtn.className = 'user-act-btn'; decBtn.style.color = '#e74c3c';
-                decBtn.textContent = '✕';
-                decBtn.onclick = function() { declineFriendRequest(u._uid); };
-                actions.appendChild(decBtn);
-                card.appendChild(actions);
-                container.appendChild(card);
-            });
-        });
-    }
-
-    function showFriendRequestsPanel() {
-        var container = document.getElementById('chatMessages');
-        if (!container) return;
-        if (!_myFriendReqs.length) {
-            container.innerHTML = '<div class="chat-login-msg">📭 Нет входящих запросов в друзья</div>';
-        } else {
-            container.innerHTML = '<div class="chat-login-msg">📨 Выбери запрос слева для действия<br>Всего запросов: ' + _myFriendReqs.length + '</div>';
-        }
-        var inputArea = document.getElementById('chatInputArea');
-        if (inputArea) inputArea.style.display = 'none';
-        var loginPrompt = document.getElementById('chatLoginPrompt');
-        if (loginPrompt) loginPrompt.style.display = 'none';
-    }
-
-    // ═══════════════════════════════════════
-    // USERS LIST (used from sidebar menu)
-    // ═══════════════════════════════════════
-    var _allUsers = [];
-
-    // ── Load all users from Firestore ──
-    function loadAllUsers(cb) {
-        if (!db) { if (cb) cb(); return; }
-        db.collection('users').orderBy('displayName').get().then(function(snap) {
-            _allUsers = [];
-            snap.forEach(function(doc) {
-                var d = doc.data(); d._uid = doc.id;
-                if (d.lastSeen && d.lastSeen.toDate) {
-                    var diff = Date.now() - d.lastSeen.toDate().getTime();
-                    d._online = d.online && diff < 120000;
-                } else { d._online = false; }
-                _allUsers.push(d);
-            });
-            _allUsers.sort(function(a, b) {
-                if (a._online && !b._online) return -1;
-                if (!a._online && b._online) return 1;
-                return (a.displayName || '').localeCompare(b.displayName || '');
-            });
-            if (cb) cb();
-        }).catch(function(e) { console.warn('Users load err:', e); if (cb) cb(); });
-    }
-
-    // ── Render all users in sidebar ──
-    function renderAllUsersSidebar() {
-        var container = document.getElementById('tgSidebarContent');
-        if (!container) return;
-        container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
-        loadFriends(function() {
-            loadAllUsers(function() {
-                container.innerHTML = '';
-                if (!_allUsers.length) { container.innerHTML = '<div class="chat-login-msg">Пока нет пользователей</div>'; return; }
-                _allUsers.forEach(function(u) {
-                    if (_currentUser && u._uid === _currentUser.uid) return;
-                    var card = document.createElement('div');
-                    card.className = 'user-card';
-                    card.style.cursor = 'default';
-
-                    var avWrap = document.createElement('div');
-                    avWrap.className = 'user-av-wrap';
-                    var av = document.createElement('div');
-                    av.className = 'user-av';
-                    if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
-                    else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
-                    avWrap.appendChild(av);
-                    var dot = document.createElement('div');
-                    dot.className = 'user-status-dot ' + (u._online ? 'online' : 'offline');
-                    avWrap.appendChild(dot);
-                    card.appendChild(avWrap);
-
-                    var info = document.createElement('div');
-                    info.className = 'user-info';
-                    info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div>'
-                        + '<div class="user-email">'+(u._online ? '🟢 Онлайн' : 'Оффлайн')+'</div>';
-                    card.appendChild(info);
-
-                    if (_currentUser) {
-                        var actions = document.createElement('div');
-                        actions.className = 'user-actions';
-                        var isFriend = _myFriends.includes(u._uid);
-                        var reqSent = _mySentReqs.includes(u._uid);
-                        var reqReceived = _myFriendReqs.includes(u._uid);
-
-                        if (isFriend || _isAdmin) {
-                            var dmBtn = document.createElement('button');
-                            dmBtn.className = 'user-act-btn';
-                            dmBtn.textContent = '✉';
-                            dmBtn.title = 'Личное сообщение';
-                            dmBtn.onclick = function() { switchChatTab('dm'); openDmChat(u._uid, u.displayName||u.email); };
-                            actions.appendChild(dmBtn);
-                        }
-                        if (isFriend) {
-                            var rmBtn = document.createElement('button');
-                            rmBtn.className = 'user-act-btn'; rmBtn.style.color = '#e74c3c';
-                            rmBtn.textContent = '×';
-                            rmBtn.title = 'Удалить из друзей';
-                            rmBtn.onclick = function() { removeFriend(u._uid); setTimeout(renderAllUsersSidebar, 300); };
-                            actions.appendChild(rmBtn);
-                        } else if (reqSent) {
-                            var pendBtn = document.createElement('button');
-                            pendBtn.className = 'user-act-btn'; pendBtn.style.opacity = '0.5';
-                            pendBtn.textContent = '⏳';
-                            pendBtn.title = 'Запрос отправлен';
-                            pendBtn.disabled = true;
-                            actions.appendChild(pendBtn);
-                        } else if (reqReceived) {
-                            var accBtn = document.createElement('button');
-                            accBtn.className = 'user-act-btn'; accBtn.style.color = '#2ecc71';
-                            accBtn.textContent = '✓';
-                            accBtn.title = 'Принять запрос';
-                            accBtn.onclick = function() { acceptFriendRequest(u._uid); setTimeout(renderAllUsersSidebar, 300); };
-                            actions.appendChild(accBtn);
-                        } else {
-                            var addBtn = document.createElement('button');
-                            addBtn.className = 'user-act-btn';
-                            addBtn.textContent = '+';
-                            addBtn.title = 'Отправить запрос в друзья';
-                            addBtn.onclick = function() { sendFriendRequest(u._uid); setTimeout(renderAllUsersSidebar, 300); };
-                            actions.appendChild(addBtn);
-                        }
-                        card.appendChild(actions);
-                    }
-                    container.appendChild(card);
-                });
-            });
-        });
-    }
-
-    function showUsersPanel() {
-        var container = document.getElementById('chatMessages');
-        if (!container) return;
-        container.innerHTML = '<div class="chat-login-msg">👥 Список пользователей<br>Добавляй друзей и пиши ЛС</div>';
-        var inputArea = document.getElementById('chatInputArea');
-        if (inputArea) inputArea.style.display = 'none';
-        var loginPrompt = document.getElementById('chatLoginPrompt');
-        if (loginPrompt) loginPrompt.style.display = 'none';
-    }
-
-    function renderUsersList() {
-        if (_currentChatTab === 'dm') renderDmContactsSidebar();
-        else if (_currentChatTab === 'users') renderAllUsersSidebar();
-    }
-
-    window.openUsersList = function() {
-        openChatSystem('users');
-    };
-
-    function openFriendRequests() {
-        openChatSystem('reqs');
-    }
-
-    function openDmInbox() {
-        openChatSystem('dm');
-    }
-
-    window.closeUsersList = function() {};
-
-    // ═══════════════════════════════════════
-    // FRIEND SYSTEM
-    // ═══════════════════════════════════════
-    var _myFriends = [];
-    var _myFriendReqs = [];
-    var _mySentReqs = [];
-    var _dmInboxListener = null;
-    var _unreadDmCount = 0;
-
-    window.closeUserMenuAndOpen = function(what) {
-        var menu = document.getElementById('userMenu');
-        if (menu) menu.classList.remove('active');
-        if (what === 'dmInbox') openDmInbox();
-        else if (what === 'friendRequests') openFriendRequests();
-    };
-
+    // ═══ FRIEND SYSTEM ═══
     function loadFriends(cb) {
         if (!db || !_currentUser) { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; if(cb) cb(); return; }
         db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
@@ -3191,55 +3081,10 @@
                 _myFriends = d.friends || [];
                 _myFriendReqs = d.friendRequests || [];
                 _mySentReqs = d.sentRequests || [];
-            } else {
-                _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[];
-            }
+            } else { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; }
             updateNotifDots();
             if (cb) cb();
         }).catch(function() { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; if(cb) cb(); });
-    }
-
-    function updateNotifDots() {
-        var hasNotif = _myFriendReqs.length > 0 || _unreadDmCount > 0;
-        // Auth button dot
-        var dot = document.getElementById('authNotifDot');
-        if (dot) dot.style.display = hasNotif ? '' : 'none';
-        // Profile menu badges
-        var frBadge = document.getElementById('frReqBadge');
-        if (frBadge) {
-            frBadge.style.display = _myFriendReqs.length > 0 ? '' : 'none';
-            frBadge.textContent = _myFriendReqs.length;
-        }
-        var dmBadge = document.getElementById('dmUnreadBadge');
-        if (dmBadge) {
-            dmBadge.style.display = _unreadDmCount > 0 ? '' : 'none';
-            dmBadge.textContent = _unreadDmCount;
-        }
-        // Sidebar chat button badge
-        var sideBadge = document.getElementById('sidebarChatBadge');
-        if (sideBadge) {
-            var total = _myFriendReqs.length + _unreadDmCount;
-            sideBadge.style.display = total > 0 ? '' : 'none';
-            sideBadge.textContent = total;
-        }
-        // Chat tabs badges
-        var tgReqsBadge = document.getElementById('tgReqsBadge');
-        if (tgReqsBadge) {
-            tgReqsBadge.style.display = _myFriendReqs.length > 0 ? 'flex' : 'none';
-            tgReqsBadge.textContent = _myFriendReqs.length;
-        }
-        var tgDmBadge = document.getElementById('tgDmBadge');
-        if (tgDmBadge) {
-            tgDmBadge.style.display = _unreadDmCount > 0 ? 'flex' : 'none';
-            tgDmBadge.textContent = _unreadDmCount;
-        }
-        // Mobile button badge
-        var mobBadge = document.getElementById('tgMobBadge');
-        if (mobBadge) {
-            var mobTotal = _myFriendReqs.length + _unreadDmCount;
-            mobBadge.style.display = mobTotal > 0 ? 'flex' : 'none';
-            mobBadge.textContent = mobTotal;
-        }
     }
 
     function sendFriendRequest(uid) {
@@ -3250,7 +3095,18 @@
         if (!_mySentReqs.includes(uid)) _mySentReqs.push(uid);
         db.collection('users').doc(_currentUser.uid).set({
             sentRequests: firebase.firestore.FieldValue.arrayUnion(uid)
-        }, { merge: true }).then(function() { renderUsersList(); });
+        }, { merge: true }).then(function() {
+            // Send system DM about friend request
+            var roomId = getDmRoomId(_currentUser.uid, uid);
+            db.collection('dms').doc(roomId).collection('messages').add({
+                text: '📨 ' + (_currentUser.displayName || 'Пользователь') + ' хочет добавить тебя в друзья!',
+                name: 'Система',
+                uid: 'system',
+                isSystem: true,
+                ts: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            loadUsersToSidebar();
+        });
     }
 
     function acceptFriendRequest(uid) {
@@ -3270,11 +3126,15 @@
             _myFriendReqs = _myFriendReqs.filter(function(r) { return r !== uid; });
             if (!_myFriends.includes(uid)) _myFriends.push(uid);
             updateNotifDots();
-            if (_currentChatTab === 'reqs') {
-                renderFriendRequestsSidebar();
-                showFriendRequestsPanel();
-            }
-            renderUsersList();
+            // Send system DM
+            var roomId = getDmRoomId(_currentUser.uid, uid);
+            db.collection('dms').doc(roomId).collection('messages').add({
+                text: '✅ Теперь вы друзья!',
+                name: 'Система',
+                uid: 'system',
+                isSystem: true,
+                ts: firebase.firestore.FieldValue.serverTimestamp()
+            });
         });
     }
 
@@ -3288,37 +3148,64 @@
                 sentRequests: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
             }, { merge: true });
             updateNotifDots();
-            if (_currentChatTab === 'reqs') {
-                renderFriendRequestsSidebar();
-                showFriendRequestsPanel();
-            }
         });
     }
 
     function removeFriend(uid) {
         if (!db || !_currentUser) return;
         var batch = db.batch();
-        batch.set(db.collection('users').doc(_currentUser.uid), {
-            friends: firebase.firestore.FieldValue.arrayRemove(uid)
-        }, { merge: true });
-        batch.set(db.collection('users').doc(uid), {
-            friends: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
-        }, { merge: true });
+        batch.set(db.collection('users').doc(_currentUser.uid), { friends: firebase.firestore.FieldValue.arrayRemove(uid) }, { merge: true });
+        batch.set(db.collection('users').doc(uid), { friends: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid) }, { merge: true });
         batch.commit().then(function() {
             _myFriends = _myFriends.filter(function(f) { return f !== uid; });
-            renderUsersList();
         });
     }
 
-    // Keep renderFriendRequests for legacy calls
-    function renderFriendRequests() {
-        if (_currentChatTab === 'reqs') {
-            renderFriendRequestsSidebar();
-            showFriendRequestsPanel();
+    // ═══ NOTIFICATIONS ═══
+    function updateNotifDots() {
+        var hasNotif = _myFriendReqs.length > 0 || _unreadDmCount > 0;
+        var dot = document.getElementById('authNotifDot');
+        if (dot) dot.style.display = hasNotif ? '' : 'none';
+        var frBadge = document.getElementById('frReqBadge');
+        if (frBadge) {
+            frBadge.style.display = _myFriendReqs.length > 0 ? '' : 'none';
+            frBadge.textContent = _myFriendReqs.length;
+        }
+        var dmBadge = document.getElementById('dmUnreadBadge');
+        if (dmBadge) {
+            dmBadge.style.display = _unreadDmCount > 0 ? '' : 'none';
+            dmBadge.textContent = _unreadDmCount;
+        }
+        var sideBadge = document.getElementById('sidebarChatBadge');
+        if (sideBadge) {
+            var total = _myFriendReqs.length + _unreadDmCount;
+            sideBadge.style.display = total > 0 ? '' : 'none';
+            sideBadge.textContent = total;
+        }
+        var tgDmBadge = document.getElementById('tgDmBadge');
+        if (tgDmBadge) {
+            var dmTotal = _myFriendReqs.length + _unreadDmCount;
+            tgDmBadge.style.display = dmTotal > 0 ? 'flex' : 'none';
+            tgDmBadge.textContent = dmTotal;
+        }
+        var mobBadge = document.getElementById('tgMobBadge');
+        if (mobBadge) {
+            mobBadge.style.display = hasNotif ? 'flex' : 'none';
+            mobBadge.textContent = (_myFriendReqs.length + _unreadDmCount) || '';
         }
     }
 
-    // DM notification listener
+    // ═══ LEGACY COMPAT ═══
+    window.closeUserMenuAndOpen = function(what) {
+        var menu = document.getElementById('userMenu');
+        if (menu) menu.classList.remove('active');
+        if (what === 'dmInbox') { openChatSystem(); setTimeout(switchToDmList, 100); }
+        else if (what === 'friendRequests') { openChatSystem(); setTimeout(switchToDmList, 100); }
+    };
+    window.openUsersList = function() { openChatSystem(); };
+    window.closeUsersList = function() {};
+    window.closeDmChat = function() { switchToDmList(); };
+
     function startDmNotifListener() {
         if (!db || !_currentUser) return;
         db.collection('users').doc(_currentUser.uid).onSnapshot(function(doc) {
