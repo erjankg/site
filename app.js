@@ -63,6 +63,7 @@
 
         document.body.classList.add('modal-open');
     }
+    window.openModal = openModal;
 
     function closeModal(id) {
         var el = document.getElementById(id);
@@ -1635,6 +1636,7 @@
             }, 150);
         }
     };
+    window.closeModal = closeModal;
 
     window.toggleP = function(name) {
         if(pinned.has(name)) pinned.delete(name);
@@ -2541,6 +2543,9 @@
         // Close mobile sidebar
         var sb = document.getElementById('tgSidebar');
         if (sb) sb.classList.remove('mobile-open');
+        // Reset mobile keyboard styles
+        var mask = document.getElementById('chatSystemMask');
+        if (mask) { mask.style.height = ''; mask.style.maxHeight = ''; mask.style.top = ''; }
     };
     // Keep legacy names working
     window.closeGlobalChat = window.closeChatSystem;
@@ -2645,15 +2650,28 @@
 
     // ── Fix mobile keyboard ──
     function fixMobileKeyboard() {
-        if (!window.visualViewport) return;
-        var wrap = document.querySelector('.tg-chat-wrap');
-        if (!wrap) return;
-        function onResize() {
-            var vvh = window.visualViewport.height;
-            wrap.style.height = vvh + 'px';
+        var vv = window.visualViewport;
+        if (!vv) return;
+        var mask = document.getElementById('chatSystemMask');
+        if (!mask) return;
+
+        function onViewportChange() {
+            if (!mask.classList.contains('active')) return;
+            // Set mask height to visual viewport height (excludes keyboard)
+            mask.style.height = vv.height + 'px';
+            mask.style.maxHeight = vv.height + 'px';
+            // Offset for any scroll the viewport does
+            mask.style.top = vv.offsetTop + 'px';
+            // Scroll chat to bottom when keyboard opens
+            var chatMsgs = document.getElementById('chatMessages');
+            if (chatMsgs) {
+                setTimeout(function() { chatMsgs.scrollTop = chatMsgs.scrollHeight; }, 100);
+            }
         }
-        window.visualViewport.addEventListener('resize', onResize);
-        window.visualViewport.addEventListener('scroll', onResize);
+        vv.addEventListener('resize', onViewportChange);
+        vv.addEventListener('scroll', onViewportChange);
+        // Initial call
+        onViewportChange();
     }
 
     // ═══════════════════════════════════════
