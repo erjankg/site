@@ -700,8 +700,8 @@
         }
 
         /* BODY SCROLL LOCK */
-        body.modal-open { overflow: hidden !important; height: 100vh; }
-        body.sidebar-open { overflow: hidden !important; }
+        body.modal-open { overflow: hidden !important; height: 100vh; touch-action: none; }
+        body.sidebar-open { overflow: hidden !important; height: 100vh; touch-action: none; position: fixed; width: 100%; }
 
         /* SCROLLBAR — hidden */
         ::-webkit-scrollbar { display: none; }
@@ -1345,6 +1345,11 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     .items-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
     .items-grid .item-card img { width: 100%; height: auto; }
     .rune-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
+    .rune-card { padding: 4px !important; }
+    .rune-card img { width: 32px !important; height: 32px !important; }
+    .rune-card-name { font-size: 7px !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #runesMask .m-win { padding: 12px 10px !important; max-width: 100vw !important; width: 100vw !important; overflow-x: hidden !important; }
+    #runesMask .side-section { font-size: 11px !important; }
 }
 
 /* ── PC GRIDS — auto-fill, many per row ── */
@@ -1964,7 +1969,9 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         const table = document.getElementById('statTable');
         table.classList.toggle('focus-mode', colFocus);
         ['ad','hp','mana','armor','mrez'].forEach(k => {
-            document.getElementById('ar-'+k).innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
+            var el = document.getElementById('ar-'+k);
+            el.innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
+            el.style.color = (k===sK) ? '#e74c3c' : '';
         });
         const { data, thres } = computeData();
         const rows = document.querySelectorAll('#statBody tr');
@@ -2003,7 +2010,9 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         const table = document.getElementById('statTable');
         table.classList.toggle('focus-mode', colFocus);
         ['ad','hp','mana','armor','mrez'].forEach(k => {
-            document.getElementById('ar-'+k).innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
+            var el = document.getElementById('ar-'+k);
+            el.innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
+            el.style.color = (k===sK) ? '#e74c3c' : '';
         });
         const { data, thres } = computeData();
         body.innerHTML = '';
@@ -2313,18 +2322,33 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         var overlay = document.getElementById('sideOverlay');
         if(!panel) return;
         var isOpen = panel.classList.contains('open');
+        if(!isOpen) {
+            // Opening: save scroll position
+            document.body.dataset.scrollY = window.scrollY;
+            document.body.style.top = '-' + window.scrollY + 'px';
+        }
         panel.classList.toggle('open', !isOpen);
         if(overlay) overlay.classList.toggle('open', !isOpen);
         document.body.classList.toggle('sidebar-open', !isOpen);
-        document.body.style.overflow = isOpen ? '' : 'hidden';
+        if(isOpen) {
+            // Closing: restore scroll position
+            var scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
+            document.body.style.top = '';
+            window.scrollTo(0, scrollY);
+        }
     };
     window.closeSidebar = function() {
         var panel = document.getElementById('sidePanel');
         var overlay = document.getElementById('sideOverlay');
         if(panel) panel.classList.remove('open');
         if(overlay) overlay.classList.remove('open');
+        var wasOpen = document.body.classList.contains('sidebar-open');
         document.body.classList.remove('sidebar-open');
-        document.body.style.overflow = '';
+        if(wasOpen) {
+            var scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
+            document.body.style.top = '';
+            window.scrollTo(0, scrollY);
+        }
     };
 
     // ═══ NEW CALCULATOR ═══
@@ -3165,13 +3189,20 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         if(_sidebarModalId && id === _sidebarModalId) {
             var savedId = _sidebarModalId;
             _sidebarModalId = null;
-            // Delay: check if another modal opened right after (e.g. item sub-modal)
+            // Delay: check if ANY modal is still open (stack or active class)
             setTimeout(function() {
                 var anyOpen = _modalStack && _modalStack.length > 0;
                 if(!anyOpen) {
-                    toggleSidebar();
+                    // Double-check: is any modal still visually active?
+                    var stillActive = MODAL_IDS.some(function(mid) {
+                        var mel = document.getElementById(mid);
+                        return mel && mel.classList.contains('active');
+                    });
+                    if(!stillActive) {
+                        toggleSidebar();
+                    }
                 }
-            }, 100);
+            }, 150);
         }
     };
 
@@ -3845,11 +3876,11 @@ Stormarrow: При максимальных зарядах следующая б
   </div>
 
   <div class="side-section">Инструменты</div>
-  <button class="side-btn" onclick="sidebarOpen('sideChamps')"><span class="side-icon">👥</span>Чемпионы</button>
+  <button class="side-btn" onclick="sidebarOpen('sideChamps')"><span class="side-icon"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Jinx.png" style="width:22px;height:22px;border-radius:5px;"></span>Чемпионы</button>
   <button class="side-btn" onclick="sidebarOpen('calc')"><span class="side-icon">⚔</span>Калькулятор урона</button>
-  <button class="side-btn" onclick="sidebarOpen('itemCalcMenu')"><span class="side-icon">🧮</span>Калькулятор предметов</button>
-  <button class="side-btn" onclick="sidebarOpen('items')"><span class="side-icon">📦</span>Предметы</button>
-  <button class="side-btn" onclick="sidebarOpen('runes')"><span class="side-icon">💎</span>Руны</button>
+  <button class="side-btn" onclick="sidebarOpen('itemCalcMenu')"><span class="side-icon"><img src="https://www.wildriftfire.com/images/items/thornmail.png" style="width:22px;height:22px;border-radius:5px;"></span>Калькулятор предметов</button>
+  <button class="side-btn" onclick="sidebarOpen('items')"><span class="side-icon"><img src="https://www.wildriftfire.com/images/items/infinity-edge.png" style="width:22px;height:22px;border-radius:5px;"></span>Предметы</button>
+  <button class="side-btn" onclick="sidebarOpen('runes')"><span class="side-icon"><img src="https://www.wildriftfire.com/images/runes/conqueror.png" style="width:22px;height:22px;border-radius:50%;"></span>Руны</button>
   <button class="side-btn" onclick="sidebarOpen('draft')" style="background:rgba(109,63,245,0.15);border-left:3px solid #b96fff;"><span class="side-icon">📋</span>Драфт-помощник</button>
 
   <div class="side-section" style="margin-top:8px;">Тир-листы</div>
