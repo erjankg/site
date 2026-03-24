@@ -67,12 +67,13 @@
         /* HEADER */
         header {
             display: grid;
-            grid-template-columns: 44px 1fr 44px;
+            grid-template-columns: 44px 1fr 44px 44px;
             align-items: center;
             margin-bottom: 20px;
             animation: fadeIn 0.5s ease;
             min-height: 44px;
             gap: 8px;
+            position: relative;
         }
 
         .logo {
@@ -1354,7 +1355,184 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     .rune-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important; gap: 6px !important; }
 }
 
+    /* ── AUTH BUTTON ── */
+    .auth-btn {
+        background: linear-gradient(135deg, #4285F4, #356AC3);
+        color: white;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        border: none;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s;
+        box-shadow: 0 2px 12px rgba(66,133,244,0.35);
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .auth-btn:active { transform: scale(0.95); }
+    .auth-btn img {
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+    .auth-btn .auth-online {
+        position: absolute;
+        bottom: -1px;
+        right: -1px;
+        width: 14px;
+        height: 14px;
+        background: #2ecc71;
+        border-radius: 50%;
+        border: 2px solid #0f0520;
+    }
+
+    /* ── USER MENU DROPDOWN ── */
+    .user-menu {
+        display: none;
+        position: absolute;
+        top: 52px;
+        right: 0;
+        background: rgba(26,13,46,0.97);
+        border: 1.5px solid rgba(155,89,182,0.3);
+        border-radius: 14px;
+        padding: 8px;
+        z-index: 9999;
+        min-width: 200px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        backdrop-filter: blur(12px);
+        animation: fadeIn 0.2s ease;
+    }
+    .user-menu.active { display: block; }
+    .user-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        color: rgba(255,255,255,0.8);
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        transition: background 0.15s;
+    }
+    .user-menu-item:hover { background: rgba(109,63,245,0.15); }
+    .user-menu-email {
+        padding: 8px 12px;
+        font-size: 11px;
+        color: rgba(255,255,255,0.35);
+        border-bottom: 1px solid rgba(155,89,182,0.15);
+        margin-bottom: 4px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* ── SYNC STATUS ── */
+    .sync-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 700;
+        background: rgba(46,204,113,0.15);
+        color: #2ecc71;
+        margin-left: 6px;
+    }
+    .sync-badge.offline {
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.3);
+    }
+
+    /* ── INFLUENCER TABLE ── */
+    .inf-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .inf-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    .inf-table th {
+        padding: 10px 12px;
+        text-align: left;
+        color: #b96fff;
+        font-weight: 800;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        border-bottom: 2px solid rgba(155,89,182,0.2);
+        white-space: nowrap;
+    }
+    .inf-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(155,89,182,0.1);
+        white-space: nowrap;
+    }
+    .inf-table tr:hover td { background: rgba(109,63,245,0.06); }
+    .inf-row-name {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        color: #fff;
+    }
+    .inf-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(155,89,182,0.3);
+    }
+    .inf-platform {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+    .inf-platform.youtube { background: rgba(255,0,0,0.12); color: #ff4444; }
+    .inf-platform.twitch { background: rgba(145,70,255,0.15); color: #9146ff; }
+    .inf-platform.tiktok { background: rgba(255,255,255,0.08); color: #fff; }
+    .inf-rank {
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+    .inf-rank.challenger { background: rgba(214,69,69,0.2); color: #ff6b6b; }
+    .inf-rank.grandmaster { background: rgba(231,76,60,0.15); color: #e74c3c; }
+    .inf-rank.sovereign { background: linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,165,0,0.2)); color: #ffd700; text-shadow: 0 0 6px rgba(255,215,0,0.4); }
+    .inf-rank.master { background: rgba(185,111,255,0.2); color: #b96fff; }
+    .inf-rank.diamond { background: rgba(93,173,226,0.2); color: #5dade2; }
+    .inf-link {
+        color: #b96fff;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 12px;
+    }
+    .inf-link:hover { text-decoration: underline; }
+
     </style>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 </head>
 <body>
@@ -1370,6 +1548,16 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank" aria-label="Twitch">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M4.265 3L3 6.236v13.223h4.488V21l2.75-2.541H13.5L20 12.318V3H4.265zm14.382 8.709l-3.256 3.012H12L9.5 17.115v-2.394H5.709V4.588h12.938v7.121zM15.5 7.559v3.883h-1.588V7.559H15.5zm-4.223 0v3.883H9.688V7.559h1.589z"/></svg>
         </a>
+        <!-- Auth Button -->
+        <button id="authBtn" class="auth-btn" onclick="toggleUserMenu()" title="Войти через Google">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+        </button>
+        <!-- User Menu Dropdown -->
+        <div id="userMenu" class="user-menu">
+            <div id="userMenuEmail" class="user-menu-email"></div>
+            <button class="user-menu-item" onclick="syncNow()">🔄 Синхронизировать</button>
+            <button class="user-menu-item" onclick="authSignOut()">🚪 Выйти</button>
+        </div>
     </header>
 
     <div class="lvl-container">
@@ -1427,7 +1615,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     // MODAL SYSTEM - only one modal at a time
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask'];
 
     function closeAllModals(except) {
         MODAL_IDS.forEach(function(id) {
@@ -3669,6 +3857,9 @@ Stormarrow: При максимальных зарядах следующая б
   <button class="side-btn" onclick="sidebarOpen('tierItems')"><span class="side-icon">⚙</span>Тир-лист предметов</button>
   <button class="side-btn" onclick="sidebarOpen('tierRunes')"><span class="side-icon">✨</span>Тир-лист рун</button>
 
+  <div class="side-section" style="margin-top:8px;">Сообщество</div>
+  <button class="side-btn" onclick="closeSidebar();openInfluencers()" style="background:rgba(255,0,0,0.08);border-left:3px solid #ff4444;"><span class="side-icon">🎬</span>Инфлюенсеры WR</button>
+
   <div style="flex:1;"></div>
   <div style="padding:0 8px;">
     <a href="https://www.donationalerts.com/r/erjankg" target="_blank"
@@ -4046,6 +4237,514 @@ Stormarrow: При максимальных зарядах следующая б
     <div id="champPickerGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;overflow-y:auto;flex:1;align-content:start;padding:2px;"></div>
   </div>
 </div>
+
+<!-- ══ INFLUENCER TABLE MODAL ══ -->
+<div class="m-mask" id="influencerMask" onclick="if(event.target===this)closeInfluencers()">
+  <div class="m-win" style="width:96vw;max-width:920px;max-height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
+    <button class="btn-close-x" onclick="closeInfluencers()" style="top:10px;right:10px;">✕</button>
+
+    <!-- LIST VIEW -->
+    <div id="infListView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="padding:16px 16px 8px;">
+        <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:4px;">🎬 Инфлюенсеры Wild Rift</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">Данные загружаются из Firebase. Нажми на карточку для подробностей.</div>
+      </div>
+      <div id="infListLoading" style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);">
+        <div style="font-size:28px;margin-bottom:8px;">⏳</div>
+        <div style="font-size:13px;font-weight:700;">Загрузка инфлюенсеров...</div>
+      </div>
+      <div id="infListEmpty" style="display:none;text-align:center;padding:40px;color:rgba(255,255,255,0.3);">
+        <div style="font-size:28px;margin-bottom:8px;">📋</div>
+        <div style="font-size:13px;font-weight:700;">Пока нет инфлюенсеров</div>
+        <div style="font-size:11px;margin-top:4px;">Добавь первого через Firebase Console → коллекция <b style="color:#b96fff;">influencers</b></div>
+      </div>
+      <div id="infListCards" style="flex:1;overflow-y:auto;padding:0 16px 16px;display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+
+    <!-- DETAIL VIEW (hidden by default) -->
+    <div id="infDetailView" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
+      <div style="padding:12px 16px;border-bottom:1px solid rgba(155,89,182,0.15);display:flex;align-items:center;gap:10px;flex-shrink:0;">
+        <button onclick="infShowList()" style="background:none;border:1.5px solid rgba(155,89,182,0.3);color:#b96fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;">← Назад</button>
+        <div id="infDetailName" style="font-size:15px;font-weight:900;color:#fff;"></div>
+        <span id="infDetailRank" class="inf-rank" style="margin-left:auto;"></span>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:16px;">
+        <!-- Profile header -->
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+          <div id="infDetailAvatar" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden;"></div>
+          <div style="flex:1;">
+            <div id="infDetailMeta" style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;"></div>
+            <a id="infDetailLink" href="#" target="_blank" rel="noopener" class="inf-link" style="font-size:13px;">🔗 Открыть канал</a>
+          </div>
+        </div>
+        <!-- Achievements -->
+        <div id="infDetailAchSection" style="display:none;margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:800;color:#ffd700;letter-spacing:0.5px;margin-bottom:6px;">🏅 ДОСТИЖЕНИЯ</div>
+          <div id="infDetailAch" style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:12px 14px;font-size:12px;color:rgba(255,255,255,0.7);line-height:1.8;white-space:pre-line;"></div>
+        </div>
+        <!-- Tier List -->
+        <div id="infDetailTierSection" style="display:none;margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:800;color:#b96fff;letter-spacing:0.5px;margin-bottom:6px;">🏆 ТИР-ЛИСТ</div>
+          <div id="infDetailTier" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+        <!-- Counters -->
+        <div id="infDetailCounterSection" style="display:none;margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:800;color:#e74c3c;letter-spacing:0.5px;margin-bottom:6px;">🔴 КОНТР-ПИКИ</div>
+          <div id="infDetailCounters" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+        <!-- Combos -->
+        <div id="infDetailComboSection" style="display:none;margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:800;color:#2ecc71;letter-spacing:0.5px;margin-bottom:6px;">🟢 КОМБО</div>
+          <div id="infDetailCombos" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+        <!-- Empty state -->
+        <div id="infDetailEmpty" style="display:none;text-align:center;padding:20px;color:rgba(255,255,255,0.25);font-size:12px;">
+          Этот инфлюенсер пока не добавил свои тир-листы и контр-пики.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FIREBASE + AUTH + SYNC ══ -->
+<script>
+(function() {
+    // ═══════════════════════════════════════
+    // FIREBASE CONFIG
+    // ═══════════════════════════════════════
+    var firebaseConfig = {
+        apiKey: "AIzaSyBpJd2cSFeyAxdz8HzexvrHlT8T6v_Bfq0",
+        authDomain: "wildrift-stats-600c0.firebaseapp.com",
+        projectId: "wildrift-stats-600c0",
+        storageBucket: "wildrift-stats-600c0.firebasestorage.app",
+        messagingSenderId: "616595917443",
+        appId: "1:616595917443:web:fc9feae1309ae42a8ce9b6",
+        measurementId: "G-82DL6WBV37"
+    };
+
+    // Initialize Firebase
+    if (typeof firebase !== 'undefined') {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    } else {
+        console.warn('Firebase SDK not loaded');
+    }
+
+    var auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
+    var db   = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
+    var _currentUser = null;
+
+    // ═══════════════════════════════════════
+    // REGISTER influencerMask IN MODAL SYSTEM
+    // ═══════════════════════════════════════
+    (function registerModals() {
+        // Wait for MODAL_IDS to be available (defined in main script)
+        var checkInterval = setInterval(function() {
+            if (typeof MODAL_IDS !== 'undefined') {
+                clearInterval(checkInterval);
+                if (!MODAL_IDS.includes('influencerMask')) {
+                    MODAL_IDS.push('influencerMask');
+                }
+            }
+        }, 100);
+        // Fallback: stop checking after 10s
+        setTimeout(function() { clearInterval(checkInterval); }, 10000);
+    })();
+
+    // ═══════════════════════════════════════
+    // AUTH: Google Sign In / Out
+    // ═══════════════════════════════════════
+    var _provider = auth ? new firebase.auth.GoogleAuthProvider() : null;
+
+    window.toggleUserMenu = function() {
+        if (!_currentUser) {
+            // Not logged in → sign in
+            authSignIn();
+            return;
+        }
+        var menu = document.getElementById('userMenu');
+        if (menu) menu.classList.toggle('active');
+    };
+
+    // Close user menu when clicking outside
+    document.addEventListener('click', function(e) {
+        var menu = document.getElementById('userMenu');
+        var btn = document.getElementById('authBtn');
+        if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+
+    function authSignIn() {
+        if (!auth || !_provider) {
+            alert('Firebase не загружен. Проверьте подключение к интернету.');
+            return;
+        }
+        auth.signInWithPopup(_provider).catch(function(err) {
+            if (err.code !== 'auth/popup-closed-by-user') {
+                console.error('Auth error:', err);
+                alert('Ошибка авторизации: ' + err.message);
+            }
+        });
+    }
+
+    window.authSignOut = function() {
+        if (auth) {
+            auth.signOut();
+        }
+        var menu = document.getElementById('userMenu');
+        if (menu) menu.classList.remove('active');
+    };
+
+    function updateAuthUI(user) {
+        var btn = document.getElementById('authBtn');
+        var emailEl = document.getElementById('userMenuEmail');
+        if (!btn) return;
+
+        if (user) {
+            btn.innerHTML = '<img src="' + (user.photoURL || '') + '" alt="' + (user.displayName || '') + '" onerror="this.style.display=\'none\'">'
+                + '<span class="auth-online"></span>';
+            btn.title = user.displayName || user.email || 'Профиль';
+            if (emailEl) emailEl.textContent = user.email || '';
+        } else {
+            btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
+            btn.title = 'Войти через Google';
+            if (emailEl) emailEl.textContent = '';
+        }
+    }
+
+    // Listen for auth state changes
+    if (auth) {
+        auth.onAuthStateChanged(function(user) {
+            _currentUser = user || null;
+            updateAuthUI(user);
+            if (user) {
+                console.log('Signed in:', user.email);
+                loadUserDataFromFirestore();
+            } else {
+                console.log('Signed out');
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════
+    // FIRESTORE: Save & Load matchups + tier-data
+    // ═══════════════════════════════════════
+    var _syncTimeout = null;
+
+    function getUserDocRef() {
+        if (!db || !_currentUser) return null;
+        return db.collection('users').doc(_currentUser.uid);
+    }
+
+    // Save matchups + tier data to Firestore
+    function saveUserDataToFirestore() {
+        var docRef = getUserDocRef();
+        if (!docRef) return;
+
+        var matchups = {};
+        var tierData = {};
+        var selectedChamps = [];
+
+        try { matchups = JSON.parse(localStorage.getItem('matchups') || '{}'); } catch(e) {}
+        try { tierData = JSON.parse(localStorage.getItem('tierData') || '{}'); } catch(e) {}
+        try { selectedChamps = JSON.parse(localStorage.getItem('p') || '[]'); } catch(e) {}
+
+        docRef.set({
+            matchups: JSON.stringify(matchups),
+            tierData: JSON.stringify(tierData),
+            selectedChamps: JSON.stringify(selectedChamps),
+            email: _currentUser.email || '',
+            displayName: _currentUser.displayName || '',
+            photoURL: _currentUser.photoURL || '',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }).then(function() {
+            console.log('Data saved to Firestore');
+            showSyncStatus('Сохранено ✓');
+        }).catch(function(err) {
+            console.error('Firestore save error:', err);
+        });
+    }
+
+    // Load data from Firestore
+    function loadUserDataFromFirestore() {
+        var docRef = getUserDocRef();
+        if (!docRef) return;
+
+        docRef.get().then(function(snap) {
+            if (!snap.exists) {
+                // First login: upload local data
+                console.log('First login — uploading local data to Firestore');
+                saveUserDataToFirestore();
+                return;
+            }
+            var d = snap.data();
+            var localUpdated = parseInt(localStorage.getItem('localUpdatedAt') || '0', 10);
+            var serverUpdated = d.updatedAt ? d.updatedAt.toMillis() : 0;
+
+            // If server data is newer, use it
+            if (serverUpdated > localUpdated) {
+                if (d.matchups) {
+                    try { localStorage.setItem('matchups', d.matchups); } catch(e) {}
+                }
+                if (d.tierData) {
+                    try { localStorage.setItem('tierData', d.tierData); } catch(e) {}
+                }
+                if (d.selectedChamps) {
+                    try { localStorage.setItem('p', d.selectedChamps); } catch(e) {}
+                }
+                console.log('Loaded data from Firestore (server is newer)');
+                showSyncStatus('Загружено ✓');
+            } else {
+                // Local is newer — push to server
+                saveUserDataToFirestore();
+            }
+        }).catch(function(err) {
+            console.error('Firestore load error:', err);
+        });
+    }
+
+    // Debounced auto-save: called when user changes matchups
+    function scheduleSyncToFirestore() {
+        if (!_currentUser) return;
+        localStorage.setItem('localUpdatedAt', String(Date.now()));
+        if (_syncTimeout) clearTimeout(_syncTimeout);
+        _syncTimeout = setTimeout(function() {
+            saveUserDataToFirestore();
+        }, 3000); // save 3s after last change
+    }
+
+    // Manual sync button
+    window.syncNow = function() {
+        var menu = document.getElementById('userMenu');
+        if (menu) menu.classList.remove('active');
+        if (!_currentUser) {
+            alert('Сначала войдите в аккаунт');
+            return;
+        }
+        saveUserDataToFirestore();
+    };
+
+    // Sync status toast
+    function showSyncStatus(text) {
+        var existing = document.getElementById('syncToast');
+        if (existing) existing.remove();
+        var toast = document.createElement('div');
+        toast.id = 'syncToast';
+        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(46,204,113,0.9);color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;z-index:99999;animation:fadeIn 0.3s ease;pointer-events:none;';
+        toast.textContent = text;
+        document.body.appendChild(toast);
+        setTimeout(function() { if (toast.parentNode) toast.remove(); }, 2500);
+    }
+
+    // Patch localStorage.setItem to auto-sync matchups changes
+    var _origSetItem = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(key, value) {
+        _origSetItem(key, value);
+        if (key === 'matchups' || key === 'tierData' || key === 'p') {
+            scheduleSyncToFirestore();
+        }
+    };
+
+    // ═══════════════════════════════════════
+    // INFLUENCER SYSTEM (100% Firestore)
+    // ═══════════════════════════════════════
+    // No hardcoded data — everything from Firestore "influencers" collection
+    // Doc fields: name, platform, rank, role, url, avatar, achievements,
+    //   tierlist: { S: ["Jinx","Kai'Sa"], A: ["Vayne"], B: [], C: [] }
+    //   counters: { "Jinx": ["Draven","Lucian"] }
+    //   combos:   { "Jinx": ["Lulu","Nami"] }
+
+    var INFLUENCERS = [];
+    var _infLoaded = false;
+    var _rankLabels = { sovereign:'Суверен', challenger:'Челленджер', grandmaster:'Грандмастер', master:'Мастер', diamond:'Бриллиант' };
+    var _platIcons = { youtube:'▶', twitch:'◆', tiktok:'♪' };
+    var _platLabels = { youtube:'YouTube', twitch:'Twitch', tiktok:'TikTok' };
+    var _DD = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
+
+    function _champImg(n) { return (typeof champIcon==='function') ? champIcon(n) : _DD+n+'.png'; }
+
+    function loadInfluencersFromFirestore(cb) {
+        if (!db) { _infLoaded = true; if(cb) cb(); return; }
+        db.collection('influencers').orderBy('name').get().then(function(snap) {
+            INFLUENCERS = [];
+            snap.forEach(function(doc) {
+                var d = doc.data(); d._id = doc.id;
+                ['tierlist','counters','combos'].forEach(function(k) {
+                    if (typeof d[k]==='string') { try { d[k]=JSON.parse(d[k]); } catch(e){ d[k]=null; } }
+                });
+                INFLUENCERS.push(d);
+            });
+            _infLoaded = true; if(cb) cb();
+        }).catch(function(err) {
+            console.warn('Influencers load error:', err);
+            INFLUENCERS = []; _infLoaded = true; if(cb) cb();
+        });
+    }
+
+    // ── LIST VIEW ──
+    function renderInfList() {
+        var cards = document.getElementById('infListCards');
+        var loading = document.getElementById('infListLoading');
+        var empty = document.getElementById('infListEmpty');
+        if (!cards) return;
+        if (!_infLoaded) { loading.style.display=''; empty.style.display='none'; cards.innerHTML=''; return; }
+        loading.style.display = 'none';
+        if (!INFLUENCERS.length) { empty.style.display=''; cards.innerHTML=''; return; }
+        empty.style.display = 'none'; cards.innerHTML = '';
+
+        INFLUENCERS.forEach(function(inf, idx) {
+            var card = document.createElement('div');
+            card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.15);background:rgba(255,255,255,0.02);cursor:pointer;transition:background 0.15s,border-color 0.15s;';
+            card.onmouseenter = function(){ card.style.background='rgba(109,63,245,0.08)'; card.style.borderColor='rgba(155,89,182,0.35)'; };
+            card.onmouseleave = function(){ card.style.background='rgba(255,255,255,0.02)'; card.style.borderColor='rgba(155,89,182,0.15)'; };
+            card.onclick = function(){ infShowDetail(idx); };
+
+            var av = document.createElement('div');
+            av.style.cssText = 'width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;color:#fff;font-weight:900;';
+            if (inf.avatar) { av.innerHTML='<img src="'+inf.avatar+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'; }
+            else { av.textContent = (inf.name||'?').charAt(0).toUpperCase(); }
+            card.appendChild(av);
+
+            var info = document.createElement('div');
+            info.style.cssText = 'flex:1;min-width:0;';
+            info.innerHTML = '<div style="font-size:14px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(inf.name||'—')+'</div>'
+                +'<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">'
+                +(_platIcons[inf.platform]||'●')+' '+(_platLabels[inf.platform]||'')+' · '+(inf.role||'')+'</div>';
+            card.appendChild(info);
+
+            if (inf.rank) {
+                var badge = document.createElement('span');
+                badge.className = 'inf-rank '+inf.rank;
+                badge.textContent = _rankLabels[inf.rank]||inf.rank;
+                badge.style.flexShrink = '0';
+                card.appendChild(badge);
+            }
+
+            var dots = document.createElement('div');
+            dots.style.cssText = 'display:flex;gap:3px;flex-shrink:0;';
+            var hasTier = inf.tierlist && (inf.tierlist.S||inf.tierlist.A||inf.tierlist.B||inf.tierlist.C);
+            var hasC = inf.counters && Object.keys(inf.counters).length;
+            var hasCo = inf.combos && Object.keys(inf.combos).length;
+            if(hasTier) dots.innerHTML+='<span title="Тир-лист" style="font-size:10px;">🏆</span>';
+            if(hasC) dots.innerHTML+='<span title="Контр-пики" style="font-size:10px;">🔴</span>';
+            if(hasCo) dots.innerHTML+='<span title="Комбо" style="font-size:10px;">🟢</span>';
+            if(dots.innerHTML) card.appendChild(dots);
+
+            var arrow = document.createElement('div');
+            arrow.style.cssText = 'color:rgba(255,255,255,0.15);font-size:16px;flex-shrink:0;';
+            arrow.textContent = '›';
+            card.appendChild(arrow);
+            cards.appendChild(card);
+        });
+    }
+
+    // ── DETAIL VIEW ──
+    function infShowDetail(idx) {
+        var inf = INFLUENCERS[idx]; if(!inf) return;
+        document.getElementById('infListView').style.display = 'none';
+        document.getElementById('infDetailView').style.display = 'flex';
+
+        document.getElementById('infDetailName').textContent = inf.name||'—';
+        var rk = document.getElementById('infDetailRank');
+        if(inf.rank){ rk.className='inf-rank '+inf.rank; rk.textContent=_rankLabels[inf.rank]||inf.rank; rk.style.display=''; }
+        else { rk.style.display='none'; }
+
+        var avEl = document.getElementById('infDetailAvatar');
+        if(inf.avatar){ avEl.innerHTML='<img src="'+inf.avatar+'" style="width:100%;height:100%;object-fit:cover;">'; }
+        else { avEl.innerHTML=''; avEl.textContent=(inf.name||'?').charAt(0).toUpperCase(); }
+
+        document.getElementById('infDetailMeta').innerHTML = (_platIcons[inf.platform]||'●')+' '+(_platLabels[inf.platform]||'')+'<br>🎮 '+(inf.role||'Не указана');
+        document.getElementById('infDetailLink').href = inf.url||'#';
+
+        // Achievements
+        var achS = document.getElementById('infDetailAchSection');
+        if(inf.achievements){ achS.style.display=''; document.getElementById('infDetailAch').textContent=inf.achievements; }
+        else { achS.style.display='none'; }
+
+        // Tier list
+        var tierS = document.getElementById('infDetailTierSection');
+        var tierEl = document.getElementById('infDetailTier');
+        var hasTier = inf.tierlist && ((inf.tierlist.S&&inf.tierlist.S.length)||(inf.tierlist.A&&inf.tierlist.A.length)||(inf.tierlist.B&&inf.tierlist.B.length)||(inf.tierlist.C&&inf.tierlist.C.length));
+        if(hasTier) {
+            tierS.style.display=''; tierEl.innerHTML='';
+            [{k:'S',c:'#C43A3A'},{k:'A',c:'#C46A1C'},{k:'B',c:'#BC9800'},{k:'C',c:'#1E8848'}].forEach(function(t){
+                var ch = inf.tierlist[t.k]||[]; if(!ch.length) return;
+                var row=document.createElement('div'); row.className='tierlist-row';
+                var lbl=document.createElement('div'); lbl.className='tierlist-label';
+                lbl.style.background='linear-gradient(135deg,'+t.c+'cc,'+t.c+'88)'; lbl.textContent=t.k;
+                var cd=document.createElement('div'); cd.className='tierlist-champs';
+                ch.forEach(function(n){ var img=document.createElement('img'); img.className='tierlist-champ-icon'; img.src=_champImg(n); img.alt=img.title=n; img.onerror=function(){this.style.display='none';}; cd.appendChild(img); });
+                row.appendChild(lbl); row.appendChild(cd); tierEl.appendChild(row);
+            });
+        } else { tierS.style.display='none'; }
+
+        // Counters
+        var ctrS = document.getElementById('infDetailCounterSection');
+        var ctrEl = document.getElementById('infDetailCounters');
+        var hasC = inf.counters && Object.keys(inf.counters).length;
+        if(hasC) {
+            ctrS.style.display=''; ctrEl.innerHTML='';
+            Object.keys(inf.counters).forEach(function(champ){
+                var row=document.createElement('div');
+                row.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(231,76,60,0.06);border-radius:8px;';
+                row.innerHTML='<img src="'+_champImg(champ)+'" style="width:28px;height:28px;border-radius:6px;" onerror="this.style.display=\'none\'">'
+                    +'<span style="font-size:12px;font-weight:700;color:#fff;min-width:70px;">'+champ+'</span>'
+                    +'<span style="font-size:11px;color:rgba(255,255,255,0.3);">→</span>'
+                    +'<div style="display:flex;gap:4px;flex-wrap:wrap;">'
+                    +(inf.counters[champ]||[]).map(function(c){return '<img src="'+_champImg(c)+'" title="'+c+'" style="width:26px;height:26px;border-radius:6px;border:1px solid rgba(231,76,60,0.3);" onerror="this.style.display=\'none\'">';}).join('')
+                    +'</div>';
+                ctrEl.appendChild(row);
+            });
+        } else { ctrS.style.display='none'; }
+
+        // Combos
+        var coS = document.getElementById('infDetailComboSection');
+        var coEl = document.getElementById('infDetailCombos');
+        var hasCo = inf.combos && Object.keys(inf.combos).length;
+        if(hasCo) {
+            coS.style.display=''; coEl.innerHTML='';
+            Object.keys(inf.combos).forEach(function(champ){
+                var row=document.createElement('div');
+                row.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(46,204,113,0.06);border-radius:8px;';
+                row.innerHTML='<img src="'+_champImg(champ)+'" style="width:28px;height:28px;border-radius:6px;" onerror="this.style.display=\'none\'">'
+                    +'<span style="font-size:12px;font-weight:700;color:#fff;min-width:70px;">'+champ+'</span>'
+                    +'<span style="font-size:11px;color:rgba(255,255,255,0.3);">+</span>'
+                    +'<div style="display:flex;gap:4px;flex-wrap:wrap;">'
+                    +(inf.combos[champ]||[]).map(function(c){return '<img src="'+_champImg(c)+'" title="'+c+'" style="width:26px;height:26px;border-radius:6px;border:1px solid rgba(46,204,113,0.3);" onerror="this.style.display=\'none\'">';}).join('')
+                    +'</div>';
+                coEl.appendChild(row);
+            });
+        } else { coS.style.display='none'; }
+
+        var emD = document.getElementById('infDetailEmpty');
+        if(!hasTier&&!hasC&&!hasCo&&!inf.achievements){ emD.style.display=''; } else { emD.style.display='none'; }
+    }
+
+    window.infShowList = function() {
+        document.getElementById('infDetailView').style.display = 'none';
+        document.getElementById('infListView').style.display = 'flex';
+    };
+
+    window.openInfluencers = function() {
+        if (typeof openModal==='function') { openModal('influencerMask'); }
+        else { var el=document.getElementById('influencerMask'); if(el) el.classList.add('active'); document.body.classList.add('modal-open'); }
+        infShowList();
+        if (!_infLoaded) { renderInfList(); loadInfluencersFromFirestore(function(){ renderInfList(); }); }
+        else { renderInfList(); }
+    };
+
+    window.closeInfluencers = function() {
+        if (typeof closeModal==='function') { closeModal('influencerMask'); }
+        else { var el=document.getElementById('influencerMask'); if(el) el.classList.remove('active'); document.body.classList.remove('modal-open'); }
+    };
+
+    // Pre-load on page load
+    loadInfluencersFromFirestore();
+
+})();
+</script>
 
 </body>
 </html>
