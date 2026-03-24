@@ -1360,6 +1360,43 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     .rune-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important; gap: 6px !important; }
 }
 
+    /* ── GLOBAL CHAT ── */
+    .chat-messages { flex:1; overflow-y:auto; padding:10px 14px; display:flex; flex-direction:column; gap:6px; }
+    .chat-msg { display:flex; gap:8px; align-items:flex-start; animation:fadeIn 0.2s ease; }
+    .chat-msg-av { width:32px; height:32px; border-radius:50%; flex-shrink:0; object-fit:cover; background:linear-gradient(135deg,#6d3ff5,#9b59b6); display:flex; align-items:center; justify-content:center; font-size:13px; color:#fff; font-weight:900; overflow:hidden; }
+    .chat-msg-av img { width:100%; height:100%; object-fit:cover; }
+    .chat-msg-body { flex:1; min-width:0; }
+    .chat-msg-head { display:flex; align-items:center; gap:6px; margin-bottom:2px; }
+    .chat-msg-name { font-size:11px; font-weight:800; color:#b96fff; }
+    .chat-msg-name.admin { color:#ffd700; }
+    .chat-msg-time { font-size:9px; color:rgba(255,255,255,0.2); }
+    .chat-msg-text { font-size:12px; color:rgba(255,255,255,0.8); line-height:1.5; word-break:break-word; font-weight:400; }
+    .chat-msg-del { opacity:0; font-size:10px; color:rgba(255,255,255,0.2); cursor:pointer; margin-left:auto; padding:2px 4px; }
+    .chat-msg:hover .chat-msg-del { opacity:1; }
+    .chat-input-row { display:flex; gap:8px; padding:10px 14px; border-top:1px solid rgba(155,89,182,0.15); flex-shrink:0; }
+    .chat-input { flex:1; background:rgba(255,255,255,0.05); border:1.5px solid rgba(155,89,182,0.2); border-radius:10px; padding:8px 12px; color:#fff; font-size:13px; font-weight:600; outline:none; font-family:inherit; }
+    .chat-input:focus { border-color:#b96fff; }
+    .chat-send { background:linear-gradient(135deg,#6d3ff5,#9b59b6); border:none; color:#fff; padding:8px 16px; border-radius:10px; font-size:13px; font-weight:800; cursor:pointer; flex-shrink:0; }
+    .chat-send:active { transform:scale(0.95); }
+    .chat-login-msg { text-align:center; padding:20px; color:rgba(255,255,255,0.3); font-size:13px; }
+
+    /* ── USERS LIST ── */
+    .user-card { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; border:1px solid rgba(155,89,182,0.12); transition:background 0.15s; }
+    .user-card:hover { background:rgba(109,63,245,0.06); }
+    .user-av-wrap { position:relative; flex-shrink:0; }
+    .user-av { width:38px; height:38px; border-radius:50%; object-fit:cover; background:linear-gradient(135deg,#6d3ff5,#9b59b6); display:flex; align-items:center; justify-content:center; font-size:16px; color:#fff; font-weight:900; overflow:hidden; }
+    .user-av img { width:100%; height:100%; object-fit:cover; }
+    .user-status-dot { position:absolute; bottom:0; right:0; width:12px; height:12px; border-radius:50%; border:2px solid #0f0520; }
+    .user-status-dot.online { background:#2ecc71; }
+    .user-status-dot.offline { background:#555; }
+    .user-info { flex:1; min-width:0; }
+    .user-name { font-size:13px; font-weight:800; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .user-name .admin-badge { font-size:9px; color:#ffd700; margin-left:4px; }
+    .user-email { font-size:10px; color:rgba(255,255,255,0.3); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .user-actions { display:flex; gap:4px; flex-shrink:0; }
+    .user-act-btn { background:rgba(109,63,245,0.15); border:1px solid rgba(155,89,182,0.25); color:#b96fff; border-radius:8px; padding:4px 10px; font-size:10px; font-weight:700; cursor:pointer; }
+    .user-act-btn:hover { background:rgba(109,63,245,0.3); }
+
     /* ── PERFORMANCE: GPU acceleration for scrollable lists ── */
     #scGrid, #champPickerGrid, #draftGrid, .items-grid, .rune-grid,
     .inf-table-wrap, #infListCards, .table-hold {
@@ -1628,10 +1665,17 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 (() => {
 
     // =========================================
-    // MODAL SYSTEM - only one modal at a time
+    // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','globalChatMask','usersListMask','dmChatMask'];
+
+    // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
+    var _modalStack = [];
+    var _baseZIndex = 6000;
+
+    // Модалки которые ВСЕГДА открываются поверх (не закрывая родителя)
+    var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','dmChatMask'];
 
     function closeAllModals(except) {
         MODAL_IDS.forEach(function(id) {
@@ -1639,61 +1683,71 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             var el = document.getElementById(id);
             if(!el) return;
             el.classList.remove('active');
-            // Also clear any inline display style
             el.style.display = '';
+            el.style.zIndex = '';
         });
+        _modalStack = [];
         if(!except) document.body.classList.remove('modal-open');
     }
 
-    // Стек модалок — для возврата к предыдущей
-    var _modalStack = [];
-
-    // Модалки-карточки которые открываются поверх других (возвращают к предыдущей)
-    var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal'];
-
     function openModal(id) {
-        // Если открываем overlay-модалку поверх другой — не закрываем предыдущую
-        var currentActive = MODAL_IDS.find(function(mid){
-            var mel = document.getElementById(mid);
-            return mel && mel.classList.contains('active');
-        });
-        if(OVERLAY_MODALS.includes(id) && currentActive && currentActive !== id) {
-            _modalStack.push(currentActive);
-            // Скрываем (не убираем active) текущую под overlay
-            var curEl = document.getElementById(currentActive);
-            if(curEl) curEl.style.visibility = 'hidden';
-        } else {
-            closeAllModals(id);
-            _modalStack = [];
-        }
         // Скрываем тултипы
         ['itemTooltip','runeTooltip','uiTip'].forEach(function(tid){
             var t=document.getElementById(tid); if(t) t.style.display='none';
         });
-        var el = document.getElementById(id);
-        if(el) { el.classList.add('active'); el.style.visibility = ''; }
+
+        // Если это overlay-модалка и уже есть активная — стекаем поверх
+        var isOverlay = OVERLAY_MODALS.includes(id);
+        var hasParent = _modalStack.length > 0;
+
+        if(isOverlay && hasParent) {
+            // Стекаем: родитель остаётся видимым, новая поверх
+            // Убираем id из стека если уже есть (перемещаем наверх)
+            _modalStack = _modalStack.filter(function(m){ return m !== id; });
+            _modalStack.push(id);
+        } else {
+            // Основная модалка — закрываем все предыдущие
+            closeAllModals(id);
+            _modalStack = [id];
+        }
+
+        // Расставляем z-index по стеку
+        _modalStack.forEach(function(mid, idx) {
+            var mel = document.getElementById(mid);
+            if(mel) {
+                mel.classList.add('active');
+                mel.style.zIndex = String(_baseZIndex + (idx * 100));
+                mel.style.visibility = '';
+            }
+        });
+
         document.body.classList.add('modal-open');
     }
 
     function closeModal(id) {
         var el = document.getElementById(id);
-        if(el) { el.classList.remove('active'); el.style.display = ''; el.style.visibility = ''; }
-
-        // Если есть предыдущая модалка в стеке — восстанавливаем её
-        if(_modalStack.length > 0) {
-            var prev = _modalStack.pop();
-            var prevEl = document.getElementById(prev);
-            if(prevEl) { prevEl.classList.add('active'); prevEl.style.visibility = ''; }
-            document.body.classList.add('modal-open');
-            return;
+        if(el) {
+            el.classList.remove('active');
+            el.style.display = '';
+            el.style.zIndex = '';
+            el.style.visibility = '';
         }
 
-        // Иначе проверяем есть ли ещё активные
-        var anyActive = MODAL_IDS.some(function(mid) {
-            var mel = document.getElementById(mid);
-            return mel && mel.classList.contains('active');
-        });
-        if(!anyActive) document.body.classList.remove('modal-open');
+        // Убираем из стека
+        _modalStack = _modalStack.filter(function(m){ return m !== id; });
+
+        // Если стек не пуст — убеждаемся что верхняя модалка видна
+        if(_modalStack.length > 0) {
+            var topId = _modalStack[_modalStack.length - 1];
+            var topEl = document.getElementById(topId);
+            if(topEl) {
+                topEl.classList.add('active');
+                topEl.style.visibility = '';
+            }
+            document.body.classList.add('modal-open');
+        } else {
+            document.body.classList.remove('modal-open');
+        }
     }
 
     // WR level scaling helpers (15 levels)
@@ -3916,6 +3970,8 @@ Stormarrow: При максимальных зарядах следующая б
   <button class="side-btn" onclick="sidebarOpen('tierRunes')"><span class="side-icon">✨</span>Тир-лист рун</button>
 
   <div class="side-section" style="margin-top:8px;">Сообщество</div>
+  <button class="side-btn" onclick="closeSidebar();openGlobalChat()" style="background:rgba(46,204,113,0.08);border-left:3px solid #2ecc71;"><span class="side-icon">💬</span>Глобальный чат</button>
+  <button class="side-btn" onclick="closeSidebar();openUsersList()"><span class="side-icon">🌐</span>Пользователи</button>
   <button class="side-btn" onclick="closeSidebar();openInfluencers()" style="background:rgba(255,0,0,0.08);border-left:3px solid #ff4444;"><span class="side-icon">🎬</span>Инфлюенсеры WR</button>
 
   <div style="flex:1;"></div>
@@ -4106,7 +4162,7 @@ Stormarrow: При максимальных зарядах следующая б
 </div><!-- balance -->
 
 <!-- ══ ITEM CALC SUB-MODAL ══ -->
-<div id="itemSubModal" class="m-mask" style="z-index:8000;" onclick="if(event.target===this)closeItemCalc()">
+<div id="itemSubModal" class="m-mask" onclick="if(event.target===this)closeItemCalc()">
   <div class="m-win" style="width:92vw;max-width:440px;max-height:88vh;overflow-y:auto;padding:20px 18px 18px;padding-right:50px;position:relative;">
     <button class="btn-close-x" onclick="closeItemCalc()">✕</button>
     <div id="itemSubTitle" style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;"></div>
@@ -4185,23 +4241,23 @@ Stormarrow: При максимальных зарядах следующая б
     <button class="btn-close-x" onclick="closeItemCalcMenu()">✕</button>
     <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;">🧮 Калькулятор предметов</div>
     <div style="display:flex;flex-direction:column;gap:8px;">
-      <button onclick="closeItemCalcMenu();openItemCalc('thornmail')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+      <button onclick="openItemCalc('thornmail')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/thornmail.png" style="width:40px;height:40px;border-radius:8px;">
         <div><div>Шипованный доспех</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">Отражённый маг. урон</div></div>
       </button>
-      <button onclick="closeItemCalcMenu();openItemCalc('botrk')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+      <button onclick="openItemCalc('botrk')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" style="width:40px;height:40px;border-radius:8px;">
         <div><div>Клинок Погибшего Короля</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">% HP врага + симулятор боя</div></div>
       </button>
-      <button onclick="closeItemCalcMenu();openItemCalc('sunfire')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+      <button onclick="openItemCalc('sunfire')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/sunfire-aegis.png" style="width:40px;height:40px;border-radius:8px;">
         <div><div>Эгида Солнечного огня</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">Маг. урон/с</div></div>
       </button>
-      <button onclick="closeItemCalcMenu();openItemCalc('liandry')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+      <button onclick="openItemCalc('liandry')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/liandrys-torment.png" style="width:40px;height:40px;border-radius:8px;">
         <div><div>Мучения Лиандри</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">% макс. HP ожог</div></div>
       </button>
-      <button onclick="closeItemCalcMenu();openItemCalc('sunderer')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+      <button onclick="openItemCalc('sunderer')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/divine-sunderer.png" style="width:40px;height:40px;border-radius:8px;">
         <div><div>Божественный Разрушитель</div><div style="font-size:10px;color:rgba(255,255,255,0.35);">Физ. удар + хил</div></div>
       </button>
@@ -4293,6 +4349,58 @@ Stormarrow: При максимальных зарядах следующая б
       style="font-size:13px;padding:8px 12px;margin-bottom:8px;" oninput="champPickerFilter()">
     <div id="champPickerRoles" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;"></div>
     <div id="champPickerGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;overflow-y:auto;flex:1;align-content:start;padding:2px;"></div>
+  </div>
+</div>
+
+<!-- ══ GLOBAL CHAT MODAL ══ -->
+<div class="m-mask" id="globalChatMask" onclick="if(event.target===this)closeGlobalChat()">
+  <div class="m-win" style="width:96vw;max-width:600px;height:80vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
+    <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(155,89,182,0.15);flex-shrink:0;display:flex;align-items:center;gap:10px;">
+      <button class="btn-close-x" onclick="closeGlobalChat()" style="position:static;width:28px;height:28px;font-size:14px;">✕</button>
+      <div style="font-size:15px;font-weight:900;color:#2ecc71;">💬 Глобальный чат</div>
+      <div id="chatOnlineCount" style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);"></div>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-login-msg">Загрузка...</div>
+    </div>
+    <div id="chatInputArea" class="chat-input-row" style="display:none;">
+      <input class="chat-input" id="chatInput" type="text" placeholder="Написать сообщение..." maxlength="300" onkeydown="if(event.key==='Enter')sendChatMsg()">
+      <button class="chat-send" onclick="sendChatMsg()">→</button>
+    </div>
+    <div id="chatLoginPrompt" class="chat-login-msg" style="border-top:1px solid rgba(155,89,182,0.15);padding:12px;">
+      Войди через Google чтобы писать в чат
+    </div>
+  </div>
+</div>
+
+<!-- ══ USERS LIST MODAL ══ -->
+<div class="m-mask" id="usersListMask" onclick="if(event.target===this)closeUsersList()">
+  <div class="m-win" style="width:96vw;max-width:500px;max-height:85vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
+    <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(155,89,182,0.15);flex-shrink:0;display:flex;align-items:center;gap:10px;">
+      <button class="btn-close-x" onclick="closeUsersList()" style="position:static;width:28px;height:28px;font-size:14px;">✕</button>
+      <div style="font-size:15px;font-weight:900;color:#b96fff;">🌐 Пользователи</div>
+      <div id="usersCount" style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);"></div>
+    </div>
+    <div id="usersListContent" style="flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:6px;">
+      <div class="chat-login-msg">Загрузка...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DM CHAT MODAL ══ -->
+<div class="m-mask" id="dmChatMask" onclick="if(event.target===this)closeDmChat()">
+  <div class="m-win" style="width:96vw;max-width:500px;height:75vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
+    <div style="padding:14px 16px 10px;border-bottom:1px solid rgba(155,89,182,0.15);flex-shrink:0;display:flex;align-items:center;gap:10px;">
+      <button onclick="closeDmChat()" style="background:none;border:1.5px solid rgba(155,89,182,0.3);color:#b96fff;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">← Назад</button>
+      <div id="dmChatName" style="font-size:14px;font-weight:900;color:#fff;"></div>
+    </div>
+    <div class="chat-messages" id="dmMessages">
+      <div class="chat-login-msg">Загрузка...</div>
+    </div>
+    <div class="chat-input-row" id="dmInputArea">
+      <input class="chat-input" id="dmInput" type="text" placeholder="Личное сообщение..." maxlength="300" onkeydown="if(event.key==='Enter')sendDmMsg()">
+      <button class="chat-send" onclick="sendDmMsg()">→</button>
+    </div>
   </div>
 </div>
 
@@ -4472,19 +4580,7 @@ Stormarrow: При максимальных зарядах следующая б
         }
     }
 
-    // Listen for auth state changes
-    if (auth) {
-        auth.onAuthStateChanged(function(user) {
-            _currentUser = user || null;
-            updateAuthUI(user);
-            if (user) {
-                console.log('Signed in:', user.email);
-                loadUserDataFromFirestore();
-            } else {
-                console.log('Signed out');
-            }
-        });
-    }
+    // Auth state is handled in the presence/chat section below
 
     // ═══════════════════════════════════════
     // FIRESTORE: Save & Load matchups + tier-data
@@ -4800,6 +4896,438 @@ Stormarrow: При максимальных зарядах следующая б
 
     // Pre-load on page load
     loadInfluencersFromFirestore();
+
+    // ═══════════════════════════════════════
+    // PRESENCE SYSTEM (online/offline)
+    // ═══════════════════════════════════════
+    var _presenceInterval = null;
+
+    function startPresence() {
+        if (!db || !_currentUser) return;
+        function updatePresence() {
+            if (!_currentUser) return;
+            db.collection('users').doc(_currentUser.uid).set({
+                online: true,
+                lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                displayName: _currentUser.displayName || '',
+                email: _currentUser.email || '',
+                photoURL: _currentUser.photoURL || ''
+            }, { merge: true });
+        }
+        updatePresence();
+        if (_presenceInterval) clearInterval(_presenceInterval);
+        _presenceInterval = setInterval(updatePresence, 60000); // update every 60s
+        // Mark offline on page close
+        window.addEventListener('beforeunload', function() {
+            if (db && _currentUser) {
+                db.collection('users').doc(_currentUser.uid).update({ online: false });
+            }
+        });
+    }
+
+    function stopPresence() {
+        if (_presenceInterval) { clearInterval(_presenceInterval); _presenceInterval = null; }
+        if (db && _currentUser) {
+            db.collection('users').doc(_currentUser.uid).update({ online: false }).catch(function(){});
+        }
+    }
+
+    // Hook into auth state
+    if (auth) {
+        auth.onAuthStateChanged(function(user) {
+            _currentUser = user || null;
+            updateAuthUI(user);
+            if (user) {
+                loadUserDataFromFirestore();
+                startPresence();
+                updateChatUI(true);
+                checkAdmin();
+            } else {
+                stopPresence();
+                updateChatUI(false);
+                _isAdmin = false;
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════
+    // GLOBAL CHAT (Firestore real-time, 100 msg limit)
+    // ═══════════════════════════════════════
+    var _chatListener = null;
+    var _chatMessages = [];
+
+    function updateChatUI(loggedIn) {
+        var inputArea = document.getElementById('chatInputArea');
+        var loginPrompt = document.getElementById('chatLoginPrompt');
+        if (inputArea) inputArea.style.display = loggedIn ? 'flex' : 'none';
+        if (loginPrompt) loginPrompt.style.display = loggedIn ? 'none' : '';
+    }
+
+    function startChatListener() {
+        if (_chatListener || !db) return;
+        _chatListener = db.collection('globalChat')
+            .orderBy('ts', 'asc')
+            .limitToLast(100)
+            .onSnapshot(function(snap) {
+                _chatMessages = [];
+                snap.forEach(function(doc) {
+                    var d = doc.data();
+                    d._id = doc.id;
+                    _chatMessages.push(d);
+                });
+                renderChatMessages();
+            }, function(err) {
+                console.warn('Chat listener error:', err);
+            });
+    }
+
+    function renderChatMessages() {
+        var container = document.getElementById('chatMessages');
+        if (!container) return;
+        container.innerHTML = '';
+        if (!_chatMessages.length) {
+            container.innerHTML = '<div class="chat-login-msg">Пока нет сообщений. Напиши первым!</div>';
+            return;
+        }
+        _chatMessages.forEach(function(msg) {
+            var div = document.createElement('div');
+            div.className = 'chat-msg';
+            // Avatar
+            var av = document.createElement('div');
+            av.className = 'chat-msg-av';
+            if (msg.photoURL) av.innerHTML = '<img src="' + msg.photoURL + '" onerror="this.style.display=\'none\'">';
+            else av.textContent = (msg.name || '?').charAt(0).toUpperCase();
+            div.appendChild(av);
+            // Body
+            var body = document.createElement('div');
+            body.className = 'chat-msg-body';
+            var head = document.createElement('div');
+            head.className = 'chat-msg-head';
+            var nameSpan = document.createElement('span');
+            nameSpan.className = 'chat-msg-name' + (msg.isAdmin ? ' admin' : '');
+            nameSpan.textContent = (msg.isAdmin ? '👑 ' : '') + (msg.name || 'Аноним');
+            head.appendChild(nameSpan);
+            var timeSpan = document.createElement('span');
+            timeSpan.className = 'chat-msg-time';
+            if (msg.ts) {
+                var d = msg.ts.toDate ? msg.ts.toDate() : new Date(msg.ts);
+                timeSpan.textContent = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            }
+            head.appendChild(timeSpan);
+            // Delete button (admin or own message)
+            if (_currentUser && (msg.uid === _currentUser.uid || _isAdmin)) {
+                var delBtn = document.createElement('span');
+                delBtn.className = 'chat-msg-del';
+                delBtn.textContent = '🗑';
+                delBtn.title = 'Удалить';
+                delBtn.onclick = function() { deleteChatMsg(msg._id); };
+                head.appendChild(delBtn);
+            }
+            body.appendChild(head);
+            var text = document.createElement('div');
+            text.className = 'chat-msg-text';
+            text.textContent = msg.text || '';
+            body.appendChild(text);
+            div.appendChild(body);
+            container.appendChild(div);
+        });
+        // Auto-scroll to bottom
+        container.scrollTop = container.scrollHeight;
+    }
+
+    window.sendChatMsg = function() {
+        if (!db || !_currentUser) return;
+        var input = document.getElementById('chatInput');
+        var text = (input.value || '').trim();
+        if (!text) return;
+        input.value = '';
+        db.collection('globalChat').add({
+            text: text,
+            name: _currentUser.displayName || _currentUser.email || 'Аноним',
+            uid: _currentUser.uid,
+            photoURL: _currentUser.photoURL || '',
+            isAdmin: _isAdmin || false,
+            ts: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function() {
+            // Cleanup: keep only last 100
+            db.collection('globalChat').orderBy('ts','asc').get().then(function(snap) {
+                if (snap.size > 100) {
+                    var toDelete = snap.size - 100;
+                    var batch = db.batch();
+                    var i = 0;
+                    snap.forEach(function(doc) {
+                        if (i < toDelete) { batch.delete(doc.ref); i++; }
+                    });
+                    batch.commit();
+                }
+            });
+        });
+    };
+
+    function deleteChatMsg(docId) {
+        if (!db) return;
+        db.collection('globalChat').doc(docId).delete().catch(function(e) { console.warn('Delete error:', e); });
+    }
+
+    window.openGlobalChat = function() {
+        openModal('globalChatMask');
+        startChatListener();
+        updateChatUI(!!_currentUser);
+        // Focus input
+        setTimeout(function() {
+            var inp = document.getElementById('chatInput');
+            if (inp && _currentUser) inp.focus();
+        }, 200);
+    };
+    window.closeGlobalChat = function() { closeModal('globalChatMask'); };
+
+    // ═══════════════════════════════════════
+    // ADMIN SYSTEM
+    // ═══════════════════════════════════════
+    var _isAdmin = false;
+
+    function checkAdmin() {
+        if (!db || !_currentUser) { _isAdmin = false; return; }
+        db.collection('admins').doc(_currentUser.uid).get().then(function(doc) {
+            _isAdmin = doc.exists;
+        }).catch(function() { _isAdmin = false; });
+    }
+
+    // ═══════════════════════════════════════
+    // USERS LIST + FRIENDS + DM
+    // ═══════════════════════════════════════
+    var _allUsers = [];
+    var _myFriends = []; // array of UIDs
+
+    function loadFriends(cb) {
+        if (!db || !_currentUser) { _myFriends = []; if (cb) cb(); return; }
+        db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+            if (doc.exists && doc.data().friends) {
+                _myFriends = doc.data().friends;
+            } else {
+                _myFriends = [];
+            }
+            if (cb) cb();
+        }).catch(function() { _myFriends = []; if (cb) cb(); });
+    }
+
+    function loadAllUsers(cb) {
+        if (!db) { if (cb) cb(); return; }
+        db.collection('users').orderBy('displayName').get().then(function(snap) {
+            _allUsers = [];
+            snap.forEach(function(doc) {
+                var d = doc.data();
+                d._uid = doc.id;
+                // Online if lastSeen < 2 min ago
+                if (d.lastSeen && d.lastSeen.toDate) {
+                    var diff = Date.now() - d.lastSeen.toDate().getTime();
+                    d._online = d.online && diff < 120000;
+                } else {
+                    d._online = false;
+                }
+                _allUsers.push(d);
+            });
+            // Sort: online first
+            _allUsers.sort(function(a, b) {
+                if (a._online && !b._online) return -1;
+                if (!a._online && b._online) return 1;
+                return (a.displayName || '').localeCompare(b.displayName || '');
+            });
+            if (cb) cb();
+        }).catch(function(e) { console.warn('Users load err:', e); if (cb) cb(); });
+    }
+
+    function renderUsersList() {
+        var container = document.getElementById('usersListContent');
+        var countEl = document.getElementById('usersCount');
+        if (!container) return;
+        container.innerHTML = '';
+        var onlineCount = _allUsers.filter(function(u) { return u._online; }).length;
+        if (countEl) countEl.textContent = onlineCount + ' онлайн / ' + _allUsers.length + ' всего';
+
+        if (!_allUsers.length) {
+            container.innerHTML = '<div class="chat-login-msg">Пока нет пользователей</div>';
+            return;
+        }
+
+        _allUsers.forEach(function(u) {
+            if (_currentUser && u._uid === _currentUser.uid) return; // skip self
+            var card = document.createElement('div');
+            card.className = 'user-card';
+
+            // Avatar + status
+            var avWrap = document.createElement('div');
+            avWrap.className = 'user-av-wrap';
+            var av = document.createElement('div');
+            av.className = 'user-av';
+            if (u.photoURL) av.innerHTML = '<img src="' + u.photoURL + '" onerror="this.style.display=\'none\'">';
+            else av.textContent = (u.displayName || '?').charAt(0).toUpperCase();
+            avWrap.appendChild(av);
+            var dot = document.createElement('div');
+            dot.className = 'user-status-dot ' + (u._online ? 'online' : 'offline');
+            avWrap.appendChild(dot);
+            card.appendChild(avWrap);
+
+            // Info
+            var info = document.createElement('div');
+            info.className = 'user-info';
+            var nameDiv = document.createElement('div');
+            nameDiv.className = 'user-name';
+            nameDiv.textContent = u.displayName || u.email || '???';
+            info.appendChild(nameDiv);
+            var emailDiv = document.createElement('div');
+            emailDiv.className = 'user-email';
+            emailDiv.textContent = u._online ? '🟢 Онлайн' : 'Оффлайн';
+            info.appendChild(emailDiv);
+            card.appendChild(info);
+
+            // Actions
+            if (_currentUser) {
+                var actions = document.createElement('div');
+                actions.className = 'user-actions';
+                var isFriend = _myFriends.includes(u._uid);
+                if (isFriend || _isAdmin) {
+                    var dmBtn = document.createElement('button');
+                    dmBtn.className = 'user-act-btn';
+                    dmBtn.textContent = '✉ ЛС';
+                    dmBtn.onclick = function() { openDmChat(u._uid, u.displayName || u.email); };
+                    actions.appendChild(dmBtn);
+                }
+                if (!isFriend) {
+                    var addBtn = document.createElement('button');
+                    addBtn.className = 'user-act-btn';
+                    addBtn.textContent = '+ Друг';
+                    addBtn.onclick = function() { addFriend(u._uid); };
+                    actions.appendChild(addBtn);
+                } else {
+                    var rmBtn = document.createElement('button');
+                    rmBtn.className = 'user-act-btn';
+                    rmBtn.style.color = '#e74c3c';
+                    rmBtn.textContent = '× Удалить';
+                    rmBtn.onclick = function() { removeFriend(u._uid); };
+                    actions.appendChild(rmBtn);
+                }
+                card.appendChild(actions);
+            }
+            container.appendChild(card);
+        });
+    }
+
+    function addFriend(uid) {
+        if (!db || !_currentUser) return;
+        if (!_myFriends.includes(uid)) _myFriends.push(uid);
+        db.collection('users').doc(_currentUser.uid).set({ friends: _myFriends }, { merge: true })
+            .then(function() { renderUsersList(); });
+    }
+
+    function removeFriend(uid) {
+        if (!db || !_currentUser) return;
+        _myFriends = _myFriends.filter(function(f) { return f !== uid; });
+        db.collection('users').doc(_currentUser.uid).set({ friends: _myFriends }, { merge: true })
+            .then(function() { renderUsersList(); });
+    }
+
+    window.openUsersList = function() {
+        openModal('usersListMask');
+        loadFriends(function() {
+            loadAllUsers(function() { renderUsersList(); });
+        });
+    };
+    window.closeUsersList = function() { closeModal('usersListMask'); };
+
+    // ═══════════════════════════════════════
+    // DM (Direct Messages)
+    // ═══════════════════════════════════════
+    var _dmListener = null;
+    var _dmPartnerUid = null;
+    var _dmPartnerName = '';
+
+    function getDmRoomId(uid1, uid2) {
+        return uid1 < uid2 ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
+    }
+
+    function openDmChat(partnerUid, partnerName) {
+        _dmPartnerUid = partnerUid;
+        _dmPartnerName = partnerName;
+        document.getElementById('dmChatName').textContent = '✉ ' + partnerName;
+        openModal('dmChatMask');
+        startDmListener();
+    }
+    window.openDmChat = openDmChat;
+
+    window.closeDmChat = function() {
+        closeModal('dmChatMask');
+        if (_dmListener) { _dmListener(); _dmListener = null; }
+    };
+
+    function startDmListener() {
+        if (_dmListener) { _dmListener(); _dmListener = null; }
+        if (!db || !_currentUser || !_dmPartnerUid) return;
+        var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
+        _dmListener = db.collection('dms').doc(roomId).collection('messages')
+            .orderBy('ts', 'asc')
+            .limitToLast(50)
+            .onSnapshot(function(snap) {
+                var msgs = [];
+                snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; msgs.push(d); });
+                renderDmMessages(msgs);
+            });
+    }
+
+    function renderDmMessages(msgs) {
+        var container = document.getElementById('dmMessages');
+        if (!container) return;
+        container.innerHTML = '';
+        if (!msgs.length) {
+            container.innerHTML = '<div class="chat-login-msg">Начни разговор!</div>';
+            return;
+        }
+        msgs.forEach(function(msg) {
+            var div = document.createElement('div');
+            div.className = 'chat-msg';
+            var isMe = _currentUser && msg.uid === _currentUser.uid;
+            var av = document.createElement('div');
+            av.className = 'chat-msg-av';
+            if (msg.photoURL) av.innerHTML = '<img src="' + msg.photoURL + '">';
+            else av.textContent = (msg.name || '?').charAt(0).toUpperCase();
+            div.appendChild(av);
+            var body = document.createElement('div');
+            body.className = 'chat-msg-body';
+            var head = document.createElement('div');
+            head.className = 'chat-msg-head';
+            head.innerHTML = '<span class="chat-msg-name" style="color:' + (isMe ? '#5dade2' : '#b96fff') + ';">' + (msg.name || '') + '</span>';
+            if (msg.ts) {
+                var d = msg.ts.toDate ? msg.ts.toDate() : new Date(msg.ts);
+                head.innerHTML += '<span class="chat-msg-time">' + d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) + '</span>';
+            }
+            body.appendChild(head);
+            var text = document.createElement('div');
+            text.className = 'chat-msg-text';
+            text.textContent = msg.text || '';
+            body.appendChild(text);
+            div.appendChild(body);
+            container.appendChild(div);
+        });
+        container.scrollTop = container.scrollHeight;
+    }
+
+    window.sendDmMsg = function() {
+        if (!db || !_currentUser || !_dmPartnerUid) return;
+        var input = document.getElementById('dmInput');
+        var text = (input.value || '').trim();
+        if (!text) return;
+        input.value = '';
+        var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
+        db.collection('dms').doc(roomId).collection('messages').add({
+            text: text,
+            name: _currentUser.displayName || _currentUser.email || 'Аноним',
+            uid: _currentUser.uid,
+            photoURL: _currentUser.photoURL || '',
+            ts: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    };
+
+    // Admin check is handled in the main auth listener above
 
 })();
 </script>
