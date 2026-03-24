@@ -1668,7 +1668,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','globalChatMask','usersListMask','dmChatMask'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','globalChatMask','usersListMask','dmChatMask','tierlistMenuMask'];
 
     // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
     var _modalStack = [];
@@ -2879,6 +2879,9 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         renderTierlist();
     };
     window.closeTierlist = function() { closeModal('tierlistMask'); };
+
+    window.openTierlistMenu = function() { openModal('tierlistMenuMask'); };
+    window.closeTierlistMenu = function() { closeModal('tierlistMenuMask'); };
     function buildTierlistTabs() {
         var el=document.getElementById('tierlistTabs'); if(!el) return;
         if(_tierType!=='champs'){el.innerHTML='';return;}
@@ -3783,7 +3786,10 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 <div class="m-mask" id="itemsMask" onclick="if(event.target===this)closeItems()">
   <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;">
     <button class="btn-close-x" onclick="closeItems()">✕</button>
-    <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;">📦 Предметы Wild Rift</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div style="font-size:15px;font-weight:900;color:#b96fff;">📦 Предметы Wild Rift</div>
+      <button onclick="closeItems();openItemCalcMenu()" style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:10px;border:1.5px solid rgba(255,193,7,0.4);background:rgba(255,193,7,0.08);color:#FFD700;font-size:12px;font-weight:800;cursor:pointer;">🧮 Калькулятор предметов</button>
+    </div>
         <div style="font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;font-weight:700;margin:10px 0 6px;">⚔ Физические</div>
     <div class="items-grid">
       <div class="item-card" data-tip="Чёрный тесак¦3000 г¦+40 Сила атаки  |  +20 Ускорение умений  |  +400 Здоровье¦Раскол: Нанесение физического урона вражескому чемпиону снижает броню на 6% в течение 6 секунд, эффект обновляется при последующих попаданиях и суммируется до 4 раз, снижая броню на 24%.
@@ -3959,15 +3965,10 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="side-section">Инструменты</div>
   <button class="side-btn" onclick="sidebarOpen('sideChamps')"><span class="side-icon">👥</span>Чемпионы</button>
   <button class="side-btn" onclick="sidebarOpen('calc')"><span class="side-icon">⚔</span>Калькулятор урона</button>
-  <button class="side-btn" onclick="sidebarOpen('itemCalcMenu')"><span class="side-icon">🧮</span>Калькулятор предметов</button>
   <button class="side-btn" onclick="sidebarOpen('items')"><span class="side-icon">📦</span>Предметы</button>
   <button class="side-btn" onclick="sidebarOpen('runes')"><span class="side-icon">💎</span>Руны</button>
   <button class="side-btn" onclick="sidebarOpen('draft')" style="background:rgba(109,63,245,0.15);border-left:3px solid #b96fff;"><span class="side-icon">📋</span>Драфт-помощник</button>
-
-  <div class="side-section" style="margin-top:8px;">Тир-листы</div>
-  <button class="side-btn" onclick="sidebarOpen('tierChamps')"><span class="side-icon">🏆</span>Тир-лист чемпионов</button>
-  <button class="side-btn" onclick="sidebarOpen('tierItems')"><span class="side-icon">⚙</span>Тир-лист предметов</button>
-  <button class="side-btn" onclick="sidebarOpen('tierRunes')"><span class="side-icon">✨</span>Тир-лист рун</button>
+  <button class="side-btn" onclick="closeSidebar();openTierlistMenu()" style="background:rgba(255,215,0,0.06);border-left:3px solid rgba(255,215,0,0.5);"><span class="side-icon">🏆</span>Тир-лист</button>
 
   <div class="side-section" style="margin-top:8px;">Сообщество</div>
   <button class="side-btn" onclick="closeSidebar();openGlobalChat()" style="background:rgba(46,204,113,0.08);border-left:3px solid #2ecc71;"><span class="side-icon">💬</span>Глобальный чат</button>
@@ -4349,6 +4350,25 @@ Stormarrow: При максимальных зарядах следующая б
       style="font-size:13px;padding:8px 12px;margin-bottom:8px;" oninput="champPickerFilter()">
     <div id="champPickerRoles" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;"></div>
     <div id="champPickerGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;overflow-y:auto;flex:1;align-content:start;padding:2px;"></div>
+  </div>
+</div>
+
+<!-- ══ TIERLIST MENU MODAL ══ -->
+<div class="m-mask" id="tierlistMenuMask" onclick="if(event.target===this)closeTierlistMenu()">
+  <div class="m-win" style="width:88vw;max-width:340px;padding:20px 18px;padding-right:50px;">
+    <button class="btn-close-x" onclick="closeTierlistMenu()">✕</button>
+    <div style="font-size:15px;font-weight:900;color:#FFD700;margin-bottom:16px;">🏆 Тир-листы</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button onclick="closeTierlistMenu();openTierlist('champs')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+        <span style="font-size:20px;">🏆</span><div><div>Тир-лист чемпионов</div><div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:500;">Лучшие чемпы по ролям</div></div>
+      </button>
+      <button onclick="closeTierlistMenu();openTierlist('items')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+        <span style="font-size:20px;">⚙</span><div><div>Тир-лист предметов</div><div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:500;">Самые эффективные предметы</div></div>
+      </button>
+      <button onclick="closeTierlistMenu();openTierlist('runes')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+        <span style="font-size:20px;">✨</span><div><div>Тир-лист рун</div><div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:500;">Топовые руны мета</div></div>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -5070,16 +5090,19 @@ Stormarrow: При максимальных зарядах следующая б
     }
 
     window.openGlobalChat = function() {
-        openModal('globalChatMask');
+        if (typeof openModal==='function') { openModal('globalChatMask'); }
+        else { var el=document.getElementById('globalChatMask'); if(el){el.classList.add('active');el.style.zIndex='6000';} document.body.classList.add('modal-open'); }
         startChatListener();
         updateChatUI(!!_currentUser);
-        // Focus input
         setTimeout(function() {
             var inp = document.getElementById('chatInput');
             if (inp && _currentUser) inp.focus();
         }, 200);
     };
-    window.closeGlobalChat = function() { closeModal('globalChatMask'); };
+    window.closeGlobalChat = function() {
+        if (typeof closeModal==='function') { closeModal('globalChatMask'); }
+        else { var el=document.getElementById('globalChatMask'); if(el) el.classList.remove('active'); document.body.classList.remove('modal-open'); }
+    };
 
     // ═══════════════════════════════════════
     // ADMIN SYSTEM
@@ -5228,12 +5251,16 @@ Stormarrow: При максимальных зарядах следующая б
     }
 
     window.openUsersList = function() {
-        openModal('usersListMask');
+        if (typeof openModal==='function') { openModal('usersListMask'); }
+        else { var el=document.getElementById('usersListMask'); if(el){el.classList.add('active');el.style.zIndex='6000';} document.body.classList.add('modal-open'); }
         loadFriends(function() {
             loadAllUsers(function() { renderUsersList(); });
         });
     };
-    window.closeUsersList = function() { closeModal('usersListMask'); };
+    window.closeUsersList = function() {
+        if (typeof closeModal==='function') { closeModal('usersListMask'); }
+        else { var el=document.getElementById('usersListMask'); if(el) el.classList.remove('active'); document.body.classList.remove('modal-open'); }
+    };
 
     // ═══════════════════════════════════════
     // DM (Direct Messages)
@@ -5250,13 +5277,15 @@ Stormarrow: При максимальных зарядах следующая б
         _dmPartnerUid = partnerUid;
         _dmPartnerName = partnerName;
         document.getElementById('dmChatName').textContent = '✉ ' + partnerName;
-        openModal('dmChatMask');
+        if (typeof openModal==='function') { openModal('dmChatMask'); }
+        else { var el=document.getElementById('dmChatMask'); if(el){el.classList.add('active');el.style.zIndex='6100';} document.body.classList.add('modal-open'); }
         startDmListener();
     }
     window.openDmChat = openDmChat;
 
     window.closeDmChat = function() {
-        closeModal('dmChatMask');
+        if (typeof closeModal==='function') { closeModal('dmChatMask'); }
+        else { var el=document.getElementById('dmChatMask'); if(el) el.classList.remove('active'); document.body.classList.remove('modal-open'); }
         if (_dmListener) { _dmListener(); _dmListener = null; }
     };
 
