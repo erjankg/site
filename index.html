@@ -1360,6 +1360,17 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     .rune-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)) !important; gap: 6px !important; }
 }
 
+    /* ── PERFORMANCE: GPU acceleration for scrollable lists ── */
+    #scGrid, #champPickerGrid, #draftGrid, .items-grid, .rune-grid,
+    .inf-table-wrap, #infListCards, .table-hold {
+        will-change: transform;
+        -webkit-overflow-scrolling: touch;
+        transform: translateZ(0);
+    }
+    .rune-card img, .item-card img, .tierlist-champ-icon {
+        content-visibility: auto;
+    }
+
     /* ── AUTH BUTTON ── */
     .auth-btn {
         background: linear-gradient(135deg, #4285F4, #356AC3);
@@ -2944,23 +2955,42 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
         var champ=raw.find(function(x){return x.name===name;});
         var el=document.getElementById('champDetailContent');
         el.innerHTML='';
-        // Иконка
+        el.style.cssText='text-align:left;padding:0;';
+
+        // ══ MAIN 2-COLUMN LAYOUT ══
+        var mainGrid=document.createElement('div');
+        mainGrid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:20px;';
+        // Mobile: stack
+        if(window.innerWidth<=768) mainGrid.style.gridTemplateColumns='1fr';
+
+        // ── LEFT COLUMN: Profile + Stats ──
+        var leftCol=document.createElement('div');
+
+        // Icon + Name header
+        var header=document.createElement('div');
+        header.style.cssText='display:flex;align-items:center;gap:14px;margin-bottom:14px;';
         var ci=document.createElement('img');
         ci.src=champIcon(name);
-        ci.style.cssText='width:90px;height:90px;border-radius:16px;margin-bottom:10px;display:block;margin-left:auto;margin-right:auto;border:2px solid rgba(185,111,255,0.45);box-shadow:0 0 18px rgba(109,63,245,0.4);object-fit:cover;';
+        ci.style.cssText='width:72px;height:72px;border-radius:14px;border:2px solid rgba(185,111,255,0.45);box-shadow:0 0 18px rgba(109,63,245,0.4);object-fit:cover;flex-shrink:0;';
         ci.onerror=function(){this.style.display='none';};
-        el.appendChild(ci);
-        // Имя
+        header.appendChild(ci);
+        var nameBlock=document.createElement('div');
         var cn=document.createElement('div');
-        cn.style.cssText='font-size:22px;font-weight:900;color:#b96fff;margin-bottom:4px;text-align:center;';
-        cn.textContent=name; el.appendChild(cn);
+        cn.style.cssText='font-size:22px;font-weight:900;color:#b96fff;';
+        cn.textContent=name;
+        nameBlock.appendChild(cn);
         if(champ){
-            // Роли
             var roles=[]; if(champ.is.Top)roles.push('Top'); if(champ.is.Jungle)roles.push('Jungle'); if(champ.is.Mid)roles.push('Mid'); if(champ.is.ADC)roles.push('ADC'); if(champ.is.Support)roles.push('Support');
             var rd=document.createElement('div');
-            rd.style.cssText='font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;text-align:center;';
-            rd.textContent=roles.join(' \u00b7 ')||'\u2014'; el.appendChild(rd);
-            // Patch info in detail card
+            rd.style.cssText='font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;';
+            rd.textContent=roles.join(' \u00b7 ')||'\u2014';
+            nameBlock.appendChild(rd);
+        }
+        header.appendChild(nameBlock);
+        leftCol.appendChild(header);
+
+        if(champ){
+            // Patch info
             var pDetail = patchMap[name];
             if(pDetail) {
                 var pBadge = document.createElement('div');
@@ -2968,9 +2998,9 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 var pLabel = pDetail.type === 'buff' ? '🟢 БАФФ' : '🔴 НЕРФ';
                 pBadge.style.cssText = 'background:rgba('+(pDetail.type==='buff'?'46,204,113':'231,76,60')+',0.12);border:1px solid '+pColor+';border-radius:10px;padding:8px 12px;margin-bottom:12px;';
                 pBadge.innerHTML = '<div style="font-size:11px;font-weight:900;color:'+pColor+';margin-bottom:3px;">'+pLabel+' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Патч '+pDetail.patch+'</span></div><div style="font-size:10px;color:rgba(255,255,255,0.7);line-height:1.4;">'+pDetail.change+'</div>';
-                el.appendChild(pBadge);
+                leftCol.appendChild(pBadge);
             }
-            // Ползунок уровня
+            // Level slider
             var _cardLvl = lvl;
             var lvlWrap=document.createElement('div');
             lvlWrap.style.cssText='margin-bottom:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(155,89,182,0.2);border-radius:12px;padding:10px 14px;';
@@ -2987,13 +3017,12 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 updateCardStats(champ, _cardLvl);
             };
             lvlWrap.appendChild(slider);
-            el.appendChild(lvlWrap);
-            // Статы
+            leftCol.appendChild(lvlWrap);
+            // Stats grid
             var sg=document.createElement('div');
             sg.id='cdStatsGrid';
             sg.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;';
-            el.appendChild(sg);
-            // Рендер статов
+            leftCol.appendChild(sg);
             function updateCardStats(c, l){
                 var f=function(b,g){return Math.round(b+(l-1)*g);};
                 var stats=[
@@ -3019,15 +3048,17 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 }
             }
             updateCardStats(champ, _cardLvl);
+        }
+        mainGrid.appendChild(leftCol);
 
-            // ═══ МАТЧАПЫ: силён / слаб / комбо ═══
-            // Top row: Strong vs (left) + Weak vs (right)
-            var topRow = document.createElement('div');
-            topRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;';
+        // ── RIGHT COLUMN: Matchups ──
+        if(champ){
+            var rightCol=document.createElement('div');
+            rightCol.style.cssText='display:flex;flex-direction:column;gap:8px;';
 
             function makeSection(id, title, color, bgRgb, key, pickerTitle) {
                 var box = document.createElement('div');
-                box.style.cssText = 'background:rgba('+bgRgb+',0.06);border:1px solid rgba('+bgRgb+',0.25);border-radius:10px;padding:10px;';
+                box.style.cssText = 'background:rgba('+bgRgb+',0.06);border:1px solid rgba('+bgRgb+',0.25);border-radius:10px;padding:10px;flex:1;';
                 box.innerHTML = '<div style="font-size:10px;color:'+color+';font-weight:800;letter-spacing:0.5px;margin-bottom:8px;">'+title+'</div>';
                 var list = document.createElement('div');
                 list.id = id;
@@ -3046,16 +3077,10 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 return box;
             }
 
-            topRow.appendChild(makeSection('cdStrongVs', '⚔ СИЛЁН ПРОТИВ', '#2ecc71', '39,174,96', 'strongVs', '⚔ Силён против'));
-            topRow.appendChild(makeSection('cdWeakVs', '💀 СЛАБ ПРОТИВ', '#e74c3c', '231,76,60', 'weakVs', '💀 Слаб против'));
-            el.appendChild(topRow);
+            rightCol.appendChild(makeSection('cdStrongVs', '⚔ СИЛЁН ПРОТИВ', '#2ecc71', '39,174,96', 'strongVs', '⚔ Силён против'));
+            rightCol.appendChild(makeSection('cdWeakVs', '💀 СЛАБ ПРОТИВ', '#e74c3c', '231,76,60', 'weakVs', '💀 Слаб против'));
+            rightCol.appendChild(makeSection('cdCombos', '🤝 КОМБО', '#5dade2', '93,173,226', 'combos', '🤝 Комбо с'));
 
-            // Bottom: Combo
-            var comboSection = makeSection('cdCombos', '🤝 КОМБО', '#5dade2', '93,173,226', 'combos', '🤝 Комбо с');
-            comboSection.style.marginTop = '8px';
-            el.appendChild(comboSection);
-
-            // Render all 3 sections
             function renderMatchups(n) {
                 var sections = [
                     {id:'cdStrongVs', key:'strongVs', bgRgb:'39,174,96'},
@@ -3084,7 +3109,9 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
                 });
             }
             renderMatchups(name);
+            mainGrid.appendChild(rightCol);
         }
+        el.appendChild(mainGrid);
         openModal('champDetailMask');
     };
     window.closeChampDetail=function(){closeModal('champDetailMask');};
@@ -3876,11 +3903,11 @@ Stormarrow: При максимальных зарядах следующая б
   </div>
 
   <div class="side-section">Инструменты</div>
-  <button class="side-btn" onclick="sidebarOpen('sideChamps')"><span class="side-icon"><img src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Jinx.png" style="width:22px;height:22px;border-radius:5px;"></span>Чемпионы</button>
+  <button class="side-btn" onclick="sidebarOpen('sideChamps')"><span class="side-icon">👥</span>Чемпионы</button>
   <button class="side-btn" onclick="sidebarOpen('calc')"><span class="side-icon">⚔</span>Калькулятор урона</button>
-  <button class="side-btn" onclick="sidebarOpen('itemCalcMenu')"><span class="side-icon"><img src="https://www.wildriftfire.com/images/items/thornmail.png" style="width:22px;height:22px;border-radius:5px;"></span>Калькулятор предметов</button>
-  <button class="side-btn" onclick="sidebarOpen('items')"><span class="side-icon"><img src="https://www.wildriftfire.com/images/items/infinity-edge.png" style="width:22px;height:22px;border-radius:5px;"></span>Предметы</button>
-  <button class="side-btn" onclick="sidebarOpen('runes')"><span class="side-icon"><img src="https://www.wildriftfire.com/images/runes/conqueror.png" style="width:22px;height:22px;border-radius:50%;"></span>Руны</button>
+  <button class="side-btn" onclick="sidebarOpen('itemCalcMenu')"><span class="side-icon">🧮</span>Калькулятор предметов</button>
+  <button class="side-btn" onclick="sidebarOpen('items')"><span class="side-icon">📦</span>Предметы</button>
+  <button class="side-btn" onclick="sidebarOpen('runes')"><span class="side-icon">💎</span>Руны</button>
   <button class="side-btn" onclick="sidebarOpen('draft')" style="background:rgba(109,63,245,0.15);border-left:3px solid #b96fff;"><span class="side-icon">📋</span>Драфт-помощник</button>
 
   <div class="side-section" style="margin-top:8px;">Тир-листы</div>
@@ -4049,7 +4076,7 @@ Stormarrow: При максимальных зарядах следующая б
 </div>
 <!-- ══ CHAMPION DETAIL MODAL ══ -->
 <div class="m-mask" id="champDetailMask" onclick="if(event.target===this)closeChampDetail()">
-  <div class="m-win" style="width:94vw;max-width:700px;max-height:92vh;overflow-y:auto;padding:24px 20px 20px;">
+  <div class="m-win" style="width:96vw;max-width:920px;max-height:92vh;overflow-y:auto;padding:24px 20px 20px;">
     <button class="btn-close-x" onclick="closeChampDetail()">✕</button>
     <div id="champDetailContent" style="text-align:center;padding:30px 0;">
       <div style="font-size:40px;margin-bottom:12px;">⚔</div>
