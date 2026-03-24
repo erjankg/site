@@ -1551,36 +1551,25 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     let patchMap = {};
 
     // ═══ MATCHUP DATA (localStorage) ═══
+    // strongVs = против кого силён, weakVs = против кого слаб, combos = комбо
     function getMatchups() {
         try { return JSON.parse(localStorage.getItem('matchups') || '{}'); } catch(e) { return {}; }
     }
     function saveMatchups(data) {
         try { localStorage.setItem('matchups', JSON.stringify(data)); } catch(e) {}
     }
-    function getCounters(name) { var m = getMatchups(); return (m[name] && m[name].counters) || []; }
+    function _ensureChamp(m, name) { if(!m[name]) m[name] = {strongVs:[], weakVs:[], combos:[]}; return m; }
+    function getStrongVs(name) { var m = getMatchups(); return (m[name] && m[name].strongVs) || (m[name] && m[name].counters) || []; }
+    function getWeakVs(name) { var m = getMatchups(); return (m[name] && m[name].weakVs) || []; }
     function getCombos(name) { var m = getMatchups(); return (m[name] && m[name].combos) || []; }
-    function addCounter(name, counter) {
-        var m = getMatchups();
-        if(!m[name]) m[name] = {counters:[], combos:[]};
-        if(m[name].counters.indexOf(counter) === -1) m[name].counters.push(counter);
+    function addTo(name, key, val) {
+        var m = getMatchups(); m = _ensureChamp(m, name);
+        if((m[name][key]||[]).indexOf(val) === -1) { if(!m[name][key]) m[name][key]=[]; m[name][key].push(val); }
         saveMatchups(m);
     }
-    function removeCounter(name, counter) {
-        var m = getMatchups();
-        if(!m[name]) return;
-        m[name].counters = m[name].counters.filter(function(c){ return c !== counter; });
-        saveMatchups(m);
-    }
-    function addCombo(name, combo) {
-        var m = getMatchups();
-        if(!m[name]) m[name] = {counters:[], combos:[]};
-        if(m[name].combos.indexOf(combo) === -1) m[name].combos.push(combo);
-        saveMatchups(m);
-    }
-    function removeCombo(name, combo) {
-        var m = getMatchups();
-        if(!m[name]) return;
-        m[name].combos = m[name].combos.filter(function(c){ return c !== combo; });
+    function removeFrom(name, key, val) {
+        var m = getMatchups(); if(!m[name] || !m[name][key]) return;
+        m[name][key] = m[name][key].filter(function(c){ return c !== val; });
         saveMatchups(m);
     } // {champName: {patch, change, type}}
     let selected = new Set();
@@ -2819,83 +2808,68 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
             }
             updateCardStats(champ, _cardLvl);
 
-            // ═══ КОНТР-ПИКИ И КОМБО ═══
-            var matchupWrap = document.createElement('div');
-            matchupWrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;';
+            // ═══ МАТЧАПЫ: силён / слаб / комбо ═══
+            // Top row: Strong vs (left) + Weak vs (right)
+            var topRow = document.createElement('div');
+            topRow.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;';
 
-            // Контр-пики (слева)
-            var counterBox = document.createElement('div');
-            counterBox.style.cssText = 'background:rgba(231,76,60,0.06);border:1px solid rgba(231,76,60,0.25);border-radius:10px;padding:10px;';
-            counterBox.innerHTML = '<div style="font-size:10px;color:#e74c3c;font-weight:800;letter-spacing:0.5px;margin-bottom:8px;">🔴 КОНТР-ПИКИ</div>';
-            var counterList = document.createElement('div');
-            counterList.id = 'cdCounters';
-            counterList.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;';
-            counterBox.appendChild(counterList);
-            var counterAddBtn = document.createElement('button');
-            counterAddBtn.style.cssText = 'width:100%;padding:5px;border-radius:7px;border:1px dashed rgba(231,76,60,0.3);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;';
-            counterAddBtn.textContent = '+ Добавить';
-            counterAddBtn.onclick = function() {
-                openChampPicker('🔴 Контр-пик для ' + name, function(c) {
-                    addCounter(name, c.name);
-                    renderMatchups(name);
-                });
-            };
-            counterBox.appendChild(counterAddBtn);
-            matchupWrap.appendChild(counterBox);
+            function makeSection(id, title, color, bgRgb, key, pickerTitle) {
+                var box = document.createElement('div');
+                box.style.cssText = 'background:rgba('+bgRgb+',0.06);border:1px solid rgba('+bgRgb+',0.25);border-radius:10px;padding:10px;';
+                box.innerHTML = '<div style="font-size:10px;color:'+color+';font-weight:800;letter-spacing:0.5px;margin-bottom:8px;">'+title+'</div>';
+                var list = document.createElement('div');
+                list.id = id;
+                list.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;';
+                box.appendChild(list);
+                var addBtn = document.createElement('button');
+                addBtn.style.cssText = 'width:100%;padding:5px;border-radius:7px;border:1px dashed rgba('+bgRgb+',0.3);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;';
+                addBtn.textContent = '+ Добавить';
+                addBtn.onclick = function() {
+                    openChampPicker(pickerTitle, function(c) {
+                        addTo(name, key, c.name);
+                        renderMatchups(name);
+                    });
+                };
+                box.appendChild(addBtn);
+                return box;
+            }
 
-            // Комбо (справа)
-            var comboBox = document.createElement('div');
-            comboBox.style.cssText = 'background:rgba(39,174,96,0.06);border:1px solid rgba(39,174,96,0.25);border-radius:10px;padding:10px;';
-            comboBox.innerHTML = '<div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:0.5px;margin-bottom:8px;">🟢 КОМБО</div>';
-            var comboList = document.createElement('div');
-            comboList.id = 'cdCombos';
-            comboList.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;';
-            comboBox.appendChild(comboList);
-            var comboAddBtn = document.createElement('button');
-            comboAddBtn.style.cssText = 'width:100%;padding:5px;border-radius:7px;border:1px dashed rgba(39,174,96,0.3);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;';
-            comboAddBtn.textContent = '+ Добавить';
-            comboAddBtn.onclick = function() {
-                openChampPicker('🟢 Комбо с ' + name, function(c) {
-                    addCombo(name, c.name);
-                    renderMatchups(name);
-                });
-            };
-            comboBox.appendChild(comboAddBtn);
-            matchupWrap.appendChild(comboBox);
-            el.appendChild(matchupWrap);
+            topRow.appendChild(makeSection('cdStrongVs', '⚔ СИЛЁН ПРОТИВ', '#2ecc71', '39,174,96', 'strongVs', '⚔ Силён против'));
+            topRow.appendChild(makeSection('cdWeakVs', '💀 СЛАБ ПРОТИВ', '#e74c3c', '231,76,60', 'weakVs', '💀 Слаб против'));
+            el.appendChild(topRow);
 
-            // Render matchup icons
+            // Bottom: Combo
+            var comboSection = makeSection('cdCombos', '🤝 КОМБО', '#5dade2', '93,173,226', 'combos', '🤝 Комбо с');
+            comboSection.style.marginTop = '8px';
+            el.appendChild(comboSection);
+
+            // Render all 3 sections
             function renderMatchups(n) {
-                var cList = document.getElementById('cdCounters');
-                var bList = document.getElementById('cdCombos');
-                if(cList) {
-                    cList.innerHTML = '';
-                    getCounters(n).forEach(function(cn) {
+                var sections = [
+                    {id:'cdStrongVs', key:'strongVs', bgRgb:'39,174,96'},
+                    {id:'cdWeakVs', key:'weakVs', bgRgb:'231,76,60'},
+                    {id:'cdCombos', key:'combos', bgRgb:'93,173,226'}
+                ];
+                sections.forEach(function(sec) {
+                    var el2 = document.getElementById(sec.id);
+                    if(!el2) return;
+                    el2.innerHTML = '';
+                    var data = [];
+                    if(sec.key === 'strongVs') data = getStrongVs(n);
+                    else if(sec.key === 'weakVs') data = getWeakVs(n);
+                    else data = getCombos(n);
+                    data.forEach(function(cn) {
                         var chip = document.createElement('div');
-                        chip.style.cssText = 'display:flex;align-items:center;gap:3px;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.25);border-radius:6px;padding:2px 5px 2px 2px;';
-                        chip.innerHTML = '<img src="'+champIcon(cn)+'" style="width:22px;height:22px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'"><span style="font-size:9px;color:#fff;">'+cn+'</span>';
+                        chip.style.cssText = 'display:flex;align-items:center;gap:3px;background:rgba('+sec.bgRgb+',0.12);border:1px solid rgba('+sec.bgRgb+',0.25);border-radius:6px;padding:2px 5px 2px 2px;cursor:default;';
+                        chip.innerHTML = '<img src="'+champIcon(cn)+'" style="width:24px;height:24px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'"><span style="font-size:9px;color:#fff;font-weight:600;">'+cn+'</span>';
                         var xBtn = document.createElement('span');
                         xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;margin-left:2px;';
-                        xBtn.textContent = '×';
-                        xBtn.onclick = function(e) { e.stopPropagation(); removeCounter(n, cn); renderMatchups(n); };
+                        xBtn.textContent = '\u00d7';
+                        xBtn.onclick = function(e) { e.stopPropagation(); removeFrom(n, sec.key, cn); renderMatchups(n); };
                         chip.appendChild(xBtn);
-                        cList.appendChild(chip);
+                        el2.appendChild(chip);
                     });
-                }
-                if(bList) {
-                    bList.innerHTML = '';
-                    getCombos(n).forEach(function(cn) {
-                        var chip = document.createElement('div');
-                        chip.style.cssText = 'display:flex;align-items:center;gap:3px;background:rgba(39,174,96,0.12);border:1px solid rgba(39,174,96,0.25);border-radius:6px;padding:2px 5px 2px 2px;';
-                        chip.innerHTML = '<img src="'+champIcon(cn)+'" style="width:22px;height:22px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'"><span style="font-size:9px;color:#fff;">'+cn+'</span>';
-                        var xBtn = document.createElement('span');
-                        xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;margin-left:2px;';
-                        xBtn.textContent = '×';
-                        xBtn.onclick = function(e) { e.stopPropagation(); removeCombo(n, cn); renderMatchups(n); };
-                        chip.appendChild(xBtn);
-                        bList.appendChild(chip);
-                    });
-                }
+                });
             }
             renderMatchups(name);
         }
@@ -3049,14 +3023,11 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
     // ══════════════════════════════════════════
     // DRAFT SYSTEM — new slot-based layout
     // ══════════════════════════════════════════
-    // Draft data from localStorage (user's own counter-picks and combos)
+    // Draft data from localStorage
     function getDraftData(name) {
-        var m = getMatchups();
-        var d = m[name];
-        if(!d) return { counters: [], synergies: [] };
         return {
-            counters: (d.counters || []).map(function(n){ return {n: n, s: 3}; }),
-            synergies: (d.combos || []).map(function(n){ return {n: n, s: 3}; })
+            counters: getWeakVs(name).map(function(n){ return {n: n, s: 3}; }),
+            synergies: getCombos(name).map(function(n){ return {n: n, s: 3}; })
         };
     }
 
@@ -3856,7 +3827,7 @@ Stormarrow: При максимальных зарядах следующая б
 </div>
 <!-- ══ CHAMPION DETAIL MODAL ══ -->
 <div class="m-mask" id="champDetailMask" onclick="if(event.target===this)closeChampDetail()">
-  <div class="m-win" style="width:92vw;max-width:500px;max-height:92vh;overflow-y:auto;padding:24px 20px 20px;padding-right:70px;">
+  <div class="m-win" style="width:94vw;max-width:700px;max-height:92vh;overflow-y:auto;padding:24px 20px 20px;">
     <button class="btn-close-x" onclick="closeChampDetail()">✕</button>
     <div id="champDetailContent" style="text-align:center;padding:30px 0;">
       <div style="font-size:40px;margin-bottom:12px;">⚔</div>
