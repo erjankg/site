@@ -2111,11 +2111,33 @@
     }
 
     window.authSignOut = function() {
-        if (auth) {
-            auth.signOut();
-        }
         var menu = document.getElementById('userMenu');
         if (menu) menu.classList.remove('active');
+        // Show confirmation
+        var overlay = document.createElement('div');
+        overlay.id = 'logoutConfirm';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:99999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.15s ease;';
+        var box = document.createElement('div');
+        box.style.cssText = 'background:linear-gradient(135deg,#1a0d2e,#0f0520);border:1.5px solid rgba(155,89,182,0.3);border-radius:16px;padding:24px;text-align:center;min-width:260px;';
+        box.innerHTML = '<div style="font-size:18px;margin-bottom:6px;">🚪</div>'
+            + '<div style="font-size:14px;font-weight:900;color:#fff;margin-bottom:4px;">Выйти из аккаунта?</div>'
+            + '<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:16px;">Данные не потеряются</div>';
+        var btns = document.createElement('div');
+        btns.style.cssText = 'display:flex;gap:8px;';
+        var cancelBtn = document.createElement('button');
+        cancelBtn.style.cssText = 'flex:1;padding:10px;border-radius:10px;border:1.5px solid rgba(155,89,182,0.3);background:none;color:#b96fff;font-size:13px;font-weight:800;cursor:pointer;';
+        cancelBtn.textContent = 'Назад';
+        cancelBtn.onclick = function() { overlay.remove(); };
+        var confirmBtn = document.createElement('button');
+        confirmBtn.style.cssText = 'flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;font-size:13px;font-weight:800;cursor:pointer;';
+        confirmBtn.textContent = 'Выйти';
+        confirmBtn.onclick = function() { overlay.remove(); if(auth) auth.signOut(); };
+        btns.appendChild(cancelBtn);
+        btns.appendChild(confirmBtn);
+        box.appendChild(btns);
+        overlay.appendChild(box);
+        overlay.onclick = function(e) { if(e.target===overlay) overlay.remove(); };
+        document.body.appendChild(overlay);
     };
 
     function updateAuthUI(user) {
@@ -2697,101 +2719,6 @@
         });
     }
 
-    // ═══ USER POPUP (click on user in sidebar) ═══
-    function showUserPopup(user, evt) {
-        // Remove existing popup
-        var old = document.getElementById('userPopup');
-        if (old) old.remove();
-
-        if (!_currentUser) return;
-        var isFriend = _myFriends.includes(user._uid);
-        var reqSent = _mySentReqs.includes(user._uid);
-        var reqReceived = _myFriendReqs.includes(user._uid);
-
-        var popup = document.createElement('div');
-        popup.id = 'userPopup';
-        popup.style.cssText = 'position:fixed;z-index:9999;background:rgba(20,8,40,0.97);border:1.5px solid rgba(185,111,255,0.4);border-radius:14px;padding:12px;min-width:180px;box-shadow:0 12px 40px rgba(0,0,0,0.7);animation:fadeIn 0.15s ease;';
-
-        // Position near click
-        var x = Math.min(evt.clientX, window.innerWidth - 200);
-        var y = Math.min(evt.clientY, window.innerHeight - 200);
-        popup.style.left = x + 'px';
-        popup.style.top = y + 'px';
-
-        // User name
-        var nameEl = document.createElement('div');
-        nameEl.style.cssText = 'font-size:13px;font-weight:900;color:#fff;margin-bottom:8px;';
-        nameEl.textContent = user.displayName || user.email || '???';
-        popup.appendChild(nameEl);
-
-        // Buttons
-        if (isFriend || _isAdmin) {
-            addPopupBtn(popup, '✉ Написать ЛС', '#b96fff', function() {
-                closePopup();
-                tgMobileCloseSidebar();
-                openDmWithUser(user._uid, user.displayName || user.email);
-            });
-        }
-        if (!isFriend && !reqSent && !reqReceived) {
-            addPopupBtn(popup, '+ Добавить в друзья', '#2ecc71', function() {
-                sendFriendRequest(user._uid);
-                closePopup();
-            });
-        }
-        if (reqSent) {
-            addPopupBtn(popup, '⏳ Запрос отправлен', 'rgba(255,255,255,0.3)', null);
-        }
-        if (reqReceived) {
-            addPopupBtn(popup, '✓ Принять запрос', '#2ecc71', function() {
-                acceptFriendRequest(user._uid);
-                closePopup();
-            });
-            addPopupBtn(popup, '✕ Отклонить', '#e74c3c', function() {
-                declineFriendRequest(user._uid);
-                closePopup();
-            });
-        }
-        if (isFriend) {
-            addPopupBtn(popup, '× Удалить из друзей', '#e74c3c', function() {
-                removeFriend(user._uid);
-                closePopup();
-                setTimeout(function() { loadUsersToSidebar(); }, 300);
-            });
-        }
-
-        document.body.appendChild(popup);
-
-        // Close on click outside
-        setTimeout(function() {
-            document.addEventListener('click', closePopupOnOutside);
-        }, 10);
-    }
-
-    function addPopupBtn(popup, text, color, onclick) {
-        var btn = document.createElement('button');
-        btn.style.cssText = 'display:block;width:100%;text-align:left;padding:8px 10px;border-radius:8px;border:none;background:none;color:'+color+';font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s;';
-        btn.textContent = text;
-        if (onclick) {
-            btn.onmouseover = function() { this.style.background = 'rgba(109,63,245,0.15)'; };
-            btn.onmouseout = function() { this.style.background = 'none'; };
-            btn.onclick = onclick;
-        } else {
-            btn.style.opacity = '0.5';
-            btn.style.cursor = 'default';
-        }
-        popup.appendChild(btn);
-    }
-
-    function closePopup() {
-        var p = document.getElementById('userPopup');
-        if (p) p.remove();
-        document.removeEventListener('click', closePopupOnOutside);
-    }
-
-    function closePopupOnOutside(e) {
-        var p = document.getElementById('userPopup');
-        if (p && !p.contains(e.target)) closePopup();
-    }
 
     // ═══ GLOBAL CHAT ═══
     function startChatListener() {
@@ -2810,7 +2737,11 @@
         var container = document.getElementById('chatMessages');
         if (!container) return;
         container.innerHTML = '';
-        updateChatUI(!!_currentUser);
+        // Show/hide input
+        var inputArea = document.getElementById('chatInputArea');
+        var loginPrompt = document.getElementById('chatLoginPrompt');
+        if (inputArea) inputArea.style.display = _currentUser ? 'flex' : 'none';
+        if (loginPrompt) loginPrompt.style.display = _currentUser ? 'none' : 'block';
 
         if (!_chatMessages.length) {
             container.innerHTML = '<div class="chat-login-msg">Напиши первым! 💬</div>';
@@ -3226,17 +3157,18 @@
     var _profileRole = '';
     var _profileRank = '';
 
+    var _wrRankBase = 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-mini-crests/';
     var RANKS = [
-        { id:'iron', name:'Iron', color:'#8B8B8B', icon:'⬛' },
-        { id:'bronze', name:'Bronze', color:'#CD7F32', icon:'🟫' },
-        { id:'silver', name:'Silver', color:'#C0C0C0', icon:'⬜' },
-        { id:'gold', name:'Gold', color:'#FFD700', icon:'🟡' },
-        { id:'platinum', name:'Platinum', color:'#00CED1', icon:'🔵' },
-        { id:'emerald', name:'Emerald', color:'#2ECC71', icon:'🟢' },
-        { id:'diamond', name:'Diamond', color:'#B9F2FF', icon:'💎' },
-        { id:'master', name:'Master', color:'#9B59B6', icon:'🟣' },
-        { id:'grandmaster', name:'GM', color:'#E74C3C', icon:'🔴' },
-        { id:'challenger', name:'Challenger', color:'#F39C12', icon:'👑' }
+        { id:'iron', name:'Iron', color:'#8B8B8B', img:_wrRankBase+'iron.png', emoji:'⬛' },
+        { id:'bronze', name:'Bronze', color:'#CD7F32', img:_wrRankBase+'bronze.png', emoji:'🟫' },
+        { id:'silver', name:'Silver', color:'#C0C0C0', img:_wrRankBase+'silver.png', emoji:'⬜' },
+        { id:'gold', name:'Gold', color:'#FFD700', img:_wrRankBase+'gold.png', emoji:'🟡' },
+        { id:'platinum', name:'Platinum', color:'#00CED1', img:_wrRankBase+'platinum.png', emoji:'🔵' },
+        { id:'emerald', name:'Emerald', color:'#50C878', img:_wrRankBase+'emerald.png', emoji:'🟢' },
+        { id:'diamond', name:'Diamond', color:'#B9F2FF', img:_wrRankBase+'diamond.png', emoji:'💎' },
+        { id:'master', name:'Master', color:'#9B59B6', img:_wrRankBase+'master.png', emoji:'🟣' },
+        { id:'grandmaster', name:'GM', color:'#E74C3C', img:_wrRankBase+'grandmaster.png', emoji:'🔴' },
+        { id:'challenger', name:'Challenger', color:'#F39C12', img:_wrRankBase+'challenger.png', emoji:'👑' }
     ];
     var ROLES_LIST = ['Top','Jungle','Mid','ADC','Support'];
 
@@ -3282,11 +3214,19 @@
             ranksEl.innerHTML = '';
             RANKS.forEach(function(rk) {
                 var btn = document.createElement('button');
-                btn.style.cssText = 'padding:6px 10px;border-radius:10px;border:1.5px solid '
-                    + (_profileRank === rk.id ? rk.color : 'rgba(155,89,182,0.2)')
-                    + ';background:' + (_profileRank === rk.id ? 'rgba(109,63,245,0.2)' : 'transparent')
-                    + ';color:' + rk.color + ';font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px;';
-                btn.innerHTML = '<span style="font-size:16px;">'+rk.icon+'</span>'+rk.name;
+                var sel = _profileRank === rk.id;
+                btn.style.cssText = 'padding:6px 8px;border-radius:10px;border:1.5px solid '
+                    + (sel ? rk.color : 'rgba(155,89,182,0.2)')
+                    + ';background:' + (sel ? 'rgba(109,63,245,0.2)' : 'transparent')
+                    + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:52px;transition:all 0.15s;';
+                var imgEl = document.createElement('img');
+                imgEl.src = rk.img;
+                imgEl.style.cssText = 'width:32px;height:32px;object-fit:contain;';
+                imgEl.onerror = function() { this.style.display='none'; var sp=document.createElement('span'); sp.style.fontSize='22px'; sp.textContent=rk.emoji; this.parentNode.insertBefore(sp,this); };
+                btn.appendChild(imgEl);
+                var label = document.createElement('span');
+                label.textContent = rk.name;
+                btn.appendChild(label);
                 btn.onclick = function() { _profileRank = rk.id; drawRanks(); };
                 ranksEl.appendChild(btn);
             });
@@ -3366,8 +3306,13 @@
                 var rk = RANKS.find(function(r) { return r.id === user.rank; });
                 if (rk) {
                     var rankBadge = document.createElement('span');
-                    rankBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:11px;font-weight:700;';
-                    rankBadge.textContent = rk.icon + ' ' + rk.name;
+                    rankBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;';
+                    var rkImg = document.createElement('img');
+                    rkImg.src = rk.img;
+                    rkImg.style.cssText = 'width:18px;height:18px;object-fit:contain;';
+                    rkImg.onerror = function() { this.outerHTML = rk.emoji; };
+                    rankBadge.appendChild(rkImg);
+                    rankBadge.appendChild(document.createTextNode(rk.name));
                     badges.appendChild(rankBadge);
                 }
             }
