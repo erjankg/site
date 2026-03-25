@@ -8,14 +8,14 @@
     // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask'];
 
     // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
     var _modalStack = [];
     var _baseZIndex = 6000;
 
     // Модалки которые ВСЕГДА открываются поверх (не закрывая родителя)
-    var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask'];
+    var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask','profileSetupMask','userCardMask'];
 
     function closeAllModals(except) {
         MODAL_IDS.forEach(function(id) {
@@ -2498,6 +2498,7 @@
                 updateChatUI(true);
                 checkAdmin();
                 startDmNotifListener();
+                checkFirstLogin();
             } else {
                 stopPresence();
                 updateChatUI(false);
@@ -2673,7 +2674,7 @@
             if (_currentUser && u._uid === _currentUser.uid) return;
             var card = document.createElement('div');
             card.className = 'user-card';
-            card.onclick = function(e) { showUserPopup(u, e); };
+            card.onclick = function() { showUserCard(u); };
 
             var avWrap = document.createElement('div');
             avWrap.className = 'user-av-wrap';
@@ -3201,6 +3202,7 @@
         if (menu) menu.classList.remove('active');
         if (what === 'dmInbox') { openChatSystem(); setTimeout(switchToDmList, 100); }
         else if (what === 'friendRequests') { openChatSystem(); setTimeout(switchToDmList, 100); }
+        else if (what === 'profile') { openProfileSetup(); }
     };
     window.openUsersList = function() { openChatSystem(); };
     window.closeUsersList = function() {};
@@ -3216,6 +3218,216 @@
             _mySentReqs = d.sentRequests || [];
             updateNotifDots();
         });
+    }
+
+    // ═══════════════════════════════════════
+    // PROFILE SETUP
+    // ═══════════════════════════════════════
+    var _profileRole = '';
+    var _profileRank = '';
+
+    var RANKS = [
+        { id:'iron', name:'Iron', color:'#8B8B8B', icon:'⬛' },
+        { id:'bronze', name:'Bronze', color:'#CD7F32', icon:'🟫' },
+        { id:'silver', name:'Silver', color:'#C0C0C0', icon:'⬜' },
+        { id:'gold', name:'Gold', color:'#FFD700', icon:'🟡' },
+        { id:'platinum', name:'Platinum', color:'#00CED1', icon:'🔵' },
+        { id:'emerald', name:'Emerald', color:'#2ECC71', icon:'🟢' },
+        { id:'diamond', name:'Diamond', color:'#B9F2FF', icon:'💎' },
+        { id:'master', name:'Master', color:'#9B59B6', icon:'🟣' },
+        { id:'grandmaster', name:'GM', color:'#E74C3C', icon:'🔴' },
+        { id:'challenger', name:'Challenger', color:'#F39C12', icon:'👑' }
+    ];
+    var ROLES_LIST = ['Top','Jungle','Mid','ADC','Support'];
+
+    window.openProfileSetup = function() {
+        openModal('profileSetupMask');
+        renderProfileSetup();
+    };
+    window.closeProfileSetup = function() { closeModal('profileSetupMask'); };
+
+    function renderProfileSetup() {
+        var rolesEl = document.getElementById('profileRoles');
+        var ranksEl = document.getElementById('profileRanks');
+        if (!rolesEl || !ranksEl) return;
+
+        // Load saved profile
+        if (_currentUser && db) {
+            db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+                if (doc.exists) {
+                    var d = doc.data();
+                    _profileRole = d.role || '';
+                    _profileRank = d.rank || '';
+                    drawRoles(); drawRanks();
+                }
+            });
+        }
+
+        drawRoles(); drawRanks();
+
+        function drawRoles() {
+            rolesEl.innerHTML = '';
+            ROLES_LIST.forEach(function(r) {
+                var btn = document.createElement('button');
+                btn.style.cssText = 'padding:8px 16px;border-radius:10px;border:1.5px solid '
+                    + (_profileRole === r ? '#b96fff' : 'rgba(155,89,182,0.2)')
+                    + ';background:' + (_profileRole === r ? 'rgba(109,63,245,0.3)' : 'transparent')
+                    + ';color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;';
+                btn.textContent = r;
+                btn.onclick = function() { _profileRole = r; drawRoles(); };
+                rolesEl.appendChild(btn);
+            });
+        }
+        function drawRanks() {
+            ranksEl.innerHTML = '';
+            RANKS.forEach(function(rk) {
+                var btn = document.createElement('button');
+                btn.style.cssText = 'padding:6px 10px;border-radius:10px;border:1.5px solid '
+                    + (_profileRank === rk.id ? rk.color : 'rgba(155,89,182,0.2)')
+                    + ';background:' + (_profileRank === rk.id ? 'rgba(109,63,245,0.2)' : 'transparent')
+                    + ';color:' + rk.color + ';font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:48px;';
+                btn.innerHTML = '<span style="font-size:16px;">'+rk.icon+'</span>'+rk.name;
+                btn.onclick = function() { _profileRank = rk.id; drawRanks(); };
+                ranksEl.appendChild(btn);
+            });
+        }
+    }
+
+    window.saveProfile = function() {
+        if (!db || !_currentUser) { alert('Войди в аккаунт'); return; }
+        db.collection('users').doc(_currentUser.uid).set({
+            role: _profileRole,
+            rank: _profileRank
+        }, { merge: true }).then(function() {
+            closeProfileSetup();
+        });
+    };
+
+    // Check if first login — open profile setup
+    function checkFirstLogin() {
+        if (!db || !_currentUser) return;
+        db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+            if (doc.exists) {
+                var d = doc.data();
+                if (!d.role && !d.rank) {
+                    setTimeout(function() { openProfileSetup(); }, 500);
+                }
+            } else {
+                setTimeout(function() { openProfileSetup(); }, 500);
+            }
+        });
+    }
+
+    // ═══════════════════════════════════════
+    // USER CARD (click on user in sidebar)
+    // ═══════════════════════════════════════
+    window.closeUserCard = function() { closeModal('userCardMask'); };
+
+    function showUserCard(user) {
+        var container = document.getElementById('userCardContent');
+        if (!container) return;
+        container.innerHTML = '';
+
+        var isFriend = _myFriends.includes(user._uid);
+        var reqSent = _mySentReqs.includes(user._uid);
+        var reqReceived = _myFriendReqs.includes(user._uid);
+
+        // Header
+        var header = document.createElement('div');
+        header.style.cssText = 'padding:20px;text-align:center;border-bottom:1px solid rgba(155,89,182,0.15);';
+
+        var av = document.createElement('div');
+        av.style.cssText = 'width:64px;height:64px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;font-weight:900;overflow:hidden;';
+        if (user.photoURL) av.innerHTML = '<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">';
+        else av.textContent = (user.displayName||'?').charAt(0).toUpperCase();
+        header.appendChild(av);
+
+        var name = document.createElement('div');
+        name.style.cssText = 'font-size:16px;font-weight:900;color:#fff;';
+        name.textContent = user.displayName || user.email || '???';
+        header.appendChild(name);
+
+        var status = document.createElement('div');
+        status.style.cssText = 'font-size:11px;color:' + (user._online ? '#2ecc71' : 'rgba(255,255,255,0.3)') + ';margin-top:4px;';
+        status.textContent = user._online ? '🟢 Онлайн' : 'Оффлайн';
+        header.appendChild(status);
+
+        // Role & Rank
+        if (user.role || user.rank) {
+            var badges = document.createElement('div');
+            badges.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:8px;';
+            if (user.role) {
+                var roleBadge = document.createElement('span');
+                roleBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:11px;font-weight:700;';
+                roleBadge.textContent = user.role;
+                badges.appendChild(roleBadge);
+            }
+            if (user.rank) {
+                var rk = RANKS.find(function(r) { return r.id === user.rank; });
+                if (rk) {
+                    var rankBadge = document.createElement('span');
+                    rankBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:11px;font-weight:700;';
+                    rankBadge.textContent = rk.icon + ' ' + rk.name;
+                    badges.appendChild(rankBadge);
+                }
+            }
+            header.appendChild(badges);
+        }
+        container.appendChild(header);
+
+        // Actions
+        var actions = document.createElement('div');
+        actions.style.cssText = 'padding:12px 16px;display:flex;flex-direction:column;gap:4px;';
+
+        if (isFriend || _isAdmin) {
+            addCardBtn(actions, '✉ Написать ЛС', '#b96fff', function() {
+                closeUserCard();
+                openChatSystem();
+                setTimeout(function() { openDmWithUser(user._uid, user.displayName||user.email); }, 200);
+            });
+        }
+        if (!isFriend && !reqSent && !reqReceived) {
+            addCardBtn(actions, '+ Добавить в друзья', '#2ecc71', function() {
+                sendFriendRequest(user._uid);
+                closeUserCard();
+            });
+        }
+        if (reqSent) {
+            addCardBtn(actions, '⏳ Запрос отправлен', 'rgba(255,255,255,0.3)', null);
+        }
+        if (reqReceived) {
+            addCardBtn(actions, '✓ Принять запрос', '#2ecc71', function() {
+                acceptFriendRequest(user._uid);
+                closeUserCard();
+            });
+        }
+        if (isFriend) {
+            addCardBtn(actions, '× Удалить из друзей', '#e74c3c', function() {
+                removeFriend(user._uid);
+                closeUserCard();
+            });
+        }
+        addCardBtn(actions, '✕ Закрыть', 'rgba(255,255,255,0.4)', function() { closeUserCard(); });
+        container.appendChild(actions);
+
+        openModal('userCardMask');
+    }
+
+    function addCardBtn(parent, text, color, onclick) {
+        var btn = document.createElement('button');
+        btn.style.cssText = 'width:100%;padding:10px;border-radius:10px;border:1px solid '
+            + color + '33;background:none;color:' + color
+            + ';font-size:13px;font-weight:700;cursor:pointer;text-align:center;transition:background 0.15s;';
+        btn.textContent = text;
+        if (onclick) {
+            btn.onclick = onclick;
+            btn.onmouseover = function() { this.style.background = 'rgba(109,63,245,0.1)'; };
+            btn.onmouseout = function() { this.style.background = 'none'; };
+        } else {
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'default';
+        }
+        parent.appendChild(btn);
     }
 
 })();

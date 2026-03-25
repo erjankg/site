@@ -1351,22 +1351,16 @@ max-height: 100vh; border-radius: 0;
 /* ══ TELEGRAM-STYLE CHAT SYSTEM ══ */
 #chatSystemMask {
 padding: 0 !important;
-align-items: stretch !important;
-justify-content: stretch !important;
-height: auto !important;
-max-height: none !important;
 overflow: hidden !important;
 }
-#chatSystemMask .btn-close-x {
-position: static !important;
-top: auto !important;
-right: auto !important;
-z-index: auto !important;
+#chatSystemMask.active {
+align-items: stretch !important;
+justify-content: stretch !important;
 }
 .tg-chat-wrap {
 width: 100% !important; max-width: 100% !important;
 height: 100% !important; max-height: 100% !important;
-display: flex; flex-direction: row; padding: 0 !important; overflow: hidden;
+display: flex !important; flex-direction: row; padding: 0 !important; overflow: hidden;
 border-radius: 0 !important; border: none !important;
 background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%);
 }
@@ -1458,7 +1452,24 @@ border-bottom-right-radius:4px;
 .user-actions { display:flex; gap:4px; flex-shrink:0; }
 .user-act-btn { background:rgba(109,63,245,0.15); border:1px solid rgba(155,89,182,0.25); color:#b96fff; border-radius:8px; padding:4px 10px; font-size:10px; font-weight:700; cursor:pointer; }
 .user-act-btn:hover { background:rgba(109,63,245,0.3); }
-/* ── Mobile toggle button ── */
+/* ── Chat close buttons (not .btn-close-x to avoid global override) ── */
+.tg-close-btn {
+background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px;
+font-size: 14px; cursor: pointer; display: flex; align-items: center;
+justify-content: center; font-weight: 900; flex-shrink: 0;
+transition: transform 0.15s;
+}
+.tg-close-btn:active { transform: scale(0.9); }
+.tg-sidebar-close-btn {
+background: none; border: 1.5px solid rgba(155,89,182,0.3); color: rgba(255,255,255,0.5);
+border-radius: 8px; width: 28px; height: 28px; font-size: 14px; cursor: pointer;
+display: none; align-items: center; justify-content: center; flex-shrink: 0;
+}
+@media (max-width: 768px) {
+.tg-sidebar-close-btn { display: flex; }
+}
+/* ── Chat close buttons (not .btn-close-x to avoid global override) ── */
 .tg-mobile-users-btn {
 display:none; background:rgba(109,63,245,0.85); border:1.5px solid rgba(185,111,255,0.5);
 color:#fff; border-radius:10px; padding:6px 10px; font-size:16px; font-weight:800; cursor:pointer;

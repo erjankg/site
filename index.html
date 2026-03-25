@@ -43,8 +43,7 @@
         <!-- User Menu Dropdown -->
         <div id="userMenu" class="user-menu">
             <div id="userMenuEmail" class="user-menu-email"></div>
-            <button class="user-menu-item" onclick="closeUserMenuAndOpen('dmInbox')">✉ Личные сообщения <span id="dmUnreadBadge" style="display:none;background:#ffd700;color:#000;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:900;margin-left:auto;"></span></button>
-            <button class="user-menu-item" onclick="closeUserMenuAndOpen('friendRequests')">📨 Запросы в друзья <span id="frReqBadge" style="display:none;background:#e74c3c;color:#fff;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:900;margin-left:auto;"></span></button>
+            <button class="user-menu-item" onclick="closeUserMenuAndOpen('profile')">👤 Мой профиль</button>
             <button class="user-menu-item" onclick="syncNow()">🔄 Синхронизировать</button>
             <button class="user-menu-item" onclick="authSignOut()">🚪 Выйти</button>
         </div>
@@ -797,12 +796,12 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ TELEGRAM-STYLE UNIFIED CHAT ══ -->
 <div class="m-mask" id="chatSystemMask" onclick="if(event.target===this)closeChatSystem()">
   <div class="m-win tg-chat-wrap">
-    <!-- LEFT: Users list (PC only) -->
+    <!-- LEFT: Users list (PC only, mobile via button) -->
     <div class="tg-sidebar" id="tgSidebar">
       <div class="tg-sidebar-header">
-        <button class="btn-close-x" onclick="closeChatSystem()" style="position:static;width:28px;height:28px;font-size:14px;">✕</button>
-        <div style="font-size:14px;font-weight:900;color:#b96fff;">👥 Пользователи</div>
-        <div id="chatOnlineCount" style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3);"></div>
+        <div style="font-size:14px;font-weight:900;color:#b96fff;flex:1;">👥 Пользователи</div>
+        <div id="chatOnlineCount" style="font-size:10px;color:rgba(255,255,255,0.3);"></div>
+        <button class="tg-sidebar-close-btn" onclick="tgMobileCloseSidebar()">✕</button>
       </div>
       <div class="tg-sidebar-content" id="tgSidebarContent">
         <div class="chat-login-msg">Загрузка...</div>
@@ -817,7 +816,7 @@ Stormarrow: При максимальных зарядах следующая б
           <button class="tg-chat-tab" id="tgTabDm" onclick="switchToDmList()">✉ ЛС<span class="tg-tab-badge" id="tgDmBadge"></span></button>
         </div>
         <button class="tg-mobile-users-btn" id="tgMobileUsersBtn" onclick="tgMobileShowSidebar()">👥<span class="tg-mob-badge" id="tgMobBadge"></span></button>
-        <button class="btn-close-x" onclick="closeChatSystem()" style="position:static;width:28px;height:28px;font-size:14px;">✕</button>
+        <button class="tg-close-btn" onclick="closeChatSystem()">✕</button>
       </div>
       <div class="chat-messages" id="chatMessages">
         <div class="chat-login-msg">Загрузка...</div>
@@ -830,6 +829,30 @@ Stormarrow: При максимальных зарядах следующая б
         Войди через Google чтобы писать в чат
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ══ PROFILE SETUP MODAL ══ -->
+<div class="m-mask" id="profileSetupMask" onclick="if(event.target===this)closeProfileSetup()">
+  <div class="m-win" style="width:92vw;max-width:420px;max-height:85vh;padding:0;overflow-y:auto;">
+    <div style="padding:18px 20px 12px;border-bottom:1px solid rgba(155,89,182,0.15);">
+      <div style="font-size:18px;font-weight:900;color:#b96fff;margin-bottom:4px;">👤 Настройка профиля</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);">Выбери свою роль и ранг</div>
+    </div>
+    <div style="padding:16px 20px;">
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;">ОСНОВНАЯ РОЛЬ</div>
+      <div id="profileRoles" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;"></div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;">МАКСИМАЛЬНЫЙ РАНГ</div>
+      <div id="profileRanks" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;"></div>
+      <button onclick="saveProfile()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#6d3ff5,#9b59b6);color:#fff;font-size:14px;font-weight:900;cursor:pointer;">✓ Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ USER CARD MODAL ══ -->
+<div class="m-mask" id="userCardMask" onclick="if(event.target===this)closeUserCard()" style="background:rgba(0,0,0,0.7);">
+  <div class="m-win" style="width:90vw;max-width:360px;max-height:80vh;padding:0;overflow-y:auto;">
+    <div id="userCardContent"></div>
   </div>
 </div>
 
