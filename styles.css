@@ -1678,3 +1678,24 @@ font-size: 12px;
 }
 .inf-link:hover { text-decoration: underline; }
 
+/* ── USER CARD MODAL FIXES ── */
+#userCardMask.active {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    z-index: 99000 !important;
+}
+#userCardMask .m-win {
+    border: 1.5px solid rgba(185,111,255,0.3);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+}
+
+/* ── TOAST NOTIFICATION ── */
+@keyframes toastIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+#_appToast {
+    animation: toastIn 0.2s ease !important;
+}
+

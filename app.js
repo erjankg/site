@@ -2031,6 +2031,30 @@
 
 (function() {
     // ═══════════════════════════════════════
+    // TOAST NOTIFICATION UTILITY
+    // ═══════════════════════════════════════
+    function showToast(msg, duration) {
+        duration = duration || 3000;
+        var existing = document.getElementById('_appToast');
+        if (existing) existing.remove();
+        var toast = document.createElement('div');
+        toast.id = '_appToast';
+        toast.textContent = msg;
+        toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);'
+            + 'background:rgba(20,10,40,0.95);color:#fff;padding:10px 22px;border-radius:12px;'
+            + 'font-size:13px;font-weight:700;z-index:999999;pointer-events:none;'
+            + 'border:1.5px solid rgba(185,111,255,0.4);backdrop-filter:blur(8px);'
+            + 'animation:fadeIn 0.2s ease;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;';
+        document.body.appendChild(toast);
+        setTimeout(function() {
+            toast.style.transition = 'opacity 0.3s';
+            toast.style.opacity = '0';
+            setTimeout(function() { toast.remove(); }, 300);
+        }, duration);
+    }
+    window.showToast = showToast;
+
+    // ═══════════════════════════════════════
     // FIREBASE CONFIG
     // ═══════════════════════════════════════
     var firebaseConfig = {
@@ -2553,9 +2577,13 @@
     }
 
     // ═══ OPEN / CLOSE ═══
-    window.openChatSystem = function() {
+    window.openChatSystem = function(tab) {
         openModal('chatSystemMask');
-        switchToGlobal();
+        if (tab === 'users' || tab === 'dmList') {
+            switchToDmList();
+        } else {
+            switchToGlobal();
+        }
         loadUsersToSidebar();
         fixMobileKeyboard();
     };
@@ -2696,7 +2724,11 @@
             if (_currentUser && u._uid === _currentUser.uid) return;
             var card = document.createElement('div');
             card.className = 'user-card';
-            card.onclick = function() { showUserCard(u); };
+            card.onclick = function() {
+                // Close mobile sidebar before opening card
+                tgMobileCloseSidebar();
+                showUserCard(u);
+            };
 
             var avWrap = document.createElement('div');
             avWrap.className = 'user-av-wrap';
@@ -2712,9 +2744,39 @@
 
             var info = document.createElement('div');
             info.className = 'user-info';
-            info.innerHTML = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div>'
-                + '<div class="user-email">'+(u._online ? '🟢 Онлайн' : 'Оффлайн')+'</div>';
+            var nameHtml = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div>';
+            var statusHtml = '<div class="user-email">'+(u._online ? '🟢 Онлайн' : 'Оффлайн');
+            // Show role & rank inline
+            if (u.role) statusHtml += ' · ' + u.role;
+            if (u.rank) {
+                var rk = RANKS.find(function(r) { return r.id === u.rank; });
+                if (rk) statusHtml += ' · <span style="color:'+rk.color+'">'+rk.emoji+' '+rk.name+'</span>';
+            }
+            statusHtml += '</div>';
+            info.innerHTML = nameHtml + statusHtml;
             card.appendChild(info);
+
+            // Friend status indicator
+            var isFriend = _myFriends.includes(u._uid);
+            var reqSent = _mySentReqs.includes(u._uid);
+            var reqReceived = _myFriendReqs.includes(u._uid);
+            if (isFriend) {
+                var friendBadge = document.createElement('div');
+                friendBadge.style.cssText = 'font-size:10px;color:#2ecc71;flex-shrink:0;font-weight:700;';
+                friendBadge.textContent = '✓';
+                card.appendChild(friendBadge);
+            } else if (reqReceived) {
+                var reqBadge = document.createElement('div');
+                reqBadge.style.cssText = 'font-size:10px;color:#ffd700;flex-shrink:0;font-weight:700;';
+                reqBadge.textContent = '📨';
+                card.appendChild(reqBadge);
+            } else if (reqSent) {
+                var sentBadge = document.createElement('div');
+                sentBadge.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.25);flex-shrink:0;font-weight:700;';
+                sentBadge.textContent = '⏳';
+                card.appendChild(sentBadge);
+            }
+
             container.appendChild(card);
         });
     }
@@ -2730,7 +2792,14 @@
                 _chatMessages = [];
                 snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; _chatMessages.push(d); });
                 if (_chatView === 'global') renderGlobalChat();
-            }, function(err) { console.warn('Chat error:', err); });
+            }, function(err) {
+                console.warn('Chat listener error:', err);
+                if (err.code === 'permission-denied') {
+                    showToast('Нет доступа к чату. Проверьте Firestore Rules.');
+                } else {
+                    showToast('Ошибка чата: ' + (err.code || err.message));
+                }
+            });
     }
 
     function renderGlobalChat() {
@@ -2808,10 +2877,13 @@
     };
 
     function sendGlobalMsg() {
-        if (!db || !_currentUser) return;
+        if (!db) { showToast('Firebase не подключён'); return; }
+        if (!_currentUser) { showToast('Войди в аккаунт чтобы писать'); return; }
         var input = document.getElementById('chatInput');
         var text = (input.value || '').trim();
         if (!text) return;
+        var sendBtn = document.querySelector('.chat-send');
+        if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = '0.5'; }
         input.value = '';
         db.collection('globalChat').add({
             text: text,
@@ -2821,6 +2893,7 @@
             isAdmin: _isAdmin || false,
             ts: firebase.firestore.FieldValue.serverTimestamp()
         }).then(function() {
+            if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = ''; }
             db.collection('globalChat').orderBy('ts','asc').get().then(function(snap) {
                 if (snap.size > 100) {
                     var toDelete = snap.size - 100;
@@ -2830,6 +2903,11 @@
                     batch.commit();
                 }
             });
+        }).catch(function(err) {
+            console.error('Send error:', err);
+            if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = ''; }
+            showToast('Ошибка отправки: ' + (err.code || err.message || 'Неизвестная'));
+            input.value = text; // restore text
         });
     }
     window.sendChatMsg = sendGlobalMsg;
@@ -2972,6 +3050,11 @@
                 var msgs = [];
                 snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; msgs.push(d); });
                 renderDmMessages(msgs);
+            }, function(err) {
+                console.warn('DM listener error:', err);
+                if (err.code === 'permission-denied') {
+                    showToast('Нет доступа к ЛС. Проверьте Firestore Rules.');
+                }
             });
     }
 
@@ -2988,10 +3071,14 @@
     }
 
     function sendDmMsg() {
-        if (!db || !_currentUser || !_dmPartnerUid) return;
+        if (!db) { showToast('Firebase не подключён'); return; }
+        if (!_currentUser) { showToast('Войди в аккаунт'); return; }
+        if (!_dmPartnerUid) return;
         var input = document.getElementById('chatInput');
         var text = (input.value || '').trim();
         if (!text) return;
+        var sendBtn = document.querySelector('.chat-send');
+        if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = '0.5'; }
         input.value = '';
         var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
         db.collection('dms').doc(roomId).collection('messages').add({
@@ -3000,6 +3087,13 @@
             uid: _currentUser.uid,
             photoURL: _currentUser.photoURL || '',
             ts: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(function() {
+            if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = ''; }
+        }).catch(function(err) {
+            console.error('DM send error:', err);
+            if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = ''; }
+            showToast('Ошибка отправки ЛС: ' + (err.code || err.message || 'Неизвестная'));
+            input.value = text;
         });
     }
     window.sendDmMsg = sendDmMsg;
@@ -3021,13 +3115,19 @@
 
     function sendFriendRequest(uid) {
         if (!db || !_currentUser || uid === _currentUser.uid) return;
-        db.collection('users').doc(uid).set({
+        showToast('Отправляем запрос...');
+        var batch = db.batch();
+        var targetRef = db.collection('users').doc(uid);
+        var myRef = db.collection('users').doc(_currentUser.uid);
+        batch.set(targetRef, {
             friendRequests: firebase.firestore.FieldValue.arrayUnion(_currentUser.uid)
         }, { merge: true });
-        if (!_mySentReqs.includes(uid)) _mySentReqs.push(uid);
-        db.collection('users').doc(_currentUser.uid).set({
+        batch.set(myRef, {
             sentRequests: firebase.firestore.FieldValue.arrayUnion(uid)
-        }, { merge: true }).then(function() {
+        }, { merge: true });
+        batch.commit().then(function() {
+            if (!_mySentReqs.includes(uid)) _mySentReqs.push(uid);
+            showToast('✓ Запрос в друзья отправлен!');
             // Send system DM about friend request
             var roomId = getDmRoomId(_currentUser.uid, uid);
             db.collection('dms').doc(roomId).collection('messages').add({
@@ -3038,11 +3138,15 @@
                 ts: firebase.firestore.FieldValue.serverTimestamp()
             });
             loadUsersToSidebar();
+        }).catch(function(err) {
+            console.error('Friend request error:', err);
+            showToast('Ошибка: ' + (err.code || err.message || 'не удалось отправить запрос'));
         });
     }
 
     function acceptFriendRequest(uid) {
         if (!db || !_currentUser) return;
+        showToast('Принимаем запрос...');
         var batch = db.batch();
         var myRef = db.collection('users').doc(_currentUser.uid);
         var theirRef = db.collection('users').doc(uid);
@@ -3058,6 +3162,8 @@
             _myFriendReqs = _myFriendReqs.filter(function(r) { return r !== uid; });
             if (!_myFriends.includes(uid)) _myFriends.push(uid);
             updateNotifDots();
+            showToast('✓ Теперь вы друзья!');
+            loadUsersToSidebar();
             // Send system DM
             var roomId = getDmRoomId(_currentUser.uid, uid);
             db.collection('dms').doc(roomId).collection('messages').add({
@@ -3067,6 +3173,9 @@
                 isSystem: true,
                 ts: firebase.firestore.FieldValue.serverTimestamp()
             });
+        }).catch(function(err) {
+            console.error('Accept friend error:', err);
+            showToast('Ошибка: ' + (err.code || err.message || 'не удалось принять запрос'));
         });
     }
 
@@ -3080,16 +3189,27 @@
                 sentRequests: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
             }, { merge: true });
             updateNotifDots();
+            showToast('Запрос отклонён');
+            loadUsersToSidebar();
+        }).catch(function(err) {
+            console.error('Decline friend error:', err);
+            showToast('Ошибка: ' + (err.code || err.message));
         });
     }
 
     function removeFriend(uid) {
         if (!db || !_currentUser) return;
+        showToast('Удаляем из друзей...');
         var batch = db.batch();
         batch.set(db.collection('users').doc(_currentUser.uid), { friends: firebase.firestore.FieldValue.arrayRemove(uid) }, { merge: true });
         batch.set(db.collection('users').doc(uid), { friends: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid) }, { merge: true });
         batch.commit().then(function() {
             _myFriends = _myFriends.filter(function(f) { return f !== uid; });
+            showToast('Удалён из друзей');
+            loadUsersToSidebar();
+        }).catch(function(err) {
+            console.error('Remove friend error:', err);
+            showToast('Ошибка: ' + (err.code || err.message));
         });
     }
 
@@ -3234,12 +3354,18 @@
     }
 
     window.saveProfile = function() {
-        if (!db || !_currentUser) { alert('Войди в аккаунт'); return; }
+        if (!db || !_currentUser) { showToast('Войди в аккаунт'); return; }
+        if (!_profileRole && !_profileRank) { showToast('Выбери роль и ранг'); return; }
         db.collection('users').doc(_currentUser.uid).set({
             role: _profileRole,
             rank: _profileRank
         }, { merge: true }).then(function() {
+            showToast('✓ Профиль сохранён!');
             closeProfileSetup();
+            loadUsersToSidebar();
+        }).catch(function(err) {
+            console.error('Save profile error:', err);
+            showToast('Ошибка сохранения: ' + (err.code || err.message));
         });
     };
 
@@ -3265,40 +3391,41 @@
 
     function showUserCard(user) {
         var container = document.getElementById('userCardContent');
-        if (!container) return;
+        if (!container) { console.error('userCardContent not found'); return; }
         container.innerHTML = '';
 
+        // Refresh friend data before showing
         var isFriend = _myFriends.includes(user._uid);
         var reqSent = _mySentReqs.includes(user._uid);
         var reqReceived = _myFriendReqs.includes(user._uid);
 
         // Header
         var header = document.createElement('div');
-        header.style.cssText = 'padding:20px;text-align:center;border-bottom:1px solid rgba(155,89,182,0.15);';
+        header.style.cssText = 'padding:24px 20px 16px;text-align:center;border-bottom:1px solid rgba(155,89,182,0.15);';
 
         var av = document.createElement('div');
-        av.style.cssText = 'width:64px;height:64px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;font-weight:900;overflow:hidden;';
+        av.style.cssText = 'width:72px;height:72px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;font-weight:900;overflow:hidden;border:3px solid rgba(185,111,255,0.3);';
         if (user.photoURL) av.innerHTML = '<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">';
         else av.textContent = (user.displayName||'?').charAt(0).toUpperCase();
         header.appendChild(av);
 
         var name = document.createElement('div');
-        name.style.cssText = 'font-size:16px;font-weight:900;color:#fff;';
+        name.style.cssText = 'font-size:17px;font-weight:900;color:#fff;';
         name.textContent = user.displayName || user.email || '???';
         header.appendChild(name);
 
         var status = document.createElement('div');
-        status.style.cssText = 'font-size:11px;color:' + (user._online ? '#2ecc71' : 'rgba(255,255,255,0.3)') + ';margin-top:4px;';
-        status.textContent = user._online ? '🟢 Онлайн' : 'Оффлайн';
+        status.style.cssText = 'font-size:12px;color:' + (user._online ? '#2ecc71' : 'rgba(255,255,255,0.35)') + ';margin-top:4px;font-weight:600;';
+        status.textContent = user._online ? '🟢 Онлайн' : '⚫ Оффлайн';
         header.appendChild(status);
 
-        // Role & Rank
+        // Role & Rank badges
         if (user.role || user.rank) {
             var badges = document.createElement('div');
-            badges.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:8px;';
+            badges.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap;';
             if (user.role) {
                 var roleBadge = document.createElement('span');
-                roleBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:11px;font-weight:700;';
+                roleBadge.style.cssText = 'padding:4px 12px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:12px;font-weight:700;';
                 roleBadge.textContent = user.role;
                 badges.appendChild(roleBadge);
             }
@@ -3306,10 +3433,10 @@
                 var rk = RANKS.find(function(r) { return r.id === user.rank; });
                 if (rk) {
                     var rankBadge = document.createElement('span');
-                    rankBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px;';
+                    rankBadge.style.cssText = 'padding:4px 12px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;';
                     var rkImg = document.createElement('img');
                     rkImg.src = rk.img;
-                    rkImg.style.cssText = 'width:18px;height:18px;object-fit:contain;';
+                    rkImg.style.cssText = 'width:20px;height:20px;object-fit:contain;';
                     rkImg.onerror = function() { this.outerHTML = rk.emoji; };
                     rankBadge.appendChild(rkImg);
                     rankBadge.appendChild(document.createTextNode(rk.name));
@@ -3318,17 +3445,29 @@
             }
             header.appendChild(badges);
         }
+
+        // Friend status label
+        if (isFriend) {
+            var friendLabel = document.createElement('div');
+            friendLabel.style.cssText = 'margin-top:8px;font-size:11px;color:#2ecc71;font-weight:700;';
+            friendLabel.textContent = '✓ В друзьях';
+            header.appendChild(friendLabel);
+        }
+
         container.appendChild(header);
 
         // Actions
         var actions = document.createElement('div');
-        actions.style.cssText = 'padding:12px 16px;display:flex;flex-direction:column;gap:4px;';
+        actions.style.cssText = 'padding:14px 16px;display:flex;flex-direction:column;gap:6px;';
 
         if (isFriend || _isAdmin) {
             addCardBtn(actions, '✉ Написать ЛС', '#b96fff', function() {
                 closeUserCard();
-                openChatSystem();
-                setTimeout(function() { openDmWithUser(user._uid, user.displayName||user.email); }, 200);
+                // Small delay to let modal close animation finish
+                setTimeout(function() {
+                    if (typeof switchToDmList === 'function') switchToDmList();
+                    openDmWithUser(user._uid, user.displayName||user.email);
+                }, 150);
             });
         }
         if (!isFriend && !reqSent && !reqReceived) {
@@ -3345,6 +3484,10 @@
                 acceptFriendRequest(user._uid);
                 closeUserCard();
             });
+            addCardBtn(actions, '✕ Отклонить запрос', '#e74c3c', function() {
+                declineFriendRequest(user._uid);
+                closeUserCard();
+            });
         }
         if (isFriend) {
             addCardBtn(actions, '× Удалить из друзей', '#e74c3c', function() {
@@ -3355,6 +3498,12 @@
         addCardBtn(actions, '✕ Закрыть', 'rgba(255,255,255,0.4)', function() { closeUserCard(); });
         container.appendChild(actions);
 
+        // Ensure the modal mask is displayed
+        var mask = document.getElementById('userCardMask');
+        if (mask) {
+            mask.style.display = '';
+            mask.style.visibility = '';
+        }
         openModal('userCardMask');
     }
 
