@@ -2034,11 +2034,17 @@
     var _champPickerRole = 'all';
     var _champPickerMulti = false;
     var _champPickerGetSelected = null;
+    var _champPickerGetExcluded = null;
+    var _champPickerOnRemove = null;
+    var _champPickerType = 'champs'; // 'champs' | 'items' | 'runes'
 
     window.openChampPicker = function(title, callback, opts) {
         _champPickerCallback = callback;
         _champPickerMulti = !!(opts && opts.multi);
         _champPickerGetSelected = (opts && opts.getSelected) || null;
+        _champPickerGetExcluded = (opts && opts.getExcluded) || null;
+        _champPickerOnRemove = (opts && opts.onRemove) || null;
+        _champPickerType = (opts && opts.type) || 'champs';
         _champPickerRole = 'all';
         var t = document.getElementById('champPickerTitle');
         if(t) t.textContent = title || '⚔ Выбери чемпиона';
@@ -2046,6 +2052,8 @@
         if(s) s.value = '';
         var doneBtn = document.getElementById('champPickerDoneBtn');
         if(doneBtn) doneBtn.style.display = _champPickerMulti ? '' : 'none';
+        var rolesEl = document.getElementById('champPickerRoles');
+        if(rolesEl) rolesEl.style.display = (_champPickerType === 'champs') ? '' : 'none';
         openModal('champPickerModal');
         champPickerBuildRoles();
         champPickerBuildGrid('');
@@ -2089,22 +2097,37 @@
 
     function champPickerBuildGrid(q) {
         var grid = document.getElementById('champPickerGrid');
-        if(!grid || !raw.length) return;
+        if(!grid) return;
         grid.innerHTML = '';
         var selected = _champPickerGetSelected ? _champPickerGetSelected() : [];
-        var list = raw.filter(function(c) {
-            if(q && !c.name.toLowerCase().includes(q)) return false;
-            if(_champPickerRole !== 'all' && !c.is[_champPickerRole]) return false;
+        var excluded = _champPickerGetExcluded ? _champPickerGetExcluded() : [];
+
+        var sourceList;
+        if(_champPickerType === 'items') {
+            sourceList = getItemsData();
+        } else if(_champPickerType === 'runes') {
+            sourceList = getRunesData();
+        } else {
+            if(!raw.length) return;
+            sourceList = raw.map(function(c){ return {name:c.name, img:champIcon(c.name), is:c.is}; });
+        }
+
+        var list = sourceList.filter(function(c) {
+            if(q && !c.name.toLowerCase().includes(q.toLowerCase())) return false;
+            if(_champPickerType === 'champs' && _champPickerRole !== 'all' && !(c.is && c.is[_champPickerRole])) return false;
+            // Hide items already placed in OTHER tiers (excluded), but show selected (current tier)
+            if(excluded.indexOf(c.name) !== -1 && selected.indexOf(c.name) === -1) return false;
             return true;
         });
+
         list.forEach(function(c) {
             var isSel = selected.indexOf(c.name) !== -1;
             var wrap = document.createElement('div');
             wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border-radius:9px;border:2px solid '+(isSel?'#b96fff':'transparent')+';background:'+(isSel?'rgba(109,63,245,0.2)':'transparent')+';transition:all 0.12s;';
             var img = document.createElement('img');
-            img.src = champIcon(c.name);
+            img.src = c.img || '';
             img.style.cssText = 'width:100%;aspect-ratio:1;border-radius:7px;object-fit:cover;';
-            img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
+            img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; this.style.minHeight='32px'; };
             var nm = document.createElement('div');
             nm.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
             nm.textContent = c.name;
@@ -2114,13 +2137,16 @@
                 ck.style.cssText = 'position:absolute;top:2px;right:2px;background:#b96fff;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:900;pointer-events:none;';
                 ck.textContent = '✓';
                 wrap.appendChild(ck);
-            }
-            if(!isSel) {
+            } else {
                 wrap.onmouseenter = function(){ this.style.borderColor='#b96fff'; this.style.background='rgba(109,63,245,0.15)'; };
                 wrap.onmouseleave = function(){ this.style.borderColor='transparent'; this.style.background=''; };
             }
             wrap.onclick = function() {
-                if(_champPickerCallback) _champPickerCallback(c);
+                if(isSel && _champPickerOnRemove) {
+                    _champPickerOnRemove(c);
+                } else if(_champPickerCallback) {
+                    _champPickerCallback(c);
+                }
                 if(_champPickerMulti) {
                     champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
                 } else {
@@ -2129,6 +2155,9 @@
             };
             grid.appendChild(wrap);
         });
+        if(!list.length) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:rgba(255,255,255,0.3);font-size:12px;">Ничего не найдено</div>';
+        }
     }
 
     // Start loading data
@@ -2368,15 +2397,21 @@
 
         var matchups = {};
         var tierData = {};
+        var itemTierData = {};
+        var runeTierData = {};
         var selectedChamps = [];
 
         try { matchups = JSON.parse(localStorage.getItem('matchups') || '{}'); } catch(e) {}
         try { tierData = JSON.parse(localStorage.getItem('tierData') || '{}'); } catch(e) {}
+        try { itemTierData = JSON.parse(localStorage.getItem('itemTierData') || '{}'); } catch(e) {}
+        try { runeTierData = JSON.parse(localStorage.getItem('runeTierData') || '{}'); } catch(e) {}
         try { selectedChamps = JSON.parse(localStorage.getItem('p') || '[]'); } catch(e) {}
 
         docRef.set({
             matchups: JSON.stringify(matchups),
             tierData: JSON.stringify(tierData),
+            itemTierData: JSON.stringify(itemTierData),
+            runeTierData: JSON.stringify(runeTierData),
             selectedChamps: JSON.stringify(selectedChamps),
             email: _currentUser.email || '',
             displayName: _currentUser.displayName || '',
@@ -2413,6 +2448,12 @@
                 }
                 if (d.tierData) {
                     try { localStorage.setItem('tierData', d.tierData); } catch(e) {}
+                }
+                if (d.itemTierData) {
+                    try { localStorage.setItem('itemTierData', d.itemTierData); loadItemTierData(); } catch(e) {}
+                }
+                if (d.runeTierData) {
+                    try { localStorage.setItem('runeTierData', d.runeTierData); loadRuneTierData(); } catch(e) {}
                 }
                 if (d.selectedChamps) {
                     try { localStorage.setItem('p', d.selectedChamps); } catch(e) {}
@@ -2465,7 +2506,7 @@
     var _origSetItem = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(key, value) {
         _origSetItem(key, value);
-        if (key === 'matchups' || key === 'tierData' || key === 'p') {
+        if (key === 'matchups' || key === 'tierData' || key === 'itemTierData' || key === 'runeTierData' || key === 'p') {
             scheduleSyncToFirestore();
         }
     };
