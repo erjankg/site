@@ -16,7 +16,6 @@ overflow-x: hidden;
 color: #ffffff;
 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 font-weight: 700;
-overscroll-behavior-y: none;
 }
 
 /* Фон вынесен в fixed pseudo-element — не перерисовывается при скрытии/показе адресной строки */
@@ -448,6 +447,8 @@ z-index: 2000;
 padding: 0;
 height: 100vh;
 height: 100dvh;
+overscroll-behavior: contain;
+touch-action: pan-y;
 }
 
 .m-mask.active {
@@ -575,6 +576,7 @@ gap: 6px;
 padding: 6px 10px 12px;
 overflow-y: auto;
 align-items: start;
+overscroll-behavior: contain;
 }
 
 /* Each role section: equal width */
@@ -1385,7 +1387,7 @@ flex-shrink: 0;
 padding:12px 14px; border-bottom:1px solid rgba(155,89,182,0.15);
 display:flex; align-items:center; gap:8px; flex-shrink:0;
 }
-.tg-sidebar-content { flex:1; overflow-y:auto; padding:6px 8px; display:flex; flex-direction:column; gap:2px; }
+.tg-sidebar-content { flex:1; overflow-y:auto; padding:6px 8px; display:flex; flex-direction:column; gap:2px; overscroll-behavior:contain; }
 /* ── Right chat panel ── */
 .tg-chat-panel {
 flex:1; display:flex; flex-direction:column; min-width:0; min-height:0; overflow:hidden;
