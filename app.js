@@ -1228,10 +1228,12 @@
         {k:'enchants',l:'Зачарования',icon:'✨'}
     ];
     var _tierItemCat = 'all'; // current tab in item tierlist
+    var _RUNE_CATS = [{k:'keystone',l:'Основные',icon:'⭐'},{k:'secondary',l:'Второстепенные',icon:'🔴'}];
+    var _tierRuneCat = 'keystone';
     var ITEM_TIER_DATA = {};  // {catKey: {S:[],A:[],...}}
-    var RUNE_TIER_DATA = {};  // {S:[],A:[],...}
+    var RUNE_TIER_DATA = {};  // {runeCatKey: {S:[],A:[],...}}
     _ITEM_CATS.forEach(function(c){ ITEM_TIER_DATA[c.k]=_emptyTierRole(); });
-    _TIER_KEYS.forEach(function(k){ RUNE_TIER_DATA[k]=[]; });
+    _RUNE_CATS.forEach(function(c){ RUNE_TIER_DATA[c.k]=_emptyTierRole(); });
     function loadItemTierData(){
         try{
             var s=JSON.parse(localStorage.getItem('itemTierData')||'{}');
@@ -1243,7 +1245,9 @@
     function loadRuneTierData(){
         try{
             var s=JSON.parse(localStorage.getItem('runeTierData')||'{}');
-            _TIER_KEYS.forEach(function(k){ if(Array.isArray(s[k])) RUNE_TIER_DATA[k]=s[k]; });
+            _RUNE_CATS.forEach(function(c){
+                if(s[c.k]) _TIER_KEYS.forEach(function(k){ if(Array.isArray(s[c.k][k])) RUNE_TIER_DATA[c.k][k]=s[c.k][k]; });
+            });
         }catch(e){}
     }
     function saveItemTierData(){ try{localStorage.setItem('itemTierData',JSON.stringify(ITEM_TIER_DATA));}catch(e){} }
@@ -1288,8 +1292,33 @@
         return _itemsByCat;
     }
 
-    // Extract rune data from DOM (lazy)
+    // Extract rune data from DOM split by category (lazy)
     var _runesData = null;
+    var _runesByCat = null;
+    function getRunesByCat(){
+        if(_runesByCat) return _runesByCat;
+        _runesByCat = {keystone:[], secondary:[]};
+        // runeGridKeystone = основные; all other rune-grids = второстепенные
+        var keystoneGrid = document.getElementById('runeGridKeystone');
+        if(keystoneGrid){
+            keystoneGrid.querySelectorAll('.rune-card').forEach(function(card){
+                var tip=card.getAttribute('data-tip')||'';
+                var name=tip.split('\u00a6')[0].trim();
+                var img=card.querySelector('img');
+                if(name&&img) _runesByCat.keystone.push({name:name,img:img.getAttribute('src')||img.src||''});
+            });
+        }
+        document.querySelectorAll('#runesMask .rune-grid').forEach(function(grid){
+            if(grid.id==='runeGridKeystone') return;
+            grid.querySelectorAll('.rune-card').forEach(function(card){
+                var tip=card.getAttribute('data-tip')||'';
+                var name=tip.split('\u00a6')[0].trim();
+                var img=card.querySelector('img');
+                if(name&&img) _runesByCat.secondary.push({name:name,img:img.getAttribute('src')||img.src||''});
+            });
+        });
+        return _runesByCat;
+    }
     function getRunesData(){
         if(_runesData) return _runesData;
         _runesData=[];
@@ -1328,6 +1357,7 @@
         _tierEditMode = false;
         _tierRole = 'all';
         _tierItemCat = 'all';
+        _tierRuneCat = 'keystone';
         var titles={champs:'🏆 Тир-лист чемпионов', items:'⚙ Тир-лист предметов', runes:'✨ Тир-лист рун'};
         var t=document.getElementById('tierlistTitle');
         if(t) t.textContent=titles[_tierType]||'Тир-лист';
@@ -1362,8 +1392,16 @@
                 b.onclick=function(){_tierItemCat=c.k;buildTierlistTabs();renderTierlist();};
                 el.appendChild(b);
             });
+        } else if(_tierType==='runes'){
+            _RUNE_CATS.forEach(function(c){
+                var b=document.createElement('button');
+                var active=c.k===_tierRuneCat;
+                b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid rgba(109,63,245,'+(active?'0.8':'0.25')+');background:rgba(109,63,245,'+(active?'0.35':'0.08')+');color:'+(active?'#fff':'rgba(255,255,255,0.5)')+';font-size:12px;font-weight:700;cursor:pointer;';
+                b.textContent=c.icon+' '+c.l;
+                b.onclick=function(){_tierRuneCat=c.k;buildTierlistTabs();renderTierlist();};
+                el.appendChild(b);
+            });
         }
-        // runes: no tabs needed
     }
     function renderTierlist() {
         var el=document.getElementById('tierlistContent'); if(!el) return;
@@ -1374,7 +1412,7 @@
             imgFn=function(n){var all=getItemsByCat().all,f=all.find(function(x){return x.name===n;});return f?f.img:'';};
             addFn=addToItemTier; removeFn=removeFromItemTier;
         } else if(_tierType==='runes'){
-            tData=RUNE_TIER_DATA;
+            tData=RUNE_TIER_DATA[_tierRuneCat]||RUNE_TIER_DATA.keystone;
             pickerType='runes';
             imgFn=function(n){var d=getRunesData(),f=d.find(function(x){return x.name===n;});return f?f.img:'';};
             addFn=addToRuneTier; removeFn=removeFromRuneTier;
@@ -1390,21 +1428,21 @@
             var row=document.createElement('div');
             row.style.cssText='display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;';
             var lbl=document.createElement('div');
-            lbl.style.cssText='width:38px;min-width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;font-weight:900;background:linear-gradient(135deg,'+color+'cc,'+color+'88);color:#fff;flex-shrink:0;margin-top:3px;';
+            lbl.style.cssText='width:54px;min-width:54px;height:54px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:17px;font-weight:900;background:linear-gradient(135deg,'+color+'cc,'+color+'88);color:#fff;flex-shrink:0;margin-top:3px;';
             lbl.textContent=tk;
             var cd=document.createElement('div');
-            cd.style.cssText='display:flex;flex-wrap:wrap;gap:4px;flex:1;align-items:center;padding:4px;background:rgba(255,255,255,0.02);border-radius:8px;min-height:44px;';
+            cd.style.cssText='display:flex;flex-wrap:wrap;gap:5px;flex:1;align-items:center;padding:5px;background:rgba(255,255,255,0.02);border-radius:8px;min-height:60px;';
             (tData[tk]||[]).forEach(function(cname){
                 var chip=document.createElement('div');
                 chip.style.cssText='position:relative;display:inline-block;';
                 var img=document.createElement('img');
-                img.style.cssText='width:36px;height:36px;border-radius:6px;object-fit:cover;display:block;';
+                img.style.cssText='width:50px;height:50px;border-radius:8px;object-fit:cover;display:block;';
                 img.src=imgFn(cname); img.alt=img.title=cname;
                 img.onerror=function(){this.style.display='none';};
                 chip.appendChild(img);
                 if(_tierEditMode){
                     var xBtn=document.createElement('div');
-                    xBtn.style.cssText='position:absolute;top:-4px;right:-4px;width:14px;height:14px;background:#e74c3c;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;z-index:1;font-weight:900;line-height:1;';
+                    xBtn.style.cssText='position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:#e74c3c;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;z-index:1;font-weight:900;line-height:1;';
                     xBtn.textContent='×';
                     (function(t,n,rf){xBtn.onclick=function(e){e.stopPropagation();rf(t,n);};}(tk,cname,removeFn));
                     chip.appendChild(xBtn);
@@ -1426,7 +1464,7 @@
                     },{
                         multi:true, type:pt,
                         defaultRole: roleFilter,
-                        itemCat: pt==='items' ? _tierItemCat : 'all',
+                        itemCat: pt==='items' ? _tierItemCat : pt==='runes' ? _tierRuneCat : 'all',
                         getSelected:function(){return td[t]||[];},
                         getExcluded:function(){var e2=[];_TIER_KEYS.forEach(function(ot){if(ot!==t)(td[ot]||[]).forEach(function(n){e2.push(n);});});return e2;},
                         onRemove:function(c){rf(t,c.name);champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');}
@@ -1467,12 +1505,15 @@
         saveItemTierData(); renderTierlist();
     }
     function addToRuneTier(tier,name){
-        _TIER_KEYS.forEach(function(tk){if(tk!==tier)RUNE_TIER_DATA[tk]=(RUNE_TIER_DATA[tk]||[]).filter(function(n){return n!==name;});});
-        if((RUNE_TIER_DATA[tier]||[]).indexOf(name)===-1){if(!RUNE_TIER_DATA[tier])RUNE_TIER_DATA[tier]=[];RUNE_TIER_DATA[tier].push(name);}
+        var cat=_tierRuneCat;
+        if(!RUNE_TIER_DATA[cat]) RUNE_TIER_DATA[cat]=_emptyTierRole();
+        _TIER_KEYS.forEach(function(tk){if(tk!==tier)RUNE_TIER_DATA[cat][tk]=(RUNE_TIER_DATA[cat][tk]||[]).filter(function(n){return n!==name;});});
+        if((RUNE_TIER_DATA[cat][tier]||[]).indexOf(name)===-1){if(!RUNE_TIER_DATA[cat][tier])RUNE_TIER_DATA[cat][tier]=[];RUNE_TIER_DATA[cat][tier].push(name);}
         saveRuneTierData(); renderTierlist();
     }
     function removeFromRuneTier(tier,name){
-        if(RUNE_TIER_DATA[tier])RUNE_TIER_DATA[tier]=RUNE_TIER_DATA[tier].filter(function(n){return n!==name;});
+        var cat=_tierRuneCat;
+        if(RUNE_TIER_DATA[cat]&&RUNE_TIER_DATA[cat][tier]) RUNE_TIER_DATA[cat][tier]=RUNE_TIER_DATA[cat][tier].filter(function(n){return n!==name;});
         saveRuneTierData(); renderTierlist();
     }
 
@@ -2132,42 +2173,12 @@
         var doneBtn = document.getElementById('champPickerDoneBtn');
         if(doneBtn) doneBtn.style.display = _champPickerMulti ? '' : 'none';
         var rolesEl = document.getElementById('champPickerRoles');
-        if(rolesEl) rolesEl.style.display = (_champPickerType === 'champs') ? '' : 'none';
+        // Hide role filter for all types — champs filtered by role silently (like items by category)
+        if(rolesEl) rolesEl.style.display = 'none';
         openModal('champPickerModal');
-        champPickerBuildRoles();
         champPickerBuildGrid('');
     };
     window.closeChampPicker = function() { closeModal('champPickerModal'); };
-
-    function champPickerBuildRoles() {
-        var el = document.getElementById('champPickerRoles');
-        if(!el) return;
-        var roles = [{k:'all',l:'Все'},{k:'Top',l:'Top'},{k:'Jungle',l:'Лес'},{k:'Mid',l:'Mid'},{k:'ADC',l:'ADC'},{k:'Support',l:'Сап'}];
-        el.innerHTML = '';
-        function mkBtn(r) {
-            var b = document.createElement('button');
-            var a = r.k === _champPickerRole;
-            b.style.cssText = 'padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(155,89,182,'+(a?'0.7':'0.25')+');background:rgba(109,63,245,'+(a?'0.3':'0.06')+');color:'+(a?'#fff':'rgba(255,255,255,0.5)')+';';
-            b.textContent = r.l;
-            b.onclick = function(){ _champPickerRole = r.k; champPickerBuildRoles(); champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||''); };
-            return b;
-        }
-        // "Все" full width
-        var allBtn = mkBtn(roles[0]);
-        allBtn.style.width = '100%';
-        allBtn.style.marginBottom = '5px';
-        el.appendChild(allBtn);
-        // 5 roles in one row
-        var row = document.createElement('div');
-        row.style.cssText = 'display:flex;gap:4px;';
-        roles.slice(1).forEach(function(r) {
-            var b = mkBtn(r);
-            b.style.flex = '1';
-            b.style.textAlign = 'center';
-            row.appendChild(b);
-        });
-        el.appendChild(row);
-    }
 
     window.champPickerFilter = function() {
         var q = (document.getElementById('champPickerSearch')||{}).value || '';
@@ -2187,7 +2198,8 @@
             var catItems = (_champPickerItemCat !== 'all' && byCat[_champPickerItemCat]) ? byCat[_champPickerItemCat] : byCat.all;
             sourceList = catItems;
         } else if(_champPickerType === 'runes') {
-            sourceList = getRunesData();
+            var byCatR = getRunesByCat();
+            sourceList = (_champPickerItemCat && byCatR[_champPickerItemCat]) ? byCatR[_champPickerItemCat] : getRunesData();
         } else {
             if(!raw.length) return;
             sourceList = raw.map(function(c){ return {name:c.name, img:champIcon(c.name), is:c.is}; });
