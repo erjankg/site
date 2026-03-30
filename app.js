@@ -1724,6 +1724,8 @@
                 (function(k, pt){
                     addBtn.onclick = function() {
                         openChampPicker(pt, function(c) {
+                            var cur = k==='strongVs' ? getStrongVs(name) : k==='weakVs' ? getWeakVs(name) : getCombos(name);
+                            if(cur.length >= 7) return;
                             addTo(name, k, c.name);
                             renderMatchups(name);
                             champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
@@ -1731,7 +1733,7 @@
                             if(k==='strongVs') return getStrongVs(name);
                             if(k==='weakVs') return getWeakVs(name);
                             return getCombos(name);
-                        },onRemove:function(c){
+                        },getExcluded:function(){ return [name]; },onRemove:function(c){
                             removeFrom(name, k, c.name);
                             renderMatchups(name);
                             champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
