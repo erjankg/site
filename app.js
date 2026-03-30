@@ -1769,10 +1769,10 @@
                     });
                 });
             }
-            renderMatchups(name);
             mainGrid.appendChild(rightCol);
         }
         el.appendChild(mainGrid);
+        renderMatchups(name);
         openModal('champDetailMask');
     };
     window.closeChampDetail=function(){closeModal('champDetailMask');};
