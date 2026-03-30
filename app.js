@@ -1719,8 +1719,8 @@
                 list.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;';
                 box.appendChild(list);
                 var addBtn = document.createElement('button');
-                addBtn.style.cssText = 'width:100%;padding:5px;border-radius:7px;border:1px dashed rgba('+bgRgb+',0.3);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;';
-                addBtn.textContent = '+ Добавить';
+                addBtn.style.cssText = 'width:28px;height:28px;border-radius:8px;border:1px solid rgba('+bgRgb+',0.4);background:transparent;color:rgba(255,255,255,0.5);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;';
+                addBtn.textContent = '+';
                 (function(k, pt){
                     addBtn.onclick = function() {
                         openChampPicker(pt, function(c) {
@@ -1731,6 +1731,10 @@
                             if(k==='strongVs') return getStrongVs(name);
                             if(k==='weakVs') return getWeakVs(name);
                             return getCombos(name);
+                        },onRemove:function(c){
+                            removeFrom(name, k, c.name);
+                            renderMatchups(name);
+                            champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
                         }});
                     };
                 }(key, pickerTitle));
