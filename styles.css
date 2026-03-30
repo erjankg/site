@@ -13,10 +13,17 @@ html {
 background: #0f0520;
 }
 
-html, body {
+html {
+width: 100%;
+max-width: 100%;
+overflow-x: clip; /* clip не создаёт новый scroll container — Chrome скрывает адресную строку */
+}
+
+body {
 width: 100%;
 max-width: 100%;
 overflow-x: hidden;
+overflow-y: auto;
 color: #ffffff;
 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 font-weight: 700;
