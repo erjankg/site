@@ -85,7 +85,7 @@
 
 <div class="m-mask" id="mMask" onclick="if(event.target===this)closeM()">
     <div class="m-win" style="width:96vw;max-width:920px;height:88vh;">
-        <button class="btn-close-x" onclick="closeM()">✕</button>
+        <button class="btn-close-x" onclick="closeM()">←</button>
         <div class="m-controls">
             <button class="m-btn m-btn-all" onclick="selectAll()">✓ ALL</button>
             <button class="m-btn m-btn-clear" onclick="clearAll()">✕ CLEAR</button>
@@ -102,7 +102,7 @@
 <!-- ═══════════════ DAMAGE CALCULATOR ═══════════════ -->
 <div class="m-mask" id="calcMask" onclick="if(event.target===this)closeCalc()">
   <div class="m-win" style="width:98vw;max-width:1400px;max-height:94vh;overflow-y:auto;padding:18px;">
-    <button class="btn-close-x" onclick="closeCalc()">✕</button>
+    <button class="btn-close-x" onclick="closeCalc()">←</button>
     <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:14px;">⚔ Калькулятор урона</div>
 
     <div class="calc-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:start;">
@@ -206,7 +206,7 @@
 <!-- ═══════════════ ITEMS REFERENCE MODAL ═══════════════ -->
 <div class="m-mask" id="itemsMask" onclick="if(event.target===this)closeItems()">
   <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;">
-    <button class="btn-close-x" onclick="closeItems()">✕</button>
+    <button class="btn-close-x" onclick="closeItems()">←</button>
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
       <div style="font-size:15px;font-weight:900;color:#b96fff;">📦 Предметы Wild Rift</div>
       <button onclick="closeItems();openItemCalcMenu()" style="display:flex;align-items:center;gap:7px;padding:7px 14px;border-radius:10px;border:1.5px solid rgba(255,193,7,0.4);background:rgba(255,193,7,0.08);color:#FFD700;font-size:12px;font-weight:800;cursor:pointer;">🧮 Калькулятор предметов</button>
@@ -453,7 +453,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ RUNES MODAL ══ -->
 <div class="m-mask" id="runesMask" onclick="if(event.target===this)closeRunes()">
   <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;overflow-y:auto;padding:20px 16px 16px;">
-    <button class="btn-close-x" onclick="closeRunes()">✕</button>
+    <button class="btn-close-x" onclick="closeRunes()">←</button>
     <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:4px;">💎 Руны Wild Rift</div>
     <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:14px;">Наведи — описание</div>
     <div class="side-section" style="padding:0;margin-bottom:8px;">⭐ ОСНОВНЫЕ РУНЫ</div>
@@ -532,7 +532,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ TIER LIST MODAL ══ -->
 <div class="m-mask" id="tierlistMask" onclick="if(event.target===this)closeTierlist()">
   <div class="m-win" style="width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0;overflow-y:auto;padding:20px 16px 24px;padding-right:60px;margin:0;">
-    <button class="btn-close-x" onclick="closeTierlist()">✕</button>
+    <button class="btn-close-x" onclick="closeTierlist()">←</button>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
       <div id="tierlistTitle" style="font-size:16px;font-weight:900;color:#b96fff;"></div>
       <button id="tierlistEditBtn" onclick="toggleTierlistEdit()" style="padding:5px 12px;border-radius:10px;border:1.5px solid rgba(255,215,0,0.4);background:rgba(255,215,0,0.08);color:#FFD700;font-size:11px;font-weight:800;cursor:pointer;margin-right:4px;white-space:nowrap;">✏ Изменить</button>
@@ -545,7 +545,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ SIDE CHAMPIONS MODAL ══ -->
 <div class="m-mask" id="sideChampsMask" onclick="if(event.target===this)closeSideChamps()">
   <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;display:flex;flex-direction:column;padding:20px 16px 16px;">
-    <button class="btn-close-x" onclick="closeSideChamps()">✕</button>
+    <button class="btn-close-x" onclick="closeSideChamps()">←</button>
     <div style="font-size:16px;font-weight:900;color:#b96fff;margin-bottom:12px;">👥 Чемпионы</div>
     <!-- Role filter -->
     <div id="scRoleFilter" style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:12px;"></div>
@@ -558,7 +558,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ CHAMPION DETAIL MODAL ══ -->
 <div class="m-mask" id="champDetailMask" onclick="if(event.target===this)closeChampDetail()">
   <div class="m-win" style="width:96vw;max-width:920px;max-height:92vh;overflow-y:auto;padding:24px 20px 20px;">
-    <button class="btn-close-x" onclick="closeChampDetail()">✕</button>
+    <button class="btn-close-x" onclick="closeChampDetail()">←</button>
     <div id="champDetailContent" style="text-align:center;padding:30px 0;">
       <div style="font-size:40px;margin-bottom:12px;">⚔</div>
       <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);">Информация о чемпионе</div>
@@ -570,7 +570,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ RUNE DETAIL MODAL ══ -->
 <div class="m-mask" id="runeDetailModal" onclick="if(event.target===this)closeRuneDetail()">
   <div class="m-win" style="width:92vw;max-width:440px;max-height:88vh;overflow-y:auto;padding:28px 20px 24px;padding-right:70px;">
-    <button class="btn-close-x" onclick="closeRuneDetail()">✕</button>
+    <button class="btn-close-x" onclick="closeRuneDetail()">←</button>
     <div id="runeDetailContent"></div>
   </div>
 </div>
@@ -578,7 +578,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ ITEM DETAIL MODAL ══ -->
 <div id="itemDetailModal" class="m-mask" onclick="if(event.target===this)closeItemDetail()">
   <div class="m-win" style="width:92vw;max-width:480px;max-height:88vh;overflow-y:auto;padding:24px 20px 20px;padding-right:70px;">
-    <button onclick="closeItemDetail()" class="btn-close-x">✕</button>
+    <button onclick="closeItemDetail()" class="btn-close-x">←</button>
     <div id="itemDetailContent"></div>
   </div>
 </div>
@@ -589,7 +589,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ ITEM CALC SUB-MODAL ══ -->
 <div id="itemSubModal" class="m-mask" onclick="if(event.target===this)closeItemCalc()">
   <div class="m-win" style="width:92vw;max-width:440px;max-height:88vh;overflow-y:auto;padding:20px 18px 18px;padding-right:50px;position:relative;">
-    <button class="btn-close-x" onclick="closeItemCalc()">✕</button>
+    <button class="btn-close-x" onclick="closeItemCalc()">←</button>
     <div id="itemSubTitle" style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;"></div>
     <!-- Range toggle -->
     <div id="icRangeBlock" style="display:none;gap:6px;margin-bottom:12px;">
@@ -663,7 +663,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ ITEM CALC MENU ══ -->
 <div class="m-mask" id="itemCalcMenuMask" onclick="if(event.target===this)closeItemCalcMenu()">
   <div class="m-win" style="width:92vw;max-width:400px;padding:20px 18px;padding-right:50px;">
-    <button class="btn-close-x" onclick="closeItemCalcMenu()">✕</button>
+    <button class="btn-close-x" onclick="closeItemCalcMenu()">←</button>
     <div style="font-size:15px;font-weight:900;color:#b96fff;margin-bottom:14px;">🧮 Калькулятор предметов</div>
     <div style="display:flex;flex-direction:column;gap:8px;">
       <button onclick="openItemCalc('thornmail')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.25);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
@@ -695,7 +695,7 @@ Stormarrow: При максимальных зарядах следующая б
   <div style="width:100vw;height:100vh;background:linear-gradient(135deg,#1a0d2e 0%,#0f0520 100%);display:flex;flex-direction:column;overflow:hidden;position:relative;">
 
     <!-- X button -->
-    <button class="btn-close-x" onclick="closeDraft()" style="position:fixed;top:14px;right:14px;z-index:9999;">✕</button>
+    <button class="btn-close-x" onclick="closeDraft()" style="position:fixed;top:14px;left:14px;z-index:9999;">←</button>
 
     <!-- Header -->
     <div style="padding:12px 60px 10px 20px;border-bottom:1px solid rgba(155,89,182,0.2);flex-shrink:0;display:flex;align-items:center;gap:12px;">
@@ -768,7 +768,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ UNIVERSAL CHAMPION PICKER MODAL ══ -->
 <div class="m-mask" id="champPickerModal" onclick="if(event.target===this)closeChampPicker()">
   <div class="m-win" style="width:96vw;max-width:900px;max-height:92vh;display:flex;flex-direction:column;padding:16px;overflow:hidden;">
-    <button class="btn-close-x" onclick="closeChampPicker()">✕</button>
+    <button class="btn-close-x" onclick="closeChampPicker()">←</button>
     <div style="font-size:14px;font-weight:900;color:#b96fff;margin-bottom:10px;" id="champPickerTitle">⚔ Выбери чемпиона</div>
     <input id="champPickerSearch" type="text" placeholder="🔍 Поиск..." class="calc-input"
       style="font-size:13px;padding:8px 12px;margin-bottom:8px;" oninput="champPickerFilter()">
@@ -781,7 +781,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ TIERLIST MENU MODAL ══ -->
 <div class="m-mask" id="tierlistMenuMask" onclick="if(event.target===this)closeTierlistMenu()">
   <div class="m-win" style="width:88vw;max-width:340px;padding:20px 18px;padding-right:50px;">
-    <button class="btn-close-x" onclick="closeTierlistMenu()">✕</button>
+    <button class="btn-close-x" onclick="closeTierlistMenu()">←</button>
     <div style="font-size:15px;font-weight:900;color:#FFD700;margin-bottom:16px;">🏆 Тир-листы</div>
     <div style="display:flex;flex-direction:column;gap:8px;">
       <button onclick="openTierlist('champs')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
@@ -863,7 +863,7 @@ Stormarrow: При максимальных зарядах следующая б
 <!-- ══ INFLUENCER TABLE MODAL ══ -->
 <div class="m-mask" id="influencerMask" onclick="if(event.target===this)closeInfluencers()">
   <div class="m-win" style="width:96vw;max-width:920px;max-height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
-    <button class="btn-close-x" onclick="closeInfluencers()" style="top:10px;right:10px;">✕</button>
+    <button class="btn-close-x" onclick="closeInfluencers()" style="top:10px;left:10px;">←</button>
 
     <!-- LIST VIEW -->
     <div id="infListView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">

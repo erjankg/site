@@ -468,33 +468,33 @@ box-shadow: 0 24px 70px rgba(0,0,0,0.85);
 overflow: hidden;
 }
 
-/* CLOSE BTN — всегда фиксирован к viewport внутри открытой модалки */
+/* BACK BTN — всегда фиксирован к viewport внутри открытой модалки */
 .m-mask.active .btn-close-x {
 position: fixed !important;
 top: 18px !important;
-right: 18px !important;
+left: 18px !important;
 z-index: 9999 !important;
 }
 
 .btn-close-x {
-background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-color: #fff;
-border: 3px solid #0f0520;
-border-radius: 50%;
+background: rgba(30, 15, 50, 0.85);
+color: rgba(255,255,255,0.85);
+border: 2px solid rgba(185, 111, 255, 0.35);
+border-radius: 12px;
 width: 44px;
 height: 44px;
-font-size: 20px;
+font-size: 22px;
 cursor: pointer;
 display: flex;
 align-items: center;
 justify-content: center;
-box-shadow: 0 4px 18px rgba(231, 76, 60, 0.55);
-font-weight: 900;
-transition: transform 0.15s, filter 0.15s;
+box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+font-weight: 400;
+transition: transform 0.15s, background 0.15s, border-color 0.15s;
 flex-shrink: 0;
 }
 
-.btn-close-x:hover { filter: brightness(1.15); transform: scale(1.07); }
+.btn-close-x:hover { background: rgba(109,63,245,0.25); border-color: rgba(185,111,255,0.6); transform: scale(1.07); }
 .btn-close-x:active { transform: scale(0.9); }
 
 /* CONTROLS */
