@@ -1460,14 +1460,14 @@
                     openChampPicker(['🏆','⚙','✨'][['champs','items','runes'].indexOf(pt)]+' Тир '+t,
                     function(c){
                         af(t,c.name);
-                        champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
+                        champPickerBuildGrid();
                     },{
                         multi:true, type:pt,
                         defaultRole: roleFilter,
                         itemCat: pt==='items' ? _tierItemCat : pt==='runes' ? _tierRuneCat : 'all',
                         getSelected:function(){return td[t]||[];},
                         getExcluded:function(){var e2=[];_TIER_KEYS.forEach(function(ot){if(ot!==t)(td[ot]||[]).forEach(function(n){e2.push(n);});});return e2;},
-                        onRemove:function(c){rf(t,c.name);champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');}
+                        onRemove:function(c){rf(t,c.name);champPickerBuildGrid();}
                     });
                 };}(tk,tData,addFn,removeFn,pickerType));
                 row.appendChild(addBtn);
@@ -1728,7 +1728,7 @@
                             if(cur.length >= 7) return;
                             addTo(name, k, c.name);
                             renderMatchups(name);
-                            champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
+                            champPickerBuildGrid();
                         },{multi:true,getSelected:function(){
                             if(k==='strongVs') return getStrongVs(name);
                             if(k==='weakVs') return getWeakVs(name);
@@ -1736,7 +1736,7 @@
                         },getExcluded:function(){ return [name]; },onRemove:function(c){
                             removeFrom(name, k, c.name);
                             renderMatchups(name);
-                            champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
+                            champPickerBuildGrid();
                         }});
                     };
                 }(key, pickerTitle));
@@ -2058,10 +2058,17 @@
             var e=Object.keys(map).map(function(n){return{name:n,stars:map[n].stars,from:map[n].from};});
             e.sort(function(a,b){return b.stars-a.stars||b.from.length-a.from.length;});
             if(!e.length) return '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">—</div>';
-            return e.slice(0,10).map(function(x){
-                var st=Array(x.stars).fill('<span style="color:'+color+'">★</span>').join('')+Array(3-x.stars).fill('<span style="color:rgba(255,255,255,0.1)">☆</span>').join('');
-                return '<div style="display:flex;align-items:center;gap:6px;padding:5px 6px;background:rgba(255,255,255,0.03);border-radius:7px;margin-bottom:3px;"><img src="'+champIcon(x.name)+'" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;" onerror="this.style.background=&quot;rgba(109,63,245,0.3)&quot;"><div style="flex:1;min-width:0;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.name+'</div><div style="font-size:11px;flex-shrink:0;">'+st+'</div></div>';
+            var wrap = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;">';
+            wrap += e.slice(0,20).map(function(x){
+                var stars = Array(x.stars).fill('★').join('');
+                return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border-radius:8px;background:rgba(255,255,255,0.03);position:relative;">'
+                    +'<img src="'+champIcon(x.name)+'" style="width:44px;height:44px;border-radius:7px;object-fit:cover;" onerror="this.style.background=\'rgba(109,63,245,0.3)\'">'
+                    +'<div style="font-size:7px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 2px;">'+x.name+'</div>'
+                    +(stars?'<div style="font-size:9px;color:'+color+';line-height:1;">'+stars+'</div>':'')
+                    +'</div>';
             }).join('');
+            wrap += '</div>';
+            return wrap;
         }
 
         var allPicked = _draftSlotsL.concat(_draftSlotsR).filter(Boolean);
@@ -2122,24 +2129,18 @@
         _champPickerRole = roleMap[dr] || dr;
         var t = document.getElementById('champPickerTitle');
         if(t) t.textContent = title || '⚔ Выбери чемпиона';
-        var s = document.getElementById('champPickerSearch');
-        if(s) s.value = '';
         var doneBtn = document.getElementById('champPickerDoneBtn');
         if(doneBtn) doneBtn.style.display = _champPickerMulti ? '' : 'none';
         var rolesEl = document.getElementById('champPickerRoles');
         // Hide role filter for all types — champs filtered by role silently (like items by category)
         if(rolesEl) rolesEl.style.display = 'none';
         openModal('champPickerModal');
-        champPickerBuildGrid('');
+        champPickerBuildGrid();
     };
     window.closeChampPicker = function() { closeModal('champPickerModal'); };
 
-    window.champPickerFilter = function() {
-        var q = (document.getElementById('champPickerSearch')||{}).value || '';
-        champPickerBuildGrid(q.toLowerCase());
-    };
 
-    function champPickerBuildGrid(q) {
+    function champPickerBuildGrid() {
         var grid = document.getElementById('champPickerGrid');
         if(!grid) return;
         grid.innerHTML = '';
@@ -2160,7 +2161,6 @@
         }
 
         var list = sourceList.filter(function(c) {
-            if(q && !c.name.toLowerCase().includes(q.toLowerCase())) return false;
             if(_champPickerType === 'champs' && _champPickerRole !== 'all' && !(c.is && c.is[_champPickerRole])) return false;
             // Hide items/runes already placed in OTHER tiers, but show currently selected (current tier)
             if(excluded.indexOf(c.name) !== -1 && selected.indexOf(c.name) === -1) return false;
@@ -2195,7 +2195,7 @@
                     _champPickerCallback(c);
                 }
                 if(_champPickerMulti) {
-                    champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
+                    champPickerBuildGrid();
                 } else {
                     closeChampPicker();
                 }
