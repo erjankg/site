@@ -1764,10 +1764,10 @@
                     else data = getCombos(n);
                     data.forEach(function(cn) {
                         var chip = document.createElement('div');
-                        chip.style.cssText = 'display:flex;align-items:center;gap:3px;background:rgba('+sec.bgRgb+',0.12);border:1px solid rgba('+sec.bgRgb+',0.25);border-radius:6px;padding:2px 5px 2px 2px;cursor:default;';
-                        chip.innerHTML = '<img src="'+champIcon(cn)+'" style="width:24px;height:24px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'"><span style="font-size:9px;color:#fff;font-weight:600;">'+cn+'</span>';
+                        chip.style.cssText = 'display:flex;align-items:center;gap:2px;background:rgba('+sec.bgRgb+',0.12);border:1px solid rgba('+sec.bgRgb+',0.25);border-radius:6px;padding:2px;cursor:default;';
+                        chip.innerHTML = '<img src="'+champIcon(cn)+'" title="'+cn+'" style="width:29px;height:29px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'">';
                         var xBtn = document.createElement('span');
-                        xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;margin-left:2px;';
+                        xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;line-height:1;';
                         xBtn.textContent = '\u00d7';
                         xBtn.onclick = function(e) { e.stopPropagation(); removeFrom(n, sec.key, cn); renderMatchups(n); };
                         chip.appendChild(xBtn);
