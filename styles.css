@@ -9,6 +9,10 @@ box-sizing: border-box;
 -webkit-tap-highlight-color: transparent;
 }
 
+html {
+background: #0f0520;
+}
+
 html, body {
 width: 100%;
 max-width: 100%;
@@ -1185,7 +1189,9 @@ display: grid; place-items: center; color: #fff; font-weight: 900; font-size: 10
 }
 .champ-icon { width: 42px; height: 42px; border-radius: 8px; }
 .champ-cell .name-tag { display: none; }
-.champ-cell { justify-content: flex-start; gap: 3px; padding-left: 4px; overflow: hidden; }
+.champ-cell { justify-content: center; gap: 0; padding-left: 0; overflow: hidden; position: relative; }
+.champ-cell .row-num { position: absolute; left: 2px; }
+.champ-cell .x-btn { position: absolute; left: 13px; }
 .row-num { font-size: 8px; min-width: 10px; }
 .btn-champ-cfg { font-size: 12px; padding: 8px 14px; border-radius: 12px; }
 input[type="range"] { height: 3.4px; }
