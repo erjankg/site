@@ -1221,29 +1221,75 @@
     loadTierData();
 
     // ITEM & RUNE TIER DATA
-    var ITEM_TIER_DATA = {};
-    var RUNE_TIER_DATA = {};
-    _TIER_KEYS.forEach(function(k){ ITEM_TIER_DATA[k]=[]; RUNE_TIER_DATA[k]=[]; });
-    function loadItemTierData(){ try{var s=JSON.parse(localStorage.getItem('itemTierData')||'{}');_TIER_KEYS.forEach(function(k){if(Array.isArray(s[k]))ITEM_TIER_DATA[k]=s[k];});}catch(e){} }
-    function loadRuneTierData(){ try{var s=JSON.parse(localStorage.getItem('runeTierData')||'{}');_TIER_KEYS.forEach(function(k){if(Array.isArray(s[k]))RUNE_TIER_DATA[k]=s[k];});}catch(e){} }
+    var _ITEM_CATS = [
+        {k:'all',l:'Все',icon:'🌐'},{k:'physical',l:'Физические',icon:'⚔'},
+        {k:'magic',l:'Магические',icon:'🔮'},{k:'defensive',l:'Защитные',icon:'🛡'},
+        {k:'support',l:'Поддержка',icon:'💛'},{k:'boots',l:'Ботинки',icon:'👟'},
+        {k:'enchants',l:'Зачарования',icon:'✨'}
+    ];
+    var _tierItemCat = 'all'; // current tab in item tierlist
+    var ITEM_TIER_DATA = {};  // {catKey: {S:[],A:[],...}}
+    var RUNE_TIER_DATA = {};  // {S:[],A:[],...}
+    _ITEM_CATS.forEach(function(c){ ITEM_TIER_DATA[c.k]=_emptyTierRole(); });
+    _TIER_KEYS.forEach(function(k){ RUNE_TIER_DATA[k]=[]; });
+    function loadItemTierData(){
+        try{
+            var s=JSON.parse(localStorage.getItem('itemTierData')||'{}');
+            _ITEM_CATS.forEach(function(c){
+                if(s[c.k]) _TIER_KEYS.forEach(function(k){ if(Array.isArray(s[c.k][k])) ITEM_TIER_DATA[c.k][k]=s[c.k][k]; });
+            });
+        }catch(e){}
+    }
+    function loadRuneTierData(){
+        try{
+            var s=JSON.parse(localStorage.getItem('runeTierData')||'{}');
+            _TIER_KEYS.forEach(function(k){ if(Array.isArray(s[k])) RUNE_TIER_DATA[k]=s[k]; });
+        }catch(e){}
+    }
     function saveItemTierData(){ try{localStorage.setItem('itemTierData',JSON.stringify(ITEM_TIER_DATA));}catch(e){} }
     function saveRuneTierData(){ try{localStorage.setItem('runeTierData',JSON.stringify(RUNE_TIER_DATA));}catch(e){} }
     loadItemTierData(); loadRuneTierData();
 
-    // Extract item/rune data from DOM (lazy)
-    var _itemsData = null;
-    var _runesData = null;
-    function getItemsData(){
-        if(_itemsData) return _itemsData;
-        _itemsData=[];
-        document.querySelectorAll('#itemsMask .item-card').forEach(function(card){
-            var tip=card.getAttribute('data-tip')||'';
-            var name=tip.split('\u00a6')[0].trim();
-            var img=card.querySelector('img');
-            if(name&&img) _itemsData.push({name:name,img:img.getAttribute('src')||img.src||''});
+    // Map each category to items in DOM (lazy, built once per session)
+    var _itemsByCat = null;
+    function getItemsByCat(){
+        if(_itemsByCat) return _itemsByCat;
+        _itemsByCat = {all:[],physical:[],magic:[],defensive:[],support:[],boots:[],enchants:[]};
+        // Category headers contain keywords we match against
+        var catKeywords = [
+            {k:'physical', words:['Физическ']},
+            {k:'magic',    words:['Магическ']},
+            {k:'defensive',words:['Защитн']},
+            {k:'support',  words:['Поддержк']},
+            {k:'boots',    words:['Ботинк']},
+            {k:'enchants', words:['Зачарован']}
+        ];
+        var curCat = 'physical';
+        var itemsMask = document.getElementById('itemsMask');
+        if(!itemsMask) return _itemsByCat;
+        // Walk all children: look for section headers and item-cards
+        itemsMask.querySelectorAll('[style*="letter-spacing:1px"], .item-card').forEach(function(el){
+            if(el.classList.contains('item-card')){
+                var tip=el.getAttribute('data-tip')||'';
+                var name=tip.split('\xa6')[0].trim();
+                var img=el.querySelector('img');
+                if(!name||!img) return;
+                var entry={name:name, img:img.getAttribute('src')||img.src||''};
+                _itemsByCat.all.push(entry);
+                if(!_itemsByCat[curCat]) _itemsByCat[curCat]=[];
+                _itemsByCat[curCat].push(entry);
+            } else {
+                var txt=el.textContent.trim();
+                catKeywords.forEach(function(ck){
+                    ck.words.forEach(function(w){ if(txt.indexOf(w)!==-1) curCat=ck.k; });
+                });
+            }
         });
-        return _itemsData;
+        return _itemsByCat;
     }
+
+    // Extract rune data from DOM (lazy)
+    var _runesData = null;
     function getRunesData(){
         if(_runesData) return _runesData;
         _runesData=[];
@@ -1280,6 +1326,8 @@
     window.openTierlist = function(type) {
         _tierType = type||'champs';
         _tierEditMode = false;
+        _tierRole = 'all';
+        _tierItemCat = 'all';
         var titles={champs:'🏆 Тир-лист чемпионов', items:'⚙ Тир-лист предметов', runes:'✨ Тир-лист рун'};
         var t=document.getElementById('tierlistTitle');
         if(t) t.textContent=titles[_tierType]||'Тир-лист';
@@ -1295,30 +1343,44 @@
     window.closeTierlistMenu = function() { closeModal('tierlistMenuMask'); };
     function buildTierlistTabs() {
         var el=document.getElementById('tierlistTabs'); if(!el) return;
-        if(_tierType!=='champs'){el.innerHTML='';return;}
         el.innerHTML='';
-        ROLES.forEach(function(r) {
-            var b=document.createElement('button');
-            var active=r.key===_tierRole;
-            b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid rgba(155,89,182,'+(active?'0.8':'0.25')+');background:rgba(109,63,245,'+(active?'0.35':'0.08')+');color:'+(active?'#fff':'rgba(255,255,255,0.55)')+';font-size:12px;font-weight:700;cursor:pointer;';
-            b.textContent=r.icon+' '+r.label;
-            b.onclick=function(){_tierRole=r.key;buildTierlistTabs();renderTierlist();};
-            el.appendChild(b);
-        });
+        if(_tierType==='champs'){
+            ROLES.forEach(function(r){
+                var b=document.createElement('button');
+                var active=r.key===_tierRole;
+                b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid rgba(155,89,182,'+(active?'0.8':'0.25')+');background:rgba(109,63,245,'+(active?'0.35':'0.08')+');color:'+(active?'#fff':'rgba(255,255,255,0.55)')+';font-size:12px;font-weight:700;cursor:pointer;';
+                b.textContent=r.icon+' '+r.label;
+                b.onclick=function(){_tierRole=r.key;buildTierlistTabs();renderTierlist();};
+                el.appendChild(b);
+            });
+        } else if(_tierType==='items'){
+            _ITEM_CATS.forEach(function(c){
+                var b=document.createElement('button');
+                var active=c.k===_tierItemCat;
+                b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid rgba(255,215,0,'+(active?'0.7':'0.2')+');background:rgba(255,215,0,'+(active?'0.18':'0.05')+');color:'+(active?'#FFD700':'rgba(255,255,255,0.5)')+';font-size:12px;font-weight:700;cursor:pointer;';
+                b.textContent=c.icon+' '+c.l;
+                b.onclick=function(){_tierItemCat=c.k;buildTierlistTabs();renderTierlist();};
+                el.appendChild(b);
+            });
+        }
+        // runes: no tabs needed
     }
     function renderTierlist() {
         var el=document.getElementById('tierlistContent'); if(!el) return;
-        var tData, saveFunc, pickerType, imgFn, addFn, removeFn;
+        var tData, pickerType, imgFn, addFn, removeFn;
         if(_tierType==='items'){
-            tData=ITEM_TIER_DATA; saveFunc=saveItemTierData; pickerType='items';
-            imgFn=function(n){var d=getItemsData(),f=d.find(function(x){return x.name===n;});return f?f.img:'';};
+            tData=ITEM_TIER_DATA[_tierItemCat]||ITEM_TIER_DATA.all;
+            pickerType='items';
+            imgFn=function(n){var all=getItemsByCat().all,f=all.find(function(x){return x.name===n;});return f?f.img:'';};
             addFn=addToItemTier; removeFn=removeFromItemTier;
         } else if(_tierType==='runes'){
-            tData=RUNE_TIER_DATA; saveFunc=saveRuneTierData; pickerType='runes';
+            tData=RUNE_TIER_DATA;
+            pickerType='runes';
             imgFn=function(n){var d=getRunesData(),f=d.find(function(x){return x.name===n;});return f?f.img:'';};
             addFn=addToRuneTier; removeFn=removeFromRuneTier;
         } else {
-            tData=TIER_DATA[_tierRole]||TIER_DATA.all; saveFunc=saveTierData; pickerType='champs';
+            tData=TIER_DATA[_tierRole]||TIER_DATA.all;
+            pickerType='champs';
             imgFn=function(n){return champIcon(n);};
             addFn=function(tier,name){addToTier(_tierRole,tier,name);}; removeFn=function(tier,name){removeFromTier(_tierRole,tier,name);};
         }
@@ -1355,20 +1417,21 @@
                 var addBtn=document.createElement('button');
                 addBtn.style.cssText='padding:5px 10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;align-self:center;';
                 addBtn.textContent='+ Выбрать';
-                (function(t,td,af,rf){addBtn.onclick=function(){
-                    var exc=[];
-                    _TIER_KEYS.forEach(function(ot){if(ot!==t)(td[ot]||[]).forEach(function(n){exc.push(n);});});
-                    openChampPicker((['champs','items','runes'].indexOf(_tierType)>=0?['🏆 ','⚙ ','✨ '][['champs','items','runes'].indexOf(_tierType)]:'')+'Тир '+t,
+                (function(t,td,af,rf,pt){addBtn.onclick=function(){
+                    var roleFilter = (pt==='champs' && _tierRole!=='all') ? _tierRole : 'all';
+                    openChampPicker(['🏆','⚙','✨'][['champs','items','runes'].indexOf(pt)]+' Тир '+t,
                     function(c){
                         af(t,c.name);
                         champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
                     },{
-                        multi:true, type:pickerType,
+                        multi:true, type:pt,
+                        defaultRole: roleFilter,
+                        itemCat: pt==='items' ? _tierItemCat : 'all',
                         getSelected:function(){return td[t]||[];},
                         getExcluded:function(){var e2=[];_TIER_KEYS.forEach(function(ot){if(ot!==t)(td[ot]||[]).forEach(function(n){e2.push(n);});});return e2;},
                         onRemove:function(c){rf(t,c.name);champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');}
                     });
-                };}(tk,tData,addFn,removeFn));
+                };}(tk,tData,addFn,removeFn,pickerType));
                 row.appendChild(addBtn);
             }
             el.appendChild(row);
@@ -1384,12 +1447,23 @@
         saveTierData(); renderTierlist();
     }
     function addToItemTier(tier,name){
-        _TIER_KEYS.forEach(function(tk){if(tk!==tier)ITEM_TIER_DATA[tk]=(ITEM_TIER_DATA[tk]||[]).filter(function(n){return n!==name;});});
-        if((ITEM_TIER_DATA[tier]||[]).indexOf(name)===-1){if(!ITEM_TIER_DATA[tier])ITEM_TIER_DATA[tier]=[];ITEM_TIER_DATA[tier].push(name);}
+        var cat=_tierItemCat;
+        if(!ITEM_TIER_DATA[cat]) ITEM_TIER_DATA[cat]=_emptyTierRole();
+        // Remove from all tiers in this category
+        _TIER_KEYS.forEach(function(tk){if(tk!==tier)ITEM_TIER_DATA[cat][tk]=(ITEM_TIER_DATA[cat][tk]||[]).filter(function(n){return n!==name;});});
+        if((ITEM_TIER_DATA[cat][tier]||[]).indexOf(name)===-1){if(!ITEM_TIER_DATA[cat][tier])ITEM_TIER_DATA[cat][tier]=[];ITEM_TIER_DATA[cat][tier].push(name);}
+        // Also sync to 'all' category
+        if(cat!=='all'){
+            if(!ITEM_TIER_DATA.all) ITEM_TIER_DATA.all=_emptyTierRole();
+            _TIER_KEYS.forEach(function(tk){if(tk!==tier)ITEM_TIER_DATA.all[tk]=(ITEM_TIER_DATA.all[tk]||[]).filter(function(n){return n!==name;});});
+            if((ITEM_TIER_DATA.all[tier]||[]).indexOf(name)===-1){if(!ITEM_TIER_DATA.all[tier])ITEM_TIER_DATA.all[tier]=[];ITEM_TIER_DATA.all[tier].push(name);}
+        }
         saveItemTierData(); renderTierlist();
     }
     function removeFromItemTier(tier,name){
-        if(ITEM_TIER_DATA[tier])ITEM_TIER_DATA[tier]=ITEM_TIER_DATA[tier].filter(function(n){return n!==name;});
+        var cat=_tierItemCat;
+        if(ITEM_TIER_DATA[cat]&&ITEM_TIER_DATA[cat][tier]) ITEM_TIER_DATA[cat][tier]=ITEM_TIER_DATA[cat][tier].filter(function(n){return n!==name;});
+        if(cat!=='all'&&ITEM_TIER_DATA.all&&ITEM_TIER_DATA.all[tier]) ITEM_TIER_DATA.all[tier]=ITEM_TIER_DATA.all[tier].filter(function(n){return n!==name;});
         saveItemTierData(); renderTierlist();
     }
     function addToRuneTier(tier,name){
@@ -2037,6 +2111,7 @@
     var _champPickerGetExcluded = null;
     var _champPickerOnRemove = null;
     var _champPickerType = 'champs'; // 'champs' | 'items' | 'runes'
+    var _champPickerItemCat = 'all'; // for items picker
 
     window.openChampPicker = function(title, callback, opts) {
         _champPickerCallback = callback;
@@ -2045,7 +2120,11 @@
         _champPickerGetExcluded = (opts && opts.getExcluded) || null;
         _champPickerOnRemove = (opts && opts.onRemove) || null;
         _champPickerType = (opts && opts.type) || 'champs';
-        _champPickerRole = 'all';
+        _champPickerItemCat = (opts && opts.itemCat) || 'all';
+        // Map tierlist role keys → picker role keys (Top/Jungle/Mid/ADC/Support)
+        var roleMap = {top:'Top', jungle:'Jungle', mid:'Mid', adc:'ADC', sup:'Support', all:'all'};
+        var dr = (opts && opts.defaultRole) || 'all';
+        _champPickerRole = roleMap[dr] || dr;
         var t = document.getElementById('champPickerTitle');
         if(t) t.textContent = title || '⚔ Выбери чемпиона';
         var s = document.getElementById('champPickerSearch');
@@ -2104,7 +2183,9 @@
 
         var sourceList;
         if(_champPickerType === 'items') {
-            sourceList = getItemsData();
+            var byCat = getItemsByCat();
+            var catItems = (_champPickerItemCat !== 'all' && byCat[_champPickerItemCat]) ? byCat[_champPickerItemCat] : byCat.all;
+            sourceList = catItems;
         } else if(_champPickerType === 'runes') {
             sourceList = getRunesData();
         } else {
@@ -2115,7 +2196,7 @@
         var list = sourceList.filter(function(c) {
             if(q && !c.name.toLowerCase().includes(q.toLowerCase())) return false;
             if(_champPickerType === 'champs' && _champPickerRole !== 'all' && !(c.is && c.is[_champPickerRole])) return false;
-            // Hide items already placed in OTHER tiers (excluded), but show selected (current tier)
+            // Hide items/runes already placed in OTHER tiers, but show currently selected (current tier)
             if(excluded.indexOf(c.name) !== -1 && selected.indexOf(c.name) === -1) return false;
             return true;
         });
