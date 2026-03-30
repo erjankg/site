@@ -162,13 +162,21 @@
     function getWeakVs(name) { var m = getMatchups(); return (m[name] && m[name].weakVs) || []; }
     function getCombos(name) { var m = getMatchups(); return (m[name] && m[name].combos) || []; }
     function addTo(name, key, val) {
-        var m = getMatchups(); m = _ensureChamp(m, name);
+        var m = getMatchups();
+        m = _ensureChamp(m, name);
+        m = _ensureChamp(m, val);
         if((m[name][key]||[]).indexOf(val) === -1) { if(!m[name][key]) m[name][key]=[]; m[name][key].push(val); }
+        // Bidirectional: strongVs↔weakVs, combos↔combos
+        var rk = key==='strongVs' ? 'weakVs' : key==='weakVs' ? 'strongVs' : 'combos';
+        if((m[val][rk]||[]).indexOf(name) === -1) { if(!m[val][rk]) m[val][rk]=[]; m[val][rk].push(name); }
         saveMatchups(m);
     }
     function removeFrom(name, key, val) {
-        var m = getMatchups(); if(!m[name] || !m[name][key]) return;
-        m[name][key] = m[name][key].filter(function(c){ return c !== val; });
+        var m = getMatchups();
+        if(m[name] && m[name][key]) m[name][key] = m[name][key].filter(function(c){ return c !== val; });
+        // Bidirectional remove
+        var rk = key==='strongVs' ? 'weakVs' : key==='weakVs' ? 'strongVs' : 'combos';
+        if(m[val] && m[val][rk]) m[val][rk] = m[val][rk].filter(function(c){ return c !== name; });
         saveMatchups(m);
     } // {champName: {patch, change, type}}
     let selected = new Set();
@@ -1195,11 +1203,22 @@
     // TIER LIST
     var _tierType = 'champs';
     var _tierRole = 'all';
-    var TIER_DATA = {
-        all:{S:[],A:[],B:[],C:[]},adc:{S:[],A:[],B:[],C:[]},
-        mid:{S:[],A:[],B:[],C:[]},top:{S:[],A:[],B:[],C:[]},
-        jungle:{S:[],A:[],B:[],C:[]},sup:{S:[],A:[],B:[],C:[]}
-    };
+    var _TIER_KEYS = ['S+','S','A','B','C','D'];
+    var _TIER_COLORS = {'S+':'#FF3A3A','S':'#C43A3A','A':'#C46A1C','B':'#BC9800','C':'#1E8848','D':'#555566'};
+    var _TIER_ROLES_LIST = ['all','adc','mid','top','jungle','sup'];
+    function _emptyTierRole(){var o={};_TIER_KEYS.forEach(function(k){o[k]=[];});return o;}
+    var TIER_DATA = {};
+    _TIER_ROLES_LIST.forEach(function(r){TIER_DATA[r]=_emptyTierRole();});
+    function loadTierData(){
+        try{
+            var saved=JSON.parse(localStorage.getItem('tierData')||'{}');
+            _TIER_ROLES_LIST.forEach(function(r){
+                if(saved[r]) _TIER_KEYS.forEach(function(k){if(Array.isArray(saved[r][k])) TIER_DATA[r][k]=saved[r][k];});
+            });
+        }catch(e){}
+    }
+    function saveTierData(){ try{localStorage.setItem('tierData',JSON.stringify(TIER_DATA));}catch(e){} }
+    loadTierData();
     var ROLES = [
         {key:'all',label:'\u0412\u0441\u0435',icon:'\uD83C\uDF0D'},
         {key:'adc',label:'ADC',icon:'\uD83C\uDFF9'},
@@ -1239,26 +1258,55 @@
     function renderTierlist() {
         var el=document.getElementById('tierlistContent'); if(!el) return;
         if(_tierType!=='champs'){
-            el.innerHTML='<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);"><div style="font-size:40px;margin-bottom:12px;">\uD83D\uDCCB</div><div style="font-size:14px;font-weight:700;">\u0421\u043a\u043e\u0440\u043e \u0431\u0443\u0434\u0435\u0442!</div></div>';
+            el.innerHTML='<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);"><div style="font-size:40px;margin-bottom:12px;">📋</div><div style="font-size:14px;font-weight:700;">Скоро будет!</div></div>';
             return;
         }
         var data=TIER_DATA[_tierRole]||TIER_DATA.all;
-        var tiers=[{k:'S',c:'#C43A3A'},{k:'A',c:'#C46A1C'},{k:'B',c:'#BC9800'},{k:'C',c:'#1E8848'}];
-        var DD='https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
         el.innerHTML='';
-        tiers.forEach(function(t) {
-            var row=document.createElement('div'); row.className='tierlist-row';
-            var lbl=document.createElement('div'); lbl.className='tierlist-label tier-'+t.k;
-            lbl.style.background='linear-gradient(135deg,'+t.c+'cc,'+t.c+'88)'; lbl.textContent=t.k;
-            var cd=document.createElement('div'); cd.className='tierlist-champs';
-            (data[t.k]||[]).forEach(function(name){
+        _TIER_KEYS.forEach(function(tk){
+            var color=_TIER_COLORS[tk];
+            var row=document.createElement('div');
+            row.style.cssText='display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;';
+            var lbl=document.createElement('div');
+            lbl.style.cssText='width:38px;min-width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;font-weight:900;background:linear-gradient(135deg,'+color+'cc,'+color+'88);color:#fff;flex-shrink:0;margin-top:3px;';
+            lbl.textContent=tk;
+            var cd=document.createElement('div');
+            cd.style.cssText='display:flex;flex-wrap:wrap;gap:4px;flex:1;align-items:center;padding:4px;background:rgba(255,255,255,0.02);border-radius:8px;min-height:44px;';
+            (data[tk]||[]).forEach(function(cname){
+                var chip=document.createElement('div');
+                chip.style.cssText='position:relative;display:inline-block;';
                 var img=document.createElement('img');
-                img.className='tierlist-champ-icon'; img.src=champIcon(name); img.alt=img.title=name;
-                img.onerror=function(){this.style.display='none';}; cd.appendChild(img);
+                img.style.cssText='width:36px;height:36px;border-radius:6px;object-fit:cover;display:block;';
+                img.src=champIcon(cname); img.alt=img.title=cname;
+                img.onerror=function(){this.style.display='none';};
+                var xBtn=document.createElement('div');
+                xBtn.style.cssText='position:absolute;top:-4px;right:-4px;width:14px;height:14px;background:#e74c3c;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;z-index:1;font-weight:900;line-height:1;';
+                xBtn.textContent='×';
+                (function(r,t,n){xBtn.onclick=function(e){e.stopPropagation();removeFromTier(r,t,n);};}(_tierRole,tk,cname));
+                chip.appendChild(img); chip.appendChild(xBtn); cd.appendChild(chip);
             });
-            if(!(data[t.k]||[]).length){var ph=document.createElement('span');ph.style.cssText='font-size:11px;color:rgba(255,255,255,0.2);padding:4px;';ph.textContent='--';cd.appendChild(ph);}
-            row.appendChild(lbl);row.appendChild(cd);el.appendChild(row);
+            if(!(data[tk]||[]).length){var ph=document.createElement('span');ph.style.cssText='font-size:11px;color:rgba(255,255,255,0.15);padding:4px;';ph.textContent='—';cd.appendChild(ph);}
+            var addBtn=document.createElement('button');
+            addBtn.style.cssText='padding:5px 10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;align-self:center;';
+            addBtn.textContent='+ Выбрать';
+            (function(t){addBtn.onclick=function(){
+                openChampPicker('🏆 Тир '+t, function(c){
+                    addToTier(_tierRole,t,c.name);
+                    champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
+                },{multi:true,getSelected:function(){return TIER_DATA[_tierRole][t]||[];}});
+            };}(tk));
+            row.appendChild(lbl); row.appendChild(cd); row.appendChild(addBtn);
+            el.appendChild(row);
         });
+    }
+    function addToTier(role,tier,name){
+        _TIER_KEYS.forEach(function(tk){ if(tk!==tier) TIER_DATA[role][tk]=(TIER_DATA[role][tk]||[]).filter(function(n){return n!==name;}); });
+        if((TIER_DATA[role][tier]||[]).indexOf(name)===-1){ if(!TIER_DATA[role][tier]) TIER_DATA[role][tier]=[]; TIER_DATA[role][tier].push(name); }
+        saveTierData(); renderTierlist();
+    }
+    function removeFromTier(role,tier,name){
+        if(TIER_DATA[role]&&TIER_DATA[role][tier]) TIER_DATA[role][tier]=TIER_DATA[role][tier].filter(function(n){return n!==name;});
+        saveTierData(); renderTierlist();
     }
 
     // SIDE CHAMPIONS
@@ -1465,12 +1513,19 @@
                 var addBtn = document.createElement('button');
                 addBtn.style.cssText = 'width:100%;padding:5px;border-radius:7px;border:1px dashed rgba('+bgRgb+',0.3);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;';
                 addBtn.textContent = '+ Добавить';
-                addBtn.onclick = function() {
-                    openChampPicker(pickerTitle, function(c) {
-                        addTo(name, key, c.name);
-                        renderMatchups(name);
-                    });
-                };
+                (function(k, pt){
+                    addBtn.onclick = function() {
+                        openChampPicker(pt, function(c) {
+                            addTo(name, k, c.name);
+                            renderMatchups(name);
+                            champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
+                        },{multi:true,getSelected:function(){
+                            if(k==='strongVs') return getStrongVs(name);
+                            if(k==='weakVs') return getWeakVs(name);
+                            return getCombos(name);
+                        }});
+                    };
+                }(key, pickerTitle));
                 box.appendChild(addBtn);
                 return box;
             }
@@ -1884,14 +1939,20 @@
     // ══ UNIVERSAL CHAMPION PICKER ══
     var _champPickerCallback = null;
     var _champPickerRole = 'all';
+    var _champPickerMulti = false;
+    var _champPickerGetSelected = null;
 
-    window.openChampPicker = function(title, callback) {
+    window.openChampPicker = function(title, callback, opts) {
         _champPickerCallback = callback;
+        _champPickerMulti = !!(opts && opts.multi);
+        _champPickerGetSelected = (opts && opts.getSelected) || null;
         _champPickerRole = 'all';
         var t = document.getElementById('champPickerTitle');
         if(t) t.textContent = title || '⚔ Выбери чемпиона';
         var s = document.getElementById('champPickerSearch');
         if(s) s.value = '';
+        var doneBtn = document.getElementById('champPickerDoneBtn');
+        if(doneBtn) doneBtn.style.display = _champPickerMulti ? '' : 'none';
         openModal('champPickerModal');
         champPickerBuildRoles();
         champPickerBuildGrid('');
@@ -1937,14 +1998,16 @@
         var grid = document.getElementById('champPickerGrid');
         if(!grid || !raw.length) return;
         grid.innerHTML = '';
+        var selected = _champPickerGetSelected ? _champPickerGetSelected() : [];
         var list = raw.filter(function(c) {
             if(q && !c.name.toLowerCase().includes(q)) return false;
             if(_champPickerRole !== 'all' && !c.is[_champPickerRole]) return false;
             return true;
         });
         list.forEach(function(c) {
+            var isSel = selected.indexOf(c.name) !== -1;
             var wrap = document.createElement('div');
-            wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border-radius:9px;border:2px solid transparent;transition:all 0.12s;';
+            wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border-radius:9px;border:2px solid '+(isSel?'#b96fff':'transparent')+';background:'+(isSel?'rgba(109,63,245,0.2)':'transparent')+';transition:all 0.12s;';
             var img = document.createElement('img');
             img.src = champIcon(c.name);
             img.style.cssText = 'width:100%;aspect-ratio:1;border-radius:7px;object-fit:cover;';
@@ -1953,11 +2016,23 @@
             nm.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
             nm.textContent = c.name;
             wrap.appendChild(img); wrap.appendChild(nm);
-            wrap.onmouseenter = function(){ this.style.borderColor='#b96fff'; this.style.background='rgba(109,63,245,0.15)'; };
-            wrap.onmouseleave = function(){ this.style.borderColor='transparent'; this.style.background=''; };
+            if(isSel) {
+                var ck = document.createElement('div');
+                ck.style.cssText = 'position:absolute;top:2px;right:2px;background:#b96fff;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:900;pointer-events:none;';
+                ck.textContent = '✓';
+                wrap.appendChild(ck);
+            }
+            if(!isSel) {
+                wrap.onmouseenter = function(){ this.style.borderColor='#b96fff'; this.style.background='rgba(109,63,245,0.15)'; };
+                wrap.onmouseleave = function(){ this.style.borderColor='transparent'; this.style.background=''; };
+            }
             wrap.onclick = function() {
                 if(_champPickerCallback) _champPickerCallback(c);
-                closeChampPicker();
+                if(_champPickerMulti) {
+                    champPickerBuildGrid((document.getElementById('champPickerSearch')||{}).value||'');
+                } else {
+                    closeChampPicker();
+                }
             };
             grid.appendChild(wrap);
         });
