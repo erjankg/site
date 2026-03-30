@@ -1430,7 +1430,7 @@
                     {id:'cd_ar',label:'\ud83d\udee1 \u0411\u0440\u043e\u043d\u044f',val:f(c.ar_b,c.ar_g),color:'#f1c40f'},
                     {id:'cd_mr',label:'\u2726 \u041c\u0421',val:f(c.mr_b,c.mr_g),color:'#9b59b6'}
                 ];
-                var grid=document.getElementById('cdStatsGrid');
+                var grid=document.getElementById('cdStatsGrid')||sg;
                 if(!grid.children.length){
                     stats.forEach(function(s){
                         var box=document.createElement('div');
@@ -1440,7 +1440,7 @@
                     });
                 } else {
                     stats.forEach(function(s){
-                        var v=document.getElementById(s.id);
+                        var v=document.getElementById(s.id)||sg.querySelector('#'+s.id);
                         if(v) v.textContent=s.val;
                     });
                 }
