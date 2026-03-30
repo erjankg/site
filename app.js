@@ -1951,7 +1951,6 @@
         };
     }
 
-    var _draftRoleFilter = 'all';
     var _draftSlotsL = [null,null,null,null,null];
     var _draftSlotsR = [null,null,null,null,null];
     var _draftActiveSlot = null;
@@ -1960,70 +1959,11 @@
         _draftSlotsL = [null,null,null,null,null];
         _draftSlotsR = [null,null,null,null,null];
         _draftActiveSlot = null;
-        _draftRoleFilter = 'all';
         openModal('draftMask');
-        draftBuildRoleFilter();
-        draftBuildGrid('');
         draftBuildSlots();
         draftRenderPanels();
     };
     window.closeDraft = function() { closeModal('draftMask'); };
-
-    function draftBuildRoleFilter() {
-        var el = document.getElementById('draftRoleFilter');
-        if(!el) return;
-        var roles = [{k:'all',l:'Все'},{k:'Top',l:'Top'},{k:'Jungle',l:'Лес'},{k:'Mid',l:'Mid'},{k:'ADC',l:'ADC'},{k:'Support',l:'Сап'}];
-        el.innerHTML = '';
-        roles.forEach(function(r) {
-            var b = document.createElement('button');
-            var active = r.k === _draftRoleFilter;
-            b.style.cssText = 'padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;border:1px solid rgba(155,89,182,'+(active?'0.7':'0.25')+');background:rgba(109,63,245,'+(active?'0.3':'0.06')+');color:'+(active?'#fff':'rgba(255,255,255,0.5)')+';';
-            b.textContent = r.l;
-            b.onclick = function(){ _draftRoleFilter = r.k; draftBuildRoleFilter(); draftBuildGrid((document.getElementById('draftSearch')||{}).value||''); };
-            el.appendChild(b);
-        });
-    }
-
-    window.draftFilterGrid = function() {
-        var q = (document.getElementById('draftSearch')||{}).value || '';
-        draftBuildGrid(q.toLowerCase());
-    };
-
-    function draftBuildGrid(q) {
-        var grid = document.getElementById('draftGrid');
-        if(!grid || !raw.length) return;
-        grid.innerHTML = '';
-        var allPicked = _draftSlotsL.concat(_draftSlotsR).filter(Boolean);
-        var list = raw.filter(function(c) {
-            if(q && !c.name.toLowerCase().includes(q)) return false;
-            if(_draftRoleFilter !== 'all' && !c.is[_draftRoleFilter]) return false;
-            return true;
-        });
-        list.forEach(function(c) {
-            var isPicked = allPicked.includes(c.name);
-            var isActiveChamp = false;
-            if(_draftActiveSlot) {
-                var arr = _draftActiveSlot.side==='left' ? _draftSlotsL : _draftSlotsR;
-                isActiveChamp = arr[_draftActiveSlot.idx] === c.name;
-            }
-            var wrap = document.createElement('div');
-            wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:2px;cursor:'+(isPicked?'default':'pointer')+';padding:3px;border-radius:8px;border:2px solid '+(isActiveChamp?'#b96fff':'transparent')+';background:'+(isActiveChamp?'rgba(109,63,245,0.2)':'transparent')+';opacity:'+(isPicked&&!isActiveChamp?'0.28':'1')+';transition:all 0.12s;';
-            var img = document.createElement('img');
-            img.src = champIcon(c.name);
-            img.style.cssText = 'width:48px;height:48px;border-radius:8px;object-fit:cover;';
-            img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
-            var nm = document.createElement('div');
-            nm.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.45);text-align:center;line-height:1.1;width:52px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
-            nm.textContent = c.name;
-            wrap.appendChild(img); wrap.appendChild(nm);
-            if(!isPicked) {
-                wrap.onmouseenter = function(){ this.style.borderColor='#b96fff'; this.style.background='rgba(109,63,245,0.15)'; };
-                wrap.onmouseleave = function(){ this.style.borderColor='transparent'; this.style.background=''; };
-                wrap.onclick = function() { draftPickChamp(c.name); };
-            }
-            grid.appendChild(wrap);
-        });
-    }
 
     function draftBuildSlots() {
         function buildSide(slotsArr, side) {
@@ -2035,29 +1975,30 @@
             for(var i=0;i<5;i++) {
                 (function(idx){
                     var champ = slotsArr[idx];
-                    var isActive = _draftActiveSlot && _draftActiveSlot.side === side && _draftActiveSlot.idx === idx;
                     var slot = document.createElement('div');
-                    slot.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:9px;cursor:pointer;border:2px solid '+(isActive?'#b96fff':(champ?teamColor:'rgba(155,89,182,0.12)'))+';background:'+(isActive?'rgba(109,63,245,0.2)':(champ?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.02)'))+';transition:all 0.12s;min-height:42px;position:relative;';
+                    slot.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:9px;cursor:pointer;border:2px solid '+(champ?teamColor:'rgba(155,89,182,0.12)')+';background:'+(champ?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.02)')+';transition:all 0.12s;min-height:36px;position:relative;';
+                    slot.onmouseenter = function(){ if(!champ) this.style.borderColor='rgba(155,89,182,0.4)'; };
+                    slot.onmouseleave = function(){ if(!champ) this.style.borderColor='rgba(155,89,182,0.12)'; };
                     if(champ) {
                         var img = document.createElement('img');
                         img.src = champIcon(champ);
-                        img.style.cssText = 'width:30px;height:30px;border-radius:6px;object-fit:cover;flex-shrink:0;';
+                        img.style.cssText = 'width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;';
                         img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
                         var nm = document.createElement('div');
-                        nm.style.cssText = 'font-size:11px;font-weight:700;color:#fff;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
+                        nm.style.cssText = 'font-size:10px;font-weight:700;color:#fff;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
                         nm.textContent = champ;
                         var x = document.createElement('button');
                         x.textContent = '×';
-                        x.style.cssText = 'background:none;border:none;color:rgba(255,255,255,0.3);font-size:15px;cursor:pointer;padding:0 2px;flex-shrink:0;line-height:1;';
+                        x.style.cssText = 'background:none;border:none;color:rgba(255,255,255,0.3);font-size:14px;cursor:pointer;padding:0 2px;flex-shrink:0;line-height:1;';
                         x.onclick = function(e){ e.stopPropagation(); draftClearSlot(side, idx); };
                         slot.appendChild(img); slot.appendChild(nm); slot.appendChild(x);
                     } else {
                         var numBadge = document.createElement('div');
-                        numBadge.style.cssText = 'width:22px;height:22px;border-radius:50%;background:'+(isActive?'rgba(109,63,245,0.5)':'rgba(255,255,255,0.06)')+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:'+(isActive?'#fff':'rgba(255,255,255,0.25)')+';flex-shrink:0;';
+                        numBadge.style.cssText = 'width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,0.25);flex-shrink:0;';
                         numBadge.textContent = idx+1;
                         var ph = document.createElement('div');
-                        ph.style.cssText = 'font-size:10px;color:'+(isActive?'#b96fff':'rgba(255,255,255,0.2)')+';font-weight:'+(isActive?'700':'400')+';font-style:'+(isActive?'normal':'italic')+';';
-                        ph.textContent = isActive ? '← выбери чемпиона' : 'пусто';
+                        ph.style.cssText = 'font-size:9px;color:rgba(255,255,255,0.2);font-style:italic;';
+                        ph.textContent = 'нажми для выбора';
                         slot.appendChild(numBadge); slot.appendChild(ph);
                     }
                     slot.onclick = function() { draftSetActiveSlot(side, idx); };
@@ -2070,53 +2011,36 @@
     }
 
     function draftSetActiveSlot(side, idx) {
-        if(_draftActiveSlot && _draftActiveSlot.side===side && _draftActiveSlot.idx===idx) {
-            _draftActiveSlot = null; // deselect if clicking same slot
-        } else {
-            _draftActiveSlot = {side:side, idx:idx};
-        }
+        _draftActiveSlot = {side:side, idx:idx};
         draftBuildSlots();
+        var allPicked = _draftSlotsL.concat(_draftSlotsR).filter(Boolean);
+        openChampPicker('⚔ Выбери чемпиона', function(c) {
+            draftPickChamp(c.name);
+        }, {
+            getExcluded: function() { return allPicked; }
+        });
     }
 
     function draftPickChamp(name) {
-        if(!_draftActiveSlot) {
-            for(var i=0;i<5;i++){ if(!_draftSlotsL[i]){ _draftActiveSlot={side:'left',idx:i}; break; } }
-            if(!_draftActiveSlot){
-                for(var j=0;j<5;j++){ if(!_draftSlotsR[j]){ _draftActiveSlot={side:'right',idx:j}; break; } }
-            }
-            if(!_draftActiveSlot) return;
-        }
+        if(!_draftActiveSlot) return;
         var side = _draftActiveSlot.side, idx = _draftActiveSlot.idx;
         if(side==='left') _draftSlotsL[idx]=name;
         else _draftSlotsR[idx]=name;
-        // Advance to next empty slot same side, else other side
         _draftActiveSlot = null;
-        function findNext(arr, startIdx, s) {
-            for(var k=startIdx+1;k<5;k++){ if(!arr[k]) return {side:s,idx:k}; }
-            return null;
-        }
-        var arr = side==='left' ? _draftSlotsL : _draftSlotsR;
-        _draftActiveSlot = findNext(arr, idx, side);
-        if(!_draftActiveSlot) {
-            var otherSide = side==='left'?'right':'left';
-            var otherArr = side==='left'?_draftSlotsR:_draftSlotsL;
-            for(var m=0;m<5;m++){ if(!otherArr[m]){ _draftActiveSlot={side:otherSide,idx:m}; break; } }
-        }
         draftBuildSlots();
-        draftBuildGrid((document.getElementById('draftSearch')||{}).value||'');
         draftRenderPanels();
     }
 
     window.draftClearAll = function() {
         _draftSlotsL=[null,null,null,null,null]; _draftSlotsR=[null,null,null,null,null]; _draftActiveSlot=null;
-        draftBuildSlots(); draftBuildGrid(''); draftRenderPanels();
+        draftBuildSlots(); draftRenderPanels();
     };
 
     function draftClearSlot(side, idx) {
         if(side==='left') _draftSlotsL[idx]=null;
         else _draftSlotsR[idx]=null;
-        _draftActiveSlot={side:side,idx:idx};
-        draftBuildSlots(); draftBuildGrid((document.getElementById('draftSearch')||{}).value||''); draftRenderPanels();
+        _draftActiveSlot=null;
+        draftBuildSlots(); draftRenderPanels();
     }
 
     function draftRenderPanels() {
@@ -2125,29 +2049,53 @@
             var cm={}, sm={};
             picked.forEach(function(n){
                 var d=getDraftData(n); if(!d) return;
-                (d.counters||[]).forEach(function(c){ if(picked.includes(c.n)) return; if(!cm[c.n]) cm[c.n]={stars:0,from:[]}; cm[c.n].stars=Math.max(cm[c.n].stars,c.s); cm[c.n].from.push(n); });
-                (d.synergies||[]).forEach(function(s){ if(picked.includes(s.n)) return; if(!sm[s.n]) sm[s.n]={stars:0,from:[]}; sm[s.n].stars=Math.max(sm[s.n].stars,s.s); sm[s.n].from.push(n); });
+                (d.counters||[]).forEach(function(c){ if(picked.indexOf(c.n)!==-1) return; if(!cm[c.n]) cm[c.n]={stars:0,from:[]}; cm[c.n].stars=Math.max(cm[c.n].stars,c.s); cm[c.n].from.push(n); });
+                (d.synergies||[]).forEach(function(s){ if(picked.indexOf(s.n)!==-1) return; if(!sm[s.n]) sm[s.n]={stars:0,from:[]}; sm[s.n].stars=Math.max(sm[s.n].stars,s.s); sm[s.n].from.push(n); });
             });
             return {cm:cm,sm:sm,picked:picked};
         }
-        function html(map, isCounter) {
+        function renderMap(map, color) {
             var e=Object.keys(map).map(function(n){return{name:n,stars:map[n].stars,from:map[n].from};});
             e.sort(function(a,b){return b.stars-a.stars||b.from.length-a.from.length;});
             if(!e.length) return '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">—</div>';
-            return e.slice(0,8).map(function(x){
-                var sc = isCounter?(x.stars===3?'#e74c3c':x.stars===2?'#e8820a':'#f1c40f'):(x.from.length>=2?'#b96fff':'#2ecc71');
-                var st=Array(x.stars).fill('<span style="color:'+sc+'">★</span>').join('')+Array(3-x.stars).fill('<span style="color:rgba(255,255,255,0.1)">☆</span>').join('');
+            return e.slice(0,10).map(function(x){
+                var st=Array(x.stars).fill('<span style="color:'+color+'">★</span>').join('')+Array(3-x.stars).fill('<span style="color:rgba(255,255,255,0.1)">☆</span>').join('');
                 return '<div style="display:flex;align-items:center;gap:6px;padding:5px 6px;background:rgba(255,255,255,0.03);border-radius:7px;margin-bottom:3px;"><img src="'+champIcon(x.name)+'" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;" onerror="this.style.background=&quot;rgba(109,63,245,0.3)&quot;"><div style="flex:1;min-width:0;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+x.name+'</div><div style="font-size:11px;flex-shrink:0;">'+st+'</div></div>';
             }).join('');
         }
-        var L=compute(_draftSlotsL), R=compute(_draftSlotsR);
-        var empty='<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">—</div>';
-        ['Left','Right'].forEach(function(side){
-            var data = side==='Left'?L:R;
-            var cEl=document.getElementById('draftCounters'+side), sEl=document.getElementById('draftSynergies'+side);
-            if(cEl) cEl.innerHTML = data.picked.length ? html(data.cm,true) : empty;
-            if(sEl) sEl.innerHTML = data.picked.length ? html(data.sm,false) : empty;
+
+        var allPicked = _draftSlotsL.concat(_draftSlotsR).filter(Boolean);
+        var L = compute(_draftSlotsL);
+        var R = compute(_draftSlotsR);
+        var hasAny = L.picked.length || R.picked.length;
+        var empty = '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">Выбери чемпиона</div>';
+
+        // GOOD PICK = counters to enemy picks (R.cm) + synergies with our picks (L.sm), combined
+        var goodMap = {};
+        Object.keys(R.cm).forEach(function(n) {
+            if(allPicked.indexOf(n)!==-1) return;
+            if(!goodMap[n]) goodMap[n]={stars:0,from:[]};
+            goodMap[n].stars = Math.max(goodMap[n].stars, R.cm[n].stars);
+            goodMap[n].from = goodMap[n].from.concat(R.cm[n].from);
         });
+        Object.keys(L.sm).forEach(function(n) {
+            if(allPicked.indexOf(n)!==-1) return;
+            if(!goodMap[n]) goodMap[n]={stars:0,from:[]};
+            goodMap[n].stars = Math.max(goodMap[n].stars, L.sm[n].stars);
+            goodMap[n].from = goodMap[n].from.concat(L.sm[n].from);
+        });
+
+        // DANGER = counters to our picks (L.cm) — what enemy could pick to hurt us
+        var dangerMap = {};
+        Object.keys(L.cm).forEach(function(n) {
+            if(allPicked.indexOf(n)!==-1) return;
+            dangerMap[n] = L.cm[n];
+        });
+
+        var gpEl = document.getElementById('draftGoodPick');
+        var dgEl = document.getElementById('draftDanger');
+        if(gpEl) gpEl.innerHTML = hasAny ? renderMap(goodMap, '#2ecc71') : empty;
+        if(dgEl) dgEl.innerHTML = hasAny ? renderMap(dangerMap, '#e74c3c') : empty;
     }
 
     // ══ UNIVERSAL CHAMPION PICKER ══

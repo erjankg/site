@@ -493,7 +493,7 @@ overflow: hidden;
 /* BACK BTN — всегда фиксирован к viewport внутри открытой модалки */
 .m-mask.active .btn-close-x {
 position: fixed !important;
-top: 18px !important;
+top: calc(18px + env(safe-area-inset-top, 0px)) !important;
 left: 18px !important;
 z-index: 9999 !important;
 }

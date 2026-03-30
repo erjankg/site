@@ -692,76 +692,46 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ DRAFT MODAL ══ -->
 <div class="m-mask" id="draftMask" onclick="if(event.target===this)closeDraft()">
-  <div style="width:100vw;height:100vh;background:linear-gradient(135deg,#1a0d2e 0%,#0f0520 100%);display:flex;flex-direction:column;overflow:hidden;position:relative;">
+  <div style="width:100vw;height:100dvh;background:linear-gradient(135deg,#1a0d2e 0%,#0f0520 100%);display:flex;flex-direction:column;overflow:hidden;position:relative;padding-top:env(safe-area-inset-top,0px);box-sizing:border-box;">
 
     <!-- X button -->
-    <button class="btn-close-x" onclick="closeDraft()" style="position:fixed;top:14px;left:14px;z-index:9999;">←</button>
+    <button class="btn-close-x" onclick="closeDraft()">←</button>
 
-    <!-- Header -->
-    <div style="padding:12px 60px 10px 20px;border-bottom:1px solid rgba(155,89,182,0.2);flex-shrink:0;display:flex;align-items:center;gap:12px;">
+    <!-- Header (no filter) -->
+    <div style="padding:10px 60px 10px 60px;border-bottom:1px solid rgba(155,89,182,0.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;">
       <div style="font-size:16px;font-weight:900;color:#b96fff;">📋 Драфт-помощник</div>
-      <!-- Search + role filter in header -->
-      <input id="draftSearch" type="text" placeholder="🔍 Поиск чемпиона..." class="calc-input"
-        style="font-size:12px;padding:6px 12px;max-width:200px;" oninput="draftFilterGrid()">
-      <div id="draftRoleFilter" style="display:flex;gap:4px;flex-wrap:nowrap;"></div>
     </div>
 
-    <!-- Main 3-column body -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;flex:1;overflow:hidden;min-height:0;gap:0;">
-
-      <!-- ═══ LEFT TEAM ═══ -->
-      <div style="display:flex;flex-direction:column;border-right:1px solid rgba(155,89,182,0.15);overflow:hidden;">
-        <!-- Counter-picks panel TOP -->
-        <div style="flex:1;overflow-y:auto;padding:10px 12px;border-bottom:1px solid rgba(155,89,182,0.12);">
-          <div style="font-size:9px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:6px;">🔴 КОНТР-ПИКИ</div>
-          <div id="draftCountersLeft" style="display:flex;flex-direction:column;gap:4px;">
-            <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
-          </div>
-        </div>
-        <!-- 5 pick slots -->
-        <div style="padding:8px 12px;display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
-          <div style="font-size:9px;color:rgba(93,173,226,0.8);font-weight:700;letter-spacing:1px;margin-bottom:2px;">🔵 СИНЯЯ КОМАНДА</div>
-          <div id="draftSlotsLeft" style="display:flex;flex-direction:column;gap:5px;"></div>
-        </div>
-        <!-- Synergies panel BOTTOM -->
-        <div style="flex:1;overflow-y:auto;padding:10px 12px;border-top:1px solid rgba(155,89,182,0.12);">
-          <div style="font-size:9px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:6px;">🟢 КОМБО</div>
-          <div id="draftSynergiesLeft" style="display:flex;flex-direction:column;gap:4px;">
-            <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
-          </div>
-        </div>
+    <!-- Slots row: 2 columns -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid rgba(155,89,182,0.2);flex-shrink:0;">
+      <!-- Left: Our team -->
+      <div style="padding:8px 10px;border-right:1px solid rgba(155,89,182,0.15);">
+        <div style="font-size:9px;color:rgba(93,173,226,0.8);font-weight:700;letter-spacing:1px;margin-bottom:5px;">🔵 МОЯ КОМАНДА</div>
+        <div id="draftSlotsLeft" style="display:flex;flex-direction:column;gap:4px;"></div>
       </div>
-
-      <!-- ═══ CENTER: Champion picker ═══ -->
-      <div style="display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(155,89,182,0.15);">
-        <div style="font-size:9px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;padding:8px 12px 6px;flex-shrink:0;">⚔ ВСЕ ЧЕМПИОНЫ</div>
-        <div id="draftGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:5px;overflow-y:auto;flex:1;padding:4px 10px 10px;align-content:start;"></div>
+      <!-- Right: Enemy team -->
+      <div style="padding:8px 10px;">
+        <div style="font-size:9px;color:rgba(231,76,60,0.8);font-weight:700;letter-spacing:1px;margin-bottom:5px;">🔴 ПРОТИВНИКИ</div>
+        <div id="draftSlotsRight" style="display:flex;flex-direction:column;gap:4px;"></div>
       </div>
-
-      <!-- ═══ RIGHT TEAM ═══ -->
-      <div style="display:flex;flex-direction:column;overflow:hidden;">
-        <!-- Counter-picks panel TOP -->
-        <div style="flex:1;overflow-y:auto;padding:10px 12px;border-bottom:1px solid rgba(155,89,182,0.12);">
-          <div style="font-size:9px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:6px;">🔴 КОНТР-ПИКИ</div>
-          <div id="draftCountersRight" style="display:flex;flex-direction:column;gap:4px;">
-            <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
-          </div>
-        </div>
-        <!-- 5 pick slots -->
-        <div style="padding:8px 12px;display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
-          <div style="font-size:9px;color:rgba(231,76,60,0.8);font-weight:700;letter-spacing:1px;margin-bottom:2px;">🔴 КРАСНАЯ КОМАНДА</div>
-          <div id="draftSlotsRight" style="display:flex;flex-direction:column;gap:5px;"></div>
-        </div>
-        <!-- Synergies panel BOTTOM -->
-        <div style="flex:1;overflow-y:auto;padding:10px 12px;border-top:1px solid rgba(155,89,182,0.12);">
-          <div style="font-size:9px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:6px;">🟢 КОМБО</div>
-          <div id="draftSynergiesRight" style="display:flex;flex-direction:column;gap:4px;">
-            <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
-          </div>
-        </div>
-      </div>
-
     </div>
+
+    <!-- GOOD PICK panel -->
+    <div style="flex:1;overflow-y:auto;padding:10px 12px;border-bottom:1px solid rgba(155,89,182,0.15);min-height:0;">
+      <div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:6px;">✅ GOOD PICK</div>
+      <div id="draftGoodPick" style="display:flex;flex-direction:column;gap:4px;">
+        <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
+      </div>
+    </div>
+
+    <!-- DANGER panel -->
+    <div style="flex:1;overflow-y:auto;padding:10px 12px;min-height:0;">
+      <div style="font-size:10px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:6px;">☠ DANGER</div>
+      <div id="draftDanger" style="display:flex;flex-direction:column;gap:4px;">
+        <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
+      </div>
+    </div>
+
   </div>
 </div>
 
