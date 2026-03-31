@@ -467,6 +467,8 @@ display: flex;
 align-items: center;
 justify-content: center;
 animation: fadeIn 0.25s ease;
+padding-top: env(safe-area-inset-top, 0px);
+padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 /* Champions modal — pinned to top */
 #sideChampsMask.active {
@@ -496,6 +498,7 @@ display: flex;
 align-items: center;
 gap: 8px;
 padding: 10px 12px;
+padding-top: max(10px, env(safe-area-inset-top, 10px));
 border-bottom: 1px solid rgba(155,89,182,0.15);
 flex-shrink: 0;
 position: sticky;
