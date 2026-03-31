@@ -490,12 +490,25 @@ box-shadow: 0 24px 70px rgba(0,0,0,0.85);
 overflow: hidden;
 }
 
-/* BACK BTN — всегда фиксирован к viewport внутри открытой модалки */
-.m-mask.active .btn-close-x {
-position: fixed !important;
-top: calc(18px + env(safe-area-inset-top, 0px)) !important;
-left: 18px !important;
-z-index: 9999 !important;
+/* MODAL HEADER — flex row with back btn + title */
+.mhdr {
+display: flex;
+align-items: center;
+gap: 8px;
+padding: 10px 12px;
+border-bottom: 1px solid rgba(155,89,182,0.15);
+flex-shrink: 0;
+position: sticky;
+top: 0;
+z-index: 5;
+background: linear-gradient(135deg,#1a0d2e 0%,#0f0520 100%);
+}
+.mhdr-t {
+font-size: 15px;
+font-weight: 900;
+color: #b96fff;
+flex: 1;
+min-width: 0;
 }
 
 .btn-close-x {
@@ -711,7 +724,7 @@ background: rgba(109,63,245,0.15);
 }
 
 /* BODY SCROLL LOCK */
-body.modal-open { overflow: hidden !important; touch-action: none; }
+body.modal-open { overflow: hidden !important; touch-action: none; position: fixed; inset: 0; width: 100%; }
 body.sidebar-open { overflow: hidden !important; touch-action: none; position: fixed; inset: 0; width: 100%; }
 
 /* SCROLLBAR — hidden */

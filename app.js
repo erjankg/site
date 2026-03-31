@@ -2875,15 +2875,7 @@
     // ═══════════════════════════════════════
     var _chatListener = null;
     var _chatMessages = [];
-    var _chatView = 'global'; // 'global' | 'dmList' | 'dm'
-    var _dmListener = null;
-    var _dmPartnerUid = null;
-    var _dmPartnerName = '';
     var _allUsers = [];
-    var _myFriends = [];
-    var _myFriendReqs = [];
-    var _mySentReqs = [];
-    var _unreadDmCount = 0;
 
     function updateChatUI(loggedIn) {
         var inputArea = document.getElementById('chatInputArea');
@@ -2893,13 +2885,9 @@
     }
 
     // ═══ OPEN / CLOSE ═══
-    window.openChatSystem = function(tab) {
+    window.openChatSystem = function() {
         openModal('chatSystemMask');
-        if (tab === 'users' || tab === 'dmList') {
-            switchToDmList();
-        } else {
-            switchToGlobal();
-        }
+        switchToGlobal();
         loadUsersToSidebar();
         fixMobileKeyboard();
     };
@@ -2908,8 +2896,6 @@
     window.closeChatSystem = function() {
         closeModal('chatSystemMask');
         if (_chatListener) { _chatListener(); _chatListener = null; }
-        if (_dmListener) { _dmListener(); _dmListener = null; }
-        _dmPartnerUid = null;
         var sb = document.getElementById('tgSidebar');
         if (sb) sb.classList.remove('mobile-open');
         var mask = document.getElementById('chatSystemMask');
