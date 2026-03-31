@@ -2043,6 +2043,17 @@
         draftBuildSlots(); draftRenderPanels();
     }
 
+    function getChampTierStar(name) {
+        var isSplus = false, isS = false;
+        _TIER_ROLES_LIST.forEach(function(r) {
+            if(TIER_DATA[r] && TIER_DATA[r]['S+'] && TIER_DATA[r]['S+'].indexOf(name) !== -1) isSplus = true;
+            if(TIER_DATA[r] && TIER_DATA[r]['S'] && TIER_DATA[r]['S'].indexOf(name) !== -1) isS = true;
+        });
+        if(isSplus) return 'red';
+        if(isS) return 'green';
+        return null;
+    }
+
     function draftRenderPanels() {
         function compute(slots) {
             var picked = slots.filter(Boolean);
@@ -2054,18 +2065,32 @@
             });
             return {cm:cm,sm:sm,picked:picked};
         }
-        function renderMap(map, color) {
-            var e=Object.keys(map).map(function(n){return{name:n,stars:map[n].stars,from:map[n].from};});
-            e.sort(function(a,b){return b.stars-a.stars||b.from.length-a.from.length;});
+        function renderMap(map) {
+            var e = Object.keys(map).map(function(n) {
+                return {name:n, counterFrom:map[n].counterFrom, synergyFrom:map[n].synergyFrom};
+            });
+            e.sort(function(a,b) {
+                return (b.counterFrom.length+b.synergyFrom.length) - (a.counterFrom.length+a.synergyFrom.length);
+            });
             if(!e.length) return '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">—</div>';
-            var wrap = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;">';
-            wrap += e.slice(0,20).map(function(x){
-                var stars = Array(x.stars).fill('★').join('');
-                return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border-radius:8px;background:rgba(255,255,255,0.03);position:relative;">'
-                    +'<img src="'+champIcon(x.name)+'" style="width:44px;height:44px;border-radius:7px;object-fit:cover;" onerror="this.style.background=\'rgba(109,63,245,0.3)\'">'
-                    +'<div style="font-size:7px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0 2px;">'+x.name+'</div>'
-                    +(stars?'<div style="font-size:9px;color:'+color+';line-height:1;">'+stars+'</div>':'')
-                    +'</div>';
+            var wrap = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:4px;">';
+            wrap += e.slice(0,20).map(function(x) {
+                var stars = [];
+                if(x.counterFrom.length === 1) stars.push('#2ecc71');
+                else if(x.counterFrom.length > 1) stars.push('#e74c3c');
+                if(x.synergyFrom.length === 1) stars.push('#2ecc71');
+                else if(x.synergyFrom.length > 1) stars.push('#e74c3c');
+                var ts = getChampTierStar(x.name);
+                if(ts) stars.push(ts === 'red' ? '#e74c3c' : '#2ecc71');
+                var starsHtml = stars.length
+                    ? '<div style="position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:center;gap:1px;pointer-events:none;">'
+                      + stars.map(function(c){ return '<span style="font-size:8px;color:'+c+';line-height:1;text-shadow:0 1px 3px #000;">★</span>'; }).join('')
+                      + '</div>'
+                    : '';
+                return '<div style="position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;overflow:hidden;">'
+                    + '<img src="'+champIcon(x.name)+'" style="width:44px;height:44px;border-radius:7px;object-fit:cover;display:block;" onerror="this.style.background=\'rgba(109,63,245,0.3)\'">'
+                    + starsHtml
+                    + '</div>';
             }).join('');
             wrap += '</div>';
             return wrap;
@@ -2077,32 +2102,36 @@
         var hasAny = L.picked.length || R.picked.length;
         var empty = '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">Выбери чемпиона</div>';
 
-        // GOOD PICK = counters to enemy picks (R.cm) + synergies with our picks (L.sm), combined
+        // GOOD PICK = counters to enemy picks (R.cm) + synergies with our picks (L.sm)
         var goodMap = {};
         Object.keys(R.cm).forEach(function(n) {
             if(allPicked.indexOf(n)!==-1) return;
-            if(!goodMap[n]) goodMap[n]={stars:0,from:[]};
-            goodMap[n].stars = Math.max(goodMap[n].stars, R.cm[n].stars);
-            goodMap[n].from = goodMap[n].from.concat(R.cm[n].from);
+            if(!goodMap[n]) goodMap[n]={counterFrom:[],synergyFrom:[]};
+            goodMap[n].counterFrom = goodMap[n].counterFrom.concat(R.cm[n].from);
         });
         Object.keys(L.sm).forEach(function(n) {
             if(allPicked.indexOf(n)!==-1) return;
-            if(!goodMap[n]) goodMap[n]={stars:0,from:[]};
-            goodMap[n].stars = Math.max(goodMap[n].stars, L.sm[n].stars);
-            goodMap[n].from = goodMap[n].from.concat(L.sm[n].from);
+            if(!goodMap[n]) goodMap[n]={counterFrom:[],synergyFrom:[]};
+            goodMap[n].synergyFrom = goodMap[n].synergyFrom.concat(L.sm[n].from);
         });
 
-        // DANGER = counters to our picks (L.cm) — what enemy could pick to hurt us
+        // DANGER = counters to our picks (L.cm) + synergies with enemy picks (R.sm)
         var dangerMap = {};
         Object.keys(L.cm).forEach(function(n) {
             if(allPicked.indexOf(n)!==-1) return;
-            dangerMap[n] = L.cm[n];
+            if(!dangerMap[n]) dangerMap[n]={counterFrom:[],synergyFrom:[]};
+            dangerMap[n].counterFrom = dangerMap[n].counterFrom.concat(L.cm[n].from);
+        });
+        Object.keys(R.sm).forEach(function(n) {
+            if(allPicked.indexOf(n)!==-1) return;
+            if(!dangerMap[n]) dangerMap[n]={counterFrom:[],synergyFrom:[]};
+            dangerMap[n].synergyFrom = dangerMap[n].synergyFrom.concat(R.sm[n].from);
         });
 
         var gpEl = document.getElementById('draftGoodPick');
         var dgEl = document.getElementById('draftDanger');
-        if(gpEl) gpEl.innerHTML = hasAny ? renderMap(goodMap, '#2ecc71') : empty;
-        if(dgEl) dgEl.innerHTML = hasAny ? renderMap(dangerMap, '#e74c3c') : empty;
+        if(gpEl) gpEl.innerHTML = hasAny ? renderMap(goodMap) : empty;
+        if(dgEl) dgEl.innerHTML = hasAny ? renderMap(dangerMap) : empty;
     }
 
     // ══ UNIVERSAL CHAMPION PICKER ══
@@ -2132,8 +2161,33 @@
         var doneBtn = document.getElementById('champPickerDoneBtn');
         if(doneBtn) doneBtn.style.display = _champPickerMulti ? '' : 'none';
         var rolesEl = document.getElementById('champPickerRoles');
-        // Hide role filter for all types — champs filtered by role silently (like items by category)
-        if(rolesEl) rolesEl.style.display = 'none';
+        if(rolesEl) {
+            if(_champPickerType === 'champs') {
+                var rolesList = [
+                    {k:'all', l:'Все'}, {k:'Top', l:'Топ'}, {k:'Jungle', l:'Джунгли'},
+                    {k:'Mid', l:'Мид'}, {k:'ADC', l:'ADC'}, {k:'Support', l:'Суп'}
+                ];
+                rolesEl.innerHTML = '';
+                rolesList.forEach(function(r) {
+                    var btn = document.createElement('button');
+                    btn.textContent = r.l;
+                    btn.style.cssText = 'padding:4px 10px;border-radius:16px;border:1px solid rgba(185,111,255,0.35);background:' + (_champPickerRole===r.k?'rgba(109,63,245,0.5)':'rgba(255,255,255,0.06)') + ';color:' + (_champPickerRole===r.k?'#fff':'rgba(255,255,255,0.6)') + ';font-size:11px;cursor:pointer;transition:all 0.12s;';
+                    btn.onclick = function() {
+                        _champPickerRole = r.k;
+                        Array.from(rolesEl.children).forEach(function(b, i) {
+                            var active = rolesList[i].k === _champPickerRole;
+                            b.style.background = active ? 'rgba(109,63,245,0.5)' : 'rgba(255,255,255,0.06)';
+                            b.style.color = active ? '#fff' : 'rgba(255,255,255,0.6)';
+                        });
+                        champPickerBuildGrid();
+                    };
+                    rolesEl.appendChild(btn);
+                });
+                rolesEl.style.display = 'flex';
+            } else {
+                rolesEl.style.display = 'none';
+            }
+        }
         openModal('champPickerModal');
         champPickerBuildGrid();
     };
