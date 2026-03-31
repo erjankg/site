@@ -2065,13 +2065,19 @@
             });
             return {cm:cm,sm:sm,picked:picked};
         }
+        function starScore(x) {
+            var s = 0;
+            if(x.counterFrom.length === 1) s += 1; else if(x.counterFrom.length > 1) s += 2;
+            if(x.synergyFrom.length === 1) s += 1; else if(x.synergyFrom.length > 1) s += 2;
+            var ts = getChampTierStar(x.name);
+            if(ts === 'red') s += 2; else if(ts) s += 1;
+            return s;
+        }
         function renderMap(map) {
             var e = Object.keys(map).map(function(n) {
                 return {name:n, counterFrom:map[n].counterFrom, synergyFrom:map[n].synergyFrom};
             });
-            e.sort(function(a,b) {
-                return (b.counterFrom.length+b.synergyFrom.length) - (a.counterFrom.length+a.synergyFrom.length);
-            });
+            e.sort(function(a,b) { return starScore(b) - starScore(a); });
             if(!e.length) return '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">—</div>';
             var wrap = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:4px;">';
             wrap += e.slice(0,20).map(function(x) {
@@ -2083,11 +2089,11 @@
                 var ts = getChampTierStar(x.name);
                 if(ts) stars.push(ts === 'red' ? '#e74c3c' : '#2ecc71');
                 var starsHtml = stars.length
-                    ? '<div style="position:absolute;bottom:2px;left:0;right:0;display:flex;justify-content:center;gap:1px;pointer-events:none;">'
+                    ? '<div style="display:flex;justify-content:center;gap:1px;margin-top:2px;">'
                       + stars.map(function(c){ return '<span style="font-size:8px;color:'+c+';line-height:1;text-shadow:0 1px 3px #000;">★</span>'; }).join('')
                       + '</div>'
-                    : '';
-                return '<div style="position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:7px;overflow:hidden;">'
+                    : '<div style="height:12px;"></div>';
+                return '<div style="display:inline-flex;flex-direction:column;align-items:center;">'
                     + '<img src="'+champIcon(x.name)+'" style="width:44px;height:44px;border-radius:7px;object-fit:cover;display:block;" onerror="this.style.background=\'rgba(109,63,245,0.3)\'">'
                     + starsHtml
                     + '</div>';
