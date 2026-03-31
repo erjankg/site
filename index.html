@@ -826,17 +826,27 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ PROFILE SETUP MODAL ══ -->
 <div class="m-mask" id="profileSetupMask" onclick="if(event.target===this)closeProfileSetup()">
-  <div class="m-win" style="width:92vw;max-width:420px;max-height:85vh;padding:0;overflow-y:auto;">
-    <div style="padding:18px 20px 12px;border-bottom:1px solid rgba(155,89,182,0.15);">
-      <div style="font-size:18px;font-weight:900;color:#b96fff;margin-bottom:4px;">👤 Настройка профиля</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.35);">Выбери свою роль и ранг</div>
+  <div class="m-win" style="width:92vw;max-width:420px;max-height:88vh;padding:0;overflow-y:auto;">
+    <div class="mhdr">
+      <button class="btn-close-x" onclick="closeProfileSetup()">←</button>
+      <span class="mhdr-t">👤 Мой профиль</span>
     </div>
-    <div style="padding:16px 20px;">
+    <!-- Profile tabs -->
+    <div style="display:flex;border-bottom:1px solid rgba(155,89,182,0.15);">
+      <button id="profTabProfile" onclick="switchProfileTab('profile')" style="flex:1;padding:10px;background:rgba(109,63,245,0.15);border:none;color:#b96fff;font-size:12px;font-weight:800;cursor:pointer;border-bottom:2px solid #b96fff;">Профиль</button>
+      <button id="profTabData" onclick="switchProfileTab('data')" style="flex:1;padding:10px;background:transparent;border:none;color:rgba(255,255,255,0.4);font-size:12px;font-weight:800;cursor:pointer;border-bottom:2px solid transparent;">📋 Данные</button>
+    </div>
+    <!-- Profile tab content -->
+    <div id="profPanelProfile" style="padding:16px 20px;">
       <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;">ОСНОВНАЯ РОЛЬ</div>
       <div id="profileRoles" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;"></div>
       <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;">МАКСИМАЛЬНЫЙ РАНГ</div>
       <div id="profileRanks" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;"></div>
       <button onclick="saveProfile()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#6d3ff5,#9b59b6);color:#fff;font-size:14px;font-weight:900;cursor:pointer;">✓ Сохранить</button>
+    </div>
+    <!-- Data tab content -->
+    <div id="profPanelData" style="display:none;padding:16px 20px;">
+      <div id="profileDataContent"></div>
     </div>
   </div>
 </div>

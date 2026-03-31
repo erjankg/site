@@ -2565,6 +2565,10 @@
                 if (d.selectedChamps) {
                     try { localStorage.setItem('p', d.selectedChamps); } catch(e) {}
                 }
+                // Sync dataVisible flag
+                if (d.dataVisible !== undefined) {
+                    localStorage.setItem('dataVisible', String(d.dataVisible));
+                }
                 console.log('Loaded data from Firestore (server is newer)');
                 showSyncStatus('Загружено ✓');
             } else {
@@ -2859,7 +2863,6 @@
                 startPresence();
                 updateChatUI(true);
                 checkAdmin();
-                startDmNotifListener();
                 checkFirstLogin();
             } else {
                 stopPresence();
@@ -2903,52 +2906,12 @@
     };
     window.closeGlobalChat = window.closeChatSystem;
 
-    // ═══ TAB SWITCHING (right panel) ═══
-    window.switchToGlobal = function() {
-        _chatView = 'global';
-        if (_dmListener) { _dmListener(); _dmListener = null; }
-        _dmPartnerUid = null;
-        updateTabUI();
+    // ═══ OPEN GLOBAL CHAT ═══
+    function switchToGlobal() {
         startChatListener();
         renderGlobalChat();
-        var input = document.getElementById('chatInput');
-        if (input) input.placeholder = 'Написать сообщение...';
-        // Show back btn on mobile only if needed
-        var backBtn = document.getElementById('tgBackBtn');
-        if (backBtn) backBtn.style.display = 'none';
-    };
-
-    window.switchToDmList = function() {
-        _chatView = 'dmList';
-        if (_dmListener) { _dmListener(); _dmListener = null; }
-        _dmPartnerUid = null;
-        updateTabUI();
-        renderDmList();
-        var backBtn = document.getElementById('tgBackBtn');
-        if (backBtn) backBtn.style.display = 'none';
-    };
-
-    window.tgBackFromDm = function() {
-        if (_chatView === 'dm') {
-            switchToDmList();
-        }
-    };
-
-    function updateTabUI() {
-        var gTab = document.getElementById('tgTabGlobal');
-        var dTab = document.getElementById('tgTabDm');
-        var tabs = document.getElementById('tgChatTabs');
-        if (gTab) gTab.classList.toggle('active', _chatView === 'global');
-        if (dTab) dTab.classList.toggle('active', _chatView === 'dmList' || _chatView === 'dm');
-        // Show tabs or back btn
-        if (_chatView === 'dm') {
-            if (tabs) tabs.style.display = 'none';
-            var backBtn = document.getElementById('tgBackBtn');
-            if (backBtn) backBtn.style.display = '';
-        } else {
-            if (tabs) tabs.style.display = '';
-        }
     }
+    window.switchToGlobal = switchToGlobal;
 
     // ═══ MOBILE ═══
     window.tgMobileShowSidebar = function() {
@@ -2959,7 +2922,6 @@
         var sb = document.getElementById('tgSidebar');
         if (sb) sb.classList.remove('mobile-open');
     };
-    window.tgMobileBack = window.tgBackFromDm;
 
     function fixMobileKeyboard() {
         var vv = window.visualViewport;
@@ -2982,10 +2944,8 @@
         var container = document.getElementById('tgSidebarContent');
         if (!container) return;
         container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
-        loadFriends(function() {
-            loadAllUsers(function() {
+        loadAllUsers(function() {
                 renderUsersSidebar();
-            });
         });
     }
 
@@ -3058,27 +3018,6 @@
             info.innerHTML = nameHtml + statusHtml;
             card.appendChild(info);
 
-            // Friend status indicator
-            var isFriend = _myFriends.includes(u._uid);
-            var reqSent = _mySentReqs.includes(u._uid);
-            var reqReceived = _myFriendReqs.includes(u._uid);
-            if (isFriend) {
-                var friendBadge = document.createElement('div');
-                friendBadge.style.cssText = 'font-size:10px;color:#2ecc71;flex-shrink:0;font-weight:700;';
-                friendBadge.textContent = '✓';
-                card.appendChild(friendBadge);
-            } else if (reqReceived) {
-                var reqBadge = document.createElement('div');
-                reqBadge.style.cssText = 'font-size:10px;color:#ffd700;flex-shrink:0;font-weight:700;';
-                reqBadge.textContent = '📨';
-                card.appendChild(reqBadge);
-            } else if (reqSent) {
-                var sentBadge = document.createElement('div');
-                sentBadge.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.25);flex-shrink:0;font-weight:700;';
-                sentBadge.textContent = '⏳';
-                card.appendChild(sentBadge);
-            }
-
             container.appendChild(card);
         });
     }
@@ -3093,7 +3032,7 @@
             .onSnapshot(function(snap) {
                 _chatMessages = [];
                 snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; _chatMessages.push(d); });
-                if (_chatView === 'global') renderGlobalChat();
+                renderGlobalChat();
             }, function(err) {
                 console.warn('Chat listener error:', err);
                 if (err.code === 'permission-denied') {
@@ -3173,10 +3112,7 @@
     }
 
     // ═══ SEND MESSAGE ═══
-    window.tgSendMsg = function() {
-        if (_chatView === 'dm' && _dmPartnerUid) sendDmMsg();
-        else sendGlobalMsg();
-    };
+    window.tgSendMsg = function() { sendGlobalMsg(); };
 
     function sendGlobalMsg() {
         if (!db) { showToast('Firebase не подключён'); return; }
@@ -3219,359 +3155,16 @@
         db.collection('globalChat').doc(docId).delete().catch(function(e) { console.warn('Del err:', e); });
     }
 
-    // ═══ DM LIST ═══
-    function renderDmList() {
-        var container = document.getElementById('chatMessages');
-        if (!container) return;
-        container.innerHTML = '';
-        var inputArea = document.getElementById('chatInputArea');
-        if (inputArea) inputArea.style.display = 'none';
-        var loginPrompt = document.getElementById('chatLoginPrompt');
-        if (loginPrompt) loginPrompt.style.display = 'none';
+    // ═══ SEND MESSAGE ═══
+    window.tgSendMsg = function() { sendGlobalMsg(); };
 
-        if (!_currentUser) { container.innerHTML = '<div class="chat-login-msg">Войди чтобы видеть ЛС</div>'; return; }
-
-        // Show friend requests as cards at top
-        if (_myFriendReqs.length > 0) {
-            var reqHeader = document.createElement('div');
-            reqHeader.style.cssText = 'padding:8px 12px;font-size:11px;font-weight:800;color:#ffd700;letter-spacing:0.5px;';
-            reqHeader.textContent = '📨 ЗАПРОСЫ В ДРУЗЬЯ';
-            container.appendChild(reqHeader);
-
-            _myFriendReqs.forEach(function(uid) {
-                db.collection('users').doc(uid).get().then(function(doc) {
-                    if (!doc.exists) return;
-                    var u = doc.data(); u._uid = doc.id;
-                    var card = document.createElement('div');
-                    card.className = 'user-card';
-                    card.style.background = 'rgba(255,215,0,0.05)';
-                    card.style.borderColor = 'rgba(255,215,0,0.2)';
-
-                    var avWrap = document.createElement('div');
-                    avWrap.className = 'user-av-wrap';
-                    var av = document.createElement('div');
-                    av.className = 'user-av';
-                    if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
-                    else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
-                    avWrap.appendChild(av);
-                    card.appendChild(avWrap);
-
-                    var info = document.createElement('div');
-                    info.className = 'user-info';
-                    info.innerHTML = '<div class="user-name">'+(u.displayName||'???')+'</div><div class="user-email" style="color:#ffd700;">Хочет добавить в друзья</div>';
-                    card.appendChild(info);
-
-                    var actions = document.createElement('div');
-                    actions.className = 'user-actions';
-                    var accBtn = document.createElement('button');
-                    accBtn.className = 'user-act-btn'; accBtn.style.color = '#2ecc71';
-                    accBtn.textContent = '✓';
-                    accBtn.onclick = function(e) { e.stopPropagation(); acceptFriendRequest(u._uid); card.remove(); };
-                    actions.appendChild(accBtn);
-                    var decBtn = document.createElement('button');
-                    decBtn.className = 'user-act-btn'; decBtn.style.color = '#e74c3c';
-                    decBtn.textContent = '✕';
-                    decBtn.onclick = function(e) { e.stopPropagation(); declineFriendRequest(u._uid); card.remove(); };
-                    actions.appendChild(decBtn);
-                    card.appendChild(actions);
-                    container.insertBefore(card, container.children[1] || null);
-                });
-            });
-        }
-
-        // Show DM contacts (friends)
-        var contactUids = _isAdmin ? _allUsers.map(function(u){return u._uid;}).filter(function(uid){return uid!==_currentUser.uid;}) : _myFriends;
-        if (!contactUids.length && !_myFriendReqs.length) {
-            container.innerHTML = '<div class="chat-login-msg">Добавь друзей чтобы писать ЛС 👥</div>';
-            return;
-        }
-
-        if (contactUids.length > 0) {
-            var dmHeader = document.createElement('div');
-            dmHeader.style.cssText = 'padding:8px 12px;font-size:11px;font-weight:800;color:#b96fff;letter-spacing:0.5px;margin-top:6px;';
-            dmHeader.textContent = '✉ ДИАЛОГИ';
-            container.appendChild(dmHeader);
-
-            contactUids.forEach(function(uid) {
-                db.collection('users').doc(uid).get().then(function(doc) {
-                    if (!doc.exists) return;
-                    var u = doc.data(); u._uid = doc.id;
-                    var card = document.createElement('div');
-                    card.className = 'user-card';
-                    card.onclick = function() { openDmWithUser(u._uid, u.displayName || u.email); };
-
-                    var avWrap = document.createElement('div');
-                    avWrap.className = 'user-av-wrap';
-                    var av = document.createElement('div');
-                    av.className = 'user-av';
-                    if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
-                    else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
-                    avWrap.appendChild(av);
-                    card.appendChild(avWrap);
-
-                    var info = document.createElement('div');
-                    info.className = 'user-info';
-                    info.innerHTML = '<div class="user-name">'+(u.displayName||'???')+'</div><div class="user-email">Нажми чтобы написать</div>';
-                    card.appendChild(info);
-
-                    var arrow = document.createElement('div');
-                    arrow.style.cssText = 'color:rgba(255,255,255,0.15);font-size:18px;flex-shrink:0;';
-                    arrow.textContent = '›';
-                    card.appendChild(arrow);
-                    container.appendChild(card);
-                });
-            });
-        }
-    }
-
-    // ═══ DM CHAT ═══
-    function getDmRoomId(uid1, uid2) {
-        return uid1 < uid2 ? uid1 + '_' + uid2 : uid2 + '_' + uid1;
-    }
-
-    function openDmWithUser(uid, name) {
-        _dmPartnerUid = uid;
-        _dmPartnerName = name;
-        _chatView = 'dm';
-        updateTabUI();
-        startDmListener();
-        var input = document.getElementById('chatInput');
-        if (input) input.placeholder = 'Сообщение для ' + name + '...';
-        var inputArea = document.getElementById('chatInputArea');
-        if (inputArea && _currentUser) inputArea.style.display = 'flex';
-    }
-    window.openDmChat = openDmWithUser;
-
-    function startDmListener() {
-        if (_dmListener) { _dmListener(); _dmListener = null; }
-        if (!db || !_currentUser || !_dmPartnerUid) return;
-        var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
-        _dmListener = db.collection('dms').doc(roomId).collection('messages')
-            .orderBy('ts', 'asc').limitToLast(50)
-            .onSnapshot(function(snap) {
-                var msgs = [];
-                snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; msgs.push(d); });
-                renderDmMessages(msgs);
-            }, function(err) {
-                console.warn('DM listener error:', err);
-                if (err.code === 'permission-denied') {
-                    showToast('Нет доступа к ЛС. Проверьте Firestore Rules.');
-                }
-            });
-    }
-
-    function renderDmMessages(msgs) {
-        var container = document.getElementById('chatMessages');
-        if (!container) return;
-        container.innerHTML = '';
-        if (!msgs.length) { container.innerHTML = '<div class="chat-login-msg">Начни разговор! 👋</div>'; return; }
-        msgs.forEach(function(msg) {
-            var isMe = _currentUser && msg.uid === _currentUser.uid;
-            renderBubble(container, msg, isMe, false);
-        });
-        container.scrollTop = container.scrollHeight;
-    }
-
-    function sendDmMsg() {
-        if (!db) { showToast('Firebase не подключён'); return; }
-        if (!_currentUser) { showToast('Войди в аккаунт'); return; }
-        if (!_dmPartnerUid) return;
-        var input = document.getElementById('chatInput');
-        var text = (input.value || '').trim();
-        if (!text) return;
-        var sendBtn = document.querySelector('.chat-send');
-        if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = '0.5'; }
-        input.value = '';
-        var roomId = getDmRoomId(_currentUser.uid, _dmPartnerUid);
-        db.collection('dms').doc(roomId).collection('messages').add({
-            text: text,
-            name: _currentUser.displayName || _currentUser.email || 'Аноним',
-            uid: _currentUser.uid,
-            photoURL: _currentUser.photoURL || '',
-            ts: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(function() {
-            if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = ''; }
-        }).catch(function(err) {
-            console.error('DM send error:', err);
-            if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = ''; }
-            showToast('Ошибка отправки ЛС: ' + (err.code || err.message || 'Неизвестная'));
-            input.value = text;
-        });
-    }
-    window.sendDmMsg = sendDmMsg;
-
-    // ═══ FRIEND SYSTEM ═══
-    function loadFriends(cb) {
-        if (!db || !_currentUser) { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; if(cb) cb(); return; }
-        db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
-            if (doc.exists) {
-                var d = doc.data();
-                _myFriends = d.friends || [];
-                _myFriendReqs = d.friendRequests || [];
-                _mySentReqs = d.sentRequests || [];
-            } else { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; }
-            updateNotifDots();
-            if (cb) cb();
-        }).catch(function() { _myFriends=[]; _myFriendReqs=[]; _mySentReqs=[]; if(cb) cb(); });
-    }
-
-    function sendFriendRequest(uid) {
-        if (!db || !_currentUser || uid === _currentUser.uid) return;
-        showToast('Отправляем запрос...');
-        var batch = db.batch();
-        var targetRef = db.collection('users').doc(uid);
-        var myRef = db.collection('users').doc(_currentUser.uid);
-        batch.set(targetRef, {
-            friendRequests: firebase.firestore.FieldValue.arrayUnion(_currentUser.uid)
-        }, { merge: true });
-        batch.set(myRef, {
-            sentRequests: firebase.firestore.FieldValue.arrayUnion(uid)
-        }, { merge: true });
-        batch.commit().then(function() {
-            if (!_mySentReqs.includes(uid)) _mySentReqs.push(uid);
-            showToast('✓ Запрос в друзья отправлен!');
-            // Send system DM about friend request
-            var roomId = getDmRoomId(_currentUser.uid, uid);
-            db.collection('dms').doc(roomId).collection('messages').add({
-                text: '📨 ' + (_currentUser.displayName || 'Пользователь') + ' хочет добавить тебя в друзья!',
-                name: 'Система',
-                uid: 'system',
-                isSystem: true,
-                ts: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            loadUsersToSidebar();
-        }).catch(function(err) {
-            console.error('Friend request error:', err);
-            showToast('Ошибка: ' + (err.code || err.message || 'не удалось отправить запрос'));
-        });
-    }
-
-    function acceptFriendRequest(uid) {
-        if (!db || !_currentUser) return;
-        showToast('Принимаем запрос...');
-        var batch = db.batch();
-        var myRef = db.collection('users').doc(_currentUser.uid);
-        var theirRef = db.collection('users').doc(uid);
-        batch.set(myRef, {
-            friends: firebase.firestore.FieldValue.arrayUnion(uid),
-            friendRequests: firebase.firestore.FieldValue.arrayRemove(uid)
-        }, { merge: true });
-        batch.set(theirRef, {
-            friends: firebase.firestore.FieldValue.arrayUnion(_currentUser.uid),
-            sentRequests: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
-        }, { merge: true });
-        batch.commit().then(function() {
-            _myFriendReqs = _myFriendReqs.filter(function(r) { return r !== uid; });
-            if (!_myFriends.includes(uid)) _myFriends.push(uid);
-            updateNotifDots();
-            showToast('✓ Теперь вы друзья!');
-            loadUsersToSidebar();
-            // Send system DM
-            var roomId = getDmRoomId(_currentUser.uid, uid);
-            db.collection('dms').doc(roomId).collection('messages').add({
-                text: '✅ Теперь вы друзья!',
-                name: 'Система',
-                uid: 'system',
-                isSystem: true,
-                ts: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        }).catch(function(err) {
-            console.error('Accept friend error:', err);
-            showToast('Ошибка: ' + (err.code || err.message || 'не удалось принять запрос'));
-        });
-    }
-
-    function declineFriendRequest(uid) {
-        if (!db || !_currentUser) return;
-        db.collection('users').doc(_currentUser.uid).set({
-            friendRequests: firebase.firestore.FieldValue.arrayRemove(uid)
-        }, { merge: true }).then(function() {
-            _myFriendReqs = _myFriendReqs.filter(function(r) { return r !== uid; });
-            db.collection('users').doc(uid).set({
-                sentRequests: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid)
-            }, { merge: true });
-            updateNotifDots();
-            showToast('Запрос отклонён');
-            loadUsersToSidebar();
-        }).catch(function(err) {
-            console.error('Decline friend error:', err);
-            showToast('Ошибка: ' + (err.code || err.message));
-        });
-    }
-
-    function removeFriend(uid) {
-        if (!db || !_currentUser) return;
-        showToast('Удаляем из друзей...');
-        var batch = db.batch();
-        batch.set(db.collection('users').doc(_currentUser.uid), { friends: firebase.firestore.FieldValue.arrayRemove(uid) }, { merge: true });
-        batch.set(db.collection('users').doc(uid), { friends: firebase.firestore.FieldValue.arrayRemove(_currentUser.uid) }, { merge: true });
-        batch.commit().then(function() {
-            _myFriends = _myFriends.filter(function(f) { return f !== uid; });
-            showToast('Удалён из друзей');
-            loadUsersToSidebar();
-        }).catch(function(err) {
-            console.error('Remove friend error:', err);
-            showToast('Ошибка: ' + (err.code || err.message));
-        });
-    }
-
-    // ═══ NOTIFICATIONS ═══
-    function updateNotifDots() {
-        var hasNotif = _myFriendReqs.length > 0 || _unreadDmCount > 0;
-        var dot = document.getElementById('authNotifDot');
-        if (dot) dot.style.display = hasNotif ? '' : 'none';
-        var frBadge = document.getElementById('frReqBadge');
-        if (frBadge) {
-            frBadge.style.display = _myFriendReqs.length > 0 ? '' : 'none';
-            frBadge.textContent = _myFriendReqs.length;
-        }
-        var dmBadge = document.getElementById('dmUnreadBadge');
-        if (dmBadge) {
-            dmBadge.style.display = _unreadDmCount > 0 ? '' : 'none';
-            dmBadge.textContent = _unreadDmCount;
-        }
-        var sideBadge = document.getElementById('sidebarChatBadge');
-        if (sideBadge) {
-            var total = _myFriendReqs.length + _unreadDmCount;
-            sideBadge.style.display = total > 0 ? '' : 'none';
-            sideBadge.textContent = total;
-        }
-        var tgDmBadge = document.getElementById('tgDmBadge');
-        if (tgDmBadge) {
-            var dmTotal = _myFriendReqs.length + _unreadDmCount;
-            tgDmBadge.style.display = dmTotal > 0 ? 'flex' : 'none';
-            tgDmBadge.textContent = dmTotal;
-        }
-        var mobBadge = document.getElementById('tgMobBadge');
-        if (mobBadge) {
-            mobBadge.style.display = hasNotif ? 'flex' : 'none';
-            mobBadge.textContent = (_myFriendReqs.length + _unreadDmCount) || '';
-        }
-    }
-
-    // ═══ LEGACY COMPAT ═══
+    // ═══ COMPAT ═══
     window.closeUserMenuAndOpen = function(what) {
         var menu = document.getElementById('userMenu');
         if (menu) menu.classList.remove('active');
-        if (what === 'dmInbox') { openChatSystem(); setTimeout(switchToDmList, 100); }
-        else if (what === 'friendRequests') { openChatSystem(); setTimeout(switchToDmList, 100); }
-        else if (what === 'profile') { openProfileSetup(); }
+        if (what === 'profile') { openProfileSetup(); }
     };
     window.openUsersList = function() { openChatSystem(); };
-    window.closeUsersList = function() {};
-    window.closeDmChat = function() { switchToDmList(); };
-
-    function startDmNotifListener() {
-        if (!db || !_currentUser) return;
-        db.collection('users').doc(_currentUser.uid).onSnapshot(function(doc) {
-            if (!doc.exists) return;
-            var d = doc.data();
-            _myFriendReqs = d.friendRequests || [];
-            _myFriends = d.friends || [];
-            _mySentReqs = d.sentRequests || [];
-            updateNotifDots();
-        });
-    }
 
     // ═══════════════════════════════════════
     // PROFILE SETUP
@@ -3596,9 +3189,184 @@
 
     window.openProfileSetup = function() {
         openModal('profileSetupMask');
-        renderProfileSetup();
+        switchProfileTab('profile');
     };
     window.closeProfileSetup = function() { closeModal('profileSetupMask'); };
+
+    window.switchProfileTab = function(tab) {
+        var panelProfile = document.getElementById('profPanelProfile');
+        var panelData = document.getElementById('profPanelData');
+        var tabProfile = document.getElementById('profTabProfile');
+        var tabData = document.getElementById('profTabData');
+        if (tab === 'data') {
+            if (panelProfile) panelProfile.style.display = 'none';
+            if (panelData) panelData.style.display = '';
+            if (tabProfile) { tabProfile.style.background = 'transparent'; tabProfile.style.color = 'rgba(255,255,255,0.4)'; tabProfile.style.borderBottom = '2px solid transparent'; }
+            if (tabData) { tabData.style.background = 'rgba(109,63,245,0.15)'; tabData.style.color = '#b96fff'; tabData.style.borderBottom = '2px solid #b96fff'; }
+            renderDataPanel();
+        } else {
+            if (panelProfile) panelProfile.style.display = '';
+            if (panelData) panelData.style.display = 'none';
+            if (tabProfile) { tabProfile.style.background = 'rgba(109,63,245,0.15)'; tabProfile.style.color = '#b96fff'; tabProfile.style.borderBottom = '2px solid #b96fff'; }
+            if (tabData) { tabData.style.background = 'transparent'; tabData.style.color = 'rgba(255,255,255,0.4)'; tabData.style.borderBottom = '2px solid transparent'; }
+            renderProfileSetup();
+        }
+    };
+
+    // ═══ DATA PANEL ═══
+    function renderDataPanel() {
+        var el = document.getElementById('profileDataContent');
+        if (!el) return;
+        el.innerHTML = '';
+
+        // --- Active dataset indicator ---
+        var activeKey = localStorage.getItem('activeDataset') || 'own'; // 'own' | 'copied'
+        var copied = null;
+        try { copied = JSON.parse(localStorage.getItem('copiedUserData') || 'null'); } catch(e) {}
+
+        // Visibility toggle section
+        var visSection = document.createElement('div');
+        visSection.style.cssText = 'margin-bottom:16px;';
+        var visLabel = document.createElement('div');
+        visLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;';
+        visLabel.textContent = 'ВИДИМОСТЬ ТВОИХ ДАННЫХ';
+        visSection.appendChild(visLabel);
+
+        var dataVisible = localStorage.getItem('dataVisible') !== 'false';
+        var visBtn = document.createElement('button');
+        visBtn.style.cssText = 'width:100%;padding:10px;border-radius:10px;border:1.5px solid '
+            + (dataVisible ? 'rgba(46,204,113,0.4)' : 'rgba(231,76,60,0.4)')
+            + ';background:' + (dataVisible ? 'rgba(46,204,113,0.08)' : 'rgba(231,76,60,0.08)')
+            + ';color:' + (dataVisible ? '#2ecc71' : '#e74c3c')
+            + ';font-size:12px;font-weight:800;cursor:pointer;';
+        visBtn.textContent = dataVisible ? '👁 Данные видны другим — Скрыть' : '🙈 Данные скрыты — Показать';
+        visBtn.onclick = function() {
+            var newVal = !dataVisible;
+            localStorage.setItem('dataVisible', String(newVal));
+            // Sync to Firestore
+            if (db && _currentUser) {
+                db.collection('users').doc(_currentUser.uid).set({ dataVisible: newVal }, { merge: true });
+            }
+            renderDataPanel();
+        };
+        visSection.appendChild(visBtn);
+        el.appendChild(visSection);
+
+        // --- My data block ---
+        var ownSection = document.createElement('div');
+        ownSection.style.cssText = 'margin-bottom:12px;';
+        var ownHeader = document.createElement('div');
+        ownHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;';
+        var ownLabel = document.createElement('div');
+        ownLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;';
+        ownLabel.textContent = 'МОИ ДАННЫЕ';
+        ownHeader.appendChild(ownLabel);
+        if (activeKey === 'own') {
+            var activeBadge = document.createElement('span');
+            activeBadge.style.cssText = 'font-size:10px;color:#2ecc71;font-weight:800;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);padding:2px 8px;border-radius:6px;';
+            activeBadge.textContent = '✓ Активны';
+            ownHeader.appendChild(activeBadge);
+        }
+        ownSection.appendChild(ownHeader);
+        var ownBtn = document.createElement('button');
+        ownBtn.style.cssText = 'width:100%;padding:10px;border-radius:10px;border:1.5px solid '
+            + (activeKey === 'own' ? 'rgba(109,63,245,0.5)' : 'rgba(155,89,182,0.2)')
+            + ';background:' + (activeKey === 'own' ? 'rgba(109,63,245,0.15)' : 'transparent')
+            + ';color:#fff;font-size:12px;font-weight:700;cursor:pointer;';
+        ownBtn.textContent = activeKey === 'own' ? '✓ Использую свои данные' : 'Активировать свои данные';
+        ownBtn.onclick = function() {
+            if (activeKey === 'own') return;
+            activateOwnData();
+        };
+        ownSection.appendChild(ownBtn);
+        el.appendChild(ownSection);
+
+        // --- Copied data block (if exists) ---
+        if (copied && copied.fromName) {
+            var copiedSection = document.createElement('div');
+            copiedSection.style.cssText = 'margin-bottom:12px;';
+            var copiedHeader = document.createElement('div');
+            copiedHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;';
+            var copiedLabel = document.createElement('div');
+            copiedLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;';
+            copiedLabel.textContent = 'СКОПИРОВАННЫЕ (от ' + copied.fromName + ')';
+            copiedHeader.appendChild(copiedLabel);
+            if (activeKey === 'copied') {
+                var activeBadge2 = document.createElement('span');
+                activeBadge2.style.cssText = 'font-size:10px;color:#2ecc71;font-weight:800;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);padding:2px 8px;border-radius:6px;';
+                activeBadge2.textContent = '✓ Активны';
+                copiedHeader.appendChild(activeBadge2);
+            }
+            copiedSection.appendChild(copiedHeader);
+            var copiedBtn = document.createElement('button');
+            copiedBtn.style.cssText = 'width:100%;padding:10px;border-radius:10px;border:1.5px solid '
+                + (activeKey === 'copied' ? 'rgba(255,215,0,0.5)' : 'rgba(255,215,0,0.2)')
+                + ';background:' + (activeKey === 'copied' ? 'rgba(255,215,0,0.08)' : 'transparent')
+                + ';color:#FFD700;font-size:12px;font-weight:700;cursor:pointer;';
+            copiedBtn.textContent = activeKey === 'copied' ? '✓ Использую данные ' + copied.fromName : 'Активировать данные ' + copied.fromName;
+            copiedBtn.onclick = function() {
+                if (activeKey === 'copied') return;
+                activateCopiedData(copied);
+            };
+            copiedSection.appendChild(copiedBtn);
+
+            // Delete copied data
+            var delBtn = document.createElement('button');
+            delBtn.style.cssText = 'width:100%;margin-top:4px;padding:7px;border-radius:10px;border:1px solid rgba(231,76,60,0.2);background:transparent;color:rgba(231,76,60,0.6);font-size:11px;font-weight:700;cursor:pointer;';
+            delBtn.textContent = '× Удалить скопированные данные';
+            delBtn.onclick = function() {
+                localStorage.removeItem('copiedUserData');
+                if (activeKey === 'copied') activateOwnData();
+                else renderDataPanel();
+            };
+            copiedSection.appendChild(delBtn);
+            el.appendChild(copiedSection);
+        }
+
+        var hint = document.createElement('div');
+        hint.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.2);line-height:1.5;margin-top:8px;';
+        hint.textContent = 'Скопировать данные другого игрока можно нажав на него в списке Пользователи → Скопировать данные.';
+        el.appendChild(hint);
+    }
+
+    function activateOwnData() {
+        // Restore own saved data from firestore or localStorage backup
+        localStorage.setItem('activeDataset', 'own');
+        var ownBackup = localStorage.getItem('ownDataBackup');
+        if (ownBackup) {
+            try {
+                var b = JSON.parse(ownBackup);
+                if (b.matchups) localStorage.setItem('matchups', b.matchups);
+                if (b.tierData) localStorage.setItem('tierData', b.tierData);
+                if (b.itemTierData) { localStorage.setItem('itemTierData', b.itemTierData); loadItemTierData(); }
+                if (b.runeTierData) { localStorage.setItem('runeTierData', b.runeTierData); loadRuneTierData(); }
+            } catch(e) {}
+        }
+        loadTierData();
+        showToast('✓ Активированы свои данные');
+        renderDataPanel();
+    }
+
+    function activateCopiedData(copied) {
+        // Backup own data first
+        var ownBackup = {
+            matchups: localStorage.getItem('matchups') || '{}',
+            tierData: localStorage.getItem('tierData') || '{}',
+            itemTierData: localStorage.getItem('itemTierData') || '{}',
+            runeTierData: localStorage.getItem('runeTierData') || '{}'
+        };
+        // Only save backup if currently using own data (avoid overwriting backup with copied)
+        if (localStorage.getItem('activeDataset') !== 'copied') {
+            localStorage.setItem('ownDataBackup', JSON.stringify(ownBackup));
+        }
+        localStorage.setItem('activeDataset', 'copied');
+        if (copied.matchups) localStorage.setItem('matchups', copied.matchups);
+        if (copied.tierData) { localStorage.setItem('tierData', copied.tierData); loadTierData(); }
+        if (copied.itemTierData) { localStorage.setItem('itemTierData', copied.itemTierData); loadItemTierData(); }
+        if (copied.runeTierData) { localStorage.setItem('runeTierData', copied.runeTierData); loadRuneTierData(); }
+        showToast('✓ Активированы данные ' + copied.fromName);
+        renderDataPanel();
+    }
 
     function renderProfileSetup() {
         var rolesEl = document.getElementById('profileRoles');
@@ -3693,41 +3461,36 @@
 
     function showUserCard(user) {
         var container = document.getElementById('userCardContent');
-        if (!container) { console.error('userCardContent not found'); return; }
+        if (!container) return;
         container.innerHTML = '';
-
-        // Refresh friend data before showing
-        var isFriend = _myFriends.includes(user._uid);
-        var reqSent = _mySentReqs.includes(user._uid);
-        var reqReceived = _myFriendReqs.includes(user._uid);
 
         // Header
         var header = document.createElement('div');
-        header.style.cssText = 'padding:24px 20px 16px;text-align:center;border-bottom:1px solid rgba(155,89,182,0.15);';
+        header.style.cssText = 'padding:20px 20px 14px;text-align:center;border-bottom:1px solid rgba(155,89,182,0.15);';
 
         var av = document.createElement('div');
-        av.style.cssText = 'width:72px;height:72px;border-radius:50%;margin:0 auto 12px;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:28px;color:#fff;font-weight:900;overflow:hidden;border:3px solid rgba(185,111,255,0.3);';
+        av.style.cssText = 'width:64px;height:64px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-weight:900;overflow:hidden;border:3px solid rgba(185,111,255,0.3);';
         if (user.photoURL) av.innerHTML = '<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">';
         else av.textContent = (user.displayName||'?').charAt(0).toUpperCase();
         header.appendChild(av);
 
-        var name = document.createElement('div');
-        name.style.cssText = 'font-size:17px;font-weight:900;color:#fff;';
-        name.textContent = user.displayName || user.email || '???';
-        header.appendChild(name);
+        var nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-size:16px;font-weight:900;color:#fff;';
+        nameEl.textContent = user.displayName || user.email || '???';
+        header.appendChild(nameEl);
 
-        var status = document.createElement('div');
-        status.style.cssText = 'font-size:12px;color:' + (user._online ? '#2ecc71' : 'rgba(255,255,255,0.35)') + ';margin-top:4px;font-weight:600;';
-        status.textContent = user._online ? '🟢 Онлайн' : '⚫ Оффлайн';
-        header.appendChild(status);
+        var statusEl = document.createElement('div');
+        statusEl.style.cssText = 'font-size:11px;color:' + (user._online ? '#2ecc71' : 'rgba(255,255,255,0.35)') + ';margin-top:3px;font-weight:600;';
+        statusEl.textContent = user._online ? '🟢 Онлайн' : '⚫ Оффлайн';
+        header.appendChild(statusEl);
 
         // Role & Rank badges
         if (user.role || user.rank) {
             var badges = document.createElement('div');
-            badges.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap;';
+            badges.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;';
             if (user.role) {
                 var roleBadge = document.createElement('span');
-                roleBadge.style.cssText = 'padding:4px 12px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:12px;font-weight:700;';
+                roleBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:11px;font-weight:700;';
                 roleBadge.textContent = user.role;
                 badges.appendChild(roleBadge);
             }
@@ -3735,10 +3498,10 @@
                 var rk = RANKS.find(function(r) { return r.id === user.rank; });
                 if (rk) {
                     var rankBadge = document.createElement('span');
-                    rankBadge.style.cssText = 'padding:4px 12px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;';
+                    rankBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px;';
                     var rkImg = document.createElement('img');
                     rkImg.src = rk.img;
-                    rkImg.style.cssText = 'width:20px;height:20px;object-fit:contain;';
+                    rkImg.style.cssText = 'width:16px;height:16px;object-fit:contain;';
                     rkImg.onerror = function() { this.outerHTML = rk.emoji; };
                     rankBadge.appendChild(rkImg);
                     rankBadge.appendChild(document.createTextNode(rk.name));
@@ -3748,66 +3511,49 @@
             header.appendChild(badges);
         }
 
-        // Friend status label
-        if (isFriend) {
-            var friendLabel = document.createElement('div');
-            friendLabel.style.cssText = 'margin-top:8px;font-size:11px;color:#2ecc71;font-weight:700;';
-            friendLabel.textContent = '✓ В друзьях';
-            header.appendChild(friendLabel);
-        }
-
         container.appendChild(header);
 
         // Actions
         var actions = document.createElement('div');
-        actions.style.cssText = 'padding:14px 16px;display:flex;flex-direction:column;gap:6px;';
+        actions.style.cssText = 'padding:12px 16px;display:flex;flex-direction:column;gap:6px;';
 
-        if (isFriend || _isAdmin) {
-            addCardBtn(actions, '✉ Написать ЛС', '#b96fff', function() {
-                closeUserCard();
-                // Small delay to let modal close animation finish
-                setTimeout(function() {
-                    if (typeof switchToDmList === 'function') switchToDmList();
-                    openDmWithUser(user._uid, user.displayName||user.email);
-                }, 150);
-            });
-        }
-        if (!isFriend && !reqSent && !reqReceived) {
-            addCardBtn(actions, '+ Добавить в друзья', '#2ecc71', function() {
-                sendFriendRequest(user._uid);
+        // "Данные" button — show copy button based on dataVisible flag
+        // dataVisible: undefined means visible (default), false means hidden
+        var isDataHidden = user.dataVisible === false;
+        if (!isDataHidden || _isAdmin) {
+            addCardBtn(actions, '📋 Скопировать данные', '#2ecc71', function() {
+                copyUserData(user);
                 closeUserCard();
             });
         }
-        if (reqSent) {
-            addCardBtn(actions, '⏳ Запрос отправлен', 'rgba(255,255,255,0.3)', null);
-        }
-        if (reqReceived) {
-            addCardBtn(actions, '✓ Принять запрос', '#2ecc71', function() {
-                acceptFriendRequest(user._uid);
-                closeUserCard();
-            });
-            addCardBtn(actions, '✕ Отклонить запрос', '#e74c3c', function() {
-                declineFriendRequest(user._uid);
-                closeUserCard();
-            });
-        }
-        if (isFriend) {
-            addCardBtn(actions, '× Удалить из друзей', '#e74c3c', function() {
-                removeFriend(user._uid);
-                closeUserCard();
-            });
-        }
+
         addCardBtn(actions, '✕ Закрыть', 'rgba(255,255,255,0.4)', function() { closeUserCard(); });
         container.appendChild(actions);
 
-        // Ensure the modal mask is displayed
-        var mask = document.getElementById('userCardMask');
-        if (mask) {
-            mask.style.display = '';
-            mask.style.visibility = '';
-        }
         openModal('userCardMask');
     }
+
+    // Copy another user's data and store it as "copied dataset"
+    function copyUserData(user) {
+        if (!db) { showToast('Firebase не подключён'); return; }
+        db.collection('users').doc(user._uid).get().then(function(doc) {
+            if (!doc.exists) { showToast('Данные не найдены'); return; }
+            var d = doc.data();
+            var copied = {
+                fromUid: user._uid,
+                fromName: user.displayName || user.email || '???',
+                matchups: d.matchups || '{}',
+                tierData: d.tierData || '{}',
+                itemTierData: d.itemTierData || '{}',
+                runeTierData: d.runeTierData || '{}'
+            };
+            try { localStorage.setItem('copiedUserData', JSON.stringify(copied)); } catch(e) {}
+            showToast('✓ Данные скопированы от ' + copied.fromName);
+        }).catch(function(err) {
+            showToast('Ошибка: ' + (err.code || err.message));
+        });
+    }
+    window.copyUserData = copyUserData;
 
     function addCardBtn(parent, text, color, onclick) {
         var btn = document.createElement('button');
