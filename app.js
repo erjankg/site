@@ -1422,40 +1422,28 @@
             imgFn=function(n){return champIcon(n);};
             addFn=function(tier,name){addToTier(_tierRole,tier,name);}; removeFn=function(tier,name){removeFromTier(_tierRole,tier,name);};
         }
+        // Scale down icons on mobile for "all" tabs (too many items to fit)
+        var isMobile = window.innerWidth <= 768;
+        var scale = 1;
+        if(isMobile && _tierType==='champs' && _tierRole==='all') scale = 0.7;
+        else if(isMobile && _tierType==='items' && _tierItemCat==='all') scale = 0.8;
+        var lblSize = Math.round(54 * scale);
+        var iconSize = Math.round(50 * scale);
+        var lblFontSize = Math.round(17 * scale);
+        var lblRadius = Math.round(10 * scale);
+        var iconRadius = Math.round(8 * scale);
+        var cdMinHeight = Math.round(60 * scale);
         el.innerHTML='';
         _TIER_KEYS.forEach(function(tk){
             var color=_TIER_COLORS[tk];
             var row=document.createElement('div');
             row.style.cssText='display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;';
             var lbl=document.createElement('div');
-            lbl.style.cssText='width:54px;min-width:54px;height:54px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:17px;font-weight:900;background:linear-gradient(135deg,'+color+'cc,'+color+'88);color:#fff;flex-shrink:0;margin-top:3px;';
+            var lblEditExtra = _tierEditMode ? 'box-shadow:0 0 0 2px rgba(255,215,0,0.7),0 0 14px rgba(255,215,0,0.35);cursor:pointer;transition:box-shadow 0.15s;' : '';
+            lbl.style.cssText='width:'+lblSize+'px;min-width:'+lblSize+'px;height:'+lblSize+'px;display:flex;align-items:center;justify-content:center;border-radius:'+lblRadius+'px;font-size:'+lblFontSize+'px;font-weight:900;background:linear-gradient(135deg,'+color+'cc,'+color+'88);color:#fff;flex-shrink:0;margin-top:3px;'+lblEditExtra;
             lbl.textContent=tk;
-            var cd=document.createElement('div');
-            cd.style.cssText='display:flex;flex-wrap:wrap;gap:5px;flex:1;align-items:center;padding:5px;background:rgba(255,255,255,0.02);border-radius:8px;min-height:60px;';
-            (tData[tk]||[]).forEach(function(cname){
-                var chip=document.createElement('div');
-                chip.style.cssText='position:relative;display:inline-block;';
-                var img=document.createElement('img');
-                img.style.cssText='width:50px;height:50px;border-radius:8px;object-fit:cover;display:block;';
-                img.src=imgFn(cname); img.alt=img.title=cname;
-                img.onerror=function(){this.style.display='none';};
-                chip.appendChild(img);
-                if(_tierEditMode){
-                    var xBtn=document.createElement('div');
-                    xBtn.style.cssText='position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:#e74c3c;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;z-index:1;font-weight:900;line-height:1;';
-                    xBtn.textContent='×';
-                    (function(t,n,rf){xBtn.onclick=function(e){e.stopPropagation();rf(t,n);};}(tk,cname,removeFn));
-                    chip.appendChild(xBtn);
-                }
-                cd.appendChild(chip);
-            });
-            if(!(tData[tk]||[]).length){var ph=document.createElement('span');ph.style.cssText='font-size:11px;color:rgba(255,255,255,0.15);padding:4px;';ph.textContent='—';cd.appendChild(ph);}
-            row.appendChild(lbl); row.appendChild(cd);
             if(_tierEditMode){
-                var addBtn=document.createElement('button');
-                addBtn.style.cssText='padding:5px 10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;white-space:nowrap;flex-shrink:0;align-self:center;';
-                addBtn.textContent='+ Выбрать';
-                (function(t,td,af,rf,pt){addBtn.onclick=function(){
+                (function(t,td,af,rf,pt){lbl.onclick=function(){
                     var roleFilter = (pt==='champs' && _tierRole!=='all') ? _tierRole : 'all';
                     openChampPicker(['🏆','⚙','✨'][['champs','items','runes'].indexOf(pt)]+' Тир '+t,
                     function(c){
@@ -1470,8 +1458,28 @@
                         onRemove:function(c){rf(t,c.name);champPickerBuildGrid();}
                     });
                 };}(tk,tData,addFn,removeFn,pickerType));
-                row.appendChild(addBtn);
             }
+            var cd=document.createElement('div');
+            cd.style.cssText='display:flex;flex-wrap:wrap;gap:5px;flex:1;align-items:center;padding:5px;background:rgba(255,255,255,0.02);border-radius:8px;min-height:'+cdMinHeight+'px;';
+            (tData[tk]||[]).forEach(function(cname){
+                var chip=document.createElement('div');
+                chip.style.cssText='position:relative;display:inline-block;';
+                var img=document.createElement('img');
+                img.style.cssText='width:'+iconSize+'px;height:'+iconSize+'px;border-radius:'+iconRadius+'px;object-fit:cover;display:block;';
+                img.src=imgFn(cname); img.alt=img.title=cname;
+                img.onerror=function(){this.style.display='none';};
+                chip.appendChild(img);
+                if(_tierEditMode){
+                    var xBtn=document.createElement('div');
+                    xBtn.style.cssText='position:absolute;top:-5px;right:-5px;width:16px;height:16px;background:#e74c3c;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;z-index:1;font-weight:900;line-height:1;';
+                    xBtn.textContent='×';
+                    (function(t,n,rf){xBtn.onclick=function(e){e.stopPropagation();rf(t,n);};}(tk,cname,removeFn));
+                    chip.appendChild(xBtn);
+                }
+                cd.appendChild(chip);
+            });
+            if(!(tData[tk]||[]).length){var ph=document.createElement('span');ph.style.cssText='font-size:11px;color:rgba(255,255,255,0.15);padding:4px;';ph.textContent='—';cd.appendChild(ph);}
+            row.appendChild(lbl); row.appendChild(cd);
             el.appendChild(row);
         });
     }
