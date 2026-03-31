@@ -1422,11 +1422,9 @@
             imgFn=function(n){return champIcon(n);};
             addFn=function(tier,name){addToTier(_tierRole,tier,name);}; removeFn=function(tier,name){removeFromTier(_tierRole,tier,name);};
         }
-        // Scale down icons on mobile for "all" tabs (too many items to fit)
+        // Scale down icons on mobile
         var isMobile = window.innerWidth <= 768;
-        var scale = 1;
-        if(isMobile && _tierType==='champs' && _tierRole==='all') scale = 0.7;
-        else if(isMobile && _tierType==='items' && _tierItemCat==='all') scale = 0.8;
+        var scale = isMobile ? 0.7 : 1;
         var lblSize = Math.round(54 * scale);
         var iconSize = Math.round(50 * scale);
         var lblFontSize = Math.round(17 * scale);
