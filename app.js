@@ -2230,15 +2230,13 @@
         list.forEach(function(c) {
             var isSel = selected.indexOf(c.name) !== -1;
             var wrap = document.createElement('div');
-            wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px;border-radius:9px;border:2px solid '+(isSel?'#b96fff':'transparent')+';background:'+(isSel?'rgba(109,63,245,0.2)':'transparent')+';transition:all 0.12s;';
+            wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:2px;border-radius:9px;border:2px solid '+(isSel?'#b96fff':'transparent')+';background:'+(isSel?'rgba(109,63,245,0.2)':'transparent')+';transition:all 0.12s;';
             var img = document.createElement('img');
             img.src = c.img || '';
+            img.title = c.name;
             img.style.cssText = 'width:100%;aspect-ratio:1;border-radius:7px;object-fit:cover;';
             img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; this.style.minHeight='32px'; };
-            var nm = document.createElement('div');
-            nm.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.5);text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
-            nm.textContent = c.name;
-            wrap.appendChild(img); wrap.appendChild(nm);
+            wrap.appendChild(img);
             if(isSel) {
                 var ck = document.createElement('div');
                 ck.style.cssText = 'position:absolute;top:2px;right:2px;background:#b96fff;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:900;pointer-events:none;';

@@ -1726,6 +1726,34 @@ font-size: 12px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.9);
 }
 
+/* ── TIERLIST FULLSCREEN (no overlay, no border) ── */
+#tierlistMask {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+#tierlistMask .m-win {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%) !important;
+}
+#tierlistMenuMask {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+#tierlistMenuMask .m-win {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    background: linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%) !important;
+}
+
 /* ── TOAST NOTIFICATION ── */
 @keyframes toastIn {
     from { opacity: 0; transform: translateX(-50%) translateY(10px); }
