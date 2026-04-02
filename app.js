@@ -2991,11 +2991,12 @@
             if (_currentUser && u._uid === _currentUser.uid) return;
             var card = document.createElement('div');
             card.className = 'user-card';
-            card.onclick = function() {
-                // Close mobile sidebar before opening card
-                tgMobileCloseSidebar();
-                showUserCard(u);
-            };
+            card.onclick = (function(usr, cardEl) {
+                return function(e) {
+                    e.stopPropagation();
+                    showUserTooltip(usr, cardEl);
+                };
+            })(u, card);
 
             var avWrap = document.createElement('div');
             avWrap.className = 'user-av-wrap';
@@ -3032,16 +3033,21 @@
     function startChatListener() {
         if (_chatListener || !db) return;
         _chatListener = db.collection('globalChat')
-            .orderBy('ts', 'asc')
-            .limitToLast(100)
+            .orderBy('ts', 'desc')
+            .limit(100)
             .onSnapshot(function(snap) {
                 _chatMessages = [];
                 snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; _chatMessages.push(d); });
+                _chatMessages.reverse(); // oldest first for display
                 renderGlobalChat();
             }, function(err) {
-                console.warn('Chat listener error:', err);
+                console.error('Chat listener error:', err);
+                // Reset so startChatListener() can retry next time
+                _chatListener = null;
                 if (err.code === 'permission-denied') {
                     showToast('Нет доступа к чату. Проверьте Firestore Rules.');
+                } else if (err.code === 'failed-precondition') {
+                    showToast('Чат: требуется индекс Firestore. Проверь консоль.');
                 } else {
                     showToast('Ошибка чата: ' + (err.code || err.message));
                 }
@@ -3251,8 +3257,22 @@
         var dataVisible = (_pendingDataVisible !== null) ? _pendingDataVisible : savedVisible;
         var pendingDataset = (_pendingDataset !== null) ? _pendingDataset : savedDataset;
 
-        var copied = null;
-        try { copied = JSON.parse(localStorage.getItem('copiedUserData') || 'null'); } catch(e) {}
+        // Load all 3 copied slots + backward compat migration
+        var copiedSlots = [0,1,2].map(function(i) {
+            try { return JSON.parse(localStorage.getItem('copiedUserData_'+i) || 'null'); } catch(e) { return null; }
+        });
+        if (!copiedSlots[0]) {
+            var _oldCopied = null;
+            try { _oldCopied = JSON.parse(localStorage.getItem('copiedUserData') || 'null'); } catch(e) {}
+            if (_oldCopied) {
+                copiedSlots[0] = _oldCopied;
+                localStorage.setItem('copiedUserData_0', JSON.stringify(_oldCopied));
+                localStorage.removeItem('copiedUserData');
+            }
+        }
+        // backward compat: 'copied' → 'copied_0'
+        if (savedDataset === 'copied') { savedDataset = 'copied_0'; localStorage.setItem('activeDataset', 'copied_0'); }
+        if (pendingDataset === 'copied') { pendingDataset = 'copied_0'; _pendingDataset = 'copied_0'; }
 
         var hasChanges = (_pendingDataVisible !== null && _pendingDataVisible !== savedVisible)
                       || (_pendingDataset !== null && _pendingDataset !== savedDataset);
@@ -3316,50 +3336,62 @@
         ownSection.appendChild(ownBtn);
         el.appendChild(ownSection);
 
-        // --- Copied data block (if exists) ---
-        if (copied && copied.fromName) {
+        // --- Copied data slots (up to 3) ---
+        var _slotColors = ['rgba(255,215,0,', 'rgba(46,204,113,', 'rgba(52,152,219,'];
+        var _slotTextColors = ['#FFD700', '#2ecc71', '#3498db'];
+        var _slotLabels = ['СЛОТ 1', 'СЛОТ 2', 'СЛОТ 3'];
+        ;[0,1,2].forEach(function(i) {
+            var slotCopied = copiedSlots[i];
+            if (!slotCopied || !slotCopied.fromName) return;
+            var slotKey = 'copied_' + i;
+            var isSlotSelected = pendingDataset === slotKey;
+            var isSlotActive = savedDataset === slotKey && pendingDataset === slotKey;
+
             var copiedSection = document.createElement('div');
             copiedSection.style.cssText = 'margin-bottom:12px;';
             var copiedHeader = document.createElement('div');
             copiedHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;';
             var copiedLabel = document.createElement('div');
             copiedLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;';
-            copiedLabel.textContent = 'СКОПИРОВАННЫЕ (от ' + copied.fromName + ')';
+            copiedLabel.textContent = _slotLabels[i] + ' — ' + slotCopied.fromName;
             copiedHeader.appendChild(copiedLabel);
-            if (savedDataset === 'copied' && pendingDataset === 'copied') {
+            if (isSlotActive) {
                 var activeBadge2 = document.createElement('span');
                 activeBadge2.style.cssText = 'font-size:10px;color:#2ecc71;font-weight:800;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);padding:2px 8px;border-radius:6px;';
                 activeBadge2.textContent = '✓ Активны';
                 copiedHeader.appendChild(activeBadge2);
             }
             copiedSection.appendChild(copiedHeader);
-            var isCopiedSelected = pendingDataset === 'copied';
+
             var copiedBtn = document.createElement('button');
             copiedBtn.style.cssText = 'width:100%;padding:10px;border-radius:10px;border:1.5px solid '
-                + (isCopiedSelected ? 'rgba(255,215,0,0.5)' : 'rgba(255,215,0,0.2)')
-                + ';background:' + (isCopiedSelected ? 'rgba(255,215,0,0.08)' : 'transparent')
-                + ';color:#FFD700;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;';
-            copiedBtn.textContent = isCopiedSelected ? '✓ Выбраны данные ' + copied.fromName : 'Выбрать данные ' + copied.fromName;
-            copiedBtn.onclick = function() {
-                if (pendingDataset === 'copied') return;
-                _pendingDataset = 'copied';
-                renderDataPanel();
-            };
+                + (isSlotSelected ? _slotColors[i] + '0.5)' : _slotColors[i] + '0.2)')
+                + ';background:' + (isSlotSelected ? _slotColors[i] + '0.08)' : 'transparent')
+                + ';color:' + _slotTextColors[i] + ';font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;';
+            copiedBtn.textContent = isSlotSelected ? '✓ Выбраны данные ' + slotCopied.fromName : 'Выбрать данные ' + slotCopied.fromName;
+            (function(sk, isSel) {
+                copiedBtn.onclick = function() {
+                    if (isSel) return;
+                    _pendingDataset = sk;
+                    renderDataPanel();
+                };
+            })(slotKey, isSlotSelected);
             copiedSection.appendChild(copiedBtn);
 
-            // Delete copied data
             var delBtn = document.createElement('button');
             delBtn.style.cssText = 'width:100%;margin-top:4px;padding:7px;border-radius:10px;border:1px solid rgba(231,76,60,0.2);background:transparent;color:rgba(231,76,60,0.6);font-size:11px;font-weight:700;cursor:pointer;';
-            delBtn.textContent = '× Удалить скопированные данные';
-            delBtn.onclick = function() {
-                localStorage.removeItem('copiedUserData');
-                _pendingDataset = null;
-                if (savedDataset === 'copied') activateOwnData();
-                else renderDataPanel();
-            };
+            delBtn.textContent = '× Удалить слот ' + (i + 1);
+            (function(sk, sd) {
+                delBtn.onclick = function() {
+                    localStorage.removeItem('copiedUserData_' + sk.split('_')[1]);
+                    if (_pendingDataset === sk) _pendingDataset = null;
+                    if (sd === sk) activateOwnData();
+                    else renderDataPanel();
+                };
+            })(slotKey, savedDataset);
             copiedSection.appendChild(delBtn);
             el.appendChild(copiedSection);
-        }
+        });
 
         // --- Save button ---
         var saveBtn = document.createElement('button');
@@ -3374,17 +3406,17 @@
         saveBtn.disabled = !hasChanges;
         saveBtn.onclick = function() {
             if (!hasChanges) return;
-            _applyDataPanelSave(dataVisible, savedVisible, pendingDataset, savedDataset, copied);
+            _applyDataPanelSave(dataVisible, savedVisible, pendingDataset, savedDataset);
         };
         el.appendChild(saveBtn);
 
         var hint = document.createElement('div');
         hint.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.2);line-height:1.5;margin-top:12px;';
-        hint.textContent = 'Скопировать данные другого игрока можно нажав на него в списке Пользователи → Скопировать данные.';
+        hint.textContent = 'Можно сохранить до 3 наборов данных разных игроков. Нажми на пользователя в списке → Скопировать данные.';
         el.appendChild(hint);
     }
 
-    function _applyDataPanelSave(newVisible, savedVisible, newDataset, savedDataset, copied) {
+    function _applyDataPanelSave(newVisible, savedVisible, newDataset, savedDataset) {
         var el = document.getElementById('profileDataContent');
         if (!el) return;
 
@@ -3416,8 +3448,11 @@
             if (datasetChanged) {
                 if (newDataset === 'own') {
                     activateOwnData();
-                } else if (newDataset === 'copied' && copied) {
-                    activateCopiedData(copied);
+                } else if (newDataset && newDataset.startsWith('copied_')) {
+                    var _slotIdx = parseInt(newDataset.split('_')[1]);
+                    var _copiedSlot = null;
+                    try { _copiedSlot = JSON.parse(localStorage.getItem('copiedUserData_' + _slotIdx) || 'null'); } catch(e) {}
+                    if (_copiedSlot) activateCopiedData(_copiedSlot, _slotIdx);
                 }
             } else {
                 if (visChanged) showToast('✓ Настройки видимости сохранены');
@@ -3445,7 +3480,7 @@
         renderDataPanel();
     }
 
-    function activateCopiedData(copied) {
+    function activateCopiedData(copied, slotIdx) {
         // Backup own data first
         var ownBackup = {
             matchups: localStorage.getItem('matchups') || '{}',
@@ -3457,7 +3492,7 @@
         if (localStorage.getItem('activeDataset') !== 'copied') {
             localStorage.setItem('ownDataBackup', JSON.stringify(ownBackup));
         }
-        localStorage.setItem('activeDataset', 'copied');
+        localStorage.setItem('activeDataset', 'copied_' + (slotIdx !== undefined ? slotIdx : 0));
         if (copied.matchups) localStorage.setItem('matchups', copied.matchups);
         if (copied.tierData) { localStorage.setItem('tierData', copied.tierData); loadTierData(); }
         if (copied.itemTierData) { localStorage.setItem('itemTierData', copied.itemTierData); loadItemTierData(); }
@@ -3550,6 +3585,97 @@
                 setTimeout(function() { openProfileSetup(); }, 500);
             }
         });
+    }
+
+    // ═══════════════════════════════════════
+    // USER TOOLTIP (click on user in sidebar)
+    // ═══════════════════════════════════════
+    function showUserTooltip(user, cardEl) {
+        var existing = document.getElementById('userTooltipPopup');
+        if (existing) {
+            // Toggle off if clicking same card
+            if (existing.dataset.uid === user._uid) { existing.remove(); return; }
+            existing.remove();
+        }
+
+        var tip = document.createElement('div');
+        tip.id = 'userTooltipPopup';
+        tip.dataset.uid = user._uid;
+        tip.style.cssText = 'position:fixed;z-index:9999;background:rgba(18,10,35,0.97);border:1px solid rgba(155,89,182,0.35);border-radius:14px;padding:14px;min-width:210px;max-width:250px;box-shadow:0 8px 32px rgba(0,0,0,0.6);backdrop-filter:blur(16px);';
+
+        // Position near the card
+        var rect = cardEl.getBoundingClientRect();
+        var left = rect.right + 10;
+        if (left + 260 > window.innerWidth) left = Math.max(4, rect.left - 260);
+        var top = rect.top;
+        if (top + 220 > window.innerHeight) top = Math.max(4, window.innerHeight - 230);
+        tip.style.left = left + 'px';
+        tip.style.top = top + 'px';
+
+        // Avatar + name row
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:10px;';
+        var avEl = document.createElement('div');
+        avEl.style.cssText = 'width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:900;overflow:hidden;flex-shrink:0;border:2px solid rgba(185,111,255,0.3);';
+        if (user.photoURL) avEl.innerHTML = '<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">';
+        else avEl.textContent = (user.displayName||'?').charAt(0).toUpperCase();
+        var infoDiv = document.createElement('div');
+        var nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-size:13px;font-weight:900;color:#fff;line-height:1.2;';
+        nameEl.textContent = user.displayName || user.email || '???';
+        var statusEl = document.createElement('div');
+        statusEl.style.cssText = 'font-size:10px;font-weight:600;margin-top:3px;color:'+(user._online?'#2ecc71':'rgba(255,255,255,0.35)')+';';
+        statusEl.textContent = user._online ? '🟢 Онлайн' : '⚫ Оффлайн';
+        infoDiv.appendChild(nameEl); infoDiv.appendChild(statusEl);
+        row.appendChild(avEl); row.appendChild(infoDiv);
+        tip.appendChild(row);
+
+        // Role & rank badges
+        if (user.role || user.rank) {
+            var badges = document.createElement('div');
+            badges.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;';
+            if (user.role) {
+                var rb = document.createElement('span');
+                rb.style.cssText = 'padding:2px 8px;border-radius:6px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:10px;font-weight:700;';
+                rb.textContent = user.role;
+                badges.appendChild(rb);
+            }
+            if (user.rank) {
+                var rk = RANKS.find(function(r) { return r.id === user.rank; });
+                if (rk) {
+                    var rkb = document.createElement('span');
+                    rkb.style.cssText = 'padding:2px 8px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:10px;font-weight:700;';
+                    rkb.textContent = rk.emoji + ' ' + rk.name;
+                    badges.appendChild(rkb);
+                }
+            }
+            tip.appendChild(badges);
+        }
+
+        // Copy data button
+        var isDataHidden = user.dataVisible === false;
+        if (!isDataHidden || _isAdmin) {
+            var copyBtn = document.createElement('button');
+            copyBtn.style.cssText = 'width:100%;padding:8px;border-radius:8px;border:1px solid rgba(46,204,113,0.3);background:rgba(46,204,113,0.08);color:#2ecc71;font-size:11px;font-weight:700;cursor:pointer;';
+            copyBtn.textContent = '📋 Скопировать данные';
+            copyBtn.onclick = function(e) {
+                e.stopPropagation();
+                copyUserData(user);
+                tip.remove();
+            };
+            tip.appendChild(copyBtn);
+        }
+
+        document.body.appendChild(tip);
+
+        // Close on outside click
+        function _closeTooltip(e) {
+            if (!tip.contains(e.target) && e.target !== cardEl && !cardEl.contains(e.target)) {
+                tip.remove();
+                document.removeEventListener('click', _closeTooltip, true);
+            }
+        }
+        setTimeout(function() { document.addEventListener('click', _closeTooltip, true); }, 0);
     }
 
     // ═══════════════════════════════════════
@@ -3650,8 +3776,13 @@
                 itemTierData: d.itemTierData || '{}',
                 runeTierData: d.runeTierData || '{}'
             };
-            try { localStorage.setItem('copiedUserData', JSON.stringify(copied)); } catch(e) {}
-            showToast('✓ Данные скопированы от ' + copied.fromName);
+            var _slots = [0,1,2].map(function(si) {
+                try { return JSON.parse(localStorage.getItem('copiedUserData_'+si) || 'null'); } catch(e) { return null; }
+            });
+            var _targetSlot = _slots.findIndex(function(s) { return !s; });
+            if (_targetSlot === -1) _targetSlot = 0; // overwrite slot 0 if all full
+            try { localStorage.setItem('copiedUserData_' + _targetSlot, JSON.stringify(copied)); } catch(e) {}
+            showToast('✓ Скопировано в слот ' + (_targetSlot + 1) + ': ' + copied.fromName);
         }).catch(function(err) {
             showToast('Ошибка: ' + (err.code || err.message));
         });
