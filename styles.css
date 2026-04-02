@@ -1764,3 +1764,38 @@ font-size: 12px;
     animation: toastIn 0.2s ease !important;
 }
 
+/* ── Data panel loading overlay ── */
+.data-loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 6, 25, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    z-index: 20;
+    animation: fadeIn 0.15s ease;
+}
+.data-loading-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(185, 111, 255, 0.2);
+    border-top-color: #b96fff;
+    border-radius: 50%;
+    animation: dataSpin 0.7s linear infinite;
+}
+@keyframes dataSpin {
+    to { transform: rotate(360deg); }
+}
+/* Skeleton shimmer for buttons during load */
+.data-loading-skeleton {
+    background: linear-gradient(90deg, rgba(109,63,245,0.08) 25%, rgba(185,111,255,0.15) 50%, rgba(109,63,245,0.08) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.2s infinite;
+    border-radius: 10px;
+}
+@keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
