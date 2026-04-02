@@ -72,6 +72,8 @@
             el.style.display = '';
             el.style.zIndex = '';
             el.style.visibility = '';
+            // Reset any visual-viewport sizing applied when keyboard was open
+            if (window._resetModalVV) window._resetModalVV(el);
         }
 
         // Убираем из стека
@@ -2944,6 +2946,43 @@
         vv.addEventListener('scroll', onVV);
     }
 
+    // ─── Global visual-viewport fix: prevent modal headers from flying off ───
+    // When soft keyboard opens, shrink any active modal to fit visible area
+    (function() {
+        var vv = window.visualViewport;
+        if (!vv) return;
+        var _vvListener = null;
+        function applyVVFix() {
+            var h = vv.height;
+            var t = vv.offsetTop;
+            // Update every active m-mask that is NOT the chat (chat has its own handler)
+            document.querySelectorAll('.m-mask.active').forEach(function(mask) {
+                if (mask.id === 'chatSystemMask') return;
+                mask.style.position = 'fixed';
+                mask.style.top = t + 'px';
+                mask.style.height = h + 'px';
+                mask.style.maxHeight = h + 'px';
+                var win = mask.querySelector('.m-win');
+                if (win) win.style.maxHeight = Math.floor(h * 0.95) + 'px';
+            });
+        }
+        function resetVVFix(mask) {
+            if (!mask) return;
+            mask.style.top = '';
+            mask.style.height = '';
+            mask.style.maxHeight = '';
+            var win = mask.querySelector('.m-win');
+            if (win) win.style.maxHeight = '';
+        }
+        if (!_vvListener) {
+            _vvListener = applyVVFix;
+            vv.addEventListener('resize', applyVVFix);
+            vv.addEventListener('scroll', applyVVFix);
+        }
+        // Expose reset so closeModal can clean up
+        window._resetModalVV = resetVVFix;
+    })();
+
     // ═══ USERS SIDEBAR (always shows all users) ═══
     function loadUsersToSidebar() {
         var container = document.getElementById('tgSidebarContent');
@@ -3058,10 +3097,16 @@
         var container = document.getElementById('chatMessages');
         if (!container) return;
         container.innerHTML = '';
-        // Show/hide input
+        // Show/hide input and always reset disabled state on re-render
         var inputArea = document.getElementById('chatInputArea');
         var loginPrompt = document.getElementById('chatLoginPrompt');
-        if (inputArea) inputArea.style.display = _currentUser ? 'flex' : 'none';
+        if (inputArea) {
+            inputArea.style.display = _currentUser ? 'flex' : 'none';
+            var inp = document.getElementById('chatInput');
+            var sBtn = document.querySelector('#tgChatPanel .chat-send');
+            if (inp) inp.disabled = false;
+            if (sBtn) { sBtn.disabled = false; sBtn.textContent = '➤'; }
+        }
         if (loginPrompt) loginPrompt.style.display = _currentUser ? 'none' : 'block';
 
         if (!_chatMessages.length) {
@@ -3193,18 +3238,20 @@
     var _profileRole = '';
     var _profileRank = '';
 
+    // Wild Rift rank emblem images (helmet-style crests)
     var _wrRankBase = 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-mini-crests/';
     var RANKS = [
-        { id:'iron', name:'Iron', color:'#8B8B8B', img:_wrRankBase+'iron.png', emoji:'⬛' },
-        { id:'bronze', name:'Bronze', color:'#CD7F32', img:_wrRankBase+'bronze.png', emoji:'🟫' },
-        { id:'silver', name:'Silver', color:'#C0C0C0', img:_wrRankBase+'silver.png', emoji:'⬜' },
-        { id:'gold', name:'Gold', color:'#FFD700', img:_wrRankBase+'gold.png', emoji:'🟡' },
-        { id:'platinum', name:'Platinum', color:'#00CED1', img:_wrRankBase+'platinum.png', emoji:'🔵' },
-        { id:'emerald', name:'Emerald', color:'#50C878', img:_wrRankBase+'emerald.png', emoji:'🟢' },
-        { id:'diamond', name:'Diamond', color:'#B9F2FF', img:_wrRankBase+'diamond.png', emoji:'💎' },
-        { id:'master', name:'Master', color:'#9B59B6', img:_wrRankBase+'master.png', emoji:'🟣' },
-        { id:'grandmaster', name:'GM', color:'#E74C3C', img:_wrRankBase+'grandmaster.png', emoji:'🔴' },
-        { id:'challenger', name:'Challenger', color:'#F39C12', img:_wrRankBase+'challenger.png', emoji:'👑' }
+        { id:'iron',        name:'Iron',        color:'#8B8B8B', img:_wrRankBase+'iron.png',        emoji:'⬛' },
+        { id:'bronze',      name:'Bronze',      color:'#CD7F32', img:_wrRankBase+'bronze.png',      emoji:'🟫' },
+        { id:'silver',      name:'Silver',      color:'#C0C0C0', img:_wrRankBase+'silver.png',      emoji:'⬜' },
+        { id:'gold',        name:'Gold',        color:'#FFD700', img:_wrRankBase+'gold.png',        emoji:'🟡' },
+        { id:'platinum',    name:'Platinum',    color:'#00CED1', img:_wrRankBase+'platinum.png',    emoji:'🔵' },
+        { id:'emerald',     name:'Emerald',     color:'#50C878', img:_wrRankBase+'emerald.png',     emoji:'🟢' },
+        { id:'diamond',     name:'Diamond',     color:'#B9F2FF', img:_wrRankBase+'diamond.png',     emoji:'💎' },
+        { id:'master',      name:'Master',      color:'#9B59B6', img:_wrRankBase+'master.png',      emoji:'🟣' },
+        { id:'grandmaster', name:'GM',          color:'#E74C3C', img:_wrRankBase+'grandmaster.png', emoji:'🔴' },
+        { id:'challenger',  name:'Chall',       color:'#F39C12', img:_wrRankBase+'challenger.png',  emoji:'👑' },
+        { id:'sovereign',   name:'Sovereign',   color:'#D4AF37', img:_wrRankBase+'sovereign.png',   emoji:'⚜️' }
     ];
     var ROLES_LIST = ['Top','Jungle','Mid','ADC','Support'];
 
@@ -3379,16 +3426,35 @@
             copiedSection.appendChild(copiedBtn);
 
             var delBtn = document.createElement('button');
-            delBtn.style.cssText = 'width:100%;margin-top:4px;padding:7px;border-radius:10px;border:1px solid rgba(231,76,60,0.2);background:transparent;color:rgba(231,76,60,0.6);font-size:11px;font-weight:700;cursor:pointer;';
+            delBtn.style.cssText = 'width:100%;margin-top:4px;padding:7px;border-radius:10px;border:1px solid rgba(231,76,60,0.2);background:transparent;color:rgba(231,76,60,0.6);font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;';
             delBtn.textContent = '× Удалить слот ' + (i + 1);
-            (function(sk, sd) {
+            (function(sk, sd, idx) {
+                var _confirmPending = false;
+                var _confirmTimer = null;
                 delBtn.onclick = function() {
-                    localStorage.removeItem('copiedUserData_' + sk.split('_')[1]);
-                    if (_pendingDataset === sk) _pendingDataset = null;
-                    if (sd === sk) activateOwnData();
-                    else renderDataPanel();
+                    if (!_confirmPending) {
+                        _confirmPending = true;
+                        delBtn.textContent = '✓ Подтвердить удаление слота ' + (idx + 1);
+                        delBtn.style.border = '1px solid rgba(231,76,60,0.7)';
+                        delBtn.style.color = '#e74c3c';
+                        delBtn.style.background = 'rgba(231,76,60,0.08)';
+                        _confirmTimer = setTimeout(function() {
+                            _confirmPending = false;
+                            delBtn.textContent = '× Удалить слот ' + (idx + 1);
+                            delBtn.style.border = '1px solid rgba(231,76,60,0.2)';
+                            delBtn.style.color = 'rgba(231,76,60,0.6)';
+                            delBtn.style.background = 'transparent';
+                        }, 3000);
+                    } else {
+                        clearTimeout(_confirmTimer);
+                        _confirmPending = false;
+                        localStorage.removeItem('copiedUserData_' + sk.split('_')[1]);
+                        if (_pendingDataset === sk) _pendingDataset = null;
+                        if (sd === sk) activateOwnData();
+                        else renderDataPanel();
+                    }
                 };
-            })(slotKey, savedDataset);
+            })(slotKey, savedDataset, i);
             copiedSection.appendChild(delBtn);
             el.appendChild(copiedSection);
         });
@@ -3522,30 +3588,49 @@
 
         function drawRoles() {
             rolesEl.innerHTML = '';
+            rolesEl.style.flexWrap = 'nowrap';
+            rolesEl.style.gap = '6px';
             ROLES_LIST.forEach(function(r) {
                 var btn = document.createElement('button');
-                btn.style.cssText = 'padding:8px 16px;border-radius:10px;border:1.5px solid '
-                    + (_profileRole === r ? '#b96fff' : 'rgba(155,89,182,0.2)')
-                    + ';background:' + (_profileRole === r ? 'rgba(109,63,245,0.3)' : 'transparent')
-                    + ';color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;';
-                btn.textContent = r;
+                var sel = _profileRole === r;
+                btn.style.cssText = 'flex:1;min-width:0;padding:6px 2px;border-radius:10px;border:2px solid '
+                    + (sel ? '#b96fff' : 'rgba(155,89,182,0.2)')
+                    + ';background:' + (sel ? 'rgba(109,63,245,0.3)' : 'transparent')
+                    + ';cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:3px;';
+                var img = document.createElement('img');
+                img.src = roleIcons[r] || '';
+                img.alt = r;
+                img.style.cssText = 'width:28px;height:28px;object-fit:contain;flex-shrink:0;';
+                var label = document.createElement('span');
+                label.style.cssText = 'font-size:9px;color:#fff;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;';
+                label.textContent = r;
+                btn.appendChild(img);
+                btn.appendChild(label);
                 btn.onclick = function() { _profileRole = r; drawRoles(); };
                 rolesEl.appendChild(btn);
             });
         }
         function drawRanks() {
             ranksEl.innerHTML = '';
+            ranksEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;';
             RANKS.forEach(function(rk) {
                 var btn = document.createElement('button');
                 var sel = _profileRank === rk.id;
-                btn.style.cssText = 'padding:6px 8px;border-radius:10px;border:1.5px solid '
+                btn.style.cssText = 'padding:6px 4px;border-radius:10px;border:2px solid '
                     + (sel ? rk.color : 'rgba(155,89,182,0.2)')
                     + ';background:' + (sel ? 'rgba(109,63,245,0.2)' : 'transparent')
-                    + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:52px;transition:all 0.15s;';
+                    + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all 0.15s;'
+                    + (sel ? 'box-shadow:0 0 8px ' + rk.color + '55;' : '');
                 var imgEl = document.createElement('img');
                 imgEl.src = rk.img;
-                imgEl.style.cssText = 'width:32px;height:32px;object-fit:contain;';
-                imgEl.onerror = function() { this.style.display='none'; var sp=document.createElement('span'); sp.style.fontSize='22px'; sp.textContent=rk.emoji; this.parentNode.insertBefore(sp,this); };
+                imgEl.style.cssText = 'width:36px;height:36px;object-fit:contain;';
+                imgEl.onerror = function() {
+                    this.style.display = 'none';
+                    var sp = document.createElement('span');
+                    sp.style.cssText = 'font-size:26px;line-height:1;';
+                    sp.textContent = rk.emoji;
+                    this.parentNode.insertBefore(sp, this);
+                };
                 btn.appendChild(imgEl);
                 var label = document.createElement('span');
                 label.textContent = rk.name;
