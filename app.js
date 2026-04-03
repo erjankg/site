@@ -2512,6 +2512,9 @@
         return db.collection('users').doc(_currentUser.uid);
     }
 
+    // UID главного админа — его данные копируются новым пользователям по дефолту
+    var ADMIN_UID = 'PaNQ2BWUUOYdvyblvMdcLwJfteB3';
+
     // Save matchups + tier data to Firestore
     function saveUserDataToFirestore() {
         var docRef = getUserDocRef();
@@ -2554,9 +2557,28 @@
 
         docRef.get().then(function(snap) {
             if (!snap.exists) {
-                // First login: upload local data
-                console.log('First login — uploading local data to Firestore');
-                saveUserDataToFirestore();
+                // First login: load admin's default data, then save as user's own
+                console.log('First login — loading default data from admin');
+                if (ADMIN_UID && ADMIN_UID !== 'REPLACE_WITH_YOUR_UID' && db) {
+                    db.collection('users').doc(ADMIN_UID).get().then(function(adminSnap) {
+                        if (adminSnap.exists) {
+                            var ad = adminSnap.data();
+                            if (ad.matchups)     try { localStorage.setItem('matchups', ad.matchups); } catch(e) {}
+                            if (ad.tierData)     try { localStorage.setItem('tierData', ad.tierData); loadTierData(); } catch(e) {}
+                            if (ad.itemTierData) try { localStorage.setItem('itemTierData', ad.itemTierData); loadItemTierData(); } catch(e) {}
+                            if (ad.runeTierData) try { localStorage.setItem('runeTierData', ad.runeTierData); loadRuneTierData(); } catch(e) {}
+                            if (ad.selectedChamps) try { localStorage.setItem('p', ad.selectedChamps); } catch(e) {}
+                            console.log('Default data loaded from admin');
+                            showSyncStatus('Данные по умолчанию загружены ✓');
+                        }
+                        // Save a copy as this user's own data in Firestore
+                        saveUserDataToFirestore();
+                    }).catch(function() {
+                        saveUserDataToFirestore();
+                    });
+                } else {
+                    saveUserDataToFirestore();
+                }
                 return;
             }
             var d = snap.data();
@@ -3642,29 +3664,9 @@
         });
     };
 
-    // Check if first login — open profile setup (after welcome is closed)
+    // Check if first login — no auto-open, profile opens only on user action
     function checkFirstLogin() {
-        if (!db || !_currentUser) return;
-        db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
-            var shouldOpen = false;
-            if (doc.exists) {
-                var d = doc.data();
-                shouldOpen = !d.role || !d.rank;
-            } else {
-                shouldOpen = true;
-            }
-            if (!shouldOpen) return;
-            // Wait until welcome overlay is dismissed before opening profile
-            function tryOpen() {
-                var welcome = document.getElementById('welcomeOverlay');
-                if (welcome && welcome.classList.contains('active')) {
-                    setTimeout(tryOpen, 400);
-                } else {
-                    openProfileSetup();
-                }
-            }
-            setTimeout(tryOpen, 600);
-        });
+        // intentionally empty — profile opens only when user clicks
     }
 
     // ═══════════════════════════════════════
