@@ -3612,8 +3612,28 @@
         ranksEl.innerHTML = html;
     }
 
-    window._profileSelectRole = function(r) { _profileRole = r; drawRoles(); };
-    window._profileSelectRank = function(id) { _profileRank = id; drawRanks(); };
+    window._profileSelectRole = function(r) {
+        _profileRole = r;
+        ROLES_LIST.forEach(function(role) {
+            var btn = document.getElementById('prole-' + role);
+            if (!btn) return;
+            var sel = role === r;
+            btn.style.border = '2px solid ' + (sel ? '#b96fff' : 'rgba(155,89,182,0.35)');
+            btn.style.background = sel ? 'rgba(109,63,245,0.3)' : 'rgba(109,63,245,0.08)';
+        });
+    };
+    window._profileSelectRank = function(id) {
+        _profileRank = id;
+        var rankColors = {iron:'#8B8B8B',bronze:'#CD7F32',silver:'#C0C0C0',gold:'#FFD700',platinum:'#00CED1',emerald:'#50C878',diamond:'#B9F2FF',master:'#9B59B6',grandmaster:'#E74C3C',challenger:'#F39C12',sovereign:'#D4AF37'};
+        Object.keys(rankColors).forEach(function(rid) {
+            var btn = document.getElementById('prank-' + rid);
+            if (!btn) return;
+            var sel = rid === id;
+            btn.style.border = '2px solid ' + (sel ? rankColors[rid] : 'rgba(155,89,182,0.35)');
+            btn.style.background = sel ? 'rgba(109,63,245,0.2)' : 'rgba(109,63,245,0.08)';
+            btn.style.boxShadow = sel ? '0 0 8px ' + rankColors[rid] + '55' : '';
+        });
+    };
 
     window.saveProfile = function() {
         if (!db || !_currentUser) { showToast('Войди в аккаунт'); return; }
