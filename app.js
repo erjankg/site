@@ -3568,7 +3568,8 @@
     function renderProfileSetup() {
         var rolesEl = document.getElementById('profileRoles');
         var ranksEl = document.getElementById('profileRanks');
-        if (!rolesEl || !ranksEl) return;
+        console.log('[Profile] renderProfileSetup called. rolesEl:', !!rolesEl, 'ranksEl:', !!ranksEl, 'ROLES_LIST:', ROLES_LIST, 'RANKS.length:', RANKS.length);
+        if (!rolesEl || !ranksEl) { console.error('[Profile] Elements not found!'); return; }
 
         // Load saved profile — only overwrite if user hasn't made a selection yet
         if (_currentUser && db) {
@@ -3583,11 +3584,11 @@
         }
 
         drawRoles(); drawRanks();
+        console.log('[Profile] after drawRoles/drawRanks — rolesEl children:', rolesEl.children.length, 'ranksEl children:', ranksEl.children.length);
 
         function drawRoles() {
             rolesEl.innerHTML = '';
-            rolesEl.style.flexWrap = 'nowrap';
-            rolesEl.style.gap = '6px';
+            rolesEl.style.cssText = 'display:flex;flex-wrap:nowrap;gap:6px;margin-bottom:18px;';
             ROLES_LIST.forEach(function(r) {
                 var btn = document.createElement('button');
                 var sel = _profileRole === r;
