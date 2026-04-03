@@ -2389,6 +2389,15 @@
     var auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
     var db   = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
     var _currentUser = null;
+    var _isAdmin = false;
+
+    function checkAdmin() {
+        _isAdmin = false;
+        if (!db || !_currentUser) return;
+        db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+            if (doc.exists && doc.data().isAdmin === true) { _isAdmin = true; }
+        }).catch(function() { _isAdmin = false; });
+    }
 
     // ═══════════════════════════════════════
     // REGISTER influencerMask IN MODAL SYSTEM
@@ -3303,14 +3312,16 @@
         var el = document.getElementById('profileDataContent');
         if (!el) return;
         el.innerHTML = '';
-        el.style.position = 'relative';
 
         var savedVisible = localStorage.getItem('dataVisible') !== 'false';
         var savedDataset = localStorage.getItem('activeDataset') || 'own';
-        var dataVisible = (_pendingDataVisible !== null) ? _pendingDataVisible : savedVisible;
-        var pendingDataset = (_pendingDataset !== null) ? _pendingDataset : savedDataset;
+        if (savedDataset === 'copied') { savedDataset = 'copied_0'; localStorage.setItem('activeDataset', 'copied_0'); }
 
-        // Load all 3 copied slots + backward compat migration
+        var dataVisible = (_pendingDataVisible !== null) ? _pendingDataVisible : savedVisible;
+        var activeDataset = (_pendingDataset !== null) ? _pendingDataset : savedDataset;
+        if (activeDataset === 'copied') { activeDataset = 'copied_0'; _pendingDataset = 'copied_0'; }
+
+        // Load copied slots + backward compat
         var copiedSlots = [0,1,2].map(function(i) {
             try { return JSON.parse(localStorage.getItem('copiedUserData_'+i) || 'null'); } catch(e) { return null; }
         });
@@ -3323,180 +3334,121 @@
                 localStorage.removeItem('copiedUserData');
             }
         }
-        // backward compat: 'copied' → 'copied_0'
-        if (savedDataset === 'copied') { savedDataset = 'copied_0'; localStorage.setItem('activeDataset', 'copied_0'); }
-        if (pendingDataset === 'copied') { pendingDataset = 'copied_0'; _pendingDataset = 'copied_0'; }
 
         var hasChanges = (_pendingDataVisible !== null && _pendingDataVisible !== savedVisible)
                       || (_pendingDataset !== null && _pendingDataset !== savedDataset);
 
-        // --- Visibility section ---
-        var visSection = document.createElement('div');
-        visSection.style.cssText = 'margin-bottom:16px;';
-        var visLabel = document.createElement('div');
-        visLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;';
-        visLabel.textContent = 'ВИДИМОСТЬ ТВОИХ ДАННЫХ';
-        visSection.appendChild(visLabel);
-
-        var visBtn = document.createElement('button');
-        visBtn.style.cssText = 'width:100%;padding:10px;border-radius:10px;border:1.5px solid '
-            + (dataVisible ? 'rgba(46,204,113,0.4)' : 'rgba(231,76,60,0.4)')
-            + ';background:' + (dataVisible ? 'rgba(46,204,113,0.08)' : 'rgba(231,76,60,0.08)')
-            + ';color:' + (dataVisible ? '#2ecc71' : '#e74c3c')
-            + ';font-size:12px;font-weight:800;cursor:pointer;transition:all 0.2s;';
-        visBtn.textContent = dataVisible ? '👁 Данные видны другим — Скрыть' : '🙈 Данные скрыты — Показать';
-        visBtn.onclick = function() {
-            _pendingDataVisible = !dataVisible;
-            renderDataPanel();
-        };
-        visSection.appendChild(visBtn);
-        if (_pendingDataVisible !== null && _pendingDataVisible !== savedVisible) {
-            var visHint = document.createElement('div');
-            visHint.style.cssText = 'font-size:10px;color:rgba(255,193,7,0.8);margin-top:4px;text-align:center;';
-            visHint.textContent = '⚠ Не сохранено — нажми Сохранить';
-            visSection.appendChild(visHint);
+        function makeRow(labelText, isSelected, color, onclick) {
+            var row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:center;padding:11px 14px;border-radius:11px;margin-bottom:7px;cursor:pointer;border:1.5px solid '
+                + (isSelected ? color + '88' : 'rgba(255,255,255,0.07)')
+                + ';background:' + (isSelected ? color + '14' : 'transparent')
+                + ';transition:all 0.15s;user-select:none;';
+            var lbl = document.createElement('span');
+            lbl.style.cssText = 'flex:1;font-size:13px;font-weight:700;color:' + (isSelected ? color : 'rgba(255,255,255,0.75)') + ';';
+            lbl.textContent = labelText;
+            var chk = document.createElement('span');
+            chk.style.cssText = 'width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;border:2px solid '
+                + (isSelected ? color : 'rgba(255,255,255,0.18)')
+                + ';color:' + color + ';background:' + (isSelected ? color + '22' : 'transparent') + ';transition:all 0.15s;';
+            chk.textContent = isSelected ? '✓' : '';
+            row.appendChild(lbl);
+            row.appendChild(chk);
+            row.onclick = onclick;
+            return row;
         }
-        el.appendChild(visSection);
 
-        // --- My data block ---
-        var ownSection = document.createElement('div');
-        ownSection.style.cssText = 'margin-bottom:12px;';
-        var ownHeader = document.createElement('div');
-        ownHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;';
-        var ownLabel = document.createElement('div');
-        ownLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;';
-        ownLabel.textContent = 'МОИ ДАННЫЕ';
-        ownHeader.appendChild(ownLabel);
-        if (savedDataset === 'own' && pendingDataset === 'own') {
-            var activeBadge = document.createElement('span');
-            activeBadge.style.cssText = 'font-size:10px;color:#2ecc71;font-weight:800;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);padding:2px 8px;border-radius:6px;';
-            activeBadge.textContent = '✓ Активны';
-            ownHeader.appendChild(activeBadge);
-        }
-        ownSection.appendChild(ownHeader);
-        var isOwnSelected = pendingDataset === 'own';
-        var ownBtn = document.createElement('button');
-        ownBtn.style.cssText = 'width:100%;padding:10px;border-radius:10px;border:1.5px solid '
-            + (isOwnSelected ? 'rgba(109,63,245,0.5)' : 'rgba(155,89,182,0.2)')
-            + ';background:' + (isOwnSelected ? 'rgba(109,63,245,0.15)' : 'transparent')
-            + ';color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;';
-        ownBtn.textContent = isOwnSelected ? '✓ Выбраны свои данные' : 'Выбрать свои данные';
-        ownBtn.onclick = function() {
-            if (pendingDataset === 'own') return;
-            _pendingDataset = 'own';
-            renderDataPanel();
-        };
-        ownSection.appendChild(ownBtn);
-        el.appendChild(ownSection);
+        // ─── ВИДИМОСТЬ ───
+        var secVis = document.createElement('div');
+        secVis.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.3);font-weight:800;letter-spacing:1px;margin-bottom:8px;';
+        secVis.textContent = 'ВИДИМОСТЬ ДАННЫХ';
+        el.appendChild(secVis);
 
-        // --- Copied data slots (up to 3) ---
-        var _slotColors = ['rgba(255,215,0,', 'rgba(46,204,113,', 'rgba(52,152,219,'];
-        var _slotTextColors = ['#FFD700', '#2ecc71', '#3498db'];
-        var _slotLabels = ['СЛОТ 1', 'СЛОТ 2', 'СЛОТ 3'];
-        ;[0,1,2].forEach(function(i) {
-            var slotCopied = copiedSlots[i];
-            if (!slotCopied || !slotCopied.fromName) return;
+        el.appendChild(makeRow('👁  Видно всем', dataVisible === true, '#2ecc71', function() {
+            if (dataVisible === true) return;
+            _pendingDataVisible = true; renderDataPanel();
+        }));
+        el.appendChild(makeRow('🙈  Скрыто', dataVisible === false, '#e74c3c', function() {
+            if (dataVisible === false) return;
+            _pendingDataVisible = false; renderDataPanel();
+        }));
+
+        // ─── DIVIDER ───
+        var divider = document.createElement('div');
+        divider.style.cssText = 'height:1px;background:rgba(255,255,255,0.06);margin:10px 0 14px;';
+        el.appendChild(divider);
+
+        // ─── ИСТОЧНИК ДАННЫХ ───
+        var secSrc = document.createElement('div');
+        secSrc.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.3);font-weight:800;letter-spacing:1px;margin-bottom:8px;';
+        secSrc.textContent = 'ИСТОЧНИК ДАННЫХ';
+        el.appendChild(secSrc);
+
+        el.appendChild(makeRow('Свои данные', activeDataset === 'own', '#b96fff', function() {
+            if (activeDataset === 'own') return;
+            _pendingDataset = 'own'; renderDataPanel();
+        }));
+
+        var _slotColors = ['#FFD700', '#2ecc71', '#3498db'];
+        [0,1,2].forEach(function(i) {
+            var slot = copiedSlots[i];
+            if (!slot || !slot.fromName) return;
             var slotKey = 'copied_' + i;
-            var isSlotSelected = pendingDataset === slotKey;
-            var isSlotActive = savedDataset === slotKey && pendingDataset === slotKey;
 
-            var copiedSection = document.createElement('div');
-            copiedSection.style.cssText = 'margin-bottom:12px;';
-            var copiedHeader = document.createElement('div');
-            copiedHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;';
-            var copiedLabel = document.createElement('div');
-            copiedLabel.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;';
-            copiedLabel.textContent = _slotLabels[i] + ' — ' + slotCopied.fromName;
-            copiedHeader.appendChild(copiedLabel);
-            if (isSlotActive) {
-                var activeBadge2 = document.createElement('span');
-                activeBadge2.style.cssText = 'font-size:10px;color:#2ecc71;font-weight:800;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);padding:2px 8px;border-radius:6px;';
-                activeBadge2.textContent = '✓ Активны';
-                copiedHeader.appendChild(activeBadge2);
-            }
-            copiedSection.appendChild(copiedHeader);
+            var wrap = document.createElement('div');
+            wrap.style.cssText = 'margin-bottom:7px;';
 
-            var copiedBtn = document.createElement('button');
-            copiedBtn.style.cssText = 'width:100%;padding:10px;border-radius:10px;border:1.5px solid '
-                + (isSlotSelected ? _slotColors[i] + '0.5)' : _slotColors[i] + '0.2)')
-                + ';background:' + (isSlotSelected ? _slotColors[i] + '0.08)' : 'transparent')
-                + ';color:' + _slotTextColors[i] + ';font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;';
-            copiedBtn.textContent = isSlotSelected ? '✓ Выбраны данные ' + slotCopied.fromName : 'Выбрать данные ' + slotCopied.fromName;
-            (function(sk, isSel) {
-                copiedBtn.onclick = function() {
-                    if (isSel) return;
-                    _pendingDataset = sk;
-                    renderDataPanel();
-                };
-            })(slotKey, isSlotSelected);
-            copiedSection.appendChild(copiedBtn);
+            var row = makeRow(slot.fromName, activeDataset === slotKey, _slotColors[i], function() {
+                if (activeDataset === slotKey) return;
+                _pendingDataset = slotKey; renderDataPanel();
+            });
+            row.style.marginBottom = '0';
+            wrap.appendChild(row);
 
+            // Delete link
             var delBtn = document.createElement('button');
-            delBtn.style.cssText = 'width:100%;margin-top:4px;padding:7px;border-radius:10px;border:1px solid rgba(231,76,60,0.2);background:transparent;color:rgba(231,76,60,0.6);font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;';
-            delBtn.textContent = '× Удалить слот ' + (i + 1);
+            delBtn.style.cssText = 'width:100%;padding:3px;border:none;background:transparent;color:rgba(231,76,60,0.35);font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.3px;';
+            delBtn.textContent = '× Удалить';
             (function(sk, sd, idx) {
-                var _confirmPending = false;
-                var _confirmTimer = null;
-                delBtn.onclick = function() {
-                    if (!_confirmPending) {
-                        _confirmPending = true;
-                        delBtn.textContent = '✓ Подтвердить удаление слота ' + (idx + 1);
-                        delBtn.style.border = '1px solid rgba(231,76,60,0.7)';
+                var _conf = false, _confTimer;
+                delBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    if (!_conf) {
+                        _conf = true;
+                        delBtn.textContent = '✓ Подтвердить удаление';
                         delBtn.style.color = '#e74c3c';
-                        delBtn.style.background = 'rgba(231,76,60,0.08)';
-                        _confirmTimer = setTimeout(function() {
-                            _confirmPending = false;
-                            delBtn.textContent = '× Удалить слот ' + (idx + 1);
-                            delBtn.style.border = '1px solid rgba(231,76,60,0.2)';
-                            delBtn.style.color = 'rgba(231,76,60,0.6)';
-                            delBtn.style.background = 'transparent';
+                        _confTimer = setTimeout(function() {
+                            _conf = false;
+                            delBtn.textContent = '× Удалить';
+                            delBtn.style.color = 'rgba(231,76,60,0.35)';
                         }, 3000);
                     } else {
-                        clearTimeout(_confirmTimer);
-                        _confirmPending = false;
-
-                        // Show full-modal loading overlay that blocks all clicks
-                        var _blockOverlay = document.createElement('div');
-                        _blockOverlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,6,25,0.78);display:flex;align-items:center;justify-content:center;';
-                        _blockOverlay.innerHTML = '<div style="width:44px;height:44px;border:3px solid rgba(185,111,255,0.2);border-top-color:#b96fff;border-radius:50%;animation:dataSpin 0.7s linear infinite;"></div>';
-                        document.body.appendChild(_blockOverlay);
-
-                        // Remove slot data
-                        localStorage.removeItem('copiedUserData_' + sk.split('_')[1]);
+                        clearTimeout(_confTimer);
+                        localStorage.removeItem('copiedUserData_' + idx);
                         if (_pendingDataset === sk) _pendingDataset = null;
-
-                        setTimeout(function() {
-                            document.body.removeChild(_blockOverlay);
-                            if (sd === sk) activateOwnData();
-                            else renderDataPanel();
-                        }, 500);
+                        if (sd === sk) activateOwnData();
+                        else renderDataPanel();
                     }
                 };
             })(slotKey, savedDataset, i);
-            copiedSection.appendChild(delBtn);
-            el.appendChild(copiedSection);
+            wrap.appendChild(delBtn);
+            el.appendChild(wrap);
         });
 
-        // --- Save button ---
-        var saveBtn = document.createElement('button');
-        saveBtn.id = 'dataPanelSaveBtn';
-        saveBtn.style.cssText = 'width:100%;padding:13px;border-radius:12px;border:none;'
-            + 'background:' + (hasChanges ? 'linear-gradient(135deg,#6d3ff5,#9b59b6)' : 'rgba(109,63,245,0.15)')
-            + ';color:#fff;font-size:14px;font-weight:900;cursor:'
-            + (hasChanges ? 'pointer' : 'not-allowed')
-            + ';margin-top:16px;opacity:' + (hasChanges ? '1' : '0.4')
-            + ';transition:all 0.2s;';
-        saveBtn.textContent = '✓ Сохранить';
-        saveBtn.disabled = !hasChanges;
-        saveBtn.onclick = function() {
-            if (!hasChanges) return;
-            _applyDataPanelSave(dataVisible, savedVisible, pendingDataset, savedDataset);
-        };
-        el.appendChild(saveBtn);
+        // ─── КНОПКА СОХРАНИТЬ (только если есть изменения) ───
+        if (hasChanges) {
+            var saveBtn = document.createElement('button');
+            saveBtn.style.cssText = 'width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#6d3ff5,#9b59b6);color:#fff;font-size:14px;font-weight:900;cursor:pointer;margin-top:14px;';
+            saveBtn.textContent = '✓ Сохранить';
+            saveBtn.onclick = function() {
+                _applyDataPanelSave(dataVisible, savedVisible, activeDataset, savedDataset);
+            };
+            el.appendChild(saveBtn);
+        }
 
         var hint = document.createElement('div');
-        hint.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.2);line-height:1.5;margin-top:12px;';
-        hint.textContent = 'Можно сохранить до 3 наборов данных разных игроков. Нажми на пользователя в списке → Скопировать данные.';
+        hint.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.15);line-height:1.5;margin-top:14px;';
+        hint.textContent = 'Нажми на пользователя в списке → Скопировать данные, чтобы добавить набор.';
         el.appendChild(hint);
     }
 

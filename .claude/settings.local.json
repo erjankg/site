@@ -6,7 +6,8 @@
       "Read(//d/Flutter ERjanKG/**)",
       "Bash(find 'd:/Flutter ERjanKG' -maxdepth 3 -type f -name *.dart)",
       "Bash(grep -E \"\\\\.\\(html|css|js\\)$\")",
-      "Read(//d//**)"
+      "Read(//d//**)",
+      "Bash(cd /d/Flutter ERjanKG)"
     ]
   }
 }
