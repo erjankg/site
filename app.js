@@ -3293,11 +3293,33 @@
     var ROLES_LIST = ['Top','Jungle','Mid','ADC','Support'];
 
     window.openProfileSetup = function() {
-        // Reset so Firestore data loads fresh each time
         _profileRole = '';
         _profileRank = '';
         openModal('profileSetupMask');
-        switchProfileTab('profile');
+        // Show profile tab
+        var panelProfile = document.getElementById('profPanelProfile');
+        var panelData = document.getElementById('profPanelData');
+        var tabProfile = document.getElementById('profTabProfile');
+        var tabData = document.getElementById('profTabData');
+        if (panelProfile) { panelProfile.style.display = 'block'; panelProfile.style.flex = '1'; }
+        if (panelData) panelData.style.display = 'none';
+        if (tabProfile) { tabProfile.style.background = 'rgba(109,63,245,0.15)'; tabProfile.style.color = '#b96fff'; tabProfile.style.borderBottom = '2px solid #b96fff'; }
+        if (tabData) { tabData.style.background = 'transparent'; tabData.style.color = 'rgba(255,255,255,0.4)'; tabData.style.borderBottom = '2px solid transparent'; }
+        // Load from Firestore then render
+        if (_currentUser && db) {
+            try {
+                db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+                    if (doc.exists) {
+                        var d = doc.data();
+                        _profileRole = d.role || '';
+                        _profileRank = d.rank || '';
+                    }
+                    renderProfileSetup();
+                }).catch(function() { renderProfileSetup(); });
+            } catch(e) { renderProfileSetup(); }
+        } else {
+            renderProfileSetup();
+        }
     };
     window.closeProfileSetup = function() {
         closeModal('profileSetupMask');
@@ -3325,7 +3347,7 @@
             if (panelData) panelData.style.display = 'none';
             if (tabProfile) { tabProfile.style.background = 'rgba(109,63,245,0.15)'; tabProfile.style.color = '#b96fff'; tabProfile.style.borderBottom = '2px solid #b96fff'; }
             if (tabData) { tabData.style.background = 'transparent'; tabData.style.color = 'rgba(255,255,255,0.4)'; tabData.style.borderBottom = '2px solid transparent'; }
-            renderProfileSetup();
+            drawRoles(); drawRanks();
         }
     };
 
@@ -3566,84 +3588,50 @@
         var rolesEl = document.getElementById('profileRoles');
         var ranksEl = document.getElementById('profileRanks');
         if (!rolesEl || !ranksEl) return;
-
-        // Load saved profile from Firestore — wrapped in try/catch so a
-        // Firebase SDK error (e.g. "google is not defined") never blocks rendering
-        try {
-            if (_currentUser && db) {
-                db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
-                    if (doc.exists) {
-                        var d = doc.data();
-                        if (!_profileRole) _profileRole = d.role || '';
-                        if (!_profileRank) _profileRank = d.rank || '';
-                        drawRoles(); drawRanks();
-                    }
-                }).catch(function() {});
-            }
-        } catch(e) {}
-
-        drawRoles(); drawRanks();
-
-        function drawRoles() {
-            rolesEl.innerHTML = '';
-            rolesEl.style.cssText = 'display:flex;flex-wrap:nowrap;gap:6px;margin-bottom:18px;';
-            ROLES_LIST.forEach(function(r) {
-                var btn = document.createElement('button');
-                var sel = _profileRole === r;
-                btn.style.cssText = 'flex:1;min-width:0;padding:6px 2px;border-radius:10px;border:2px solid '
-                    + (sel ? '#b96fff' : 'rgba(155,89,182,0.2)')
-                    + ';background:' + (sel ? 'rgba(109,63,245,0.3)' : 'transparent')
-                    + ';cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:3px;';
-                var img = document.createElement('img');
-                img.src = roleIcons[r] || '';
-                img.alt = r;
-                img.style.cssText = 'width:28px;height:28px;object-fit:contain;flex-shrink:0;';
-                var label = document.createElement('span');
-                label.style.cssText = 'font-size:9px;color:#fff;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;';
-                label.textContent = r;
-                btn.appendChild(img);
-                btn.appendChild(label);
-                btn.onclick = function() { _profileRole = r; drawRoles(); };
-                rolesEl.appendChild(btn);
-            });
-        }
-        function drawRanks() {
-            ranksEl.innerHTML = '';
-            ranksEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;';
-            RANKS.forEach(function(rk) {
-                var btn = document.createElement('button');
-                var sel = _profileRank === rk.id;
-                btn.style.cssText = 'padding:6px 4px;border-radius:10px;border:2px solid '
-                    + (sel ? rk.color : 'rgba(155,89,182,0.2)')
-                    + ';background:' + (sel ? 'rgba(109,63,245,0.2)' : 'transparent')
-                    + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all 0.15s;'
-                    + (sel ? 'box-shadow:0 0 8px ' + rk.color + '55;' : '');
-                if (rk.img) {
-                    var imgEl = document.createElement('img');
-                    imgEl.src = rk.img;
-                    imgEl.style.cssText = 'width:36px;height:36px;object-fit:contain;';
-                    imgEl.onerror = function() {
-                        this.style.display = 'none';
-                        var sp = document.createElement('span');
-                        sp.style.cssText = 'font-size:26px;line-height:1;';
-                        sp.textContent = rk.emoji;
-                        this.parentNode.insertBefore(sp, this);
-                    };
-                    btn.appendChild(imgEl);
-                } else {
-                    var sp = document.createElement('span');
-                    sp.style.cssText = 'font-size:26px;line-height:1;';
-                    sp.textContent = rk.emoji;
-                    btn.appendChild(sp);
-                }
-                var label = document.createElement('span');
-                label.textContent = rk.name;
-                btn.appendChild(label);
-                btn.onclick = function() { _profileRank = rk.id; drawRanks(); };
-                ranksEl.appendChild(btn);
-            });
-        }
+        drawRoles();
+        drawRanks();
     }
+
+    function drawRoles() {
+        var rolesEl = document.getElementById('profileRoles');
+        if (!rolesEl) return;
+        var html = '';
+        ROLES_LIST.forEach(function(r) {
+            var sel = _profileRole === r;
+            var border = sel ? '#b96fff' : 'rgba(155,89,182,0.35)';
+            var bg = sel ? 'rgba(109,63,245,0.3)' : 'rgba(109,63,245,0.08)';
+            html += '<button onclick="window._profileSelectRole(\'' + r + '\')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;">'
+                  + '<img src="' + (roleIcons[r] || '') + '" alt="' + r + '" style="width:26px;height:26px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+                  + '<span style="font-size:9px;color:#fff;font-weight:700;">' + r + '</span>'
+                  + '</button>';
+        });
+        rolesEl.style.cssText = 'display:flex;flex-wrap:nowrap;gap:6px;margin-bottom:18px;';
+        rolesEl.innerHTML = html;
+    }
+
+    function drawRanks() {
+        var ranksEl = document.getElementById('profileRanks');
+        if (!ranksEl) return;
+        var html = '';
+        RANKS.forEach(function(rk) {
+            var sel = _profileRank === rk.id;
+            var border = sel ? rk.color : 'rgba(155,89,182,0.35)';
+            var bg = sel ? 'rgba(109,63,245,0.2)' : 'rgba(109,63,245,0.08)';
+            var shadow = sel ? 'box-shadow:0 0 8px ' + rk.color + '55;' : '';
+            var icon = rk.img
+                ? '<img src="' + rk.img + '" style="width:32px;height:32px;object-fit:contain;" onerror="this.outerHTML=\'<span style=font-size:22px>' + rk.emoji + '</span>\'">'
+                : '<span style="font-size:22px;line-height:1;">' + rk.emoji + '</span>';
+            html += '<button onclick="window._profileSelectRank(\'' + rk.id + '\')" style="padding:6px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;' + shadow + '">'
+                  + icon
+                  + '<span>' + rk.name + '</span>'
+                  + '</button>';
+        });
+        ranksEl.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;margin-bottom:18px;';
+        ranksEl.innerHTML = html;
+    }
+
+    window._profileSelectRole = function(r) { _profileRole = r; drawRoles(); };
+    window._profileSelectRank = function(id) { _profileRank = id; drawRanks(); };
 
     window.saveProfile = function() {
         if (!db || !_currentUser) { showToast('Войди в аккаунт'); return; }
