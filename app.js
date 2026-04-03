@@ -3565,23 +3565,24 @@
     function renderProfileSetup() {
         var rolesEl = document.getElementById('profileRoles');
         var ranksEl = document.getElementById('profileRanks');
-        console.log('[Profile] renderProfileSetup called. rolesEl:', !!rolesEl, 'ranksEl:', !!ranksEl, 'ROLES_LIST:', ROLES_LIST, 'RANKS.length:', RANKS.length);
-        if (!rolesEl || !ranksEl) { console.error('[Profile] Elements not found!'); return; }
+        if (!rolesEl || !ranksEl) return;
 
-        // Load saved profile — only overwrite if user hasn't made a selection yet
-        if (_currentUser && db) {
-            db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
-                if (doc.exists) {
-                    var d = doc.data();
-                    if (!_profileRole) _profileRole = d.role || '';
-                    if (!_profileRank) _profileRank = d.rank || '';
-                    drawRoles(); drawRanks();
-                }
-            });
-        }
+        // Load saved profile from Firestore — wrapped in try/catch so a
+        // Firebase SDK error (e.g. "google is not defined") never blocks rendering
+        try {
+            if (_currentUser && db) {
+                db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+                    if (doc.exists) {
+                        var d = doc.data();
+                        if (!_profileRole) _profileRole = d.role || '';
+                        if (!_profileRank) _profileRank = d.rank || '';
+                        drawRoles(); drawRanks();
+                    }
+                }).catch(function() {});
+            }
+        } catch(e) {}
 
         drawRoles(); drawRanks();
-        console.log('[Profile] after drawRoles/drawRanks — rolesEl children:', rolesEl.children.length, 'ranksEl children:', ranksEl.children.length);
 
         function drawRoles() {
             rolesEl.innerHTML = '';
