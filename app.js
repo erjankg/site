@@ -3187,6 +3187,12 @@
         input.value = '';
         input.disabled = true;
 
+        // Fallback: если Firestore завис и ни .then() ни .catch() не сработали за 5с
+        var _sendFallback = setTimeout(function() {
+            if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = '➤'; }
+            if (input) input.disabled = false;
+        }, 5000);
+
         db.collection('globalChat').add({
             text: text,
             name: _currentUser.displayName || _currentUser.email || 'Аноним',
@@ -3195,6 +3201,7 @@
             isAdmin: _isAdmin || false,
             ts: firebase.firestore.FieldValue.serverTimestamp()
         }).then(function() {
+            clearTimeout(_sendFallback);
             if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = '➤'; }
             if (input) input.disabled = false;
             // Cleanup old messages beyond 100
@@ -3208,6 +3215,7 @@
                 }
             });
         }).catch(function(err) {
+            clearTimeout(_sendFallback);
             console.error('Send error:', err);
             if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = '➤'; }
             if (input) { input.disabled = false; input.value = text; }
@@ -3220,9 +3228,6 @@
         if (!db) return;
         db.collection('globalChat').doc(docId).delete().catch(function(e) { console.warn('Del err:', e); });
     }
-
-    // ═══ SEND MESSAGE ═══
-    window.tgSendMsg = function() { sendGlobalMsg(); };
 
     // ═══ COMPAT ═══
     window.closeUserMenuAndOpen = function(what) {
@@ -3257,7 +3262,8 @@
 
     window.openProfileSetup = function() {
         openModal('profileSetupMask');
-        switchProfileTab('profile');
+        // Небольшая задержка: дождаться пока CSS-переход покажет модалку, затем рендерить
+        setTimeout(function() { switchProfileTab('profile'); }, 30);
     };
     window.closeProfileSetup = function() {
         closeModal('profileSetupMask');
@@ -3276,12 +3282,12 @@
         var tabData = document.getElementById('profTabData');
         if (tab === 'data') {
             if (panelProfile) panelProfile.style.display = 'none';
-            if (panelData) panelData.style.display = '';
+            if (panelData) { panelData.style.display = 'block'; panelData.style.flex = '1'; }
             if (tabProfile) { tabProfile.style.background = 'transparent'; tabProfile.style.color = 'rgba(255,255,255,0.4)'; tabProfile.style.borderBottom = '2px solid transparent'; }
             if (tabData) { tabData.style.background = 'rgba(109,63,245,0.15)'; tabData.style.color = '#b96fff'; tabData.style.borderBottom = '2px solid #b96fff'; }
             renderDataPanel();
         } else {
-            if (panelProfile) panelProfile.style.display = '';
+            if (panelProfile) { panelProfile.style.display = 'block'; panelProfile.style.flex = '1'; }
             if (panelData) panelData.style.display = 'none';
             if (tabProfile) { tabProfile.style.background = 'rgba(109,63,245,0.15)'; tabProfile.style.color = '#b96fff'; tabProfile.style.borderBottom = '2px solid #b96fff'; }
             if (tabData) { tabData.style.background = 'transparent'; tabData.style.color = 'rgba(255,255,255,0.4)'; tabData.style.borderBottom = '2px solid transparent'; }
@@ -3448,10 +3454,22 @@
                     } else {
                         clearTimeout(_confirmTimer);
                         _confirmPending = false;
+
+                        // Show full-modal loading overlay that blocks all clicks
+                        var _blockOverlay = document.createElement('div');
+                        _blockOverlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(10,6,25,0.78);display:flex;align-items:center;justify-content:center;';
+                        _blockOverlay.innerHTML = '<div style="width:44px;height:44px;border:3px solid rgba(185,111,255,0.2);border-top-color:#b96fff;border-radius:50%;animation:dataSpin 0.7s linear infinite;"></div>';
+                        document.body.appendChild(_blockOverlay);
+
+                        // Remove slot data
                         localStorage.removeItem('copiedUserData_' + sk.split('_')[1]);
                         if (_pendingDataset === sk) _pendingDataset = null;
-                        if (sd === sk) activateOwnData();
-                        else renderDataPanel();
+
+                        setTimeout(function() {
+                            document.body.removeChild(_blockOverlay);
+                            if (sd === sk) activateOwnData();
+                            else renderDataPanel();
+                        }, 500);
                     }
                 };
             })(slotKey, savedDataset, i);
