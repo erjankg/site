@@ -3297,10 +3297,7 @@
         _profileRole = '';
         _profileRank = '';
         openModal('profileSetupMask');
-        // Render immediately — DOM elements are always present regardless of CSS transition
         switchProfileTab('profile');
-        // Re-render after paint as a safety net for layout-dependent browsers
-        requestAnimationFrame(function() { renderProfileSetup(); });
     };
     window.closeProfileSetup = function() {
         closeModal('profileSetupMask');
