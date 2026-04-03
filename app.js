@@ -3253,19 +3253,20 @@
     var _profileRank = '';
 
     // Wild Rift rank emblem images (helmet-style crests)
-    var _wrRankBase = 'https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-mini-crests/';
+    // Wild Rift rank icons from Liquipedia WR wiki (128×128 WR-specific crests)
+    var _lqBase = 'https://liquipedia.net/commons/images/thumb/';
     var RANKS = [
-        { id:'iron',        name:'Iron',        color:'#8B8B8B', img:_wrRankBase+'iron.png',        emoji:'⬛' },
-        { id:'bronze',      name:'Bronze',      color:'#CD7F32', img:_wrRankBase+'bronze.png',      emoji:'🟫' },
-        { id:'silver',      name:'Silver',      color:'#C0C0C0', img:_wrRankBase+'silver.png',      emoji:'⬜' },
-        { id:'gold',        name:'Gold',        color:'#FFD700', img:_wrRankBase+'gold.png',        emoji:'🟡' },
-        { id:'platinum',    name:'Platinum',    color:'#00CED1', img:_wrRankBase+'platinum.png',    emoji:'🔵' },
-        { id:'emerald',     name:'Emerald',     color:'#50C878', img:_wrRankBase+'emerald.png',     emoji:'🟢' },
-        { id:'diamond',     name:'Diamond',     color:'#B9F2FF', img:_wrRankBase+'diamond.png',     emoji:'💎' },
-        { id:'master',      name:'Master',      color:'#9B59B6', img:_wrRankBase+'master.png',      emoji:'🟣' },
-        { id:'grandmaster', name:'GM',          color:'#E74C3C', img:_wrRankBase+'grandmaster.png', emoji:'🔴' },
-        { id:'challenger',  name:'Chall',       color:'#F39C12', img:_wrRankBase+'challenger.png',  emoji:'👑' },
-        { id:'sovereign',   name:'Sovereign',   color:'#D4AF37', img:_wrRankBase+'sovereign.png',   emoji:'⚜️' }
+        { id:'iron',        name:'Iron',        color:'#8B8B8B', img:_lqBase+'2/24/Iron_rank.png/175px-Iron_rank.png',              emoji:'⬛' },
+        { id:'bronze',      name:'Bronze',      color:'#CD7F32', img:_lqBase+'f/fe/Bronze_rank.png/175px-Bronze_rank.png',           emoji:'🟫' },
+        { id:'silver',      name:'Silver',      color:'#C0C0C0', img:_lqBase+'3/39/Silver_rank.png/175px-Silver_rank.png',           emoji:'⬜' },
+        { id:'gold',        name:'Gold',        color:'#FFD700', img:_lqBase+'f/f8/Gold_rank.png/175px-Gold_rank.png',               emoji:'🟡' },
+        { id:'platinum',    name:'Platinum',    color:'#00CED1', img:_lqBase+'5/5e/Platinum_rank.png/175px-Platinum_rank.png',       emoji:'🔵' },
+        { id:'emerald',     name:'Emerald',     color:'#50C878', img:_lqBase+'b/bf/Emerald_rank.png/175px-Emerald_rank.png',         emoji:'🟢' },
+        { id:'diamond',     name:'Diamond',     color:'#B9F2FF', img:_lqBase+'c/c6/Diamond_rank.png/175px-Diamond_rank.png',         emoji:'💎' },
+        { id:'master',      name:'Master',      color:'#9B59B6', img:_lqBase+'7/76/Master_rank.png/175px-Master_rank.png',           emoji:'🟣' },
+        { id:'grandmaster', name:'GM',          color:'#E74C3C', img:_lqBase+'f/f2/Grandmaster_rank.png/175px-Grandmaster_rank.png', emoji:'🔴' },
+        { id:'challenger',  name:'Chall',       color:'#F39C12', img:_lqBase+'a/a0/Challenger_rank.png/175px-Challenger_rank.png',   emoji:'👑' },
+        { id:'sovereign',   name:'Sovereign',   color:'#D4AF37', img:'',                                                             emoji:'⚜️' }
     ];
     var ROLES_LIST = ['Top','Jungle','Mid','ADC','Support'];
 
@@ -3591,17 +3592,24 @@
                     + ';background:' + (sel ? 'rgba(109,63,245,0.2)' : 'transparent')
                     + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all 0.15s;'
                     + (sel ? 'box-shadow:0 0 8px ' + rk.color + '55;' : '');
-                var imgEl = document.createElement('img');
-                imgEl.src = rk.img;
-                imgEl.style.cssText = 'width:36px;height:36px;object-fit:contain;';
-                imgEl.onerror = function() {
-                    this.style.display = 'none';
+                if (rk.img) {
+                    var imgEl = document.createElement('img');
+                    imgEl.src = rk.img;
+                    imgEl.style.cssText = 'width:36px;height:36px;object-fit:contain;';
+                    imgEl.onerror = function() {
+                        this.style.display = 'none';
+                        var sp = document.createElement('span');
+                        sp.style.cssText = 'font-size:26px;line-height:1;';
+                        sp.textContent = rk.emoji;
+                        this.parentNode.insertBefore(sp, this);
+                    };
+                    btn.appendChild(imgEl);
+                } else {
                     var sp = document.createElement('span');
                     sp.style.cssText = 'font-size:26px;line-height:1;';
                     sp.textContent = rk.emoji;
-                    this.parentNode.insertBefore(sp, this);
-                };
-                btn.appendChild(imgEl);
+                    btn.appendChild(sp);
+                }
                 var label = document.createElement('span');
                 label.textContent = rk.name;
                 btn.appendChild(label);
@@ -3778,11 +3786,15 @@
                 if (rk) {
                     var rankBadge = document.createElement('span');
                     rankBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px;';
-                    var rkImg = document.createElement('img');
-                    rkImg.src = rk.img;
-                    rkImg.style.cssText = 'width:16px;height:16px;object-fit:contain;';
-                    rkImg.onerror = function() { this.outerHTML = rk.emoji; };
-                    rankBadge.appendChild(rkImg);
+                    if (rk.img) {
+                        var rkImg = document.createElement('img');
+                        rkImg.src = rk.img;
+                        rkImg.style.cssText = 'width:16px;height:16px;object-fit:contain;';
+                        rkImg.onerror = function() { this.outerHTML = rk.emoji; };
+                        rankBadge.appendChild(rkImg);
+                    } else {
+                        rankBadge.appendChild(document.createTextNode(rk.emoji + ' '));
+                    }
                     rankBadge.appendChild(document.createTextNode(rk.name));
                     badges.appendChild(rankBadge);
                 }
