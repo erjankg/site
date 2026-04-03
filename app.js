@@ -3271,6 +3271,9 @@
     var ROLES_LIST = ['Top','Jungle','Mid','ADC','Support'];
 
     window.openProfileSetup = function() {
+        // Reset so Firestore data loads fresh each time
+        _profileRole = '';
+        _profileRank = '';
         openModal('profileSetupMask');
         // Небольшая задержка: дождаться пока CSS-переход покажет модалку, затем рендерить
         setTimeout(function() { switchProfileTab('profile'); }, 30);
@@ -3543,13 +3546,13 @@
         var ranksEl = document.getElementById('profileRanks');
         if (!rolesEl || !ranksEl) return;
 
-        // Load saved profile
+        // Load saved profile — only overwrite if user hasn't made a selection yet
         if (_currentUser && db) {
             db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
                 if (doc.exists) {
                     var d = doc.data();
-                    _profileRole = d.role || '';
-                    _profileRank = d.rank || '';
+                    if (!_profileRole) _profileRole = d.role || '';
+                    if (!_profileRank) _profileRank = d.rank || '';
                     drawRoles(); drawRanks();
                 }
             });
@@ -3621,7 +3624,11 @@
 
     window.saveProfile = function() {
         if (!db || !_currentUser) { showToast('Войди в аккаунт'); return; }
-        if (!_profileRole && !_profileRank) { showToast('Выбери роль и ранг'); return; }
+        if (!_profileRole || !_profileRank) {
+            var _msg = (!_profileRole && !_profileRank) ? 'Выбери роль и ранг'
+                     : !_profileRole ? 'Выбери роль' : 'Выбери ранг';
+            showToast(_msg); return;
+        }
         db.collection('users').doc(_currentUser.uid).set({
             role: _profileRole,
             rank: _profileRank
@@ -3635,18 +3642,28 @@
         });
     };
 
-    // Check if first login — open profile setup
+    // Check if first login — open profile setup (after welcome is closed)
     function checkFirstLogin() {
         if (!db || !_currentUser) return;
         db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+            var shouldOpen = false;
             if (doc.exists) {
                 var d = doc.data();
-                if (!d.role && !d.rank) {
-                    setTimeout(function() { openProfileSetup(); }, 500);
-                }
+                shouldOpen = !d.role || !d.rank;
             } else {
-                setTimeout(function() { openProfileSetup(); }, 500);
+                shouldOpen = true;
             }
+            if (!shouldOpen) return;
+            // Wait until welcome overlay is dismissed before opening profile
+            function tryOpen() {
+                var welcome = document.getElementById('welcomeOverlay');
+                if (welcome && welcome.classList.contains('active')) {
+                    setTimeout(tryOpen, 400);
+                } else {
+                    openProfileSetup();
+                }
+            }
+            setTimeout(tryOpen, 600);
         });
     }
 
