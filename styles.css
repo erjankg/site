@@ -633,7 +633,7 @@ width: 100%;
 }
 
 /* Mobile: 1 champ column per role */
-@media (max-width: 600px) {
+@media (max-width: 600px) and (orientation: portrait) {
 .m-role-champs {
     grid-template-columns: 1fr !important;
 }
@@ -733,7 +733,7 @@ body.sidebar-open { overflow: hidden !important; touch-action: none; position: f
 * { scrollbar-width: none; -ms-overflow-style: none; }
 
 /* MOBILE */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 .app-wrapper {
 overflow-x: hidden; padding: 12px; padding-bottom: 88px; }
 .logo { font-size: 18px; }
@@ -755,7 +755,7 @@ td { font-size: 10px; padding: 8px 2px; }
 .m-grid { gap: 8px; }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 400px) and (orientation: portrait) {
 th { font-size: 8px; padding: 6px 2px; }
 td { font-size: 9px; padding: 6px 1px; }
 	            #statTable td:first-child { font-size: 8px; }
@@ -775,7 +775,7 @@ flex-shrink: 0;
 border: 1px solid rgba(155,89,182,0.35);
 }
 /* Mobile: hide name, show number inside cell */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 .champ-icon { width: 42px; height: 42px; border-radius: 8px; }
 .champ-cell .name-tag { display: none !important; }
 .champ-cell {
@@ -794,14 +794,14 @@ text-align: center;
 flex-shrink: 0;
 font-weight: 700;
 }
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 .row-num { font-size: 8px; min-width: 10px; }
 }
 /* Modal champion items with icons */
 /* m-item uses width:100% and aspect-ratio:1 for icons — see .m-item CSS above */
 
 /* Mobile: force sort arrows visible under header text */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 #statTable thead th span[id^="ar-"] {
     display: block;
     visibility: visible;
@@ -894,7 +894,7 @@ display: grid;
 grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
 gap: 8px;
 }
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 .items-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; }
 .items-grid .item-card img { width: 100%; height: auto; }
 }
@@ -943,7 +943,7 @@ text-align: center;
 /* Mana label: full on PC, short on mobile */
 .mana-label-short { display: none; }
 .mana-label-full  { display: inline; }
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 .mana-label-short { display: inline; }
 .mana-label-full  { display: none; }
 }
@@ -1197,7 +1197,7 @@ margin-top: 10px; text-align: center; opacity: 0.92; min-height: 12px;
 }
 
 /* ── MOBILE ── */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 /* Table sizing handled by consolidated section */
 #statTable th:first-child, #statTable td:first-child { width: 35%; }
 #statTable th:not(:first-child), #statTable td:not(:first-child) { width: 13%; }
@@ -1318,7 +1318,7 @@ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 
 
 /* ── ITEMS GRID MOBILE: 5 cols ── */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 .items-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 5px; }
 .items-grid .item-card img { width: 38px; height: 38px; }
 }
@@ -1363,7 +1363,7 @@ max-height: 100vh; border-radius: 0;
 }
 }
 /* ── MOBILE MODALS ── */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 .m-win { padding-right: 16px !important; }
 #champPickerGrid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
 #scGrid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
@@ -1504,7 +1504,7 @@ background: none; border: 1.5px solid rgba(155,89,182,0.3); color: rgba(255,255,
 border-radius: 8px; width: 28px; height: 28px; font-size: 14px; cursor: pointer;
 display: none; align-items: center; justify-content: center; flex-shrink: 0;
 }
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 .tg-sidebar-close-btn { display: flex; }
 }
 /* ── Chat close buttons (not .btn-close-x to avoid global override) ── */
@@ -1519,7 +1519,7 @@ background:#ffd700; color:#000; border-radius:10px; font-size:9px; font-weight:9
 display:none; align-items:center; justify-content:center; padding:0 4px;
 }
 /* ── MOBILE CHAT ── */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 .tg-sidebar { display:none; position:fixed; inset:0; z-index:100; max-width:100%; width:100%; border-right:none; background:linear-gradient(135deg, #1a0d2e 0%, #0f0520 100%); }
 .tg-sidebar.mobile-open { display:flex; }
 .tg-back-btn { display:flex !important; align-items:center; }
