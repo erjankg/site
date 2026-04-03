@@ -3296,30 +3296,12 @@
         _profileRole = '';
         _profileRank = '';
         openModal('profileSetupMask');
-        // Show profile tab
         var panelProfile = document.getElementById('profPanelProfile');
         var panelData = document.getElementById('profPanelData');
-        var tabProfile = document.getElementById('profTabProfile');
-        var tabData = document.getElementById('profTabData');
         if (panelProfile) { panelProfile.style.display = 'block'; panelProfile.style.flex = '1'; }
         if (panelData) panelData.style.display = 'none';
-        if (tabProfile) { tabProfile.style.background = 'rgba(109,63,245,0.15)'; tabProfile.style.color = '#b96fff'; tabProfile.style.borderBottom = '2px solid #b96fff'; }
-        if (tabData) { tabData.style.background = 'transparent'; tabData.style.color = 'rgba(255,255,255,0.4)'; tabData.style.borderBottom = '2px solid transparent'; }
-        // Load from Firestore then render
-        if (_currentUser && db) {
-            try {
-                db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
-                    if (doc.exists) {
-                        var d = doc.data();
-                        _profileRole = d.role || '';
-                        _profileRank = d.rank || '';
-                    }
-                    renderProfileSetup();
-                }).catch(function() { renderProfileSetup(); });
-            } catch(e) { renderProfileSetup(); }
-        } else {
-            renderProfileSetup();
-        }
+        drawRoles();
+        drawRanks();
     };
     window.closeProfileSetup = function() {
         closeModal('profileSetupMask');
