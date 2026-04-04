@@ -4333,9 +4333,11 @@
         var btnMain = document.getElementById('viewBtnMain');
         var btnWrpr = document.getElementById('viewBtnWrpr');
         if (!mainEl || !wrprEl) return;
+        var lvlEl = document.querySelector('.lvl-container');
         if (view === 'wrpr') {
             mainEl.style.display = 'none';
             wrprEl.style.display = 'flex';
+            if (lvlEl) lvlEl.style.display = 'none';
             if (btnMain) btnMain.classList.remove('active');
             if (btnWrpr) btnWrpr.classList.add('active');
             wrprBuildFilters();
@@ -4343,6 +4345,7 @@
         } else {
             mainEl.style.display = '';
             wrprEl.style.display = 'none';
+            if (lvlEl) lvlEl.style.display = '';
             if (btnMain) btnMain.classList.add('active');
             if (btnWrpr) btnWrpr.classList.remove('active');
         }
