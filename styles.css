@@ -87,7 +87,7 @@ position: relative;
 display: flex;
 align-items: center;
 justify-content: center;
-gap: 6px;
+gap: 10px;
 }
 
 .logo {
@@ -104,24 +104,25 @@ text-align: center;
 
 /* View toggle buttons in header */
 .header-view-btn {
-padding: 6px 11px;
-border-radius: 20px;
+padding: 8px 18px;
+border-radius: 22px;
 border: 1.5px solid rgba(185,111,255,0.3);
-background: transparent;
-color: rgba(255,255,255,0.45);
-font-size: 11px;
+background: rgba(255,255,255,0.04);
+color: rgba(255,255,255,0.5);
+font-size: 13px;
 font-weight: 800;
 cursor: pointer;
 white-space: nowrap;
-transition: all 0.15s;
-letter-spacing: 0.3px;
+transition: all 0.18s;
+letter-spacing: 0.4px;
 }
 .header-view-btn.active {
-background: rgba(109,63,245,0.25);
+background: rgba(109,63,245,0.3);
 border-color: #b96fff;
-color: #b96fff;
+color: #d0a0ff;
+box-shadow: 0 0 12px rgba(185,111,255,0.25);
 }
-.header-view-btn:active { transform: scale(0.96); }
+.header-view-btn:active { transform: scale(0.95); }
 
 .twitch-btn {
 background: linear-gradient(135deg, #9146ff 0%, #772ce8 100%);
