@@ -1883,10 +1883,29 @@ font-size: 12px;
 #wrprTbody td:nth-child(2) { padding: 5px 6px !important; text-align: center; }
 }
 
-/* PC sidebar panel mode: modals open to the RIGHT of the sidebar */
+/* PC sidebar panel mode: modals open to the RIGHT of the sidebar — fullscreen right panel */
 @media (min-width: 769px) {
   .m-mask.side-panel-modal {
     left: 240px !important;
     width: calc(100% - 240px) !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    top: 0 !important;
+  }
+  .m-mask.side-panel-modal.active {
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    padding: 0 !important;
+    animation: none !important;
+  }
+  .m-mask.side-panel-modal > .m-win {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-left: 1px solid rgba(155,89,182,0.25) !important;
+    box-shadow: none !important;
   }
 }
