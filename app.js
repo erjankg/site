@@ -4380,10 +4380,21 @@
         });
         _WRPR_ROLES.forEach(function(r) {
             var b = document.createElement('button');
-            b.textContent = r.label;
             b.dataset.role = r.id;
+            b.title = r.label;
             b.onclick = function() { _wrprRole = r.id; wrprUpdateButtons(); wrprRender(); };
-            b.style.cssText = 'padding:6px 13px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.15);background:none;color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;';
+            b.style.cssText = 'padding:5px 8px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.15);background:none;color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
+            var iconKey = r.id === 'adc' ? 'ADC' : (r.id.charAt(0).toUpperCase() + r.id.slice(1));
+            var iconSrc = window._roleIcons && window._roleIcons[iconKey];
+            if (iconSrc) {
+                var img = document.createElement('img');
+                img.src = iconSrc;
+                img.alt = r.label;
+                img.style.cssText = 'width:22px;height:22px;object-fit:contain;';
+                b.appendChild(img);
+            } else {
+                b.textContent = r.label;
+            }
             ro.appendChild(b);
         });
         wrprUpdateButtons();
