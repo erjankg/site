@@ -3788,10 +3788,6 @@
         var row = document.createElement('div');
         row.style.cssText = 'display:flex;align-items:center;gap:10px;background:rgba(109,63,245,0.08);border:1.5px solid rgba(155,89,182,0.25);border-radius:12px;padding:10px 14px;';
 
-        var label = document.createElement('div');
-        label.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.35);font-weight:800;letter-spacing:0.8px;margin-right:2px;flex-shrink:0;';
-        label.textContent = 'НИК';
-
         var nameEl = document.createElement('div');
         nameEl.id = 'profileNickText';
         nameEl.style.cssText = 'flex:1;font-size:15px;font-weight:900;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
@@ -3803,7 +3799,6 @@
         editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b96fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
         editBtn.onclick = function() { showNickEditor(el, nick); };
 
-        row.appendChild(label);
         row.appendChild(nameEl);
         row.appendChild(editBtn);
         el.appendChild(row);
@@ -3817,13 +3812,9 @@
 
         var labelRow = document.createElement('div');
         labelRow.style.cssText = 'display:flex;align-items:center;gap:6px;';
-        var label = document.createElement('div');
-        label.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.35);font-weight:800;letter-spacing:0.8px;';
-        label.textContent = 'НИК';
         var hint = document.createElement('div');
         hint.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.25);margin-left:auto;';
-        hint.textContent = 'буквы, цифры, 3–20 символов';
-        labelRow.appendChild(label);
+        hint.textContent = 'буквы, цифры, пробел, 3–20 символов';
         labelRow.appendChild(hint);
 
         var inp = document.createElement('input');
@@ -3838,8 +3829,8 @@
         counter.textContent = (inp.value.length) + '/20';
 
         inp.addEventListener('input', function() {
-            // Strip invalid chars in real-time
-            var clean = inp.value.replace(/[^a-zA-Zа-яА-ЯёЁ0-9]/g, '');
+            // Strip invalid chars in real-time (allow letters, digits, single spaces)
+            var clean = inp.value.replace(/[^a-zA-Zа-яА-ЯёЁ0-9 ]/g, '').replace(/  +/g, ' ');
             if (inp.value !== clean) inp.value = clean;
             counter.textContent = inp.value.length + '/20';
             inp.style.borderColor = 'rgba(155,89,182,0.35)';
@@ -3864,7 +3855,7 @@
             var val = inp.value.trim();
             if (val.length < 3) { errEl.textContent = 'Минимум 3 символа'; inp.style.borderColor='#e74c3c'; return; }
             if (val.length > 20) { errEl.textContent = 'Максимум 20 символов'; inp.style.borderColor='#e74c3c'; return; }
-            if (!/^[a-zA-Zа-яА-ЯёЁ0-9]+$/.test(val)) { errEl.textContent = 'Только буквы и цифры'; inp.style.borderColor='#e74c3c'; return; }
+            if (!/^[a-zA-Zа-яА-ЯёЁ0-9 ]+$/.test(val)) { errEl.textContent = 'Только буквы, цифры и пробел'; inp.style.borderColor='#e74c3c'; return; }
             saveBtn.disabled = true;
             saveBtn.textContent = '...';
             var auth = firebase.auth();
@@ -4155,6 +4146,27 @@
                 }
             }
             tip.appendChild(badges);
+        }
+
+        // Social links
+        if (user.socialLinks && user.socialLinks.length) {
+            var socialRow = document.createElement('div');
+            socialRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;';
+            user.socialLinks.forEach(function(link) {
+                var pl = SOCIAL_PLATFORMS.find(function(p) { return p.id === link.platform; });
+                if (!pl) return;
+                var sb = document.createElement('button');
+                sb.style.cssText = 'width:34px;height:34px;border-radius:9px;border:1.5px solid '+pl.border+';background:'+pl.bg+';cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:transform 0.1s;';
+                sb.title = pl.name;
+                sb.innerHTML = '<div style="width:18px;height:18px;pointer-events:none;">'+pl.svg+'</div>';
+                sb.onmouseover = function() { this.style.transform = 'scale(1.12)'; };
+                sb.onmouseout = function() { this.style.transform = ''; };
+                sb.onclick = (function(url, pid) {
+                    return function(e) { e.stopPropagation(); tip.remove(); openSocialLinkConfirm(url, pid); };
+                })(link.url, link.platform);
+                socialRow.appendChild(sb);
+            });
+            tip.appendChild(socialRow);
         }
 
         // Copy data button
@@ -4770,39 +4782,39 @@
 
             // Rank
             var tdN = document.createElement('td');
-            tdN.style.cssText = 'padding:7px 4px;text-align:center;color:rgba(255,255,255,0.3);font-size:11px;width:28px;';
+            tdN.style.cssText = 'padding:8px 5px;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;width:34px;';
             tdN.textContent = i + 1;
             tr.appendChild(tdN);
 
             // Champion
             var tdC = document.createElement('td');
-            tdC.style.cssText = 'padding:7px 6px;';
+            tdC.style.cssText = 'padding:8px 7px;';
             var iconUrl = wrprIcon(d.name);
             var engName = _wrprDisplayName[d.name] || d.name;
-            tdC.innerHTML = '<div style="display:flex;align-items:center;gap:7px;">'
+            tdC.innerHTML = '<div style="display:flex;align-items:center;gap:8px;">'
                 + '<img src="' + iconUrl + '" alt="' + engName + '" '
-                + 'onerror="this.onerror=null;this.style.cssText=\'width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,rgba(109,63,245,0.4),rgba(185,111,255,0.2));flex-shrink:0;display:block;\'" '
-                + 'style="width:28px;height:28px;border-radius:6px;object-fit:cover;flex-shrink:0;">'
-                + '<span class="wrpr-champ-name" style="font-size:12px;font-weight:700;color:#fff;">' + engName + '</span>'
+                + 'onerror="this.onerror=null;this.style.cssText=\'width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,rgba(109,63,245,0.4),rgba(185,111,255,0.2));flex-shrink:0;display:block;\'" '
+                + 'style="width:34px;height:34px;border-radius:7px;object-fit:cover;flex-shrink:0;">'
+                + '<span class="wrpr-champ-name" style="font-size:14px;font-weight:700;color:#fff;">' + engName + '</span>'
                 + '</div>';
             tr.appendChild(tdC);
 
             // WR
             var tdWR = document.createElement('td');
-            tdWR.style.cssText = 'padding:7px 6px;text-align:center;font-weight:900;font-size:12px;';
+            tdWR.style.cssText = 'padding:8px 7px;text-align:center;font-weight:900;font-size:14px;';
             var wrColor = d.wr >= 52 ? '#2ecc71' : d.wr >= 50 ? '#f1c40f' : '#e74c3c';
             tdWR.innerHTML = '<span style="color:' + wrColor + ';">' + d.wr.toFixed(2) + '%</span>';
             tr.appendChild(tdWR);
 
             // PR
             var tdPR = document.createElement('td');
-            tdPR.style.cssText = 'padding:7px 6px;text-align:center;font-size:12px;color:rgba(255,255,255,0.85);font-weight:700;';
+            tdPR.style.cssText = 'padding:8px 7px;text-align:center;font-size:14px;color:rgba(255,255,255,0.85);font-weight:700;';
             tdPR.textContent = d.pr + '%';
             tr.appendChild(tdPR);
 
             // BR
             var tdBR = document.createElement('td');
-            tdBR.style.cssText = 'padding:7px 6px;text-align:center;font-size:12px;color:rgba(255,255,255,0.6);';
+            tdBR.style.cssText = 'padding:8px 7px;text-align:center;font-size:14px;color:rgba(255,255,255,0.6);';
             tdBR.textContent = d.br + '%';
             tr.appendChild(tdBR);
 
