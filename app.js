@@ -8,7 +8,7 @@
     // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask','wrprMask'];
 
     // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
     var _modalStack = [];
@@ -1882,7 +1882,7 @@
             'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask',
             'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask',
             'tierMenu':'tierlistMenuMask', 'globalChat':'chatSystemMask',
-            'users':'chatSystemMask', 'influencers':'influencerMask'
+            'users':'chatSystemMask', 'influencers':'influencerMask', 'wrpr':'wrprMask'
         };
         _sidebarModalId = modalMap[what] || null;
         switch(what) {
@@ -1899,6 +1899,7 @@
             case 'globalChat': openChatSystem(); break;
             case 'users': openChatSystem('users'); break;
             case 'influencers': openInfluencers(); break;
+            case 'wrpr': openWRPR(); break;
         }
     };
 
@@ -3988,6 +3989,441 @@
             btn.style.cursor = 'default';
         }
         parent.appendChild(btn);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // 📊 WIN RATE & PICK RATE
+    // ═══════════════════════════════════════════════════════════════
+
+    var _wrprRank = 'чалик';
+    var _wrprRole = 'top';
+    var _wrprSortCol = 'wr';
+    var _wrprSortDir = -1; // -1 = desc (высокий сверху), 1 = asc
+
+    // Russian name → English DDragon key
+    var WR_CHAMP_KEYS = {
+        'Кеннен':'Kennen','Олаф':'Olaf','Обжаренный':'Smolder','Укунг':'MonkeyKing',
+        'Вейн':'Vayne','Маки':'Maokai','Райз':'Ryze','Ясуо':'Yasuo','Сион':'Sion',
+        'Ирелия':'Irelia','Амбесса':'Ambessa','Триндамер':'Tryndamere','Фиора':'Fiora',
+        'Кейл':'Kayle','Ренектон':'Renekton','Шен':'Shen','Грохот':'Rumble','Орнн':'Ornn',
+        'Наутилус':'Nautilus','Тимо':'Teemo','Гарен':'Garen','Аатрокс':'Aatrox',
+        'Камилла':'Camille','Джейс':'Jayce','Насус':'Nasus','Ривен':'Riven',
+        'Дариус':'Darius','Гвен':'Gwen','Сетт':'Sett','Гнар':'Gnar',
+        'Джарван IV':'JarvanIV','Мальфит':'Malphite','Йон':'Yone','Джакс':'Jax',
+        'Свейн':'Swain','Волибер':'Volibear','Мордекайзер':'Mordekaiser','Ургот':'Urgot',
+        'Д-р Мундо':'DrMundo',
+        // Jungle
+        'Уорвик':'Warwick','Амуму':'Amumu','Нуну и Уилламп':'Nunu','Раммус':'Rammus',
+        'Нидали':'Nidalee','Ноктюрн':'Nocturne','Скрипачки':'Fiddlesticks',
+        'Синь Чжао':'XinZhao','Эвелинн':'Evelynn','Нила':'Nilah','Шивана':'Shyvana',
+        'Лиллия':'Lillia','Пантеон':'Pantheon','Хекарим':'Hecarim','Виего':'Viego',
+        'Родственные':'Kindred','Диана':'Diana','Зед':'Zed','Грагас':'Gragas',
+        'Ренгар':'Rengar',"Ха'Зикс":'Khazix','Когть':'Briar','VI':'Vi','Экко':'Ekko',
+        'Мастер Йи':'MasterYi','Ли Син':'LeeSin','Физз':'Fizz','Могилы':'Graves',
+        'Кайн':'Kayn',
+        // Mid
+        'Энни':'Annie','Хаймердингер':'Heimerdinger','Катарина':'Katarina','Мел':'Mel',
+        'Синдра':'Syndra','Искаженная судьба':'TwistedFate','Акшан':'Akshan',
+        'Лиссандра':'Lissandra','Зира':'Zyra','Ахри':'Ahri','Кассадин':'Kassadin',
+        'Аурелион Сол':'AurelionSol','Бренд':'Brand','Велкоз':'Velkoz','Аврора':'Aurora',
+        'Векс':'Vex','Владимир':'Vladimir','Виктор':'Viktor','Люкс':'Lux',
+        'Орианна':'Orianna','Моргана':'Morgana','Зиггс':'Ziggs','Вейгар':'Veigar',
+        'Галио':'Galio','Акали':'Akali','Норра':'Norra',
+        // Support
+        'Браум':'Braum','Зилеан':'Zilean','Сона':'Sona','Маокай':'Maokai','Нами':'Nami',
+        'Пайк':'Pyke','Леона':'Leona','Серафин':'Seraphine','Бард':'Bard','Сенна':'Senna',
+        'Блицкранк':'Blitzcrank','Ракан':'Rakan','Релл':'Rell','Сорака':'Soraka',
+        'Янна':'Janna','Лулу':'Lulu','Карма':'Karma','Милио':'Milio','Поршень':'Thresh',
+        'Алистар':'Alistar','Юми':'Yuumi',
+        // ADC
+        'Тлеть':'Smolder',"Ког'Мау":'KogMaw','Мисс Фортун':'MissFortune','Джин':'Jhin',
+        'Ксайя':'Xayah','Джинкс':'Jinx','Эш':'Ashe','Самира':'Samira','Калистка':'Kalista',
+        'Лучиан':'Lucian','Кэйтлин':'Caitlyn','Сивир':'Sivir','Дравена':'Draven',
+        'Эзреал':'Ezreal','Кайса':'Kaisa','Корки':'Corki','Варус':'Varus','Твитч':'Twitch',
+        'Тристана':'Tristana','Зери':'Zeri',
+    };
+
+    var _wrprSpecialIcons = {
+        'Нила': 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Nilah.png',
+        'Норра': 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/norra.png',
+        'Мел': 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Mel_0.jpg',
+    };
+
+    function wrprIcon(ruName) {
+        if (_wrprSpecialIcons[ruName]) return _wrprSpecialIcons[ruName];
+        var key = WR_CHAMP_KEYS[ruName];
+        if (!key) key = ruName.replace(/[\s'\.\#&]/g,'');
+        return 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/' + key + '.png';
+    }
+
+    // Data: WR_DATA[rank][role] = [{name, wr, change, pr, br}, ...]
+    // change = number or null (Н/Д)
+    var WR_DATA = {
+        'чалик': {
+            'top': [
+                {name:'Кеннен',wr:56.04,ch:6.5,pr:1.2,br:0.21},
+                {name:'Олаф',wr:55.26,ch:5.7,pr:1.06,br:0.86},
+                {name:'Обжаренный',wr:54.11,ch:-2.1,pr:2.43,br:0.38},
+                {name:'Укунг',wr:53.48,ch:2.5,pr:2.99,br:0.53},
+                {name:'Вейн',wr:52.86,ch:-1.1,pr:1.57,br:25.11},
+                {name:'Маки',wr:52.68,ch:2.4,pr:2.35,br:0.41},
+                {name:'Райз',wr:52.68,ch:1.1,pr:1.5,br:4.02},
+                {name:'Ясуо',wr:52.56,ch:4.1,pr:3.2,br:30.19},
+                {name:'Сион',wr:51.96,ch:0.1,pr:5.31,br:0.39},
+                {name:'Ирелия',wr:51.88,ch:-1.3,pr:3.4,br:2.72},
+                {name:'Амбесса',wr:51.33,ch:0.2,pr:4.26,br:1.91},
+                {name:'Триндамер',wr:51.24,ch:1.5,pr:2.67,br:17.01},
+                {name:'Фиора',wr:51.22,ch:0.7,pr:6.13,br:6.45},
+                {name:'Кейл',wr:51.16,ch:3.4,pr:2.85,br:0.41},
+                {name:'Ренектон',wr:51.1,ch:-0.3,pr:9.81,br:3.81},
+                {name:'Шен',wr:50.77,ch:-1.2,pr:1.43,br:0.07},
+                {name:'Грохот',wr:50.61,ch:-1.2,pr:3.2,br:0.75},
+                {name:'Орнн',wr:50.46,ch:-0.6,pr:2.91,br:0.16},
+                {name:'Наутилус',wr:50.38,ch:-1.5,pr:2.3,br:3.29},
+                {name:'Тимо',wr:50.34,ch:-1.2,pr:3.47,br:12.53},
+                {name:'Гарен',wr:50.21,ch:0.5,pr:20.07,br:6.46},
+                {name:'Аатрокс',wr:50.13,ch:-0.3,pr:7.82,br:5.4},
+                {name:'Камилла',wr:50.11,ch:-0.4,pr:3.43,br:0.17},
+                {name:'Джейс',wr:49.98,ch:-1.5,pr:3.7,br:0.85},
+                {name:'Насус',wr:49.95,ch:-1.3,pr:7,br:5.39},
+                {name:'Ривен',wr:49.9,ch:-0.6,pr:2.37,br:2.26},
+                {name:'Дариус',wr:49.89,ch:0.4,pr:16.71,br:6.74},
+                {name:'Гвен',wr:49.74,ch:0.5,pr:2.39,br:0.56},
+                {name:'Сетт',wr:49.64,ch:0.7,pr:15.05,br:1.49},
+                {name:'Гнар',wr:49.53,ch:-0.6,pr:2.34,br:0.18},
+                {name:'Джарван IV',wr:49.43,ch:-1.8,pr:1.11,br:0.35},
+                {name:'Мальфит',wr:49.29,ch:-1.1,pr:7.2,br:10.76},
+                {name:'Йон',wr:49.24,ch:-0.5,pr:7.59,br:8.4},
+                {name:'Джакс',wr:48.83,ch:0.3,pr:3.36,br:0.21},
+                {name:'Свейн',wr:48.21,ch:1.4,pr:1.19,br:4.42},
+                {name:'Волибер',wr:47.86,ch:-1.7,pr:4.6,br:1.37},
+                {name:'Мордекайзер',wr:47.66,ch:1,pr:8.26,br:23.58},
+                {name:'Ургот',wr:46.87,ch:-1.3,pr:3.29,br:1.3},
+                {name:'Д-р Мундо',wr:44,ch:-3.9,pr:3.24,br:0.24},
+            ],
+            'jungle': [
+                {name:'Уорвик',wr:54.98,ch:0.6,pr:5.23,br:3.16},
+                {name:'Амуму',wr:54.92,ch:0.7,pr:3.76,br:0.14},
+                {name:'Нуну и Уилламп',wr:54.16,ch:2.5,pr:1.63,br:0.51},
+                {name:'Раммус',wr:53.96,ch:-0.7,pr:5.55,br:7.86},
+                {name:'Нидали',wr:53.73,ch:-2.2,pr:2.38,br:5.91},
+                {name:'Ноктюрн',wr:52.8,ch:3.4,pr:4.33,br:15.54},
+                {name:'Скрипачки',wr:52.26,ch:0,pr:3.73,br:2.99},
+                {name:'Синь Чжао',wr:52.06,ch:-0.1,pr:10.28,br:1.7},
+                {name:'Эвелинн',wr:51.73,ch:-0.1,pr:3.88,br:2.3},
+                {name:'Нила',wr:51.61,ch:-1.3,pr:1.52,br:1.22},
+                {name:'Шивана',wr:51.49,ch:0.8,pr:9.7,br:11.5},
+                {name:'Лиллия',wr:51.42,ch:-1.3,pr:4.43,br:1.36},
+                {name:'Наутилус',wr:51.38,ch:1.6,pr:3.36,br:3.29},
+                {name:'Пантеон',wr:51.16,ch:0.1,pr:6.85,br:2.17},
+                {name:'Хекарим',wr:50.98,ch:-0.1,pr:4.25,br:20.16},
+                {name:'Амбесса',wr:50.77,ch:3.9,pr:1.53,br:1.91},
+                {name:'Виего',wr:50.62,ch:-0.1,pr:10.91,br:24.24},
+                {name:'Родственные',wr:50.52,ch:-1.7,pr:2.72,br:0.43},
+                {name:'Укунг',wr:50.42,ch:1.4,pr:3.59,br:0.53},
+                {name:'Диана',wr:50.26,ch:2.4,pr:1.22,br:0.06},
+                {name:'Зед',wr:50.25,ch:0,pr:4.8,br:3.3},
+                {name:'Грагас',wr:50.21,ch:-1,pr:1.88,br:0.39},
+                {name:'Ренгар',wr:50.18,ch:-2.4,pr:1.76,br:2.15},
+                {name:'Олаф',wr:49.94,ch:1.1,pr:1.21,br:0.86},
+                {name:"Ха'Зикс",wr:49.84,ch:0.3,pr:6.04,br:0.28},
+                {name:'Когть',wr:49.82,ch:2.8,pr:3.97,br:1.2},
+                {name:'VI',wr:49.78,ch:-1.5,pr:6.41,br:0.56},
+                {name:'Экко',wr:49.41,ch:0.3,pr:2.02,br:0.05},
+                {name:'Джарван IV',wr:49.03,ch:-0.4,pr:5.67,br:0.35},
+                {name:'Мастер Йи',wr:48.75,ch:0.4,pr:7.74,br:62.9},
+                {name:'Ривен',wr:48.54,ch:-1.3,pr:2.86,br:2.26},
+                {name:'Ли Син',wr:48.5,ch:-0.8,pr:17.32,br:23.92},
+                {name:'Камилла',wr:48.3,ch:null,pr:1.06,br:0.17},
+                {name:'Физз',wr:48.15,ch:-1.5,pr:3.79,br:1.57},
+                {name:'Могилы',wr:48.08,ch:1,pr:7.87,br:0.76},
+                {name:'Аатрокс',wr:47.83,ch:1.2,pr:2,br:5.4},
+                {name:'Волибер',wr:47.4,ch:6.1,pr:2.03,br:1.37},
+                {name:'Кайн',wr:47.02,ch:-1.9,pr:3.04,br:0.11},
+                {name:'Триндамер',wr:46.66,ch:-0.2,pr:4.62,br:17.01},
+                {name:'Дариус',wr:46.5,ch:-0.7,pr:2.81,br:6.74},
+                {name:'Джакс',wr:45.31,ch:-0.4,pr:1.83,br:0.21},
+            ],
+            'mid': [
+                {name:'Энни',wr:55.01,ch:3.9,pr:1.93,br:0.05},
+                {name:'Свейн',wr:54.44,ch:3.2,pr:5.26,br:4.42},
+                {name:'Хаймердингер',wr:54.34,ch:6,pr:1.38,br:0.41},
+                {name:'Кеннен',wr:54.34,ch:0.6,pr:2.53,br:0.21},
+                {name:'Катарина',wr:53.81,ch:6.4,pr:1.8,br:0.24},
+                {name:'Мел',wr:53.08,ch:2.8,pr:4.07,br:88.57},
+                {name:'Ясуо',wr:52.79,ch:2.2,pr:12.54,br:30.19},
+                {name:'Грагас',wr:52.32,ch:-2.8,pr:1.66,br:0.39},
+                {name:'Синдра',wr:51.52,ch:0.2,pr:7.97,br:5.95},
+                {name:'Искаженная судьба',wr:51.49,ch:0.6,pr:7.42,br:0.48},
+                {name:'Кейл',wr:51.48,ch:2.6,pr:1.33,br:0.41},
+                {name:'Джейс',wr:51.1,ch:0.6,pr:1.86,br:0.85},
+                {name:'Физз',wr:51.05,ch:0.4,pr:3.51,br:1.57},
+                {name:'Норра',wr:50.92,ch:-4.7,pr:2.23,br:79.41},
+                {name:'Акшан',wr:50.85,ch:3,pr:1.2,br:0.05},
+                {name:'Лиссандра',wr:50.83,ch:0.3,pr:5.61,br:8.88},
+                {name:'Зира',wr:50.7,ch:2.1,pr:2.12,br:12.72},
+                {name:'Ахри',wr:50.48,ch:0.1,pr:4.48,br:0.07},
+                {name:'Диана',wr:50.46,ch:3.5,pr:1.2,br:0.06},
+                {name:'Кассадин',wr:50.43,ch:-0.2,pr:3.86,br:1.19},
+                {name:'Аурелион Сол',wr:50.42,ch:0.2,pr:9.73,br:6.1},
+                {name:'Бренд',wr:50.26,ch:-2.1,pr:7.4,br:2.2},
+                {name:'Велкоз',wr:50.14,ch:-1,pr:2.77,br:0.37},
+                {name:'Аврора',wr:50.04,ch:-0.6,pr:5.59,br:11.61},
+                {name:'Векс',wr:49.87,ch:-0.5,pr:3.06,br:0.52},
+                {name:'Владимир',wr:49.81,ch:0.9,pr:4.24,br:1.07},
+                {name:'Виктор',wr:49.73,ch:0.9,pr:4.65,br:0.37},
+                {name:'Тимо',wr:49.65,ch:-3.2,pr:2.48,br:12.53},
+                {name:'Люкс',wr:49.54,ch:1.5,pr:4.92,br:8.09},
+                {name:'Райз',wr:49.48,ch:0.1,pr:6.85,br:4.02},
+                {name:'Орианна',wr:49,ch:-1.6,pr:5.62,br:0.28},
+                {name:'Моргана',wr:48.75,ch:-2.7,pr:5.78,br:29.16},
+                {name:'Ирелия',wr:48.41,ch:null,pr:1.04,br:2.72},
+                {name:'Зед',wr:48.41,ch:-3.6,pr:5.1,br:3.3},
+                {name:'Зиггс',wr:48.23,ch:0.5,pr:4.97,br:0.92},
+                {name:'Экко',wr:48.05,ch:1.5,pr:1.5,br:0.05},
+                {name:'Вейгар',wr:47.96,ch:-1.4,pr:7.17,br:6.61},
+                {name:'Йон',wr:47.9,ch:-1.2,pr:6.48,br:8.4},
+                {name:'Галио',wr:47.85,ch:-0.5,pr:10.38,br:1.26},
+                {name:'Акали',wr:46.47,ch:-1,pr:4.2,br:0.61},
+            ],
+            'adc': [
+                {name:'Тлеть',wr:55.77,ch:-0.8,pr:16.6,br:61.82},
+                {name:"Ког'Мау",wr:52.25,ch:0.4,pr:6.13,br:0.52},
+                {name:'Вейн',wr:51.54,ch:-1.3,pr:14.82,br:25.11},
+                {name:'Мисс Фортун',wr:51.08,ch:-0.4,pr:11.42,br:0.88},
+                {name:'Джин',wr:50.66,ch:0.8,pr:14,br:0.37},
+                {name:'Ксайя',wr:50.56,ch:0.3,pr:6.38,br:0.22},
+                {name:'Джинкс',wr:50.2,ch:0.6,pr:13.51,br:0.36},
+                {name:'Эш',wr:50.06,ch:-0.3,pr:8.79,br:0.13},
+                {name:'Самира',wr:49.46,ch:0,pr:8.3,br:3.5},
+                {name:'Калистка',wr:49.43,ch:-1.4,pr:3.98,br:1.02},
+                {name:'Лучиан',wr:49.37,ch:0.9,pr:9.62,br:0.77},
+                {name:'Кэйтлин',wr:49.23,ch:1.4,pr:20.79,br:2.74},
+                {name:'Сивир',wr:48.9,ch:0.5,pr:3.74,br:0.03},
+                {name:'Дравена',wr:48.76,ch:-1.2,pr:5.85,br:0.8},
+                {name:'Эзреал',wr:48.22,ch:-0.5,pr:12.51,br:0.24},
+                {name:'Кайса',wr:47.87,ch:0.7,pr:16.68,br:0.54},
+                {name:'Корки',wr:47.83,ch:1.5,pr:1.49,br:0.03},
+                {name:'Варус',wr:47.71,ch:2.2,pr:4.61,br:0.24},
+                {name:'Твитч',wr:47.58,ch:0.1,pr:3.81,br:0.08},
+                {name:'Тристана',wr:46.71,ch:-2.1,pr:6.67,br:0.1},
+                {name:'Зери',wr:46.51,ch:-0.6,pr:1.65,br:0.03},
+            ],
+            'support': [
+                {name:'Норра',wr:55.27,ch:null,pr:1.03,br:79.41},
+                {name:'Орнн',wr:53.45,ch:2,pr:3.19,br:0.16},
+                {name:'Браум',wr:53.27,ch:0.4,pr:6.99,br:1.08},
+                {name:'Зилеан',wr:53.23,ch:-3.8,pr:2.61,br:4.89},
+                {name:'Сона',wr:52.89,ch:2.4,pr:3.13,br:0.01},
+                {name:'Галио',wr:52.58,ch:1.3,pr:3.33,br:1.26},
+                {name:'Маокай',wr:52.28,ch:-0.2,pr:4.91,br:0.29},
+                {name:'Нами',wr:51.17,ch:-3,pr:8.95,br:0.19},
+                {name:'Люкс',wr:51.15,ch:1.3,pr:8.96,br:8.09},
+                {name:'Пайк',wr:50.83,ch:0.6,pr:4.08,br:1.48},
+                {name:'Леона',wr:50.76,ch:-1.2,pr:5.91,br:1.73},
+                {name:'Серафин',wr:50.73,ch:0.6,pr:6.8,br:0.24},
+                {name:'Бард',wr:50.7,ch:-0.1,pr:1.23,br:2.25},
+                {name:'Сенна',wr:50.65,ch:0.8,pr:5.84,br:0.72},
+                {name:'Блицкранк',wr:50.64,ch:-0.9,pr:7.5,br:0.95},
+                {name:'Наутилус',wr:50.53,ch:0.3,pr:11.96,br:3.29},
+                {name:'Моргана',wr:50.37,ch:1.8,pr:8.3,br:29.16},
+                {name:'Ракан',wr:50.21,ch:-1.4,pr:4.94,br:0.44},
+                {name:'Релл',wr:50.21,ch:0.5,pr:2.59,br:0.96},
+                {name:'Сорака',wr:50.02,ch:-1,pr:4.73,br:0.74},
+                {name:'Мальфит',wr:49.93,ch:0.1,pr:8.4,br:10.76},
+                {name:'Янна',wr:49.84,ch:0,pr:3.84,br:0.13},
+                {name:'Вейгар',wr:49.81,ch:3.7,pr:2.06,br:6.61},
+                {name:'Лулу',wr:49.76,ch:0.8,pr:10.91,br:10.07},
+                {name:'Карма',wr:49.6,ch:-0.4,pr:10.67,br:0.45},
+                {name:'Милио',wr:49.33,ch:-1.1,pr:5.75,br:6.32},
+                {name:'Свейн',wr:49.3,ch:1.4,pr:4.85,br:4.42},
+                {name:'Поршень',wr:48.93,ch:1.5,pr:12.87,br:2.45},
+                {name:'Зира',wr:48.61,ch:-3.2,pr:4.14,br:12.72},
+                {name:'Велкоз',wr:48.44,ch:-0.7,pr:1.26,br:0.37},
+                {name:'Бренд',wr:48.21,ch:-2.3,pr:1.58,br:2.2},
+                {name:'Сетт',wr:48.16,ch:0.8,pr:1.58,br:1.49},
+                {name:'Алистар',wr:47.34,ch:-1,pr:5.22,br:0.34},
+                {name:'Юми',wr:42.49,ch:0.3,pr:6.05,br:21.81},
+            ],
+        },
+        'алмаз': { top:[], jungle:[], mid:[], adc:[], support:[] },
+        'мастер': { top:[], jungle:[], mid:[], adc:[], support:[] },
+        'грандмастер': { top:[], jungle:[], mid:[], adc:[], support:[] },
+        'суверен': { top:[], jungle:[], mid:[], adc:[], support:[] },
+    };
+
+    var _WRPR_RANKS = [
+        {id:'алмаз', label:'Алмаз'},
+        {id:'мастер', label:'Мастер'},
+        {id:'грандмастер', label:'Грандмастер'},
+        {id:'чалик', label:'Чалик'},
+        {id:'суверен', label:'Суверен'},
+    ];
+    var _WRPR_ROLES = [
+        {id:'top', label:'Топ'},
+        {id:'jungle', label:'Лес'},
+        {id:'mid', label:'Мид'},
+        {id:'adc', label:'АДК'},
+        {id:'support', label:'Сап'},
+    ];
+
+    window.openWRPR = function() {
+        openModal('wrprMask');
+        wrprBuildFilters();
+        wrprRender();
+    };
+
+    window.wrprSort = function(col) {
+        if (_wrprSortCol === col) {
+            _wrprSortDir *= -1;
+        } else {
+            _wrprSortCol = col;
+            _wrprSortDir = -1;
+        }
+        wrprRender();
+    };
+
+    function wrprBuildFilters() {
+        var rr = document.getElementById('wrprRankRow');
+        var ro = document.getElementById('wrprRoleRow');
+        if (!rr || !ro) return;
+        rr.innerHTML = '';
+        ro.innerHTML = '';
+        _WRPR_RANKS.forEach(function(r) {
+            var b = document.createElement('button');
+            b.textContent = r.label;
+            b.dataset.rank = r.id;
+            b.onclick = function() { _wrprRank = r.id; wrprUpdateButtons(); wrprRender(); };
+            b.style.cssText = 'padding:6px 13px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.15);background:none;color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;';
+            rr.appendChild(b);
+        });
+        _WRPR_ROLES.forEach(function(r) {
+            var b = document.createElement('button');
+            b.textContent = r.label;
+            b.dataset.role = r.id;
+            b.onclick = function() { _wrprRole = r.id; wrprUpdateButtons(); wrprRender(); };
+            b.style.cssText = 'padding:6px 13px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.15);background:none;color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;';
+            ro.appendChild(b);
+        });
+        wrprUpdateButtons();
+    }
+
+    function wrprUpdateButtons() {
+        var rr = document.getElementById('wrprRankRow');
+        var ro = document.getElementById('wrprRoleRow');
+        if (!rr || !ro) return;
+        Array.from(rr.querySelectorAll('button')).forEach(function(b) {
+            var active = b.dataset.rank === _wrprRank;
+            b.style.background = active ? 'rgba(46,204,113,0.25)' : 'none';
+            b.style.borderColor = active ? '#2ecc71' : 'rgba(255,255,255,0.15)';
+            b.style.color = active ? '#2ecc71' : 'rgba(255,255,255,0.6)';
+        });
+        Array.from(ro.querySelectorAll('button')).forEach(function(b) {
+            var active = b.dataset.role === _wrprRole;
+            b.style.background = active ? 'rgba(109,63,245,0.25)' : 'none';
+            b.style.borderColor = active ? '#b96fff' : 'rgba(255,255,255,0.15)';
+            b.style.color = active ? '#b96fff' : 'rgba(255,255,255,0.6)';
+        });
+    }
+
+    function wrprRender() {
+        var tbody = document.getElementById('wrprTbody');
+        var noData = document.getElementById('wrprNoData');
+        if (!tbody) return;
+
+        // Update sort arrows
+        ['WR','PR','BR'].forEach(function(c) {
+            var el = document.getElementById('wrprAr' + c);
+            if (!el) return;
+            var col = c.toLowerCase();
+            if (_wrprSortCol === col) {
+                el.textContent = _wrprSortDir === -1 ? ' ▼' : ' ▲';
+            } else {
+                el.textContent = '';
+            }
+        });
+        // Update header highlight
+        ['wrprThWR','wrprThPR','wrprThBR'].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            var col = id.replace('wrprTh','').toLowerCase();
+            el.style.color = _wrprSortCol === col ? '#b96fff' : 'rgba(255,255,255,0.7)';
+        });
+
+        var rankData = WR_DATA[_wrprRank];
+        var list = rankData ? (rankData[_wrprRole] || []) : [];
+
+        if (list.length === 0) {
+            tbody.innerHTML = '';
+            noData.style.display = 'block';
+            return;
+        }
+        noData.style.display = 'none';
+
+        var sorted = list.slice().sort(function(a, b) {
+            var colMap = {wr:'wr', pr:'pr', br:'br'};
+            var field = colMap[_wrprSortCol] || 'wr';
+            return _wrprSortDir * (b[field] - a[field]);
+        });
+
+        tbody.innerHTML = '';
+        sorted.forEach(function(d, i) {
+            var tr = document.createElement('tr');
+            tr.style.cssText = 'border-bottom:1px solid rgba(255,255,255,0.04);' + (i % 2 === 0 ? 'background:rgba(255,255,255,0.015);' : '');
+
+            // Rank
+            var tdN = document.createElement('td');
+            tdN.style.cssText = 'padding:7px 4px;text-align:center;color:rgba(255,255,255,0.3);font-size:11px;width:28px;';
+            tdN.textContent = i + 1;
+            tr.appendChild(tdN);
+
+            // Champion
+            var tdC = document.createElement('td');
+            tdC.style.cssText = 'padding:7px 6px;';
+            var iconUrl = wrprIcon(d.name);
+            tdC.innerHTML = '<div style="display:flex;align-items:center;gap:7px;">'
+                + '<img src="' + iconUrl + '" alt="' + d.name + '" '
+                + 'onerror="this.onerror=null;this.style.cssText=\'width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg,rgba(109,63,245,0.4),rgba(185,111,255,0.2));flex-shrink:0;display:block;\'" '
+                + 'style="width:28px;height:28px;border-radius:6px;object-fit:cover;flex-shrink:0;">'
+                + '<span style="font-size:12px;font-weight:700;color:#fff;">' + d.name + '</span>'
+                + '</div>';
+            tr.appendChild(tdC);
+
+            // WR
+            var tdWR = document.createElement('td');
+            tdWR.style.cssText = 'padding:7px 6px;text-align:center;font-weight:900;font-size:12px;';
+            var wrColor = d.wr >= 52 ? '#2ecc71' : d.wr >= 50 ? '#f1c40f' : '#e74c3c';
+            tdWR.innerHTML = '<span style="color:' + wrColor + ';">' + d.wr.toFixed(2) + '%</span>';
+            tr.appendChild(tdWR);
+
+            // Change
+            var tdCh = document.createElement('td');
+            tdCh.style.cssText = 'padding:7px 4px;text-align:center;font-size:11px;';
+            if (d.ch === null || d.ch === undefined) {
+                tdCh.innerHTML = '<span style="color:rgba(255,255,255,0.25);">—</span>';
+            } else if (d.ch === 0) {
+                tdCh.innerHTML = '<span style="color:rgba(255,255,255,0.35);">0%</span>';
+            } else if (d.ch > 0) {
+                tdCh.innerHTML = '<span style="color:#2ecc71;">+' + d.ch + '%</span>';
+            } else {
+                tdCh.innerHTML = '<span style="color:#e74c3c;">' + d.ch + '%</span>';
+            }
+            tr.appendChild(tdCh);
+
+            // PR
+            var tdPR = document.createElement('td');
+            tdPR.style.cssText = 'padding:7px 6px;text-align:center;font-size:12px;color:rgba(255,255,255,0.85);font-weight:700;';
+            tdPR.textContent = d.pr + '%';
+            tr.appendChild(tdPR);
+
+            // BR
+            var tdBR = document.createElement('td');
+            tdBR.style.cssText = 'padding:7px 6px;text-align:center;font-size:12px;color:rgba(255,255,255,0.6);';
+            tdBR.textContent = d.br + '%';
+            tr.appendChild(tdBR);
+
+            tbody.appendChild(tr);
+        });
     }
 
 })();

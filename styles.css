@@ -468,6 +468,11 @@ align-items: center;
 justify-content: center;
 animation: fadeIn 0.25s ease;
 }
+/* WR/PR fullscreen modal */
+#wrprMask.active {
+align-items: flex-start;
+padding: 0;
+}
 /* Champions modal — pinned to top */
 #sideChampsMask.active {
 align-items: flex-start;
