@@ -2332,6 +2332,9 @@
         if(ruler) ruler.innerHTML = '';
     })();
 
+    // Expose roleIcons globally so the second IIFE (profile setup) can access it
+    window._roleIcons = roleIcons;
+
 })();
 
 
@@ -3288,7 +3291,7 @@
         { id:'master',      name:'Master',      color:'#9B59B6', img:_lqBase+'7/76/Master_rank.png/175px-Master_rank.png',           emoji:'🟣' },
         { id:'grandmaster', name:'GM',          color:'#E74C3C', img:_lqBase+'f/f2/Grandmaster_rank.png/175px-Grandmaster_rank.png', emoji:'🔴' },
         { id:'challenger',  name:'Chall',       color:'#F39C12', img:_lqBase+'a/a0/Challenger_rank.png/175px-Challenger_rank.png',   emoji:'👑' },
-        { id:'sovereign',   name:'Sovereign',   color:'#D4AF37', img:'',                                                             emoji:'⚜️' }
+        { id:'sovereign',   name:'Sovereign',   color:'#D4AF37', img:'https://static.wikia.nocookie.net/leagueoflegends/images/d/d4/Wild_Rift_Sovereign_rank.png/revision/latest?cb=20240719125655', emoji:'⚜️' }
     ];
     var ROLES_LIST = ['Top','Jungle','Mid','ADC','Support'];
 
@@ -3518,6 +3521,7 @@
                     var _copiedSlot = null;
                     try { _copiedSlot = JSON.parse(localStorage.getItem('copiedUserData_' + _slotIdx) || 'null'); } catch(e) {}
                     if (_copiedSlot) activateCopiedData(_copiedSlot, _slotIdx);
+                    else renderDataPanel();
                 }
             } else {
                 if (visChanged) showToast('✓ Настройки видимости сохранены');
@@ -3582,8 +3586,9 @@
             var sel = _profileRole === r;
             var border = sel ? '#b96fff' : 'rgba(155,89,182,0.35)';
             var bg = sel ? 'rgba(109,63,245,0.3)' : 'rgba(109,63,245,0.08)';
-            html += '<button onclick="window._profileSelectRole(\'' + r + '\')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;">'
-                  + '<img src="' + (roleIcons[r] || '') + '" alt="' + r + '" style="width:26px;height:26px;object-fit:contain;" onerror="this.style.display=\'none\'">'
+            var roleImg = (window._roleIcons && window._roleIcons[r]) || '';
+            html += '<button id="prole-' + r + '" onclick="window._profileSelectRole(\'' + r + '\')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;">'
+                  + (roleImg ? '<img src="' + roleImg + '" alt="' + r + '" style="width:26px;height:26px;object-fit:contain;" onerror="this.style.display=\'none\'">' : '')
                   + '<span style="font-size:9px;color:#fff;font-weight:700;">' + r + '</span>'
                   + '</button>';
         });
@@ -3603,7 +3608,7 @@
             var icon = rk.img
                 ? '<img src="' + rk.img + '" style="width:32px;height:32px;object-fit:contain;" onerror="this.outerHTML=\'<span style=font-size:22px>' + rk.emoji + '</span>\'">'
                 : '<span style="font-size:22px;line-height:1;">' + rk.emoji + '</span>';
-            html += '<button onclick="window._profileSelectRank(\'' + rk.id + '\')" style="padding:6px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;' + shadow + '">'
+            html += '<button id="prank-' + rk.id + '" onclick="window._profileSelectRank(\'' + rk.id + '\')" style="padding:6px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;' + shadow + '">'
                   + icon
                   + '<span>' + rk.name + '</span>'
                   + '</button>';
@@ -3642,14 +3647,28 @@
                      : !_profileRole ? 'Выбери роль' : 'Выбери ранг';
             showToast(_msg); return;
         }
+        // Show loading overlay on profile panel
+        var profPanel = document.getElementById('profPanelProfile');
+        var saveOverlay = null;
+        if (profPanel) {
+            saveOverlay = document.createElement('div');
+            saveOverlay.className = 'data-loading-overlay';
+            saveOverlay.innerHTML = '<div class="data-loading-spinner"></div>';
+            profPanel.style.position = 'relative';
+            profPanel.appendChild(saveOverlay);
+            profPanel.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
+        }
         db.collection('users').doc(_currentUser.uid).set({
             role: _profileRole,
             rank: _profileRank
         }, { merge: true }).then(function() {
+            if (saveOverlay) saveOverlay.remove();
             showToast('✓ Профиль сохранён!');
             closeProfileSetup();
             loadUsersToSidebar();
         }).catch(function(err) {
+            if (saveOverlay) saveOverlay.remove();
+            if (profPanel) profPanel.querySelectorAll('button').forEach(function(b) { b.disabled = false; });
             console.error('Save profile error:', err);
             showToast('Ошибка сохранения: ' + (err.code || err.message));
         });
@@ -3709,16 +3728,33 @@
             badges.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;';
             if (user.role) {
                 var rb = document.createElement('span');
-                rb.style.cssText = 'padding:2px 8px;border-radius:6px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:10px;font-weight:700;';
-                rb.textContent = user.role;
+                rb.style.cssText = 'padding:2px 8px;border-radius:6px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;';
+                var roleIconSrc = window._roleIcons && window._roleIcons[user.role];
+                if (roleIconSrc) {
+                    var roleIconEl = document.createElement('img');
+                    roleIconEl.src = roleIconSrc;
+                    roleIconEl.style.cssText = 'width:12px;height:12px;object-fit:contain;';
+                    roleIconEl.onerror = function() { this.style.display = 'none'; };
+                    rb.appendChild(roleIconEl);
+                }
+                rb.appendChild(document.createTextNode(user.role));
                 badges.appendChild(rb);
             }
             if (user.rank) {
                 var rk = RANKS.find(function(r) { return r.id === user.rank; });
                 if (rk) {
                     var rkb = document.createElement('span');
-                    rkb.style.cssText = 'padding:2px 8px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:10px;font-weight:700;';
-                    rkb.textContent = rk.emoji + ' ' + rk.name;
+                    rkb.style.cssText = 'padding:2px 8px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid '+rk.color+'44;color:'+rk.color+';font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;';
+                    if (rk.img) {
+                        var rkImg = document.createElement('img');
+                        rkImg.src = rk.img;
+                        rkImg.style.cssText = 'width:13px;height:13px;object-fit:contain;';
+                        rkImg.onerror = function() { this.outerHTML = rk.emoji; };
+                        rkb.appendChild(rkImg);
+                    } else {
+                        rkb.appendChild(document.createTextNode(rk.emoji));
+                    }
+                    rkb.appendChild(document.createTextNode(' ' + rk.name));
                     badges.appendChild(rkb);
                 }
             }
@@ -3787,8 +3823,16 @@
             badges.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;';
             if (user.role) {
                 var roleBadge = document.createElement('span');
-                roleBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:11px;font-weight:700;';
-                roleBadge.textContent = user.role;
+                roleBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;';
+                var roleIconSrc2 = window._roleIcons && window._roleIcons[user.role];
+                if (roleIconSrc2) {
+                    var roleIconEl2 = document.createElement('img');
+                    roleIconEl2.src = roleIconSrc2;
+                    roleIconEl2.style.cssText = 'width:14px;height:14px;object-fit:contain;';
+                    roleIconEl2.onerror = function() { this.style.display = 'none'; };
+                    roleBadge.appendChild(roleIconEl2);
+                }
+                roleBadge.appendChild(document.createTextNode(user.role));
                 badges.appendChild(roleBadge);
             }
             if (user.rank) {
