@@ -1799,3 +1799,74 @@ font-size: 12px;
     100% { background-position: -200% 0; }
 }
 
+
+/* ── PC CHAT MODE (sidebar stays left, users panel moves right) ── */
+@media (min-width: 769px) {
+    body.pc-chat-mode #chatSystemMask {
+        left: 240px !important;
+        width: calc(100vw - 240px) !important;
+    }
+    body.pc-chat-mode #sideOverlay {
+        display: none !important;
+    }
+    body.pc-chat-mode.sidebar-open {
+        position: static !important;
+        overflow: visible !important;
+        inset: unset !important;
+        width: auto !important;
+    }
+    body.pc-chat-mode .tg-chat-panel {
+        order: 1;
+    }
+    body.pc-chat-mode .tg-sidebar {
+        order: 2;
+        border-right: none;
+        border-left: 1px solid rgba(155,89,182,0.15);
+    }
+    body.pc-chat-mode .tg-mobile-users-btn {
+        display: none !important;
+    }
+    body.pc-chat-mode .tg-sidebar-close-btn {
+        display: none !important;
+    }
+}
+
+/* ── DEFAULT DATA ROW ── */
+.default-data-row {
+    display: flex;
+    align-items: center;
+    padding: 11px 14px;
+    border-radius: 11px;
+    margin-bottom: 7px;
+    border: 1.5px solid rgba(212,175,55,0.4);
+    background: rgba(212,175,55,0.07);
+    transition: all 0.15s;
+}
+.default-data-row:hover { background: rgba(212,175,55,0.13); }
+.default-data-label {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 700;
+    color: #D4AF37;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.default-data-sublabel {
+    font-size: 10px;
+    color: rgba(212,175,55,0.55);
+    font-weight: 600;
+}
+.default-data-btn {
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(212,175,55,0.5);
+    background: rgba(212,175,55,0.12);
+    color: #D4AF37;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+}
+.default-data-btn:hover { background: rgba(212,175,55,0.25); }

@@ -1863,6 +1863,19 @@
     var _mainSidebarModals = ['sideChampsMask','calcMask','itemCalcMenuMask','itemsMask','runesMask','draftMask','tierlistMask'];
 
     window.sidebarOpen = function(what) {
+        // PC mode: when opening chat, keep hamburger sidebar open, move users panel to right
+        if ((what === 'globalChat' || what === 'users') && window.matchMedia('(min-width: 769px)').matches) {
+            document.body.classList.add('pc-chat-mode');
+            var sPanel = document.getElementById('sidePanel');
+            if (sPanel && !sPanel.classList.contains('open')) {
+                sPanel.classList.add('open');
+                // Don't add sidebar-open to body to avoid scroll lock
+            }
+            _sidebarModalId = null; // don't auto-reopen sidebar on chat close
+            if (what === 'users') openChatSystem('users');
+            else openChatSystem();
+            return;
+        }
         closeSidebar();
         var modalMap = {
             'sideChamps':'sideChampsMask', 'calc':'calcMask', 'itemCalcMenu':'itemCalcMenuMask',
@@ -2944,6 +2957,12 @@
         if (sb) sb.classList.remove('mobile-open');
         var mask = document.getElementById('chatSystemMask');
         if (mask) { mask.style.height = ''; mask.style.maxHeight = ''; mask.style.top = ''; }
+        // Clean up PC chat mode
+        if (document.body.classList.contains('pc-chat-mode')) {
+            document.body.classList.remove('pc-chat-mode');
+            var sPanel = document.getElementById('sidePanel');
+            if (sPanel) sPanel.classList.remove('open');
+        }
     };
     window.closeGlobalChat = window.closeChatSystem;
 
@@ -3340,6 +3359,35 @@
     var _pendingDataVisible = null; // null = no pending change
     var _pendingDataset = null;     // null = no pending change
 
+    function applyDefaultData(panelEl) {
+        if (!db) { showToast('Firebase не подключён'); return; }
+        var el = panelEl || document.getElementById('profileDataContent');
+        // Show loading overlay
+        var overlay = document.createElement('div');
+        overlay.className = 'data-loading-overlay';
+        overlay.innerHTML = '<div class="data-loading-spinner"></div>';
+        if (el) { el.appendChild(overlay); el.querySelectorAll('button').forEach(function(b) { b.disabled = true; }); }
+
+        db.collection('users').doc(ADMIN_UID).get().then(function(doc) {
+            if (overlay) overlay.remove();
+            if (!doc.exists) { showToast('Данные дефолта не найдены'); renderDataPanel(); return; }
+            var ad = doc.data();
+            if (ad.matchups)     try { localStorage.setItem('matchups',     ad.matchups);     } catch(e) {}
+            if (ad.tierData)     try { localStorage.setItem('tierData',     ad.tierData);     loadTierData();     } catch(e) {}
+            if (ad.itemTierData) try { localStorage.setItem('itemTierData', ad.itemTierData); loadItemTierData(); } catch(e) {}
+            if (ad.runeTierData) try { localStorage.setItem('runeTierData', ad.runeTierData); loadRuneTierData(); } catch(e) {}
+            // Switch to own data
+            localStorage.setItem('activeDataset', 'own');
+            _pendingDataset = null;
+            showToast('✓ Дефолт применён — данные ERjanKG скопированы в свои');
+            renderDataPanel();
+        }).catch(function(err) {
+            if (overlay) overlay.remove();
+            showToast('Ошибка загрузки дефолта: ' + (err.code || err.message));
+            renderDataPanel();
+        });
+    }
+
     function renderDataPanel() {
         var el = document.getElementById('profileDataContent');
         if (!el) return;
@@ -3415,6 +3463,21 @@
         secSrc.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.3);font-weight:800;letter-spacing:1px;margin-bottom:8px;';
         secSrc.textContent = 'ИСТОЧНИК ДАННЫХ';
         el.appendChild(secSrc);
+
+        // ─── ДЕФОЛТ (ERjanKG) — не удаляется, живёт всегда наверху ───
+        var defRow = document.createElement('div');
+        defRow.className = 'default-data-row';
+        var defLbl = document.createElement('div');
+        defLbl.className = 'default-data-label';
+        defLbl.innerHTML = '⭐ Дефолт <span style="font-size:10px;color:rgba(212,175,55,0.7);">(ERjanKG)</span>'
+            + '<span class="default-data-sublabel">Нажми «Применить» — данные перепишутся в свои</span>';
+        var defBtn = document.createElement('button');
+        defBtn.className = 'default-data-btn';
+        defBtn.textContent = 'Применить';
+        defBtn.onclick = function() { applyDefaultData(el); };
+        defRow.appendChild(defLbl);
+        defRow.appendChild(defBtn);
+        el.appendChild(defRow);
 
         el.appendChild(makeRow('Свои данные', activeDataset === 'own', '#b96fff', function() {
             if (activeDataset === 'own') return;
