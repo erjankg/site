@@ -1891,6 +1891,7 @@ font-size: 12px;
     background: transparent !important;
     backdrop-filter: none !important;
     top: 0 !important;
+    z-index: 8005 !important; /* above sideOverlay(8000) so clicks reach modal, not overlay */
   }
   .m-mask.side-panel-modal.active {
     align-items: stretch !important;
@@ -1898,7 +1899,8 @@ font-size: 12px;
     padding: 0 !important;
     animation: none !important;
   }
-  .m-mask.side-panel-modal > .m-win {
+  /* Use > * to catch draft's inner div which has no .m-win class */
+  .m-mask.side-panel-modal > * {
     width: 100% !important;
     max-width: 100% !important;
     height: 100vh !important;
