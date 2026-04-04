@@ -31,7 +31,11 @@
         <button id="menuBtn" onclick="toggleSidebar()" aria-label="Меню">
             <span></span><span></span><span></span>
         </button>
-        <div class="logo"><a id="nickname" href="#" aria-label="ERjanKG">ERjanKG</a>&nbsp;STATS</div>
+        <div id="headerCenter">
+            <button id="viewBtnMain" class="header-view-btn active" onclick="switchMainView('main')">Матчапы</button>
+            <div class="logo"><a id="nickname" href="#" aria-label="ERjanKG">ERjanKG</a>&nbsp;STATS</div>
+            <button id="viewBtnWrpr" class="header-view-btn" onclick="switchMainView('wrpr')">WinRate</button>
+        </div>
         <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank" aria-label="Twitch">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M4.265 3L3 6.236v13.223h4.488V21l2.75-2.541H13.5L20 12.318V3H4.265zm14.382 8.709l-3.256 3.012H12L9.5 17.115v-2.394H5.709V4.588h12.938v7.121zM15.5 7.559v3.883h-1.588V7.559H15.5zm-4.223 0v3.883H9.688V7.559h1.589z"/></svg>
         </a>
@@ -82,6 +86,36 @@
             <tbody id="statBody"></tbody>
         </table>
     </div>
+</div>
+
+<!-- ══ WINRATE INLINE SECTION ══ -->
+<div id="wrprSection" style="display:none;flex-direction:column;background:linear-gradient(135deg,#1a0d2e 0%,#0f0520 100%);border-radius:15px;min-height:60vh;">
+  <!-- Header -->
+  <div style="display:flex;align-items:center;padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
+    <span style="font-size:18px;margin-right:8px;">📊</span>
+    <span style="font-size:15px;font-weight:900;flex:1;color:#fff;">WinRate &amp; PickRate</span>
+    <span style="font-size:10px;color:rgba(255,255,255,0.35);white-space:nowrap;">обновлено 04.04.2026</span>
+  </div>
+  <!-- Rank filters -->
+  <div style="display:flex;gap:6px;padding:10px 12px 8px;flex-shrink:0;overflow-x:auto;" id="wrprRankRow"></div>
+  <!-- Role filters -->
+  <div style="display:flex;gap:6px;padding:0 12px 10px;flex-shrink:0;overflow-x:auto;" id="wrprRoleRow"></div>
+  <!-- Table -->
+  <div style="flex:1;overflow-y:auto;overscroll-behavior:contain;">
+    <table id="wrprTable" style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead id="wrprThead">
+        <tr style="position:sticky;top:0;background:#1a0d2e;z-index:2;">
+          <th style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.4);font-size:10px;width:32px;">#</th>
+          <th style="padding:8px 6px;text-align:left;color:rgba(255,255,255,0.4);font-size:10px;">Чемпион</th>
+          <th id="wrprThWR" onclick="wrprSort('wr')" style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;white-space:nowrap;user-select:none;">WR% <span id="wrprArWR"></span></th>
+          <th id="wrprThPR" onclick="wrprSort('pr')" style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;white-space:nowrap;user-select:none;">PR% <span id="wrprArPR"></span></th>
+          <th id="wrprThBR" onclick="wrprSort('br')" style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;white-space:nowrap;user-select:none;">BR% <span id="wrprArBR"></span></th>
+        </tr>
+      </thead>
+      <tbody id="wrprTbody"></tbody>
+    </table>
+    <div id="wrprNoData" style="display:none;text-align:center;padding:40px;color:rgba(255,255,255,0.3);font-size:13px;">Данные для этого ранга скоро появятся</div>
+  </div>
 </div>
 
 <div class="m-mask" id="mMask" onclick="if(event.target===this)closeM()">
@@ -789,38 +823,7 @@ Stormarrow: При максимальных зарядах следующая б
   </div>
 </div>
 
-<!-- ══ WIN/RATE & PICK/RATE ══ -->
-<div class="m-mask" id="wrprMask" onclick="if(event.target===this)closeModal('wrprMask')">
-  <div id="wrprBox" style="width:100%;height:100%;display:flex;flex-direction:column;background:linear-gradient(135deg,#1a0d2e 0%,#0f0520 100%);overflow:hidden;">
-    <!-- Header -->
-    <div style="display:flex;align-items:center;padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
-      <span style="font-size:18px;margin-right:8px;">📊</span>
-      <span style="font-size:15px;font-weight:900;flex:1;color:#fff;">WinRate</span>
-      <span style="font-size:10px;color:rgba(255,255,255,0.35);margin-right:8px;white-space:nowrap;">обновлено 04.04.2026</span>
-      <button onclick="closeModal('wrprMask')" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;line-height:1;padding:0 4px;">✕</button>
-    </div>
-    <!-- Rank filters -->
-    <div style="display:flex;gap:6px;padding:10px 12px 8px;flex-shrink:0;overflow-x:auto;" id="wrprRankRow"></div>
-    <!-- Role filters -->
-    <div style="display:flex;gap:6px;padding:0 12px 10px;flex-shrink:0;overflow-x:auto;" id="wrprRoleRow"></div>
-    <!-- Table -->
-    <div style="flex:1;overflow-y:auto;overscroll-behavior:contain;">
-      <table id="wrprTable" style="width:100%;border-collapse:collapse;font-size:12px;">
-        <thead id="wrprThead">
-          <tr style="position:sticky;top:0;background:#1a0d2e;z-index:2;">
-            <th style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.4);font-size:10px;width:32px;">#</th>
-            <th style="padding:8px 6px;text-align:left;color:rgba(255,255,255,0.4);font-size:10px;">Чемпион</th>
-            <th id="wrprThWR" onclick="wrprSort('wr')" style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;white-space:nowrap;user-select:none;">WR% <span id="wrprArWR"></span></th>
-            <th id="wrprThPR" onclick="wrprSort('pr')" style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;white-space:nowrap;user-select:none;">PR% <span id="wrprArPR"></span></th>
-            <th id="wrprThBR" onclick="wrprSort('br')" style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;white-space:nowrap;user-select:none;">BR% <span id="wrprArBR"></span></th>
-          </tr>
-        </thead>
-        <tbody id="wrprTbody"></tbody>
-      </table>
-      <div id="wrprNoData" style="display:none;text-align:center;padding:40px;color:rgba(255,255,255,0.3);font-size:13px;">Данные для этого ранга скоро появятся</div>
-    </div>
-  </div>
-</div>
+<!-- wrprMask removed — WinRate is now an inline section (#wrprSection) -->
 
 <!-- ══ TELEGRAM-STYLE UNIFIED CHAT ══ -->
 <div class="m-mask" id="chatSystemMask" onclick="if(event.target===this)closeChatSystem()">

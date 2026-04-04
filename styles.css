@@ -82,6 +82,14 @@ gap: 8px;
 position: relative;
 }
 
+/* Header center: logo + view toggle buttons */
+#headerCenter {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 6px;
+}
+
 .logo {
 font-size: 22px;
 font-weight: 900;
@@ -93,6 +101,27 @@ white-space: nowrap;
 line-height: 1;
 text-align: center;
 }
+
+/* View toggle buttons in header */
+.header-view-btn {
+padding: 6px 11px;
+border-radius: 20px;
+border: 1.5px solid rgba(185,111,255,0.3);
+background: transparent;
+color: rgba(255,255,255,0.45);
+font-size: 11px;
+font-weight: 800;
+cursor: pointer;
+white-space: nowrap;
+transition: all 0.15s;
+letter-spacing: 0.3px;
+}
+.header-view-btn.active {
+background: rgba(109,63,245,0.25);
+border-color: #b96fff;
+color: #b96fff;
+}
+.header-view-btn:active { transform: scale(0.96); }
 
 .twitch-btn {
 background: linear-gradient(135deg, #9146ff 0%, #772ce8 100%);
@@ -468,10 +497,10 @@ align-items: center;
 justify-content: center;
 animation: fadeIn 0.25s ease;
 }
-/* WR/PR fullscreen modal */
-#wrprMask.active {
-align-items: flex-start;
-padding: 0;
+/* WR/PR inline section */
+#wrprSection {
+border-radius: 15px;
+overflow: hidden;
 }
 /* Champions modal — pinned to top */
 #sideChampsMask.active {
@@ -741,6 +770,9 @@ body.sidebar-open { overflow: hidden !important; touch-action: none; position: f
 @media (max-width: 768px) and (orientation: portrait) {
 .app-wrapper {
 overflow-x: hidden; padding: 12px; padding-bottom: 88px; }
+/* On mobile: hide logo, show only toggle buttons centered */
+#headerCenter .logo { display: none; }
+.header-view-btn { padding: 7px 16px; font-size: 12px; }
 .logo { font-size: 18px; }
 .btn-support { font-size: 13px; padding: 12px; }
 .lvl-container { padding: 14px; }

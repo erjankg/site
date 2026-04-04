@@ -8,7 +8,7 @@
     // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask','wrprMask'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask'];
 
     // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
     var _modalStack = [];
@@ -1887,7 +1887,7 @@
         'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask',
         'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask',
         'tierMenu':'tierlistMenuMask', 'globalChat':'chatSystemMask',
-        'users':'chatSystemMask', 'wrpr':'wrprMask'
+        'users':'chatSystemMask'
     };
 
     function _sidebarDoOpen(what) {
@@ -1904,7 +1904,7 @@
             case 'tierMenu': openTierlistMenu(); break;
             case 'globalChat': openChatSystem(); break;
             case 'users': openChatSystem('users'); break;
-            case 'wrpr': window.openWRPR(); break;
+            case 'wrpr': window.switchMainView('wrpr'); break;
         }
     }
 
@@ -4326,20 +4326,30 @@
         {id:'support', label:'Сап'},
     ];
 
-    window.openWRPR = function() {
-        var el = document.getElementById('wrprMask');
-        if (!el) return;
-        // Close all other modals
-        if (typeof closeAllModals === 'function') closeAllModals('wrprMask');
-        _modalStack = ['wrprMask'];
-        el.classList.add('active');
-        el.style.display = 'flex';
-        el.style.zIndex = '9000';
-        el.style.visibility = '';
-        document.body.classList.add('modal-open');
-        wrprBuildFilters();
-        wrprRender();
+    // ── Main view toggle: 'main' = matchups table, 'wrpr' = WinRate inline section ──
+    window.switchMainView = function(view) {
+        var mainEl = document.querySelector('.table-wrap-outer');
+        var wrprEl = document.getElementById('wrprSection');
+        var btnMain = document.getElementById('viewBtnMain');
+        var btnWrpr = document.getElementById('viewBtnWrpr');
+        if (!mainEl || !wrprEl) return;
+        if (view === 'wrpr') {
+            mainEl.style.display = 'none';
+            wrprEl.style.display = 'flex';
+            if (btnMain) btnMain.classList.remove('active');
+            if (btnWrpr) btnWrpr.classList.add('active');
+            wrprBuildFilters();
+            wrprRender();
+        } else {
+            mainEl.style.display = '';
+            wrprEl.style.display = 'none';
+            if (btnMain) btnMain.classList.add('active');
+            if (btnWrpr) btnWrpr.classList.remove('active');
+        }
     };
+
+    // Keep openWRPR as alias for sidebar nav compatibility
+    window.openWRPR = function() { window.switchMainView('wrpr'); };
 
     window.wrprSort = function(col) {
         if (_wrprSortCol === col) {
