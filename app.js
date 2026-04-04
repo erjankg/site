@@ -765,6 +765,7 @@
         if(panel) panel.classList.remove('open');
         if(overlay) overlay.classList.remove('open');
         document.body.classList.remove('pc-chat-mode');
+        document.body.classList.remove('pc-side-mode');
         var wasOpen = document.body.classList.contains('sidebar-open');
         document.body.classList.remove('sidebar-open');
         if(wasOpen) {
@@ -1926,6 +1927,7 @@
                 _origCloseModal(_sidebarModalId);
             }
             _pcSideMode = true;
+            document.body.classList.add('pc-side-mode'); // hides sideOverlay so it can't block clicks
             _sidebarModalId = _sidebarModalMap[what] || null;
             if (what === 'globalChat' || what === 'users') {
                 document.body.classList.add('pc-chat-mode');
@@ -1955,6 +1957,7 @@
             var el = document.getElementById(id);
             if (el) el.classList.remove('side-panel-modal');
             document.body.classList.remove('pc-chat-mode');
+            document.body.classList.remove('pc-side-mode');
             _sidebarModalId = null;
             if (_pcSideMode) {
                 // PC: sidebar stays open, just clear state

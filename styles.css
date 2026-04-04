@@ -1811,7 +1811,8 @@ font-size: 12px;
         left: 240px !important;
         width: calc(100vw - 240px) !important;
     }
-    body.pc-chat-mode #sideOverlay {
+    body.pc-chat-mode #sideOverlay,
+    body.pc-side-mode #sideOverlay {
         display: none !important;
     }
     body.pc-chat-mode.sidebar-open {
