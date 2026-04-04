@@ -395,8 +395,6 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="side-section" style="margin-top:8px;">Сообщество</div>
   <button class="side-btn" onclick="sidebarOpen('globalChat')" style="background:rgba(46,204,113,0.08);border-left:3px solid #2ecc71;"><span class="side-icon">💬</span>Чат<span id="sidebarChatBadge" style="display:none;background:#ffd700;color:#000;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:900;margin-left:auto;"></span></button>
 
-  <button class="side-btn" onclick="sidebarOpen('influencers')" style="background:rgba(255,0,0,0.08);border-left:3px solid #ff4444;"><span class="side-icon">🎬</span>Инфлюенсеры WR</button>
-
   <div style="flex:1;"></div>
   <div style="padding:0 8px;">
     <a href="https://www.donationalerts.com/r/erjankg" target="_blank"
@@ -843,6 +841,7 @@ Stormarrow: При максимальных зарядах следующая б
       <div class="tg-chat-header" id="tgChatHeader">
         <button class="btn-close-x" onclick="closeChatSystem()">←</button>
         <span class="mhdr-t">💬 Чат</span>
+        <button onclick="openInfluencers()" style="background:rgba(255,0,0,0.15);border:1px solid rgba(255,68,68,0.3);color:#ff4444;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;margin-right:4px;white-space:nowrap;">🎬 Инфл.</button>
         <button class="tg-mobile-users-btn" id="tgMobileUsersBtn" onclick="tgMobileShowSidebar()">👥<span class="tg-mob-badge" id="tgMobBadge"></span></button>
       </div>
       <div class="chat-messages" id="chatMessages">

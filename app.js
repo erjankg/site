@@ -738,16 +738,22 @@
         var overlay = document.getElementById('sideOverlay');
         if(!panel) return;
         var isOpen = panel.classList.contains('open');
-        if(!isOpen) {
-            // Opening: save scroll position
+        var isPc = window.matchMedia('(min-width: 769px)').matches;
+        if(isOpen && isPc) {
+            // PC closing: delegate to closeSidebar so it also closes any open modal
+            closeSidebar();
+            return;
+        }
+        if(!isOpen && !isPc) {
+            // Mobile opening: save scroll position
             document.body.dataset.scrollY = window.scrollY;
             document.body.style.top = '-' + window.scrollY + 'px';
         }
         panel.classList.toggle('open', !isOpen);
         if(overlay) overlay.classList.toggle('open', !isOpen);
-        document.body.classList.toggle('sidebar-open', !isOpen);
-        if(isOpen) {
-            // Closing: restore scroll position
+        if(!isPc) document.body.classList.toggle('sidebar-open', !isOpen);
+        if(isOpen && !isPc) {
+            // Mobile closing: restore scroll position
             var scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
             document.body.style.top = '';
             window.scrollTo(0, scrollY);
@@ -758,12 +764,28 @@
         var overlay = document.getElementById('sideOverlay');
         if(panel) panel.classList.remove('open');
         if(overlay) overlay.classList.remove('open');
+        document.body.classList.remove('pc-chat-mode');
         var wasOpen = document.body.classList.contains('sidebar-open');
         document.body.classList.remove('sidebar-open');
         if(wasOpen) {
             var scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
             document.body.style.top = '';
             window.scrollTo(0, scrollY);
+        }
+        // Close any modal that was opened in PC side-panel mode
+        if (_sidebarModalId && _pcSideMode) {
+            var _id = _sidebarModalId;
+            var _el = document.getElementById(_id);
+            if (_el) _el.classList.remove('side-panel-modal');
+            _sidebarModalId = null;
+            _pcSideMode = false;
+            if (_origCloseModal) _origCloseModal(_id);
+        } else {
+            // Also close chat if it's open (e.g. pc-chat-mode was active)
+            var _chatEl = document.getElementById('chatSystemMask');
+            if (_chatEl && _chatEl.classList.contains('active')) {
+                if (_origCloseModal) _origCloseModal('chatSystemMask');
+            }
         }
     };
 
@@ -1860,31 +1882,18 @@
 
     // Sidebar → modal → close modal → sidebar reopens
     var _sidebarModalId = null; // which MAIN modal was opened from sidebar
+    var _pcSideMode = false;    // true when on PC sidebar stays open + modal to the right
     var _mainSidebarModals = ['sideChampsMask','calcMask','itemCalcMenuMask','itemsMask','runesMask','draftMask','tierlistMask'];
 
-    window.sidebarOpen = function(what) {
-        // PC mode: when opening chat, keep hamburger sidebar open, move users panel to right
-        if ((what === 'globalChat' || what === 'users') && window.matchMedia('(min-width: 769px)').matches) {
-            document.body.classList.add('pc-chat-mode');
-            var sPanel = document.getElementById('sidePanel');
-            if (sPanel && !sPanel.classList.contains('open')) {
-                sPanel.classList.add('open');
-                // Don't add sidebar-open to body to avoid scroll lock
-            }
-            _sidebarModalId = null; // don't auto-reopen sidebar on chat close
-            if (what === 'users') openChatSystem('users');
-            else openChatSystem();
-            return;
-        }
-        closeSidebar();
-        var modalMap = {
-            'sideChamps':'sideChampsMask', 'calc':'calcMask', 'itemCalcMenu':'itemCalcMenuMask',
-            'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask',
-            'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask',
-            'tierMenu':'tierlistMenuMask', 'globalChat':'chatSystemMask',
-            'users':'chatSystemMask', 'influencers':'influencerMask', 'wrpr':'wrprMask'
-        };
-        _sidebarModalId = modalMap[what] || null;
+    var _sidebarModalMap = {
+        'sideChamps':'sideChampsMask', 'calc':'calcMask', 'itemCalcMenu':'itemCalcMenuMask',
+        'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask',
+        'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask',
+        'tierMenu':'tierlistMenuMask', 'globalChat':'chatSystemMask',
+        'users':'chatSystemMask', 'wrpr':'wrprMask'
+    };
+
+    function _sidebarDoOpen(what) {
         switch(what) {
             case 'sideChamps': openSideChamps(); break;
             case 'calc': openCalc(); break;
@@ -1898,33 +1907,73 @@
             case 'tierMenu': openTierlistMenu(); break;
             case 'globalChat': openChatSystem(); break;
             case 'users': openChatSystem('users'); break;
-            case 'influencers': openInfluencers(); break;
             case 'wrpr': window.openWRPR(); break;
         }
+    }
+
+    window.sidebarOpen = function(what) {
+        var isPc = window.matchMedia('(min-width: 769px)').matches;
+        var panel = document.getElementById('sidePanel');
+        var sidebarIsOpen = panel && panel.classList.contains('open');
+
+        if (isPc && sidebarIsOpen) {
+            // PC mode: keep sidebar open, open modal to the RIGHT of sidebar
+            // Close previously opened pc side modal if switching
+            if (_sidebarModalId && _pcSideMode) {
+                var prevEl = document.getElementById(_sidebarModalId);
+                if (prevEl) prevEl.classList.remove('side-panel-modal');
+                document.body.classList.remove('pc-chat-mode');
+                _origCloseModal(_sidebarModalId);
+            }
+            _pcSideMode = true;
+            _sidebarModalId = _sidebarModalMap[what] || null;
+            if (what === 'globalChat' || what === 'users') {
+                document.body.classList.add('pc-chat-mode');
+            }
+            _sidebarDoOpen(what);
+            // Tag modal as side-panel-modal for CSS positioning
+            if (_sidebarModalId) {
+                var el = document.getElementById(_sidebarModalId);
+                if (el) el.classList.add('side-panel-modal');
+            }
+            return;
+        }
+
+        // Mobile or sidebar not open: original behavior — close sidebar first
+        _pcSideMode = false;
+        closeSidebar();
+        _sidebarModalId = _sidebarModalMap[what] || null;
+        _sidebarDoOpen(what);
     };
 
     // Hook into closeModal to reopen sidebar ONLY for main modals
     var _origCloseModal = closeModal;
     closeModal = function(id) {
         _origCloseModal(id);
-        // Only reopen sidebar if closing the MAIN modal that was opened from sidebar
+        // Only act if closing the MAIN modal that was opened from sidebar
         if(_sidebarModalId && id === _sidebarModalId) {
-            var savedId = _sidebarModalId;
+            var el = document.getElementById(id);
+            if (el) el.classList.remove('side-panel-modal');
+            document.body.classList.remove('pc-chat-mode');
             _sidebarModalId = null;
-            // Delay: check if ANY modal is still open (stack or active class)
-            setTimeout(function() {
-                var anyOpen = _modalStack && _modalStack.length > 0;
-                if(!anyOpen) {
-                    // Double-check: is any modal still visually active?
-                    var stillActive = MODAL_IDS.some(function(mid) {
-                        var mel = document.getElementById(mid);
-                        return mel && mel.classList.contains('active');
-                    });
-                    if(!stillActive) {
-                        toggleSidebar();
+            if (_pcSideMode) {
+                // PC: sidebar stays open, just clear state
+                _pcSideMode = false;
+            } else {
+                // Mobile: reopen sidebar after modal closes
+                setTimeout(function() {
+                    var anyOpen = _modalStack && _modalStack.length > 0;
+                    if(!anyOpen) {
+                        var stillActive = MODAL_IDS.some(function(mid) {
+                            var mel = document.getElementById(mid);
+                            return mel && mel.classList.contains('active');
+                        });
+                        if(!stillActive) {
+                            toggleSidebar();
+                        }
                     }
-                }
-            }, 150);
+                }, 150);
+            }
         }
     };
     window.closeModal = closeModal;

@@ -1882,3 +1882,11 @@ font-size: 12px;
 #wrprTbody img { width: 36px !important; height: 36px !important; border-radius: 8px !important; }
 #wrprTbody td:nth-child(2) { padding: 5px 6px !important; text-align: center; }
 }
+
+/* PC sidebar panel mode: modals open to the RIGHT of the sidebar */
+@media (min-width: 769px) {
+  .m-mask.side-panel-modal {
+    left: 240px !important;
+    width: calc(100% - 240px) !important;
+  }
+}
