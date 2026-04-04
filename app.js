@@ -1899,7 +1899,7 @@
             case 'globalChat': openChatSystem(); break;
             case 'users': openChatSystem('users'); break;
             case 'influencers': openInfluencers(); break;
-            case 'wrpr': openWRPR(); break;
+            case 'wrpr': window.openWRPR(); break;
         }
     };
 
@@ -4268,7 +4268,16 @@
     ];
 
     window.openWRPR = function() {
-        openModal('wrprMask');
+        var el = document.getElementById('wrprMask');
+        if (!el) return;
+        // Close all other modals
+        if (typeof closeAllModals === 'function') closeAllModals('wrprMask');
+        _modalStack = ['wrprMask'];
+        el.classList.add('active');
+        el.style.display = 'flex';
+        el.style.zIndex = '9000';
+        el.style.visibility = '';
+        document.body.classList.add('modal-open');
         wrprBuildFilters();
         wrprRender();
     };
