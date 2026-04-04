@@ -1875,3 +1875,10 @@ font-size: 12px;
     transition: all 0.15s;
 }
 .default-data-btn:hover { background: rgba(212,175,55,0.25); }
+
+/* WinRate modal: hide champ name on mobile, bigger icons */
+@media (max-width: 768px) and (orientation: portrait) {
+.wrpr-champ-name { display: none; }
+#wrprTbody img { width: 36px !important; height: 36px !important; border-radius: 8px !important; }
+#wrprTbody td:nth-child(2) { padding: 5px 6px !important; text-align: center; }
+}

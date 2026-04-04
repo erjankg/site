@@ -390,7 +390,7 @@ Stormarrow: При максимальных зарядах следующая б
   <button class="side-btn" onclick="sidebarOpen('runes')"><span class="side-icon">💎</span>Руны</button>
   <button class="side-btn" onclick="sidebarOpen('draft')" style="background:rgba(109,63,245,0.15);border-left:3px solid #b96fff;"><span class="side-icon">📋</span>Драфт-помощник</button>
   <button class="side-btn" onclick="sidebarOpen('tierMenu')" style="background:rgba(255,215,0,0.06);border-left:3px solid rgba(255,215,0,0.5);"><span class="side-icon">🏆</span>Тир-лист</button>
-  <button class="side-btn" onclick="sidebarOpen('wrpr')" style="background:rgba(46,204,113,0.06);border-left:3px solid rgba(46,204,113,0.5);"><span class="side-icon">📊</span>Win/rate &amp; Pick/rate</button>
+  <button class="side-btn" onclick="sidebarOpen('wrpr')" style="background:rgba(46,204,113,0.06);border-left:3px solid rgba(46,204,113,0.5);"><span class="side-icon">📊</span>WinRate</button>
 
   <div class="side-section" style="margin-top:8px;">Сообщество</div>
   <button class="side-btn" onclick="sidebarOpen('globalChat')" style="background:rgba(46,204,113,0.08);border-left:3px solid #2ecc71;"><span class="side-icon">💬</span>Чат<span id="sidebarChatBadge" style="display:none;background:#ffd700;color:#000;padding:1px 7px;border-radius:10px;font-size:10px;font-weight:900;margin-left:auto;"></span></button>
@@ -797,7 +797,8 @@ Stormarrow: При максимальных зарядах следующая б
     <!-- Header -->
     <div style="display:flex;align-items:center;padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;">
       <span style="font-size:18px;margin-right:8px;">📊</span>
-      <span style="font-size:15px;font-weight:900;flex:1;color:#fff;">Win Rate &amp; Pick Rate</span>
+      <span style="font-size:15px;font-weight:900;flex:1;color:#fff;">WinRate</span>
+      <span style="font-size:10px;color:rgba(255,255,255,0.35);margin-right:8px;white-space:nowrap;">обновлено 04.04.2026</span>
       <button onclick="closeModal('wrprMask')" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;line-height:1;padding:0 4px;">✕</button>
     </div>
     <!-- Rank filters -->
@@ -812,7 +813,6 @@ Stormarrow: При максимальных зарядах следующая б
             <th style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.4);font-size:10px;width:32px;">#</th>
             <th style="padding:8px 6px;text-align:left;color:rgba(255,255,255,0.4);font-size:10px;">Чемпион</th>
             <th id="wrprThWR" onclick="wrprSort('wr')" style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;white-space:nowrap;user-select:none;">WR% <span id="wrprArWR"></span></th>
-            <th style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.4);font-size:10px;">Δ</th>
             <th id="wrprThPR" onclick="wrprSort('pr')" style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;white-space:nowrap;user-select:none;">PR% <span id="wrprArPR"></span></th>
             <th id="wrprThBR" onclick="wrprSort('br')" style="padding:8px 6px;text-align:center;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;white-space:nowrap;user-select:none;">BR% <span id="wrprArBR"></span></th>
           </tr>
