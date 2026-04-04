@@ -1372,10 +1372,10 @@
     var ROLES = [
         {key:'all',label:'\u0412\u0441\u0435',icon:'\uD83C\uDF0D'},
         {key:'adc',label:'ADC',icon:'\uD83C\uDFF9'},
-        {key:'mid',label:'\u041c\u0438\u0434',icon:'\u26A1'},
-        {key:'top',label:'\u0422\u043e\u043f',icon:'\uD83D\uDEE1'},
-        {key:'jungle',label:'\u041b\u0435\u0441',icon:'\uD83C\uDF3F'},
-        {key:'sup',label:'\u0421\u0430\u043f',icon:'\uD83D\uDC9B'}
+        {key:'mid',label:'Mid',icon:'\u26A1'},
+        {key:'top',label:'Top',icon:'\uD83D\uDEE1'},
+        {key:'jungle',label:'Jungle',icon:'\uD83C\uDF3F'},
+        {key:'sup',label:'Support',icon:'\uD83D\uDC9B'}
     ];
     window.openTierlist = function(type) {
         _tierType = type||'champs';
@@ -1396,6 +1396,17 @@
 
     window.openTierlistMenu = function() { openModal('tierlistMenuMask'); };
     window.closeTierlistMenu = function() { closeModal('tierlistMenuMask'); };
+    window.openTierlistFromMenu = function(type) {
+        var map = {champs:'tierChamps', items:'tierItems', runes:'tierRunes'};
+        var isPc = window.matchMedia('(min-width: 769px)').matches;
+        var panel = document.getElementById('sidePanel');
+        var sidebarIsOpen = panel && panel.classList.contains('open');
+        if (isPc && sidebarIsOpen) {
+            sidebarOpen(map[type] || type);
+        } else {
+            openTierlist(type);
+        }
+    };
     function buildTierlistTabs() {
         var el=document.getElementById('tierlistTabs'); if(!el) return;
         el.innerHTML='';
@@ -1549,7 +1560,7 @@
     }
 
     // SIDE CHAMPIONS
-    var SC_ROLES=[{key:'all',label:'\u0412\u0441\u0435'},{key:'ADC',label:'ADC'},{key:'Mid',label:'\u041c\u0438\u0434'},{key:'Top',label:'\u0422\u043e\u043f'},{key:'Jungle',label:'\u041b\u0435\u0441'},{key:'Support',label:'\u0421\u0430\u043f'}];
+    var SC_ROLES=[{key:'all',label:'\u0412\u0441\u0435'},{key:'ADC',label:'ADC'},{key:'Mid',label:'Mid'},{key:'Top',label:'Top'},{key:'Jungle',label:'Jungle'},{key:'Support',label:'Support'}];
     var _scRole='all';
     window.openSideChamps = function() {
         openModal('sideChampsMask');
@@ -1814,21 +1825,6 @@
     };
     window.closeChampDetail=function(){closeModal('champDetailMask');};
 
-    // Sidebar support tooltip
-    (function(){
-        var btn=document.getElementById('sideSupport'); if(!btn) return;
-        var tip=null;
-        btn.addEventListener('mouseenter',function(){
-            tip=document.createElement('div');
-            tip.style.cssText='position:fixed;z-index:99999;background:rgba(10,3,20,0.97);border:1px solid rgba(185,111,255,0.6);color:rgba(255,255,255,0.9);font-size:12px;line-height:1.6;padding:12px 14px;border-radius:10px;max-width:260px;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.6);';
-            tip.textContent=btn.getAttribute('title')||'';
-            document.body.appendChild(tip);
-            var r=btn.getBoundingClientRect();
-            tip.style.left=(r.right+10)+'px';
-            tip.style.top=Math.max(10,r.top)+'px';
-        });
-        btn.addEventListener('mouseleave',function(){if(tip){tip.remove();tip=null;}});
-    })();
 
     // ── Expose all global functions needed by inline onclick handlers ──
     window.openM = function() { openModal('mMask'); drawM(); };
@@ -2244,8 +2240,8 @@
         if(rolesEl) {
             if(_champPickerType === 'champs') {
                 var rolesList = [
-                    {k:'all', l:'Все'}, {k:'Top', l:'Топ'}, {k:'Jungle', l:'Джунгли'},
-                    {k:'Mid', l:'Мид'}, {k:'ADC', l:'ADC'}, {k:'Support', l:'Суп'}
+                    {k:'all', l:'Все'}, {k:'Top', l:'Top'}, {k:'Jungle', l:'Jungle'},
+                    {k:'Mid', l:'Mid'}, {k:'ADC', l:'ADC'}, {k:'Support', l:'Support'}
                 ];
                 rolesEl.innerHTML = '';
                 rolesList.forEach(function(r) {

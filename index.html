@@ -400,8 +400,7 @@ Stormarrow: При максимальных зарядах следующая б
     <a href="https://www.donationalerts.com/r/erjankg" target="_blank"
        id="sideSupport"
        class="side-btn side-support"
-       style="text-decoration:none;display:flex;"
-       title="Ребята, сайт абсолютно бесплатен для всех. Буду очень благодарен за поддержку — для меня это мощная мотивация развивать проект. В планах: добавить характеристики HP реген, winrate/pickrate, мана реген, особый столбец для лесников (фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа), изображения чемпов и регулярно обновлять сайт до актуальности.">
+       style="text-decoration:none;display:flex;">
       <span class="side-icon">💎</span>Поддержать проект
     </a>
   </div>
@@ -409,7 +408,8 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ WELCOME POPUP ══ -->
 <div id="welcomeOverlay" class="m-mask" onclick="if(event.target===this)closeWelcome()" style="z-index:9500;background:rgba(10,4,24,0.97);backdrop-filter:blur(12px);">
-  <div style="max-width:540px;width:92vw;padding:0 16px;text-align:center;animation:fadeIn 0.6s ease;">
+  <div style="max-width:540px;width:92vw;padding:0 16px;text-align:center;animation:fadeIn 0.6s ease;position:relative;">
+    <button onclick="closeWelcome()" style="position:absolute;top:-8px;right:-8px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);font-size:18px;line-height:1;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
 
     <!-- Логотип/эмблема -->
     <div style="font-size:56px;margin-bottom:16px;filter:drop-shadow(0 0 24px rgba(109,63,245,0.8));">⚔️</div>
@@ -556,7 +556,7 @@ Stormarrow: При максимальных зарядах следующая б
     <!-- Search -->
     <input id="scSearch" type="text" placeholder="🔍 Поиск чемпиона..." class="calc-input" style="margin-bottom:12px;font-size:14px;padding:10px 14px;" oninput="scFilter()">
     <!-- Grid -->
-    <div id="scGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;overflow-y:auto;flex:1;padding:4px;"></div>
+    <div id="scGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;overflow-y:auto;flex:1;padding:4px;scrollbar-gutter:stable;"></div>
     </div>
   </div>
 </div>
@@ -776,13 +776,13 @@ Stormarrow: При максимальных зарядах следующая б
       <span class="mhdr-t" style="color:#FFD700;">🏆 Тир-листы</span>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;padding:14px 18px;">
-      <button onclick="openTierlist('champs')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+      <button onclick="openTierlistFromMenu('champs')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <span style="font-size:20px;">🏆</span><div><div>Тир-лист чемпионов</div><div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:500;">Лучшие чемпы по ролям</div></div>
       </button>
-      <button onclick="openTierlist('items')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+      <button onclick="openTierlistFromMenu('items')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <span style="font-size:20px;">⚙</span><div><div>Тир-лист предметов</div><div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:500;">Самые эффективные предметы</div></div>
       </button>
-      <button onclick="openTierlist('runes')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
+      <button onclick="openTierlistFromMenu('runes')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <span style="font-size:20px;">✨</span><div><div>Тир-лист рун</div><div style="font-size:10px;color:rgba(255,255,255,0.35);font-weight:500;">Топовые руны мета</div></div>
       </button>
     </div>
