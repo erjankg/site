@@ -8,14 +8,16 @@
     // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask'];
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask',
+        'socialPickerMask','socialLinkConfirmMask'];
 
     // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
     var _modalStack = [];
     var _baseZIndex = 6000;
 
     // Модалки которые ВСЕГДА открываются поверх (не закрывая родителя)
-    var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask','profileSetupMask','userCardMask'];
+    var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask','profileSetupMask','userCardMask',
+        'socialPickerMask','socialLinkConfirmMask'];
 
     function closeAllModals(except) {
         MODAL_IDS.forEach(function(id) {
@@ -3344,6 +3346,7 @@
     // ═══════════════════════════════════════
     var _profileRole = '';
     var _profileRank = '';
+    var _profileSocialLinks = [];
 
     // Wild Rift rank emblem images (helmet-style crests)
     // Wild Rift rank icons from Liquipedia WR wiki (128×128 WR-specific crests)
@@ -3363,16 +3366,37 @@
     ];
     var ROLES_LIST = ['Top','Jungle','Mid','ADC','Support'];
 
+    var SOCIAL_PLATFORMS = [
+        { id:'youtube',  name:'YouTube',  color:'#FF0000', bg:'rgba(255,0,0,0.15)',      border:'rgba(255,0,0,0.5)',      svg:'<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#FF0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>' },
+        { id:'twitch',   name:'Twitch',   color:'#9146FF', bg:'rgba(145,70,255,0.15)',   border:'rgba(145,70,255,0.5)',   svg:'<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#9146FF" d="M11.6 5.5H13v4.5h-1.4V5.5zm3.8 0H17v4.5h-1.6V5.5zM2.6 0L0 2.6v18.8h6.3V24l3.8-2.6H14l8.8-8.8V0H2.6zm18.7 12.1l-3.8 3.8H13l-3.4 2.5v-2.5H3.8V1.3h17.5v10.8z"/></svg>' },
+        { id:'telegram', name:'Telegram', color:'#2AABEE', bg:'rgba(42,171,238,0.15)',  border:'rgba(42,171,238,0.5)',  svg:'<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#2AABEE" d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.9 8.2-2 9.4c-.1.6-.5.8-1 .5l-2.8-2-1.3 1.3c-.2.2-.4.3-.7.3l.2-2.9 5-4.5c.2-.2 0-.3-.3-.1L6.5 14.6l-2.7-.9c-.6-.2-.6-.6.1-.9l10.5-4c.6-.1 1.1.2.9.8z"/></svg>' },
+        { id:'discord',  name:'Discord',  color:'#5865F2', bg:'rgba(88,101,242,0.15)',  border:'rgba(88,101,242,0.5)',  svg:'<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#5865F2" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3c-.2.4-.5.9-.7 1.3a18.2 18.2 0 0 0-5.4 0C9.1 3.9 8.8 3.4 8.6 3A19.5 19.5 0 0 0 3.7 4.4C.5 9.2-.3 13.9.1 18.5a19.8 19.8 0 0 0 6 3 14.7 14.7 0 0 0 1.3-2 12.8 12.8 0 0 1-2-.9l.5-.4a14.2 14.2 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1 14.7 14.7 0 0 0 1.3 2 19.7 19.7 0 0 0 6-3c.5-5.2-.8-9.8-3.7-14.1zM8.1 15.7c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3c1.2 0 2.1 1 2.1 2.3s-.9 2.3-2.1 2.3zm7.8 0c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3c1.2 0 2.1 1 2.1 2.3s-.9 2.3-2.1 2.3z"/></svg>' }
+    ];
+
     window.openProfileSetup = function() {
         _profileRole = '';
         _profileRank = '';
+        _profileSocialLinks = [];
         openModal('profileSetupMask');
         var panelProfile = document.getElementById('profPanelProfile');
         var panelData = document.getElementById('profPanelData');
         if (panelProfile) { panelProfile.style.display = 'block'; panelProfile.style.flex = '1'; }
         if (panelData) panelData.style.display = 'none';
+        renderProfileNick();
         drawRoles();
         drawRanks();
+        renderProfileSocialLinks();
+        if (db && _currentUser) {
+            db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+                if (doc.exists) {
+                    var d = doc.data();
+                    if (d.socialLinks && Array.isArray(d.socialLinks)) {
+                        _profileSocialLinks = d.socialLinks;
+                        renderProfileSocialLinks();
+                    }
+                }
+            }).catch(function(e) { console.warn('Social links load:', e); });
+        }
     };
     window.closeProfileSetup = function() {
         closeModal('profileSetupMask');
@@ -3400,7 +3424,7 @@
             if (panelData) panelData.style.display = 'none';
             if (tabProfile) { tabProfile.style.background = 'rgba(109,63,245,0.15)'; tabProfile.style.color = '#b96fff'; tabProfile.style.borderBottom = '2px solid #b96fff'; }
             if (tabData) { tabData.style.background = 'transparent'; tabData.style.color = 'rgba(255,255,255,0.4)'; tabData.style.borderBottom = '2px solid transparent'; }
-            drawRoles(); drawRanks();
+            renderProfileNick(); drawRoles(); drawRanks(); renderProfileSocialLinks();
         }
     };
 
@@ -3752,6 +3776,265 @@
         });
     };
 
+    // ═══ PROFILE NICK ═══
+
+    function renderProfileNick() {
+        var el = document.getElementById('profileNickRow');
+        if (!el) return;
+        el.innerHTML = '';
+        var nick = (_currentUser && _currentUser.displayName) || '';
+
+        // Display row: nick + pencil
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;background:rgba(109,63,245,0.08);border:1.5px solid rgba(155,89,182,0.25);border-radius:12px;padding:10px 14px;';
+
+        var label = document.createElement('div');
+        label.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.35);font-weight:800;letter-spacing:0.8px;margin-right:2px;flex-shrink:0;';
+        label.textContent = 'НИК';
+
+        var nameEl = document.createElement('div');
+        nameEl.id = 'profileNickText';
+        nameEl.style.cssText = 'flex:1;font-size:15px;font-weight:900;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+        nameEl.textContent = nick || '—';
+
+        var editBtn = document.createElement('button');
+        editBtn.style.cssText = 'flex-shrink:0;width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:#b96fff;';
+        editBtn.title = 'Изменить ник';
+        editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b96fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+        editBtn.onclick = function() { showNickEditor(el, nick); };
+
+        row.appendChild(label);
+        row.appendChild(nameEl);
+        row.appendChild(editBtn);
+        el.appendChild(row);
+    }
+
+    function showNickEditor(container, currentNick) {
+        container.innerHTML = '';
+
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;flex-direction:column;gap:8px;background:rgba(109,63,245,0.08);border:1.5px solid rgba(185,111,255,0.4);border-radius:12px;padding:10px 14px;';
+
+        var labelRow = document.createElement('div');
+        labelRow.style.cssText = 'display:flex;align-items:center;gap:6px;';
+        var label = document.createElement('div');
+        label.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.35);font-weight:800;letter-spacing:0.8px;';
+        label.textContent = 'НИК';
+        var hint = document.createElement('div');
+        hint.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.25);margin-left:auto;';
+        hint.textContent = 'буквы, цифры, 3–20 символов';
+        labelRow.appendChild(label);
+        labelRow.appendChild(hint);
+
+        var inp = document.createElement('input');
+        inp.type = 'text';
+        inp.value = currentNick || '';
+        inp.maxLength = 20;
+        inp.placeholder = 'Введи ник...';
+        inp.style.cssText = 'width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid rgba(155,89,182,0.35);background:rgba(18,10,35,0.6);color:#fff;font-size:14px;font-weight:700;outline:none;box-sizing:border-box;';
+
+        var counter = document.createElement('div');
+        counter.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.3);text-align:right;';
+        counter.textContent = (inp.value.length) + '/20';
+
+        inp.addEventListener('input', function() {
+            // Strip invalid chars in real-time
+            var clean = inp.value.replace(/[^a-zA-Zа-яА-ЯёЁ0-9]/g, '');
+            if (inp.value !== clean) inp.value = clean;
+            counter.textContent = inp.value.length + '/20';
+            inp.style.borderColor = 'rgba(155,89,182,0.35)';
+            errEl.textContent = '';
+        });
+
+        var errEl = document.createElement('div');
+        errEl.style.cssText = 'font-size:11px;color:#e74c3c;min-height:14px;';
+
+        var btns = document.createElement('div');
+        btns.style.cssText = 'display:flex;gap:8px;';
+
+        var cancelBtn = document.createElement('button');
+        cancelBtn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;';
+        cancelBtn.textContent = 'Отмена';
+        cancelBtn.onclick = function() { renderProfileNick(); };
+
+        var saveBtn = document.createElement('button');
+        saveBtn.style.cssText = 'flex:2;padding:8px;border-radius:8px;border:none;background:linear-gradient(135deg,#6d3ff5,#9b59b6);color:#fff;font-size:12px;font-weight:700;cursor:pointer;';
+        saveBtn.textContent = '✓ Сохранить ник';
+        saveBtn.onclick = function() {
+            var val = inp.value.trim();
+            if (val.length < 3) { errEl.textContent = 'Минимум 3 символа'; inp.style.borderColor='#e74c3c'; return; }
+            if (val.length > 20) { errEl.textContent = 'Максимум 20 символов'; inp.style.borderColor='#e74c3c'; return; }
+            if (!/^[a-zA-Zа-яА-ЯёЁ0-9]+$/.test(val)) { errEl.textContent = 'Только буквы и цифры'; inp.style.borderColor='#e74c3c'; return; }
+            saveBtn.disabled = true;
+            saveBtn.textContent = '...';
+            var auth = firebase.auth();
+            auth.currentUser.updateProfile({ displayName: val }).then(function() {
+                if (db && _currentUser) {
+                    return db.collection('users').doc(_currentUser.uid).set({ displayName: val }, { merge: true });
+                }
+            }).then(function() {
+                showToast('✓ Ник обновлён!');
+                renderProfileNick();
+                // Update header button tooltip if visible
+                var headerBtn = document.querySelector('.user-menu-btn');
+                if (headerBtn) headerBtn.title = val;
+            }).catch(function(err) {
+                saveBtn.disabled = false;
+                saveBtn.textContent = '✓ Сохранить ник';
+                errEl.textContent = 'Ошибка: ' + (err.message || err.code);
+            });
+        };
+
+        inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') saveBtn.click(); if (e.key === 'Escape') renderProfileNick(); });
+
+        btns.appendChild(cancelBtn);
+        btns.appendChild(saveBtn);
+        row.appendChild(labelRow);
+        row.appendChild(inp);
+        row.appendChild(counter);
+        row.appendChild(errEl);
+        row.appendChild(btns);
+        container.appendChild(row);
+        setTimeout(function() { inp.focus(); inp.select(); }, 60);
+    }
+
+    // ═══ SOCIAL LINKS ═══
+
+    function renderProfileSocialLinks() {
+        var el = document.getElementById('profileSocialLinks');
+        if (!el) return;
+        el.innerHTML = '';
+        _profileSocialLinks.forEach(function(link) {
+            var p = SOCIAL_PLATFORMS.find(function(pl) { return pl.id === link.platform; });
+            if (!p) return;
+            var wrap = document.createElement('div');
+            wrap.style.cssText = 'position:relative;';
+            var btn = document.createElement('button');
+            btn.style.cssText = 'width:40px;height:40px;border-radius:10px;border:2px solid '+p.border+';background:'+p.bg+';cursor:default;display:flex;align-items:center;justify-content:center;padding:0;';
+            btn.innerHTML = '<div style="width:22px;height:22px;pointer-events:none;">'+p.svg+'</div>';
+            var removeBtn = document.createElement('button');
+            removeBtn.style.cssText = 'position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;border:none;background:#e74c3c;color:#fff;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;z-index:1;';
+            removeBtn.textContent = '×';
+            removeBtn.title = 'Удалить ' + p.name;
+            removeBtn.onclick = (function(pid) { return function(e) { e.stopPropagation(); removeSocialLink(pid); }; })(link.platform);
+            wrap.appendChild(btn);
+            wrap.appendChild(removeBtn);
+            el.appendChild(wrap);
+        });
+        if (_profileSocialLinks.length < SOCIAL_PLATFORMS.length) {
+            var addBtn = document.createElement('button');
+            addBtn.style.cssText = 'width:40px;height:40px;border-radius:10px;border:2px dashed rgba(155,89,182,0.4);background:rgba(109,63,245,0.08);cursor:pointer;color:#b96fff;font-size:24px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;';
+            addBtn.textContent = '+';
+            addBtn.title = 'Добавить соцсеть';
+            addBtn.onclick = function() { openSocialPicker(); };
+            el.appendChild(addBtn);
+        }
+    }
+
+    var _socialPickerPlatform = null;
+    var _socialPickerStep = 'pick';
+
+    window.openSocialPicker = function() {
+        _socialPickerStep = 'pick';
+        _socialPickerPlatform = null;
+        renderSocialPickerContent();
+        openModal('socialPickerMask');
+    };
+    window.closeSocialPicker = function() { closeModal('socialPickerMask'); };
+
+    window.renderSocialPickerContent = function renderSocialPickerContent() {
+        var content = document.getElementById('socialPickerContent');
+        var titleEl = document.getElementById('socialPickerTitle');
+        if (!content) return;
+        var alreadyAdded = _profileSocialLinks.map(function(l) { return l.platform; });
+        if (_socialPickerStep === 'pick') {
+            if (titleEl) titleEl.textContent = 'Выбери соцсеть';
+            var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
+            SOCIAL_PLATFORMS.forEach(function(p) {
+                var disabled = alreadyAdded.indexOf(p.id) !== -1;
+                html += '<button '+(disabled ? '' : 'onclick="window._socialPickerSelectPlatform(\''+p.id+'\')"')+' '
+                      + 'style="padding:14px 10px;border-radius:12px;border:2px solid '+(disabled ? 'rgba(255,255,255,0.1)' : p.border)+';background:'+(disabled ? 'rgba(255,255,255,0.03)' : p.bg)+';cursor:'+(disabled ? 'default' : 'pointer')+';display:flex;flex-direction:column;align-items:center;gap:8px;opacity:'+(disabled ? '0.4' : '1')+';">'
+                      + '<div style="width:32px;height:32px;">'+p.svg+'</div>'
+                      + '<span style="font-size:12px;font-weight:800;color:#fff;">'+p.name+'</span>'
+                      + (disabled ? '<span style="font-size:9px;color:rgba(255,255,255,0.4);font-weight:600;">уже добавлен</span>' : '')
+                      + '</button>';
+            });
+            html += '</div>';
+            content.innerHTML = html;
+        } else {
+            var p2 = SOCIAL_PLATFORMS.find(function(pl) { return pl.id === _socialPickerPlatform; });
+            if (!p2) return;
+            if (titleEl) titleEl.textContent = p2.name;
+            var placeholders = { youtube:'https://youtube.com/@канал', twitch:'https://twitch.tv/канал', telegram:'https://t.me/username', discord:'https://discord.gg/invite' };
+            var ph = placeholders[p2.id] || 'https://...';
+            content.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">'
+                + '<div style="width:36px;height:36px;flex-shrink:0;">'+p2.svg+'</div>'
+                + '<span style="font-size:13px;color:rgba(255,255,255,0.6);">Вставь ссылку на свой '+p2.name+'</span>'
+                + '</div>'
+                + '<input id="socialLinkInput" type="url" placeholder="'+ph+'" style="width:100%;padding:11px 12px;border-radius:10px;border:1.5px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#fff;font-size:13px;font-weight:600;outline:none;box-sizing:border-box;margin-bottom:12px;" />'
+                + '<div style="display:flex;gap:8px;">'
+                + '<button onclick="window._socialPickerBack()" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;cursor:pointer;">← Назад</button>'
+                + '<button onclick="window.confirmAddSocialLink()" style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#6d3ff5,#9b59b6);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Добавить</button>'
+                + '</div>';
+            setTimeout(function() {
+                var inp = document.getElementById('socialLinkInput');
+                if (inp) { inp.focus(); inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') window.confirmAddSocialLink(); }); }
+            }, 80);
+        }
+    };
+
+    window._socialPickerSelectPlatform = function(id) {
+        _socialPickerStep = 'url';
+        _socialPickerPlatform = id;
+        window.renderSocialPickerContent();
+    };
+    window._socialPickerBack = function() {
+        _socialPickerStep = 'pick';
+        _socialPickerPlatform = null;
+        window.renderSocialPickerContent();
+    };
+
+    window.confirmAddSocialLink = function() {
+        var inp = document.getElementById('socialLinkInput');
+        if (!inp) return;
+        var url = inp.value.trim();
+        if (!url) { inp.style.borderColor = '#e74c3c'; return; }
+        if (!/^https?:\/\//i.test(url)) { inp.style.borderColor = '#e74c3c'; showToast('Ссылка должна начинаться с https://'); return; }
+        _profileSocialLinks = _profileSocialLinks.filter(function(l) { return l.platform !== _socialPickerPlatform; });
+        _profileSocialLinks.push({ platform: _socialPickerPlatform, url: url });
+        window.closeSocialPicker();
+        renderProfileSocialLinks();
+    };
+
+    window.removeSocialLink = function(platformId) {
+        _profileSocialLinks = _profileSocialLinks.filter(function(l) { return l.platform !== platformId; });
+        renderProfileSocialLinks();
+    };
+
+    window.openSocialLinkConfirm = function(url, platformId) {
+        var p = SOCIAL_PLATFORMS.find(function(pl) { return pl.id === platformId; });
+        if (!p) return;
+        var content = document.getElementById('socialLinkConfirmContent');
+        if (!content) return;
+        content.innerHTML = '';
+        var iconWrap = document.createElement('div');
+        iconWrap.style.cssText = 'width:48px;height:48px;margin:0 auto 10px;';
+        iconWrap.innerHTML = p.svg;
+        content.appendChild(iconWrap);
+        var titleEl = document.createElement('div');
+        titleEl.style.cssText = 'font-size:14px;color:#fff;font-weight:800;margin-bottom:6px;';
+        titleEl.textContent = 'Перейти на ' + p.name + '?';
+        content.appendChild(titleEl);
+        var urlEl = document.createElement('div');
+        urlEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.45);word-break:break-all;padding:0 4px;';
+        urlEl.textContent = url;
+        content.appendChild(urlEl);
+        var goBtn = document.getElementById('socialLinkGoBtn');
+        if (goBtn) goBtn.onclick = function() { window.open(url, '_blank', 'noopener,noreferrer'); closeSocialLinkConfirm(); };
+        openModal('socialLinkConfirmMask');
+    };
+    window.closeSocialLinkConfirm = function() { closeModal('socialLinkConfirmMask'); };
+
     window.saveProfile = function() {
         if (!db || !_currentUser) { showToast('Войди в аккаунт'); return; }
         if (!_profileRole || !_profileRank) {
@@ -3772,7 +4055,8 @@
         }
         db.collection('users').doc(_currentUser.uid).set({
             role: _profileRole,
-            rank: _profileRank
+            rank: _profileRank,
+            socialLinks: _profileSocialLinks
         }, { merge: true }).then(function() {
             if (saveOverlay) saveOverlay.remove();
             showToast('✓ Профиль сохранён!');
@@ -3966,6 +4250,27 @@
                 }
             }
             header.appendChild(badges);
+        }
+
+        // Social links
+        if (user.socialLinks && user.socialLinks.length) {
+            var socialRow = document.createElement('div');
+            socialRow.style.cssText = 'display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;';
+            user.socialLinks.forEach(function(link) {
+                var pl = SOCIAL_PLATFORMS.find(function(p) { return p.id === link.platform; });
+                if (!pl) return;
+                var btn = document.createElement('button');
+                btn.style.cssText = 'width:38px;height:38px;border-radius:10px;border:2px solid '+pl.border+';background:'+pl.bg+';cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:transform 0.1s;';
+                btn.title = pl.name;
+                btn.innerHTML = '<div style="width:20px;height:20px;pointer-events:none;">'+pl.svg+'</div>';
+                btn.onmouseover = function() { this.style.transform = 'scale(1.1)'; };
+                btn.onmouseout = function() { this.style.transform = ''; };
+                btn.onclick = (function(url, pid) {
+                    return function() { openSocialLinkConfirm(url, pid); };
+                })(link.url, link.platform);
+                socialRow.appendChild(btn);
+            });
+            header.appendChild(socialRow);
         }
 
         container.appendChild(header);
