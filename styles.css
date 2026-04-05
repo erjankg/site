@@ -1952,21 +1952,3 @@ font-size: 12px;
   }
 }
 
-/* ── PC: sidebar always visible ── */
-@media (min-width: 769px) {
-    #sidePanel {
-        transform: translateX(0) !important;
-        box-shadow: none;
-        transition: none;
-    }
-    #sidePanel .side-close { display: none !important; }
-    #sideOverlay { display: none !important; }
-    #menuBtn { display: none !important; }
-    body { overflow-x: hidden; }
-    body.sidebar-open { position: static !important; overflow: visible !important; inset: unset !important; width: auto !important; }
-    .app-wrapper { margin-left: 240px; }
-    /* Modals start after sidebar */
-    .m-mask { left: 240px !important; width: calc(100% - 240px) !important; }
-    /* Calc inner div must not use 100vw on PC */
-    #calcMask > div { width: 100% !important; }
-}
