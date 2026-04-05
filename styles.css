@@ -1223,6 +1223,8 @@ margin-top: 10px; text-align: center; opacity: 0.92; min-height: 12px;
 
 /* ── DESKTOP ── */
 @media (min-width: 769px) {
+.lvl-container, .table-wrap-outer { max-width: 60%; margin-left: auto; margin-right: auto; }
+#wrprSection { max-width: 50% !important; }
 #statTable th:first-child, #statTable td:first-child { width: 26%; }
 #statTable th:not(:first-child), #statTable td:not(:first-child) { width: 14.8%; }
 .btn-champ-cfg { font-size: 13px; padding: 9px 16px; border-radius: 12px; }
