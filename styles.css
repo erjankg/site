@@ -1225,8 +1225,8 @@ margin-top: 10px; text-align: center; opacity: 0.92; min-height: 12px;
 @media (min-width: 769px) {
 .lvl-container, .table-wrap-outer { max-width: 60%; margin-left: auto; margin-right: auto; }
 #wrprSection { max-width: 50% !important; }
-#statTable th:first-child, #statTable td:first-child { width: 26%; }
-#statTable th:not(:first-child), #statTable td:not(:first-child) { width: 14.8%; }
+#statTable th:first-child, #statTable td:first-child { width: 36%; }
+#statTable th:not(:first-child), #statTable td:not(:first-child) { width: 12.8%; }
 .btn-champ-cfg { font-size: 13px; padding: 9px 16px; border-radius: 12px; }
 .champ-cell .name-tag { font-size: 16px; padding: 7px 18px; }
 .champ-icon { width: 55px; height: 55px; border-radius: 10px; }
@@ -1950,4 +1950,23 @@ font-size: 12px;
     border-left: 1px solid rgba(155,89,182,0.25) !important;
     box-shadow: none !important;
   }
+}
+
+/* ── PC: sidebar always visible ── */
+@media (min-width: 769px) {
+    #sidePanel {
+        transform: translateX(0) !important;
+        box-shadow: none;
+        transition: none;
+    }
+    #sidePanel .side-close { display: none !important; }
+    #sideOverlay { display: none !important; }
+    #menuBtn { display: none !important; }
+    body { overflow-x: hidden; }
+    body.sidebar-open { position: static !important; overflow: visible !important; inset: unset !important; width: auto !important; }
+    .app-wrapper { margin-left: 240px; }
+    /* Modals start after sidebar */
+    .m-mask { left: 240px !important; width: calc(100% - 240px) !important; }
+    /* Calc inner div must not use 100vw on PC */
+    #calcMask > div { width: 100% !important; }
 }

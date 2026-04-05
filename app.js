@@ -3066,8 +3066,14 @@
                 mask.style.top = t + 'px';
                 mask.style.height = h + 'px';
                 mask.style.maxHeight = h + 'px';
-                var win = mask.querySelector('.m-win');
-                if (win) win.style.maxHeight = Math.floor(h * 0.95) + 'px';
+                // calcMask uses a direct child div (not .m-win) — fix its height too
+                if (mask.id === 'calcMask') {
+                    var calcInner = mask.querySelector('div');
+                    if (calcInner) { calcInner.style.height = h + 'px'; calcInner.style.maxHeight = h + 'px'; }
+                } else {
+                    var win = mask.querySelector('.m-win');
+                    if (win) win.style.maxHeight = Math.floor(h * 0.95) + 'px';
+                }
             });
         }
         function resetVVFix(mask) {
