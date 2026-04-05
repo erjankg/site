@@ -123,8 +123,8 @@
         <div class="mhdr">
             <button class="btn-close-x" onclick="closeM()">←</button>
             <span class="mhdr-t">Champions</span>
-            <button class="m-btn m-btn-all" onclick="selectAll()">✓ ALL</button>
-            <button class="m-btn m-btn-clear" onclick="clearAll()">✕ CLEAR</button>
+            <button class="m-btn m-btn-all" onclick="selectAll()">✓</button>
+            <button class="m-btn m-btn-clear" onclick="clearAll()">✕</button>
         </div>
         <div class="m-search">
             <input type="text" id="mSearch" placeholder="🔍 Поиск..." oninput="drawM()">
@@ -589,7 +589,7 @@ Stormarrow: При максимальных зарядах следующая б
     <!-- Search -->
     <input id="scSearch" type="text" placeholder="🔍 Поиск чемпиона..." class="calc-input" style="margin-bottom:12px;font-size:14px;padding:10px 14px;" oninput="scFilter()">
     <!-- Grid -->
-    <div id="scGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;overflow-y:auto;flex:1;padding:4px;scrollbar-gutter:stable;"></div>
+    <div id="scGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;overflow-y:auto;flex:1;padding:4px;scrollbar-gutter:stable;align-content:start;"></div>
     </div>
   </div>
 </div>
@@ -1007,6 +1007,11 @@ Stormarrow: При максимальных зарядах следующая б
       </div>
     </div>
   </div>
+</div>
+
+<!-- ══ GLOBAL LOADING OVERLAY ══ -->
+<div id="globalLoadingOverlay">
+  <div class="global-spinner"></div>
 </div>
 
 <!-- ══ FIREBASE + AUTH + SYNC ══ -->

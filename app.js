@@ -95,6 +95,16 @@
         }
     }
 
+    // ── Global fullscreen spinner ──
+    function showGlobalSpinner() {
+        var el = document.getElementById('globalLoadingOverlay');
+        if (el) el.classList.add('active');
+    }
+    function hideGlobalSpinner() {
+        var el = document.getElementById('globalLoadingOverlay');
+        if (el) el.classList.remove('active');
+    }
+
     // WR level scaling helpers (15 levels)
     function wrScaleByLevel(minVal, maxVal, lvl) {
         return Math.round(minVal + (maxVal - minVal) * (lvl - 1) / 14);
@@ -752,7 +762,7 @@
             document.body.style.top = '-' + window.scrollY + 'px';
         }
         panel.classList.toggle('open', !isOpen);
-        if(overlay) overlay.classList.toggle('open', !isOpen);
+        if(overlay) overlay.classList.toggle('open', !isOpen && !isPc);
         if(!isPc) document.body.classList.toggle('sidebar-open', !isOpen);
         if(isOpen && !isPc) {
             // Mobile closing: restore scroll position
@@ -3440,15 +3450,10 @@
 
     function applyDefaultData(panelEl) {
         if (!db) { showToast('Firebase не подключён'); return; }
-        var el = panelEl || document.getElementById('profileDataContent');
-        // Show loading overlay
-        var overlay = document.createElement('div');
-        overlay.className = 'data-loading-overlay';
-        overlay.innerHTML = '<div class="data-loading-spinner"></div>';
-        if (el) { el.appendChild(overlay); el.querySelectorAll('button').forEach(function(b) { b.disabled = true; }); }
+        showGlobalSpinner();
 
         db.collection('users').doc(ADMIN_UID).get().then(function(doc) {
-            if (overlay) overlay.remove();
+            hideGlobalSpinner();
             if (!doc.exists) { showToast('Данные дефолта не найдены'); renderDataPanel(); return; }
             var ad = doc.data();
             if (ad.matchups)     try { localStorage.setItem('matchups',     ad.matchups);     } catch(e) {}
@@ -3461,7 +3466,7 @@
             showToast('✓ Дефолт применён — данные ERjanKG скопированы в свои');
             renderDataPanel();
         }).catch(function(err) {
-            if (overlay) overlay.remove();
+            hideGlobalSpinner();
             showToast('Ошибка загрузки дефолта: ' + (err.code || err.message));
             renderDataPanel();
         });
@@ -3553,7 +3558,28 @@
         var defBtn = document.createElement('button');
         defBtn.className = 'default-data-btn';
         defBtn.textContent = 'Применить';
-        defBtn.onclick = function() { applyDefaultData(el); };
+        (function(btn) {
+            var _conf = false, _confTimer;
+            btn.onclick = function() {
+                if (!_conf) {
+                    _conf = true;
+                    btn.textContent = 'Точно?';
+                    btn.style.background = 'rgba(231,76,60,0.25)';
+                    btn.style.borderColor = 'rgba(231,76,60,0.6)';
+                    btn.style.color = '#e74c3c';
+                    _confTimer = setTimeout(function() {
+                        _conf = false;
+                        btn.textContent = 'Применить';
+                        btn.style.background = '';
+                        btn.style.borderColor = '';
+                        btn.style.color = '';
+                    }, 3000);
+                } else {
+                    clearTimeout(_confTimer);
+                    applyDefaultData(el);
+                }
+            };
+        })(defBtn);
         defRow.appendChild(defLbl);
         defRow.appendChild(defBtn);
         el.appendChild(defRow);
@@ -3627,17 +3653,7 @@
     }
 
     function _applyDataPanelSave(newVisible, savedVisible, newDataset, savedDataset) {
-        var el = document.getElementById('profileDataContent');
-        if (!el) return;
-
-        // Show loading overlay
-        var overlay = document.createElement('div');
-        overlay.className = 'data-loading-overlay';
-        overlay.innerHTML = '<div class="data-loading-spinner"></div>';
-        el.appendChild(overlay);
-
-        // Disable all buttons in panel
-        el.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
+        showGlobalSpinner();
 
         // Apply visibility change
         var visChanged = newVisible !== savedVisible;
@@ -3655,6 +3671,7 @@
         _pendingDataset = null;
 
         setTimeout(function() {
+            hideGlobalSpinner();
             if (datasetChanged) {
                 if (newDataset === 'own') {
                     activateOwnData();
@@ -4039,29 +4056,18 @@
                      : !_profileRole ? 'Выбери роль' : 'Выбери ранг';
             showToast(_msg); return;
         }
-        // Show loading overlay on profile panel
-        var profPanel = document.getElementById('profPanelProfile');
-        var saveOverlay = null;
-        if (profPanel) {
-            saveOverlay = document.createElement('div');
-            saveOverlay.className = 'data-loading-overlay';
-            saveOverlay.innerHTML = '<div class="data-loading-spinner"></div>';
-            profPanel.style.position = 'relative';
-            profPanel.appendChild(saveOverlay);
-            profPanel.querySelectorAll('button').forEach(function(b) { b.disabled = true; });
-        }
+        showGlobalSpinner();
         db.collection('users').doc(_currentUser.uid).set({
             role: _profileRole,
             rank: _profileRank,
             socialLinks: _profileSocialLinks
         }, { merge: true }).then(function() {
-            if (saveOverlay) saveOverlay.remove();
+            hideGlobalSpinner();
             showToast('✓ Профиль сохранён!');
             closeProfileSetup();
             loadUsersToSidebar();
         }).catch(function(err) {
-            if (saveOverlay) saveOverlay.remove();
-            if (profPanel) profPanel.querySelectorAll('button').forEach(function(b) { b.disabled = false; });
+            hideGlobalSpinner();
             console.error('Save profile error:', err);
             showToast('Ошибка сохранения: ' + (err.code || err.message));
         });

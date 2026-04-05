@@ -576,11 +576,17 @@ gap: 12px;
 }
 
 .m-btn {
-flex: 1;
-padding: 12px;
-border-radius: 12px;
+flex: 0;
+padding: 0;
+width: 40px;
+height: 40px;
+border-radius: 10px;
 border: none;
 font-weight: 900;
+font-size: 16px;
+display: flex;
+align-items: center;
+justify-content: center;
 font-size: 12px;
 cursor: pointer;
 transition: all 0.2s;
@@ -786,7 +792,7 @@ td { font-size: 10px; padding: 8px 2px; }
 .btn-champ-cfg { font-size: 8px; padding: 5px 8px; }
 
 .m-win { width: 95%; max-width: 500px; }
-.m-btn { font-size: 10px; padding: 10px; }
+.m-btn { font-size: 14px; width: 34px; height: 34px; padding: 0; }
 .m-search input { font-size: 12px; padding: 10px 12px; }
 .m-item { font-size: 10px; padding: 8px 3px; }
 .m-role img { max-width: 45px; }
@@ -1950,5 +1956,27 @@ font-size: 12px;
     border-left: 1px solid rgba(155,89,182,0.25) !important;
     box-shadow: none !important;
   }
+}
+
+/* ── Global fullscreen loading overlay ── */
+#globalLoadingOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: rgba(0, 0, 0, 0.65);
+    align-items: center;
+    justify-content: center;
+}
+#globalLoadingOverlay.active {
+    display: flex;
+}
+.global-spinner {
+    width: 52px;
+    height: 52px;
+    border: 4px solid rgba(185, 111, 255, 0.2);
+    border-top-color: #b96fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
 }
 
