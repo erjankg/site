@@ -3382,10 +3382,21 @@
         { id:'discord',  name:'Discord',  color:'#5865F2', bg:'rgba(88,101,242,0.15)',  border:'rgba(88,101,242,0.5)',  svg:'<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#5865F2" d="M20.3 4.4A19.6 19.6 0 0 0 15.4 3c-.2.4-.5.9-.7 1.3a18.2 18.2 0 0 0-5.4 0C9.1 3.9 8.8 3.4 8.6 3A19.5 19.5 0 0 0 3.7 4.4C.5 9.2-.3 13.9.1 18.5a19.8 19.8 0 0 0 6 3 14.7 14.7 0 0 0 1.3-2 12.8 12.8 0 0 1-2-.9l.5-.4a14.2 14.2 0 0 0 12.2 0l.5.4a12.8 12.8 0 0 1-2 1 14.7 14.7 0 0 0 1.3 2 19.7 19.7 0 0 0 6-3c.5-5.2-.8-9.8-3.7-14.1zM8.1 15.7c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3c1.2 0 2.1 1 2.1 2.3s-.9 2.3-2.1 2.3zm7.8 0c-1.2 0-2.1-1-2.1-2.3s.9-2.3 2.1-2.3c1.2 0 2.1 1 2.1 2.3s-.9 2.3-2.1 2.3z"/></svg>' }
     ];
 
+    function _resetSaveBtn() {
+        var btn = document.getElementById('profileSaveBtn');
+        if (!btn) return;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        btn.style.background = 'linear-gradient(135deg,#6d3ff5,#9b59b6)';
+        btn.textContent = '✓ Сохранить';
+    }
+
     window.openProfileSetup = function() {
         _profileRole = '';
         _profileRank = '';
         _profileSocialLinks = [];
+        _resetSaveBtn();
         openModal('profileSetupMask');
         var panelProfile = document.getElementById('profPanelProfile');
         var panelData = document.getElementById('profPanelData');
