@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Generate Preview PNG</title>
+<style>
+  body { background: #111; color: white; font-family: Arial; padding: 20px; }
+  canvas { display: none; }
+  img { max-width: 100%; border: 1px solid #444; }
+  a { color: #a78bfa; font-size: 18px; }
+  p { color: #9ca3af; }
+</style>
+</head>
+<body>
+<h2>Preview PNG Generator</h2>
+<p>Нажмите кнопку, скачайте файл и положите его в корень проекта как <b>preview.png</b></p>
+<button onclick="generate()" style="background:#6D3FF5;color:white;border:none;padding:12px 24px;border-radius:8px;font-size:16px;cursor:pointer;margin-bottom:16px">
+  Скачать preview.png
+</button>
+<br>
+<img id="preview" alt="Preview будет здесь"/>
+<canvas id="canvas" width="1200" height="630"></canvas>
+
+<script>
+async function generate() {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  const img = new Image();
+  img.onload = function() {
+    ctx.drawImage(img, 0, 0, 1200, 630);
+    const dataUrl = canvas.toDataURL('image/png');
+    document.getElementById('preview').src = dataUrl;
+    document.getElementById('preview').style.display = 'block';
+
+    const a = document.createElement('a');
+    a.download = 'preview.png';
+    a.href = dataUrl;
+    a.click();
+  };
+  img.src = 'preview.svg';
+}
+</script>
+</body>
+</html>

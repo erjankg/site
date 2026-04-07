@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0520"/>
+      <stop offset="50%" style="stop-color:#1a0840"/>
+      <stop offset="100%" style="stop-color:#0f0520"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6D3FF5"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Stars -->
+  <circle cx="100" cy="80" r="2" fill="white" opacity="0.4"/>
+  <circle cx="250" cy="40" r="1.5" fill="white" opacity="0.3"/>
+  <circle cx="450" cy="100" r="2" fill="white" opacity="0.5"/>
+  <circle cx="700" cy="50" r="1" fill="white" opacity="0.4"/>
+  <circle cx="900" cy="90" r="2.5" fill="white" opacity="0.3"/>
+  <circle cx="1100" cy="60" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="1050" cy="200" r="1" fill="white" opacity="0.3"/>
+  <circle cx="150" cy="350" r="1.5" fill="white" opacity="0.2"/>
+  <circle cx="350" cy="500" r="2" fill="white" opacity="0.3"/>
+  <circle cx="800" cy="550" r="1" fill="white" opacity="0.4"/>
+  <circle cx="1000" cy="450" r="2" fill="white" opacity="0.2"/>
+
+  <!-- Purple glow blob left -->
+  <ellipse cx="200" cy="315" rx="300" ry="200" fill="#6D3FF5" opacity="0.08"/>
+  <!-- Purple glow blob right -->
+  <ellipse cx="1000" cy="315" rx="300" ry="200" fill="#a855f7" opacity="0.06"/>
+
+  <!-- Top accent line -->
+  <rect x="0" y="0" width="1200" height="4" fill="url(#accent)"/>
+  <!-- Bottom accent line -->
+  <rect x="0" y="626" width="1200" height="4" fill="url(#accent)"/>
+
+  <!-- Sword icon (⚔️ styled) -->
+  <g transform="translate(560, 120)" filter="url(#glow)" opacity="0.9">
+    <!-- Sword blade -->
+    <rect x="-3" y="-60" width="6" height="100" rx="3" fill="url(#accent)"/>
+    <!-- Sword crossguard -->
+    <rect x="-25" y="35" width="50" height="8" rx="4" fill="#8b6cf7"/>
+    <!-- Sword handle -->
+    <rect x="-4" y="43" width="8" height="30" rx="4" fill="#6b46c1"/>
+    <!-- Sword pommel -->
+    <circle cx="0" cy="78" r="7" fill="#8b6cf7"/>
+    <!-- Blade tip glow -->
+    <polygon points="0,-65 -4,-55 4,-55" fill="white" opacity="0.8"/>
+  </g>
+  <!-- Second sword (mirrored) -->
+  <g transform="translate(640, 120) scale(-1,1)" filter="url(#glow)" opacity="0.9">
+    <rect x="-3" y="-60" width="6" height="100" rx="3" fill="url(#accent)"/>
+    <rect x="-25" y="35" width="50" height="8" rx="4" fill="#8b6cf7"/>
+    <rect x="-4" y="43" width="8" height="30" rx="4" fill="#6b46c1"/>
+    <circle cx="0" cy="78" r="7" fill="#8b6cf7"/>
+    <polygon points="0,-65 -4,-55 4,-55" fill="white" opacity="0.8"/>
+  </g>
+
+  <!-- Main title -->
+  <text x="600" y="310" font-family="Arial Black, Arial, sans-serif" font-size="88" font-weight="900"
+        text-anchor="middle" fill="white" letter-spacing="2">WILD RIFT</text>
+  <text x="600" y="390" font-family="Arial Black, Arial, sans-serif" font-size="80" font-weight="900"
+        text-anchor="middle" fill="url(#accent)" letter-spacing="8">STATS</text>
+
+  <!-- Divider line -->
+  <rect x="300" y="410" width="600" height="2" rx="1" fill="url(#accent)" opacity="0.6"/>
+
+  <!-- Subtitle -->
+  <text x="600" y="455" font-family="Arial, sans-serif" font-size="26" font-weight="400"
+        text-anchor="middle" fill="#c4b5fd" letter-spacing="1">
+    Статы чемпионов · Калькулятор урона · Руны · Предметы
+  </text>
+
+  <!-- Features row -->
+  <text x="600" y="520" font-family="Arial, sans-serif" font-size="20"
+        text-anchor="middle" fill="#9ca3af">
+    Уровни 1–15 · Тир-листы · Патч-ноты · Обновляется каждый патч
+  </text>
+
+  <!-- URL badge -->
+  <rect x="430" y="555" width="340" height="44" rx="22" fill="#6D3FF5" opacity="0.3"/>
+  <rect x="430" y="555" width="340" height="44" rx="22" fill="none" stroke="#8b6cf7" stroke-width="1.5" opacity="0.6"/>
+  <text x="600" y="583" font-family="Arial, sans-serif" font-size="18"
+        text-anchor="middle" fill="#c4b5fd" font-weight="500">erjankg.github.io/site</text>
+</svg>
