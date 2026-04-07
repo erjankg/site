@@ -2845,7 +2845,9 @@
         else { avEl.innerHTML=''; avEl.textContent=(inf.name||'?').charAt(0).toUpperCase(); }
 
         document.getElementById('infDetailMeta').innerHTML = (_platIcons[inf.platform]||'●')+' '+(_platLabels[inf.platform]||'')+'<br>🎮 '+(inf.role||'Не указана');
-        document.getElementById('infDetailLink').href = inf.url||'#';
+        var infLink = document.getElementById('infDetailLink');
+        infLink.href = '#';
+        infLink.onclick = (function(url, name) { return function(e) { e.preventDefault(); if(url && url !== '#') openExternalLink(url, name); }; })(inf.url||'#', inf.name||'');
 
         // Achievements
         var achS = document.getElementById('infDetailAchSection');
@@ -3364,21 +3366,12 @@
     var _profileRank = '';
     var _profileSocialLinks = [];
 
-    // Wild Rift rank emblem images (helmet-style crests)
-    // Wild Rift rank icons from Liquipedia WR wiki (128×128 WR-specific crests)
-    var _lqBase = 'https://liquipedia.net/commons/images/thumb/';
     var RANKS = [
-        { id:'iron',        name:'Iron',        color:'#8B8B8B', img:_lqBase+'2/24/Iron_rank.png/175px-Iron_rank.png',              emoji:'⬛' },
-        { id:'bronze',      name:'Bronze',      color:'#CD7F32', img:_lqBase+'f/fe/Bronze_rank.png/175px-Bronze_rank.png',           emoji:'🟫' },
-        { id:'silver',      name:'Silver',      color:'#C0C0C0', img:_lqBase+'3/39/Silver_rank.png/175px-Silver_rank.png',           emoji:'⬜' },
-        { id:'gold',        name:'Gold',        color:'#FFD700', img:_lqBase+'f/f8/Gold_rank.png/175px-Gold_rank.png',               emoji:'🟡' },
-        { id:'platinum',    name:'Platinum',    color:'#00CED1', img:_lqBase+'5/5e/Platinum_rank.png/175px-Platinum_rank.png',       emoji:'🔵' },
-        { id:'emerald',     name:'Emerald',     color:'#50C878', img:_lqBase+'b/bf/Emerald_rank.png/175px-Emerald_rank.png',         emoji:'🟢' },
-        { id:'diamond',     name:'Diamond',     color:'#B9F2FF', img:_lqBase+'c/c6/Diamond_rank.png/175px-Diamond_rank.png',         emoji:'💎' },
-        { id:'master',      name:'Master',      color:'#9B59B6', img:_lqBase+'7/76/Master_rank.png/175px-Master_rank.png',           emoji:'🟣' },
-        { id:'grandmaster', name:'GM',          color:'#E74C3C', img:_lqBase+'f/f2/Grandmaster_rank.png/175px-Grandmaster_rank.png', emoji:'🔴' },
-        { id:'challenger',  name:'Chall',       color:'#F39C12', img:_lqBase+'a/a0/Challenger_rank.png/175px-Challenger_rank.png',   emoji:'👑' },
-        { id:'sovereign',   name:'Sovereign',   color:'#D4AF37', img:'https://static.wikia.nocookie.net/leagueoflegends/images/d/d4/Wild_Rift_Sovereign_rank.png/revision/latest?cb=20240719125655', emoji:'⚜️' }
+        { id:'diamond',     name:'Diamond',   color:'#B9F2FF', img:'web.p/Diamond.webp' },
+        { id:'master',      name:'Master',    color:'#9B59B6', img:'web.p/Master.webp' },
+        { id:'grandmaster', name:'GM',        color:'#E74C3C', img:'web.p/Grandmaster.webp' },
+        { id:'challenger',  name:'Chall',     color:'#F39C12', img:'web.p/Challenger.webp' },
+        { id:'sovereign',   name:'Sovereign', color:'#D4AF37', img:'web.p/Sovereign.webp' }
     ];
     var ROLES_LIST = ['Top','Jungle','Mid','ADC','Support'];
 
@@ -3406,12 +3399,14 @@
             db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
                 if (doc.exists) {
                     var d = doc.data();
+                    if (d.role) { _profileRole = d.role; window._profileSelectRole(d.role); }
+                    if (d.rank) { _profileRank = d.rank; window._profileSelectRank(d.rank); }
                     if (d.socialLinks && Array.isArray(d.socialLinks)) {
                         _profileSocialLinks = d.socialLinks;
                         renderProfileSocialLinks();
                     }
                 }
-            }).catch(function(e) { console.warn('Social links load:', e); });
+            }).catch(function(e) { console.warn('Profile load:', e); });
         }
     };
     window.closeProfileSetup = function() {
@@ -3788,7 +3783,7 @@
     };
     window._profileSelectRank = function(id) {
         _profileRank = id;
-        var rankColors = {iron:'#8B8B8B',bronze:'#CD7F32',silver:'#C0C0C0',gold:'#FFD700',platinum:'#00CED1',emerald:'#50C878',diamond:'#B9F2FF',master:'#9B59B6',grandmaster:'#E74C3C',challenger:'#F39C12',sovereign:'#D4AF37'};
+        var rankColors = {diamond:'#B9F2FF',master:'#9B59B6',grandmaster:'#E74C3C',challenger:'#F39C12',sovereign:'#D4AF37'};
         Object.keys(rankColors).forEach(function(rid) {
             var btn = document.getElementById('prank-' + rid);
             if (!btn) return;
@@ -4025,19 +4020,36 @@
         renderProfileSocialLinks();
     };
 
-    window.openSocialLinkConfirm = function(url, platformId) {
-        var p = SOCIAL_PLATFORMS.find(function(pl) { return pl.id === platformId; });
-        if (!p) return;
+    window.openExternalLink = function(url, label) {
         var content = document.getElementById('socialLinkConfirmContent');
         if (!content) return;
         content.innerHTML = '';
-        var iconWrap = document.createElement('div');
-        iconWrap.style.cssText = 'width:48px;height:48px;margin:0 auto 10px;';
-        iconWrap.innerHTML = p.svg;
-        content.appendChild(iconWrap);
+        var titleEl = document.createElement('div');
+        titleEl.style.cssText = 'font-size:14px;color:#fff;font-weight:800;margin-bottom:8px;';
+        titleEl.textContent = label ? ('Перейти: ' + label + '?') : 'Покинуть сайт?';
+        content.appendChild(titleEl);
+        var urlEl = document.createElement('div');
+        urlEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.45);word-break:break-all;padding:0 4px;';
+        urlEl.textContent = url;
+        content.appendChild(urlEl);
+        var goBtn = document.getElementById('socialLinkGoBtn');
+        if (goBtn) goBtn.onclick = function() { window.open(url, '_blank', 'noopener,noreferrer'); closeSocialLinkConfirm(); };
+        openModal('socialLinkConfirmMask');
+    };
+    window.openSocialLinkConfirm = function(url, platformId) {
+        var p = SOCIAL_PLATFORMS.find(function(pl) { return pl.id === platformId; });
+        var content = document.getElementById('socialLinkConfirmContent');
+        if (!content) return;
+        content.innerHTML = '';
+        if (p) {
+            var iconWrap = document.createElement('div');
+            iconWrap.style.cssText = 'width:48px;height:48px;margin:0 auto 10px;';
+            iconWrap.innerHTML = p.svg;
+            content.appendChild(iconWrap);
+        }
         var titleEl = document.createElement('div');
         titleEl.style.cssText = 'font-size:14px;color:#fff;font-weight:800;margin-bottom:6px;';
-        titleEl.textContent = 'Перейти на ' + p.name + '?';
+        titleEl.textContent = p ? ('Перейти на ' + p.name + '?') : 'Покинуть сайт?';
         content.appendChild(titleEl);
         var urlEl = document.createElement('div');
         urlEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.45);word-break:break-all;padding:0 4px;';

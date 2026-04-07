@@ -41,7 +41,7 @@
             <div class="logo"><a id="nickname" href="#" aria-label="ERjanKG">ERjanKG</a>&nbsp;STATS</div>
             <button id="viewBtnWrpr" class="header-view-btn" onclick="switchMainView('wrpr')">WinRate</button>
         </div>
-        <a href="https://www.twitch.tv/ERjanKG" class="twitch-btn" target="_blank" aria-label="Twitch">
+        <a href="#" class="twitch-btn" aria-label="Twitch" onclick="event.preventDefault();openExternalLink('https://www.twitch.tv/ERjanKG','Twitch')">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M4.265 3L3 6.236v13.223h4.488V21l2.75-2.541H13.5L20 12.318V3H4.265zm14.382 8.709l-3.256 3.012H12L9.5 17.115v-2.394H5.709V4.588h12.938v7.121zM15.5 7.559v3.883h-1.588V7.559H15.5zm-4.223 0v3.883H9.688V7.559h1.589z"/></svg>
         </a>
         <!-- Auth Button -->
@@ -433,10 +433,11 @@ Stormarrow: При максимальных зарядах следующая б
 
   <div style="flex:1;"></div>
   <div style="padding:0 8px;">
-    <a href="https://www.donationalerts.com/r/erjankg" target="_blank"
+    <a href="#"
        id="sideSupport"
        class="side-btn side-support"
-       style="text-decoration:none;display:flex;">
+       style="text-decoration:none;display:flex;"
+       onclick="event.preventDefault();openExternalLink('https://www.donationalerts.com/r/erjankg','Поддержать проект')">
       <span class="side-icon">💎</span>Поддержать проект
     </a>
   </div>
@@ -474,7 +475,7 @@ Stormarrow: При максимальных зарядах следующая б
     </div>
 
     <!-- Кнопки -->
-    <a href="https://www.donationalerts.com/r/erjankg" target="_blank" onclick="closeWelcome()"
+    <a href="#" onclick="event.preventDefault();closeWelcome();openExternalLink('https://www.donationalerts.com/r/erjankg','Поддержать проект')"
        style="display:block;text-align:center;background:linear-gradient(135deg,#6d3ff5,#8e44ad);color:#fff;text-decoration:none;padding:14px;border-radius:14px;font-weight:900;font-size:15px;margin-bottom:10px;box-shadow:0 4px 20px rgba(109,63,245,0.45);">
       💎 Поддержать проект
     </a>
@@ -887,19 +888,7 @@ Stormarrow: При максимальных зарядах следующая б
         <button id="prole-Support" onclick="window._profileSelectRole('Support')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;"><span>Support</span></button>
       </div>
       <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;">МАКСИМАЛЬНЫЙ РАНГ</div>
-      <div id="profileRanks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;margin-bottom:18px;">
-        <button id="prank-iron"        onclick="window._profileSelectRank('iron')"        style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#8B8B8B;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">⬛</span><span>Iron</span></button>
-        <button id="prank-bronze"      onclick="window._profileSelectRank('bronze')"      style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#CD7F32;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">🟫</span><span>Bronze</span></button>
-        <button id="prank-silver"      onclick="window._profileSelectRank('silver')"      style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#C0C0C0;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">⬜</span><span>Silver</span></button>
-        <button id="prank-gold"        onclick="window._profileSelectRank('gold')"        style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#FFD700;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">🟡</span><span>Gold</span></button>
-        <button id="prank-platinum"    onclick="window._profileSelectRank('platinum')"    style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#00CED1;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">🔵</span><span>Platinum</span></button>
-        <button id="prank-emerald"     onclick="window._profileSelectRank('emerald')"     style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#50C878;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">🟢</span><span>Emerald</span></button>
-        <button id="prank-diamond"     onclick="window._profileSelectRank('diamond')"     style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#B9F2FF;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">💎</span><span>Diamond</span></button>
-        <button id="prank-master"      onclick="window._profileSelectRank('master')"      style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#9B59B6;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">🟣</span><span>Master</span></button>
-        <button id="prank-grandmaster" onclick="window._profileSelectRank('grandmaster')" style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#E74C3C;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">🔴</span><span>GM</span></button>
-        <button id="prank-challenger"  onclick="window._profileSelectRank('challenger')"  style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#F39C12;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">👑</span><span>Chall</span></button>
-        <button id="prank-sovereign"   onclick="window._profileSelectRank('sovereign')"   style="padding:6px 4px;border-radius:10px;border:2px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#D4AF37;font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;"><span style="font-size:22px;">⚜️</span><span>Sovereign</span></button>
-      </div>
+      <div id="profileRanks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;margin-bottom:18px;"></div>
       <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;">СОЦИАЛЬНЫЕ СЕТИ</div>
       <div id="profileSocialLinks" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;align-items:center;min-height:44px;">
         <!-- rendered by JS -->
