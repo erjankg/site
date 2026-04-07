@@ -3424,17 +3424,20 @@
         var panelData = document.getElementById('profPanelData');
         var tabProfile = document.getElementById('profTabProfile');
         var tabData = document.getElementById('profTabData');
+        var saveFooter = document.getElementById('profileSaveFooter');
         if (tab === 'data') {
             if (panelProfile) panelProfile.style.display = 'none';
             if (panelData) { panelData.style.display = 'block'; panelData.style.flex = '1'; }
             if (tabProfile) { tabProfile.style.background = 'transparent'; tabProfile.style.color = 'rgba(255,255,255,0.4)'; tabProfile.style.borderBottom = '2px solid transparent'; }
             if (tabData) { tabData.style.background = 'rgba(109,63,245,0.15)'; tabData.style.color = '#b96fff'; tabData.style.borderBottom = '2px solid #b96fff'; }
+            if (saveFooter) saveFooter.style.display = 'none';
             renderDataPanel();
         } else {
             if (panelProfile) { panelProfile.style.display = 'block'; panelProfile.style.flex = '1'; }
             if (panelData) panelData.style.display = 'none';
             if (tabProfile) { tabProfile.style.background = 'rgba(109,63,245,0.15)'; tabProfile.style.color = '#b96fff'; tabProfile.style.borderBottom = '2px solid #b96fff'; }
             if (tabData) { tabData.style.background = 'transparent'; tabData.style.color = 'rgba(255,255,255,0.4)'; tabData.style.borderBottom = '2px solid transparent'; }
+            if (saveFooter) saveFooter.style.display = 'block';
             renderProfileNick(); drawRoles(); drawRanks(); renderProfileSocialLinks();
         }
     };
