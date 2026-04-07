@@ -4066,18 +4066,38 @@
                      : !_profileRole ? 'Выбери роль' : 'Выбери ранг';
             showToast(_msg); return;
         }
-        showGlobalSpinner();
+
+        var btn = document.getElementById('profileSaveBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            btn.style.cursor = 'not-allowed';
+            btn.textContent = '⏳ Сохраняем...';
+        }
+
         db.collection('users').doc(_currentUser.uid).set({
             role: _profileRole,
             rank: _profileRank,
             socialLinks: _profileSocialLinks
         }, { merge: true }).then(function() {
-            hideGlobalSpinner();
+            if (btn) {
+                btn.textContent = '✓ Сохранено!';
+                btn.style.background = 'linear-gradient(135deg,#27ae60,#2ecc71)';
+                btn.style.opacity = '1';
+            }
             showToast('✓ Профиль сохранён!');
-            closeProfileSetup();
-            loadUsersToSidebar();
+            setTimeout(function() {
+                closeProfileSetup();
+                loadUsersToSidebar();
+            }, 600);
         }).catch(function(err) {
-            hideGlobalSpinner();
+            if (btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.textContent = '✓ Сохранить';
+                btn.style.background = 'linear-gradient(135deg,#6d3ff5,#9b59b6)';
+            }
             console.error('Save profile error:', err);
             showToast('Ошибка сохранения: ' + (err.code || err.message));
         });
