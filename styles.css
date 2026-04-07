@@ -799,6 +799,7 @@ display: grid;
 grid-template-columns: 1fr 1fr;
 gap: 3px;
 width: 100%;
+align-items: start;
 }
 
 /* Mobile: 1 champ column per role */
@@ -841,13 +842,13 @@ filter: brightness(1.2) contrast(1.2);
 }
 
 .m-role.on {
-border: 2px solid var(--accent);
-background: linear-gradient(135deg, var(--accent) 0%, #8e44ad 100%);
-box-shadow: 0 0 25px var(--accent-glow), 0 4px 15px rgba(0,0,0,0.3);
+border: 2px solid rgba(185,111,255,0.7);
+background: linear-gradient(135deg, rgba(109,63,245,0.38) 0%, rgba(142,68,173,0.28) 100%);
+box-shadow: 0 0 12px rgba(185,111,255,0.2), 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .m-role.on img {
-filter: brightness(1.4) drop-shadow(0 0 8px rgba(255,255,255,0.6));
+filter: brightness(1.2) drop-shadow(0 0 4px rgba(255,255,255,0.35));
 }
 
 /* CHAMPION */

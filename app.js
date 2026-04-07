@@ -383,9 +383,17 @@
         var typeLabel = pInfo.type === 'buff' ? '🟢 БАФФ' : '🔴 НЕРФ';
         tip.innerHTML = '<div style="font-weight:900;margin-bottom:4px;">' + typeLabel + ' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Патч ' + pInfo.patch + '</span></div><div style="font-size:11px;line-height:1.4;color:rgba(255,255,255,0.8);">' + pInfo.change + '</div>';
         var rect = el.getBoundingClientRect();
-        tip.style.top = (rect.bottom + 6) + 'px';
-        tip.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - 260)) + 'px';
+        tip.style.visibility = 'hidden';
         document.body.appendChild(tip);
+        var tipRect = tip.getBoundingClientRect();
+        var tipW = tipRect.width || 260;
+        var tipH = tipRect.height || 80;
+        var left = Math.max(8, Math.min(rect.left, window.innerWidth - tipW - 8));
+        var top = rect.bottom + 6;
+        if (top + tipH > window.innerHeight - 8) top = Math.max(8, rect.top - tipH - 6);
+        tip.style.top = top + 'px';
+        tip.style.left = left + 'px';
+        tip.style.visibility = '';
         setTimeout(function() {
             document.addEventListener('click', function rm() { var t=document.getElementById('patchTip'); if(t) t.remove(); document.removeEventListener('click', rm); }, {once:true});
         }, 50);
@@ -4838,12 +4846,21 @@
             tdC.style.cssText = 'padding:8px 7px;';
             var iconUrl = wrprIcon(d.name);
             var engName = _wrprDisplayName[d.name] || d.name;
-            tdC.innerHTML = '<div style="display:flex;align-items:center;gap:8px;">'
+            var pWR = patchMap[d.name];
+            tdC.innerHTML = '<div style="display:flex;align-items:center;gap:8px;position:relative;">'
                 + '<img src="' + iconUrl + '" alt="' + engName + '" '
                 + 'onerror="this.onerror=null;this.style.cssText=\'width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,rgba(109,63,245,0.4),rgba(185,111,255,0.2));flex-shrink:0;display:block;\'" '
                 + 'style="width:34px;height:34px;border-radius:7px;object-fit:cover;flex-shrink:0;">'
                 + '<span class="wrpr-champ-name" style="font-size:14px;font-weight:700;color:#fff;">' + engName + '</span>'
+                + (pWR ? '<span class="patch-dot ' + pWR.type + '" style="margin-left:4px;flex-shrink:0;"></span>' : '')
                 + '</div>';
+            if (pWR) {
+                (function(pi, cell) {
+                    cell.style.cursor = 'pointer';
+                    cell.addEventListener('mouseenter', function(e){ showGlobalPatchTip(e, pi, cell); });
+                    cell.addEventListener('mouseleave', function(){ var t=document.getElementById('patchTip'); if(t) t.remove(); });
+                })(pWR, tdC);
+            }
             tr.appendChild(tdC);
 
             // WR
