@@ -142,7 +142,7 @@
         return m[n] || n.replace(/[\s\'\.\#&]/g,'');
     }
     const DD_URL = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
-    var _sp={'Norra':'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/norra.png','Mel':'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Mel_0.jpg'};
+    var _sp={'Norra':'image/norra.png','Mel':'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Mel_0.jpg'};
     function champIcon(name){ return _sp[name] || (DD_URL + champKey(name) + '.png'); }
     // Fallback URLs for WR-exclusive champs
     var _spFallback = {
@@ -4422,7 +4422,7 @@
 
     var _wrprSpecialIcons = {
         'Nilah': 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Nilah.png',
-        'Norra': 'https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/norra.png',
+        'Norra': 'image/norra.png',
         'Mel': 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Mel_0.jpg',
     };
 
