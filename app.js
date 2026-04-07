@@ -3179,7 +3179,7 @@
             if (u.role) statusHtml += ' · ' + u.role;
             if (u.rank) {
                 var rk = RANKS.find(function(r) { return r.id === u.rank; });
-                if (rk) statusHtml += ' · <span style="color:'+rk.color+'">'+rk.emoji+' '+rk.name+'</span>';
+                if (rk) statusHtml += ' · <span style="color:'+rk.color+'">'+rk.name+'</span>';
             }
             statusHtml += '</div>';
             info.innerHTML = nameHtml + statusHtml;
@@ -3424,20 +3424,17 @@
         var panelData = document.getElementById('profPanelData');
         var tabProfile = document.getElementById('profTabProfile');
         var tabData = document.getElementById('profTabData');
-        var saveFooter = document.getElementById('profileSaveFooter');
         if (tab === 'data') {
             if (panelProfile) panelProfile.style.display = 'none';
             if (panelData) { panelData.style.display = 'block'; panelData.style.flex = '1'; }
             if (tabProfile) { tabProfile.style.background = 'transparent'; tabProfile.style.color = 'rgba(255,255,255,0.4)'; tabProfile.style.borderBottom = '2px solid transparent'; }
             if (tabData) { tabData.style.background = 'rgba(109,63,245,0.15)'; tabData.style.color = '#b96fff'; tabData.style.borderBottom = '2px solid #b96fff'; }
-            if (saveFooter) saveFooter.style.display = 'none';
             renderDataPanel();
         } else {
             if (panelProfile) { panelProfile.style.display = 'block'; panelProfile.style.flex = '1'; }
             if (panelData) panelData.style.display = 'none';
             if (tabProfile) { tabProfile.style.background = 'rgba(109,63,245,0.15)'; tabProfile.style.color = '#b96fff'; tabProfile.style.borderBottom = '2px solid #b96fff'; }
             if (tabData) { tabData.style.background = 'transparent'; tabData.style.color = 'rgba(255,255,255,0.4)'; tabData.style.borderBottom = '2px solid transparent'; }
-            if (saveFooter) saveFooter.style.display = 'block';
             renderProfileNick(); drawRoles(); drawRanks(); renderProfileSocialLinks();
         }
     };
@@ -3762,9 +3759,7 @@
             var border = sel ? rk.color : 'rgba(155,89,182,0.35)';
             var bg = sel ? 'rgba(109,63,245,0.2)' : 'rgba(109,63,245,0.08)';
             var shadow = sel ? 'box-shadow:0 0 8px ' + rk.color + '55;' : '';
-            var icon = rk.img
-                ? '<img src="' + rk.img + '" style="width:32px;height:32px;object-fit:contain;" onerror="this.outerHTML=\'<span style=font-size:22px>' + rk.emoji + '</span>\'">'
-                : '<span style="font-size:22px;line-height:1;">' + rk.emoji + '</span>';
+            var icon = '<img src="' + rk.img + '" style="width:32px;height:32px;object-fit:contain;">';
             html += '<button id="prank-' + rk.id + '" onclick="window._profileSelectRank(\'' + rk.id + '\')" style="padding:6px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;' + shadow + '">'
                   + icon
                   + '<span>' + rk.name + '</span>'
@@ -4163,10 +4158,7 @@
                         var rkImg = document.createElement('img');
                         rkImg.src = rk.img;
                         rkImg.style.cssText = 'width:13px;height:13px;object-fit:contain;';
-                        rkImg.onerror = function() { this.outerHTML = rk.emoji; };
                         rkb.appendChild(rkImg);
-                    } else {
-                        rkb.appendChild(document.createTextNode(rk.emoji));
                     }
                     rkb.appendChild(document.createTextNode(' ' + rk.name));
                     badges.appendChild(rkb);
@@ -4279,10 +4271,7 @@
                         var rkImg = document.createElement('img');
                         rkImg.src = rk.img;
                         rkImg.style.cssText = 'width:16px;height:16px;object-fit:contain;';
-                        rkImg.onerror = function() { this.outerHTML = rk.emoji; };
                         rankBadge.appendChild(rkImg);
-                    } else {
-                        rankBadge.appendChild(document.createTextNode(rk.emoji + ' '));
                     }
                     rankBadge.appendChild(document.createTextNode(rk.name));
                     badges.appendChild(rankBadge);
