@@ -155,7 +155,7 @@
         if(fb && img._fallbackIdx < fb.length) {
             img.src = fb[img._fallbackIdx++];
         } else {
-            img.style.cssText = 'width:100%;aspect-ratio:1;background:linear-gradient(135deg,rgba(109,63,245,0.4),rgba(185,111,255,0.2));border-radius:8px;display:block;';
+            img.style.cssText = 'width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--sel-fill),var(--sel-glow-sub));border-radius:8px;display:block;';
             img.alt = name;
         }
     }
@@ -570,7 +570,7 @@
                 mImg.src = champIcon(c.name);
                 mImg.alt = c.name;
                 mImg.title = c.name;
-                mImg.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; this.src=''; };
+                mImg.onerror = function(){ this.style.background='var(--sel-placeholder)'; this.src=''; };
 
                 const nm = document.createElement('div');
                 nm.style.cssText = 'font-size:7px;color:'+(isOn?'#fff':'rgba(255,255,255,0.45)')+';text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
@@ -693,7 +693,7 @@
             stats.split('  |  ').filter(Boolean).forEach(function(s) {
                 var row = document.createElement('div');
                 row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);';
-                row.innerHTML = '<span style="color:#7ec8e3;font-weight:700;font-size:14px;">' + s.trim() + '</span>';
+                row.innerHTML = '<span style="color:var(--accent-light);font-weight:700;font-size:14px;">' + s.trim() + '</span>';
                 statsBox.appendChild(row);
             });
             box.appendChild(statsBox);
@@ -707,7 +707,7 @@
                 var el = document.createElement('div');
                 el.style.marginBottom = '10px';
                 if(m) {
-                    el.innerHTML = '<div style="color:#b96fff;font-weight:800;font-size:13px;margin-bottom:3px;">' + m[1] + '</div>'
+                    el.innerHTML = '<div style="color:var(--sel-text);font-weight:800;font-size:13px;margin-bottom:3px;">' + m[1] + '</div>'
                                  + '<div style="color:rgba(255,255,255,0.82);font-size:13px;line-height:1.65;">' + m[2] + '</div>';
                 } else {
                     el.style.cssText = 'color:rgba(255,255,255,0.7);font-size:13px;line-height:1.65;margin-bottom:8px;';
@@ -1160,8 +1160,8 @@
         window._liandryPct = pct;
         document.querySelectorAll('.lp-btn').forEach(function(b){
             var active = +b.dataset.pct === pct;
-            b.style.background = active ? 'rgba(109,63,245,0.3)' : 'transparent';
-            b.style.borderColor = active ? '#b96fff' : 'rgba(155,89,182,0.25)';
+            b.style.background = active ? 'var(--sel-placeholder)' : 'transparent';
+            b.style.borderColor = active ? 'var(--sel-text)' : 'var(--sel-border)';
             b.style.color = active ? '#fff' : 'rgba(255,255,255,0.5)';
         });
         var modal = document.getElementById('itemSubModal');
@@ -1171,8 +1171,8 @@
     window.setCalcRange = function(type) {
         _calcRange = type;
         var m=document.getElementById('icBtnMelee'), r=document.getElementById('icBtnRanged');
-        if(m){ m.style.background=type==='melee'?'rgba(109,63,245,0.25)':'transparent'; m.style.borderColor=type==='melee'?'rgba(155,89,182,0.4)':'rgba(155,89,182,0.25)'; m.style.color=type==='melee'?'#fff':'rgba(255,255,255,0.5)'; }
-        if(r){ r.style.background=type==='ranged'?'rgba(109,63,245,0.25)':'transparent'; r.style.borderColor=type==='ranged'?'rgba(155,89,182,0.4)':'rgba(155,89,182,0.25)'; r.style.color=type==='ranged'?'#fff':'rgba(255,255,255,0.5)'; }
+        if(m){ m.style.background=type==='melee'?'var(--sel-hover)':'transparent'; m.style.borderColor=type==='melee'?'var(--sel-border-str)':'var(--sel-border)'; m.style.color=type==='melee'?'#fff':'rgba(255,255,255,0.5)'; }
+        if(r){ r.style.background=type==='ranged'?'var(--sel-hover)':'transparent'; r.style.borderColor=type==='ranged'?'var(--sel-border-str)':'var(--sel-border)'; r.style.color=type==='ranged'?'#fff':'rgba(255,255,255,0.5)'; }
         var modal = document.getElementById('itemSubModal');
         if(modal && modal._calcKey) runItemCalc(modal._calcKey);
     };
@@ -1214,14 +1214,14 @@
         if(imgSrc) {
             var img = document.createElement('img');
             img.src = imgSrc;
-            img.style.cssText = 'width:72px;height:72px;border-radius:50%;display:block;margin:0 auto 14px;border:2px solid rgba(185,111,255,0.5);box-shadow:0 0 20px rgba(109,63,245,0.4);';
+            img.style.cssText = 'width:72px;height:72px;border-radius:50%;display:block;margin:0 auto 14px;border:2px solid var(--sel-glow);box-shadow:0 0 20px var(--sel-fill);';
             img.onerror = function(){ this.style.display='none'; };
             box.appendChild(img);
         }
 
         // Имя
         var nameEl = document.createElement('div');
-        nameEl.style.cssText = 'font-size:20px;font-weight:900;color:#b96fff;text-align:center;margin-bottom:6px;';
+        nameEl.style.cssText = 'font-size:20px;font-weight:900;color:var(--sel-text);text-align:center;margin-bottom:6px;';
         nameEl.textContent = name;
         box.appendChild(nameEl);
 
@@ -1236,7 +1236,7 @@
         // Описание
         if(desc) {
             var descBox = document.createElement('div');
-            descBox.style.cssText = 'background:rgba(109,63,245,0.1);border:1px solid rgba(155,89,182,0.25);border-radius:12px;padding:14px 16px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.75;';
+            descBox.style.cssText = 'background:var(--sel-bg);border:1px solid var(--sel-border);border-radius:12px;padding:14px 16px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.75;';
             descBox.textContent = desc;
             box.appendChild(descBox);
         }
@@ -1382,9 +1382,9 @@
         var btn=document.getElementById('tierlistEditBtn');
         if(btn){
             btn.textContent=_tierEditMode?'✓ Готово':'✏ Изменить';
-            btn.style.background=_tierEditMode?'rgba(109,63,245,0.25)':'rgba(255,215,0,0.08)';
-            btn.style.borderColor=_tierEditMode?'rgba(109,63,245,0.6)':'rgba(255,215,0,0.4)';
-            btn.style.color=_tierEditMode?'#b96fff':'#FFD700';
+            btn.style.background=_tierEditMode?'var(--sel-hover)':'rgba(255,215,0,0.08)';
+            btn.style.borderColor=_tierEditMode?'var(--sel-strong)':'rgba(255,215,0,0.4)';
+            btn.style.color=_tierEditMode?'var(--sel-text)':'#FFD700';
         }
         renderTierlist();
     };
@@ -1434,7 +1434,7 @@
             ROLES.forEach(function(r){
                 var b=document.createElement('button');
                 var active=r.key===_tierRole;
-                b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid rgba(155,89,182,'+(active?'0.8':'0.25')+');background:rgba(109,63,245,'+(active?'0.35':'0.08')+');color:'+(active?'#fff':'rgba(255,255,255,0.55)')+';font-size:12px;font-weight:700;cursor:pointer;';
+                b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid '+(active?'var(--sel-border-act)':'var(--sel-border)')+';background:'+(active?'var(--sel-act)':'var(--sel-bg-faint)')+';color:'+(active?'#fff':'rgba(255,255,255,0.55)')+';font-size:12px;font-weight:700;cursor:pointer;';
                 b.textContent=r.icon+' '+r.label;
                 b.onclick=function(){_tierRole=r.key;buildTierlistTabs();renderTierlist();};
                 el.appendChild(b);
@@ -1452,7 +1452,7 @@
             _RUNE_CATS.forEach(function(c){
                 var b=document.createElement('button');
                 var active=c.k===_tierRuneCat;
-                b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid rgba(109,63,245,'+(active?'0.8':'0.25')+');background:rgba(109,63,245,'+(active?'0.35':'0.08')+');color:'+(active?'#fff':'rgba(255,255,255,0.5)')+';font-size:12px;font-weight:700;cursor:pointer;';
+                b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid '+(active?'var(--sel-border-act)':'var(--sel-border)')+';background:'+(active?'var(--sel-act)':'var(--sel-bg-faint)')+';color:'+(active?'#fff':'rgba(255,255,255,0.5)')+';font-size:12px;font-weight:700;cursor:pointer;';
                 b.textContent=c.icon+' '+c.l;
                 b.onclick=function(){_tierRuneCat=c.k;buildTierlistTabs();renderTierlist();};
                 el.appendChild(b);
@@ -1588,7 +1588,7 @@
         if(rf&&!rf.children.length){
             // "Все" button on its own row
             var allBtn=document.createElement('button');
-            allBtn.style.cssText='padding:7px 16px;border-radius:18px;border:1.5px solid rgba(155,89,182,0.3);background:rgba(109,63,245,0.08);color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;width:100%;';
+            allBtn.style.cssText='padding:7px 16px;border-radius:18px;border:1.5px solid var(--sel-border-med);background:var(--sel-bg-faint);color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;width:100%;';
             allBtn.textContent=SC_ROLES[0].label; allBtn.dataset.key=SC_ROLES[0].key;
             allBtn.onclick=function(){_scRole='all';scHighlightRole();scBuildGrid();};
             rf.appendChild(allBtn);
@@ -1597,7 +1597,7 @@
             rolesRow.style.cssText='display:flex;gap:5px;';
             SC_ROLES.slice(1).forEach(function(r){
                 var b=document.createElement('button');
-                b.style.cssText='flex:1;padding:7px 4px;border-radius:18px;border:1.5px solid rgba(155,89,182,0.3);background:rgba(109,63,245,0.08);color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;cursor:pointer;text-align:center;';
+                b.style.cssText='flex:1;padding:7px 4px;border-radius:18px;border:1.5px solid var(--sel-border-med);background:var(--sel-bg-faint);color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;cursor:pointer;text-align:center;';
                 b.textContent=r.label; b.dataset.key=r.key;
                 b.onclick=function(){_scRole=r.key;scHighlightRole();scBuildGrid();};
                 rolesRow.appendChild(b);
@@ -1612,16 +1612,16 @@
         var allB=rf.children[0];
         if(allB&&allB.dataset){
             var aa=allB.dataset.key===_scRole;
-            allB.style.borderColor=aa?'#b96fff':'rgba(155,89,182,0.3)';
-            allB.style.background=aa?'rgba(109,63,245,0.35)':'rgba(109,63,245,0.08)';
+            allB.style.borderColor=aa?'var(--sel-text)':'var(--sel-border-med)';
+            allB.style.background=aa?'var(--sel-act)':'var(--sel-bg-faint)';
             allB.style.color=aa?'#fff':'rgba(255,255,255,0.6)';
         }
         // Highlight role buttons (inside second child div)
         var row=rf.children[1];
         if(row) Array.from(row.children).forEach(function(b){
             var a=b.dataset.key===_scRole;
-            b.style.borderColor=a?'#b96fff':'rgba(155,89,182,0.3)';
-            b.style.background=a?'rgba(109,63,245,0.35)':'rgba(109,63,245,0.08)';
+            b.style.borderColor=a?'var(--sel-text)':'var(--sel-border-med)';
+            b.style.background=a?'var(--sel-act)':'var(--sel-bg-faint)';
             b.style.color=a?'#fff':'rgba(255,255,255,0.6)';
         });
     }
@@ -1638,12 +1638,12 @@
         filtered.forEach(function(ch){
             var div=document.createElement('div');
             div.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px;border-radius:10px;border:2px solid transparent;transition:all 0.15s;';
-            div.onmouseenter=function(){div.style.borderColor='#b96fff';div.style.background='rgba(109,63,245,0.2)';};
+            div.onmouseenter=function(){div.style.borderColor='var(--sel-text)';div.style.background='var(--sel-dim)';};
             div.onmouseleave=function(){div.style.borderColor='transparent';div.style.background='';};
             var img=document.createElement('img');
             img.src=champIcon(ch.name);
             img.style.cssText='width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;';
-            img.onerror=function(){this.src='';this.style.background='rgba(109,63,245,0.3)';};
+            img.onerror=function(){this.src='';this.style.background='var(--sel-placeholder)';};
             var lbl=document.createElement('div');
             lbl.style.cssText='font-size:8px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.15;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
             lbl.textContent=ch.name;
@@ -1687,12 +1687,12 @@
         header.style.cssText='display:flex;align-items:center;gap:14px;margin-bottom:14px;';
         var ci=document.createElement('img');
         ci.src=champIcon(name);
-        ci.style.cssText='width:72px;height:72px;border-radius:14px;border:2px solid rgba(185,111,255,0.45);box-shadow:0 0 18px rgba(109,63,245,0.4);object-fit:cover;flex-shrink:0;';
+        ci.style.cssText='width:72px;height:72px;border-radius:14px;border:2px solid var(--sel-glow-med);box-shadow:0 0 18px var(--sel-fill);object-fit:cover;flex-shrink:0;';
         ci.onerror=function(){this.style.display='none';};
         header.appendChild(ci);
         var nameBlock=document.createElement('div');
         var cn=document.createElement('div');
-        cn.style.cssText='font-size:22px;font-weight:900;color:#b96fff;';
+        cn.style.cssText='font-size:22px;font-weight:900;color:var(--sel-text);';
         cn.textContent=name;
         nameBlock.appendChild(cn);
         if(champ){
@@ -1719,14 +1719,14 @@
             // Level slider
             var _cardLvl = lvl;
             var lvlWrap=document.createElement('div');
-            lvlWrap.style.cssText='margin-bottom:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(155,89,182,0.2);border-radius:12px;padding:10px 14px;';
+            lvlWrap.style.cssText='margin-bottom:14px;background:rgba(255,255,255,0.04);border:1px solid var(--sel-border-sub);border-radius:12px;padding:10px 14px;';
             var lvlRow=document.createElement('div');
             lvlRow.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;';
             lvlRow.innerHTML='<span style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:700;">УРОВЕНЬ</span><span id="cdLvlNum" style="font-size:28px;font-weight:900;color:var(--accent);">'+_cardLvl+'</span>';
             lvlWrap.appendChild(lvlRow);
             var slider=document.createElement('input');
             slider.type='range'; slider.min='1'; slider.max='15'; slider.value=String(_cardLvl);
-            slider.style.cssText='width:100%;height:4px;appearance:none;background:linear-gradient(90deg,#2d1b4e,var(--accent));border-radius:10px;outline:none;';
+            slider.style.cssText='width:100%;height:4px;appearance:none;background:linear-gradient(90deg,var(--sel-dark),var(--accent));border-radius:10px;outline:none;';
             slider.oninput=function(){
                 _cardLvl=+this.value;
                 document.getElementById('cdLvlNum').textContent=_cardLvl;
@@ -1746,13 +1746,13 @@
                     {id:'cd_hp',label:'\u271a HP',val:f(c.hp_b,c.hp_g),color:'#2ecc71'},
                     {id:'cd_mn',label:'\ud83d\udca7 '+(c.res==='Energy'?'Energy':'Mana'),val:c.res==='Energy'?'150':String(f(c.mn_b,c.mn_g)),color:'#5dade2'},
                     {id:'cd_ar',label:'\ud83d\udee1 \u0411\u0440\u043e\u043d\u044f',val:f(c.ar_b,c.ar_g),color:'#f1c40f'},
-                    {id:'cd_mr',label:'\u2726 \u041c\u0421',val:f(c.mr_b,c.mr_g),color:'#9b59b6'}
+                    {id:'cd_mr',label:'\u2726 \u041c\u0421',val:f(c.mr_b,c.mr_g),color:'var(--sel-stat)'}
                 ];
                 var grid=document.getElementById('cdStatsGrid')||sg;
                 if(!grid.children.length){
                     stats.forEach(function(s){
                         var box=document.createElement('div');
-                        box.style.cssText='background:rgba(255,255,255,0.04);border:1px solid rgba(155,89,182,0.2);border-radius:10px;padding:8px 12px;';
+                        box.style.cssText='background:rgba(255,255,255,0.04);border:1px solid var(--sel-border-sub);border-radius:10px;padding:8px 12px;';
                         box.innerHTML='<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:3px;">'+s.label+'</div><div id="'+s.id+'" style="font-size:20px;font-weight:900;color:'+s.color+';">'+s.val+'</div>';
                         grid.appendChild(box);
                     });
@@ -2066,14 +2066,14 @@
                 (function(idx){
                     var champ = slotsArr[idx];
                     var slot = document.createElement('div');
-                    slot.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:9px;cursor:pointer;border:2px solid '+(champ?teamColor:'rgba(155,89,182,0.12)')+';background:'+(champ?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.02)')+';transition:all 0.12s;min-height:36px;position:relative;';
-                    slot.onmouseenter = function(){ if(!champ) this.style.borderColor='rgba(155,89,182,0.4)'; };
-                    slot.onmouseleave = function(){ if(!champ) this.style.borderColor='rgba(155,89,182,0.12)'; };
+                    slot.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:9px;cursor:pointer;border:2px solid '+(champ?teamColor:'var(--sel-border-xs)')+';background:'+(champ?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.02)')+';transition:all 0.12s;min-height:36px;position:relative;';
+                    slot.onmouseenter = function(){ if(!champ) this.style.borderColor='var(--sel-border-str)'; };
+                    slot.onmouseleave = function(){ if(!champ) this.style.borderColor='var(--sel-border-xs)'; };
                     if(champ) {
                         var img = document.createElement('img');
                         img.src = champIcon(champ);
                         img.style.cssText = 'width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;';
-                        img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; };
+                        img.onerror = function(){ this.style.background='var(--sel-placeholder)'; };
                         var nm = document.createElement('div');
                         nm.style.cssText = 'font-size:10px;font-weight:700;color:#fff;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
                         nm.textContent = champ;
@@ -2184,7 +2184,7 @@
                       + '</div>'
                     : '<div style="height:12px;"></div>';
                 return '<div style="display:inline-flex;flex-direction:column;align-items:center;">'
-                    + '<img src="'+champIcon(x.name)+'" style="width:44px;height:44px;border-radius:7px;object-fit:cover;display:block;" onerror="this.style.background=\'rgba(109,63,245,0.3)\'">'
+                    + '<img src="'+champIcon(x.name)+'" style="width:44px;height:44px;border-radius:7px;object-fit:cover;display:block;" onerror="this.style.background=\'var(--sel-placeholder)\'">'
                     + starsHtml
                     + '</div>';
             }).join('');
@@ -2267,12 +2267,12 @@
                 rolesList.forEach(function(r) {
                     var btn = document.createElement('button');
                     btn.textContent = r.l;
-                    btn.style.cssText = 'padding:4px 10px;border-radius:16px;border:1px solid rgba(185,111,255,0.35);background:' + (_champPickerRole===r.k?'rgba(109,63,245,0.5)':'rgba(255,255,255,0.06)') + ';color:' + (_champPickerRole===r.k?'#fff':'rgba(255,255,255,0.6)') + ';font-size:11px;cursor:pointer;transition:all 0.12s;';
+                    btn.style.cssText = 'padding:4px 10px;border-radius:16px;border:1px solid var(--sel-glow-35);background:' + (_champPickerRole===r.k?'var(--sel-act-str)':'rgba(255,255,255,0.06)') + ';color:' + (_champPickerRole===r.k?'#fff':'rgba(255,255,255,0.6)') + ';font-size:11px;cursor:pointer;transition:all 0.12s;';
                     btn.onclick = function() {
                         _champPickerRole = r.k;
                         Array.from(rolesEl.children).forEach(function(b, i) {
                             var active = rolesList[i].k === _champPickerRole;
-                            b.style.background = active ? 'rgba(109,63,245,0.5)' : 'rgba(255,255,255,0.06)';
+                            b.style.background = active ? 'var(--sel-act-str)' : 'rgba(255,255,255,0.06)';
                             b.style.color = active ? '#fff' : 'rgba(255,255,255,0.6)';
                         });
                         champPickerBuildGrid();
@@ -2320,20 +2320,20 @@
         list.forEach(function(c) {
             var isSel = selected.indexOf(c.name) !== -1;
             var wrap = document.createElement('div');
-            wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:2px;border-radius:9px;border:2px solid '+(isSel?'#b96fff':'transparent')+';background:'+(isSel?'rgba(109,63,245,0.2)':'transparent')+';transition:all 0.12s;';
+            wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:2px;border-radius:9px;border:2px solid '+(isSel?'var(--sel-text)':'transparent')+';background:'+(isSel?'var(--sel-dim)':'transparent')+';transition:all 0.12s;';
             var img = document.createElement('img');
             img.src = c.img || '';
             img.title = c.name;
             img.style.cssText = 'width:100%;aspect-ratio:1;border-radius:7px;object-fit:cover;';
-            img.onerror = function(){ this.style.background='rgba(109,63,245,0.3)'; this.style.minHeight='32px'; };
+            img.onerror = function(){ this.style.background='var(--sel-placeholder)'; this.style.minHeight='32px'; };
             wrap.appendChild(img);
             if(isSel) {
                 var ck = document.createElement('div');
-                ck.style.cssText = 'position:absolute;top:2px;right:2px;background:#b96fff;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:900;pointer-events:none;';
+                ck.style.cssText = 'position:absolute;top:2px;right:2px;background:var(--sel-text);border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:900;pointer-events:none;';
                 ck.textContent = '✓';
                 wrap.appendChild(ck);
             } else {
-                wrap.onmouseenter = function(){ this.style.borderColor='#b96fff'; this.style.background='rgba(109,63,245,0.15)'; };
+                wrap.onmouseenter = function(){ this.style.borderColor='var(--sel-text)'; this.style.background='var(--sel-bg-soft)'; };
                 wrap.onmouseleave = function(){ this.style.borderColor='transparent'; this.style.background=''; };
             }
             wrap.onclick = function() {
@@ -2438,7 +2438,7 @@
         toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);'
             + 'background:rgba(20,10,40,0.95);color:#fff;padding:10px 22px;border-radius:12px;'
             + 'font-size:13px;font-weight:700;z-index:999999;pointer-events:none;'
-            + 'border:1.5px solid rgba(185,111,255,0.4);backdrop-filter:blur(8px);'
+            + 'border:1.5px solid var(--sel-glow-brd);backdrop-filter:blur(8px);'
             + 'animation:fadeIn 0.2s ease;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;';
         document.body.appendChild(toast);
         setTimeout(function() {
@@ -2546,14 +2546,14 @@
         overlay.id = 'logoutConfirm';
         overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:99999;display:flex;align-items:center;justify-content:center;animation:fadeIn 0.15s ease;';
         var box = document.createElement('div');
-        box.style.cssText = 'background:linear-gradient(135deg,#1a0d2e,#0f0520);border:1.5px solid rgba(155,89,182,0.3);border-radius:16px;padding:24px;text-align:center;min-width:260px;';
+        box.style.cssText = 'background:linear-gradient(135deg,#1a0d2e,#0f0520);border:1.5px solid var(--sel-border-med);border-radius:16px;padding:24px;text-align:center;min-width:260px;';
         box.innerHTML = '<div style="font-size:18px;margin-bottom:6px;">🚪</div>'
             + '<div style="font-size:14px;font-weight:900;color:#fff;margin-bottom:4px;">Выйти из аккаунта?</div>'
             + '<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:16px;">Данные не потеряются</div>';
         var btns = document.createElement('div');
         btns.style.cssText = 'display:flex;gap:8px;';
         var cancelBtn = document.createElement('button');
-        cancelBtn.style.cssText = 'flex:1;padding:10px;border-radius:10px;border:1.5px solid rgba(155,89,182,0.3);background:none;color:#b96fff;font-size:13px;font-weight:800;cursor:pointer;';
+        cancelBtn.style.cssText = 'flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--sel-border-med);background:none;color:var(--sel-text);font-size:13px;font-weight:800;cursor:pointer;';
         cancelBtn.textContent = 'Назад';
         cancelBtn.onclick = function() { overlay.remove(); };
         var confirmBtn = document.createElement('button');
@@ -2793,13 +2793,13 @@
 
         INFLUENCERS.forEach(function(inf, idx) {
             var card = document.createElement('div');
-            card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1.5px solid rgba(155,89,182,0.15);background:rgba(255,255,255,0.02);cursor:pointer;transition:background 0.15s,border-color 0.15s;';
-            card.onmouseenter = function(){ card.style.background='rgba(109,63,245,0.08)'; card.style.borderColor='rgba(155,89,182,0.35)'; };
-            card.onmouseleave = function(){ card.style.background='rgba(255,255,255,0.02)'; card.style.borderColor='rgba(155,89,182,0.15)'; };
+            card.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1.5px solid var(--sel-border-15);background:rgba(255,255,255,0.02);cursor:pointer;transition:background 0.15s,border-color 0.15s;';
+            card.onmouseenter = function(){ card.style.background='var(--sel-bg-faint)'; card.style.borderColor='var(--sel-border-35)'; };
+            card.onmouseleave = function(){ card.style.background='rgba(255,255,255,0.02)'; card.style.borderColor='var(--sel-border-15)'; };
             card.onclick = function(){ infShowDetail(idx); };
 
             var av = document.createElement('div');
-            av.style.cssText = 'width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;color:#fff;font-weight:900;';
+            av.style.cssText = 'width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;color:#fff;font-weight:900;';
             if (inf.avatar) { av.innerHTML='<img src="'+inf.avatar+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'; }
             else { av.textContent = (inf.name||'?').charAt(0).toUpperCase(); }
             card.appendChild(av);
@@ -3396,7 +3396,7 @@
         btn.disabled = false;
         btn.style.opacity = '1';
         btn.style.cursor = 'pointer';
-        btn.style.background = 'linear-gradient(135deg,#6d3ff5,#9b59b6)';
+        btn.style.background = 'linear-gradient(135deg,var(--sel-base),var(--sel-stat))';
         btn.textContent = '✓ Сохранить';
     }
 
@@ -3447,12 +3447,12 @@
             if (panelProfile) panelProfile.style.display = 'none';
             if (panelData) { panelData.style.display = 'block'; panelData.style.flex = '1'; }
             if (tabProfile) { tabProfile.style.background = 'transparent'; tabProfile.style.color = 'rgba(255,255,255,0.4)'; tabProfile.style.borderBottom = '2px solid transparent'; }
-            if (tabData) { tabData.style.background = 'rgba(109,63,245,0.15)'; tabData.style.color = '#b96fff'; tabData.style.borderBottom = '2px solid #b96fff'; }
+            if (tabData) { tabData.style.background = 'var(--sel-bg-soft)'; tabData.style.color = 'var(--sel-text)'; tabData.style.borderBottom = '2px solid var(--sel-text)'; }
             renderDataPanel();
         } else {
             if (panelProfile) { panelProfile.style.display = 'block'; panelProfile.style.flex = '1'; }
             if (panelData) panelData.style.display = 'none';
-            if (tabProfile) { tabProfile.style.background = 'rgba(109,63,245,0.15)'; tabProfile.style.color = '#b96fff'; tabProfile.style.borderBottom = '2px solid #b96fff'; }
+            if (tabProfile) { tabProfile.style.background = 'var(--sel-bg-soft)'; tabProfile.style.color = 'var(--sel-text)'; tabProfile.style.borderBottom = '2px solid var(--sel-text)'; }
             if (tabData) { tabData.style.background = 'transparent'; tabData.style.color = 'rgba(255,255,255,0.4)'; tabData.style.borderBottom = '2px solid transparent'; }
             renderProfileNick(); drawRoles(); drawRanks(); renderProfileSocialLinks();
         }
@@ -3598,7 +3598,7 @@
         defRow.appendChild(defBtn);
         el.appendChild(defRow);
 
-        el.appendChild(makeRow('Свои данные', activeDataset === 'own', '#b96fff', function() {
+        el.appendChild(makeRow('Свои данные', activeDataset === 'own', 'var(--sel-text)', function() {
             if (activeDataset === 'own') return;
             _pendingDataset = 'own'; renderDataPanel();
         }));
@@ -3652,7 +3652,7 @@
         // ─── КНОПКА СОХРАНИТЬ (только если есть изменения) ───
         if (hasChanges) {
             var saveBtn = document.createElement('button');
-            saveBtn.style.cssText = 'width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#6d3ff5,#9b59b6);color:#fff;font-size:14px;font-weight:900;cursor:pointer;margin-top:14px;';
+            saveBtn.style.cssText = 'width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));color:#fff;font-size:14px;font-weight:900;cursor:pointer;margin-top:14px;';
             saveBtn.textContent = '✓ Сохранить';
             saveBtn.onclick = function() {
                 _applyDataPanelSave(dataVisible, savedVisible, activeDataset, savedDataset);
@@ -3757,8 +3757,8 @@
         var html = '';
         ROLES_LIST.forEach(function(r) {
             var sel = _profileRole === r;
-            var border = sel ? '#b96fff' : 'rgba(155,89,182,0.35)';
-            var bg = sel ? 'rgba(109,63,245,0.3)' : 'rgba(109,63,245,0.08)';
+            var border = sel ? 'var(--sel-text)' : 'var(--sel-border-35)';
+            var bg = sel ? 'var(--sel-placeholder)' : 'var(--sel-bg-faint)';
             var roleImg = (window._roleIcons && window._roleIcons[r]) || '';
             html += '<button id="prole-' + r + '" onclick="window._profileSelectRole(\'' + r + '\')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;">'
                   + (roleImg ? '<img src="' + roleImg + '" alt="' + r + '" style="width:26px;height:26px;object-fit:contain;" onerror="this.style.display=\'none\'">' : '')
@@ -3775,8 +3775,8 @@
         var html = '';
         RANKS.forEach(function(rk) {
             var sel = _profileRank === rk.id;
-            var border = sel ? rk.color : 'rgba(155,89,182,0.35)';
-            var bg = sel ? 'rgba(109,63,245,0.2)' : 'rgba(109,63,245,0.08)';
+            var border = sel ? rk.color : 'var(--sel-border-35)';
+            var bg = sel ? 'var(--sel-dim)' : 'var(--sel-bg-faint)';
             var shadow = sel ? 'box-shadow:0 0 8px ' + rk.color + '55;' : '';
             var icon = '<img src="' + rk.img + '" style="width:32px;height:32px;object-fit:contain;">';
             html += '<button id="prank-' + rk.id + '" onclick="window._profileSelectRank(\'' + rk.id + '\')" style="padding:6px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;' + shadow + '">'
@@ -3794,8 +3794,8 @@
             var btn = document.getElementById('prole-' + role);
             if (!btn) return;
             var sel = role === r;
-            btn.style.border = '2px solid ' + (sel ? '#b96fff' : 'rgba(155,89,182,0.35)');
-            btn.style.background = sel ? 'rgba(109,63,245,0.3)' : 'rgba(109,63,245,0.08)';
+            btn.style.border = '2px solid ' + (sel ? 'var(--sel-text)' : 'var(--sel-border-35)');
+            btn.style.background = sel ? 'var(--sel-placeholder)' : 'var(--sel-bg-faint)';
         });
     };
     window._profileSelectRank = function(id) {
@@ -3805,8 +3805,8 @@
             var btn = document.getElementById('prank-' + rid);
             if (!btn) return;
             var sel = rid === id;
-            btn.style.border = '2px solid ' + (sel ? rankColors[rid] : 'rgba(155,89,182,0.35)');
-            btn.style.background = sel ? 'rgba(109,63,245,0.2)' : 'rgba(109,63,245,0.08)';
+            btn.style.border = '2px solid ' + (sel ? rankColors[rid] : 'var(--sel-border-35)');
+            btn.style.background = sel ? 'var(--sel-dim)' : 'var(--sel-bg-faint)';
             btn.style.boxShadow = sel ? '0 0 8px ' + rankColors[rid] + '55' : '';
         });
     };
@@ -3821,7 +3821,7 @@
 
         // Display row: nick + pencil
         var row = document.createElement('div');
-        row.style.cssText = 'display:flex;align-items:center;gap:10px;background:rgba(109,63,245,0.08);border:1.5px solid rgba(155,89,182,0.25);border-radius:12px;padding:10px 14px;';
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;background:var(--sel-bg-faint);border:1.5px solid var(--sel-border);border-radius:12px;padding:10px 14px;';
 
         var nameEl = document.createElement('div');
         nameEl.id = 'profileNickText';
@@ -3829,9 +3829,9 @@
         nameEl.textContent = nick || '—';
 
         var editBtn = document.createElement('button');
-        editBtn.style.cssText = 'flex-shrink:0;width:30px;height:30px;border-radius:8px;border:1.5px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:#b96fff;';
+        editBtn.style.cssText = 'flex-shrink:0;width:30px;height:30px;border-radius:8px;border:1.5px solid var(--sel-border-35);background:var(--sel-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--sel-text);';
         editBtn.title = 'Изменить ник';
-        editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b96fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+        editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sel-text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
         editBtn.onclick = function() { showNickEditor(el, nick); };
 
         row.appendChild(nameEl);
@@ -3843,7 +3843,7 @@
         container.innerHTML = '';
 
         var row = document.createElement('div');
-        row.style.cssText = 'display:flex;flex-direction:column;gap:8px;background:rgba(109,63,245,0.08);border:1.5px solid rgba(185,111,255,0.4);border-radius:12px;padding:10px 14px;';
+        row.style.cssText = 'display:flex;flex-direction:column;gap:8px;background:var(--sel-bg-faint);border:1.5px solid var(--sel-glow-brd);border-radius:12px;padding:10px 14px;';
 
         var labelRow = document.createElement('div');
         labelRow.style.cssText = 'display:flex;align-items:center;gap:6px;';
@@ -3857,7 +3857,7 @@
         inp.value = currentNick || '';
         inp.maxLength = 20;
         inp.placeholder = 'Введи ник...';
-        inp.style.cssText = 'width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid rgba(155,89,182,0.35);background:rgba(18,10,35,0.6);color:#fff;font-size:14px;font-weight:700;outline:none;box-sizing:border-box;';
+        inp.style.cssText = 'width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--sel-border-35);background:var(--sel-bg-input);color:#fff;font-size:14px;font-weight:700;outline:none;box-sizing:border-box;';
 
         var counter = document.createElement('div');
         counter.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.3);text-align:right;';
@@ -3868,7 +3868,7 @@
             var clean = inp.value.replace(/[^a-zA-Zа-яА-ЯёЁ0-9 ]/g, '').replace(/  +/g, ' ');
             if (inp.value !== clean) inp.value = clean;
             counter.textContent = inp.value.length + '/20';
-            inp.style.borderColor = 'rgba(155,89,182,0.35)';
+            inp.style.borderColor = 'var(--sel-border-35)';
             errEl.textContent = '';
         });
 
@@ -3884,7 +3884,7 @@
         cancelBtn.onclick = function() { renderProfileNick(); };
 
         var saveBtn = document.createElement('button');
-        saveBtn.style.cssText = 'flex:2;padding:8px;border-radius:8px;border:none;background:linear-gradient(135deg,#6d3ff5,#9b59b6);color:#fff;font-size:12px;font-weight:700;cursor:pointer;';
+        saveBtn.style.cssText = 'flex:2;padding:8px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));color:#fff;font-size:12px;font-weight:700;cursor:pointer;';
         saveBtn.textContent = '✓ Сохранить ник';
         saveBtn.onclick = function() {
             var val = inp.value.trim();
@@ -3949,7 +3949,7 @@
         });
         if (_profileSocialLinks.length < SOCIAL_PLATFORMS.length) {
             var addBtn = document.createElement('button');
-            addBtn.style.cssText = 'width:40px;height:40px;border-radius:10px;border:2px dashed rgba(155,89,182,0.4);background:rgba(109,63,245,0.08);cursor:pointer;color:#b96fff;font-size:24px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;';
+            addBtn.style.cssText = 'width:40px;height:40px;border-radius:10px;border:2px dashed var(--sel-border-str);background:var(--sel-bg-faint);cursor:pointer;color:var(--sel-text);font-size:24px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;';
             addBtn.textContent = '+';
             addBtn.title = 'Добавить соцсеть';
             addBtn.onclick = function() { openSocialPicker(); };
@@ -3997,10 +3997,10 @@
                 + '<div style="width:36px;height:36px;flex-shrink:0;">'+p2.svg+'</div>'
                 + '<span style="font-size:13px;color:rgba(255,255,255,0.6);">Вставь ссылку на свой '+p2.name+'</span>'
                 + '</div>'
-                + '<input id="socialLinkInput" type="url" placeholder="'+ph+'" style="width:100%;padding:11px 12px;border-radius:10px;border:1.5px solid rgba(155,89,182,0.35);background:rgba(109,63,245,0.08);color:#fff;font-size:13px;font-weight:600;outline:none;box-sizing:border-box;margin-bottom:12px;" />'
+                + '<input id="socialLinkInput" type="url" placeholder="'+ph+'" style="width:100%;padding:11px 12px;border-radius:10px;border:1.5px solid var(--sel-border-35);background:var(--sel-bg-faint);color:#fff;font-size:13px;font-weight:600;outline:none;box-sizing:border-box;margin-bottom:12px;" />'
                 + '<div style="display:flex;gap:8px;">'
                 + '<button onclick="window._socialPickerBack()" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;cursor:pointer;">← Назад</button>'
-                + '<button onclick="window.confirmAddSocialLink()" style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#6d3ff5,#9b59b6);color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Добавить</button>'
+                + '<button onclick="window.confirmAddSocialLink()" style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Добавить</button>'
                 + '</div>';
             setTimeout(function() {
                 var inp = document.getElementById('socialLinkInput');
@@ -4115,7 +4115,7 @@
                 btn.style.opacity = '1';
                 btn.style.cursor = 'pointer';
                 btn.textContent = '✓ Сохранить';
-                btn.style.background = 'linear-gradient(135deg,#6d3ff5,#9b59b6)';
+                btn.style.background = 'linear-gradient(135deg,var(--sel-base),var(--sel-stat))';
             }
             console.error('Save profile error:', err);
             showToast('Ошибка сохранения: ' + (err.code || err.message));
@@ -4141,7 +4141,7 @@
         var tip = document.createElement('div');
         tip.id = 'userTooltipPopup';
         tip.dataset.uid = user._uid;
-        tip.style.cssText = 'position:fixed;z-index:9999;background:rgba(18,10,35,0.97);border:1px solid rgba(155,89,182,0.35);border-radius:14px;padding:14px;min-width:210px;max-width:250px;box-shadow:0 8px 32px rgba(0,0,0,0.6);backdrop-filter:blur(16px);';
+        tip.style.cssText = 'position:fixed;z-index:9999;background:var(--sel-bg-tooltip);border:1px solid var(--sel-border-35);border-radius:14px;padding:14px;min-width:210px;max-width:250px;box-shadow:0 8px 32px rgba(0,0,0,0.6);backdrop-filter:blur(16px);';
 
         // Position near the card
         var rect = cardEl.getBoundingClientRect();
@@ -4156,7 +4156,7 @@
         var row = document.createElement('div');
         row.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:10px;';
         var avEl = document.createElement('div');
-        avEl.style.cssText = 'width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:900;overflow:hidden;flex-shrink:0;border:2px solid rgba(185,111,255,0.3);';
+        avEl.style.cssText = 'width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:900;overflow:hidden;flex-shrink:0;border:2px solid var(--sel-glow-30);';
         if (user.photoURL) avEl.innerHTML = '<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">';
         else avEl.textContent = (user.displayName||'?').charAt(0).toUpperCase();
         var infoDiv = document.createElement('div');
@@ -4176,7 +4176,7 @@
             badges.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;';
             if (user.role) {
                 var rb = document.createElement('span');
-                rb.style.cssText = 'padding:2px 8px;border-radius:6px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;';
+                rb.style.cssText = 'padding:2px 8px;border-radius:6px;background:var(--sel-dim);border:1px solid var(--sel-border-med);color:var(--sel-text);font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;';
                 var roleIconSrc = window._roleIcons && window._roleIcons[user.role];
                 if (roleIconSrc) {
                     var roleIconEl = document.createElement('img');
@@ -4265,10 +4265,10 @@
 
         // Header
         var header = document.createElement('div');
-        header.style.cssText = 'padding:20px 20px 14px;text-align:center;border-bottom:1px solid rgba(155,89,182,0.15);';
+        header.style.cssText = 'padding:20px 20px 14px;text-align:center;border-bottom:1px solid var(--sel-border-15);';
 
         var av = document.createElement('div');
-        av.style.cssText = 'width:64px;height:64px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#6d3ff5,#9b59b6);display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-weight:900;overflow:hidden;border:3px solid rgba(185,111,255,0.3);';
+        av.style.cssText = 'width:64px;height:64px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-weight:900;overflow:hidden;border:3px solid var(--sel-glow-30);';
         if (user.photoURL) av.innerHTML = '<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">';
         else av.textContent = (user.displayName||'?').charAt(0).toUpperCase();
         header.appendChild(av);
@@ -4289,7 +4289,7 @@
             badges.style.cssText = 'display:flex;gap:6px;justify-content:center;margin-top:8px;flex-wrap:wrap;';
             if (user.role) {
                 var roleBadge = document.createElement('span');
-                roleBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(155,89,182,0.3);color:#b96fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;';
+                roleBadge.style.cssText = 'padding:3px 10px;border-radius:8px;background:var(--sel-dim);border:1px solid var(--sel-border-med);color:var(--sel-text);font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;';
                 var roleIconSrc2 = window._roleIcons && window._roleIcons[user.role];
                 if (roleIconSrc2) {
                     var roleIconEl2 = document.createElement('img');
@@ -4402,7 +4402,7 @@
         btn.textContent = text;
         if (onclick) {
             btn.onclick = onclick;
-            btn.onmouseover = function() { this.style.background = 'rgba(109,63,245,0.1)'; };
+            btn.onmouseover = function() { this.style.background = 'var(--sel-bg)'; };
             btn.onmouseout = function() { this.style.background = 'none'; };
         } else {
             btn.style.opacity = '0.5';
@@ -4784,9 +4784,9 @@
         });
         Array.from(ro.querySelectorAll('button')).forEach(function(b) {
             var active = b.dataset.role === _wrprRole;
-            b.style.background = active ? 'rgba(109,63,245,0.25)' : 'none';
-            b.style.borderColor = active ? '#b96fff' : 'rgba(255,255,255,0.15)';
-            b.style.color = active ? '#b96fff' : 'rgba(255,255,255,0.6)';
+            b.style.background = active ? 'var(--sel-hover)' : 'none';
+            b.style.borderColor = active ? 'var(--sel-text)' : 'rgba(255,255,255,0.15)';
+            b.style.color = active ? 'var(--sel-text)' : 'rgba(255,255,255,0.6)';
         });
     }
 
@@ -4811,7 +4811,7 @@
             var el = document.getElementById(id);
             if (!el) return;
             var col = id.replace('wrprTh','').toLowerCase();
-            el.style.color = _wrprSortCol === col ? '#b96fff' : 'rgba(255,255,255,0.7)';
+            el.style.color = _wrprSortCol === col ? 'var(--sel-text)' : 'rgba(255,255,255,0.7)';
         });
 
         var rankData = WR_DATA[_wrprRank];
@@ -4849,7 +4849,7 @@
             var pWR = (window.patchMap || {})[d.name];
             tdC.innerHTML = '<div style="display:flex;align-items:center;gap:8px;position:relative;">'
                 + '<img src="' + iconUrl + '" alt="' + engName + '" '
-                + 'onerror="this.onerror=null;this.style.cssText=\'width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,rgba(109,63,245,0.4),rgba(185,111,255,0.2));flex-shrink:0;display:block;\'" '
+                + 'onerror="this.onerror=null;this.style.cssText=\'width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,var(--sel-fill),var(--sel-glow-sub));flex-shrink:0;display:block;\'" '
                 + 'style="width:34px;height:34px;border-radius:7px;object-fit:cover;flex-shrink:0;">'
                 + '<span class="wrpr-champ-name" style="font-size:14px;font-weight:700;color:#fff;">' + engName + '</span>'
                 + (pWR ? '<span class="patch-dot ' + pWR.type + '" style="margin-left:4px;flex-shrink:0;"></span>' : '')
