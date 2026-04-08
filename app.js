@@ -161,7 +161,7 @@
     }
 
     let raw = [];
-    let patchMap = {};
+    let patchMap = window.patchMap = {};
 
     // ═══ MATCHUP DATA (localStorage) ═══
     // strongVs = против кого силён, weakVs = против кого слаб, combos = комбо
@@ -4846,7 +4846,7 @@
             tdC.style.cssText = 'padding:8px 7px;';
             var iconUrl = wrprIcon(d.name);
             var engName = _wrprDisplayName[d.name] || d.name;
-            var pWR = patchMap[d.name];
+            var pWR = (window.patchMap || {})[d.name];
             tdC.innerHTML = '<div style="display:flex;align-items:center;gap:8px;position:relative;">'
                 + '<img src="' + iconUrl + '" alt="' + engName + '" '
                 + 'onerror="this.onerror=null;this.style.cssText=\'width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,rgba(109,63,245,0.4),rgba(185,111,255,0.2));flex-shrink:0;display:block;\'" '
