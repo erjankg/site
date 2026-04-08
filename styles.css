@@ -26,7 +26,7 @@ overflow-x: hidden;
 overflow-y: auto;
 color: #ffffff;
 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-font-weight: 700;
+font-weight: 400;
 }
 
 /* Фон вынесен в fixed pseudo-element — не перерисовывается при скрытии/показе адресной строки */
