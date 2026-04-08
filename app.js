@@ -2488,6 +2488,7 @@
         if (!db || !_currentUser) return;
         db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
             if (doc.exists && doc.data().isAdmin === true) { _isAdmin = true; }
+            renderGlobalChat();
         }).catch(function() { _isAdmin = false; });
     }
 
