@@ -231,7 +231,7 @@
             console.log('Fetching champions from:', G_URL);
             // Fetch both in parallel
             var promises = [fetch(G_URL).then(function(r){ return r.text(); })];
-            if(PATCH_URL) promises.push(fetch(PATCH_URL).then(function(r){ return r.text(); }));
+            if(PATCH_URL) promises.push(fetch(PATCH_URL).then(function(r){ return r.text(); }).catch(function(){ return ''; }));
             var results = await Promise.all(promises);
             t = results[0];
             console.log('Data received, length:', t.length);
