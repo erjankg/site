@@ -11,7 +11,9 @@
       "Bash(node --check \"d:/Flutter ERjanKG/site/app.js\")",
       "Bash(node -e ':*)",
       "WebSearch",
-      "Bash(python3 -c ':*)"
+      "Bash(python3 -c ':*)",
+      "Bash(where python:*)",
+      "Bash(python -c \"print\\('hello'\\)\")"
     ]
   }
 }
