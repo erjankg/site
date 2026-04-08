@@ -1317,7 +1317,7 @@
         var itemsMask = document.getElementById('itemsMask');
         if(!itemsMask) return _itemsByCat;
         // Walk all children: look for section headers and item-cards
-        itemsMask.querySelectorAll('[style*="letter-spacing:1px"], .item-card').forEach(function(el){
+        itemsMask.querySelectorAll('.items-section-label, .item-card').forEach(function(el){
             if(el.classList.contains('item-card')){
                 var tip=el.getAttribute('data-tip')||'';
                 var name=tip.split('\xa6')[0].trim();
