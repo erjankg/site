@@ -163,8 +163,8 @@ animation: twinkle2 4.5s ease-in-out infinite alternate;
   --accent-dark:        #0a9db8;
 
   /* ── LEVEL PILL / SUPPORT (кнопки 1-15, никнейм) ── */
-  --pill-rgb:           124, 77, 255;           /* ← меняй только это */
-  --pill-color:         #7C4DFF;                /* hex-версия для градиентов */
+  --pill-rgb:           0, 164, 228;            /* ← меняй только это */
+  --pill-color:         #00A4E4;               /* hex-версия для градиентов */
   --pill-bg:            rgba(var(--pill-rgb), 0.95);
   --pill-shadow:        rgba(var(--pill-rgb), 0.45);
   --pill-glow:          rgba(var(--pill-rgb), 0.65);
@@ -180,16 +180,16 @@ animation: twinkle2 4.5s ease-in-out infinite alternate;
      SELECTION / PICKER accent (champion, item, rune, profile)
      Чтобы сменить цвет — меняй ТОЛЬКО 4 строки ниже:
      ══════════════════════════════════════════════════ */
-  --sel-rgb:         109, 63, 245;   /* ← ГЛАВНЫЙ ЦВЕТ: R, G, B основного акцента */
-  --sel-border-rgb:  155, 89, 182;   /* ← ЦВЕТ РАМОК:   R, G, B для бордеров */
-  --sel-light-rgb:   185, 111, 255;  /* ← СВЕТЛЫЙ:      R, G, B для свечений/glow */
-  --sel-text:        #b96fff;        /* ← ТЕКСТОВЫЙ:    hex для текста и solid-цветов */
+  --sel-rgb:         0, 90, 200;     /* ← ГЛАВНЫЙ ЦВЕТ: R, G, B основного акцента */
+  --sel-border-rgb:  0, 164, 228;    /* ← ЦВЕТ РАМОК:   R, G, B для бордеров */
+  --sel-light-rgb:   100, 210, 255;  /* ← СВЕТЛЫЙ:      R, G, B для свечений/glow */
+  --sel-text:        #64d2ff;        /* ← ТЕКСТОВЫЙ:    hex для текста и solid-цветов */
   /* Всё остальное — производные, менять не нужно: */
-  --sel-base:        #6d3ff5;                          /* hex для линейных градиентов */
-  --sel-stat:        #9b59b6;                          /* цвет стата МС */
-  --sel-dark:        #2d1b4e;                          /* тёмный конец слайдера */
-  --sel-bg-input:    rgba(18,10,35,0.6);               /* фон тёмных инпутов */
-  --sel-bg-tooltip:  rgba(18,10,35,0.97);              /* фон тултипа */
+  --sel-base:        #005ac8;                          /* hex для линейных градиентов */
+  --sel-stat:        #0094cc;                          /* цвет стата МС */
+  --sel-dark:        #001830;                          /* тёмный конец слайдера */
+  --sel-bg-input:    rgba(0,10,30,0.6);                /* фон тёмных инпутов */
+  --sel-bg-tooltip:  rgba(0,10,30,0.97);               /* фон тултипа */
   /* производные фоны (--sel-rgb) */
   --sel-strong:      rgba(var(--sel-rgb), 0.6);
   --sel-act-str:     rgba(var(--sel-rgb), 0.5);
