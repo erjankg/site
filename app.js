@@ -1775,14 +1775,21 @@
             function makeSection(id, title, color, bgRgb, key, pickerTitle) {
                 var box = document.createElement('div');
                 box.style.cssText = 'background:rgba('+bgRgb+',0.06);border:1px solid rgba('+bgRgb+',0.25);border-radius:10px;padding:10px;flex:1;';
-                box.innerHTML = '<div style="font-size:10px;color:'+color+';font-weight:800;letter-spacing:0.5px;margin-bottom:8px;">'+title+'</div>';
+                var hdr = document.createElement('div');
+                hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;';
+                var titleEl = document.createElement('div');
+                titleEl.style.cssText = 'font-size:10px;color:'+color+';font-weight:800;letter-spacing:0.5px;';
+                titleEl.textContent = title;
+                hdr.appendChild(titleEl);
+                var addBtn = document.createElement('button');
+                addBtn.style.cssText = 'width:26px;height:26px;border-radius:8px;border:1px solid rgba('+bgRgb+',0.4);background:transparent;color:rgba(255,255,255,0.5);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;';
+                addBtn.textContent = '+';
+                hdr.appendChild(addBtn);
+                box.appendChild(hdr);
                 var list = document.createElement('div');
                 list.id = id;
-                list.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;';
+                list.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;';
                 box.appendChild(list);
-                var addBtn = document.createElement('button');
-                addBtn.style.cssText = 'width:28px;height:28px;border-radius:8px;border:1px solid rgba('+bgRgb+',0.4);background:transparent;color:rgba(255,255,255,0.5);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;';
-                addBtn.textContent = '+';
                 (function(k, pt){
                     addBtn.onclick = function() {
                         openChampPicker(pt, function(c) {
@@ -3055,60 +3062,68 @@
     };
 
     function fixMobileKeyboard() {
-        var vv = window.visualViewport;
-        if (!vv) return;
-        var mask = document.getElementById('chatSystemMask');
-        if (!mask) return;
-        function onVV() {
-            if (!mask.classList.contains('active')) return;
-            mask.style.height = vv.height + 'px';
-            mask.style.top = vv.offsetTop + 'px';
-            var chatMsgs = document.getElementById('chatMessages');
-            if (chatMsgs) setTimeout(function() { chatMsgs.scrollTop = chatMsgs.scrollHeight; }, 50);
-        }
-        vv.addEventListener('resize', onVV);
-        vv.addEventListener('scroll', onVV);
+        // Now handled by the unified VV fix below
     }
 
     // ─── Global visual-viewport fix: prevent modal headers from flying off ───
-    // When soft keyboard opens, shrink any active modal to fit visible area
+    // When soft keyboard opens, shrink ALL active modals to fit visible area
     (function() {
         var vv = window.visualViewport;
         if (!vv) return;
-        var _vvListener = null;
+
         function applyVVFix() {
             var h = vv.height;
             var t = vv.offsetTop;
-            // Update every active m-mask that is NOT the chat (chat has its own handler)
+
             document.querySelectorAll('.m-mask.active').forEach(function(mask) {
-                if (mask.id === 'chatSystemMask') return;
+                // Pin mask to the visible part of the viewport
                 mask.style.position = 'fixed';
                 mask.style.top = t + 'px';
+                mask.style.bottom = 'auto';
                 mask.style.height = h + 'px';
                 mask.style.maxHeight = h + 'px';
-                // calcMask uses a direct child div (not .m-win) — fix its height too
+
+                // Chat mask — also scroll messages to bottom
+                if (mask.id === 'chatSystemMask') {
+                    var chatWin = mask.querySelector('.m-win');
+                    if (chatWin) {
+                        chatWin.style.height = h + 'px';
+                        chatWin.style.maxHeight = h + 'px';
+                    }
+                    var chatMsgs = document.getElementById('chatMessages');
+                    if (chatMsgs) setTimeout(function() { chatMsgs.scrollTop = chatMsgs.scrollHeight; }, 50);
+                    return;
+                }
+
+                // calcMask uses .calc-body (direct child div), not .m-win
                 if (mask.id === 'calcMask') {
-                    var calcInner = mask.querySelector('div');
-                    if (calcInner) { calcInner.style.height = h + 'px'; calcInner.style.maxHeight = h + 'px'; }
+                    var calcInner = mask.querySelector('.calc-body') || mask.querySelector('div');
+                    if (calcInner) {
+                        calcInner.style.height = h + 'px';
+                        calcInner.style.maxHeight = h + 'px';
+                    }
                 } else {
                     var win = mask.querySelector('.m-win');
-                    if (win) win.style.maxHeight = Math.floor(h * 0.95) + 'px';
+                    if (win) {
+                        win.style.height = h + 'px';
+                        win.style.maxHeight = h + 'px';
+                    }
                 }
             });
         }
+
         function resetVVFix(mask) {
             if (!mask) return;
             mask.style.top = '';
+            mask.style.bottom = '';
             mask.style.height = '';
             mask.style.maxHeight = '';
-            var win = mask.querySelector('.m-win');
-            if (win) win.style.maxHeight = '';
+            var win = mask.querySelector('.m-win') || mask.querySelector('.calc-body') || mask.querySelector('div');
+            if (win) { win.style.height = ''; win.style.maxHeight = ''; }
         }
-        if (!_vvListener) {
-            _vvListener = applyVVFix;
-            vv.addEventListener('resize', applyVVFix);
-            vv.addEventListener('scroll', applyVVFix);
-        }
+
+        vv.addEventListener('resize', applyVVFix);
+        vv.addEventListener('scroll', applyVVFix);
         // Expose reset so closeModal can clean up
         window._resetModalVV = resetVVFix;
     })();

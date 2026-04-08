@@ -1615,7 +1615,8 @@ max-height: 100vh; border-radius: 0;
     padding: 0 !important; padding-right: 0 !important;
     padding-top: env(safe-area-inset-top, 0px) !important;
 }
-#champDetailMask { padding: 0 !important; align-items: stretch !important; }
+#champDetailMask { padding: 0 !important; align-items: stretch !important; background: var(--bg-base) !important; }
+#champDetailMask .m-win { overscroll-behavior: contain; }
 #champPickerGrid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
 #scGrid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
 .items-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; }
