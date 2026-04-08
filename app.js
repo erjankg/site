@@ -200,7 +200,7 @@
 
     
     let sD = 'desc';
-    let colFocus = true; // always show column focus
+    let colFocus = false;
 
 
     const roleIcons = {

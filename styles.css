@@ -484,10 +484,7 @@ table-layout: fixed;
 /* === Mobile-first table sizing (no horizontal scroll) === */
 /* Table sizing handled by consolidated section */
 #statTable th, #statTable td { padding: 8px 4px; font-size: 13px; }
-#statTable td:not(:first-child) { font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.85); }
-@media (max-width: 768px) and (orientation: portrait) {
-  #statTable td:not(:first-child) { font-weight: 700; }
-}
+#statTable td:not(:first-child) { font-size: 14px; font-weight: 900; color: rgba(255,255,255,0.85); }
 /* First column (Champs) takes more space; other 5 columns share remaining width */
 /* table widths: see consolidated section */
 
@@ -636,8 +633,6 @@ box-shadow: 0 0 10px var(--accent-glow);
 }
 
 /* TIERS */
-td.s, td.a, td.b, td.c { padding: 0; }
-td.s > *, td.a > *, td.b > *, td.c > * { display:block; }
 .s { color: #C43A3A !important; font-weight: 700; }
 .a { color: #C46A1C !important; font-weight: 700; }
 .b { color: #BC9800 !important; font-weight: 700; }
@@ -1408,7 +1403,7 @@ display: table-cell; vertical-align: middle;
 html, body { overflow-y: auto; }
 
 /* Column focus mode — disabled */
-#statTable td.active-col { opacity: 1; filter: none; transition: opacity 0.3s ease, filter 0.3s ease; }
+#statTable td.active-col { opacity: 1; filter: none; background: var(--accent-border-sub); transition: opacity 0.3s ease, filter 0.3s ease; }
 #statTable.focus-mode td:first-child { opacity: 1; filter: none; }
 
 /* Sort arrows under headers */
@@ -2528,6 +2523,16 @@ font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   margin-bottom: 28px;
+}
+@media (max-width: 768px) and (orientation: portrait) {
+  #welcomeOverlay .welcome-title { font-size: 20px; }
+  #welcomeOverlay .welcome-subtitle { font-size: 11px; margin-bottom: 14px; }
+  #welcomeOverlay .welcome-card { padding: 10px 14px !important; margin-bottom: 10px !important; }
+  #welcomeOverlay .welcome-card-title { font-size: 12px; margin-bottom: 6px !important; }
+  #welcomeOverlay .welcome-card-text, #welcomeOverlay .welcome-card-steps { font-size: 11px; line-height: 1.5; }
+  #welcomeOverlay .welcome-btn-support { padding: 10px; font-size: 13px; margin-bottom: 7px; }
+  #welcomeOverlay .welcome-btn-skip { padding: 9px; font-size: 12px; }
+  #welcomeOverlay > div { font-size: 36px !important; margin-bottom: 8px !important; }
 }
 .welcome-card {
   background: var(--accent-dim);
