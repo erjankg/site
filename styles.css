@@ -162,52 +162,62 @@ animation: twinkle2 4.5s ease-in-out infinite alternate;
   /* ── ACCENT dark (тёмный циан для градиентов) ── */
   --accent-dark:        #0a9db8;
 
-  /* ── LEVEL PILL / SUPPORT (фиолетовый акцент) ── */
-  --pill-bg:            rgba(124,77,255,0.95);
-  --pill-shadow:        rgba(124,77,255,0.45);
-  --pill-dim:           rgba(124,77,255,0.12);
-  --pill-glow:          rgba(124,77,255,0.65);
-  --pill-glow-sub:      rgba(124,77,255,0.55);
-  --pill-color:         #7C4DFF;
+  /* ── LEVEL PILL / SUPPORT (кнопки 1-15, никнейм) ── */
+  --pill-rgb:           124, 77, 255;           /* ← меняй только это */
+  --pill-color:         #7C4DFF;                /* hex-версия для градиентов */
+  --pill-bg:            rgba(var(--pill-rgb), 0.95);
+  --pill-shadow:        rgba(var(--pill-rgb), 0.45);
+  --pill-glow:          rgba(var(--pill-rgb), 0.65);
+  --pill-glow-sub:      rgba(var(--pill-rgb), 0.55);
+  --pill-dim:           rgba(var(--pill-rgb), 0.12);
 
   /* ── BG декоративные (звёзды и фоновые свечения) ── */
   --bg-purple-deep:     rgba(30,10,80,0.4);
   --star-purple:        rgba(180,140,255,0.55);
   --star-purple-sm:     rgba(180,140,255,0.45);
 
-  /* ── SELECTION / PICKER accent (champion, item, rune, profile) ── */
-  /* Чтобы поменять тему — меняй только эти значения                 */
-  --sel-glow:           rgba(185,111,255,0.5);   /* рамка аватара/иконки */
-  --sel-glow-med:       rgba(185,111,255,0.45);  /* рамка иконки чемпа */
-  --sel-glow-sub:       rgba(185,111,255,0.2);   /* светлое свечение фона */
-  --sel-fill:           rgba(109,63,245,0.4);    /* тень иконки / заполнение */
-  --sel-strong:         rgba(109,63,245,0.6);    /* активная рамка редактора */
-  --sel-act:            rgba(109,63,245,0.35);   /* активный фон кнопки */
-  --sel-placeholder:    rgba(109,63,245,0.3);    /* placeholder иконки */
-  --sel-hover:          rgba(109,63,245,0.25);   /* hover фон */
-  --sel-dim:            rgba(109,63,245,0.2);    /* мягкий hover */
-  --sel-bg:             rgba(109,63,245,0.1);    /* фон описания */
-  --sel-bg-faint:       rgba(109,63,245,0.08);   /* совсем слабый фон */
-  --sel-border-act:     rgba(155,89,182,0.8);    /* рамка активного элемента */
-  --sel-border-str:     rgba(155,89,182,0.4);    /* рамка сильная */
-  --sel-border-med:     rgba(155,89,182,0.3);    /* рамка средняя */
-  --sel-border:         rgba(155,89,182,0.25);   /* рамка стандарт */
-  --sel-border-sub:     rgba(155,89,182,0.2);    /* рамка тонкая */
-  --sel-border-xs:      rgba(155,89,182,0.12);   /* рамка минимальная */
-  --sel-text:           #b96fff;                  /* текст/название */
-  --sel-base:           #6d3ff5;                  /* базовый фиолетовый для градиентов */
-  --sel-stat:           #9b59b6;                  /* цвет стата МС */
-  --sel-dark:           #2d1b4e;                  /* тёмный конец слайдера */
-  --sel-glow-brd:       rgba(185,111,255,0.4);    /* рамка с эффектом свечения */
-  --sel-glow-35:        rgba(185,111,255,0.35);   /* слабая рамка свечения */
-  --sel-glow-30:        rgba(185,111,255,0.3);    /* минимальная рамка */
-  --sel-act-str:        rgba(109,63,245,0.5);     /* усиленный активный фон */
-  --sel-bg-soft:        rgba(109,63,245,0.15);    /* мягкий тонированный фон */
-  --sel-border-35:      rgba(155,89,182,0.35);    /* рамка средне-сильная */
-  --sel-border-15:      rgba(155,89,182,0.15);    /* очень тонкая рамка */
-  --sel-bg-input:       rgba(18,10,35,0.6);       /* тёмный фон инпутов */
-  --sel-bg-tooltip:     rgba(18,10,35,0.97);      /* фон тултипа */
-  --accent-light:       #7ec8e3;                  /* светлый циан для стат-строк */
+  /* ══════════════════════════════════════════════════
+     SELECTION / PICKER accent (champion, item, rune, profile)
+     Чтобы сменить цвет — меняй ТОЛЬКО 4 строки ниже:
+     ══════════════════════════════════════════════════ */
+  --sel-rgb:         109, 63, 245;   /* ← ГЛАВНЫЙ ЦВЕТ: R, G, B основного акцента */
+  --sel-border-rgb:  155, 89, 182;   /* ← ЦВЕТ РАМОК:   R, G, B для бордеров */
+  --sel-light-rgb:   185, 111, 255;  /* ← СВЕТЛЫЙ:      R, G, B для свечений/glow */
+  --sel-text:        #b96fff;        /* ← ТЕКСТОВЫЙ:    hex для текста и solid-цветов */
+  /* Всё остальное — производные, менять не нужно: */
+  --sel-base:        #6d3ff5;                          /* hex для линейных градиентов */
+  --sel-stat:        #9b59b6;                          /* цвет стата МС */
+  --sel-dark:        #2d1b4e;                          /* тёмный конец слайдера */
+  --sel-bg-input:    rgba(18,10,35,0.6);               /* фон тёмных инпутов */
+  --sel-bg-tooltip:  rgba(18,10,35,0.97);              /* фон тултипа */
+  /* производные фоны (--sel-rgb) */
+  --sel-strong:      rgba(var(--sel-rgb), 0.6);
+  --sel-act-str:     rgba(var(--sel-rgb), 0.5);
+  --sel-fill:        rgba(var(--sel-rgb), 0.4);
+  --sel-act:         rgba(var(--sel-rgb), 0.35);
+  --sel-placeholder: rgba(var(--sel-rgb), 0.3);
+  --sel-hover:       rgba(var(--sel-rgb), 0.25);
+  --sel-dim:         rgba(var(--sel-rgb), 0.2);
+  --sel-bg-soft:     rgba(var(--sel-rgb), 0.15);
+  --sel-bg:          rgba(var(--sel-rgb), 0.1);
+  --sel-bg-faint:    rgba(var(--sel-rgb), 0.08);
+  /* производные рамки (--sel-border-rgb) */
+  --sel-border-act:  rgba(var(--sel-border-rgb), 0.8);
+  --sel-border-str:  rgba(var(--sel-border-rgb), 0.4);
+  --sel-border-35:   rgba(var(--sel-border-rgb), 0.35);
+  --sel-border-med:  rgba(var(--sel-border-rgb), 0.3);
+  --sel-border:      rgba(var(--sel-border-rgb), 0.25);
+  --sel-border-sub:  rgba(var(--sel-border-rgb), 0.2);
+  --sel-border-15:   rgba(var(--sel-border-rgb), 0.15);
+  --sel-border-xs:   rgba(var(--sel-border-rgb), 0.12);
+  /* производные свечения (--sel-light-rgb) */
+  --sel-glow:        rgba(var(--sel-light-rgb), 0.5);
+  --sel-glow-med:    rgba(var(--sel-light-rgb), 0.45);
+  --sel-glow-brd:    rgba(var(--sel-light-rgb), 0.4);
+  --sel-glow-35:     rgba(var(--sel-light-rgb), 0.35);
+  --sel-glow-30:     rgba(var(--sel-light-rgb), 0.3);
+  --sel-glow-sub:    rgba(var(--sel-light-rgb), 0.2);
+  --accent-light:    #7ec8e3;                          /* светлый циан для стат-строк */
 }
 
 @keyframes fadeIn {
