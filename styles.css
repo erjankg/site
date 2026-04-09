@@ -294,23 +294,26 @@ box-shadow: 0 0 12px rgba(11,196,227,0.3);
 }
 .header-view-btn:active { transform: scale(0.95); }
 
-.twitch-btn {
-background: linear-gradient(135deg, #6441a5 0%, #9146ff 100%);
+.lang-btn {
+background: linear-gradient(135deg, var(--accent) 0%, var(--accent-border-str) 100%);
 color: white;
 width: 44px;
 height: 44px;
 border-radius: 12px;
-text-decoration: none;
-font-size: 20px;
+border: none;
+cursor: pointer;
+font-size: 14px;
+font-weight: 900;
+letter-spacing: 0.5px;
 display: flex;
 align-items: center;
 justify-content: center;
 flex-shrink: 0;
-transition: transform 0.2s;
-box-shadow: 0 2px 12px rgba(145,70,255,0.45);
+transition: transform 0.2s, filter 0.2s;
+box-shadow: 0 2px 12px var(--accent-glow);
 }
 
-.twitch-btn:active {
+.lang-btn:active {
 transform: scale(0.95);
 }
 
@@ -1551,8 +1554,8 @@ transform: rotate(10deg); animation: supportShine 2.8s ease-in-out infinite;
 100% { transform: translateX(220%) rotate(10deg); opacity: 0; }
 }
 
-/* Twitch button hover */
-.twitch-btn:hover { filter: brightness(1.15); transform: scale(1.06); }
+/* Lang button hover */
+.lang-btn:hover { filter: brightness(1.15); transform: scale(1.06); }
 
 /* Hide menuBtn when sidebar open */
 body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }

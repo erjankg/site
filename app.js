@@ -269,7 +269,7 @@
             const skEl = document.getElementById('skeletonOverlay');
             if(skEl) skEl.style.display = 'none';
             document.getElementById('statTable').style.visibility = 'visible';
-            document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">Ошибка: ' + (fetchErr.message || 'Не удалось загрузить данные') + '</td></tr>';
+            document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">'+t('Ошибка: ') + (fetchErr.message || t('Не удалось загрузить данные')) + '</td></tr>';
             return;
         }
 
@@ -380,8 +380,8 @@
         var tip = document.createElement('div');
         tip.id = 'patchTip';
         tip.className = 'patch-tooltip';
-        var typeLabel = pInfo.type === 'buff' ? '🟢 БАФФ' : '🔴 НЕРФ';
-        tip.innerHTML = '<div style="font-weight:900;margin-bottom:4px;">' + typeLabel + ' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Патч ' + pInfo.patch + '</span></div><div style="font-size:11px;line-height:1.4;color:rgba(255,255,255,0.8);">' + pInfo.change + '</div>';
+        var typeLabel = pInfo.type === 'buff' ? t('🟢 БАФФ') : t('🔴 НЕРФ');
+        tip.innerHTML = '<div style="font-weight:900;margin-bottom:4px;">' + typeLabel + ' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Patch ' + pInfo.patch + '</span></div><div style="font-size:11px;line-height:1.4;color:rgba(255,255,255,0.8);">' + pInfo.change + '</div>';
         var rect = el.getBoundingClientRect();
         tip.style.visibility = 'hidden';
         document.body.appendChild(tip);
@@ -480,7 +480,7 @@
             champImg.src = champIcon(item.name);
             champImg.onerror = function(){ champImgError(this, item.name); };
             champImg.style.cursor = 'pointer';
-            champImg.title = isP ? 'Закреплён (нажми чтобы снять)' : 'Нажми чтобы закрепить';
+            champImg.title = isP ? t('Закреплён (нажми чтобы снять)') : t('Нажми чтобы закрепить');
             if(isP) champImg.classList.add('icon-pinned');
             champImg.addEventListener('click', (ev) => { ev.stopPropagation(); moveToTop(item.name); });
 
@@ -616,7 +616,7 @@
         if (q && grid.children.length === 0) {
             const empty = document.createElement('div');
             empty.style.cssText = 'grid-column:1/-1;opacity:0.8;font-size:14px;text-align:center;padding:20px;color:rgba(255,255,255,0.4);';
-            empty.innerText = 'Ничего не найдено';
+            empty.innerText = t('Ничего не найдено');
             grid.appendChild(empty);
         }
     }
@@ -833,7 +833,7 @@
         _calcMyChamp = null;
         document.getElementById('calcMyBadge').style.display = 'flex';
         document.getElementById('calcMyIcon').src = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png';
-        document.getElementById('calcMyName').innerHTML = '🪆 Манекен';
+        document.getElementById('calcMyName').innerHTML = t('🪆 Манекен');
         document.getElementById('calcMyLvlWrap').style.display = 'none';
         document.getElementById('cMyAD').value = '100';
         document.getElementById('cMyAD').readOnly = false;
@@ -865,7 +865,7 @@
         _calcTgtChamp = null;
         document.getElementById('calcTgtBadge').style.display = 'flex';
         document.getElementById('calcTgtIcon').src = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png';
-        document.getElementById('calcTgtName').innerHTML = '🪆 Манекен';
+        document.getElementById('calcTgtName').innerHTML = t('🪆 Манекен');
         document.getElementById('calcTgtLvlWrap').style.display = 'none';
         document.getElementById('cTgtArmor').value = '100';
         document.getElementById('cTgtHpMax').value = '2000';
@@ -924,29 +924,29 @@
     window.openItemCalc = function(key) {
         var ITEMS = {
             thornmail: {
-                name:'\ud83d\udee1 Шипованный доспех', desc:'Отражает маг. урон атакующему + Тяжкие раны',
+                name:t('\ud83d\udee1 Шипованный доспех'), desc:t('Отражает маг. урон атакующему + Тяжкие раны'),
                 needsRange: false,
                 fields: [
-                    {id:'ic_myArmor',label:'Моя броня',ph:'100',side:'my'},
-                    {id:'ic_myBonusHp',label:'Мой бонусный HP',ph:'500',side:'my'},
-                    {id:'ic_eMR',label:'МС врага',ph:'40',side:'enemy'}
+                    {id:'ic_myArmor',label:t('Моя броня'),ph:'100',side:'my'},
+                    {id:'ic_myBonusHp',label:t('Мой бонусный HP'),ph:'500',side:'my'},
+                    {id:'ic_eMR',label:t('МС врага'),ph:'40',side:'enemy'}
                 ],
                 calc: function(v){
                     var a=+v('ic_myArmor')||100, h=+v('ic_myBonusHp')||500, mr=+v('ic_eMR')||40;
                     var raw=20+a*0.06+h*0.02;
                     var real=raw*100/(100+mr);
-                    return {label:'Отражённый маг. урон (после МС)',val:Math.round(real),
-                        formula:'Сырой: '+Math.round(raw)+' \u2192 после '+mr+' МС: '+Math.round(real)+'. Тяжкие раны 60% 3с'};
+                    return {label:t('Отражённый маг. урон (после МС)'),val:Math.round(real),
+                        formula:t('Сырой: ')+Math.round(raw)+' \u2192 '+t('после ')+mr+t(' МС: ')+Math.round(real)+t('. Тяжкие раны 60% 3с')};
                 }
             },
             botrk: {
-                name:'\u2694 Клинок Погибшего Короля', desc:'% текущего HP врага (физ.)',
+                name:t('\u2694 Клинок Погибшего Короля'), desc:t('% текущего HP врага (физ.)'),
                 needsRange: true,
                 hasHitBtn: true,
                 fields: [
-                    {id:'ic_eHpCur',label:'Текущий HP цели',ph:'2500',side:'enemy'},
-                    {id:'ic_eArmor',label:'Броня врага',ph:'100',side:'enemy'},
-                    {id:'ic_ePen',label:'% пробив. брони',ph:'0',side:'enemy',min:0,max:100}
+                    {id:'ic_eHpCur',label:t('Текущий HP цели'),ph:'2500',side:'enemy'},
+                    {id:'ic_eArmor',label:t('Броня врага'),ph:'100',side:'enemy'},
+                    {id:'ic_ePen',label:t('% пробив. брони'),ph:'0',side:'enemy',min:0,max:100}
                 ],
                 calc: function(v){
                     var hp=+v('ic_eHpCur')||2500, ar=+v('ic_eArmor')||100, pen=+v('ic_ePen')||0;
@@ -955,54 +955,54 @@
                     var raw=Math.max(15, hp*pct);
                     var effAr=ar>0?ar*(1-pen/100):ar;
                     var real=raw*100/(100+effAr);
-                    return {label:(rng?'Дальний 7%':'Ближний 10%'),val:Math.round(real),
-                        formula:'Сырой: '+Math.round(raw)+' \u2192 эфф. броня '+Math.round(effAr)+' \u2192 урон: '+Math.round(real),
+                    return {label:t(rng?'Дальний 7%':'Ближний 10%'),val:Math.round(real),
+                        formula:t('Сырой: ')+Math.round(raw)+t(' → эфф. броня ')+Math.round(effAr)+t(' → урон: ')+Math.round(real),
                         rawDmg:Math.round(real), hpField:'ic_eHpCur'};
                 }
             },
             sunfire: {
-                name:'\ud83d\udd25 Эгида Солнечного огня', desc:'Маг. урон/с рядом с врагами',
+                name:t('\ud83d\udd25 Эгида Солнечного огня'), desc:t('Маг. урон/с рядом с врагами'),
                 needsRange: false,
                 fields: [
-                    {id:'ic_myBHp2',label:'Мой бонусный HP',ph:'1000',side:'my'},
-                    {id:'ic_stacks',label:'Стаки (0-4)',ph:'4',side:'my',min:0,max:4},
-                    {id:'ic_eLvl',label:'Уровень врага',ph:'10',side:'enemy',min:1,max:15},
-                    {id:'ic_eMR2',label:'МС врага',ph:'40',side:'enemy'}
+                    {id:'ic_myBHp2',label:t('Мой бонусный HP'),ph:'1000',side:'my'},
+                    {id:'ic_stacks',label:t('Стаки (0-4)'),ph:'4',side:'my',min:0,max:4},
+                    {id:'ic_eLvl',label:t('Уровень врага'),ph:'10',side:'enemy',min:1,max:15},
+                    {id:'ic_eMR2',label:t('МС врага'),ph:'40',side:'enemy'}
                 ],
                 calc: function(v){
                     var bHp=+v('ic_myBHp2')||1000, st=Math.min(4,+v('ic_stacks')||4), lv=+v('ic_eLvl')||10, mr=+v('ic_eMR2')||40;
                     var base=Math.round(16+(30-16)*(lv-1)/14);
                     var raw=(base+bHp*0.01)*(1+st*0.11);
                     var real=raw*100/(100+mr);
-                    return {label:'Маг. урон/сек (после МС)',val:Math.round(real),
-                        formula:'Сырой: '+Math.round(raw)+' \u2192 после '+mr+' МС: '+Math.round(real)};
+                    return {label:t('Маг. урон/сек (после МС)'),val:Math.round(real),
+                        formula:t('Сырой: ')+Math.round(raw)+' \u2192 '+t('после ')+mr+' МС: '+Math.round(real)};
                 }
             },
             liandry: {
-                name:'\ud83d\udd2e Мучения Лиандри', desc:'% макс. HP/с маг. ожог (скейлится до 3%)',
+                name:t('\ud83d\udd2e Мучения Лиандри'), desc:t('% макс. HP/с маг. ожог (скейлится до 3%)'),
                 needsRange: false,
                 hasLiandryPct: true,
                 fields: [
-                    {id:'ic_eHpMaxL',label:'Макс HP цели',ph:'3000',side:'enemy'},
-                    {id:'ic_eMR3',label:'МС врага',ph:'40',side:'enemy'}
+                    {id:'ic_eHpMaxL',label:t('Макс HP цели'),ph:'3000',side:'enemy'},
+                    {id:'ic_eMR3',label:t('МС врага'),ph:'40',side:'enemy'}
                 ],
                 calc: function(v){
                     var hp=+v('ic_eHpMaxL')||3000, mr=+v('ic_eMR3')||40;
                     var pct=window._liandryPct||0.5;
                     var raw=hp*(pct/100)*3;
                     var real=raw*100/(100+mr);
-                    return {label:'Ожог '+pct+'%/с за 3с (после МС)',val:Math.round(real),
-                        formula:hp+'\u00d7'+pct+'%\u00d73с = '+Math.round(raw)+' \u2192 после '+mr+' МС: '+Math.round(real)};
+                    return {label:'Burn '+pct+'%/s 3s (after MR)',val:Math.round(real),
+                        formula:hp+'\u00d7'+pct+'%\u00d73с = '+Math.round(raw)+' \u2192 '+t('после ')+mr+' МС: '+Math.round(real)};
                 }
             },
             sunderer: {
-                name:'\u26a1 Божественный Разрушитель', desc:'Физ. удар после способности + хил',
+                name:t('\u26a1 Божественный Разрушитель'), desc:t('Физ. удар + хил'),
                 needsRange: true,
                 fields: [
-                    {id:'ic_myAD2',label:'Мой базовый AD',ph:'120',side:'my'},
-                    {id:'ic_eHpMaxS',label:'Макс HP цели',ph:'3000',side:'enemy'},
-                    {id:'ic_eArmorS',label:'Броня врага',ph:'100',side:'enemy'},
-                    {id:'ic_ePenS',label:'% пробив. брони',ph:'0',side:'enemy',min:0,max:100}
+                    {id:'ic_myAD2',label:t('Мой базовый AD'),ph:'120',side:'my'},
+                    {id:'ic_eHpMaxS',label:t('Макс HP цели'),ph:'3000',side:'enemy'},
+                    {id:'ic_eArmorS',label:t('Броня врага'),ph:'100',side:'enemy'},
+                    {id:'ic_ePenS',label:t('% пробив. брони'),ph:'0',side:'enemy',min:0,max:100}
                 ],
                 calc: function(v){
                     var ad=+v('ic_myAD2')||120, rng=_calcRange==='ranged', hp=+v('ic_eHpMaxS')||3000, ar=+v('ic_eArmorS')||100, pen=+v('ic_ePenS')||0;
@@ -1012,8 +1012,8 @@
                     var effAr=ar>0?ar*(1-pen/100):ar;
                     var real=raw*100/(100+effAr);
                     var heal=Math.max(hp*(rng?0.025:0.06), ad*(rng?0.5:0.9));
-                    return {label:(rng?'Дальн.':'Ближн.')+' (после брони)',val:Math.round(real),
-                        formula:'Сырой: '+Math.round(raw)+' \u2192 эфф. броня '+Math.round(effAr)+' \u2192 урон: '+Math.round(real),
+                    return {label:t(rng?'Дальн.':'Ближн.')+t(' (после брони)'),val:Math.round(real),
+                        formula:t('Сырой: ')+Math.round(raw)+t(' → эфф. броня ')+Math.round(effAr)+t(' → урон: ')+Math.round(real),
                         healVal:Math.round(heal)};
                 }
             }
@@ -1121,7 +1121,7 @@
         if(log) {
             var entry = document.createElement('div');
             entry.style.cssText='display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:11px;';
-            entry.innerHTML='<span style="color:rgba(255,255,255,0.4);">Удар #'+_hitCount+'</span><span style="color:#ff6b6b;font-weight:700;">-'+dmg+' HP</span><span style="color:rgba(255,255,255,0.5);">'+Math.round(newHp)+' HP</span>';
+            entry.innerHTML='<span style="color:rgba(255,255,255,0.4);">'+t('Удар #')+_hitCount+'</span><span style="color:#ff6b6b;font-weight:700;">-'+dmg+' HP</span><span style="color:rgba(255,255,255,0.5);">'+Math.round(newHp)+' HP</span>';
             log.appendChild(entry);
             log.scrollTop = log.scrollHeight;
         }
@@ -1131,7 +1131,7 @@
             hpBar.style.background = pct > 60 ? '#2ecc71' : pct > 30 ? '#f1c40f' : '#e74c3c';
         }
         if(hpText) hpText.textContent = Math.round(newHp) + ' / ' + _hitStartHp + ' HP';
-        if(hitNum) hitNum.textContent = _hitCount + ' ударов';
+        if(hitNum) hitNum.textContent = _hitCount + t(' ударов');
         // Show combat block
         var cb = document.getElementById('icCombatBlock');
         if(cb) cb.style.display = 'block';
@@ -1139,7 +1139,7 @@
         if(newHp <= 0) {
             var entry2 = document.createElement('div');
             entry2.style.cssText='text-align:center;padding:6px 0;font-size:13px;font-weight:900;color:#e74c3c;';
-            entry2.textContent='\u2620 УБИТ за '+_hitCount+' ударов';
+            entry2.textContent=t('☠ УБИТ за ')+_hitCount+t(' ударов');
             if(log) log.appendChild(entry2);
         }
     };
@@ -1381,7 +1381,7 @@
         _tierEditMode = !_tierEditMode;
         var btn=document.getElementById('tierlistEditBtn');
         if(btn){
-            btn.textContent=_tierEditMode?'✓ Готово':'✏ Изменить';
+            btn.textContent=_tierEditMode?t('✓ Готово'):t('✏ Изменить');
             btn.style.background=_tierEditMode?'var(--sel-hover)':'rgba(255,215,0,0.08)';
             btn.style.borderColor=_tierEditMode?'var(--sel-strong)':'rgba(255,215,0,0.4)';
             btn.style.color=_tierEditMode?'var(--sel-text)':'#FFD700';
@@ -1403,11 +1403,11 @@
         _tierRole = 'all';
         _tierItemCat = 'all';
         _tierRuneCat = 'keystone';
-        var titles={champs:'🏆 Тир-лист чемпионов', items:'⚙ Тир-лист предметов', runes:'✨ Тир-лист рун'};
-        var t=document.getElementById('tierlistTitle');
-        if(t) t.textContent=titles[_tierType]||'Тир-лист';
+        var titles={champs:t('🏆 Тир-лист чемпионов'), items:t('⚙ Тир-лист предметов'), runes:t('✨ Тир-лист рун')};
+        var tEl=document.getElementById('tierlistTitle');
+        if(tEl) tEl.textContent=titles[_tierType]||t('Тир-лист');
         var editBtn=document.getElementById('tierlistEditBtn');
-        if(editBtn){ editBtn.textContent='✏ Изменить'; editBtn.style.background='rgba(255,215,0,0.08)'; editBtn.style.borderColor='rgba(255,215,0,0.4)'; editBtn.style.color='#FFD700'; }
+        if(editBtn){ editBtn.textContent=t('✏ Изменить'); editBtn.style.background='rgba(255,215,0,0.08)'; editBtn.style.borderColor='rgba(255,215,0,0.4)'; editBtn.style.color='#FFD700'; }
         openModal('tierlistMask');
         buildTierlistTabs();
         renderTierlist();
@@ -1444,7 +1444,7 @@
                 var b=document.createElement('button');
                 var active=c.k===_tierItemCat;
                 b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid rgba(255,215,0,'+(active?'0.7':'0.2')+');background:rgba(255,215,0,'+(active?'0.18':'0.05')+');color:'+(active?'#FFD700':'rgba(255,255,255,0.5)')+';font-size:12px;font-weight:700;cursor:pointer;';
-                b.textContent=c.icon+' '+c.l;
+                b.textContent=c.icon+' '+t(c.l);
                 b.onclick=function(){_tierItemCat=c.k;buildTierlistTabs();renderTierlist();};
                 el.appendChild(b);
             });
@@ -1453,7 +1453,7 @@
                 var b=document.createElement('button');
                 var active=c.k===_tierRuneCat;
                 b.style.cssText='padding:7px 13px;border-radius:20px;border:1.5px solid '+(active?'var(--sel-border-act)':'var(--sel-border)')+';background:'+(active?'var(--sel-act)':'var(--sel-bg-faint)')+';color:'+(active?'#fff':'rgba(255,255,255,0.5)')+';font-size:12px;font-weight:700;cursor:pointer;';
-                b.textContent=c.icon+' '+c.l;
+                b.textContent=c.icon+' '+t(c.l);
                 b.onclick=function(){_tierRuneCat=c.k;buildTierlistTabs();renderTierlist();};
                 el.appendChild(b);
             });
@@ -1499,7 +1499,7 @@
             if(_tierEditMode){
                 (function(t,td,af,rf,pt){lbl.onclick=function(){
                     var roleFilter = (pt==='champs' && _tierRole!=='all') ? _tierRole : 'all';
-                    openChampPicker(['🏆','⚙','✨'][['champs','items','runes'].indexOf(pt)]+' Тир '+t,
+                    openChampPicker(['🏆','⚙','✨'][['champs','items','runes'].indexOf(pt)]+' '+t('Тир')+' '+t,
                     function(c){
                         af(t,c.name);
                         champPickerBuildGrid();
@@ -1711,9 +1711,9 @@
             if(pDetail) {
                 var pBadge = document.createElement('div');
                 var pColor = pDetail.type === 'buff' ? '#2ecc71' : '#e74c3c';
-                var pLabel = pDetail.type === 'buff' ? '🟢 БАФФ' : '🔴 НЕРФ';
+                var pLabel = pDetail.type === 'buff' ? t('🟢 БАФФ') : t('🔴 НЕРФ');
                 pBadge.style.cssText = 'background:rgba('+(pDetail.type==='buff'?'46,204,113':'231,76,60')+',0.12);border:1px solid '+pColor+';border-radius:10px;padding:8px 12px;margin-bottom:12px;';
-                pBadge.innerHTML = '<div style="font-size:11px;font-weight:900;color:'+pColor+';margin-bottom:3px;">'+pLabel+' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Патч '+pDetail.patch+'</span></div><div style="font-size:10px;color:rgba(255,255,255,0.7);line-height:1.4;">'+pDetail.change+'</div>';
+                pBadge.innerHTML = '<div style="font-size:11px;font-weight:900;color:'+pColor+';margin-bottom:3px;">'+pLabel+' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Patch '+pDetail.patch+'</span></div><div style="font-size:10px;color:rgba(255,255,255,0.7);line-height:1.4;">'+pDetail.change+'</div>';
                 leftCol.appendChild(pBadge);
             }
             // Level slider
@@ -1722,7 +1722,7 @@
             lvlWrap.style.cssText='margin-bottom:14px;background:rgba(255,255,255,0.04);border:1px solid var(--sel-border-sub);border-radius:12px;padding:10px 14px;';
             var lvlRow=document.createElement('div');
             lvlRow.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;';
-            lvlRow.innerHTML='<span style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:700;">УРОВЕНЬ</span><span id="cdLvlNum" style="font-size:28px;font-weight:900;color:var(--accent);">'+_cardLvl+'</span>';
+            lvlRow.innerHTML='<span style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:700;">'+t('УРОВЕНЬ')+'</span><span id="cdLvlNum" style="font-size:28px;font-weight:900;color:var(--accent);">'+_cardLvl+'</span>';
             lvlWrap.appendChild(lvlRow);
             var slider=document.createElement('input');
             slider.type='range'; slider.min='1'; slider.max='15'; slider.value=String(_cardLvl);
@@ -1813,9 +1813,9 @@
                 return box;
             }
 
-            rightCol.appendChild(makeSection('cdStrongVs', '⚔ СИЛЁН ПРОТИВ', '#2ecc71', '39,174,96', 'strongVs', '⚔ Силён против'));
-            rightCol.appendChild(makeSection('cdWeakVs', '💀 СЛАБ ПРОТИВ', '#e74c3c', '231,76,60', 'weakVs', '💀 Слаб против'));
-            rightCol.appendChild(makeSection('cdCombos', '🤝 КОМБО', '#5dade2', '93,173,226', 'combos', '🤝 Комбо с'));
+            rightCol.appendChild(makeSection('cdStrongVs', t('⚔ СИЛЁН ПРОТИВ'), '#2ecc71', '39,174,96', 'strongVs', t('⚔ Силён против')));
+            rightCol.appendChild(makeSection('cdWeakVs', t('💀 СЛАБ ПРОТИВ'), '#e74c3c', '231,76,60', 'weakVs', t('💀 Слаб против')));
+            rightCol.appendChild(makeSection('cdCombos', t('🤝 КОМБО'), '#5dade2', '93,173,226', 'combos', t('🤝 Комбо с')));
 
             function renderMatchups(n) {
                 var sections = [
@@ -2017,7 +2017,7 @@
     const _uiTip = document.getElementById('uiTip');
     window.showT = function(ev, growthVal) {
         if(!_uiTip) return;
-        _uiTip.textContent = '+' + (Math.round(growthVal * 10) / 10) + ' за уровень';
+        _uiTip.textContent = '+' + (Math.round(growthVal * 10) / 10) + t(' за уровень');
         _uiTip.style.display = 'block';
         _uiTip.style.left = ev.clientX + 'px';
         _uiTip.style.top = ev.clientY + 'px';
@@ -2095,7 +2095,7 @@
                         numBadge.textContent = idx+1;
                         var ph = document.createElement('div');
                         ph.style.cssText = 'font-size:9px;color:rgba(255,255,255,0.2);font-style:italic;';
-                        ph.textContent = 'нажми для выбора';
+                        ph.textContent = t('нажми для выбора');
                         slot.appendChild(numBadge); slot.appendChild(ph);
                     }
                     slot.onclick = function() { draftSetActiveSlot(side, idx); };
@@ -2111,7 +2111,7 @@
         _draftActiveSlot = {side:side, idx:idx};
         draftBuildSlots();
         var allPicked = _draftSlotsL.concat(_draftSlotsR).filter(Boolean);
-        openChampPicker('⚔ Выбери чемпиона', function(c) {
+        openChampPicker(t('⚔ Выбери чемпиона'), function(c) {
             draftPickChamp(c.name);
         }, {
             getExcluded: function() { return allPicked; }
@@ -2203,7 +2203,7 @@
         var L = compute(_draftSlotsL);
         var R = compute(_draftSlotsR);
         var hasAny = L.picked.length || R.picked.length;
-        var empty = '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">Выбери чемпиона</div>';
+        var empty = '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">'+t('Выбери чемпиона')+'</div>';
 
         // GOOD PICK = counters to enemy picks (R.cm) + synergies with our picks (L.sm)
         var goodMap = {};
@@ -2259,8 +2259,8 @@
         var roleMap = {top:'Top', jungle:'Jungle', mid:'Mid', adc:'ADC', sup:'Support', all:'all'};
         var dr = (opts && opts.defaultRole) || 'all';
         _champPickerRole = roleMap[dr] || dr;
-        var t = document.getElementById('champPickerTitle');
-        if(t) t.textContent = title || '⚔ Выбери чемпиона';
+        var tEl2 = document.getElementById('champPickerTitle');
+        if(tEl2) tEl2.textContent = title || t('⚔ Выбери чемпиона');
         var doneBtn = document.getElementById('champPickerDoneBtn');
         if(doneBtn) doneBtn.style.display = _champPickerMulti ? '' : 'none';
         var rolesEl = document.getElementById('champPickerRoles');
@@ -2273,7 +2273,7 @@
                 rolesEl.innerHTML = '';
                 rolesList.forEach(function(r) {
                     var btn = document.createElement('button');
-                    btn.textContent = r.l;
+                    btn.textContent = t(r.l);
                     btn.style.cssText = 'padding:4px 10px;border-radius:16px;border:1px solid var(--sel-glow-35);background:' + (_champPickerRole===r.k?'var(--sel-act-str)':'rgba(255,255,255,0.06)') + ';color:' + (_champPickerRole===r.k?'#fff':'rgba(255,255,255,0.6)') + ';font-size:11px;cursor:pointer;transition:all 0.12s;';
                     btn.onclick = function() {
                         _champPickerRole = r.k;
@@ -2358,7 +2358,7 @@
             grid.appendChild(wrap);
         });
         if(!list.length) {
-            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:rgba(255,255,255,0.3);font-size:12px;">Ничего не найдено</div>';
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:rgba(255,255,255,0.3);font-size:12px;">'+t('Ничего не найдено')+'</div>';
         }
     }
 
@@ -2378,11 +2378,7 @@
         if(!btn) return;
         const block = document.createElement('div');
         block.id = 'support-panel-text';
-        block.innerHTML = `
-Ребята, сайт абсолютно бесплатен для всех.<br><br>
-Буду очень благодарен за поддержку, для меня это мощная мотивация развивать проект.<br><br>
-В планах: добавить характеристики HP реген, winrate/pickrate, мана реген, особый столбец для лесников: фулл клир таймер, ганг потенциал, сложность реализации и импакт чемпа, изображения чемпов и регулярно обновлять сайт до актуальности)
-        `.trim();
+        block.innerHTML = t('support-text');
         btn.insertAdjacentElement('afterend', block);
     })();
 
@@ -2535,13 +2531,13 @@
 
     function authSignIn() {
         if (!auth || !_provider) {
-            alert('Firebase не загружен. Проверьте подключение к интернету.');
+            alert(t('Firebase не загружен. Проверьте подключение к интернету.'));
             return;
         }
         auth.signInWithPopup(_provider).catch(function(err) {
             if (err.code !== 'auth/popup-closed-by-user') {
                 console.error('Auth error:', err);
-                alert('Ошибка авторизации: ' + err.message);
+                alert(t('Ошибка авторизации: ') + err.message);
             }
         });
     }
@@ -2556,17 +2552,17 @@
         var box = document.createElement('div');
         box.style.cssText = 'background:linear-gradient(135deg,#1a0d2e,#0f0520);border:1.5px solid var(--sel-border-med);border-radius:16px;padding:24px;text-align:center;min-width:260px;';
         box.innerHTML = '<div style="font-size:18px;margin-bottom:6px;">🚪</div>'
-            + '<div style="font-size:14px;font-weight:900;color:#fff;margin-bottom:4px;">Выйти из аккаунта?</div>'
-            + '<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:16px;">Данные не потеряются</div>';
+            + '<div style="font-size:14px;font-weight:900;color:#fff;margin-bottom:4px;">'+t('Выйти из аккаунта?')+'</div>'
+            + '<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:16px;">'+t('Данные не потеряются')+'</div>';
         var btns = document.createElement('div');
         btns.style.cssText = 'display:flex;gap:8px;';
         var cancelBtn = document.createElement('button');
         cancelBtn.style.cssText = 'flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--sel-border-med);background:none;color:var(--sel-text);font-size:13px;font-weight:800;cursor:pointer;';
-        cancelBtn.textContent = 'Назад';
+        cancelBtn.textContent = t('Назад');
         cancelBtn.onclick = function() { overlay.remove(); };
         var confirmBtn = document.createElement('button');
         confirmBtn.style.cssText = 'flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;font-size:13px;font-weight:800;cursor:pointer;';
-        confirmBtn.textContent = 'Выйти';
+        confirmBtn.textContent = t('Выйти');
         confirmBtn.onclick = function() { overlay.remove(); if(auth) auth.signOut(); };
         btns.appendChild(cancelBtn);
         btns.appendChild(confirmBtn);
@@ -2584,11 +2580,11 @@
         if (user) {
             btn.innerHTML = '<img src="' + (user.photoURL || '') + '" alt="' + (user.displayName || '') + '" onerror="this.style.display=\'none\'">'
                 + '<span id="authNotifDot" style="display:none;position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ffd700;border-radius:50%;border:2px solid #0f0520;"></span>';
-            btn.title = user.displayName || user.email || 'Профиль';
+            btn.title = user.displayName || user.email || t('Профиль');
             if (emailEl) emailEl.textContent = user.email || '';
         } else {
             btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
-            btn.title = 'Войти через Google';
+            btn.title = t('Войти через Google');
             if (emailEl) emailEl.textContent = '';
         }
     }
@@ -2637,7 +2633,7 @@
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true }).then(function() {
             console.log('Data saved to Firestore');
-            showSyncStatus('Сохранено ✓');
+            showSyncStatus(t('Сохранено ✓'));
         }).catch(function(err) {
             console.error('Firestore save error:', err);
         });
@@ -2662,7 +2658,7 @@
                             if (ad.runeTierData) try { localStorage.setItem('runeTierData', ad.runeTierData); loadRuneTierData(); } catch(e) {}
                             if (ad.selectedChamps) try { localStorage.setItem('p', ad.selectedChamps); } catch(e) {}
                             console.log('Default data loaded from admin');
-                            showSyncStatus('Данные по умолчанию загружены ✓');
+                            showSyncStatus(t('Данные по умолчанию загружены ✓'));
                         }
                         // Save a copy as this user's own data in Firestore
                         saveUserDataToFirestore();
@@ -2700,7 +2696,7 @@
                     localStorage.setItem('dataVisible', String(d.dataVisible));
                 }
                 console.log('Loaded data from Firestore (server is newer)');
-                showSyncStatus('Загружено ✓');
+                showSyncStatus(t('Загружено ✓'));
             } else {
                 // Local is newer — push to server
                 saveUserDataToFirestore();
@@ -2725,7 +2721,7 @@
         var menu = document.getElementById('userMenu');
         if (menu) menu.classList.remove('active');
         if (!_currentUser) {
-            alert('Сначала войдите в аккаунт');
+            alert(t('Сначала войдите в аккаунт'));
             return;
         }
         saveUserDataToFirestore();
@@ -2822,7 +2818,7 @@
             if (inf.rank) {
                 var badge = document.createElement('span');
                 badge.className = 'inf-rank '+inf.rank;
-                badge.textContent = _rankLabels[inf.rank]||inf.rank;
+                badge.textContent = t(_rankLabels[inf.rank]||inf.rank);
                 badge.style.flexShrink = '0';
                 card.appendChild(badge);
             }
@@ -2832,9 +2828,9 @@
             var hasTier = inf.tierlist && (inf.tierlist.S||inf.tierlist.A||inf.tierlist.B||inf.tierlist.C);
             var hasC = inf.counters && Object.keys(inf.counters).length;
             var hasCo = inf.combos && Object.keys(inf.combos).length;
-            if(hasTier) dots.innerHTML+='<span title="Тир-лист" style="font-size:10px;">🏆</span>';
-            if(hasC) dots.innerHTML+='<span title="Контр-пики" style="font-size:10px;">🔴</span>';
-            if(hasCo) dots.innerHTML+='<span title="Комбо" style="font-size:10px;">🟢</span>';
+            if(hasTier) dots.innerHTML+='<span title="'+t('Тир-лист')+'" style="font-size:10px;">🏆</span>';
+            if(hasC) dots.innerHTML+='<span title="'+t('Контр-пики')+'" style="font-size:10px;">🔴</span>';
+            if(hasCo) dots.innerHTML+='<span title="'+t('Комбо')+'" style="font-size:10px;">🟢</span>';
             if(dots.innerHTML) card.appendChild(dots);
 
             var arrow = document.createElement('div');
@@ -2853,14 +2849,14 @@
 
         document.getElementById('infDetailName').textContent = inf.name||'—';
         var rk = document.getElementById('infDetailRank');
-        if(inf.rank){ rk.className='inf-rank '+inf.rank; rk.textContent=_rankLabels[inf.rank]||inf.rank; rk.style.display=''; }
+        if(inf.rank){ rk.className='inf-rank '+inf.rank; rk.textContent=t(_rankLabels[inf.rank]||inf.rank); rk.style.display=''; }
         else { rk.style.display='none'; }
 
         var avEl = document.getElementById('infDetailAvatar');
         if(inf.avatar){ avEl.innerHTML='<img src="'+inf.avatar+'" style="width:100%;height:100%;object-fit:cover;">'; }
         else { avEl.innerHTML=''; avEl.textContent=(inf.name||'?').charAt(0).toUpperCase(); }
 
-        document.getElementById('infDetailMeta').innerHTML = (_platIcons[inf.platform]||'●')+' '+(_platLabels[inf.platform]||'')+'<br>🎮 '+(inf.role||'Не указана');
+        document.getElementById('infDetailMeta').innerHTML = (_platIcons[inf.platform]||'●')+' '+(_platLabels[inf.platform]||'')+'<br>🎮 '+(inf.role||t('Не указана'));
         var infLink = document.getElementById('infDetailLink');
         infLink.href = '#';
         infLink.onclick = (function(url, name) { return function(e) { e.preventDefault(); if(url && url !== '#') openExternalLink(url, name); }; })(inf.url||'#', inf.name||'');
@@ -3133,7 +3129,7 @@
     function loadUsersToSidebar() {
         var container = document.getElementById('tgSidebarContent');
         if (!container) return;
-        container.innerHTML = '<div class="chat-login-msg">Загрузка...</div>';
+        container.innerHTML = '<div class="chat-login-msg">'+t('Загрузка...')+'</div>';
         loadAllUsers(function() {
                 renderUsersSidebar();
         });
@@ -3160,7 +3156,7 @@
             var countEl = document.getElementById('chatOnlineCount');
             if (countEl) {
                 var onl = _allUsers.filter(function(u) { return u._online; }).length;
-                countEl.textContent = onl + ' онлайн';
+                countEl.textContent = onl + t(' онлайн');
             }
             if (cb) cb();
         }).catch(function(e) { console.warn('Users load err:', e); if (cb) cb(); });
@@ -3170,7 +3166,7 @@
         var container = document.getElementById('tgSidebarContent');
         if (!container) return;
         container.innerHTML = '';
-        if (!_allUsers.length) { container.innerHTML = '<div class="chat-login-msg">Нет пользователей</div>'; return; }
+        if (!_allUsers.length) { container.innerHTML = '<div class="chat-login-msg">'+t('Нет пользователей')+'</div>'; return; }
 
         _allUsers.forEach(function(u) {
             if (_currentUser && u._uid === _currentUser.uid) return;
@@ -3198,7 +3194,7 @@
             var info = document.createElement('div');
             info.className = 'user-info';
             var nameHtml = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div>';
-            var statusHtml = '<div class="user-email">'+(u._online ? '🟢 Онлайн' : 'Оффлайн');
+            var statusHtml = '<div class="user-email">'+(u._online ? t('🟢 Онлайн') : t('Оффлайн'));
             // Show role & rank inline
             if (u.role) statusHtml += ' · ' + u.role;
             if (u.rank) {
@@ -3230,11 +3226,11 @@
                 // Reset so startChatListener() can retry next time
                 _chatListener = null;
                 if (err.code === 'permission-denied') {
-                    showToast('Нет доступа к чату. Проверьте Firestore Rules.');
+                    showToast(t('Нет доступа к чату. Проверьте Firestore Rules.'));
                 } else if (err.code === 'failed-precondition') {
-                    showToast('Чат: требуется индекс Firestore. Проверь консоль.');
+                    showToast(t('Чат: требуется индекс Firestore. Проверь консоль.'));
                 } else {
-                    showToast('Ошибка чата: ' + (err.code || err.message));
+                    showToast(t('Ошибка чата: ') + (err.code || err.message));
                 }
             });
     }
@@ -3256,7 +3252,7 @@
         if (loginPrompt) loginPrompt.style.display = _currentUser ? 'none' : 'block';
 
         if (!_chatMessages.length) {
-            container.innerHTML = '<div class="chat-login-msg">Напиши первым! 💬</div>';
+            container.innerHTML = '<div class="chat-login-msg">'+t('Напиши первым! 💬')+'</div>';
             return;
         }
         _chatMessages.forEach(function(msg) {
@@ -3283,7 +3279,7 @@
         if (!isMe) {
             var nameEl = document.createElement('div');
             nameEl.className = 'chat-bubble-name' + (showAdmin && msg.isAdmin ? ' admin' : '');
-            nameEl.textContent = (showAdmin && msg.isAdmin ? '👑 ' : '') + (msg.name || 'Аноним');
+            nameEl.textContent = (showAdmin && msg.isAdmin ? '👑 ' : '') + (msg.name || t('Аноним'));
             bubble.appendChild(nameEl);
         }
 
@@ -3317,8 +3313,8 @@
     window.tgSendMsg = function() { sendGlobalMsg(); };
 
     function sendGlobalMsg() {
-        if (!db) { showToast('Firebase не подключён'); return; }
-        if (!_currentUser) { showToast('Войди в аккаунт чтобы писать'); return; }
+        if (!db) { showToast(t('Firebase не подключён')); return; }
+        if (!_currentUser) { showToast(t('Войди в аккаунт чтобы писать')); return; }
         var input = document.getElementById('chatInput');
         if (!input) return;
         var text = (input.value || '').trim();
@@ -3341,7 +3337,7 @@
 
         db.collection('globalChat').add({
             text: text,
-            name: _currentUser.displayName || _currentUser.email || 'Аноним',
+            name: _currentUser.displayName || _currentUser.email || t('Аноним'),
             uid: _currentUser.uid,
             photoURL: _currentUser.photoURL || '',
             isAdmin: _isAdmin || false,
@@ -3365,7 +3361,7 @@
             console.error('Send error:', err);
             if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = '➤'; }
             if (input) { input.disabled = false; input.value = text; }
-            showToast('Ошибка отправки: ' + (err.code || err.message || 'Неизвестная'));
+            showToast(t('Ошибка отправки: ') + (err.code || err.message || t('Неизвестная')));
         });
     }
     window.sendChatMsg = sendGlobalMsg;
@@ -3413,7 +3409,7 @@
         btn.style.opacity = '1';
         btn.style.cursor = 'pointer';
         btn.style.background = 'linear-gradient(135deg,var(--sel-base),var(--sel-stat))';
-        btn.textContent = '✓ Сохранить';
+        btn.textContent = t('✓ Сохранить');
     }
 
     window.openProfileSetup = function() {
@@ -3479,12 +3475,12 @@
     var _pendingDataset = null;     // null = no pending change
 
     function applyDefaultData(panelEl) {
-        if (!db) { showToast('Firebase не подключён'); return; }
+        if (!db) { showToast(t('Firebase не подключён')); return; }
         showGlobalSpinner();
 
         db.collection('users').doc(ADMIN_UID).get().then(function(doc) {
             hideGlobalSpinner();
-            if (!doc.exists) { showToast('Данные дефолта не найдены'); renderDataPanel(); return; }
+            if (!doc.exists) { showToast(t('Данные дефолта не найдены')); renderDataPanel(); return; }
             var ad = doc.data();
             if (ad.matchups)     try { localStorage.setItem('matchups',     ad.matchups);     } catch(e) {}
             if (ad.tierData)     try { localStorage.setItem('tierData',     ad.tierData);     loadTierData();     } catch(e) {}
@@ -3493,11 +3489,11 @@
             // Switch to own data
             localStorage.setItem('activeDataset', 'own');
             _pendingDataset = null;
-            showToast('✓ Дефолт применён — данные ERjanKG скопированы в свои');
+            showToast(t('✓ Дефолт применён — данные ERjanKG скопированы в свои'));
             renderDataPanel();
         }).catch(function(err) {
             hideGlobalSpinner();
-            showToast('Ошибка загрузки дефолта: ' + (err.code || err.message));
+            showToast(t('Ошибка загрузки дефолта: ') + (err.code || err.message));
             renderDataPanel();
         });
     }
@@ -3555,14 +3551,14 @@
         // ─── ВИДИМОСТЬ ───
         var secVis = document.createElement('div');
         secVis.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.3);font-weight:800;letter-spacing:1px;margin-bottom:8px;';
-        secVis.textContent = 'ВИДИМОСТЬ ДАННЫХ';
+        secVis.textContent = t('ВИДИМОСТЬ ДАННЫХ');
         el.appendChild(secVis);
 
-        el.appendChild(makeRow('👁  Видно всем', dataVisible === true, '#2ecc71', function() {
+        el.appendChild(makeRow(t('👁  Видно всем'), dataVisible === true, '#2ecc71', function() {
             if (dataVisible === true) return;
             _pendingDataVisible = true; renderDataPanel();
         }));
-        el.appendChild(makeRow('🙈  Скрыто', dataVisible === false, '#e74c3c', function() {
+        el.appendChild(makeRow(t('🙈  Скрыто'), dataVisible === false, '#e74c3c', function() {
             if (dataVisible === false) return;
             _pendingDataVisible = false; renderDataPanel();
         }));
@@ -3575,7 +3571,7 @@
         // ─── ИСТОЧНИК ДАННЫХ ───
         var secSrc = document.createElement('div');
         secSrc.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.3);font-weight:800;letter-spacing:1px;margin-bottom:8px;';
-        secSrc.textContent = 'ИСТОЧНИК ДАННЫХ';
+        secSrc.textContent = t('ИСТОЧНИК ДАННЫХ');
         el.appendChild(secSrc);
 
         // ─── ДЕФОЛТ (ERjanKG) — не удаляется, живёт всегда наверху ───
@@ -3583,23 +3579,23 @@
         defRow.className = 'default-data-row';
         var defLbl = document.createElement('div');
         defLbl.className = 'default-data-label';
-        defLbl.innerHTML = '⭐ Дефолт <span style="font-size:10px;color:rgba(212,175,55,0.7);">(ERjanKG)</span>'
-            + '<span class="default-data-sublabel">Нажми «Применить» — данные перепишутся в свои</span>';
+        defLbl.innerHTML = '⭐ '+t('Дефолт')+' <span style="font-size:10px;color:rgba(212,175,55,0.7);">(ERjanKG)</span>'
+            + '<span class="default-data-sublabel">'+t('Нажми «Применить» — данные перепишутся в свои')+'</span>';
         var defBtn = document.createElement('button');
         defBtn.className = 'default-data-btn';
-        defBtn.textContent = 'Применить';
+        defBtn.textContent = t('Применить');
         (function(btn) {
             var _conf = false, _confTimer;
             btn.onclick = function() {
                 if (!_conf) {
                     _conf = true;
-                    btn.textContent = 'Точно?';
+                    btn.textContent = t('Точно?');
                     btn.style.background = 'rgba(231,76,60,0.25)';
                     btn.style.borderColor = 'rgba(231,76,60,0.6)';
                     btn.style.color = '#e74c3c';
                     _confTimer = setTimeout(function() {
                         _conf = false;
-                        btn.textContent = 'Применить';
+                        btn.textContent = t('Применить');
                         btn.style.background = '';
                         btn.style.borderColor = '';
                         btn.style.color = '';
@@ -3614,7 +3610,7 @@
         defRow.appendChild(defBtn);
         el.appendChild(defRow);
 
-        el.appendChild(makeRow('Свои данные', activeDataset === 'own', 'var(--sel-text)', function() {
+        el.appendChild(makeRow(t('Свои данные'), activeDataset === 'own', 'var(--sel-text)', function() {
             if (activeDataset === 'own') return;
             _pendingDataset = 'own'; renderDataPanel();
         }));
@@ -3638,18 +3634,18 @@
             // Delete link
             var delBtn = document.createElement('button');
             delBtn.style.cssText = 'width:100%;padding:3px;border:none;background:transparent;color:rgba(231,76,60,0.35);font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.3px;';
-            delBtn.textContent = '× Удалить';
+            delBtn.textContent = t('× Удалить');
             (function(sk, sd, idx) {
                 var _conf = false, _confTimer;
                 delBtn.onclick = function(e) {
                     e.stopPropagation();
                     if (!_conf) {
                         _conf = true;
-                        delBtn.textContent = '✓ Подтвердить удаление';
+                        delBtn.textContent = t('✓ Подтвердить удаление');
                         delBtn.style.color = '#e74c3c';
                         _confTimer = setTimeout(function() {
                             _conf = false;
-                            delBtn.textContent = '× Удалить';
+                            delBtn.textContent = t('× Удалить');
                             delBtn.style.color = 'rgba(231,76,60,0.35)';
                         }, 3000);
                     } else {
@@ -3669,7 +3665,7 @@
         if (hasChanges) {
             var saveBtn = document.createElement('button');
             saveBtn.style.cssText = 'width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));color:#fff;font-size:14px;font-weight:900;cursor:pointer;margin-top:14px;';
-            saveBtn.textContent = '✓ Сохранить';
+            saveBtn.textContent = t('✓ Сохранить');
             saveBtn.onclick = function() {
                 _applyDataPanelSave(dataVisible, savedVisible, activeDataset, savedDataset);
             };
@@ -3678,7 +3674,7 @@
 
         var hint = document.createElement('div');
         hint.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.15);line-height:1.5;margin-top:14px;';
-        hint.textContent = 'Нажми на пользователя в списке → Скопировать данные, чтобы добавить набор.';
+        hint.textContent = t('Нажми на пользователя в списке → Скопировать данные, чтобы добавить набор.');
         el.appendChild(hint);
     }
 
@@ -3713,8 +3709,8 @@
                     else renderDataPanel();
                 }
             } else {
-                if (visChanged) showToast('✓ Настройки видимости сохранены');
-                else showToast('✓ Сохранено');
+                if (visChanged) showToast(t('✓ Настройки видимости сохранены'));
+                else showToast(t('✓ Сохранено'));
                 renderDataPanel();
             }
         }, 600);
@@ -3734,7 +3730,7 @@
             } catch(e) {}
         }
         loadTierData();
-        showToast('✓ Активированы свои данные');
+        showToast(t('✓ Активированы свои данные'));
         renderDataPanel();
     }
 
@@ -3755,7 +3751,7 @@
         if (copied.tierData) { localStorage.setItem('tierData', copied.tierData); loadTierData(); }
         if (copied.itemTierData) { localStorage.setItem('itemTierData', copied.itemTierData); loadItemTierData(); }
         if (copied.runeTierData) { localStorage.setItem('runeTierData', copied.runeTierData); loadRuneTierData(); }
-        showToast('✓ Активированы данные ' + copied.fromName);
+        showToast(t('✓ Активированы данные ') + copied.fromName);
         renderDataPanel();
     }
 
@@ -3846,7 +3842,7 @@
 
         var editBtn = document.createElement('button');
         editBtn.style.cssText = 'flex-shrink:0;width:30px;height:30px;border-radius:8px;border:1.5px solid var(--sel-border-35);background:var(--sel-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--sel-text);';
-        editBtn.title = 'Изменить ник';
+        editBtn.title = t('Изменить ник');
         editBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--sel-text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
         editBtn.onclick = function() { showNickEditor(el, nick); };
 
@@ -3865,14 +3861,14 @@
         labelRow.style.cssText = 'display:flex;align-items:center;gap:6px;';
         var hint = document.createElement('div');
         hint.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.25);margin-left:auto;';
-        hint.textContent = 'буквы, цифры, пробел, 3–20 символов';
+        hint.textContent = t('буквы, цифры, пробел, 3–20 символов');
         labelRow.appendChild(hint);
 
         var inp = document.createElement('input');
         inp.type = 'text';
         inp.value = currentNick || '';
         inp.maxLength = 20;
-        inp.placeholder = 'Введи ник...';
+        inp.placeholder = t('Введи ник...');
         inp.style.cssText = 'width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--sel-border-35);background:var(--sel-bg-input);color:#fff;font-size:14px;font-weight:700;outline:none;box-sizing:border-box;';
 
         var counter = document.createElement('div');
@@ -3896,17 +3892,17 @@
 
         var cancelBtn = document.createElement('button');
         cancelBtn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;cursor:pointer;';
-        cancelBtn.textContent = 'Отмена';
+        cancelBtn.textContent = t('Отмена');
         cancelBtn.onclick = function() { renderProfileNick(); };
 
         var saveBtn = document.createElement('button');
         saveBtn.style.cssText = 'flex:2;padding:8px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));color:#fff;font-size:12px;font-weight:700;cursor:pointer;';
-        saveBtn.textContent = '✓ Сохранить ник';
+        saveBtn.textContent = t('✓ Сохранить ник');
         saveBtn.onclick = function() {
             var val = inp.value.trim();
-            if (val.length < 3) { errEl.textContent = 'Минимум 3 символа'; inp.style.borderColor='#e74c3c'; return; }
-            if (val.length > 20) { errEl.textContent = 'Максимум 20 символов'; inp.style.borderColor='#e74c3c'; return; }
-            if (!/^[a-zA-Zа-яА-ЯёЁ0-9 ]+$/.test(val)) { errEl.textContent = 'Только буквы, цифры и пробел'; inp.style.borderColor='#e74c3c'; return; }
+            if (val.length < 3) { errEl.textContent = t('Минимум 3 символа'); inp.style.borderColor='#e74c3c'; return; }
+            if (val.length > 20) { errEl.textContent = t('Максимум 20 символов'); inp.style.borderColor='#e74c3c'; return; }
+            if (!/^[a-zA-Zа-яА-ЯёЁ0-9 ]+$/.test(val)) { errEl.textContent = t('Только буквы, цифры и пробел'); inp.style.borderColor='#e74c3c'; return; }
             saveBtn.disabled = true;
             saveBtn.textContent = '...';
             var auth = firebase.auth();
@@ -3915,15 +3911,15 @@
                     return db.collection('users').doc(_currentUser.uid).set({ displayName: val }, { merge: true });
                 }
             }).then(function() {
-                showToast('✓ Ник обновлён!');
+                showToast(t('✓ Ник обновлён!'));
                 renderProfileNick();
                 // Update header button tooltip if visible
                 var headerBtn = document.querySelector('.user-menu-btn');
                 if (headerBtn) headerBtn.title = val;
             }).catch(function(err) {
                 saveBtn.disabled = false;
-                saveBtn.textContent = '✓ Сохранить ник';
-                errEl.textContent = 'Ошибка: ' + (err.message || err.code);
+                saveBtn.textContent = t('✓ Сохранить ник');
+                errEl.textContent = t('Ошибка: ') + (err.message || err.code);
             });
         };
 
@@ -3957,7 +3953,7 @@
             var removeBtn = document.createElement('button');
             removeBtn.style.cssText = 'position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;border:none;background:#e74c3c;color:#fff;font-size:12px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;z-index:1;';
             removeBtn.textContent = '×';
-            removeBtn.title = 'Удалить ' + p.name;
+            removeBtn.title = t('Удалить ') + p.name;
             removeBtn.onclick = (function(pid) { return function(e) { e.stopPropagation(); removeSocialLink(pid); }; })(link.platform);
             wrap.appendChild(btn);
             wrap.appendChild(removeBtn);
@@ -3967,7 +3963,7 @@
             var addBtn = document.createElement('button');
             addBtn.style.cssText = 'width:40px;height:40px;border-radius:10px;border:2px dashed var(--sel-border-str);background:var(--sel-bg-faint);cursor:pointer;color:var(--sel-text);font-size:24px;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;';
             addBtn.textContent = '+';
-            addBtn.title = 'Добавить соцсеть';
+            addBtn.title = t('Добавить соцсеть');
             addBtn.onclick = function() { openSocialPicker(); };
             el.appendChild(addBtn);
         }
@@ -3990,7 +3986,7 @@
         if (!content) return;
         var alreadyAdded = _profileSocialLinks.map(function(l) { return l.platform; });
         if (_socialPickerStep === 'pick') {
-            if (titleEl) titleEl.textContent = 'Выбери соцсеть';
+            if (titleEl) titleEl.textContent = t('Выбери соцсеть');
             var html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
             SOCIAL_PLATFORMS.forEach(function(p) {
                 var disabled = alreadyAdded.indexOf(p.id) !== -1;
@@ -3998,7 +3994,7 @@
                       + 'style="padding:14px 10px;border-radius:12px;border:2px solid '+(disabled ? 'rgba(255,255,255,0.1)' : p.border)+';background:'+(disabled ? 'rgba(255,255,255,0.03)' : p.bg)+';cursor:'+(disabled ? 'default' : 'pointer')+';display:flex;flex-direction:column;align-items:center;gap:8px;opacity:'+(disabled ? '0.4' : '1')+';">'
                       + '<div style="width:32px;height:32px;">'+p.svg+'</div>'
                       + '<span style="font-size:12px;font-weight:800;color:#fff;">'+p.name+'</span>'
-                      + (disabled ? '<span style="font-size:9px;color:rgba(255,255,255,0.4);font-weight:600;">уже добавлен</span>' : '')
+                      + (disabled ? '<span style="font-size:9px;color:rgba(255,255,255,0.4);font-weight:600;">'+t('уже добавлен')+'</span>' : '')
                       + '</button>';
             });
             html += '</div>';
@@ -4007,16 +4003,16 @@
             var p2 = SOCIAL_PLATFORMS.find(function(pl) { return pl.id === _socialPickerPlatform; });
             if (!p2) return;
             if (titleEl) titleEl.textContent = p2.name;
-            var placeholders = { youtube:'https://youtube.com/@канал', twitch:'https://twitch.tv/канал', telegram:'https://t.me/username', discord:'https://discord.gg/invite' };
+            var placeholders = { youtube:'https://youtube.com/@channel', twitch:'https://twitch.tv/channel', telegram:'https://t.me/username', discord:'https://discord.gg/invite' };
             var ph = placeholders[p2.id] || 'https://...';
             content.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">'
                 + '<div style="width:36px;height:36px;flex-shrink:0;">'+p2.svg+'</div>'
-                + '<span style="font-size:13px;color:rgba(255,255,255,0.6);">Вставь ссылку на свой '+p2.name+'</span>'
+                + '<span style="font-size:13px;color:rgba(255,255,255,0.6);">'+t('Вставь ссылку на свой ')+p2.name+'</span>'
                 + '</div>'
                 + '<input id="socialLinkInput" type="url" placeholder="'+ph+'" style="width:100%;padding:11px 12px;border-radius:10px;border:1.5px solid var(--sel-border-35);background:var(--sel-bg-faint);color:#fff;font-size:13px;font-weight:600;outline:none;box-sizing:border-box;margin-bottom:12px;" />'
                 + '<div style="display:flex;gap:8px;">'
-                + '<button onclick="window._socialPickerBack()" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;cursor:pointer;">← Назад</button>'
-                + '<button onclick="window.confirmAddSocialLink()" style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Добавить</button>'
+                + '<button onclick="window._socialPickerBack()" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;cursor:pointer;">'+t('← Назад')+'</button>'
+                + '<button onclick="window.confirmAddSocialLink()" style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));color:#fff;font-size:13px;font-weight:700;cursor:pointer;">'+t('Добавить')+'</button>'
                 + '</div>';
             setTimeout(function() {
                 var inp = document.getElementById('socialLinkInput');
@@ -4041,7 +4037,7 @@
         if (!inp) return;
         var url = inp.value.trim();
         if (!url) { inp.style.borderColor = '#e74c3c'; return; }
-        if (!/^https?:\/\//i.test(url)) { inp.style.borderColor = '#e74c3c'; showToast('Ссылка должна начинаться с https://'); return; }
+        if (!/^https?:\/\//i.test(url)) { inp.style.borderColor = '#e74c3c'; showToast(t('Ссылка должна начинаться с https://')); return; }
         _profileSocialLinks = _profileSocialLinks.filter(function(l) { return l.platform !== _socialPickerPlatform; });
         _profileSocialLinks.push({ platform: _socialPickerPlatform, url: url });
         window.closeSocialPicker();
@@ -4059,7 +4055,7 @@
         content.innerHTML = '';
         var titleEl = document.createElement('div');
         titleEl.style.cssText = 'font-size:14px;color:#fff;font-weight:800;margin-bottom:8px;';
-        titleEl.textContent = label ? ('Перейти: ' + label + '?') : 'Покинуть сайт?';
+        titleEl.textContent = label ? (t('Перейти: ') + label + '?') : t('Покинуть сайт?');
         content.appendChild(titleEl);
         var urlEl = document.createElement('div');
         urlEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.45);word-break:break-all;padding:0 4px;';
@@ -4082,7 +4078,7 @@
         }
         var titleEl = document.createElement('div');
         titleEl.style.cssText = 'font-size:14px;color:#fff;font-weight:800;margin-bottom:6px;';
-        titleEl.textContent = p ? ('Перейти на ' + p.name + '?') : 'Покинуть сайт?';
+        titleEl.textContent = p ? (t('Перейти на ') + p.name + '?') : t('Покинуть сайт?');
         content.appendChild(titleEl);
         var urlEl = document.createElement('div');
         urlEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.45);word-break:break-all;padding:0 4px;';
@@ -4095,10 +4091,10 @@
     window.closeSocialLinkConfirm = function() { closeModal('socialLinkConfirmMask'); };
 
     window.saveProfile = function() {
-        if (!db || !_currentUser) { showToast('Войди в аккаунт'); return; }
+        if (!db || !_currentUser) { showToast(t('Войди в аккаунт')); return; }
         if (!_profileRole || !_profileRank) {
-            var _msg = (!_profileRole && !_profileRank) ? 'Выбери роль и ранг'
-                     : !_profileRole ? 'Выбери роль' : 'Выбери ранг';
+            var _msg = (!_profileRole && !_profileRank) ? t('Выбери роль и ранг')
+                     : !_profileRole ? t('Выбери роль') : t('Выбери ранг');
             showToast(_msg); return;
         }
 
@@ -4107,7 +4103,7 @@
             btn.disabled = true;
             btn.style.opacity = '0.7';
             btn.style.cursor = 'not-allowed';
-            btn.textContent = '⏳ Сохраняем...';
+            btn.textContent = t('⏳ Сохраняем...');
         }
 
         db.collection('users').doc(_currentUser.uid).set({
@@ -4116,11 +4112,11 @@
             socialLinks: _profileSocialLinks
         }, { merge: true }).then(function() {
             if (btn) {
-                btn.textContent = '✓ Сохранено!';
+                btn.textContent = t('✓ Сохранено!');
                 btn.style.background = 'linear-gradient(135deg,#27ae60,#2ecc71)';
                 btn.style.opacity = '1';
             }
-            showToast('✓ Профиль сохранён!');
+            showToast(t('✓ Профиль сохранён!'));
             setTimeout(function() {
                 closeProfileSetup();
                 loadUsersToSidebar();
@@ -4130,11 +4126,11 @@
                 btn.disabled = false;
                 btn.style.opacity = '1';
                 btn.style.cursor = 'pointer';
-                btn.textContent = '✓ Сохранить';
+                btn.textContent = t('✓ Сохранить');
                 btn.style.background = 'linear-gradient(135deg,var(--sel-base),var(--sel-stat))';
             }
             console.error('Save profile error:', err);
-            showToast('Ошибка сохранения: ' + (err.code || err.message));
+            showToast(t('Ошибка сохранения: ') + (err.code || err.message));
         });
     };
 
@@ -4181,7 +4177,7 @@
         nameEl.textContent = user.displayName || user.email || '???';
         var statusEl = document.createElement('div');
         statusEl.style.cssText = 'font-size:10px;font-weight:600;margin-top:3px;color:'+(user._online?'#2ecc71':'rgba(255,255,255,0.35)')+';';
-        statusEl.textContent = user._online ? '🟢 Онлайн' : '⚫ Оффлайн';
+        statusEl.textContent = user._online ? t('🟢 Онлайн') : t('⚫ Оффлайн');
         infoDiv.appendChild(nameEl); infoDiv.appendChild(statusEl);
         row.appendChild(avEl); row.appendChild(infoDiv);
         tip.appendChild(row);
@@ -4248,7 +4244,7 @@
         if (!isDataHidden || _isAdmin) {
             var copyBtn = document.createElement('button');
             copyBtn.style.cssText = 'width:100%;padding:8px;border-radius:8px;border:1px solid rgba(46,204,113,0.3);background:rgba(46,204,113,0.08);color:#2ecc71;font-size:11px;font-weight:700;cursor:pointer;';
-            copyBtn.textContent = '📋 Скопировать данные';
+            copyBtn.textContent = t('📋 Скопировать данные');
             copyBtn.onclick = function(e) {
                 e.stopPropagation();
                 copyUserData(user);
@@ -4296,7 +4292,7 @@
 
         var statusEl = document.createElement('div');
         statusEl.style.cssText = 'font-size:11px;color:' + (user._online ? '#2ecc71' : 'rgba(255,255,255,0.35)') + ';margin-top:3px;font-weight:600;';
-        statusEl.textContent = user._online ? '🟢 Онлайн' : '⚫ Оффлайн';
+        statusEl.textContent = user._online ? t('🟢 Онлайн') : t('⚫ Оффлайн');
         header.appendChild(statusEl);
 
         // Role & Rank badges
@@ -4366,13 +4362,13 @@
         // dataVisible: undefined means visible (default), false means hidden
         var isDataHidden = user.dataVisible === false;
         if (!isDataHidden || _isAdmin) {
-            addCardBtn(actions, '📋 Скопировать данные', '#2ecc71', function() {
+            addCardBtn(actions, t('📋 Скопировать данные'), '#2ecc71', function() {
                 copyUserData(user);
                 closeUserCard();
             });
         }
 
-        addCardBtn(actions, '✕ Закрыть', 'rgba(255,255,255,0.4)', function() { closeUserCard(); });
+        addCardBtn(actions, t('✕ Закрыть'), 'rgba(255,255,255,0.4)', function() { closeUserCard(); });
         container.appendChild(actions);
 
         openModal('userCardMask');
@@ -4380,13 +4376,13 @@
 
     // Copy another user's data and store it as "copied dataset"
     function copyUserData(user) {
-        if (!db) { showToast('Firebase не подключён'); return; }
+        if (!db) { showToast(t('Firebase не подключён')); return; }
         db.collection('users').doc(user._uid).get().then(function(doc) {
-            if (!doc.exists) { showToast('Данные не найдены'); return; }
+            if (!doc.exists) { showToast(t('Данные не найдены')); return; }
             var d = doc.data();
             // Check fresh visibility — blocks copy even if cached card showed the button
             if (d.dataVisible === false && !_isAdmin) {
-                showToast('🙈 Игрок скрыл свои данные');
+                showToast(t('🙈 Игрок скрыл свои данные'));
                 return;
             }
             var copied = {
@@ -4403,9 +4399,9 @@
             var _targetSlot = _slots.findIndex(function(s) { return !s; });
             if (_targetSlot === -1) _targetSlot = 0; // overwrite slot 0 if all full
             try { localStorage.setItem('copiedUserData_' + _targetSlot, JSON.stringify(copied)); } catch(e) {}
-            showToast('✓ Скопировано в слот ' + (_targetSlot + 1) + ': ' + copied.fromName);
+            showToast(t('✓ Скопировано в слот ') + (_targetSlot + 1) + ': ' + copied.fromName);
         }).catch(function(err) {
-            showToast('Ошибка: ' + (err.code || err.message));
+            showToast(t('Ошибка: ') + (err.code || err.message));
         });
     }
     window.copyUserData = copyUserData;
@@ -4701,17 +4697,17 @@
     };
 
     var _WRPR_RANKS = [
-        {id:'мастер', label:'Мастер'},
-        {id:'грандмастер', label:'ГМ'},
-        {id:'чалик', label:'Чалик'},
-        {id:'суверен', label:'Суверен'},
+        {id:'мастер', label:t('Мастер')},
+        {id:'грандмастер', label:t('ГМ')},
+        {id:'чалик', label:t('Чалик')},
+        {id:'суверен', label:t('Суверен')},
     ];
     var _WRPR_ROLES = [
-        {id:'top', label:'Топ'},
-        {id:'jungle', label:'Лес'},
-        {id:'mid', label:'Мид'},
-        {id:'adc', label:'АДК'},
-        {id:'support', label:'Сап'},
+        {id:'top', label:t('Топ')},
+        {id:'jungle', label:t('Лес')},
+        {id:'mid', label:t('Мид')},
+        {id:'adc', label:t('АДК')},
+        {id:'support', label:t('Сап')},
     ];
 
     // ── Main view toggle: 'main' = matchups table, 'wrpr' = WinRate inline section ──

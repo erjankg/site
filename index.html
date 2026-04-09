@@ -52,6 +52,7 @@
     }
     </script>
     <link rel="stylesheet" href="styles.css">
+    <script src="i18n.js"></script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -72,9 +73,9 @@
             <div class="logo"><a id="nickname" href="#" aria-label="ERjanKG">ERjanKG</a>&nbsp;STATS</div>
             <button id="viewBtnWrpr" class="header-view-btn" onclick="switchMainView('wrpr')">WinRate</button>
         </div>
-        <a href="#" class="twitch-btn" aria-label="Twitch" onclick="event.preventDefault();openExternalLink('https://www.twitch.tv/ERjanKG','Twitch')">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M4.265 3L3 6.236v13.223h4.488V21l2.75-2.541H13.5L20 12.318V3H4.265zm14.382 8.709l-3.256 3.012H12L9.5 17.115v-2.394H5.709V4.588h12.938v7.121zM15.5 7.559v3.883h-1.588V7.559H15.5zm-4.223 0v3.883H9.688V7.559h1.589z"/></svg>
-        </a>
+        <button class="lang-btn" id="langBtn" onclick="toggleLang()" aria-label="Switch language" title="RU / EN">
+            <span id="langLabel">EN</span>
+        </button>
         <!-- Auth Button -->
         <button id="authBtn" class="auth-btn" onclick="toggleUserMenu()" title="Войти через Google">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
@@ -83,15 +84,15 @@
         <!-- User Menu Dropdown -->
         <div id="userMenu" class="user-menu">
             <div id="userMenuEmail" class="user-menu-email"></div>
-            <button class="user-menu-item" onclick="closeUserMenuAndOpen('profile')">👤 Мой профиль</button>
-            <button class="user-menu-item" onclick="syncNow()">🔄 Синхронизировать</button>
-            <button class="user-menu-item" onclick="authSignOut()">🚪 Выйти</button>
+            <button class="user-menu-item" onclick="closeUserMenuAndOpen('profile')" data-i18n="👤 Мой профиль">👤 Мой профиль</button>
+            <button class="user-menu-item" onclick="syncNow()" data-i18n="🔄 Синхронизировать">🔄 Синхронизировать</button>
+            <button class="user-menu-item" onclick="authSignOut()" data-i18n="🚪 Выйти">🚪 Выйти</button>
         </div>
     </header>
 
     <div class="lvl-container">
         <div class="lvl-info">
-            <span class="lvl-label">УРОВЕНЬ</span>
+            <span class="lvl-label" data-i18n="УРОВЕНЬ">УРОВЕНЬ</span>
             <span id="lvlLabel" class="lvl-num">10</span>
             <span class="patch-badge">Patch 7.0f</span>
         </div>
@@ -130,7 +131,7 @@
   <div class="wrpr-header">
     <span style="font-size:18px;margin-right:8px;">📊</span>
     <span class="wrpr-title">WinRate &amp; PickRate</span>
-    <span class="wrpr-update">обновлено 04.04.2026</span>
+    <span class="wrpr-update" data-i18n="обновлено 04.04.2026">обновлено 04.04.2026</span>
   </div>
   <!-- Rank filters -->
   <div style="display:flex;gap:6px;padding:10px 12px 8px;overflow-x:auto;justify-content:center;" id="wrprRankRow"></div>
@@ -142,7 +143,7 @@
       <thead id="wrprThead">
         <tr class="wrpr-thead-row">
           <th class="wrpr-th wrpr-th-num">#</th>
-          <th class="wrpr-th wrpr-th-name">Чемпион</th>
+          <th class="wrpr-th wrpr-th-name" data-i18n="Чемпион">Чемпион</th>
           <th id="wrprThWR" onclick="wrprSort('wr')" class="wrpr-th wrpr-th-sort">WR% <span id="wrprArWR"></span></th>
           <th id="wrprThPR" onclick="wrprSort('pr')" class="wrpr-th wrpr-th-sort">PR% <span id="wrprArPR"></span></th>
           <th id="wrprThBR" onclick="wrprSort('br')" class="wrpr-th wrpr-th-sort">BR% <span id="wrprArBR"></span></th>
@@ -150,7 +151,7 @@
       </thead>
       <tbody id="wrprTbody"></tbody>
     </table>
-    <div id="wrprNoData">Данные для этого ранга скоро появятся</div>
+    <div id="wrprNoData" data-i18n="Данные для этого ранга скоро появятся">Данные для этого ранга скоро появятся</div>
   </div>
 </div>
 
@@ -161,7 +162,7 @@
             <span class="mhdr-t">Champions</span>
         </div>
         <div class="m-search">
-            <input type="text" id="mSearch" placeholder="🔍 Поиск..." oninput="drawM()">
+            <input type="text" id="mSearch" placeholder="🔍 Поиск..." data-i18n="🔍 Поиск..." data-i18n-attr="placeholder" oninput="drawM()">
         </div>
         <div class="m-grid" id="mGrid"></div>
     </div>
@@ -174,22 +175,22 @@
   <div class="calc-body">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeCalc()">←</button>
-      <span class="mhdr-t">⚔ Калькулятор урона</span>
+      <span class="mhdr-t" data-i18n="⚔ Калькулятор урона">⚔ Калькулятор урона</span>
     </div>
     <div style="flex:1;overflow-y:auto;padding:18px;min-height:0;">
     <div class="calc-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;align-items:start;">
 
       <!-- ══ COL 1: МОЙ ЧЕМПИОН ══ -->
       <div class="calc-col-my">
-        <div class="calc-col-my-label">🟢 МОЙ ЧЕМПИОН</div>
+        <div class="calc-col-my-label" data-i18n="🟢 МОЙ ЧЕМПИОН">🟢 МОЙ ЧЕМПИОН</div>
         <div id="calcMyBadge" style="display:flex;align-items:center;gap:8px;border-radius:9px;padding:5px 10px;margin-bottom:8px;">
           <img id="calcMyIcon" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png">
           <span id="calcMyName" class="calc-champ-name">🪆 Манекен</span>
-          <button onclick="openChampPicker('🟢 Мой чемпион',window._calcPickMy)" title="Сменить чемпиона" class="btn-swap">⇄</button>
+          <button onclick="openChampPicker('🟢 Мой чемпион',window._calcPickMy)" title="Сменить чемпиона" data-i18n="Сменить чемпиона" data-i18n-attr="title" class="btn-swap">⇄</button>
         </div>
         <div id="calcMyLvlWrap" style="display:none;margin-bottom:8px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-            <span class="calc-lvl-label">УРОВЕНЬ</span>
+            <span class="calc-lvl-label" data-i18n="УРОВЕНЬ">УРОВЕНЬ</span>
             <span id="calcMyLvlNum" style="font-size:16px;font-weight:900;color:var(--accent);"></span>
           </div>
           <input type="range" id="calcMyLvlSlider" min="1" max="15" value="1" style="width:100%;height:3px;" oninput="calcMyLvlChange()">
@@ -202,7 +203,7 @@
             <input type="number" id="cMyADBonus" placeholder="0" min="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
           </div>
           <div style="display:flex;align-items:center;gap:5px;">
-            <span class="calc-field-label" style="width:50px;">% Проб.</span>
+            <span class="calc-field-label" style="width:50px;" data-i18n="% Проб.">% Проб.</span>
             <input type="number" id="cMyPen" placeholder="0" min="0" max="100" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="clampInput(this);calcRun()">
           </div>
         </div>
@@ -210,23 +211,23 @@
 
       <!-- ══ COL 3: ЦЕЛЬ ══ -->
       <div class="calc-col-tgt">
-        <div class="calc-col-tgt-label">🔴 ЦЕЛЬ</div>
+        <div class="calc-col-tgt-label" data-i18n="🔴 ЦЕЛЬ">🔴 ЦЕЛЬ</div>
         <!-- Default: mannequin badge -->
         <div id="calcTgtBadge" style="display:flex;align-items:center;gap:8px;border-radius:9px;padding:5px 10px;margin-bottom:8px;">
           <img id="calcTgtIcon" style="width:28px;height:28px;border-radius:6px;object-fit:cover;" src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png">
           <span id="calcTgtName" class="calc-champ-name">🪆 Манекен</span>
-          <button onclick="openChampPicker('🔴 Цель',window._calcPickTgt)" title="Сменить чемпиона" class="btn-swap">⇄</button>
+          <button onclick="openChampPicker('🔴 Цель',window._calcPickTgt)" title="Сменить чемпиона" data-i18n="Сменить чемпиона" data-i18n-attr="title" class="btn-swap">⇄</button>
         </div>
         <div id="calcTgtLvlWrap" style="display:none;margin-bottom:8px;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-            <span class="calc-lvl-label">УРОВЕНЬ</span>
+            <span class="calc-lvl-label" data-i18n="УРОВЕНЬ">УРОВЕНЬ</span>
             <span id="calcTgtLvlNum" style="font-size:16px;font-weight:900;color:var(--accent);"></span>
           </div>
           <input type="range" id="calcTgtLvlSlider" min="1" max="15" value="1" style="width:100%;height:3px;" oninput="calcTgtLvlChange()">
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;">
           <div style="display:flex;align-items:center;gap:5px;">
-            <span class="calc-field-label" style="width:50px;">Броня</span>
+            <span class="calc-field-label" style="width:50px;" data-i18n="Броня">Броня</span>
             <input type="number" id="cTgtArmor" placeholder="100" value="100" min="0" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
             <span class="calc-plus-tgt">+</span>
             <input type="number" id="cTgtArmorBonus" placeholder="0" min="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
@@ -238,7 +239,7 @@
             <input type="number" id="cTgtHpBonus" placeholder="0" min="0" class="calc-input" style="width:50px;padding:5px 7px;font-size:12px;" oninput="calcRun()">
           </div>
           <div style="display:flex;align-items:center;gap:5px;">
-            <span class="calc-field-label" style="width:50px;">Тек. HP</span>
+            <span class="calc-field-label" style="width:50px;" data-i18n="Тек. HP">Тек. HP</span>
             <input type="number" id="cTgtHpCur" placeholder="2000" value="2000" min="0" class="calc-input" style="flex:1;padding:5px 7px;font-size:12px;" oninput="calcRun()">
           </div>
         </div>
@@ -246,11 +247,11 @@
 
       <!-- ══ COL 4: РЕЗУЛЬТАТ ══ -->
       <div id="calcRes" class="calc-col-result">
-        <div class="calc-result-label">📊 РЕЗУЛЬТАТ</div>
+        <div class="calc-result-label" data-i18n="📊 РЕЗУЛЬТАТ">📊 РЕЗУЛЬТАТ</div>
         <div style="display:flex;flex-direction:column;gap:6px;">
-          <div class="calc-stat-box"><div class="calc-stat-label">Эфф. броня</div><div class="calc-stat-val" id="rEff">—</div></div>
-          <div class="calc-stat-box"><div class="calc-stat-label">Снижение урона</div><div class="calc-stat-val" id="rMit">—</div></div>
-          <div class="calc-stat-box calc-stat-box-accent"><div class="calc-stat-label">✅ Нанесено урона</div><div class="calc-stat-val calc-val-dmg" id="rDmg">—</div></div>
+          <div class="calc-stat-box"><div class="calc-stat-label" data-i18n="Эфф. броня">Эфф. броня</div><div class="calc-stat-val" id="rEff">—</div></div>
+          <div class="calc-stat-box"><div class="calc-stat-label" data-i18n="Снижение урона">Снижение урона</div><div class="calc-stat-val" id="rMit">—</div></div>
+          <div class="calc-stat-box calc-stat-box-accent"><div class="calc-stat-label" data-i18n="✅ Нанесено урона">✅ Нанесено урона</div><div class="calc-stat-val calc-val-dmg" id="rDmg">—</div></div>
         </div>
         <div id="rHpBar" style="display:none;margin-top:8px;">
           <div class="calc-hp-bar">
@@ -276,14 +277,14 @@
   <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;overflow-y:auto;padding:0 16px 16px;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeItems()">←</button>
-      <span class="mhdr-t">📦 Предметы Wild Rift</span>
-      <button onclick="closeItems();openItemCalcMenu()" class="btn-items-calc">🧮 Калькулятор</button>
+      <span class="mhdr-t" data-i18n="📦 Предметы Wild Rift">📦 Предметы Wild Rift</span>
+      <button onclick="closeItems();openItemCalcMenu()" class="btn-items-calc" data-i18n="🧮 Калькулятор">🧮 Калькулятор</button>
     </div>
         <div class="items-section-label">⚔ Физические</div>
     <div class="items-grid">
-      <div class="item-card" data-tip="Чёрный тесак¦3000 г¦+40 Сила атаки  |  +20 Ускорение умений  |  +400 Здоровье¦Раскол: Нанесение физического урона вражескому чемпиону снижает броню на 6% в течение 6 секунд, эффект обновляется при последующих попаданиях и суммируется до 4 раз, снижая броню на 24%.
+      <div class="item-card" data-tip="Чёрный тесак¦3000 gold¦+40 Сила атаки  |  +20 Ускорение умений  |  +400 Здоровье¦Раскол: Нанесение физического урона вражескому чемпиону снижает броню на 6% в течение 6 секунд, эффект обновляется при последующих попаданиях и суммируется до 4 раз, снижая броню на 24%.
 Преследование: Базовые атаки при попадании дают (20/10) бонус к скорости передвижения на 2 секунды. Вы также получаете (40/20) бонус к скорости передвижения по врагам с максимальным количеством стаков «Раскола»."><img src="https://www.wildriftfire.com/images/items/black-cleaver.png" alt="Чёрный тесак" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:var(--accent-border);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Клинок Погибшего Короля¦3200 г¦+25 Сила атаки  |  +35% Скорость атаки¦Жажда: +10% всестороннего вампиризма.
+      <div class="item-card" data-tip="Клинок Погибшего Короля¦3200 gold¦+25 Сила атаки  |  +35% Скорость атаки¦Жажда: +10% всестороннего вампиризма.
 Испорченные удары: Базовые атаки наносят дополнительный физический урон, равный (10%/7%) текущему здоровью цели, минимум 15, максимум 60 по монстрам.
 Истощение: Если нанести чемпиону 3 базовых удара или использовать способности за 2 секунды — он получит 30–100 (зависит от уровня) магического урона и замедлится на 25% на 2 секунды, а вы получите 25% бонуса к скорости передвижения на тот же период (перезарядка 60 секунд)."><img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" alt="Клинок Погибшего Короля" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:var(--accent-border);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Кровожадный¦3100 г¦+55 Сила атаки  |  +25% Шанс крита  |  +250 Здоровье¦Кровавый: +8% физического вампиризма. Критические удары получают 4% физического вампиризма."><img src="https://www.wildriftfire.com/images/items/bloodthirster.png" alt="Кровожадный" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:var(--accent-border);border-radius:6px;display:block;'"></div>
@@ -296,7 +297,7 @@ Defy: Убийства чемпионов снимают весь накопле
       <div class="item-card" data-tip="Затмение¦3000 г¦+65 Сила атаки  |  +20 Ускорение умений¦Вечная восходящая луна: При попадании по вражескому чемпиону накладывается стак на 1,8 секунды (не чаще 1 раза за атаку/способность на каждого чемпиона). При 2 стаках: наносит доп. физ. урон (6%/3%) макс. здоровья цели, даёт щит (140/70) + (35%/18%) бонусного AD на 2 секунды (перезарядка 6 секунд). Учитываются атаки, способности, предметы, КК и периодический урон."><img src="https://www.wildriftfire.com/images/items/eclipse.png" alt="Затмение" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:var(--accent-border);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Край ночи¦3150 г¦+50 Сила атаки  |  +250 Здоровье¦Пробитие брони: +8 к бронепробиваемости.
 Аннулирование: Даёт магический щит, блокирующий следующую вражескую способность."><img src="https://www.wildriftfire.com/images/items/edge-of-night.png" alt="Край ночи" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:var(--accent-border);border-radius:6px;display:block;'"></div>
-      <div class="item-card" data-tip="Похититель Сущности¦3000 г¦+35 Сила атаки  |  +20 Ускорение умений  |  +25% Шанс крита¦Заклинатель: Применение способностей генерирует заряд на 10 секунд (обновляется, макс. 3 стака, каждая уникальная способность раз в 2 секунды). Базовые атаки расходуют заряд: наносят 90% бонусного AD физ. урона и дают 40 скорости передвижения на 2 секунды. Урон зависит от критического удара.
+      <div class="item-card" data-tip="Похититель Сущности¦3000 gold¦+35 Сила атаки  |  +20 Ускорение умений  |  +25% Шанс крита¦Заклинатель: Применение способностей генерирует заряд на 10 секунд (обновляется, макс. 3 стака, каждая уникальная способность раз в 2 секунды). Базовые атаки расходуют заряд: наносят 90% бонусного AD физ. урона и дают 40 скорости передвижения на 2 секунды. Урон зависит от критического удара.
 Поглощение маны: Базовые атаки восстанавливают 3% недостающей маны."><img src="https://www.wildriftfire.com/images/items/essence-reaver.png" alt="Похититель Сущности" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:var(--accent-border);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Экспериментальная Гексплатина¦3000 г¦+400 Здоровье  |  +35 Сила атаки  |  +20% Скорость атаки¦Заряженный: Получите 20 единиц ускорения ультимативной способности.
 Перегрузка: После ультимативной способности получаете 40% (20% для дальнего боя) скорости атаки и 20% (10% для дальнего боя) скорости передвижения на 8 секунд (перезарядка 30 секунд)."><img src="https://www.wildriftfire.com/images/items/experimental-hexplate.png" alt="Экспериментальная Гексплатина" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:var(--accent-border);border-radius:6px;display:block;'"></div>
@@ -446,7 +447,7 @@ Stormarrow: При максимальных зарядах следующая б
     <span class="side-logo">🎮</span>
     <div>
       <div class="side-title">Wild Rift Stats</div>
-      <div class="side-subtitle">справочник чемпионов</div>
+      <div class="side-subtitle" data-i18n="справочник чемпионов">справочник чемпионов</div>
     </div>
     <button class="side-close" onclick="closeSidebar()">✕</button>
   </div>
@@ -485,28 +486,28 @@ Stormarrow: При максимальных зарядах следующая б
     <div class="welcome-subtitle">by ERjanKG</div>
 
     <div class="welcome-card" style="padding:20px 22px;margin-bottom:20px;text-align:left;">
-      <div class="welcome-card-title" style="margin-bottom:12px;">📊 Что это?</div>
+      <div class="welcome-card-title" style="margin-bottom:12px;" data-i18n="📊 Что это?">📊 Что это?</div>
       <div class="welcome-card-text">
-        Справочник базовых характеристик всех чемпионов Wild Rift.<br>
-        Сравни <b style="color:#e8820a;">AD</b>, <b style="color:#2ecc71;">HP</b>, <b style="color:#5dade2;">Мана</b>, <b style="color:#f1c40f;">Броню</b> и <b style="color:var(--accent);">МС</b> на любом уровне от 1 до 15.
+        <span data-i18n="Справочник базовых характеристик всех чемпионов Wild Rift.">Справочник базовых характеристик всех чемпионов Wild Rift.</span><br>
+        <span data-i18n-html="welcome-compare">Сравни <b style="color:#e8820a;">AD</b>, <b style="color:#2ecc71;">HP</b>, <b style="color:#5dade2;">Мана</b>, <b style="color:#f1c40f;">Броню</b> и <b style="color:var(--accent);">МС</b> на любом уровне от 1 до 15.</span>
       </div>
     </div>
 
     <div class="welcome-card" style="padding:16px 22px;margin-bottom:24px;text-align:left;">
-      <div class="welcome-card-title" style="margin-bottom:10px;">🎮 Как пользоваться?</div>
+      <div class="welcome-card-title" style="margin-bottom:10px;" data-i18n="🎮 Как пользоваться?">🎮 Как пользоваться?</div>
       <div class="welcome-card-steps">
-        🎚 <b style="color:#fff;">Слайдер</b> — выбери уровень 1–15<br>
-        ⚔ <b style="color:#fff;">Champions</b> — выбери кого сравнивать<br>
-        📊 <b style="color:#fff;">Столбцы</b> — нажми чтобы отсортировать<br>
-        🔲 <b style="color:#fff;">Иконка чемпа</b> — полная инфа и график роста
+        🎚 <b style="color:#fff;" data-i18n="Слайдер">Слайдер</b> — <span data-i18n="выбери уровень 1–15">выбери уровень 1–15</span><br>
+        ⚔ <b style="color:#fff;">Champions</b> — <span data-i18n="выбери кого сравнивать">выбери кого сравнивать</span><br>
+        📊 <b style="color:#fff;" data-i18n="Столбцы">Столбцы</b> — <span data-i18n="нажми чтобы отсортировать">нажми чтобы отсортировать</span><br>
+        🔲 <b style="color:#fff;" data-i18n="Иконка чемпа">Иконка чемпа</b> — <span data-i18n="полная инфа и график роста">полная инфа и график роста</span>
       </div>
     </div>
 
     <a href="#" onclick="event.preventDefault();closeWelcome();openExternalLink('https://www.donationalerts.com/r/erjankg','Поддержать проект')"
-       class="welcome-btn-support">
+       class="welcome-btn-support" data-i18n="💎 Поддержать проект">
       💎 Поддержать проект
     </a>
-    <button onclick="closeWelcome()" class="welcome-btn-skip">
+    <button onclick="closeWelcome()" class="welcome-btn-skip" data-i18n="Понятно, начать →">
       Понятно, начать →
     </button>
 
@@ -518,8 +519,8 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;overflow-y:auto;padding:0 16px 16px;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeRunes()">←</button>
-      <span class="mhdr-t">💎 Руны Wild Rift</span>
-      <span style="font-size:10px;color:rgba(255,255,255,0.3);">Наведи — описание</span>
+      <span class="mhdr-t" data-i18n="💎 Руны Wild Rift">💎 Руны Wild Rift</span>
+      <span style="font-size:10px;color:rgba(255,255,255,0.3);" data-i18n="Наведи — описание">Наведи — описание</span>
     </div>
     <div class="side-section" style="padding:0;margin-bottom:8px;">⭐ ОСНОВНЫЕ РУНЫ</div>
     <div class="rune-grid" id="runeGridKeystone">
@@ -600,7 +601,7 @@ Stormarrow: При максимальных зарядах следующая б
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeTierlist()">←</button>
       <div id="tierlistTitle" class="mhdr-t"></div>
-      <button id="tierlistEditBtn" onclick="toggleTierlistEdit()" style="padding:5px 12px;border-radius:10px;border:1.5px solid rgba(255,215,0,0.4);background:rgba(255,215,0,0.08);color:#FFD700;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">✏ Изменить</button>
+      <button id="tierlistEditBtn" onclick="toggleTierlistEdit()" data-i18n="✏ Изменить" style="padding:5px 12px;border-radius:10px;border:1.5px solid rgba(255,215,0,0.4);background:rgba(255,215,0,0.08);color:#FFD700;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">✏ Изменить</button>
     </div>
     <div id="tierlistTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
     <div id="tierlistContent"></div>
@@ -612,13 +613,13 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;display:flex;flex-direction:column;padding:0;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeSideChamps()">←</button>
-      <span class="mhdr-t">👥 Чемпионы</span>
+      <span class="mhdr-t" data-i18n="👥 Чемпионы">👥 Чемпионы</span>
     </div>
     <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;padding:12px 16px 16px;">
     <!-- Role filter -->
     <div id="scRoleFilter" style="display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:12px;"></div>
     <!-- Search -->
-    <input id="scSearch" type="text" placeholder="🔍 Поиск чемпиона..." class="calc-input" style="margin-bottom:12px;font-size:14px;padding:10px 14px;" oninput="scFilter()">
+    <input id="scSearch" type="text" placeholder="🔍 Поиск чемпиона..." data-i18n="🔍 Поиск чемпиона..." data-i18n-attr="placeholder" class="calc-input" style="margin-bottom:12px;font-size:14px;padding:10px 14px;" oninput="scFilter()">
     <!-- Grid -->
     <div id="scGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;overflow-y:auto;flex:1;padding:4px;scrollbar-gutter:stable;align-content:start;"></div>
     </div>
@@ -629,12 +630,12 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:96vw;max-width:920px;height:92vh;overflow-y:auto;padding:0 20px 20px;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeChampDetail()">←</button>
-      <span class="mhdr-t">⚔ Чемпион</span>
+      <span class="mhdr-t" data-i18n="⚔ Чемпион">⚔ Чемпион</span>
     </div>
     <div id="champDetailContent" style="text-align:center;padding:24px 0;">
       <div style="font-size:40px;margin-bottom:12px;">⚔</div>
-      <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);">Информация о чемпионе</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px;">Скоро будет!</div>
+      <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);" data-i18n="Информация о чемпионе">Информация о чемпионе</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px;" data-i18n="Скоро будет!">Скоро будет!</div>
     </div>
   </div>
 </div>
@@ -644,7 +645,7 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:92vw;max-width:440px;max-height:88vh;overflow-y:auto;padding:0 20px 24px;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeRuneDetail()">←</button>
-      <span class="mhdr-t">💎 Руна</span>
+      <span class="mhdr-t" data-i18n="💎 Руна">💎 Руна</span>
     </div>
     <div id="runeDetailContent" style="padding-top:12px;"></div>
   </div>
@@ -655,7 +656,7 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:92vw;max-width:480px;max-height:88vh;overflow-y:auto;padding:0 20px 20px;">
     <div class="mhdr">
       <button onclick="closeItemDetail()" class="btn-close-x">←</button>
-      <span class="mhdr-t">📦 Предмет</span>
+      <span class="mhdr-t" data-i18n="📦 Предмет">📦 Предмет</span>
     </div>
     <div id="itemDetailContent" style="padding-top:12px;"></div>
   </div>
@@ -674,8 +675,8 @@ Stormarrow: При максимальных зарядах следующая б
     <div style="flex:1;overflow-y:auto;padding:20px 18px;min-height:0;max-width:520px;align-self:center;width:100%;box-sizing:border-box;">
     <!-- Range toggle -->
     <div id="icRangeBlock" style="display:none;gap:6px;margin-bottom:12px;">
-      <button class="ic-range-btn active" id="icBtnMelee" onclick="setCalcRange('melee')" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--accent-border);background:var(--accent-dim);color:#fff;font-size:11px;font-weight:700;cursor:pointer;">⚔ Ближний</button>
-      <button class="ic-range-btn" id="icBtnRanged" onclick="setCalcRange('ranged')" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--accent-border);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;cursor:pointer;">🏹 Дальний</button>
+      <button class="ic-range-btn active" id="icBtnMelee" onclick="setCalcRange('melee')" data-i18n="⚔ Ближний" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--accent-border);background:var(--accent-dim);color:#fff;font-size:11px;font-weight:700;cursor:pointer;">⚔ Ближний</button>
+      <button class="ic-range-btn" id="icBtnRanged" onclick="setCalcRange('ranged')" data-i18n="🏹 Дальний" style="flex:1;padding:7px;border-radius:8px;border:1.5px solid var(--accent-border);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;cursor:pointer;">🏹 Дальний</button>
     </div>
     <!-- My fields -->
     <div id="icMySection" style="margin-bottom:10px;">
@@ -702,8 +703,8 @@ Stormarrow: При максимальных зарядах следующая б
     <!-- Hit button + combat sim (BotRK) -->
     <div id="icHitBtn" style="display:none;margin-bottom:10px;">
       <div style="display:flex;gap:6px;margin-bottom:8px;">
-        <button onclick="icHit()" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid rgba(231,76,60,0.5);background:rgba(231,76,60,0.15);color:#ff6b6b;font-size:13px;font-weight:900;cursor:pointer;">⚔ Ударить</button>
-        <button onclick="icResetHp()" style="padding:10px 14px;border-radius:10px;border:1.5px solid var(--accent-border);background:transparent;color:rgba(255,255,255,0.4);font-size:11px;font-weight:700;cursor:pointer;">↺ Сброс</button>
+        <button onclick="icHit()" data-i18n="⚔ Ударить" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid rgba(231,76,60,0.5);background:rgba(231,76,60,0.15);color:#ff6b6b;font-size:13px;font-weight:900;cursor:pointer;">⚔ Ударить</button>
+        <button onclick="icResetHp()" data-i18n="↺ Сброс" style="padding:10px 14px;border-radius:10px;border:1.5px solid var(--accent-border);background:transparent;color:rgba(255,255,255,0.4);font-size:11px;font-weight:700;cursor:pointer;">↺ Сброс</button>
       </div>
       <div id="icCombatBlock" style="display:none;">
         <!-- HP bar -->
@@ -722,7 +723,7 @@ Stormarrow: При максимальных зарядах следующая б
     </div>
     <!-- Heal result (Sunderer) -->
     <div id="icHealResult" style="display:none;margin-bottom:10px;background:rgba(39,174,96,0.1);border:1px solid rgba(39,174,96,0.3);border-radius:8px;padding:8px 12px;">
-      <div style="font-size:10px;color:#2ecc71;font-weight:700;">💚 Исцеление</div>
+      <div style="font-size:10px;color:#2ecc71;font-weight:700;" data-i18n="💚 Исцеление">💚 Исцеление</div>
       <span style="font-size:18px;font-weight:900;color:#2ecc71;">—</span>
     </div>
     <!-- Result -->
@@ -747,28 +748,28 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:92vw;max-width:400px;padding:0;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeItemCalcMenu()">←</button>
-      <span class="mhdr-t">🧮 Калькулятор предметов</span>
+      <span class="mhdr-t" data-i18n="🧮 Калькулятор предметов">🧮 Калькулятор предметов</span>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;padding:16px 18px;">
       <button onclick="openItemCalc('thornmail')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--accent-border);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/thornmail.png" style="width:40px;height:40px;border-radius:8px;">
-        <div><div>Шипованный доспех</div><div class="text-faint-sm">Отражённый маг. урон</div></div>
+        <div><div data-i18n="Шипованный доспех">Шипованный доспех</div><div class="text-faint-sm" data-i18n="Отражённый маг. урон">Отражённый маг. урон</div></div>
       </button>
       <button onclick="openItemCalc('botrk')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--accent-border);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/blade-of-the-ruined-king.png" style="width:40px;height:40px;border-radius:8px;">
-        <div><div>Клинок Погибшего Короля</div><div class="text-faint-sm">% HP врага + симулятор боя</div></div>
+        <div><div data-i18n="Клинок Погибшего Короля">Клинок Погибшего Короля</div><div class="text-faint-sm" data-i18n="% HP врага + симулятор боя">% HP врага + симулятор боя</div></div>
       </button>
       <button onclick="openItemCalc('sunfire')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--accent-border);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/sunfire-aegis.png" style="width:40px;height:40px;border-radius:8px;">
-        <div><div>Эгида Солнечного огня</div><div class="text-faint-sm">Маг. урон/с</div></div>
+        <div><div data-i18n="Эгида Солнечного огня">Эгида Солнечного огня</div><div class="text-faint-sm" data-i18n="Маг. урон/с">Маг. урон/с</div></div>
       </button>
       <button onclick="openItemCalc('liandry')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--accent-border);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/liandrys-torment.png" style="width:40px;height:40px;border-radius:8px;">
-        <div><div>Мучения Лиандри</div><div class="text-faint-sm">% макс. HP ожог</div></div>
+        <div><div data-i18n="Мучения Лиандри">Мучения Лиандри</div><div class="text-faint-sm" data-i18n="% макс. HP ожог">% макс. HP ожог</div></div>
       </button>
       <button onclick="openItemCalc('sunderer')" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;border:1.5px solid var(--accent-border);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
         <img src="https://www.wildriftfire.com/images/items/divine-sunderer.png" style="width:40px;height:40px;border-radius:8px;">
-        <div><div>Божественный Разрушитель</div><div class="text-faint-sm">Физ. удар + хил</div></div>
+        <div><div data-i18n="Божественный Разрушитель">Божественный Разрушитель</div><div class="text-faint-sm" data-i18n="Физ. удар + хил">Физ. удар + хил</div></div>
       </button>
     </div>
   </div>
@@ -781,14 +782,14 @@ Stormarrow: При максимальных зарядах следующая б
     <!-- Header with back btn -->
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeDraft()">←</button>
-      <span class="mhdr-t" style="text-align:center;">📋 Драфт-помощник</span>
+      <span class="mhdr-t" style="text-align:center;" data-i18n="📋 Драфт-помощник">📋 Драфт-помощник</span>
     </div>
 
     <!-- GOOD PICK panel -->
     <div style="flex:1;overflow-y:auto;padding:10px 12px;border-bottom:1px solid var(--accent-border-sub);min-height:0;">
       <div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:6px;">✅ GOOD PICK</div>
       <div id="draftGoodPick" style="display:flex;flex-direction:column;gap:4px;">
-        <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
+        <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;" data-i18n="Выбери чемпиона">Выбери чемпиона</div>
       </div>
     </div>
 
@@ -796,12 +797,12 @@ Stormarrow: При максимальных зарядах следующая б
     <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--accent-border);border-top:1px solid var(--accent-border);flex-shrink:0;">
       <!-- Left: Our team -->
       <div style="padding:8px 10px;border-right:1px solid var(--accent-border-sub);">
-        <div style="font-size:9px;color:rgba(93,173,226,0.8);font-weight:700;letter-spacing:1px;margin-bottom:5px;">🔵 МОЯ КОМАНДА</div>
+        <div style="font-size:9px;color:rgba(93,173,226,0.8);font-weight:700;letter-spacing:1px;margin-bottom:5px;" data-i18n="🔵 МОЯ КОМАНДА">🔵 МОЯ КОМАНДА</div>
         <div id="draftSlotsLeft" style="display:flex;flex-direction:column;gap:4px;"></div>
       </div>
       <!-- Right: Enemy team -->
       <div style="padding:8px 10px;">
-        <div style="font-size:9px;color:rgba(231,76,60,0.8);font-weight:700;letter-spacing:1px;margin-bottom:5px;">🔴 ПРОТИВНИКИ</div>
+        <div style="font-size:9px;color:rgba(231,76,60,0.8);font-weight:700;letter-spacing:1px;margin-bottom:5px;" data-i18n="🔴 ПРОТИВНИКИ">🔴 ПРОТИВНИКИ</div>
         <div id="draftSlotsRight" style="display:flex;flex-direction:column;gap:4px;"></div>
       </div>
     </div>
@@ -810,7 +811,7 @@ Stormarrow: При максимальных зарядах следующая б
     <div style="flex:1;overflow-y:auto;padding:10px 12px;min-height:0;">
       <div style="font-size:10px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:6px;">☠ DANGER</div>
       <div id="draftDanger" style="display:flex;flex-direction:column;gap:4px;">
-        <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;">Выбери чемпиона</div>
+        <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;" data-i18n="Выбери чемпиона">Выбери чемпиона</div>
       </div>
     </div>
 
@@ -827,7 +828,7 @@ Stormarrow: При максимальных зарядах следующая б
     <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;padding:8px 12px 12px;">
     <div id="champPickerRoles" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;"></div>
     <div id="champPickerGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:4px;overflow-y:auto;flex:1;align-content:start;padding:2px;"></div>
-    <button id="champPickerDoneBtn" onclick="closeChampPicker()" style="display:none;margin-top:10px;padding:10px;border-radius:10px;border:none;background:var(--accent-glow);color:#fff;font-size:13px;font-weight:900;cursor:pointer;width:100%;">✓ Готово</button>
+    <button id="champPickerDoneBtn" onclick="closeChampPicker()" data-i18n="✓ Готово" style="display:none;margin-top:10px;padding:10px;border-radius:10px;border:none;background:var(--accent-glow);color:#fff;font-size:13px;font-weight:900;cursor:pointer;width:100%;">✓ Готово</button>
     </div>
   </div>
 </div>
@@ -837,17 +838,17 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:88vw;max-width:340px;padding:0;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeTierlistMenu()">←</button>
-      <span class="mhdr-t" style="color:#FFD700;">🏆 Тир-листы</span>
+      <span class="mhdr-t" style="color:#FFD700;" data-i18n="🏆 Тир-листы">🏆 Тир-листы</span>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;padding:14px 18px;">
       <button onclick="openTierlistFromMenu('champs')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
-        <span style="font-size:20px;">🏆</span><div><div>Тир-лист чемпионов</div><div class="text-faint-sm">Лучшие чемпы по ролям</div></div>
+        <span style="font-size:20px;">🏆</span><div><div data-i18n="Тир-лист чемпионов">Тир-лист чемпионов</div><div class="text-faint-sm" data-i18n="Лучшие чемпы по ролям">Лучшие чемпы по ролям</div></div>
       </button>
       <button onclick="openTierlistFromMenu('items')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
-        <span style="font-size:20px;">⚙</span><div><div>Тир-лист предметов</div><div class="text-faint-sm">Самые эффективные предметы</div></div>
+        <span style="font-size:20px;">⚙</span><div><div data-i18n="Тир-лист предметов">Тир-лист предметов</div><div class="text-faint-sm" data-i18n="Самые эффективные предметы">Самые эффективные предметы</div></div>
       </button>
       <button onclick="openTierlistFromMenu('runes')" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;border:1.5px solid rgba(255,215,0,0.25);background:rgba(255,215,0,0.06);color:#fff;font-size:13px;font-weight:700;cursor:pointer;text-align:left;">
-        <span style="font-size:20px;">✨</span><div><div>Тир-лист рун</div><div class="text-faint-sm">Топовые руны мета</div></div>
+        <span style="font-size:20px;">✨</span><div><div data-i18n="Тир-лист рун">Тир-лист рун</div><div class="text-faint-sm" data-i18n="Топовые руны мета">Топовые руны мета</div></div>
       </button>
     </div>
   </div>
@@ -861,30 +862,30 @@ Stormarrow: При максимальных зарядах следующая б
     <!-- LEFT: Users list (PC only, mobile via button) -->
     <div class="tg-sidebar" id="tgSidebar">
       <div class="tg-sidebar-header">
-        <div style="font-size:14px;font-weight:900;color:var(--accent);flex:1;">👥 Пользователи</div>
+        <div style="font-size:14px;font-weight:900;color:var(--accent);flex:1;" data-i18n="👥 Пользователи">👥 Пользователи</div>
         <div id="chatOnlineCount" style="font-size:10px;color:rgba(255,255,255,0.3);"></div>
         <button class="tg-sidebar-close-btn" onclick="tgMobileCloseSidebar()">✕</button>
       </div>
       <div class="tg-sidebar-content" id="tgSidebarContent">
-        <div class="chat-login-msg">Загрузка...</div>
+        <div class="chat-login-msg" data-i18n="Загрузка...">Загрузка...</div>
       </div>
     </div>
     <!-- RIGHT: Chat -->
     <div class="tg-chat-panel" id="tgChatPanel">
       <div class="tg-chat-header" id="tgChatHeader">
         <button class="btn-close-x" onclick="closeChatSystem()">←</button>
-        <span class="mhdr-t">💬 Чат</span>
-        <button onclick="openInfluencers()" style="background:rgba(255,0,0,0.15);border:1px solid rgba(255,68,68,0.3);color:#ff4444;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;margin-right:4px;white-space:nowrap;">🎬 Инфл.</button>
+        <span class="mhdr-t" data-i18n="💬 Чат">💬 Чат</span>
+        <button onclick="openInfluencers()" style="background:rgba(255,0,0,0.15);border:1px solid rgba(255,68,68,0.3);color:#ff4444;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;margin-right:4px;white-space:nowrap;" data-i18n="🎬 Инфл.">🎬 Инфл.</button>
         <button class="tg-mobile-users-btn" id="tgMobileUsersBtn" onclick="tgMobileShowSidebar()">👥<span class="tg-mob-badge" id="tgMobBadge"></span></button>
       </div>
       <div class="chat-messages" id="chatMessages">
-        <div class="chat-login-msg">Загрузка...</div>
+        <div class="chat-login-msg" data-i18n="Загрузка...">Загрузка...</div>
       </div>
       <div id="chatInputArea" class="chat-input-row" style="display:none;">
-        <input class="chat-input" id="chatInput" type="text" placeholder="Написать сообщение..." maxlength="300" onkeydown="if(event.key==='Enter')tgSendMsg()">
+        <input class="chat-input" id="chatInput" type="text" placeholder="Написать сообщение..." data-i18n="Написать сообщение..." data-i18n-attr="placeholder" maxlength="300" onkeydown="if(event.key==='Enter')tgSendMsg()">
         <button class="chat-send" onclick="tgSendMsg()">➤</button>
       </div>
-      <div id="chatLoginPrompt" class="chat-login-msg" style="border-top:1px solid var(--accent-border-sub);padding:12px;">
+      <div id="chatLoginPrompt" class="chat-login-msg" style="border-top:1px solid var(--accent-border-sub);padding:12px;" data-i18n="Войди через Google чтобы писать в чат">
         Войди через Google чтобы писать в чат
       </div>
     </div>
@@ -896,17 +897,17 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:92vw;max-width:420px;height:88vh;padding:0;display:flex;flex-direction:column;overflow:hidden;">
     <div class="mhdr" style="flex-shrink:0;">
       <button class="btn-close-x" onclick="closeProfileSetup()">←</button>
-      <span class="mhdr-t">👤 Мой профиль</span>
+      <span class="mhdr-t" data-i18n="👤 Мой профиль">👤 Мой профиль</span>
     </div>
     <!-- Profile tabs -->
     <div style="display:flex;border-bottom:1px solid var(--accent-border-sub);flex-shrink:0;">
-      <button id="profTabProfile" onclick="switchProfileTab('profile')" style="flex:1;padding:10px;background:var(--accent-dim);border:none;color:var(--accent);font-size:12px;font-weight:800;cursor:pointer;border-bottom:2px solid var(--accent);">Профиль</button>
-      <button id="profTabData" onclick="switchProfileTab('data')" style="flex:1;padding:10px;background:transparent;border:none;color:rgba(255,255,255,0.4);font-size:12px;font-weight:800;cursor:pointer;border-bottom:2px solid transparent;">📋 Данные</button>
+      <button id="profTabProfile" onclick="switchProfileTab('profile')" style="flex:1;padding:10px;background:var(--accent-dim);border:none;color:var(--accent);font-size:12px;font-weight:800;cursor:pointer;border-bottom:2px solid var(--accent);" data-i18n="Профиль">Профиль</button>
+      <button id="profTabData" onclick="switchProfileTab('data')" style="flex:1;padding:10px;background:transparent;border:none;color:rgba(255,255,255,0.4);font-size:12px;font-weight:800;cursor:pointer;border-bottom:2px solid transparent;" data-i18n="📋 Данные">📋 Данные</button>
     </div>
     <!-- Profile tab content -->
     <div id="profPanelProfile" style="flex:1;min-height:0;overflow-y:auto;padding:16px 20px;">
       <div id="profileNickRow" style="margin-bottom:18px;"></div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;">ОСНОВНАЯ РОЛЬ</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;" data-i18n="ОСНОВНАЯ РОЛЬ">ОСНОВНАЯ РОЛЬ</div>
       <div id="profileRoles" style="display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:18px;">
         <button id="prole-Top" onclick="window._profileSelectRole('Top')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid var(--accent-border);background:var(--accent-dim);cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;"><span>Top</span></button>
         <button id="prole-Jungle" onclick="window._profileSelectRole('Jungle')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid var(--accent-border);background:var(--accent-dim);cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;"><span>Jungle</span></button>
@@ -914,13 +915,13 @@ Stormarrow: При максимальных зарядах следующая б
         <button id="prole-ADC" onclick="window._profileSelectRole('ADC')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid var(--accent-border);background:var(--accent-dim);cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;"><span>ADC</span></button>
         <button id="prole-Support" onclick="window._profileSelectRole('Support')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid var(--accent-border);background:var(--accent-dim);cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;"><span>Support</span></button>
       </div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;">МАКСИМАЛЬНЫЙ РАНГ</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;" data-i18n="МАКСИМАЛЬНЫЙ РАНГ">МАКСИМАЛЬНЫЙ РАНГ</div>
       <div id="profileRanks" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:6px;margin-bottom:18px;"></div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;">СОЦИАЛЬНЫЕ СЕТИ</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:800;letter-spacing:1px;margin-bottom:8px;" data-i18n="СОЦИАЛЬНЫЕ СЕТИ">СОЦИАЛЬНЫЕ СЕТИ</div>
       <div id="profileSocialLinks" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;align-items:center;min-height:44px;">
         <!-- rendered by JS -->
       </div>
-      <button id="profileSaveBtn" onclick="window.saveProfile()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--bg-secondary));color:#fff;font-size:14px;font-weight:900;cursor:pointer;position:relative;z-index:2;transition:transform 0.1s,opacity 0.2s,background 0.2s;outline:none;" onmousedown="this.style.transform='scale(0.96)';this.style.opacity='0.85'" onmouseup="this.style.transform='scale(1)';this.style.opacity='1'" onmouseleave="this.style.transform='scale(1)';this.style.opacity='1'">✓ Сохранить</button>
+      <button id="profileSaveBtn" onclick="window.saveProfile()" data-i18n="✓ Сохранить" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--bg-secondary));color:#fff;font-size:14px;font-weight:900;cursor:pointer;position:relative;z-index:2;transition:transform 0.1s,opacity 0.2s,background 0.2s;outline:none;" onmousedown="this.style.transform='scale(0.96)';this.style.opacity='0.85'" onmouseup="this.style.transform='scale(1)';this.style.opacity='1'" onmouseleave="this.style.transform='scale(1)';this.style.opacity='1'">✓ Сохранить</button>
       <div style="height:8px;"></div>
     </div>
     <!-- Data tab content -->
@@ -935,7 +936,7 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:92vw;max-width:340px;padding:0;overflow:hidden;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeSocialPicker()">←</button>
-      <span class="mhdr-t" id="socialPickerTitle">Добавить соцсеть</span>
+      <span class="mhdr-t" id="socialPickerTitle" data-i18n="Добавить соцсеть">Добавить соцсеть</span>
     </div>
     <div id="socialPickerContent" style="padding:16px 20px 20px;"></div>
   </div>
@@ -946,8 +947,8 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:88vw;max-width:300px;padding:20px 20px 16px;">
     <div id="socialLinkConfirmContent" style="text-align:center;margin-bottom:16px;"></div>
     <div style="display:flex;gap:8px;">
-      <button onclick="closeSocialLinkConfirm()" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;cursor:pointer;">Назад</button>
-      <button id="socialLinkGoBtn" style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent),var(--bg-secondary));color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Перейти →</button>
+      <button onclick="closeSocialLinkConfirm()" data-i18n="Назад" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;cursor:pointer;">Назад</button>
+      <button id="socialLinkGoBtn" data-i18n="Перейти →" style="flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent),var(--bg-secondary));color:#fff;font-size:13px;font-weight:700;cursor:pointer;">Перейти →</button>
     </div>
   </div>
 </div>
@@ -964,21 +965,21 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="m-win" style="width:96vw;max-width:920px;max-height:92vh;display:flex;flex-direction:column;padding:0;overflow:hidden;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeInfluencers()">←</button>
-      <span class="mhdr-t">🎬 Инфлюенсеры Wild Rift</span>
+      <span class="mhdr-t" data-i18n="🎬 Инфлюенсеры Wild Rift">🎬 Инфлюенсеры Wild Rift</span>
     </div>
 
     <!-- LIST VIEW -->
     <div id="infListView" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
       <div style="padding:8px 16px 8px;">
-        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">Данные загружаются из Firebase. Нажми на карточку для подробностей.</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;" data-i18n="Данные загружаются из Firebase. Нажми на карточку для подробностей.">Данные загружаются из Firebase. Нажми на карточку для подробностей.</div>
       </div>
       <div id="infListLoading" style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);">
         <div style="font-size:28px;margin-bottom:8px;">⏳</div>
-        <div style="font-size:13px;font-weight:700;">Загрузка инфлюенсеров...</div>
+        <div style="font-size:13px;font-weight:700;" data-i18n="Загрузка инфлюенсеров...">Загрузка инфлюенсеров...</div>
       </div>
       <div id="infListEmpty" style="display:none;text-align:center;padding:40px;color:rgba(255,255,255,0.3);">
         <div style="font-size:28px;margin-bottom:8px;">📋</div>
-        <div style="font-size:13px;font-weight:700;">Пока нет инфлюенсеров</div>
+        <div style="font-size:13px;font-weight:700;" data-i18n="Пока нет инфлюенсеров">Пока нет инфлюенсеров</div>
         <div style="font-size:11px;margin-top:4px;">Добавь первого через Firebase Console → коллекция <b style="color:var(--accent);">influencers</b></div>
       </div>
       <div id="infListCards" style="flex:1;overflow-y:auto;padding:0 16px 16px;display:flex;flex-direction:column;gap:8px;"></div>
@@ -987,7 +988,7 @@ Stormarrow: При максимальных зарядах следующая б
     <!-- DETAIL VIEW (hidden by default) -->
     <div id="infDetailView" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
       <div style="padding:12px 16px;border-bottom:1px solid var(--accent-border-sub);display:flex;align-items:center;gap:10px;flex-shrink:0;">
-        <button onclick="infShowList()" style="background:none;border:1.5px solid var(--accent-border);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;">← Назад</button>
+        <button onclick="infShowList()" data-i18n="← Назад" style="background:none;border:1.5px solid var(--accent-border);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;">← Назад</button>
         <div id="infDetailName" style="font-size:15px;font-weight:900;color:#fff;"></div>
         <span id="infDetailRank" class="inf-rank" style="margin-left:auto;"></span>
       </div>
@@ -997,32 +998,32 @@ Stormarrow: При максимальных зарядах следующая б
           <div id="infDetailAvatar" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--bg-secondary));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;overflow:hidden;"></div>
           <div style="flex:1;">
             <div id="infDetailMeta" style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.6;"></div>
-            <a id="infDetailLink" href="#" target="_blank" rel="noopener" class="inf-link" style="font-size:13px;">🔗 Открыть канал</a>
+            <a id="infDetailLink" href="#" target="_blank" rel="noopener" class="inf-link" data-i18n="🔗 Открыть канал" style="font-size:13px;">🔗 Открыть канал</a>
           </div>
         </div>
         <!-- Achievements -->
         <div id="infDetailAchSection" style="display:none;margin-bottom:16px;">
-          <div style="font-size:12px;font-weight:800;color:#ffd700;letter-spacing:0.5px;margin-bottom:6px;">🏅 ДОСТИЖЕНИЯ</div>
+          <div style="font-size:12px;font-weight:800;color:#ffd700;letter-spacing:0.5px;margin-bottom:6px;" data-i18n="🏅 ДОСТИЖЕНИЯ">🏅 ДОСТИЖЕНИЯ</div>
           <div id="infDetailAch" style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.15);border-radius:12px;padding:12px 14px;font-size:12px;color:rgba(255,255,255,0.7);line-height:1.8;white-space:pre-line;"></div>
         </div>
         <!-- Tier List -->
         <div id="infDetailTierSection" style="display:none;margin-bottom:16px;">
-          <div style="font-size:12px;font-weight:800;color:var(--accent);letter-spacing:0.5px;margin-bottom:6px;">🏆 ТИР-ЛИСТ</div>
+          <div style="font-size:12px;font-weight:800;color:var(--accent);letter-spacing:0.5px;margin-bottom:6px;" data-i18n="🏆 ТИР-ЛИСТ">🏆 ТИР-ЛИСТ</div>
           <div id="infDetailTier" style="display:flex;flex-direction:column;gap:6px;"></div>
         </div>
         <!-- Counters -->
         <div id="infDetailCounterSection" style="display:none;margin-bottom:16px;">
-          <div style="font-size:12px;font-weight:800;color:#e74c3c;letter-spacing:0.5px;margin-bottom:6px;">🔴 КОНТР-ПИКИ</div>
+          <div style="font-size:12px;font-weight:800;color:#e74c3c;letter-spacing:0.5px;margin-bottom:6px;" data-i18n="🔴 КОНТР-ПИКИ">🔴 КОНТР-ПИКИ</div>
           <div id="infDetailCounters" style="display:flex;flex-direction:column;gap:6px;"></div>
         </div>
         <!-- Combos -->
         <div id="infDetailComboSection" style="display:none;margin-bottom:16px;">
-          <div style="font-size:12px;font-weight:800;color:#2ecc71;letter-spacing:0.5px;margin-bottom:6px;">🟢 КОМБО</div>
+          <div style="font-size:12px;font-weight:800;color:#2ecc71;letter-spacing:0.5px;margin-bottom:6px;" data-i18n="🟢 КОМБО">🟢 КОМБО</div>
           <div id="infDetailCombos" style="display:flex;flex-direction:column;gap:6px;"></div>
         </div>
         <!-- Empty state -->
         <div id="infDetailEmpty" style="display:none;text-align:center;padding:20px;color:rgba(255,255,255,0.25);font-size:12px;">
-          Этот инфлюенсер пока не добавил свои тир-листы и контр-пики.
+          <span data-i18n="Этот инфлюенсер пока не добавил свои тир-листы и контр-пики.">Этот инфлюенсер пока не добавил свои тир-листы и контр-пики.</span>
         </div>
       </div>
     </div>
