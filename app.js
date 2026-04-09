@@ -1497,19 +1497,19 @@
             lbl.style.cssText='width:'+lblSize+'px;min-width:'+lblSize+'px;height:'+lblSize+'px;display:flex;align-items:center;justify-content:center;border-radius:'+lblRadius+'px;font-size:'+lblFontSize+'px;font-weight:900;background:linear-gradient(135deg,'+color+'cc,'+color+'88);color:#fff;flex-shrink:0;margin-top:3px;'+lblEditExtra;
             lbl.textContent=tk;
             if(_tierEditMode){
-                (function(t,td,af,rf,pt){lbl.onclick=function(){
+                (function(tierKey,td,af,rf,pt){lbl.onclick=function(){
                     var roleFilter = (pt==='champs' && _tierRole!=='all') ? _tierRole : 'all';
-                    openChampPicker(['🏆','⚙','✨'][['champs','items','runes'].indexOf(pt)]+' '+t('Тир')+' '+t,
+                    openChampPicker(['🏆','⚙','✨'][['champs','items','runes'].indexOf(pt)]+' '+t('Тир')+' '+tierKey,
                     function(c){
-                        af(t,c.name);
+                        af(tierKey,c.name);
                         champPickerBuildGrid();
                     },{
                         multi:true, type:pt,
                         defaultRole: roleFilter,
                         itemCat: pt==='items' ? _tierItemCat : pt==='runes' ? _tierRuneCat : 'all',
-                        getSelected:function(){return td[t]||[];},
-                        getExcluded:function(){var e2=[];_TIER_KEYS.forEach(function(ot){if(ot!==t)(td[ot]||[]).forEach(function(n){e2.push(n);});});return e2;},
-                        onRemove:function(c){rf(t,c.name);champPickerBuildGrid();}
+                        getSelected:function(){return td[tierKey]||[];},
+                        getExcluded:function(){var e2=[];_TIER_KEYS.forEach(function(ot){if(ot!==tierKey)(td[ot]||[]).forEach(function(n){e2.push(n);});});return e2;},
+                        onRemove:function(c){rf(tierKey,c.name);champPickerBuildGrid();}
                     });
                 };}(tk,tData,addFn,removeFn,pickerType));
             }
