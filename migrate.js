@@ -63,7 +63,7 @@ async function migrateItems(db) {
     var imgEl = el.querySelector('img');
     var imgSrc = imgEl ? imgEl.getAttribute('src') : '';
     var nameRu = (parts[0] || '').trim();
-    var nameEn = _itemName[nameRu] || _altName[nameRu] || nameRu;
+    var nameEn = (window._itemName || {})[nameRu] || (window._altName || {})[nameRu] || nameRu;
 
     allItems.push({
       name_ru: nameRu,
@@ -137,7 +137,7 @@ async function migrateRunes(db) {
     var imgEl = el.querySelector('img');
     var imgSrc = imgEl ? imgEl.getAttribute('src') : '';
     var nameRu = (parts[0] || '').trim();
-    var nameEn = _runeName[nameRu] || nameRu;
+    var nameEn = (window._runeName || {})[nameRu] || nameRu;
     var category = (parts[1] || '').trim(); // Ключевая, Доминация, etc.
     var description = (parts[3] || parts[2] || '').trim();
 
