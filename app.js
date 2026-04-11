@@ -2510,17 +2510,20 @@
     function checkAdmin() {
         _isAdmin = false;
         window._isAdmin = false;
-        if (!db || !_currentUser) return;
+        if (!db || !_currentUser) { console.warn('[checkAdmin] db or user missing', !!db, !!_currentUser); return; }
+        console.log('[checkAdmin] checking uid:', _currentUser.uid);
         db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+            console.log('[checkAdmin] doc exists:', doc.exists, 'isAdmin:', doc.exists ? doc.data().isAdmin : 'N/A');
             if (doc.exists && doc.data().isAdmin === true) { _isAdmin = true; }
             window._isAdmin = _isAdmin;
+            console.log('[checkAdmin] final _isAdmin:', _isAdmin);
             renderGlobalChat();
             // CMS: перерисовать с кнопками редактирования для админа
             if (_isAdmin && window._cmsLoaded) {
                 window.cmsRenderItems && window.cmsRenderItems();
                 window.cmsRenderRunes && window.cmsRenderRunes();
             }
-        }).catch(function() { _isAdmin = false; window._isAdmin = false; });
+        }).catch(function(err) { console.error('[checkAdmin] ERROR:', err); _isAdmin = false; window._isAdmin = false; });
     }
 
     // ═══════════════════════════════════════
