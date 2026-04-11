@@ -1302,6 +1302,11 @@
     // Map each category to items in DOM (lazy, built once per session)
     var _itemsByCat = null;
     function getItemsByCat(){
+        // CMS override: если данные загружены из Firestore
+        if (window.cmsGetItemsByCat) {
+            var cmsResult = window.cmsGetItemsByCat();
+            if (cmsResult) { _itemsByCat = cmsResult; return _itemsByCat; }
+        }
         if(_itemsByCat) return _itemsByCat;
         _itemsByCat = {all:[],physical:[],magic:[],defensive:[],support:[],boots:[],enchants:[]};
         // Category headers contain keywords we match against
@@ -1341,6 +1346,11 @@
     var _runesData = null;
     var _runesByCat = null;
     function getRunesByCat(){
+        // CMS override
+        if (window.cmsGetRunesByCat) {
+            var cmsResult = window.cmsGetRunesByCat();
+            if (cmsResult) { _runesByCat = cmsResult; return _runesByCat; }
+        }
         if(_runesByCat) return _runesByCat;
         _runesByCat = {keystone:[], secondary:[]};
         // runeGridKeystone = основные; all other rune-grids = второстепенные
@@ -1365,6 +1375,11 @@
         return _runesByCat;
     }
     function getRunesData(){
+        // CMS override
+        if (window.cmsGetRunesData) {
+            var cmsResult = window.cmsGetRunesData();
+            if (cmsResult) { _runesData = cmsResult; return _runesData; }
+        }
         if(_runesData) return _runesData;
         _runesData=[];
         document.querySelectorAll('#runesMask .rune-card').forEach(function(card){
@@ -2477,6 +2492,19 @@
     var auth = (typeof firebase !== 'undefined') ? firebase.auth() : null;
     var db   = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
     var _currentUser = null;
+
+    // CMS: загрузка данных предметов и рун из Firestore
+    if (db && typeof window.cmsLoadData === 'function') {
+        window.cmsLoadData(function() {
+            // Сбрасываем кеш, чтобы getItemsByCat/getRunesByCat использовали CMS данные
+            _itemsByCat = null;
+            _runesByCat = null;
+            _runesData = null;
+            // Рендерим предметы и руны из Firestore
+            if (window.cmsRenderItems) window.cmsRenderItems();
+            if (window.cmsRenderRunes) window.cmsRenderRunes();
+        });
+    }
     var _isAdmin = false;
 
     function checkAdmin() {
@@ -2485,6 +2513,11 @@
         db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
             if (doc.exists && doc.data().isAdmin === true) { _isAdmin = true; }
             renderGlobalChat();
+            // CMS: перерисовать с кнопками редактирования для админа
+            if (_isAdmin && window._cmsLoaded) {
+                window.cmsRenderItems && window.cmsRenderItems();
+                window.cmsRenderRunes && window.cmsRenderRunes();
+            }
         }).catch(function() { _isAdmin = false; });
     }
 
