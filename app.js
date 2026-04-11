@@ -2509,16 +2509,18 @@
 
     function checkAdmin() {
         _isAdmin = false;
+        window._isAdmin = false;
         if (!db || !_currentUser) return;
         db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
             if (doc.exists && doc.data().isAdmin === true) { _isAdmin = true; }
+            window._isAdmin = _isAdmin;
             renderGlobalChat();
             // CMS: перерисовать с кнопками редактирования для админа
             if (_isAdmin && window._cmsLoaded) {
                 window.cmsRenderItems && window.cmsRenderItems();
                 window.cmsRenderRunes && window.cmsRenderRunes();
             }
-        }).catch(function() { _isAdmin = false; });
+        }).catch(function() { _isAdmin = false; window._isAdmin = false; });
     }
 
     // ═══════════════════════════════════════
@@ -3029,6 +3031,7 @@
                 stopPresence();
                 updateChatUI(false);
                 _isAdmin = false;
+                window._isAdmin = false;
             }
         });
     }
