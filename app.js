@@ -2506,8 +2506,10 @@
         });
         // Загружаем винрейты из Firestore
         if (typeof window.cmsLoadWinrates === 'function') {
+            console.log('[CMS] Загружаем винрейты...');
             window.cmsLoadWinrates(function() {
                 var cmsWR = window.cmsGetWinrateData && window.cmsGetWinrateData();
+                console.log('[CMS] cmsWR:', cmsWR ? Object.keys(cmsWR) : 'null');
                 if (cmsWR && Object.keys(cmsWR).length > 0) {
                     // Заменяем хардкод WR_DATA данными из Firestore
                     Object.keys(cmsWR).forEach(function(rank) {
@@ -2516,6 +2518,8 @@
                     console.log('[CMS] WR_DATA обновлён из Firestore');
                 }
             });
+        } else {
+            console.warn('[CMS] cmsLoadWinrates не найден');
         }
     }
     var _isAdmin = false;
