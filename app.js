@@ -2512,7 +2512,7 @@
         window._isAdmin = false;
         if (!db || !_currentUser) { console.warn('[checkAdmin] db or user missing', !!db, !!_currentUser); return; }
         console.log('[checkAdmin] checking uid:', _currentUser.uid);
-        db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
+        db.collection('users').doc(_currentUser.uid).get({ source: 'server' }).then(function(doc) {
             console.log('[checkAdmin] doc exists:', doc.exists, 'isAdmin:', doc.exists ? doc.data().isAdmin : 'N/A');
             if (doc.exists && doc.data().isAdmin === true) { _isAdmin = true; }
             window._isAdmin = _isAdmin;
@@ -3028,7 +3028,8 @@
                 loadUserDataFromFirestore();
                 startPresence();
                 updateChatUI(true);
-                checkAdmin();
+                // checkAdmin вызывается с задержкой чтобы Firestore кеш обновился
+                setTimeout(function() { checkAdmin(); }, 1500);
                 checkFirstLogin();
             } else {
                 stopPresence();
