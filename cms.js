@@ -809,4 +809,205 @@
     });
   };
 
+  // ═══════════════════════════════════════════════════════════════
+  // 📊 WINRATES CMS — загрузка из Firestore + админ-редактирование
+  // ═══════════════════════════════════════════════════════════════
+
+  window._cmsWinrates = null; // {rank: {role: [{name,wr,ch,pr,br}, ...]}}
+
+  var WR_RANKS = ['чалик','алмаз','мастер','грандмастер','суверен'];
+  var WR_ROLES = ['top','jungle','mid','adc','support'];
+
+  // Загрузка винрейтов из Firestore
+  window.cmsLoadWinrates = function(callback) {
+    var db = firebase.firestore();
+    window._cmsWinrates = {};
+
+    db.collection('winrates').get()
+      .then(function(snap) {
+        snap.forEach(function(doc) {
+          window._cmsWinrates[doc.id] = doc.data();
+        });
+        console.log('[CMS] Загружено рангов винрейтов: ' + Object.keys(window._cmsWinrates).length);
+        if (callback) callback();
+      })
+      .catch(function(err) {
+        console.warn('[CMS] Ошибка загрузки винрейтов:', err);
+        window._cmsWinrates = null;
+        if (callback) callback();
+      });
+  };
+
+  // Получить WR_DATA для app.js (заменяет хардкод)
+  window.cmsGetWinrateData = function() {
+    return window._cmsWinrates;
+  };
+
+  // ── Админ: редактирование строки винрейта ──
+
+  window.cmsOpenWinrateEditor = function(entry, rank, role) {
+    var isNew = !entry;
+    var data = entry ? Object.assign({}, entry) : {
+      name: '', wr: 50, ch: null, pr: 1, br: 0
+    };
+
+    var overlay = document.createElement('div');
+    overlay.className = 'cms-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var win = document.createElement('div');
+    win.className = 'cms-modal-win';
+
+    win.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">' +
+      '<h3 style="margin:0;color:#fff;font-size:18px;">' + (isNew ? '➕ Новый чемпион' : '✏ ' + data.name) + '</h3>' +
+      '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button></div>';
+
+    var fields = [
+      { key: 'name', label: 'Имя (EN DDragon key)', placeholder: 'Aatrox' },
+      { key: 'wr', label: 'Win Rate %', placeholder: '50.00', type: 'number' },
+      { key: 'pr', label: 'Pick Rate %', placeholder: '5.00', type: 'number' },
+      { key: 'br', label: 'Ban Rate %', placeholder: '2.00', type: 'number' },
+    ];
+
+    var inputs = {};
+    fields.forEach(function(f) {
+      var group = document.createElement('div');
+      group.style.marginBottom = '12px';
+
+      var label = document.createElement('label');
+      label.style.cssText = 'display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;';
+      label.textContent = f.label;
+      group.appendChild(label);
+
+      var input = document.createElement('input');
+      input.type = f.type || 'text';
+      input.className = 'cms-input';
+      if (f.placeholder) input.placeholder = f.placeholder;
+      input.value = data[f.key] != null ? data[f.key] : '';
+      if (f.type === 'number') input.step = '0.01';
+      inputs[f.key] = input;
+      group.appendChild(input);
+      win.appendChild(group);
+    });
+
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:10px;margin-top:18px;';
+
+    var saveBtn = document.createElement('button');
+    saveBtn.className = 'cms-btn-save';
+    saveBtn.textContent = isNew ? '➕ Добавить' : '💾 Сохранить';
+    saveBtn.onclick = function() {
+      var newData = {
+        name: inputs.name.value.trim(),
+        wr: parseFloat(inputs.wr.value) || 0,
+        ch: null,
+        pr: parseFloat(inputs.pr.value) || 0,
+        br: parseFloat(inputs.br.value) || 0,
+      };
+      if (!newData.name) { _showToast('Имя не может быть пустым', 'error'); return; }
+      _saveWinrateEntry(newData, entry, rank, role);
+      overlay.remove();
+    };
+    btnRow.appendChild(saveBtn);
+
+    if (!isNew) {
+      var delBtn = document.createElement('button');
+      delBtn.className = 'cms-btn-delete';
+      delBtn.textContent = '🗑 Удалить';
+      delBtn.onclick = function() {
+        if (!confirm('Удалить "' + data.name + '" из винрейтов?')) return;
+        _deleteWinrateEntry(entry, rank, role);
+        overlay.remove();
+      };
+      btnRow.appendChild(delBtn);
+    }
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'cms-btn-cancel';
+    cancelBtn.textContent = 'Отмена';
+    cancelBtn.onclick = function() { overlay.remove(); };
+    btnRow.appendChild(cancelBtn);
+
+    win.appendChild(btnRow);
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+  };
+
+  function _saveWinrateEntry(newData, oldEntry, rank, role) {
+    var db = firebase.firestore();
+
+    // Обновляем локальные данные
+    if (!window._cmsWinrates) window._cmsWinrates = {};
+    if (!window._cmsWinrates[rank]) window._cmsWinrates[rank] = {};
+    if (!window._cmsWinrates[rank][role]) window._cmsWinrates[rank][role] = [];
+
+    var list = window._cmsWinrates[rank][role];
+    if (oldEntry) {
+      // Редактирование — находим и заменяем
+      var idx = list.findIndex(function(e) { return e.name === oldEntry.name; });
+      if (idx !== -1) list[idx] = newData;
+      else list.push(newData);
+    } else {
+      list.push(newData);
+    }
+
+    // Сохраняем весь документ ранга
+    var docData = {};
+    WR_ROLES.forEach(function(r) {
+      docData[r] = (window._cmsWinrates[rank] && window._cmsWinrates[rank][r]) || [];
+    });
+
+    db.collection('winrates').doc(rank).set(docData)
+      .then(function() {
+        // Changelog
+        db.collection('changelog').add({
+          type: oldEntry ? 'edit' : 'add',
+          entity: 'winrate',
+          name: newData.name + ' (' + rank + '/' + role + ')',
+          newData: JSON.stringify(newData),
+          oldData: oldEntry ? JSON.stringify(oldEntry) : null,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          adminUid: window._currentUser ? window._currentUser.uid : 'unknown'
+        });
+        // Перерисовка
+        if (window.wrprRenderFromCMS) window.wrprRenderFromCMS();
+        _showToast(oldEntry ? 'Винрейт обновлён!' : 'Чемпион добавлен!', 'success');
+      })
+      .catch(function(err) {
+        _showToast('Ошибка: ' + err.message, 'error');
+      });
+  }
+
+  function _deleteWinrateEntry(entry, rank, role) {
+    var db = firebase.firestore();
+
+    if (!window._cmsWinrates || !window._cmsWinrates[rank] || !window._cmsWinrates[rank][role]) return;
+
+    window._cmsWinrates[rank][role] = window._cmsWinrates[rank][role].filter(function(e) {
+      return e.name !== entry.name;
+    });
+
+    var docData = {};
+    WR_ROLES.forEach(function(r) {
+      docData[r] = (window._cmsWinrates[rank] && window._cmsWinrates[rank][r]) || [];
+    });
+
+    db.collection('winrates').doc(rank).set(docData)
+      .then(function() {
+        db.collection('changelog').add({
+          type: 'delete',
+          entity: 'winrate',
+          name: entry.name + ' (' + rank + '/' + role + ')',
+          oldData: JSON.stringify(entry),
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          adminUid: window._currentUser ? window._currentUser.uid : 'unknown'
+        });
+        if (window.wrprRenderFromCMS) window.wrprRenderFromCMS();
+        _showToast('Чемпион удалён из винрейтов', 'success');
+      })
+      .catch(function(err) {
+        _showToast('Ошибка: ' + err.message, 'error');
+      });
+  }
+
 })();

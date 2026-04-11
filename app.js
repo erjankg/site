@@ -2504,6 +2504,19 @@
             if (window.cmsRenderItems) window.cmsRenderItems();
             if (window.cmsRenderRunes) window.cmsRenderRunes();
         });
+        // Загружаем винрейты из Firestore
+        if (typeof window.cmsLoadWinrates === 'function') {
+            window.cmsLoadWinrates(function() {
+                var cmsWR = window.cmsGetWinrateData && window.cmsGetWinrateData();
+                if (cmsWR && Object.keys(cmsWR).length > 0) {
+                    // Заменяем хардкод WR_DATA данными из Firestore
+                    Object.keys(cmsWR).forEach(function(rank) {
+                        WR_DATA[rank] = cmsWR[rank];
+                    });
+                    console.log('[CMS] WR_DATA обновлён из Firestore');
+                }
+            });
+        }
     }
     var _isAdmin = false;
 
@@ -2523,6 +2536,8 @@
                 window.cmsRenderItems && window.cmsRenderItems();
                 window.cmsRenderRunes && window.cmsRenderRunes();
             }
+            // Перерисовать винрейты (добавить кнопки ✏ для админа)
+            if (_isAdmin) wrprRender();
         }).catch(function(err) { console.error('[checkAdmin] ERROR:', err); _isAdmin = false; window._isAdmin = false; });
     }
 
@@ -4778,6 +4793,18 @@
     // Keep openWRPR as alias for sidebar nav compatibility
     window.openWRPR = function() { window.switchMainView('wrpr'); };
 
+    // CMS: позволяет cms.js вызвать перерисовку после сохранения
+    window.wrprRenderFromCMS = function() {
+        // Обновляем WR_DATA из CMS
+        var cmsWR = window.cmsGetWinrateData && window.cmsGetWinrateData();
+        if (cmsWR) {
+            Object.keys(cmsWR).forEach(function(rank) {
+                WR_DATA[rank] = cmsWR[rank];
+            });
+        }
+        wrprRender();
+    };
+
     window.wrprSort = function(col) {
         if (_wrprSortCol === col) {
             _wrprSortDir *= -1;
@@ -4934,8 +4961,45 @@
             tdBR.textContent = d.br + '%';
             tr.appendChild(tdBR);
 
+            // Admin edit button
+            if (window._isAdmin && window.cmsOpenWinrateEditor) {
+                var tdEdit = document.createElement('td');
+                tdEdit.style.cssText = 'padding:4px 2px;text-align:center;width:32px;';
+                var editBtn = document.createElement('button');
+                editBtn.className = 'cms-edit-btn';
+                editBtn.textContent = '✏';
+                editBtn.title = 'Редактировать';
+                editBtn.style.cssText = 'position:relative;top:0;right:0;';
+                (function(entry, r, ro) {
+                    editBtn.onclick = function(e) {
+                        e.stopPropagation();
+                        window.cmsOpenWinrateEditor(entry, r, ro);
+                    };
+                })(d, _wrprRank, _wrprRole);
+                tdEdit.appendChild(editBtn);
+                tr.appendChild(tdEdit);
+            }
+
             tbody.appendChild(tr);
         });
+
+        // Admin: кнопка "Добавить чемпиона"
+        if (window._isAdmin && window.cmsOpenWinrateEditor) {
+            var addRow = document.createElement('tr');
+            addRow.style.cssText = 'border-bottom:none;';
+            var addTd = document.createElement('td');
+            addTd.colSpan = 6;
+            addTd.style.cssText = 'padding:10px;text-align:center;';
+            var addBtn = document.createElement('button');
+            addBtn.style.cssText = 'background:rgba(46,204,113,0.1);border:1.5px dashed rgba(46,204,113,0.4);color:#2ecc71;padding:8px 20px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;';
+            addBtn.textContent = '+ Добавить чемпиона';
+            addBtn.onclick = function() {
+                window.cmsOpenWinrateEditor(null, _wrprRank, _wrprRole);
+            };
+            addTd.appendChild(addBtn);
+            addRow.appendChild(addTd);
+            tbody.appendChild(addRow);
+        }
     }
 
 })();
