@@ -1049,13 +1049,16 @@
           window._cmsPatchnotes.push(d);
         });
 
-        // Заполняем patchMap (последний патч-нот для каждого чемпиона)
+        // Заполняем patchMap (Firestore данные ПЕРЕЗАПИСЫВАЮТ Google Sheets)
         window._cmsPatchnotes.sort(function(a, b) {
           return (b.timestamp && b.timestamp.seconds || 0) - (a.timestamp && a.timestamp.seconds || 0);
         });
-        window.patchMap = window.patchMap || {};
+        if (!window.patchMap) window.patchMap = {};
+        // Сначала помечаем все существующие записи из Google Sheets
+        var firestoreChamps = {};
         window._cmsPatchnotes.forEach(function(note) {
-          if (note.champion && note.type && !window.patchMap[note.champion]) {
+          if (note.champion && note.type && !firestoreChamps[note.champion]) {
+            firestoreChamps[note.champion] = true;
             window.patchMap[note.champion] = {
               patch: note.patch || '',
               change: note.change || '',
