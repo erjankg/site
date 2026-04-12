@@ -599,13 +599,22 @@ function translateTip(tip) {
 
 function translateText(text) {
     if (!text) return text;
+    // Word-boundary aware replacement
+    // Matches term only when NOT surrounded by Cyrillic/Latin letters
+    function replaceWhole(str, from, to) {
+        // Escape regex special chars in the search term
+        var escaped = from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Use lookbehind/lookahead for word boundaries (Cyrillic-aware)
+        var re = new RegExp('(?<![а-яёА-ЯЁa-zA-Z])' + escaped + '(?![а-яёА-ЯЁa-zA-Z])', 'g');
+        return str.replace(re, to);
+    }
     // Stat terms
     for (var i = 0; i < _statTerms.length; i++) {
-        text = text.split(_statTerms[i][0]).join(_statTerms[i][1]);
+        text = replaceWhole(text, _statTerms[i][0], _statTerms[i][1]);
     }
     // Game terms
     for (var i = 0; i < _gameTerms.length; i++) {
-        text = text.split(_gameTerms[i][0]).join(_gameTerms[i][1]);
+        text = replaceWhole(text, _gameTerms[i][0], _gameTerms[i][1]);
     }
     return text;
 }

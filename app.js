@@ -2509,11 +2509,11 @@
             console.log('[CMS] Загружаем винрейты...');
             window.cmsLoadWinrates(function() {
                 var cmsWR = window.cmsGetWinrateData && window.cmsGetWinrateData();
-                console.log('[CMS] cmsWR:', cmsWR ? Object.keys(cmsWR) : 'null');
+                console.log('[CMS] cmsWR загружен, ранги:', cmsWR ? Object.keys(cmsWR) : 'null');
                 if (cmsWR && Object.keys(cmsWR).length > 0) {
                     // Заменяем хардкод WR_DATA данными из Firestore
                     Object.keys(cmsWR).forEach(function(rank) {
-                        WR_DATA[rank] = cmsWR[rank];
+                        if (window.WR_DATA) window.WR_DATA[rank] = cmsWR[rank];
                     });
                     console.log('[CMS] WR_DATA обновлён из Firestore');
                 }
@@ -4754,6 +4754,8 @@
         'грандмастер': { top:[], jungle:[], mid:[], adc:[], support:[] },
         'суверен': { top:[], jungle:[], mid:[], adc:[], support:[] },
     };
+    // Экспортируем для CMS
+    window.WR_DATA = WR_DATA;
 
     var _WRPR_RANKS = [
         {id:'мастер', label:t('Мастер')},
@@ -4804,10 +4806,13 @@
         if (cmsWR) {
             Object.keys(cmsWR).forEach(function(rank) {
                 WR_DATA[rank] = cmsWR[rank];
+                window.WR_DATA[rank] = cmsWR[rank];
             });
         }
         wrprRender();
     };
+    // Экспортируем wrprRender для отладки
+    window.wrprRender = wrprRender;
 
     window.wrprSort = function(col) {
         if (_wrprSortCol === col) {

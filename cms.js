@@ -165,6 +165,9 @@
       container.appendChild(grid);
     });
 
+    // Применяем перевод к новым элементам
+    if (window.applyLang) window.applyLang();
+
     return true;
   };
 
@@ -263,6 +266,9 @@
 
       container.appendChild(grid);
     });
+
+    // Применяем перевод к новым элементам
+    if (window.applyLang) window.applyLang();
 
     return true;
   };
