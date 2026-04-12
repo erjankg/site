@@ -430,6 +430,7 @@ pointer-events: none;
 }
 .patch-dot.buff { background: #2ecc71; box-shadow: 0 0 8px rgba(46,204,113,0.7); }
 .patch-dot.nerf { background: #e74c3c; box-shadow: 0 0 8px rgba(231,76,60,0.7); }
+.patch-dot.adjust { background: #f1c40f; box-shadow: 0 0 8px rgba(241,196,15,0.7); }
 
 .patch-tooltip {
 position: fixed;
@@ -2766,6 +2767,95 @@ select.cms-input { cursor: pointer; }
 .cms-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .cms-toast.success { background: rgba(46, 204, 113, 0.9); color: #fff; }
 .cms-toast.error { background: rgba(231, 76, 60, 0.9); color: #fff; }
+
+/* Patch note admin button */
+.cms-patch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(241,196,15,0.4);
+  background: rgba(241,196,15,0.08);
+  color: #f1c40f;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cms-patch-btn:hover { background: rgba(241,196,15,0.18); }
+
+/* File upload button in CMS editors */
+.cms-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(11, 196, 227, 0.4);
+  background: rgba(11, 196, 227, 0.08);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+.cms-upload-btn:hover { background: rgba(11, 196, 227, 0.18); }
+.cms-upload-progress {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  margin-top: 4px;
+  overflow: hidden;
+}
+.cms-upload-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s;
+  width: 0;
+}
+
+/* Site config editor */
+.cms-config-group {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.cms-config-group-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.cms-config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.cms-config-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+}
+.cms-config-input {
+  width: 80px;
+  padding: 4px 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  outline: none;
+}
+.cms-config-input:focus { border-color: var(--accent); }
 
 /* Кнопка Changelog в профиле */
 .cms-changelog-btn {

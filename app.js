@@ -380,7 +380,7 @@
         var tip = document.createElement('div');
         tip.id = 'patchTip';
         tip.className = 'patch-tooltip';
-        var typeLabel = pInfo.type === 'buff' ? t('🟢 БАФФ') : t('🔴 НЕРФ');
+        var typeLabel = pInfo.type === 'buff' ? t('🟢 БАФФ') : pInfo.type === 'adjust' ? t('🟡 КОРРЕКТИРОВКА') : t('🔴 НЕРФ');
         tip.innerHTML = '<div style="font-weight:900;margin-bottom:4px;">' + typeLabel + ' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Patch ' + pInfo.patch + '</span></div><div style="font-size:11px;line-height:1.4;color:rgba(255,255,255,0.8);">' + pInfo.change + '</div>';
         var rect = el.getBoundingClientRect();
         tip.style.visibility = 'hidden';
@@ -1725,11 +1725,26 @@
             var pDetail = patchMap[name];
             if(pDetail) {
                 var pBadge = document.createElement('div');
-                var pColor = pDetail.type === 'buff' ? '#2ecc71' : '#e74c3c';
-                var pLabel = pDetail.type === 'buff' ? t('🟢 БАФФ') : t('🔴 НЕРФ');
-                pBadge.style.cssText = 'background:rgba('+(pDetail.type==='buff'?'46,204,113':'231,76,60')+',0.12);border:1px solid '+pColor+';border-radius:10px;padding:8px 12px;margin-bottom:12px;';
+                var pColor = pDetail.type === 'buff' ? '#2ecc71' : pDetail.type === 'adjust' ? '#f1c40f' : '#e74c3c';
+                var pLabel = pDetail.type === 'buff' ? t('🟢 БАФФ') : pDetail.type === 'adjust' ? t('🟡 КОРРЕКТИРОВКА') : t('🔴 НЕРФ');
+                var pRgb = pDetail.type === 'buff' ? '46,204,113' : pDetail.type === 'adjust' ? '241,196,15' : '231,76,60';
+                pBadge.style.cssText = 'background:rgba('+pRgb+',0.12);border:1px solid '+pColor+';border-radius:10px;padding:8px 12px;margin-bottom:12px;';
                 pBadge.innerHTML = '<div style="font-size:11px;font-weight:900;color:'+pColor+';margin-bottom:3px;">'+pLabel+' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Patch '+pDetail.patch+'</span></div><div style="font-size:10px;color:rgba(255,255,255,0.7);line-height:1.4;">'+pDetail.change+'</div>';
                 leftCol.appendChild(pBadge);
+            }
+            // Админ: кнопка добавления/редактирования патч-нота
+            if(window._isAdmin && window.cmsOpenPatchnoteEditor) {
+                var patchBtnWrap = document.createElement('div');
+                patchBtnWrap.style.cssText = 'margin-bottom:12px;';
+                var patchBtn = document.createElement('button');
+                patchBtn.className = 'cms-patch-btn';
+                patchBtn.textContent = pDetail ? '✏ ' + t('Патч-нот') : '➕ ' + t('Патч-нот');
+                patchBtn.onclick = function() {
+                    var existing = pDetail && pDetail._id ? { _id: pDetail._id, champion: name, type: pDetail.type, change: pDetail.change, patch: pDetail.patch } : null;
+                    window.cmsOpenPatchnoteEditor(name, existing);
+                };
+                patchBtnWrap.appendChild(patchBtn);
+                leftCol.appendChild(patchBtnWrap);
             }
             // Level slider
             var _cardLvl = lvl;
@@ -2521,6 +2536,16 @@
         } else {
             console.warn('[CMS] cmsLoadWinrates не найден');
         }
+        // Загружаем патч-ноты из Firestore (заменяют Google Sheets данные)
+        if (typeof window.cmsLoadPatchnotes === 'function') {
+            window.cmsLoadPatchnotes(function() {
+                console.log('[CMS] Патч-ноты загружены, patchMap обновлён');
+            });
+        }
+        // Загружаем конфигурацию лейаута
+        if (typeof window.cmsLoadSiteConfig === 'function') {
+            window.cmsLoadSiteConfig();
+        }
     }
     var _isAdmin = false;
 
@@ -2542,6 +2567,10 @@
             }
             // Перерисовать винрейты (добавить кнопки ✏ для админа)
             if (_isAdmin) wrprRender();
+            // Показать/скрыть админ-кнопки в меню
+            document.querySelectorAll('.admin-only').forEach(function(el) {
+                el.style.display = _isAdmin ? '' : 'none';
+            });
         }).catch(function(err) { console.error('[checkAdmin] ERROR:', err); _isAdmin = false; window._isAdmin = false; });
     }
 
@@ -3055,6 +3084,7 @@
                 updateChatUI(false);
                 _isAdmin = false;
                 window._isAdmin = false;
+                document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = 'none'; });
             }
         });
     }

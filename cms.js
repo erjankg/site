@@ -683,6 +683,14 @@
 
       inputs[field.key] = input;
       group.appendChild(input);
+
+      // Кнопка загрузки файла для поля image (Этап 4)
+      if (field.key === 'image' && window.cmsCreateUploadButton) {
+        var storagePath = entityName === 'Предмет' ? 'items' : 'runes';
+        var uploadWidget = window.cmsCreateUploadButton(input, storagePath);
+        group.appendChild(uploadWidget);
+      }
+
       win.appendChild(group);
     });
 
@@ -1010,6 +1018,640 @@
         });
         if (window.wrprRenderFromCMS) window.wrprRenderFromCMS();
         _showToast('Чемпион удалён из винрейтов', 'success');
+      })
+      .catch(function(err) {
+        _showToast('Ошибка: ' + err.message, 'error');
+      });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 📝 ЭТАП 3: ПАТЧ-НОТЫ ИЗ FIRESTORE
+  // ═══════════════════════════════════════════════════════════════
+
+  var PATCH_TYPES = [
+    { id: 'buff', label: '🟢 Бафф', labelEn: '🟢 Buff', color: '#2ecc71' },
+    { id: 'nerf', label: '🔴 Нерф', labelEn: '🔴 Nerf', color: '#e74c3c' },
+    { id: 'adjust', label: '🟡 Корректировка', labelEn: '🟡 Adjust', color: '#f1c40f' }
+  ];
+
+  window._cmsPatchnotes = null;
+
+  // Загрузка патч-нотов из Firestore → заполнение window.patchMap
+  window.cmsLoadPatchnotes = function(callback) {
+    var db = firebase.firestore();
+    window._cmsPatchnotes = [];
+
+    db.collection('patchnotes').get()
+      .then(function(snap) {
+        snap.forEach(function(doc) {
+          var d = doc.data();
+          d._id = doc.id;
+          window._cmsPatchnotes.push(d);
+        });
+
+        // Заполняем patchMap (последний патч-нот для каждого чемпиона)
+        window._cmsPatchnotes.sort(function(a, b) {
+          return (b.timestamp && b.timestamp.seconds || 0) - (a.timestamp && a.timestamp.seconds || 0);
+        });
+        window.patchMap = window.patchMap || {};
+        window._cmsPatchnotes.forEach(function(note) {
+          if (note.champion && note.type && !window.patchMap[note.champion]) {
+            window.patchMap[note.champion] = {
+              patch: note.patch || '',
+              change: note.change || '',
+              type: note.type,
+              _id: note._id
+            };
+          }
+        });
+
+        console.log('[CMS] Загружено патч-нотов: ' + window._cmsPatchnotes.length);
+        if (callback) callback();
+      })
+      .catch(function(err) {
+        console.warn('[CMS] Ошибка загрузки патч-нотов:', err);
+        if (callback) callback();
+      });
+  };
+
+  // Открыть редактор патч-нота (вызывается из openChampDetail)
+  window.cmsOpenPatchnoteEditor = function(champName, existingNote) {
+    var isNew = !existingNote;
+    var data = existingNote ? Object.assign({}, existingNote) : {
+      champion: champName,
+      type: 'buff',
+      change: '',
+      patch: ''
+    };
+
+    var overlay = document.createElement('div');
+    overlay.className = 'cms-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var win = document.createElement('div');
+    win.className = 'cms-modal-win';
+
+    var t = window.translateText || function(s) { return s; };
+
+    win.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">' +
+      '<h3 style="margin:0;color:#fff;font-size:18px;">📝 ' + t('Патч-нот') + ': ' + champName + '</h3>' +
+      '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button></div>';
+
+    // Тип изменения
+    var typeGroup = document.createElement('div');
+    typeGroup.style.marginBottom = '12px';
+    var typeLabel = document.createElement('label');
+    typeLabel.style.cssText = 'display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;';
+    typeLabel.textContent = t('Тип изменения');
+    typeGroup.appendChild(typeLabel);
+
+    var typeSelect = document.createElement('select');
+    typeSelect.className = 'cms-input';
+    PATCH_TYPES.forEach(function(pt) {
+      var o = document.createElement('option');
+      o.value = pt.id;
+      o.textContent = pt.label;
+      if (data.type === pt.id) o.selected = true;
+      typeSelect.appendChild(o);
+    });
+    typeGroup.appendChild(typeSelect);
+    win.appendChild(typeGroup);
+
+    // Версия патча
+    var patchGroup = document.createElement('div');
+    patchGroup.style.marginBottom = '12px';
+    var patchLabel = document.createElement('label');
+    patchLabel.style.cssText = 'display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;';
+    patchLabel.textContent = t('Версия патча');
+    patchGroup.appendChild(patchLabel);
+    var patchInput = document.createElement('input');
+    patchInput.type = 'text';
+    patchInput.className = 'cms-input';
+    patchInput.placeholder = '7.0f';
+    patchInput.value = data.patch || '';
+    patchGroup.appendChild(patchInput);
+    win.appendChild(patchGroup);
+
+    // Описание
+    var descGroup = document.createElement('div');
+    descGroup.style.marginBottom = '12px';
+    var descLabel = document.createElement('label');
+    descLabel.style.cssText = 'display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;';
+    descLabel.textContent = t('Описание изменения');
+    descGroup.appendChild(descLabel);
+    var descInput = document.createElement('textarea');
+    descInput.className = 'cms-input';
+    descInput.rows = 4;
+    descInput.placeholder = 'Базовый AD увеличен с 58 до 62...';
+    descInput.value = data.change || '';
+    descGroup.appendChild(descInput);
+    win.appendChild(descGroup);
+
+    // Кнопки
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:10px;margin-top:18px;';
+
+    var saveBtn = document.createElement('button');
+    saveBtn.className = 'cms-btn-save';
+    saveBtn.textContent = isNew ? '➕ Добавить' : '💾 Сохранить';
+    saveBtn.onclick = function() {
+      var newData = {
+        champion: champName,
+        type: typeSelect.value,
+        patch: patchInput.value.trim(),
+        change: descInput.value.trim(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        adminUid: window._currentUser ? window._currentUser.uid : 'unknown'
+      };
+      _savePatchnote(newData, existingNote ? existingNote._id : null, isNew, champName);
+      overlay.remove();
+    };
+    btnRow.appendChild(saveBtn);
+
+    if (!isNew) {
+      var delBtn = document.createElement('button');
+      delBtn.className = 'cms-btn-delete';
+      delBtn.textContent = '🗑 Удалить';
+      delBtn.onclick = function() {
+        if (!confirm('Удалить патч-нот для "' + champName + '"?')) return;
+        _deletePatchnote(existingNote._id, champName);
+        overlay.remove();
+      };
+      btnRow.appendChild(delBtn);
+    }
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'cms-btn-cancel';
+    cancelBtn.textContent = 'Отмена';
+    cancelBtn.onclick = function() { overlay.remove(); };
+    btnRow.appendChild(cancelBtn);
+
+    win.appendChild(btnRow);
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+  };
+
+  function _savePatchnote(data, docId, isNew, champName) {
+    var db = firebase.firestore();
+    var slug = docId || ('patch-' + _slugify(champName) + '-' + Date.now());
+
+    var ref = db.collection('patchnotes').doc(slug);
+    ref.set(data, { merge: true })
+      .then(function() {
+        // Обновляем локальные данные
+        data._id = slug;
+        if (isNew) {
+          if (!window._cmsPatchnotes) window._cmsPatchnotes = [];
+          window._cmsPatchnotes.push(data);
+        } else {
+          var idx = (window._cmsPatchnotes || []).findIndex(function(n) { return n._id === docId; });
+          if (idx !== -1) window._cmsPatchnotes[idx] = data;
+        }
+
+        // Обновляем patchMap
+        window.patchMap[champName] = {
+          patch: data.patch,
+          change: data.change,
+          type: data.type,
+          _id: slug
+        };
+
+        // Changelog
+        db.collection('changelog').add({
+          type: isNew ? 'add' : 'edit',
+          entity: 'patchnote',
+          name: champName + ' (' + data.type + ')',
+          newData: JSON.stringify(data),
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          adminUid: window._currentUser ? window._currentUser.uid : 'unknown'
+        });
+
+        _showToast(isNew ? 'Патч-нот добавлен!' : 'Патч-нот обновлён!', 'success');
+
+        // Перерисовываем детали чемпиона если открыты
+        if (window.openChampDetail) window.openChampDetail(champName);
+      })
+      .catch(function(err) {
+        _showToast('Ошибка: ' + err.message, 'error');
+      });
+  }
+
+  function _deletePatchnote(docId, champName) {
+    var db = firebase.firestore();
+    db.collection('patchnotes').doc(docId).delete()
+      .then(function() {
+        // Удаляем из локальных данных
+        window._cmsPatchnotes = (window._cmsPatchnotes || []).filter(function(n) { return n._id !== docId; });
+        delete window.patchMap[champName];
+
+        db.collection('changelog').add({
+          type: 'delete',
+          entity: 'patchnote',
+          name: champName,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          adminUid: window._currentUser ? window._currentUser.uid : 'unknown'
+        });
+
+        _showToast('Патч-нот удалён', 'success');
+
+        // Перерисовываем
+        if (window.openChampDetail) window.openChampDetail(champName);
+      })
+      .catch(function(err) {
+        _showToast('Ошибка: ' + err.message, 'error');
+      });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 📸 ЭТАП 4: ЗАГРУЗКА КАРТИНОК ЧЕРЕЗ FIREBASE STORAGE
+  // ═══════════════════════════════════════════════════════════════
+
+  window.cmsUploadImage = function(file, path, onProgress, onComplete, onError) {
+    if (!firebase.storage) {
+      if (onError) onError(new Error('Firebase Storage SDK не подключён'));
+      return;
+    }
+
+    var storageRef = firebase.storage().ref();
+    var fileRef = storageRef.child(path + '/' + Date.now() + '_' + file.name);
+    var uploadTask = fileRef.put(file);
+
+    uploadTask.on('state_changed',
+      function(snapshot) {
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        if (onProgress) onProgress(progress);
+      },
+      function(error) {
+        if (onError) onError(error);
+      },
+      function() {
+        uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+          if (onComplete) onComplete(downloadURL);
+        });
+      }
+    );
+  };
+
+  // Создаёт кнопку загрузки для поля URL картинки
+  window.cmsCreateUploadButton = function(inputEl, storagePath) {
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;align-items:center;gap:8px;margin-top:4px;';
+
+    var uploadBtn = document.createElement('button');
+    uploadBtn.type = 'button';
+    uploadBtn.className = 'cms-upload-btn';
+    uploadBtn.textContent = '📁 ' + (window.translateText ? window.translateText('Загрузить файл') : 'Загрузить файл');
+
+    var fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+
+    var progressWrap = document.createElement('div');
+    progressWrap.className = 'cms-upload-progress';
+    progressWrap.style.display = 'none';
+    var progressBar = document.createElement('div');
+    progressBar.className = 'cms-upload-progress-bar';
+    progressWrap.appendChild(progressBar);
+
+    uploadBtn.onclick = function() { fileInput.click(); };
+
+    fileInput.onchange = function() {
+      var file = fileInput.files[0];
+      if (!file) return;
+
+      // Проверка размера (макс 5MB для Spark)
+      if (file.size > 5 * 1024 * 1024) {
+        _showToast('Файл слишком большой (макс 5MB)', 'error');
+        return;
+      }
+
+      uploadBtn.textContent = '⏳ ' + (window.translateText ? window.translateText('Загрузка...') : 'Загрузка...');
+      uploadBtn.disabled = true;
+      progressWrap.style.display = 'block';
+
+      window.cmsUploadImage(file, storagePath || 'images',
+        function(progress) {
+          progressBar.style.width = progress + '%';
+        },
+        function(url) {
+          inputEl.value = url;
+          inputEl.dispatchEvent(new Event('input'));
+          uploadBtn.textContent = '📁 ' + (window.translateText ? window.translateText('Загрузить файл') : 'Загрузить файл');
+          uploadBtn.disabled = false;
+          progressWrap.style.display = 'none';
+          progressBar.style.width = '0';
+          _showToast(window.translateText ? window.translateText('Файл загружен!') : 'Файл загружен!', 'success');
+        },
+        function(err) {
+          uploadBtn.textContent = '📁 ' + (window.translateText ? window.translateText('Загрузить файл') : 'Загрузить файл');
+          uploadBtn.disabled = false;
+          progressWrap.style.display = 'none';
+          progressBar.style.width = '0';
+          _showToast('Ошибка загрузки: ' + err.message, 'error');
+        }
+      );
+    };
+
+    wrapper.appendChild(uploadBtn);
+    wrapper.appendChild(fileInput);
+    wrapper.appendChild(progressWrap);
+    return wrapper;
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // ⚙ ЭТАП 6: ВИЗУАЛЬНЫЙ РЕДАКТОР ЛЕЙАУТА (siteConfig)
+  // ═══════════════════════════════════════════════════════════════
+
+  window._cmsSiteConfig = null;
+
+  var DEFAULT_CONFIG = {
+    desktop: {
+      sidebarBtnSize: 38,
+      sectionSpacing: 20,
+      headerFontSize: 14
+    },
+    mobile: {
+      sidebarBtnSize: 32,
+      sectionSpacing: 14,
+      headerFontSize: 12
+    },
+    sectionOrder: ['stats', 'winrates', 'items', 'runes', 'tierlist']
+  };
+
+  // Загрузка конфигурации
+  window.cmsLoadSiteConfig = function(callback) {
+    var db = firebase.firestore();
+    db.collection('siteConfig').doc('layout').get()
+      .then(function(doc) {
+        if (doc.exists) {
+          window._cmsSiteConfig = doc.data();
+          console.log('[CMS] Конфигурация лейаута загружена');
+        } else {
+          window._cmsSiteConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+        }
+        _applySiteConfig();
+        if (callback) callback();
+      })
+      .catch(function(err) {
+        console.warn('[CMS] Ошибка загрузки конфигурации:', err);
+        window._cmsSiteConfig = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+        _applySiteConfig();
+        if (callback) callback();
+      });
+  };
+
+  // Применить конфигурацию
+  function _applySiteConfig() {
+    if (!window._cmsSiteConfig) return;
+    var cfg = window._cmsSiteConfig;
+    var isMobile = window.innerWidth <= 768;
+    var device = isMobile ? cfg.mobile : cfg.desktop;
+    if (!device) return;
+
+    var root = document.documentElement;
+    if (device.sidebarBtnSize) root.style.setProperty('--cms-sidebar-btn-size', device.sidebarBtnSize + 'px');
+    if (device.sectionSpacing) root.style.setProperty('--cms-section-spacing', device.sectionSpacing + 'px');
+    if (device.headerFontSize) root.style.setProperty('--cms-header-font-size', device.headerFontSize + 'px');
+
+    // Применяем к сайдбару
+    var sideItems = document.querySelectorAll('.side-item, .side-btn');
+    sideItems.forEach(function(el) {
+      if (device.sidebarBtnSize) {
+        el.style.minHeight = device.sidebarBtnSize + 'px';
+        el.style.fontSize = Math.max(10, device.sidebarBtnSize * 0.35) + 'px';
+      }
+    });
+
+    // Применяем отступы секций
+    var sections = document.querySelectorAll('.side-section');
+    sections.forEach(function(el) {
+      if (device.sectionSpacing) el.style.marginBottom = device.sectionSpacing + 'px';
+    });
+
+    // Порядок секций
+    if (cfg.sectionOrder && cfg.sectionOrder.length) {
+      var sidebar = document.querySelector('.sidebar, #sidebar');
+      if (sidebar) {
+        var sectionMap = {};
+        var children = Array.from(sidebar.children);
+        children.forEach(function(child) {
+          var id = child.id || child.dataset.section;
+          if (id) sectionMap[id] = child;
+        });
+        cfg.sectionOrder.forEach(function(id) {
+          if (sectionMap[id]) sidebar.appendChild(sectionMap[id]);
+        });
+      }
+    }
+  }
+
+  // Переприменяем при ресайзе
+  window.addEventListener('resize', function() {
+    if (window._cmsSiteConfig) _applySiteConfig();
+  });
+
+  // Открыть редактор лейаута
+  window.cmsOpenLayoutEditor = function() {
+    var cfg = window._cmsSiteConfig || JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+    var t = window.translateText || function(s) { return s; };
+
+    var overlay = document.createElement('div');
+    overlay.className = 'cms-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var win = document.createElement('div');
+    win.className = 'cms-modal-win';
+
+    win.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">' +
+      '<h3 style="margin:0;color:#fff;font-size:18px;">⚙ ' + t('Настройки лейаута') + '</h3>' +
+      '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button></div>';
+
+    var inputs = {};
+
+    // Десктоп и мобильный блоки
+    ['desktop', 'mobile'].forEach(function(device) {
+      var group = document.createElement('div');
+      group.className = 'cms-config-group';
+
+      var title = document.createElement('div');
+      title.className = 'cms-config-group-title';
+      title.textContent = device === 'desktop' ? '🖥 ' + t('Десктоп') : '📱 ' + t('Мобильный');
+      group.appendChild(title);
+
+      inputs[device] = {};
+
+      var fields = [
+        { key: 'sidebarBtnSize', label: t('Размер кнопок сайдбара'), min: 24, max: 60, unit: 'px' },
+        { key: 'sectionSpacing', label: t('Отступ секций'), min: 4, max: 40, unit: 'px' },
+        { key: 'headerFontSize', label: t('Размер шрифта заголовков'), min: 8, max: 24, unit: 'px' }
+      ];
+
+      fields.forEach(function(f) {
+        var row = document.createElement('div');
+        row.className = 'cms-config-row';
+
+        var lbl = document.createElement('span');
+        lbl.className = 'cms-config-label';
+        lbl.textContent = f.label;
+        row.appendChild(lbl);
+
+        var rightWrap = document.createElement('div');
+        rightWrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
+
+        var range = document.createElement('input');
+        range.type = 'range';
+        range.min = f.min;
+        range.max = f.max;
+        range.value = (cfg[device] && cfg[device][f.key]) || DEFAULT_CONFIG[device][f.key];
+        range.style.cssText = 'width:80px;height:4px;';
+
+        var valSpan = document.createElement('span');
+        valSpan.className = 'cms-config-label';
+        valSpan.style.width = '40px';
+        valSpan.style.textAlign = 'right';
+        valSpan.textContent = range.value + f.unit;
+
+        range.oninput = function() {
+          valSpan.textContent = this.value + f.unit;
+        };
+
+        rightWrap.appendChild(range);
+        rightWrap.appendChild(valSpan);
+        row.appendChild(rightWrap);
+        group.appendChild(row);
+
+        inputs[device][f.key] = range;
+      });
+
+      win.appendChild(group);
+    });
+
+    // Порядок секций (drag-like: список с кнопками ↑↓)
+    var orderGroup = document.createElement('div');
+    orderGroup.className = 'cms-config-group';
+    var orderTitle = document.createElement('div');
+    orderTitle.className = 'cms-config-group-title';
+    orderTitle.textContent = '📋 ' + t('Порядок секций');
+    orderGroup.appendChild(orderTitle);
+
+    var sectionLabels = {
+      stats: '📊 Stats',
+      winrates: '🏆 Win Rates',
+      items: '⚔ Items',
+      runes: '✨ Runes',
+      tierlist: '🎖 Tier List'
+    };
+    var currentOrder = (cfg.sectionOrder && cfg.sectionOrder.length) ? cfg.sectionOrder.slice() : DEFAULT_CONFIG.sectionOrder.slice();
+
+    var orderList = document.createElement('div');
+    orderList.id = 'cmsOrderList';
+
+    function renderOrderList() {
+      orderList.innerHTML = '';
+      currentOrder.forEach(function(id, idx) {
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:6px;margin-bottom:4px;';
+        var lbl = document.createElement('span');
+        lbl.style.cssText = 'font-size:12px;color:#fff;';
+        lbl.textContent = sectionLabels[id] || id;
+        row.appendChild(lbl);
+
+        var btnWrap = document.createElement('div');
+        btnWrap.style.cssText = 'display:flex;gap:4px;';
+
+        if (idx > 0) {
+          var upBtn = document.createElement('button');
+          upBtn.style.cssText = 'width:24px;height:24px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#fff;border-radius:4px;cursor:pointer;font-size:10px;';
+          upBtn.textContent = '▲';
+          upBtn.onclick = function() {
+            var tmp = currentOrder[idx - 1];
+            currentOrder[idx - 1] = currentOrder[idx];
+            currentOrder[idx] = tmp;
+            renderOrderList();
+          };
+          btnWrap.appendChild(upBtn);
+        }
+        if (idx < currentOrder.length - 1) {
+          var dnBtn = document.createElement('button');
+          dnBtn.style.cssText = 'width:24px;height:24px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#fff;border-radius:4px;cursor:pointer;font-size:10px;';
+          dnBtn.textContent = '▼';
+          dnBtn.onclick = function() {
+            var tmp = currentOrder[idx + 1];
+            currentOrder[idx + 1] = currentOrder[idx];
+            currentOrder[idx] = tmp;
+            renderOrderList();
+          };
+          btnWrap.appendChild(dnBtn);
+        }
+        row.appendChild(btnWrap);
+        orderList.appendChild(row);
+      });
+    }
+    renderOrderList();
+    orderGroup.appendChild(orderList);
+    win.appendChild(orderGroup);
+
+    // Кнопки
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:10px;margin-top:18px;';
+
+    var saveBtn = document.createElement('button');
+    saveBtn.className = 'cms-btn-save';
+    saveBtn.textContent = '💾 ' + t('Сохранить');
+    saveBtn.onclick = function() {
+      var newConfig = {
+        desktop: {},
+        mobile: {},
+        sectionOrder: currentOrder
+      };
+      ['desktop', 'mobile'].forEach(function(device) {
+        for (var key in inputs[device]) {
+          newConfig[device][key] = parseInt(inputs[device][key].value) || DEFAULT_CONFIG[device][key];
+        }
+      });
+      _saveSiteConfig(newConfig);
+      overlay.remove();
+    };
+    btnRow.appendChild(saveBtn);
+
+    var resetBtn = document.createElement('button');
+    resetBtn.className = 'cms-btn-delete';
+    resetBtn.textContent = '↩ Сброс';
+    resetBtn.onclick = function() {
+      _saveSiteConfig(JSON.parse(JSON.stringify(DEFAULT_CONFIG)));
+      overlay.remove();
+    };
+    btnRow.appendChild(resetBtn);
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'cms-btn-cancel';
+    cancelBtn.textContent = 'Отмена';
+    cancelBtn.onclick = function() { overlay.remove(); };
+    btnRow.appendChild(cancelBtn);
+
+    win.appendChild(btnRow);
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+  };
+
+  function _saveSiteConfig(config) {
+    var db = firebase.firestore();
+    db.collection('siteConfig').doc('layout').set(config)
+      .then(function() {
+        window._cmsSiteConfig = config;
+        _applySiteConfig();
+
+        db.collection('changelog').add({
+          type: 'edit',
+          entity: 'siteConfig',
+          name: 'layout',
+          newData: JSON.stringify(config),
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          adminUid: window._currentUser ? window._currentUser.uid : 'unknown'
+        });
+
+        _showToast(window.translateText ? window.translateText('Настройки сохранены!') : 'Настройки сохранены!', 'success');
       })
       .catch(function(err) {
         _showToast('Ошибка: ' + err.message, 'error');

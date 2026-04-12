@@ -57,6 +57,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
 </head>
 <body>
@@ -86,6 +87,8 @@
             <div id="userMenuEmail" class="user-menu-email"></div>
             <button class="user-menu-item" onclick="closeUserMenuAndOpen('profile')" data-i18n="👤 Мой профиль">👤 Мой профиль</button>
             <button class="user-menu-item" onclick="syncNow()" data-i18n="🔄 Синхронизировать">🔄 Синхронизировать</button>
+            <button class="user-menu-item admin-only" onclick="if(window.cmsOpenChangelog)cmsOpenChangelog()" style="display:none" data-i18n="📋 История изменений">📋 История изменений</button>
+            <button class="user-menu-item admin-only" onclick="if(window.cmsOpenLayoutEditor)cmsOpenLayoutEditor()" style="display:none" data-i18n="⚙ Настройки лейаута">⚙ Настройки лейаута</button>
             <button class="user-menu-item" onclick="authSignOut()" data-i18n="🚪 Выйти">🚪 Выйти</button>
         </div>
     </header>
