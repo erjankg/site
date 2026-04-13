@@ -9,6 +9,27 @@
 }
 .stat-icon-range { color: #f39c12; }
 
+/* Column-config button (⚙ рядом с заголовком таблицы) */
+.col-cfg-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-left: 6px;
+  padding: 0;
+  background: rgba(11, 196, 227, 0.08);
+  border: 1px solid rgba(11, 196, 227, 0.3);
+  color: #0bc4e3;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all 0.15s;
+}
+.col-cfg-btn:hover { background: rgba(11, 196, 227, 0.2); transform: rotate(30deg); }
+
 * {
 margin: 0;
 padding: 0;

@@ -111,20 +111,7 @@
     <div id="skeletonOverlay" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;background:var(--bg-card);border-radius:15px;overflow:hidden;padding:8px;"><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div><div class="skeleton-row"><div class="skeleton-cell sk-icon"></div><div class="skeleton-cell sk-name"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div><div class="skeleton-cell sk-stat"></div></div></div>
     <div class="table-hold" id="tableHold">
         <table id="statTable">
-            <thead>
-                <tr>
-                    <th>
-                        <button class="btn-champ-cfg" onclick="openM()">Champions</button>
-
-                    </th>
-                    <th data-short="AD" onclick="doSort('ad')"><span class="stat-icon stat-icon-ad">🗡</span>AD<span id="ar-ad"></span></th>
-                    <th data-short="HP" onclick="doSort('hp')"><span class="stat-icon stat-icon-hp">✚</span>HP<span id="ar-hp"></span></th>
-                    <th data-short="MN" onclick="doSort('mana')"><span class="stat-icon stat-icon-mana">💧</span><span class="mana-label-full">Mana</span><span class="mana-label-short">MN</span><span id="ar-mana"></span></th>
-                    <th data-short="AR" onclick="doSort('armor')"><span class="stat-icon stat-icon-armor">🛡</span>AR<span id="ar-armor"></span></th>
-                    <th data-short="MR" onclick="doSort('mrez')"><span class="stat-icon stat-icon-mr">✦</span>MR<span id="ar-mrez"></span></th>
-                    <th data-short="RNG" class="col-range" onclick="doSort('range')"><span class="stat-icon stat-icon-range">🏹</span>RNG<span id="ar-range"></span></th>
-                </tr>
-            </thead>
+            <thead id="statThead"></thead>
             <tbody id="statBody"></tbody>
         </table>
     </div>
@@ -137,6 +124,7 @@
     <span style="font-size:18px;margin-right:8px;">📊</span>
     <span class="wrpr-title">WinRate &amp; PickRate</span>
     <span class="wrpr-update" data-i18n="обновлено 04.04.2026">обновлено 04.04.2026</span>
+    <button class="col-cfg-btn" style="margin-left:auto;" onclick="openWrprColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button>
   </div>
   <!-- Rank filters -->
   <div style="display:flex;gap:6px;padding:10px 12px 8px;overflow-x:auto;justify-content:center;" id="wrprRankRow"></div>
@@ -145,15 +133,7 @@
   <!-- Table -->
   <div>
     <table id="wrprTable" style="width:100%;border-collapse:collapse;font-size:14px;">
-      <thead id="wrprThead">
-        <tr class="wrpr-thead-row">
-          <th class="wrpr-th wrpr-th-num">#</th>
-          <th class="wrpr-th wrpr-th-name" data-i18n="Чемпион">Чемпион</th>
-          <th id="wrprThWR" onclick="wrprSort('wr')" class="wrpr-th wrpr-th-sort">WR% <span id="wrprArWR"></span></th>
-          <th id="wrprThPR" onclick="wrprSort('pr')" class="wrpr-th wrpr-th-sort">PR% <span id="wrprArPR"></span></th>
-          <th id="wrprThBR" onclick="wrprSort('br')" class="wrpr-th wrpr-th-sort">BR% <span id="wrprArBR"></span></th>
-        </tr>
-      </thead>
+      <thead id="wrprThead"></thead>
       <tbody id="wrprTbody"></tbody>
     </table>
     <div id="wrprNoData" data-i18n="Данные для этого ранга скоро появятся">Данные для этого ранга скоро появятся</div>

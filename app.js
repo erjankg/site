@@ -162,6 +162,50 @@
     let raw = [];
     let patchMap = window.patchMap = {};
 
+    // ═══ Column settings для таблицы STATS ═══
+    const STATS_COL_DEFS = [
+        { key:'ad',    label:'AD',   icon:'🗡', iconClass:'stat-icon-ad' },
+        { key:'hp',    label:'HP',   icon:'✚', iconClass:'stat-icon-hp' },
+        { key:'mana',  label:'Mana', labelShort:'MN', icon:'💧', iconClass:'stat-icon-mana' },
+        { key:'armor', label:'AR',   icon:'🛡', iconClass:'stat-icon-armor' },
+        { key:'mrez',  label:'MR',   icon:'✦', iconClass:'stat-icon-mr' },
+        { key:'range', label:'RNG',  icon:'🏹', iconClass:'stat-icon-range', desktopOnly:true },
+    ];
+    function getStatsCols(){
+        var cfg = window._colSettings ? window._colSettings.load('stats', STATS_COL_DEFS) : { order: STATS_COL_DEFS.map(function(d){return d.key;}), hidden: [] };
+        var hiddenSet = new Set(cfg.hidden);
+        return cfg.order
+            .map(function(k){ return STATS_COL_DEFS.find(function(d){ return d.key === k; }); })
+            .filter(function(d){ return d && !hiddenSet.has(d.key); });
+    }
+    function buildStatsHeader(){
+        var thead = document.getElementById('statThead');
+        if(!thead) return;
+        var cols = getStatsCols();
+        var html = '<tr><th><button class="btn-champ-cfg" onclick="openM()">Champions</button>' +
+            '<button class="col-cfg-btn" onclick="openStatsColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button></th>';
+        cols.forEach(function(c){
+            var label = c.key === 'mana'
+                ? '<span class="mana-label-full">Mana</span><span class="mana-label-short">MN</span>'
+                : c.label;
+            var cls = c.desktopOnly ? 'col-range' : '';
+            html += '<th data-short="' + c.label + '" class="' + cls + '" onclick="doSort(\'' + c.key + '\')">' +
+                '<span class="stat-icon ' + c.iconClass + '">' + c.icon + '</span>' +
+                label +
+                '<span id="ar-' + c.key + '"></span>' +
+                '</th>';
+        });
+        html += '</tr>';
+        thead.innerHTML = html;
+    }
+    window.openStatsColSettings = function(){
+        // Для модалки скрываем range из desktopOnly? Нет — пусть тоже можно скрывать.
+        window._colSettings.open('stats', STATS_COL_DEFS, 'Настройка столбцов STATS', function(){
+            buildStatsHeader();
+            renderFull();
+        });
+    };
+
     // ═══ MATCHUP DATA (localStorage) ═══
     // strongVs = против кого силён, weakVs = против кого слаб, combos = комбо
     function getMatchups() {
@@ -376,11 +420,12 @@
     function renderUpdate() {
         const table = document.getElementById('statTable');
         table.classList.toggle('focus-mode', colFocus);
-        ['ad','hp','mana','armor','mrez','range'].forEach(k => {
-            var el = document.getElementById('ar-'+k);
+        const cols = getStatsCols();
+        cols.forEach(c => {
+            var el = document.getElementById('ar-'+c.key);
             if(!el) return;
-            el.innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
-            el.style.color = (k===sK) ? '#e74c3c' : '';
+            el.innerText = (c.key===sK) ? (sD==='desc'?'▼':'▲') : '';
+            el.style.color = (c.key===sK) ? '#e74c3c' : '';
         });
         const { data, thres } = computeData();
         const rows = document.querySelectorAll('#statBody tr');
@@ -388,16 +433,22 @@
         if(rows.length !== data.length) { renderFull(); return; }
         data.forEach((item, idx) => {
             const tr = rows[idx];
-            // update row-num
             const numEl = tr.querySelector('.row-num');
             if(numEl) numEl.textContent = idx + 1;
-            // update stat tds (skip first td = champ cell)
             const tds = tr.querySelectorAll('td:not(:first-child)');
-            ['ad','hp','mana','armor','mrez'].forEach((k, ki) => {
+            cols.forEach((c, ki) => {
                 const td = tds[ki];
                 if(!td) return;
+                const k = c.key;
                 const v = item[k];
                 let cls = (k===sK) ? 'active-col ' : '';
+                if(k === 'range') {
+                    // Range без tier-coloring
+                    cls = (c.desktopOnly ? 'col-range ' : '') + (k===sK ? 'active-col' : '');
+                    td.className = cls.trim();
+                    td.textContent = Math.round(v);
+                    return;
+                }
                 if(v >= thres[k].s) cls += 's';
                 else if(v >= thres[k].a) cls += 'a';
                 else if(v <= thres[k].c) cls += 'c';
@@ -408,15 +459,7 @@
                 else if(k==='mana' && v===0) txt = '0';
                 td.textContent = txt;
             });
-            // range td (last)
-            const tdRng = tds[5];
-            if(tdRng) {
-                let cls = 'col-range' + (sK==='range' ? ' active-col' : '');
-                tdRng.className = cls;
-                tdRng.textContent = Math.round(item.range);
-            }
         });
-
     }
 
     // FULL RENDER — rebuilds DOM from scratch
@@ -425,11 +468,12 @@
         const body = document.getElementById('statBody');
         const table = document.getElementById('statTable');
         table.classList.toggle('focus-mode', colFocus);
-        ['ad','hp','mana','armor','mrez','range'].forEach(k => {
-            var el = document.getElementById('ar-'+k);
+        const colsH = getStatsCols();
+        colsH.forEach(c => {
+            var el = document.getElementById('ar-'+c.key);
             if(!el) return;
-            el.innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
-            el.style.color = (k===sK) ? '#e74c3c' : '';
+            el.innerText = (c.key===sK) ? (sD==='desc'?'▼':'▲') : '';
+            el.style.color = (c.key===sK) ? '#e74c3c' : '';
         });
         const { data, thres } = computeData();
         body.innerHTML = '';
@@ -485,33 +529,35 @@
             }
             tdChamp.appendChild(btnX); tdChamp.appendChild(champWrap); tdChamp.appendChild(nameSpan);
             tr.appendChild(tdChamp);
-            ['ad','hp','mana','armor','mrez'].forEach(k => {
+            colsH.forEach(c => {
+                const k = c.key;
                 const v = item[k];
-                let cls = (k===sK) ? 'active-col ' : '';
-                if(v >= thres[k].s) cls += 's';
-                else if(v >= thres[k].a) cls += 'a';
-                else if(v <= thres[k].c) cls += 'c';
-                else cls += 'b';
-                let txt = Math.round(v);
-                if(k==='mana' && item.res==='Energy') txt = 'NRG';
-                else if(k==='mana' && v===0) txt = '0';
                 const td = document.createElement('td');
-                td.className = cls; td.textContent = txt;
-                td.addEventListener('mouseenter', (ev) => showT(ev, item.g[k]));
-                td.addEventListener('mousemove', moveT);
-                td.addEventListener('mouseleave', hideT);
+                if(k === 'range') {
+                    td.className = (c.desktopOnly ? 'col-range' : '') + (sK==='range' ? ' active-col' : '');
+                    td.textContent = Math.round(v);
+                    if(item.g.range) {
+                        td.addEventListener('mouseenter', (ev) => showT(ev, item.g.range));
+                        td.addEventListener('mousemove', moveT);
+                        td.addEventListener('mouseleave', hideT);
+                    }
+                } else {
+                    let cls = (k===sK) ? 'active-col ' : '';
+                    if(v >= thres[k].s) cls += 's';
+                    else if(v >= thres[k].a) cls += 'a';
+                    else if(v <= thres[k].c) cls += 'c';
+                    else cls += 'b';
+                    let txt = Math.round(v);
+                    if(k==='mana' && item.res==='Energy') txt = 'NRG';
+                    else if(k==='mana' && v===0) txt = '0';
+                    td.className = cls;
+                    td.textContent = txt;
+                    td.addEventListener('mouseenter', (ev) => showT(ev, item.g[k]));
+                    td.addEventListener('mousemove', moveT);
+                    td.addEventListener('mouseleave', hideT);
+                }
                 tr.appendChild(td);
             });
-            // Range column (desktop only)
-            const tdRng = document.createElement('td');
-            tdRng.className = 'col-range' + (sK==='range' ? ' active-col' : '');
-            tdRng.textContent = Math.round(item.range);
-            if(item.g.range) {
-                tdRng.addEventListener('mouseenter', (ev) => showT(ev, item.g.range));
-                tdRng.addEventListener('mousemove', moveT);
-                tdRng.addEventListener('mouseleave', hideT);
-            }
-            tr.appendChild(tdRng);
             body.appendChild(tr);
         });
     }
@@ -622,6 +668,7 @@
     }
 
     function initApp() {
+        buildStatsHeader();
         document.getElementById('lvlRange').oninput = (e) => {
             lvl = +e.target.value;
             const lbl = document.getElementById('lvlLabel');
@@ -4899,28 +4946,67 @@
         });
     }
 
+    var WRPR_COL_DEFS = [
+        { key:'wr', label:'WR%' },
+        { key:'pr', label:'PR%' },
+        { key:'br', label:'BR%' },
+    ];
+    function getWrprCols() {
+        var cfg = window._colSettings ? window._colSettings.load('wrpr', WRPR_COL_DEFS) : { order: WRPR_COL_DEFS.map(function(d){return d.key;}), hidden: [] };
+        var hidden = new Set(cfg.hidden);
+        return cfg.order
+            .map(function(k){ return WRPR_COL_DEFS.find(function(d){ return d.key === k; }); })
+            .filter(function(d){ return d && !hidden.has(d.key); });
+    }
+    function wrprBuildHeader() {
+        var thead = document.getElementById('wrprThead');
+        if(!thead) return;
+        var cols = getWrprCols();
+        var html = '<tr class="wrpr-thead-row">' +
+            '<th class="wrpr-th wrpr-th-num">#</th>' +
+            '<th class="wrpr-th wrpr-th-name" data-i18n="Чемпион">Чемпион</th>';
+        cols.forEach(function(c){
+            var upper = c.key.toUpperCase();
+            html += '<th id="wrprTh' + upper + '" onclick="wrprSort(\'' + c.key + '\')" class="wrpr-th wrpr-th-sort">' +
+                c.label + ' <span id="wrprAr' + upper + '"></span></th>';
+        });
+        html += '</tr>';
+        thead.innerHTML = html;
+    }
+    window.openWrprColSettings = function(){
+        window._colSettings.open('wrpr', WRPR_COL_DEFS, 'Настройка столбцов WinRate', function(){
+            wrprBuildHeader();
+            wrprRender();
+        });
+    };
+
     function wrprRender() {
         var tbody = document.getElementById('wrprTbody');
         var noData = document.getElementById('wrprNoData');
         if (!tbody) return;
 
+        // Build header if empty (lazy)
+        if (!document.getElementById('wrprThead').innerHTML.trim()) {
+            wrprBuildHeader();
+        }
+
+        var cols = getWrprCols();
+
         // Update sort arrows
-        ['WR','PR','BR'].forEach(function(c) {
-            var el = document.getElementById('wrprAr' + c);
+        cols.forEach(function(c) {
+            var el = document.getElementById('wrprAr' + c.key.toUpperCase());
             if (!el) return;
-            var col = c.toLowerCase();
-            if (_wrprSortCol === col) {
+            if (_wrprSortCol === c.key) {
                 el.textContent = _wrprSortDir === -1 ? ' ▼' : ' ▲';
             } else {
                 el.textContent = '';
             }
         });
         // Update header highlight
-        ['wrprThWR','wrprThPR','wrprThBR'].forEach(function(id) {
-            var el = document.getElementById(id);
+        cols.forEach(function(c) {
+            var el = document.getElementById('wrprTh' + c.key.toUpperCase());
             if (!el) return;
-            var col = id.replace('wrprTh','').toLowerCase();
-            el.style.color = _wrprSortCol === col ? 'var(--sel-text)' : 'rgba(255,255,255,0.7)';
+            el.style.color = _wrprSortCol === c.key ? 'var(--sel-text)' : 'rgba(255,255,255,0.7)';
         });
 
         var rankData = WR_DATA[_wrprRank];
@@ -4972,24 +5058,22 @@
             }
             tr.appendChild(tdC);
 
-            // WR
-            var tdWR = document.createElement('td');
-            tdWR.style.cssText = 'padding:8px 7px;text-align:center;font-weight:900;font-size:14px;';
-            var wrColor = d.wr >= 52 ? '#2ecc71' : d.wr >= 50 ? '#f1c40f' : '#e74c3c';
-            tdWR.innerHTML = '<span style="color:' + wrColor + ';">' + d.wr.toFixed(2) + '%</span>';
-            tr.appendChild(tdWR);
-
-            // PR
-            var tdPR = document.createElement('td');
-            tdPR.style.cssText = 'padding:8px 7px;text-align:center;font-size:14px;color:rgba(255,255,255,0.85);font-weight:700;';
-            tdPR.textContent = d.pr + '%';
-            tr.appendChild(tdPR);
-
-            // BR
-            var tdBR = document.createElement('td');
-            tdBR.style.cssText = 'padding:8px 7px;text-align:center;font-size:14px;color:rgba(255,255,255,0.6);';
-            tdBR.textContent = d.br + '%';
-            tr.appendChild(tdBR);
+            // WR/PR/BR в порядке конфига
+            cols.forEach(function(c){
+                var td = document.createElement('td');
+                if (c.key === 'wr') {
+                    td.style.cssText = 'padding:8px 7px;text-align:center;font-weight:900;font-size:14px;';
+                    var wrColor = d.wr >= 52 ? '#2ecc71' : d.wr >= 50 ? '#f1c40f' : '#e74c3c';
+                    td.innerHTML = '<span style="color:' + wrColor + ';">' + d.wr.toFixed(2) + '%</span>';
+                } else if (c.key === 'pr') {
+                    td.style.cssText = 'padding:8px 7px;text-align:center;font-size:14px;color:rgba(255,255,255,0.85);font-weight:700;';
+                    td.textContent = d.pr + '%';
+                } else if (c.key === 'br') {
+                    td.style.cssText = 'padding:8px 7px;text-align:center;font-size:14px;color:rgba(255,255,255,0.6);';
+                    td.textContent = d.br + '%';
+                }
+                tr.appendChild(td);
+            });
 
             // Admin edit button
             if (window._isAdmin && window.cmsOpenWinrateEditor) {
@@ -5018,7 +5102,7 @@
             var addRow = document.createElement('tr');
             addRow.style.cssText = 'border-bottom:none;';
             var addTd = document.createElement('td');
-            addTd.colSpan = 6;
+            addTd.colSpan = 2 + cols.length + (window._isAdmin ? 1 : 0);
             addTd.style.cssText = 'padding:10px;text-align:center;';
             var addBtn = document.createElement('button');
             addBtn.style.cssText = 'background:rgba(46,204,113,0.1);border:1.5px dashed rgba(46,204,113,0.4);color:#2ecc71;padding:8px 20px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;';
@@ -5032,4 +5116,114 @@
         }
     }
 
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// Table column settings — универсальная система порядка/видимости столбцов
+// Хранит конфиг в localStorage per-table, рисует модалку настроек.
+// ═══════════════════════════════════════════════════════════════════
+(function(){
+    function storageKey(id){ return 'colCfg_' + id; }
+    function loadConfig(tableId, defs){
+        try {
+            var raw = localStorage.getItem(storageKey(tableId));
+            if(!raw) return defaultConfig(defs);
+            var c = JSON.parse(raw);
+            // Валидация: все ключи из defs должны быть учтены
+            var defKeys = defs.map(function(d){ return d.key; });
+            var order = (c.order || []).filter(function(k){ return defKeys.indexOf(k) !== -1; });
+            // Добавить недостающие (новые столбцы после обновления)
+            defKeys.forEach(function(k){ if(order.indexOf(k) === -1) order.push(k); });
+            var hidden = Array.isArray(c.hidden) ? c.hidden.filter(function(k){ return defKeys.indexOf(k) !== -1; }) : [];
+            return { order: order, hidden: hidden };
+        } catch(e){ return defaultConfig(defs); }
+    }
+    function defaultConfig(defs){
+        return { order: defs.map(function(d){ return d.key; }), hidden: [] };
+    }
+    function saveConfig(tableId, cfg){
+        try { localStorage.setItem(storageKey(tableId), JSON.stringify(cfg)); } catch(e){}
+    }
+    function resetConfig(tableId){
+        try { localStorage.removeItem(storageKey(tableId)); } catch(e){}
+    }
+
+    function openModal(tableId, defs, title, onApply){
+        var cfg = loadConfig(tableId, defs);
+        var overlay = document.createElement('div');
+        overlay.className = 'cms-modal-overlay';
+        overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
+
+        var win = document.createElement('div');
+        win.className = 'cms-modal-win';
+        win.style.maxWidth = '420px';
+        win.innerHTML = '<h3 style="margin:0 0 16px;color:#fff;font-size:16px;">⚙ ' + title + '</h3>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Галочка — показывать. Стрелки — менять порядок.</div>' +
+            '<div id="colListBox" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>' +
+            '<div style="display:flex;gap:8px;">' +
+              '<button id="colResetBtn" class="cms-btn-delete" type="button">Сброс</button>' +
+              '<button id="colApplyBtn" class="cms-btn-save" type="button">Применить</button>' +
+              '<button id="colCloseBtn" class="cms-btn-cancel" type="button">Отмена</button>' +
+            '</div>';
+        overlay.appendChild(win);
+        document.body.appendChild(overlay);
+
+        var order = cfg.order.slice();
+        var hidden = new Set(cfg.hidden);
+
+        function render(){
+            var box = win.querySelector('#colListBox');
+            box.innerHTML = '';
+            order.forEach(function(key, idx){
+                var def = defs.find(function(d){ return d.key === key; });
+                if(!def) return;
+                var row = document.createElement('div');
+                row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;';
+                var locked = def.locked;
+                row.innerHTML =
+                    '<input type="checkbox" ' + (!hidden.has(key) ? 'checked' : '') + (locked ? ' disabled' : '') + ' data-key="'+key+'" style="width:16px;height:16px;cursor:'+(locked?'not-allowed':'pointer')+';">' +
+                    '<span style="flex:1;color:#fff;font-size:13px;font-weight:600;">' + (def.icon ? def.icon + ' ' : '') + def.label + (locked ? ' <span style="color:rgba(255,255,255,0.4);font-size:10px;">(нельзя скрыть)</span>' : '') + '</span>' +
+                    '<button data-dir="up" data-idx="'+idx+'" '+(idx===0?'disabled':'')+' style="width:28px;height:28px;background:rgba(11,196,227,0.1);border:1px solid rgba(11,196,227,0.3);color:#0bc4e3;border-radius:6px;cursor:pointer;'+(idx===0?'opacity:0.3;':'')+'">↑</button>' +
+                    '<button data-dir="down" data-idx="'+idx+'" '+(idx===order.length-1?'disabled':'')+' style="width:28px;height:28px;background:rgba(11,196,227,0.1);border:1px solid rgba(11,196,227,0.3);color:#0bc4e3;border-radius:6px;cursor:pointer;'+(idx===order.length-1?'opacity:0.3;':'')+'">↓</button>';
+                box.appendChild(row);
+            });
+            box.querySelectorAll('input[type=checkbox]').forEach(function(cb){
+                cb.addEventListener('change', function(){
+                    var k = cb.dataset.key;
+                    if(cb.checked) hidden.delete(k); else hidden.add(k);
+                });
+            });
+            box.querySelectorAll('button[data-dir]').forEach(function(btn){
+                btn.addEventListener('click', function(){
+                    var idx = +btn.dataset.idx;
+                    var dir = btn.dataset.dir;
+                    var ni = dir === 'up' ? idx - 1 : idx + 1;
+                    if(ni < 0 || ni >= order.length) return;
+                    var tmp = order[idx]; order[idx] = order[ni]; order[ni] = tmp;
+                    render();
+                });
+            });
+        }
+        render();
+
+        win.querySelector('#colApplyBtn').onclick = function(){
+            saveConfig(tableId, { order: order, hidden: Array.from(hidden) });
+            overlay.remove();
+            if(onApply) onApply();
+        };
+        win.querySelector('#colCloseBtn').onclick = function(){ overlay.remove(); };
+        win.querySelector('#colResetBtn').onclick = function(){
+            if(!confirm('Сбросить порядок и видимость столбцов к дефолту?')) return;
+            resetConfig(tableId);
+            overlay.remove();
+            if(onApply) onApply();
+        };
+    }
+
+    window._colSettings = {
+        load: loadConfig,
+        save: saveConfig,
+        reset: resetConfig,
+        open: openModal
+    };
 })();
