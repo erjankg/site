@@ -2,6 +2,13 @@
    Wild Rift Stats — Styles
    ═══════════════════════════════════════════ */
 
+/* Range column — desktop only */
+@media (max-width: 900px) {
+  #statTable th.col-range,
+  #statTable td.col-range { display: none; }
+}
+.stat-icon-range { color: #f39c12; }
+
 * {
 margin: 0;
 padding: 0;

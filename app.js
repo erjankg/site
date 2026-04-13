@@ -257,6 +257,7 @@
                 mn_b: +o["Mana_Base"], mn_g: +o["Mana_Growth"],
                 ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"],
                 mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
+                rng_b: +o["Range_Base"] || 0, rng_g: +o["Range_Growth"] || 0,
                 res: o["Resource"],
                 is: { 
                     Top: +o["Is_Top"]==1, 
@@ -327,7 +328,8 @@
             mana: f(x.mn_b, x.mn_g),
             armor:f(x.ar_b, x.ar_g),
             mrez: f(x.mr_b, x.mr_g),
-            g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g}
+            range:f(x.rng_b, x.rng_g),
+            g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g, range:x.rng_g}
         })).sort((a,b) => {
             var aTop = _movedToTop.has(a.name) || pinned.has(a.name) ? 1 : 0;
             var bTop = _movedToTop.has(b.name) || pinned.has(b.name) ? 1 : 0;
@@ -374,8 +376,9 @@
     function renderUpdate() {
         const table = document.getElementById('statTable');
         table.classList.toggle('focus-mode', colFocus);
-        ['ad','hp','mana','armor','mrez'].forEach(k => {
+        ['ad','hp','mana','armor','mrez','range'].forEach(k => {
             var el = document.getElementById('ar-'+k);
+            if(!el) return;
             el.innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
             el.style.color = (k===sK) ? '#e74c3c' : '';
         });
@@ -405,6 +408,13 @@
                 else if(k==='mana' && v===0) txt = '0';
                 td.textContent = txt;
             });
+            // range td (last)
+            const tdRng = tds[5];
+            if(tdRng) {
+                let cls = 'col-range' + (sK==='range' ? ' active-col' : '');
+                tdRng.className = cls;
+                tdRng.textContent = Math.round(item.range);
+            }
         });
 
     }
@@ -415,8 +425,9 @@
         const body = document.getElementById('statBody');
         const table = document.getElementById('statTable');
         table.classList.toggle('focus-mode', colFocus);
-        ['ad','hp','mana','armor','mrez'].forEach(k => {
+        ['ad','hp','mana','armor','mrez','range'].forEach(k => {
             var el = document.getElementById('ar-'+k);
+            if(!el) return;
             el.innerText = (k===sK) ? (sD==='desc'?'▼':'▲') : '';
             el.style.color = (k===sK) ? '#e74c3c' : '';
         });
@@ -491,6 +502,16 @@
                 td.addEventListener('mouseleave', hideT);
                 tr.appendChild(td);
             });
+            // Range column (desktop only)
+            const tdRng = document.createElement('td');
+            tdRng.className = 'col-range' + (sK==='range' ? ' active-col' : '');
+            tdRng.textContent = Math.round(item.range);
+            if(item.g.range) {
+                tdRng.addEventListener('mouseenter', (ev) => showT(ev, item.g.range));
+                tdRng.addEventListener('mousemove', moveT);
+                tdRng.addEventListener('mouseleave', hideT);
+            }
+            tr.appendChild(tdRng);
             body.appendChild(tr);
         });
     }
@@ -4978,7 +4999,7 @@
                 editBtn.className = 'cms-edit-btn';
                 editBtn.textContent = '✏';
                 editBtn.title = 'Редактировать';
-                editBtn.style.cssText = 'position:relative;top:0;right:0;';
+                editBtn.style.cssText = 'position:static;opacity:1;';
                 (function(entry, r, ro) {
                     editBtn.onclick = function(e) {
                         e.stopPropagation();
