@@ -116,11 +116,10 @@
     const G_URL = window.G_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
 
     // ═══════════════════════════════════════════════════════════════
-    // 🔄 ЛИСТ 2: Патч-ноты (бафф/нерф кружочки на иконках)
-    // Столбцы: Champion | Patch | Change | Type (buff или nerf)
-    // Чтобы поменять: File → Share → Publish to web → выбери Лист 2 → TSV
+    // 🔄 Патч-ноты теперь управляются через Firestore (коллекция patchnotes)
+    // Админ добавляет/редактирует/удаляет через кнопку 📝 Патч-нот на карточке чемпиона
     // ═══════════════════════════════════════════════════════════════
-    const PATCH_URL = window.PATCH_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=1129379769&single=true&output=tsv';
+    const PATCH_URL = null;
 
 
     // Map champion names to Data Dragon keys
@@ -229,41 +228,12 @@
         let t;
         try {
             console.log('Fetching champions from:', G_URL);
-            // Fetch both in parallel
-            var promises = [fetch(G_URL).then(function(r){ return r.text(); })];
-            if(PATCH_URL) promises.push(fetch(PATCH_URL).then(function(r){ return r.text(); }).catch(function(){ return ''; }));
-            var results = await Promise.all(promises);
-            t = results[0];
+            t = await fetch(G_URL).then(function(r){ return r.text(); });
             console.log('Data received, length:', t.length);
             if(t.trim().startsWith('<!') || t.trim().startsWith('<html')) {
                 throw new Error('Google Sheet вернул HTML вместо TSV — лист не опубликован!');
             }
-            // Parse patch data if available
-            if(results[1]) {
-                try {
-                    var pt = results[1];
-                    if(!pt.trim().startsWith('<!')) {
-                        var pLines = pt.trim().split('\n');
-                        var pHeads = pLines[0].split('\t').map(function(h){ return h.trim(); });
-                        pLines.slice(1).forEach(function(line) {
-                            var cols = line.split('\t');
-                            var obj = {};
-                            pHeads.forEach(function(h, i) { obj[h] = (cols[i]||'').trim(); });
-                            if(obj['Champion'] && obj['Type']) {
-                                var pType = (obj['Type']||'').toLowerCase().trim();
-                                if(pType === 'buff' || pType === 'nerf') {
-                                    patchMap[obj['Champion']] = {
-                                        patch: obj['Patch'] || '',
-                                        change: obj['Change'] || '',
-                                        type: pType
-                                    };
-                                }
-                            }
-                        });
-                        console.log('Patch data loaded:', Object.keys(patchMap).length, 'champions');
-                    }
-                } catch(pe) { console.warn('Patch parse error:', pe); }
-            }
+            // Патч-ноты теперь грузятся из Firestore через cmsLoadPatchnotes()
         } catch(fetchErr) {
             console.error('Fetch failed:', fetchErr);
             const skEl = document.getElementById('skeletonOverlay');

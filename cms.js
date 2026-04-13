@@ -1265,6 +1265,50 @@
       });
   }
 
+  // Очистить все патч-ноты (для конца сезона)
+  window.cmsClearAllPatchnotes = function() {
+    if (!window._isAdmin) return;
+    var count = (window._cmsPatchnotes || []).length;
+    if (count === 0) {
+      _showToast('Нет патч-нотов для удаления', 'error');
+      return;
+    }
+    if (!confirm('Удалить ВСЕ патч-ноты (' + count + ' шт.)? Это нельзя отменить (только через changelog).')) return;
+    if (!confirm('Точно? Все бафф/нерф/корректировки исчезнут у всех пользователей.')) return;
+
+    var db = firebase.firestore();
+    var batch = db.batch();
+    var notes = window._cmsPatchnotes.slice();
+
+    notes.forEach(function(note) {
+      batch.delete(db.collection('patchnotes').doc(note._id));
+    });
+
+    batch.commit()
+      .then(function() {
+        // Changelog — одна запись для всей операции
+        db.collection('changelog').add({
+          type: 'bulk-delete',
+          entity: 'patchnote',
+          name: 'Все патч-ноты (' + count + ' шт.)',
+          oldData: JSON.stringify(notes),
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          adminUid: window._currentUser ? window._currentUser.uid : 'unknown'
+        });
+
+        window._cmsPatchnotes = [];
+        window.patchMap = {};
+        _showToast('Удалено патч-нотов: ' + count, 'success');
+
+        // Перерисовать все представления с чемпионами
+        if (window.render) window.render();
+        if (window.wrprRender) window.wrprRender();
+      })
+      .catch(function(err) {
+        _showToast('Ошибка: ' + err.message, 'error');
+      });
+  };
+
   // ═══════════════════════════════════════════════════════════════
   // 📸 ЭТАП 4: ЗАГРУЗКА КАРТИНОК ЧЕРЕЗ FIREBASE STORAGE
   // ═══════════════════════════════════════════════════════════════

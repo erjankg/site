@@ -476,6 +476,7 @@ var _dyn = {
 'Размер шрифта заголовков':'Header Font Size','Настройки сохранены!':'Settings saved!',
 'Порядок секций':'Section Order',
 '📋 История изменений':'📋 Changelog','⚙ Настройки лейаута':'⚙ Layout Settings',
+'🧹 Очистить все патч-ноты':'🧹 Clear All Patch Notes',
 'Настройки лейаута':'Layout Settings','Сохранить':'Save',
 'Закреплён (нажми чтобы снять)':'Pinned (click to unpin)',
 'Нажми чтобы закрепить':'Click to pin',
