@@ -8,7 +8,7 @@
     // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask',
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','draftCoopMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask',
         'socialPickerMask','socialLinkConfirmMask'];
 
     // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
@@ -313,6 +313,8 @@
             };
         }).filter(x => x.name);
         console.log('Champions loaded:', raw.length);
+        // Expose for draft.js and other external modules
+        try { window._champsRaw = raw; window._champIcon = champIcon; document.dispatchEvent(new CustomEvent('champsLoaded')); } catch(e){}
         
         // Default: ADC only on first load (unless saved state exists)
         const _hasSaved = (() => { try { return !!localStorage.getItem('sel'); } catch(e){ return false; } })();
@@ -1975,11 +1977,11 @@
     // Sidebar → modal → close modal → sidebar reopens
     var _sidebarModalId = null; // which MAIN modal was opened from sidebar
     var _pcSideMode = false;    // true when on PC sidebar stays open + modal to the right
-    var _mainSidebarModals = ['sideChampsMask','calcMask','itemCalcMenuMask','itemsMask','runesMask','draftMask','tierlistMask'];
+    var _mainSidebarModals = ['sideChampsMask','calcMask','itemCalcMenuMask','itemsMask','runesMask','draftMask','draftCoopMask','tierlistMask'];
 
     var _sidebarModalMap = {
         'sideChamps':'sideChampsMask', 'calc':'calcMask', 'itemCalcMenu':'itemCalcMenuMask',
-        'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask',
+        'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask', 'draftCoop':'draftCoopMask',
         'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask',
         'tierMenu':'tierlistMenuMask', 'globalChat':'chatSystemMask',
         'users':'chatSystemMask'
@@ -1993,6 +1995,7 @@
             case 'items': openItems(); break;
             case 'runes': openRunes(); break;
             case 'draft': openDraft(); break;
+            case 'draftCoop': if(window.openDraftCoop)openDraftCoop(); break;
             case 'tierChamps': openTierlist('champs'); break;
             case 'tierItems': openTierlist('items'); break;
             case 'tierRunes': openTierlist('runes'); break;
@@ -3083,6 +3086,7 @@
                 online: true,
                 lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
                 displayName: _currentUser.displayName || '',
+                nickLower: (_currentUser.displayName || '').toLowerCase(),
                 email: _currentUser.email || '',
                 photoURL: _currentUser.photoURL || ''
             }, { merge: true });
@@ -4035,7 +4039,7 @@
             var auth = firebase.auth();
             auth.currentUser.updateProfile({ displayName: val }).then(function() {
                 if (db && _currentUser) {
-                    return db.collection('users').doc(_currentUser.uid).set({ displayName: val }, { merge: true });
+                    return db.collection('users').doc(_currentUser.uid).set({ displayName: val, nickLower: val.toLowerCase() }, { merge: true });
                 }
             }).then(function() {
                 showToast(t('✓ Ник обновлён!'));

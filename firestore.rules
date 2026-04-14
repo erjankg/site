@@ -94,5 +94,59 @@ service cloud.firestore {
       allow write: if request.auth != null
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
+
+    // ═══════════════════════════════════════════
+    // ДРАФТ-ЛОББИ (кооперативный драфт 2×капитана)
+    // ═══════════════════════════════════════════
+    match /draftLobbies/{lobbyId} {
+      // Читать могут только участники: создатель, капитаны, приглашённые/вошедшие зрители
+      allow read: if request.auth != null && (
+        resource.data.createdBy == request.auth.uid ||
+        resource.data.blueCaptain.uid == request.auth.uid ||
+        (resource.data.redCaptain != null && resource.data.redCaptain.uid == request.auth.uid) ||
+        request.auth.uid in resource.data.invitedSpectators ||
+        request.auth.uid in resource.data.spectators
+      );
+
+      // Создавать лобби может любой авторизованный, но только на своё имя
+      // Создатель = один из капитанов (синий или красный)
+      allow create: if request.auth != null
+        && request.resource.data.createdBy == request.auth.uid
+        && (
+          request.resource.data.blueCaptain.uid == request.auth.uid
+          || (request.resource.data.redCaptain != null && request.resource.data.redCaptain.uid == request.auth.uid)
+        );
+
+      // Обновлять может создатель, любой из капитанов, либо зритель (только поле spectators — для входа по ссылке)
+      allow update: if request.auth != null && (
+        resource.data.createdBy == request.auth.uid ||
+        resource.data.blueCaptain.uid == request.auth.uid ||
+        (resource.data.redCaptain != null && resource.data.redCaptain.uid == request.auth.uid) ||
+        (request.auth.uid in resource.data.invitedSpectators)
+      );
+
+      // Удалять — только создатель
+      allow delete: if request.auth != null
+        && resource.data.createdBy == request.auth.uid;
+
+      // Игры серии
+      match /games/{gameId} {
+        allow read: if request.auth != null && (
+          get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.createdBy == request.auth.uid ||
+          get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.blueCaptain.uid == request.auth.uid ||
+          (get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.redCaptain != null &&
+           get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.redCaptain.uid == request.auth.uid) ||
+          request.auth.uid in get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.invitedSpectators ||
+          request.auth.uid in get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.spectators
+        );
+        // Писать — создатель лобби или любой из капитанов (детализированные проверки хода — на клиенте)
+        allow write: if request.auth != null && (
+          get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.createdBy == request.auth.uid ||
+          get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.blueCaptain.uid == request.auth.uid ||
+          (get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.redCaptain != null &&
+           get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.redCaptain.uid == request.auth.uid)
+        );
+      }
+    }
   }
 }
