@@ -72,6 +72,7 @@
       stopLobbyListener();
       stopGameListener();
       document.body.classList.remove('dcoop-fullscreen');
+    var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
     }
   }
 
@@ -175,12 +176,23 @@
       var d = l.createdAt.toDate();
       date = d.toLocaleDateString('ru-RU') + ' ' + d.toTimeString().slice(0,5);
     }
+    var scoreBlue = (l.seriesScore && l.seriesScore.blue) || 0;
+    var scoreRed  = (l.seriesScore && l.seriesScore.red)  || 0;
+    var done = (l.status === 'series_done' || l.status === 'closed');
+    var scoreHtml = done
+      ? '<div class="dcoop-lc-score"><span class="dcoop-lc-s-b">'+scoreBlue+'</span><span class="dcoop-lc-s-sep">:</span><span class="dcoop-lc-s-r">'+scoreRed+'</span></div>'
+      : '';
     return ''
       + '<div class="dcoop-lobby-card" data-lobby-id="'+l.id+'">'
-      +   '<div style="flex:1;min-width:0;">'
-      +     '<div class="dcoop-lc-title">'+blue+' <span style="color:var(--text-faint);">vs</span> '+red+'</div>'
-      +     '<div class="dcoop-lc-meta">'+mode+' · '+series+' · '+date+'</div>'
+      +   '<div class="dcoop-lc-main">'
+      +     '<div class="dcoop-lc-teams">'
+      +       '<span class="dcoop-lc-team-b">'+blue+'</span>'
+      +       '<span class="dcoop-lc-vs">vs</span>'
+      +       '<span class="dcoop-lc-team-r">'+red+'</span>'
+      +     '</div>'
+      +     '<div class="dcoop-lc-meta">'+mode+' · '+series+(date?' · '+date:'')+'</div>'
       +   '</div>'
+      +   scoreHtml
       +   '<div class="dcoop-lc-status '+s[0]+'">'+s[1]+'</div>'
       + '</div>';
   }
@@ -434,6 +446,7 @@
     stopLobbyListener();
     stopGameListener();
     document.body.classList.remove('dcoop-fullscreen');
+    var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
     _currentLobbyId = null;
     _currentLobby = null;
     switchTab('my');
@@ -933,6 +946,9 @@
 
     // Start timer
     startTimer(lobby, game, step, mySide);
+
+    // Refresh assist panel if on
+    if (_draftAssistantOn) renderAssistPanel();
 
     if (game.phase === 'done' || game.turnIndex >= SEQ_LEN) {
       if (game.winner) {
@@ -1532,7 +1548,75 @@
 
   function toggleAssist() {
     _draftAssistantOn = !_draftAssistantOn;
-    if (_currentLobby && _currentGame) renderDraftUi(_currentLobby, _currentGame);
+    renderAssistPanel();
+    // Обновить состояние кнопки
+    document.querySelectorAll('.dcoop-hdr-assist').forEach(function(b){
+      b.setAttribute('data-on', _draftAssistantOn ? '1' : '0');
+    });
+  }
+
+  function renderAssistPanel() {
+    var existing = document.getElementById('dcoopAssistPanel');
+    if (existing) existing.parentNode.removeChild(existing);
+    if (!_draftAssistantOn || !_currentLobby || !_currentGame) return;
+    if (isMobileDraft()) return; // PC only
+
+    var lobby = _currentLobby, game = _currentGame;
+    var uid = _uid();
+    var mySide = null;
+    if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) mySide = 'blue';
+    else if (lobby.redCaptain && lobby.redCaptain.uid === uid) mySide = 'red';
+
+    var enemySide = mySide === 'blue' ? 'red' : (mySide === 'red' ? 'blue' : null);
+    var enemyPicks = [];
+    if (enemySide && game.picks && game.picks[enemySide]) {
+      enemyPicks = game.picks[enemySide].map(function(p){ return p && p.champ; }).filter(Boolean);
+    }
+
+    // Читаем матчапы юзера из localStorage (app.js уже инициализирует getMatchups)
+    var matchups = {};
+    try { matchups = JSON.parse(localStorage.getItem('matchups') || '{}'); } catch(e) {}
+
+    // Собираем карту: чемпион → сколько enemy picks он контрит (strongVs)
+    var score = {};
+    enemyPicks.forEach(function(enemy){
+      var entry = matchups[enemy];
+      if (!entry) return;
+      var counters = entry.weakVs || []; // кто силён против "enemy" = для кого "enemy" weakVs
+      // Но в данных bidirectional: если у X strongVs=[enemy], то у enemy weakVs=[X]
+      // Значит counters = champs which are strong vs this enemy = enemy.weakVs
+      counters.forEach(function(c){
+        score[c] = (score[c] || 0) + 1;
+      });
+    });
+
+    // Исключаем уже занятых
+    var fearlessLock = lobby.mode === 'fearless' ? (lobby.usedChampions || []) : [];
+    var unavail = getUnavailable(game, fearlessLock);
+    var ranked = Object.keys(score)
+      .filter(function(c){ return !unavail[c]; })
+      .map(function(c){ return { name: c, score: score[c] }; })
+      .sort(function(a,b){ return b.score - a.score; })
+      .slice(0, 9);
+
+    var listHtml = ranked.length
+      ? ranked.map(function(r){
+          var img = window._champIcon ? window._champIcon(r.name) : '';
+          return '<div class="dcoop-assist-item" onclick="dcoopChampClick(\''+r.name.replace(/'/g,"\\'")+'\')">'
+            +    '<img src="'+img+'" alt="'+escapeHtml(r.name)+'" onerror="this.style.display=\'none\'">'
+            +    '<div class="dcoop-assist-item-name">'+escapeHtml(r.name)+'</div>'
+            +  '</div>';
+        }).join('')
+      : '<div class="dcoop-assist-empty">Нет рекомендаций. Добавь матчапы в профиле чемпионов.</div>';
+
+    var panel = document.createElement('div');
+    panel.id = 'dcoopAssistPanel';
+    panel.className = 'dcoop-assist-panel';
+    panel.innerHTML = ''
+      + '<div class="dcoop-assist-title">🤖 Драфт-помощник</div>'
+      + '<div class="dcoop-assist-sub">Контрят пики соперника (на базе твоих матчапов)</div>'
+      + (ranked.length ? '<div class="dcoop-assist-list">'+listHtml+'</div>' : listHtml);
+    document.body.appendChild(panel);
   }
 
   function toggleSpectators() {
@@ -1575,6 +1659,7 @@
     }).then(function(){
       toast('Лобби закрыто');
       document.body.classList.remove('dcoop-fullscreen');
+    var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
       backToList();
     }).catch(function(e){ toast('Ошибка: '+e.message); });
   }
@@ -1756,27 +1841,116 @@
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
     stopGameListener();
+    document.body.classList.add('dcoop-fullscreen');
+
     var winCol = game.winner === 'blue' ? '#5dade2' : (game.winner === 'red' ? '#e74c3c' : 'var(--text-faint)');
     var winLabel = game.winner === 'blue' ? (lobby.blueTeamName||'Blue')
                  : (game.winner === 'red' ? (lobby.redTeamName||'Red') : '—');
-    var endTs = '';
-    if (game.finishedAt && game.finishedAt.toDate) {
-      var d = game.finishedAt.toDate();
-      endTs = d.toLocaleString('ru-RU');
+    var isMob = isMobileDraft();
+
+    // Для fearless — показываем пики предыдущих игр серии (те что были до этой игры)
+    var completed = (lobby.completedGames || []).filter(function(e){ return e.number < game.number; });
+    var fearlessIcons = [];
+    if (lobby.mode === 'fearless') {
+      completed.forEach(function(cg){
+        (cg.picksBlue || []).forEach(function(n){ if (n) fearlessIcons.push(n); });
+        (cg.picksRed  || []).forEach(function(n){ if (n) fearlessIcons.push(n); });
+      });
     }
-    pane.innerHTML = ''
-      + '<div class="dcoop-topbar">'
+
+    // Top bar реплея: назад + название игры + победитель
+    var topBar = ''
+      + '<div class="dcoop-replay-topbar">'
       +   '<button onclick="dcoopOpenLobby(\''+lobby.id+'\')" class="dcoop-back-btn">← К серии</button>'
-      +   '<div class="dcoop-topbar-info">'
-      +     '<span style="font-weight:900;color:#fff;">'+escapeHtml(lobby.blueTeamName||'Blue')+' vs '+escapeHtml(lobby.redTeamName||'Red')+'</span>'
-      +     '<span style="color:var(--text-faint);font-size:11px;">Игра '+game.number+' · реплей</span>'
+      +   '<div class="dcoop-replay-info">'
+      +     '<span class="dcoop-replay-title">Игра '+game.number+' · реплей</span>'
+      +     '<span class="dcoop-replay-teams">'+escapeHtml(lobby.blueTeamName||'Blue')+' vs '+escapeHtml(lobby.redTeamName||'Red')+'</span>'
       +   '</div>'
-      +   '<div style="color:'+winCol+';font-weight:900;font-size:13px;">🏆 '+escapeHtml(winLabel)+'</div>'
-      + '</div>'
-      + (endTs ? '<div style="padding:6px 12px;color:var(--text-faint);font-size:11px;border-bottom:1px solid var(--accent-border-sub);">Завершено: '+endTs+'</div>' : '')
-      + '<div class="dcoop-draft-layout" style="grid-template-columns:1fr 1fr;">'
-      +   sidePanelHtml('blue', lobby, game, null)
-      +   sidePanelHtml('red',  lobby, game, null)
+      +   '<div class="dcoop-replay-winner" style="color:'+winCol+';">🏆 '+escapeHtml(winLabel)+'</div>'
+      + '</div>';
+
+    // Past fearless games — mini blocks (5 champs each) for context
+    var pastHtml = '';
+    if (completed.length) {
+      var pastRows = completed.map(function(cg){
+        function champImg(n) {
+          if (!n) return '<div class="dcoop-past-slot empty"></div>';
+          var img = window._champIcon ? window._champIcon(n) : '';
+          return '<div class="dcoop-past-slot"><img src="'+img+'" alt="'+escapeHtml(n||'')+'" title="'+escapeHtml(n||'')+'" onerror="this.style.display=\'none\'"></div>';
+        }
+        var b = (cg.picksBlue || []).map(champImg).join('');
+        var r = (cg.picksRed  || []).map(champImg).join('');
+        return '<div class="dcoop-past-row">'
+          + '<div class="dcoop-past-num">'+cg.number+'</div>'
+          + '<div class="dcoop-past-side blue">'+b+'</div>'
+          + '<div class="dcoop-past-side red">'+r+'</div>'
+          + '</div>';
+      }).join('');
+      pastHtml = '<div class="dcoop-past open"><div class="dcoop-past-expanded" style="display:block;">'+pastRows+'</div></div>';
+    }
+
+    // Игроки (ники участников) — показываем рядом с пиками
+    var bluePlayers = lobby.bluePlayers || [];
+    var redPlayers  = lobby.redPlayers  || [];
+
+    function playerListHtml(side, players, picks) {
+      if (!players.length) return '';
+      var col = side === 'blue' ? '#5dade2' : '#e74c3c';
+      var rows = players.map(function(name, i){
+        var p = picks[i];
+        var champ = p && p.champ ? escapeHtml(p.champ) : '—';
+        var img = (p && p.champ && window._champIcon) ? window._champIcon(p.champ) : '';
+        var imgEl = img ? '<img src="'+img+'" class="dcoop-replay-player-icon" onerror="this.style.display=\'none\'">' : '<span class="dcoop-replay-player-icon-empty"></span>';
+        return '<div class="dcoop-replay-player" style="--side-col:'+col+';">'
+          +   imgEl
+          +   '<div class="dcoop-replay-player-info">'
+          +     '<div class="dcoop-replay-player-nick">'+escapeHtml(name)+'</div>'
+          +     '<div class="dcoop-replay-player-champ">'+champ+'</div>'
+          +   '</div>'
+          + '</div>';
+      }).join('');
+      return '<div class="dcoop-replay-players">'+rows+'</div>';
+    }
+
+    // Side panels — как в live-draft, но без active slots
+    var bluePanel = ''
+      + '<div class="dcoop-side-panel" style="--side-col:#5dade2;">'
+      +   '<div class="dcoop-replay-team-hdr blue">'+escapeHtml(lobby.blueTeamName||'Blue')+(lobby.blueCaptain&&lobby.blueCaptain.nick?' · '+escapeHtml(lobby.blueCaptain.nick):'')+'</div>'
+      +   '<div class="dcoop-bans-label">Баны</div>'
+      +   '<div class="dcoop-bans-row">'+banSlotsHtml('blue', game, null, 'pc')+'</div>'
+      +   '<div class="dcoop-picks-label">Пики</div>'
+      +   '<div class="dcoop-picks-col">'+pickSlotsHtml('blue', game, null, 'pc')+'</div>'
+      +   playerListHtml('blue', bluePlayers, (game.picks && game.picks.blue) || [])
+      + '</div>';
+
+    var redPanel = ''
+      + '<div class="dcoop-side-panel" style="--side-col:#e74c3c;">'
+      +   '<div class="dcoop-replay-team-hdr red">'+escapeHtml(lobby.redTeamName||'Red')+(lobby.redCaptain&&lobby.redCaptain.nick?' · '+escapeHtml(lobby.redCaptain.nick):'')+'</div>'
+      +   '<div class="dcoop-bans-label">Баны</div>'
+      +   '<div class="dcoop-bans-row">'+banSlotsHtml('red', game, null, 'pc')+'</div>'
+      +   '<div class="dcoop-picks-label">Пики</div>'
+      +   '<div class="dcoop-picks-col">'+pickSlotsHtml('red', game, null, 'pc')+'</div>'
+      +   playerListHtml('red', redPlayers, (game.picks && game.picks.red) || [])
+      + '</div>';
+
+    // На мобильном: стекируем всё вертикально
+    if (isMob) {
+      pane.innerHTML = ''
+        + topBar
+        + pastHtml
+        + '<div class="dcoop-replay-mobile">'
+        +   bluePanel
+        +   redPanel
+        + '</div>';
+      return;
+    }
+
+    pane.innerHTML = ''
+      + topBar
+      + pastHtml
+      + '<div class="dcoop-replay-layout">'
+      +   bluePanel
+      +   redPanel
       + '</div>';
   }
 
@@ -1853,6 +2027,7 @@
     _currentLobbyId = null;
     _currentLobby = null;
     document.body.classList.remove('dcoop-fullscreen');
+    var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
   }
 
   // ─── AUTO-REDIRECT captain to active lobby ───
@@ -1941,11 +2116,5 @@
     } catch(e) {}
   });
 
-  // Автовход по ?draft=ID на старте страницы
-  window.addEventListener('load', function(){
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('draft')) {
-      setTimeout(function(){ if (window.openDraftCoop) window.openDraftCoop(); }, 800);
-    }
-  });
+  // ?draft=ID deeplink обрабатывается в app.js после прохождения auth-gate и profile-setup
 })();

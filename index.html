@@ -60,7 +60,21 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
 </head>
-<body>
+<body class="site-auth-locked">
+
+<!-- ══ SITE AUTH GATE (blocks site until user signs in) ══ -->
+<div id="siteAuthGate" class="site-auth-gate" style="display:flex;">
+  <div class="site-auth-box">
+    <div class="site-auth-icon">⚔️</div>
+    <div class="site-auth-title">WILD RIFT STATS</div>
+    <div class="site-auth-subtitle" data-i18n="Войди в аккаунт чтобы продолжить">Войди в аккаунт чтобы продолжить</div>
+    <button class="site-auth-btn" onclick="siteAuthSignIn()">
+      <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px;"><path fill="#fff" d="M12 11v2h5.5c-.2 1.5-1.7 4.5-5.5 4.5-3.3 0-6-2.7-6-6s2.7-6 6-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3 14.6 2 12 2 6.5 2 2 6.5 2 12s4.5 10 10 10c5.8 0 9.6-4 9.6-9.8 0-.7-.1-1.2-.2-1.7H12z"/></svg>
+      <span data-i18n="Войти через Google">Войти через Google</span>
+    </button>
+    <div class="site-auth-hint" data-i18n="Мы используем Google Sign-In. Данные не передаются третьим лицам.">Мы используем Google Sign-In. Данные не передаются третьим лицам.</div>
+  </div>
+</div>
 
 <div id="uiTip"></div>
 
@@ -99,6 +113,7 @@
             <span class="lvl-label" data-i18n="УРОВЕНЬ">УРОВЕНЬ</span>
             <span id="lvlLabel" class="lvl-num">10</span>
             <span class="patch-badge">Patch 7.0f</span>
+            <button class="lvl-col-cfg-btn" onclick="openStatsColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button>
         </div>
         <div class="slider-wrapper">
             <input type="range" id="lvlRange" min="1" max="15" value="10"
@@ -458,45 +473,6 @@ Stormarrow: При максимальных зарядах следующая б
        onclick="event.preventDefault();openExternalLink('https://www.donationalerts.com/r/erjankg','Поддержать проект')">
       <span class="side-icon">💎</span>Поддержать проект
     </a>
-  </div>
-</div>
-
-<!-- ══ WELCOME POPUP ══ -->
-<div id="welcomeOverlay" class="m-mask" onclick="if(event.target===this)closeWelcome()">
-  <div style="max-width:540px;width:92vw;padding:0 16px;text-align:center;animation:fadeIn 0.6s ease;position:relative;">
-    <button onclick="closeWelcome()" class="welcome-close-btn">✕</button>
-
-    <div style="font-size:56px;margin-bottom:16px;filter:drop-shadow(0 0 24px var(--accent-glow));">⚔️</div>
-
-    <div class="welcome-title">WILD RIFT STATS</div>
-    <div class="welcome-subtitle">by ERjanKG</div>
-
-    <div class="welcome-card" style="padding:20px 22px;margin-bottom:20px;text-align:left;">
-      <div class="welcome-card-title" style="margin-bottom:12px;" data-i18n="📊 Что это?">📊 Что это?</div>
-      <div class="welcome-card-text">
-        <span data-i18n="Справочник базовых характеристик всех чемпионов Wild Rift.">Справочник базовых характеристик всех чемпионов Wild Rift.</span><br>
-        <span data-i18n-html="welcome-compare">Сравни <b style="color:#e8820a;">AD</b>, <b style="color:#2ecc71;">HP</b>, <b style="color:#5dade2;">Мана</b>, <b style="color:#f1c40f;">Броню</b> и <b style="color:var(--accent);">МС</b> на любом уровне от 1 до 15.</span>
-      </div>
-    </div>
-
-    <div class="welcome-card" style="padding:16px 22px;margin-bottom:24px;text-align:left;">
-      <div class="welcome-card-title" style="margin-bottom:10px;" data-i18n="🎮 Как пользоваться?">🎮 Как пользоваться?</div>
-      <div class="welcome-card-steps">
-        🎚 <b style="color:#fff;" data-i18n="Слайдер">Слайдер</b> — <span data-i18n="выбери уровень 1–15">выбери уровень 1–15</span><br>
-        ⚔ <b style="color:#fff;">Champions</b> — <span data-i18n="выбери кого сравнивать">выбери кого сравнивать</span><br>
-        📊 <b style="color:#fff;" data-i18n="Столбцы">Столбцы</b> — <span data-i18n="нажми чтобы отсортировать">нажми чтобы отсортировать</span><br>
-        🔲 <b style="color:#fff;" data-i18n="Иконка чемпа">Иконка чемпа</b> — <span data-i18n="полная инфа и график роста">полная инфа и график роста</span>
-      </div>
-    </div>
-
-    <a href="#" onclick="event.preventDefault();closeWelcome();openExternalLink('https://www.donationalerts.com/r/erjankg','Поддержать проект')"
-       class="welcome-btn-support" data-i18n="💎 Поддержать проект">
-      💎 Поддержать проект
-    </a>
-    <button onclick="closeWelcome()" class="welcome-btn-skip" data-i18n="Понятно, начать →">
-      Понятно, начать →
-    </button>
-
   </div>
 </div>
 

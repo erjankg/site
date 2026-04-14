@@ -8,7 +8,7 @@
     // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','draftCoopMask','champPickerModal','welcomeOverlay','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask',
+        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','draftCoopMask','champPickerModal','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask',
         'socialPickerMask','socialLinkConfirmMask'];
 
     // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
@@ -182,8 +182,7 @@
         var thead = document.getElementById('statThead');
         if(!thead) return;
         var cols = getStatsCols();
-        var html = '<tr><th><button class="btn-champ-cfg" onclick="openM()">Champions</button>' +
-            '<button class="col-cfg-btn" onclick="openStatsColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button></th>';
+        var html = '<tr><th><button class="btn-champ-cfg" onclick="openM()">Champions</button></th>';
         cols.forEach(function(c){
             var label = c.key === 'mana'
                 ? '<span class="mana-label-full">Mana</span><span class="mana-label-short">MN</span>'
@@ -782,15 +781,6 @@
             });
         }, 80);
     };
-
-    // WELCOME
-    window.closeWelcome = function() {
-        closeModal('welcomeOverlay');
-    };
-    // Показываем приветствие каждый раз при открытии сайта
-    (function() {
-        setTimeout(function() { openModal('welcomeOverlay'); }, 400);
-    })();
 
     // SIDEBAR
     window.toggleSidebar = function() {
@@ -3109,6 +3099,87 @@
         }
     }
 
+    // ═══════════════════════════════════════
+    // SITE AUTH GATE (блокировка сайта для гостей + profile-gate для новичков)
+    // ═══════════════════════════════════════
+    window.siteAuthSignIn = function() {
+        if (!auth || !_provider) {
+            alert(t('Firebase не загружен. Проверьте подключение к интернету.'));
+            return;
+        }
+        auth.signInWithPopup(_provider).catch(function(err){
+            if (err.code !== 'auth/popup-closed-by-user') {
+                console.error('Auth error:', err);
+                alert(t('Ошибка авторизации: ') + (err.message || ''));
+            }
+        });
+    };
+
+    function showSiteAuthGate() {
+        var g = document.getElementById('siteAuthGate');
+        if (g) g.style.display = 'flex';
+        document.body.classList.add('site-auth-locked');
+    }
+    function hideSiteAuthGate() {
+        var g = document.getElementById('siteAuthGate');
+        if (g) g.style.display = 'none';
+        document.body.classList.remove('site-auth-locked');
+    }
+
+    // Захватываем pending-URL параметры до любых навигаций
+    var _pendingDeepLink = (function(){
+        try {
+            var p = new URLSearchParams(window.location.search);
+            var draft = p.get('draft');
+            var token = p.get('t');
+            if (draft) return { type: 'draft', id: draft, token: token || '' };
+        } catch(e) {}
+        return null;
+    })();
+
+    function applyPendingDeepLink() {
+        if (!_pendingDeepLink) return;
+        var dl = _pendingDeepLink;
+        _pendingDeepLink = null;
+        // Чистим URL чтобы при перезагрузке не повторялось
+        try {
+            var url = new URL(window.location.href);
+            url.searchParams.delete('draft');
+            url.searchParams.delete('t');
+            window.history.replaceState({}, '', url.pathname + (url.search || '') + url.hash);
+        } catch(e) {}
+        if (dl.type === 'draft') {
+            setTimeout(function(){
+                if (window.openDraftCoop) window.openDraftCoop();
+                setTimeout(function(){
+                    if (window.dcoopOpenLobby) window.dcoopOpenLobby(dl.id);
+                }, 300);
+            }, 200);
+        }
+    }
+
+    function checkProfileGate(user) {
+        if (!db || !user) return;
+        db.collection('users').doc(user.uid).get().then(function(snap){
+            var d = snap.exists ? snap.data() : {};
+            var needSetup = !d.role || !d.rank || !d.displayName;
+            hideSiteAuthGate();
+            if (needSetup) {
+                document.body.classList.add('profile-gated');
+                setTimeout(function(){
+                    if (window.openProfileSetup) window.openProfileSetup();
+                }, 200);
+            } else {
+                document.body.classList.remove('profile-gated');
+                applyPendingDeepLink();
+            }
+        }).catch(function(e){
+            console.warn('Profile gate check:', e);
+            hideSiteAuthGate();
+            applyPendingDeepLink();
+        });
+    }
+
     // Hook into auth state
     if (auth) {
         auth.onAuthStateChanged(function(user) {
@@ -3118,17 +3189,22 @@
                 loadUserDataFromFirestore();
                 startPresence();
                 updateChatUI(true);
-                // checkAdmin вызывается с задержкой чтобы Firestore кеш обновился
                 setTimeout(function() { checkAdmin(); }, 1500);
                 checkFirstLogin();
+                checkProfileGate(user);
             } else {
                 stopPresence();
                 updateChatUI(false);
                 _isAdmin = false;
                 window._isAdmin = false;
                 document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = 'none'; });
+                document.body.classList.remove('profile-gated');
+                showSiteAuthGate();
             }
         });
+    } else {
+        // Firebase недоступен — всё равно показываем gate (там кнопка покажет алерт)
+        showSiteAuthGate();
     }
 
 
@@ -3572,6 +3648,10 @@
         }
     };
     window.closeProfileSetup = function() {
+        if (document.body.classList.contains('profile-gated')) {
+            showToast(t('Заполни ник, роль и ранг — это одноразовая настройка.'));
+            return;
+        }
         closeModal('profileSetupMask');
         _pendingDataVisible = null;
         _pendingDataset = null;
@@ -4249,8 +4329,10 @@
             }
             showToast(t('✓ Профиль сохранён!'));
             setTimeout(function() {
+                document.body.classList.remove('profile-gated');
                 closeProfileSetup();
                 loadUsersToSidebar();
+                if (typeof applyPendingDeepLink === 'function') applyPendingDeepLink();
             }, 600);
         }).catch(function(err) {
             if (btn) {
