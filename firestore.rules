@@ -129,7 +129,7 @@ service cloud.firestore {
       allow delete: if request.auth != null
         && resource.data.createdBy == request.auth.uid;
 
-      // Игры серии
+      // Игры серии (внутри лобби)
       match /games/{gameId} {
         allow read: if request.auth != null && (
           get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.createdBy == request.auth.uid ||
@@ -147,6 +147,31 @@ service cloud.firestore {
            get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.redCaptain.uid == request.auth.uid)
         );
       }
+    }
+
+    // ═══════════════════════════════════════════
+    // ПРИГЛАШЕНИЯ В ДРАФТ-ЛОББИ
+    // ═══════════════════════════════════════════
+    // Документ: { toUid, fromUid, lobbyId, role, side?, status, declineCount, cooldownUntil?, createdAt }
+    match /draftInvites/{inviteId} {
+      // Читать могут отправитель и получатель
+      allow read: if request.auth != null && (
+        resource.data.toUid == request.auth.uid ||
+        resource.data.fromUid == request.auth.uid
+      );
+      // Создавать может только отправитель (и только на своё имя)
+      allow create: if request.auth != null
+        && request.resource.data.fromUid == request.auth.uid;
+      // Обновлять — отправитель или получатель
+      allow update: if request.auth != null && (
+        resource.data.toUid == request.auth.uid ||
+        resource.data.fromUid == request.auth.uid
+      );
+      // Удалять — отправитель или получатель
+      allow delete: if request.auth != null && (
+        resource.data.toUid == request.auth.uid ||
+        resource.data.fromUid == request.auth.uid
+      );
     }
   }
 }

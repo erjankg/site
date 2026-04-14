@@ -3359,35 +3359,364 @@ select.cms-input { cursor: pointer; }
   text-align: center;
 }
 
-/* ── MOBILE DRAFT LAYOUT ── */
+/* ══════════════════════════════════════════
+   NEW DRAFT HEADER (mobile + PC) — 2026-04-14
+   ══════════════════════════════════════════ */
+
+/* Fullscreen lobby mode (скрыть сайдбар, занять весь экран) */
+body.dcoop-fullscreen #sidePanel,
+body.dcoop-fullscreen #sideOverlay,
+body.dcoop-fullscreen #sidebar,
+body.dcoop-fullscreen .sidebar,
+body.dcoop-fullscreen #sidebarMask { display: none !important; }
+body.dcoop-fullscreen .dcoop-win {
+  width: 100vw !important;
+  height: 100dvh !important;
+  max-width: none !important;
+  border-radius: 0 !important;
+}
+body.dcoop-fullscreen .dcoop-win .mhdr { display: none; }
+body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
+
+/* Captain user-card block */
+.dcoop-hdr-cap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--side-col) 45%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--side-col) 10%, transparent);
+  min-width: 0;
+  max-width: 120px;
+  position: relative;
+}
+.dcoop-hdr-cap.active {
+  box-shadow: 0 0 0 2px var(--side-col);
+  animation: dcoopCapPulse 1.4s ease-in-out infinite;
+}
+@keyframes dcoopCapPulse {
+  0%, 100% { box-shadow: 0 0 0 2px var(--side-col); }
+  50%      { box-shadow: 0 0 0 4px color-mix(in srgb, var(--side-col) 35%, transparent); }
+}
+.dcoop-hdr-cap-team {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--side-col);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dcoop-hdr-cap-nick {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dcoop-hdr-cap-score {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 10px;
+  font-weight: 900;
+  color: var(--side-col);
+  opacity: 0.6;
+}
+
+/* Corner buttons */
+.dcoop-hdr-spec, .dcoop-hdr-close, .dcoop-hdr-assist {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--accent-border-sub);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.dcoop-hdr-spec:hover, .dcoop-hdr-close:hover, .dcoop-hdr-assist:hover { background: rgba(255,255,255,0.1); }
+.dcoop-hdr-close { color: #e74c3c; border-color: rgba(231,76,60,0.4); }
+.dcoop-hdr-assist[data-on="1"] { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+
+/* ─── PC header layout ─── */
+.dcoop-hdr-pc {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--accent-border-sub);
+  background: rgba(0,0,0,0.28);
+}
+.dcoop-hdr-pc-left  { justify-self: start; }
+.dcoop-hdr-pc-right { justify-self: end; }
+.dcoop-hdr-pc .dcoop-hdr-cap { max-width: 200px; }
+.dcoop-hdr-timer-pc {
+  font-size: 54px;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  min-width: 140px;
+  text-shadow: 0 0 16px color-mix(in srgb, currentColor 45%, transparent);
+}
+.dcoop-hdr-corner-pc {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ─── Mobile sticky header ─── */
+.dcoop-hdr-mobile {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg-base, #15151a);
+  border-bottom: 1px solid var(--accent-border-sub);
+  padding: 6px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.dcoop-hdr-row-caps {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.dcoop-hdr-row-caps .dcoop-hdr-cap-blue  { justify-self: start; }
+.dcoop-hdr-row-caps .dcoop-hdr-cap-red   { justify-self: end; }
+.dcoop-hdr-mobile .dcoop-hdr-cap {
+  padding: 2px 6px;
+  max-width: 45vw;
+}
+.dcoop-hdr-mobile .dcoop-hdr-cap-team { font-size: 8px; }
+.dcoop-hdr-mobile .dcoop-hdr-cap-nick { font-size: 10px; }
+.dcoop-hdr-mobile .dcoop-hdr-cap-score { font-size: 9px; }
+
+.dcoop-hdr-timer-m {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  padding: 0 10px;
+  min-width: 54px;
+}
+
+.dcoop-hdr-row-bans {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.dcoop-hdr-bans {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+}
+.dcoop-hdr-bans-red { direction: rtl; }
+.dcoop-hdr-bans-red > * { direction: ltr; }
+
+.dcoop-hdr-row-picks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.dcoop-hdr-picks {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+}
+.dcoop-hdr-picks-red { direction: rtl; }
+.dcoop-hdr-picks-red > * { direction: ltr; }
+
+/* ban slot on mobile header — smaller */
+.dcoop-ban-slot.m {
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 3px;
+}
+.dcoop-ban-slot.m .dcoop-slot-x { font-size: 10px; }
+/* pick slot on mobile header — larger than bans */
+.dcoop-pick-slot.m {
+  aspect-ratio: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  flex-direction: column;
+  border-radius: 4px;
+}
+.dcoop-pick-slot.m img { width: 100%; height: 100%; border-radius: 4px; }
+.dcoop-pick-slot.m .dcoop-pick-name { display: none; }
+.dcoop-pick-slot.m .dcoop-slot-placeholder { padding: 0; font-size: 12px; }
+
+.dcoop-hdr-corner {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 4px;
+}
+.dcoop-hdr-mobile .dcoop-hdr-spec,
+.dcoop-hdr-mobile .dcoop-hdr-close { padding: 2px 6px; font-size: 10px; }
+
+/* ─── Past games block ─── */
+.dcoop-past {
+  border: 1px solid var(--accent-border-sub);
+  border-radius: 8px;
+  margin: 8px 10px;
+  background: rgba(255,255,255,0.02);
+  overflow: hidden;
+}
+.dcoop-past-collapsed {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+}
+.dcoop-past-toggle {
+  background: none;
+  border: 1px solid var(--accent-border);
+  color: #fff;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.dcoop-past-toggle:hover { background: var(--accent-dim); }
+.dcoop-past-side {
+  display: flex;
+  gap: 3px;
+}
+.dcoop-past-side.red { justify-content: flex-end; }
+.dcoop-past-slot {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+.dcoop-past-slot.empty { background: rgba(255,255,255,0.05); }
+.dcoop-past-slot img { width: 100%; height: 100%; object-fit: cover; }
+.dcoop-past-expanded {
+  display: none;
+  padding: 6px 8px 8px;
+  border-top: 1px solid var(--accent-border-sub);
+  gap: 6px;
+  flex-direction: column;
+}
+.dcoop-past.open .dcoop-past-expanded { display: flex; }
+.dcoop-past-row {
+  display: grid;
+  grid-template-columns: 30px 1fr 1fr;
+  gap: 6px;
+  align-items: center;
+}
+.dcoop-past-num {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* PC past games — как row of blocks at bottom */
+@media (min-width: 761px) {
+  .dcoop-past { margin: 10px 14px 14px; }
+  .dcoop-past-slot { width: 36px; height: 36px; }
+}
+
+/* ─── Spectators dropdown ─── */
+.dcoop-spec-drop {
+  position: fixed;
+  top: 56px;
+  right: 10px;
+  z-index: 8000;
+  background: var(--bg-base);
+  border: 1px solid var(--accent-border);
+  border-radius: 10px;
+  padding: 10px;
+  min-width: 180px;
+  max-width: 260px;
+  max-height: 60vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  animation: dcoopDropIn 0.15s ease-out;
+}
+@keyframes dcoopDropIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.dcoop-spec-title {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--accent);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+.dcoop-spec-row {
+  padding: 6px 8px;
+  font-size: 12px;
+  color: #fff;
+  border: 1px solid var(--accent-border-sub);
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+/* ─── Invite toast (plywing banner) ─── */
+.dcoop-invite-toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9500;
+  background: var(--bg-base);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 0 1px var(--accent);
+  min-width: 280px;
+  max-width: 90vw;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: dcoopDropIn 0.2s ease-out;
+}
+.dcoop-invite-toast-text {
+  flex: 1;
+  font-size: 12px;
+  color: #fff;
+}
+.dcoop-invite-toast-text strong { color: var(--accent); }
+.dcoop-invite-toast-btns { display: flex; gap: 6px; }
+.dcoop-invite-toast-btns button {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1px solid;
+}
+.dcoop-inv-accept { background: rgba(46,204,113,0.2); color: #2ecc71; border-color: #2ecc71; }
+.dcoop-inv-decline { background: rgba(231,76,60,0.2); color: #e74c3c; border-color: #e74c3c; }
+
+/* ── MOBILE DRAFT LAYOUT (content below sticky header) ── */
 @media (max-width: 760px) {
   .dcoop-draft-layout {
     grid-template-columns: 1fr;
     gap: 6px;
     padding: 6px;
   }
-  .dcoop-side-panel {
-    display: flex;
-    flex-direction: row;
-    gap: 6px;
-    padding: 6px;
-  }
-  .dcoop-side-header {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    border: none;
-    margin: 0;
-    padding: 0;
-    font-size: 11px;
-    align-self: stretch;
-  }
-  .dcoop-bans-label, .dcoop-picks-label { display: none; }
-  .dcoop-bans-row { grid-template-columns: repeat(5, 28px); gap: 3px; }
-  .dcoop-ban-slot { width: 28px; height: 28px; }
-  .dcoop-picks-col { flex-direction: row; gap: 3px; }
-  .dcoop-pick-slot { flex-direction: column; padding: 2px; min-width: 38px; min-height: 48px; }
-  .dcoop-pick-slot img { width: 34px; height: 34px; }
-  .dcoop-pick-name { display: none; }
+  .dcoop-side-panel { display: none; }
+  .dcoop-gallery-col { min-height: 0; }
   .dcoop-gallery { grid-template-columns: repeat(5, 1fr); }
   .dcoop-champ-name { display: none; }
   .dcoop-lock-btn {
@@ -3395,5 +3724,6 @@ select.cms-input { cursor: pointer; }
     bottom: 0;
     z-index: 5;
   }
+  .dcoop-fearless-bar { overflow-x: auto; }
 }
 

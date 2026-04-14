@@ -68,7 +68,11 @@
     if (tab === 'my') startMyLobbiesListener();
     else stopMyLobbiesListener();
 
-    if (tab !== 'lobby') stopLobbyListener();
+    if (tab !== 'lobby') {
+      stopLobbyListener();
+      stopGameListener();
+      document.body.classList.remove('dcoop-fullscreen');
+    }
   }
 
   // ─── AUTH GATE ───
@@ -428,6 +432,8 @@
 
   function backToList() {
     stopLobbyListener();
+    stopGameListener();
+    document.body.classList.remove('dcoop-fullscreen');
     _currentLobbyId = null;
     _currentLobby = null;
     switchTab('my');
@@ -448,6 +454,9 @@
   var _searchMode = null; // 'captainBlue' | 'captainRed' | 'spectator'
   var _searchOverlay = null;
 
+  var _userCache = null; // кэш списка юзеров (TTL 60s)
+  var _userCacheAt = 0;
+
   function openUserSearch(mode) {
     _searchMode = mode;
     closeUserSearch();
@@ -463,10 +472,10 @@
       spectator:   '➕ Пригласить зрителя'
     };
     overlay.innerHTML = ''
-      + '<div style="background:var(--bg-base);border:1px solid var(--accent-border);border-radius:12px;width:100%;max-width:420px;padding:16px;display:flex;flex-direction:column;gap:10px;max-height:80vh;">'
+      + '<div style="background:var(--bg-base);border:1px solid var(--accent-border);border-radius:12px;width:100%;max-width:420px;padding:14px;display:flex;flex-direction:column;gap:10px;max-height:85vh;">'
       +   '<div style="font-size:14px;font-weight:900;color:#fff;">'+ (titles[mode] || 'Поиск юзера') +'</div>'
-      +   '<input id="dcoopSearchInput" type="text" placeholder="Введите ник (минимум 2 символа)" style="padding:10px 12px;border:1px solid var(--accent-border);background:var(--bg-primary);color:#fff;border-radius:8px;font-size:13px;outline:none;">'
-      +   '<div id="dcoopSearchResults" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px;min-height:80px;"><div style="color:var(--text-faint);font-size:11px;text-align:center;padding:20px;">Начните вводить ник</div></div>'
+      +   '<input id="dcoopSearchInput" type="text" placeholder="🔍 Фильтр по нику" style="padding:9px 12px;border:1px solid var(--accent-border);background:var(--bg-primary);color:#fff;border-radius:8px;font-size:13px;outline:none;">'
+      +   '<div id="dcoopSearchResults" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px;min-height:200px;"><div style="color:var(--text-faint);font-size:11px;text-align:center;padding:20px;">Загрузка…</div></div>'
       +   '<button onclick="dcoopCloseSearch()" style="padding:8px;border:1px solid var(--accent-border);background:transparent;color:#fff;border-radius:8px;cursor:pointer;font-size:12px;">Отмена</button>'
       + '</div>';
     document.body.appendChild(overlay);
@@ -476,9 +485,90 @@
     var timer = null;
     inp.addEventListener('input', function(){
       if (timer) clearTimeout(timer);
-      timer = setTimeout(function(){ doSearch(inp.value.trim()); }, 250);
+      timer = setTimeout(function(){ renderUserList(inp.value.trim().toLowerCase()); }, 80);
     });
     setTimeout(function(){ inp.focus(); }, 50);
+
+    loadUserList().then(function(){ renderUserList(''); }).catch(function(e){
+      var r = document.getElementById('dcoopSearchResults');
+      if (r) r.innerHTML = '<div style="color:#e74c3c;font-size:11px;text-align:center;padding:20px;">Ошибка загрузки: '+escapeHtml(e.message||'')+'</div>';
+    });
+  }
+
+  function loadUserList() {
+    var dbInst = _db();
+    if (!dbInst) return Promise.reject(new Error('no db'));
+    if (_userCache && (Date.now() - _userCacheAt) < 60000) return Promise.resolve();
+
+    return dbInst.collection('users').limit(300).get().then(function(snap){
+      var me = _uid();
+      var list = [];
+      snap.forEach(function(d){
+        var u = d.data(); u.uid = d.id;
+        if (u.uid === me) return;
+        // online = реальная метка + updated < 120s
+        var fresh = false;
+        if (u.online && u.lastSeen && u.lastSeen.toMillis) {
+          fresh = (Date.now() - u.lastSeen.toMillis()) < 120000;
+        } else if (u.online) {
+          fresh = true; // запасной вариант если lastSeen нет
+        }
+        u._online = fresh;
+        list.push(u);
+      });
+      list.sort(function(a,b){
+        if (a._online !== b._online) return a._online ? -1 : 1;
+        var na = (a.displayName || '').toLowerCase();
+        var nb = (b.displayName || '').toLowerCase();
+        return na < nb ? -1 : (na > nb ? 1 : 0);
+      });
+      _userCache = list;
+      _userCacheAt = Date.now();
+    });
+  }
+
+  function renderUserList(filter) {
+    var results = document.getElementById('dcoopSearchResults');
+    if (!results || !_userCache) return;
+    var q = (filter || '').toLowerCase();
+    var list = _userCache.filter(function(u){
+      if (!q) return true;
+      var n = (u.displayName || '').toLowerCase();
+      return n.indexOf(q) !== -1;
+    });
+    if (!list.length) {
+      results.innerHTML = '<div style="color:var(--text-faint);font-size:11px;text-align:center;padding:20px;">Никого не найдено</div>';
+      return;
+    }
+    var online = list.filter(function(u){ return u._online; });
+    var offline = list.filter(function(u){ return !u._online; });
+
+    function rowHtml(u) {
+      var nick = escapeHtml(u.displayName || '?');
+      var dot = u._online
+        ? '<span style="color:#2ecc71;font-size:10px;">● онлайн</span>'
+        : '<span style="color:var(--text-faint);font-size:10px;">● оффлайн</span>';
+      return ''
+        + '<div onclick="dcoopPickUser(\''+u.uid+'\',\''+encodeURIComponent(u.displayName||'')+'\')" '
+        +   'style="display:flex;align-items:center;gap:10px;padding:7px 10px;border:1px solid var(--accent-border-sub);border-radius:8px;cursor:pointer;background:rgba(255,255,255,0.02);">'
+        +   '<div style="flex:1;min-width:0;">'
+        +     '<div style="font-weight:700;color:#fff;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+nick+'</div>'
+        +     '<div>'+dot+'</div>'
+        +   '</div>'
+        +   '<div style="font-size:14px;color:var(--accent);">→</div>'
+        + '</div>';
+    }
+
+    var html = '';
+    if (online.length) {
+      html += '<div style="font-size:10px;color:#2ecc71;font-weight:900;letter-spacing:0.5px;margin:2px 0;">🟢 ОНЛАЙН · '+online.length+'</div>';
+      html += online.map(rowHtml).join('');
+    }
+    if (offline.length) {
+      html += '<div style="font-size:10px;color:var(--text-faint);font-weight:900;letter-spacing:0.5px;margin:10px 0 2px;">⚫ ОФФЛАЙН · '+offline.length+'</div>';
+      html += offline.map(rowHtml).join('');
+    }
+    results.innerHTML = html;
   }
 
   function closeUserSearch() {
@@ -488,58 +578,10 @@
     _searchOverlay = null;
   }
 
-  function doSearch(query) {
-    var results = document.getElementById('dcoopSearchResults');
-    if (!results) return;
-    if (query.length < 2) {
-      results.innerHTML = '<div style="color:var(--text-faint);font-size:11px;text-align:center;padding:20px;">Начните вводить ник</div>';
-      return;
-    }
-    var q = query.toLowerCase();
-    var dbInst = _db();
-    if (!dbInst) return;
-    results.innerHTML = '<div style="color:var(--text-faint);font-size:11px;text-align:center;padding:20px;">Поиск…</div>';
-
-    // Префиксный поиск по nickLower
-    dbInst.collection('users')
-      .where('nickLower','>=', q)
-      .where('nickLower','<=', q + '\uf8ff')
-      .limit(12)
-      .get()
-      .then(function(snap){
-        var me = _uid();
-        var rows = [];
-        snap.forEach(function(d){
-          var u = d.data(); u.uid = d.id;
-          if (u.uid === me) return;
-          rows.push(u);
-        });
-        if (!rows.length) {
-          results.innerHTML = '<div style="color:var(--text-faint);font-size:11px;text-align:center;padding:20px;">Никого не найдено</div>';
-          return;
-        }
-        results.innerHTML = rows.map(function(u){
-          var nick = escapeHtml(u.displayName || '?');
-          var online = u.online ? '<span style="color:#2ecc71;">● online</span>' : '<span style="color:var(--text-faint);">● offline</span>';
-          return ''
-            + '<div onclick="dcoopPickUser(\''+u.uid+'\',\''+encodeURIComponent(u.displayName||'')+'\')" '
-            +   'style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--accent-border-sub);border-radius:8px;cursor:pointer;">'
-            +   '<div style="flex:1;"><div style="font-weight:700;color:#fff;font-size:13px;">'+nick+'</div><div style="font-size:10px;">'+online+'</div></div>'
-            +   '<div style="font-size:16px;color:var(--accent);">→</div>'
-            + '</div>';
-        }).join('');
-      })
-      .catch(function(err){
-        console.warn('[draft] search error', err);
-        results.innerHTML = '<div style="color:#e74c3c;font-size:11px;text-align:center;padding:20px;">Ошибка поиска. Возможно, поле nickLower ещё не заполнено у пользователей.</div>';
-      });
-  }
-
   function pickUser(uid, nickEncoded) {
     var nick = decodeURIComponent(nickEncoded || '');
     var l = _currentLobby;
     if (!l) { closeUserSearch(); return; }
-    var dbInst = _db();
 
     if (_searchMode === 'captainBlue' || _searchMode === 'captainRed') {
       var side = _searchMode === 'captainBlue' ? 'blue' : 'red';
@@ -547,27 +589,210 @@
       var other = side === 'blue' ? l.redCaptain : l.blueCaptain;
       if (l[capField] && l[capField].uid) { toast('Капитан уже назначен'); closeUserSearch(); return; }
       if (other && other.uid === uid) { toast('Нельзя пригласить того же юзера'); return; }
-      var patch = {};
-      patch[capField] = { uid: uid, nick: nick };
-      patch.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-      dbInst.collection('draftLobbies').doc(l.id).update(patch)
-        .then(function(){ toast('Капитан приглашён'); closeUserSearch(); })
-        .catch(function(e){ toast('Ошибка: '+e.message); });
+      sendInvite(uid, nick, 'captain', side).then(function(msg){
+        toast(msg || 'Приглашение отправлено');
+        closeUserSearch();
+      }).catch(function(e){ toast('Ошибка: '+(e.message || e)); });
     } else if (_searchMode === 'spectator') {
       var list = (l.invitedSpectators || []).slice();
       if (list.indexOf(uid) !== -1) { toast('Уже приглашён'); closeUserSearch(); return; }
       if (list.length >= 12) { toast('Максимум 12 зрителей'); return; }
-      list.push(uid);
-      var nicks = Object.assign({}, l.spectatorNicks || {});
-      nicks[uid] = nick;
-      dbInst.collection('draftLobbies').doc(l.id).update({
-        invitedSpectators: list,
-        spectatorNicks: nicks,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function(){ toast('Зритель приглашён'); closeUserSearch(); })
-        .catch(function(e){ toast('Ошибка: '+e.message); });
+      sendInvite(uid, nick, 'spectator', null).then(function(msg){
+        toast(msg || 'Приглашение отправлено');
+        closeUserSearch();
+      }).catch(function(e){ toast('Ошибка: '+(e.message || e)); });
     }
   }
+
+  // ═══════════════════════════════════════════
+  // INVITE SYSTEM — draftInvites collection
+  // ═══════════════════════════════════════════
+  function inviteDocId(lobbyId, toUid) { return lobbyId + '__' + toUid; }
+
+  function sendInvite(toUid, toNick, role, side) {
+    var l = _currentLobby;
+    if (!l) return Promise.reject(new Error('no lobby'));
+    var fromUid = _uid();
+    if (!fromUid) return Promise.reject(new Error('no auth'));
+    var id = inviteDocId(l.id, toUid);
+    var dbInst = _db();
+    var ref = dbInst.collection('draftInvites').doc(id);
+    return ref.get().then(function(snap){
+      var prev = snap.exists ? snap.data() : {};
+      if (prev.cooldownUntil && prev.cooldownUntil.toMillis && prev.cooldownUntil.toMillis() > Date.now()) {
+        var mins = Math.ceil((prev.cooldownUntil.toMillis() - Date.now()) / 60000);
+        return Promise.reject(new Error('Этот юзер отклонил дважды — подождите '+mins+' мин'));
+      }
+      if (prev.status === 'pending') {
+        return Promise.reject(new Error('Приглашение уже ожидает ответа'));
+      }
+      return ref.set({
+        toUid: toUid,
+        toNick: toNick || '',
+        fromUid: fromUid,
+        fromNick: _myNick(),
+        lobbyId: l.id,
+        role: role,
+        side: side || null,
+        status: 'pending',
+        declineCount: prev.declineCount || 0,
+        cooldownUntil: prev.cooldownUntil || null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function(){ return 'Приглашение отправлено'; });
+    });
+  }
+
+  function acceptInvite(inviteId) {
+    return _db().collection('draftInvites').doc(inviteId).update({
+      status: 'accepted',
+      acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
+  function declineInvite(inviteId) {
+    var ref = _db().collection('draftInvites').doc(inviteId);
+    return ref.get().then(function(snap){
+      if (!snap.exists) return;
+      var d = snap.data();
+      var newCount = (d.declineCount || 0) + 1;
+      var patch = {
+        status: 'declined',
+        declineCount: newCount,
+        declinedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (newCount >= 2) {
+        patch.cooldownUntil = firebase.firestore.Timestamp.fromMillis(Date.now() + 60 * 60 * 1000);
+      }
+      return ref.update(patch);
+    });
+  }
+
+  // ─── Listeners ───
+  var _invitesListener = null;
+  var _sentInvitesListener = null;
+  var _shownInvites = {};
+
+  function startInvitesListeners() {
+    stopInvitesListeners();
+    var uid = _uid();
+    var dbInst = _db();
+    if (!uid || !dbInst) return;
+
+    // Получатель — pending invites → тост
+    _invitesListener = dbInst.collection('draftInvites')
+      .where('toUid','==',uid)
+      .where('status','==','pending')
+      .onSnapshot(function(snap){
+        snap.docChanges().forEach(function(ch){
+          var d = ch.doc.data(); d.id = ch.doc.id;
+          if ((ch.type === 'added' || ch.type === 'modified') && !_shownInvites[d.id]) {
+            _shownInvites[d.id] = 1;
+            showInviteToast(d);
+          }
+          if (ch.type === 'removed') {
+            var el = document.getElementById('dcoopInviteToast-' + d.id);
+            if (el) el.remove();
+            delete _shownInvites[d.id];
+          }
+        });
+      }, function(err){ console.warn('[draft] invites listener', err); });
+
+    // Отправитель — следим за accepted invites и финализируем
+    _sentInvitesListener = dbInst.collection('draftInvites')
+      .where('fromUid','==',uid)
+      .where('status','==','accepted')
+      .onSnapshot(function(snap){
+        snap.docChanges().forEach(function(ch){
+          if (ch.type !== 'added' && ch.type !== 'modified') return;
+          var d = ch.doc.data(); d.id = ch.doc.id;
+          finalizeAcceptedInvite(d);
+        });
+      }, function(err){ console.warn('[draft] sent invites listener', err); });
+  }
+
+  function stopInvitesListeners() {
+    if (_invitesListener) { try { _invitesListener(); } catch(e){} _invitesListener = null; }
+    if (_sentInvitesListener) { try { _sentInvitesListener(); } catch(e){} _sentInvitesListener = null; }
+  }
+
+  function finalizeAcceptedInvite(invite) {
+    var dbInst = _db();
+    var lobbyRef = dbInst.collection('draftLobbies').doc(invite.lobbyId);
+    lobbyRef.get().then(function(snap){
+      if (!snap.exists) return;
+      var l = snap.data();
+      var patch = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+      if (invite.role === 'captain') {
+        var capField = invite.side === 'blue' ? 'blueCaptain' : 'redCaptain';
+        if (l[capField] && l[capField].uid && l[capField].uid !== invite.toUid) return;
+        patch[capField] = { uid: invite.toUid, nick: invite.toNick || '' };
+      } else if (invite.role === 'spectator') {
+        var list = (l.invitedSpectators || []).slice();
+        if (list.indexOf(invite.toUid) === -1) list.push(invite.toUid);
+        var nicks = Object.assign({}, l.spectatorNicks || {});
+        nicks[invite.toUid] = invite.toNick || '';
+        patch.invitedSpectators = list;
+        patch.spectatorNicks = nicks;
+      }
+      lobbyRef.update(patch).then(function(){
+        dbInst.collection('draftInvites').doc(invite.id).update({ status: 'finalized' }).catch(function(){});
+      }).catch(function(e){ console.warn('[draft] finalize', e); });
+    });
+  }
+
+  function showInviteToast(invite) {
+    if (document.getElementById('dcoopInviteToast-' + invite.id)) return;
+    var roleText = invite.role === 'captain'
+      ? ('капитаном ' + (invite.side === 'blue' ? 'СИНИХ' : 'КРАСНЫХ'))
+      : 'зрителем';
+    var toastEl = document.createElement('div');
+    toastEl.className = 'dcoop-invite-toast';
+    toastEl.id = 'dcoopInviteToast-' + invite.id;
+    toastEl.innerHTML = ''
+      + '<div class="dcoop-invite-toast-text">'
+      +   '<strong>'+escapeHtml(invite.fromNick || '?')+'</strong> приглашает вас '+roleText+' в драфт-лобби'
+      + '</div>'
+      + '<div class="dcoop-invite-toast-btns">'
+      +   '<button class="dcoop-inv-accept" onclick="dcoopAcceptInvite(\''+invite.id+'\')">Принять</button>'
+      +   '<button class="dcoop-inv-decline" onclick="dcoopDeclineInvite(\''+invite.id+'\')">Отклонить</button>'
+      + '</div>';
+    document.body.appendChild(toastEl);
+    // Авто-скрытие через 5 минут
+    setTimeout(function(){
+      var el = document.getElementById('dcoopInviteToast-' + invite.id);
+      if (el) el.remove();
+    }, 5 * 60 * 1000);
+  }
+
+  window.dcoopAcceptInvite = function(id) {
+    acceptInvite(id).then(function(){
+      var el = document.getElementById('dcoopInviteToast-' + id);
+      if (el) el.remove();
+      toast('Приглашение принято — ждём подтверждения от создателя…');
+      _db().collection('draftInvites').doc(id).get().then(function(snap){
+        if (!snap.exists) return;
+        var d = snap.data();
+        if (window.openDraftCoop) window.openDraftCoop();
+        // Ретраим открытие лобби пока не получим доступ (создатель финализирует)
+        var tries = 0;
+        (function tryOpen() {
+          _db().collection('draftLobbies').doc(d.lobbyId).get().then(function(s){
+            if (s.exists) { openLobby(d.lobbyId); return; }
+          }).catch(function(){
+            if (tries++ < 15) setTimeout(tryOpen, 1000);
+          });
+        })();
+      });
+    }).catch(function(e){ toast('Ошибка: '+e.message); });
+  };
+
+  window.dcoopDeclineInvite = function(id) {
+    declineInvite(id).then(function(){
+      var el = document.getElementById('dcoopInviteToast-' + id);
+      if (el) el.remove();
+      toast('Приглашение отклонено');
+    }).catch(function(e){ toast('Ошибка: '+e.message); });
+  };
 
   function removeSpectator(uid) {
     var l = _currentLobby;
@@ -663,20 +888,28 @@
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
 
+    // Активируем fullscreen режим для лобби
+    document.body.classList.add('dcoop-fullscreen');
+
     var uid = _uid();
     var mySide = null;
     if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) mySide = 'blue';
     else if (lobby.redCaptain && lobby.redCaptain.uid === uid) mySide = 'red';
     var iAmCaptain = !!mySide;
+    var isCreator = lobby.createdBy === uid;
 
     var step = WR_DRAFT_SEQUENCE[game.turnIndex] || null;
     var myTurn = iAmCaptain && step && step.side === mySide && game.phase !== 'done';
     var fearlessLock = lobby.mode === 'fearless' ? (lobby.usedChampions || []) : [];
     var unavail = getUnavailable(game, fearlessLock);
 
+    // Если hover невалиден (ход ушёл / чемп недоступен) — сбрасываем локально
+    if (_hoverLocal && (!myTurn || unavail[_hoverLocal])) _hoverLocal = null;
+
+    var isMob = isMobileDraft();
     pane.innerHTML = ''
-      + topBarHtml(lobby, game, step)
-      + fearlessLockHtml(fearlessLock)
+      + draftHeaderHtml(lobby, game, step, mySide, isCreator)
+      + (isMob ? pastGamesHtml(lobby, game) : '')
       + '<div class="dcoop-draft-layout">'
       +   sidePanelHtml('blue', lobby, game, step)
       +   '<div class="dcoop-gallery-col">'
@@ -685,17 +918,24 @@
       +     lockInBtnHtml(myTurn, game, step)
       +   '</div>'
       +   sidePanelHtml('red', lobby, game, step)
-      + '</div>';
+      + '</div>'
+      + (isMob ? '' : pastGamesHtml(lobby, game))
+      + fearlessLockHtml(fearlessLock);
 
     // Render gallery
     renderGallery(lobby, game, step, mySide, unavail);
+
+    // Restore LockIn button state after re-render (fix "двойной клик")
+    if (_hoverLocal && myTurn) {
+      var lockBtn = document.getElementById('dcoopLockIn');
+      if (lockBtn) lockBtn.disabled = false;
+    }
 
     // Start timer
     startTimer(lobby, game, step, mySide);
 
     if (game.phase === 'done' || game.turnIndex >= SEQ_LEN) {
       if (game.winner) {
-        // Победитель уже выбран — показываем экран "между играми" или "серия завершена"
         if (lobby.status === 'series_done' || lobby.status === 'closed') {
           renderSeriesDone(lobby, pane);
         } else {
@@ -707,23 +947,8 @@
     }
   }
 
-  function topBarHtml(lobby, game, step) {
-    var phaseText = {ban1:'Баны 1',pick1:'Пики 1',ban2:'Баны 2',pick2:'Пики 2',done:'Драфт завершён'}[game.phase] || game.phase;
-    var sideCol = step ? (step.side === 'blue' ? '#5dade2' : '#e74c3c') : 'var(--text-faint)';
-    var sideText = step ? (step.side === 'blue' ? 'СИНИЕ' : 'КРАСНЫЕ') : '—';
-    var actionText = step ? (step.action === 'ban' ? 'БАНЯТ' : 'ПИКАЮТ') : '';
-
-    return ''
-      + '<div class="dcoop-topbar">'
-      +   '<button onclick="dcoopBackToList()" class="dcoop-back-btn">← К списку</button>'
-      +   '<div class="dcoop-topbar-info">'
-      +     '<span style="font-weight:900;color:#fff;">'+escapeHtml(lobby.blueTeamName||'Blue')+' vs '+escapeHtml(lobby.redTeamName||'Red')+'</span>'
-      +     '<span style="color:var(--text-faint);font-size:11px;">Игра '+ (game.number || lobby.currentGame || 1) +'</span>'
-      +     '<span style="color:var(--text-faint);font-size:11px;">'+phaseText+'</span>'
-      +   '</div>'
-      +   '<div class="dcoop-turn-info" style="color:'+sideCol+';">'+sideText+' '+actionText+'</div>'
-      +   '<div id="dcoopTimer" class="dcoop-timer">--</div>'
-      + '</div>';
+  function isMobileDraft() {
+    return window.innerWidth <= 760;
   }
 
   function fearlessLockHtml(list) {
@@ -735,19 +960,14 @@
     return '<div class="dcoop-fearless-bar"><span class="dcoop-fearless-label">🔒 Fearless ('+list.length+'):</span>'+icons+'</div>';
   }
 
-  function sidePanelHtml(side, lobby, game, step) {
-    var col = side === 'blue' ? '#5dade2' : '#e74c3c';
-    var emoji = side === 'blue' ? '🔵' : '🔴';
-    var teamName = side === 'blue' ? (lobby.blueTeamName||'Blue') : (lobby.redTeamName||'Red');
-    var bans = game.bans[side] || [];
-    var picks = game.picks[side] || [];
-    var hover = game.hover[side] || null;
+  // ─── Bans/Picks slot rendering (shared PC + mobile) ───
+  function banSlotsHtml(side, game, step, mode) {
+    var bans = (game.bans && game.bans[side]) || [];
+    var hover = (game.hover && game.hover[side]) || null;
     var activeBanIdx = (step && step.side === side && step.action === 'ban') ? step.banIdx : -1;
-    var activePickIdx = (step && step.side === side && step.action === 'pick') ? step.pickIdx : -1;
-
-    var banSlots = [0,1,2,3,4].map(function(i){
+    return [0,1,2,3,4].map(function(i){
       var n = bans[i];
-      var cls = 'dcoop-ban-slot';
+      var cls = 'dcoop-ban-slot' + (mode === 'mobile' ? ' m' : '');
       var html = '<span class="dcoop-slot-x">✕</span>';
       if (n) {
         var img = window._champIcon ? window._champIcon(n) : '';
@@ -761,37 +981,140 @@
       }
       return '<div class="'+cls+'">'+html+'</div>';
     }).join('');
+  }
 
-    var pickSlots = [0,1,2,3,4].map(function(i){
+  function pickSlotsHtml(side, game, step, mode) {
+    var picks = (game.picks && game.picks[side]) || [];
+    var hover = (game.hover && game.hover[side]) || null;
+    var activePickIdx = (step && step.side === side && step.action === 'pick') ? step.pickIdx : -1;
+    var showName = mode !== 'mobile';
+    return [0,1,2,3,4].map(function(i){
       var p = picks[i];
-      var cls = 'dcoop-pick-slot';
+      var cls = 'dcoop-pick-slot' + (mode === 'mobile' ? ' m' : '');
       var html = '<span class="dcoop-slot-placeholder">'+(i+1)+'</span>';
       if (p && p.champ) {
         var img = window._champIcon ? window._champIcon(p.champ) : '';
-        html = '<img src="'+img+'" alt="'+escapeHtml(p.champ)+'" onerror="this.style.display=\'none\'"><div class="dcoop-pick-name">'+escapeHtml(p.champ)+'</div>';
+        html = '<img src="'+img+'" alt="'+escapeHtml(p.champ)+'" onerror="this.style.display=\'none\'">'
+             + (showName ? '<div class="dcoop-pick-name">'+escapeHtml(p.champ)+'</div>' : '');
       } else if (i === activePickIdx && hover) {
         var imgh = window._champIcon ? window._champIcon(hover) : '';
-        html = '<img src="'+imgh+'" alt="'+escapeHtml(hover)+'" style="opacity:0.45;" onerror="this.style.display=\'none\'"><div class="dcoop-pick-name" style="opacity:0.5;">'+escapeHtml(hover)+'</div>';
+        html = '<img src="'+imgh+'" alt="'+escapeHtml(hover)+'" style="opacity:0.45;" onerror="this.style.display=\'none\'">'
+             + (showName ? '<div class="dcoop-pick-name" style="opacity:0.5;">'+escapeHtml(hover)+'</div>' : '');
         cls += ' dcoop-active-slot';
       } else if (i === activePickIdx) {
         cls += ' dcoop-active-slot';
       }
       return '<div class="'+cls+'">'+html+'</div>';
     }).join('');
+  }
 
+  // ─── Captain block (user-card style) ───
+  function captainBlockHtml(side, cap, lobby, step) {
+    var col = side === 'blue' ? '#5dade2' : '#e74c3c';
+    var nick = (cap && cap.nick) ? escapeHtml(cap.nick) : '<span style="color:#f1c40f;">ждём…</span>';
+    var teamName = side === 'blue' ? (lobby.blueTeamName || 'Blue') : (lobby.redTeamName || 'Red');
+    var isActive = step && step.side === side;
+    var score = (lobby.seriesScore && lobby.seriesScore[side]) || 0;
+    return '<div class="dcoop-hdr-cap dcoop-hdr-cap-'+side+(isActive?' active':'')+'" style="--side-col:'+col+';">'
+      + '<div class="dcoop-hdr-cap-team">'+escapeHtml(teamName)+'</div>'
+      + '<div class="dcoop-hdr-cap-nick">'+nick+'</div>'
+      + '<div class="dcoop-hdr-cap-score">'+score+'</div>'
+      + '</div>';
+  }
+
+  // ─── Header (mobile vs PC) ───
+  function draftHeaderHtml(lobby, game, step, mySide, isCreator) {
+    var stepCol = step ? (step.side === 'blue' ? '#5dade2' : '#e74c3c') : '#fff';
+    var closeBtn = isCreator
+      ? '<button class="dcoop-hdr-close" onclick="dcoopCloseLobbyConfirm()" title="Закрыть лобби">✕</button>'
+      : '';
+    var specCount = (lobby.invitedSpectators || []).length;
+    var specBtn = '<button class="dcoop-hdr-spec" onclick="dcoopToggleSpectators()" title="Зрители">👁 '+specCount+'</button>';
+    var assistBtn = '<button class="dcoop-hdr-assist" onclick="dcoopToggleAssist()" title="Драфт-помощник" data-on="'+(_draftAssistantOn?'1':'0')+'">🤖</button>';
+
+    if (isMobileDraft()) {
+      return ''
+        + '<div class="dcoop-hdr dcoop-hdr-mobile">'
+        +   '<div class="dcoop-hdr-row-caps">'
+        +     captainBlockHtml('blue', lobby.blueCaptain, lobby, step)
+        +     '<div class="dcoop-hdr-timer-m" id="dcoopTimer" style="color:'+stepCol+';">—</div>'
+        +     captainBlockHtml('red',  lobby.redCaptain,  lobby, step)
+        +   '</div>'
+        +   '<div class="dcoop-hdr-row-bans">'
+        +     '<div class="dcoop-hdr-bans dcoop-hdr-bans-blue">'+banSlotsHtml('blue', game, step, 'mobile')+'</div>'
+        +     '<div class="dcoop-hdr-bans dcoop-hdr-bans-red">'+banSlotsHtml('red',  game, step, 'mobile')+'</div>'
+        +   '</div>'
+        +   '<div class="dcoop-hdr-row-picks">'
+        +     '<div class="dcoop-hdr-picks dcoop-hdr-picks-blue">'+pickSlotsHtml('blue', game, step, 'mobile')+'</div>'
+        +     '<div class="dcoop-hdr-picks dcoop-hdr-picks-red">'+pickSlotsHtml('red',  game, step, 'mobile')+'</div>'
+        +   '</div>'
+        +   '<div class="dcoop-hdr-corner">'+specBtn+closeBtn+'</div>'
+        + '</div>';
+    }
+
+    // PC: большой таймер по центру + блоки капитанов по краям
+    return ''
+      + '<div class="dcoop-hdr dcoop-hdr-pc">'
+      +   '<div class="dcoop-hdr-pc-left">'+captainBlockHtml('blue', lobby.blueCaptain, lobby, step)+'</div>'
+      +   '<div class="dcoop-hdr-timer-pc" id="dcoopTimer" style="color:'+stepCol+';">—</div>'
+      +   '<div class="dcoop-hdr-pc-right">'+captainBlockHtml('red', lobby.redCaptain, lobby, step)+'</div>'
+      +   '<div class="dcoop-hdr-corner-pc">'+specBtn+assistBtn+closeBtn+'</div>'
+      + '</div>';
+  }
+
+  // ─── Past games collapsible block ───
+  function pastGamesHtml(lobby, game) {
+    var completed = lobby.completedGames || [];
+    if (!completed.length) return '';
+
+    function champImg(n) {
+      if (!n) return '<div class="dcoop-past-slot empty"></div>';
+      var img = window._champIcon ? window._champIcon(n) : '';
+      return '<div class="dcoop-past-slot"><img src="'+img+'" alt="'+escapeHtml(n)+'" title="'+escapeHtml(n)+'" onerror="this.style.display=\'none\'"></div>';
+    }
+
+    var last = completed[completed.length - 1];
+    var lastBlueHtml = (last.picksBlue || []).map(champImg).join('');
+    var lastRedHtml  = (last.picksRed  || []).map(champImg).join('');
+
+    var expandedRows = completed.map(function(g){
+      var blueRow = (g.picksBlue || []).map(champImg).join('');
+      var redRow  = (g.picksRed  || []).map(champImg).join('');
+      return '<div class="dcoop-past-row">'
+        + '<div class="dcoop-past-num">'+g.number+'</div>'
+        + '<div class="dcoop-past-side blue">'+blueRow+'</div>'
+        + '<div class="dcoop-past-side red">'+redRow+'</div>'
+        + '</div>';
+    }).join('');
+
+    var icon = _pastGamesExpanded ? '⌃' : '⌄';
+    return ''
+      + '<div class="dcoop-past'+(_pastGamesExpanded?' open':'')+'" id="dcoopPast">'
+      +   '<div class="dcoop-past-collapsed">'
+      +     '<div class="dcoop-past-side blue">'+lastBlueHtml+'</div>'
+      +     '<div class="dcoop-past-side red">'+lastRedHtml+'</div>'
+      +     '<button class="dcoop-past-toggle" onclick="dcoopTogglePast()" title="Развернуть/свернуть прошлые пики">'+icon+'</button>'
+      +   '</div>'
+      +   '<div class="dcoop-past-expanded">'+expandedRows+'</div>'
+      + '</div>';
+  }
+
+  // ─── Side panel (PC only — bans/picks) ───
+  function sidePanelHtml(side, lobby, game, step) {
+    if (isMobileDraft()) return '';
+    var col = side === 'blue' ? '#5dade2' : '#e74c3c';
     return ''
       + '<div class="dcoop-side-panel" style="--side-col:'+col+';">'
-      +   '<div class="dcoop-side-header">'+emoji+' '+escapeHtml(teamName)+'</div>'
       +   '<div class="dcoop-bans-label">Баны</div>'
-      +   '<div class="dcoop-bans-row">'+banSlots+'</div>'
+      +   '<div class="dcoop-bans-row">'+banSlotsHtml(side, game, step, 'pc')+'</div>'
       +   '<div class="dcoop-picks-label">Пики</div>'
-      +   '<div class="dcoop-picks-col">'+pickSlots+'</div>'
+      +   '<div class="dcoop-picks-col">'+pickSlotsHtml(side, game, step, 'pc')+'</div>'
       + '</div>';
   }
 
   function gallerySearchHtml() {
     var roles = [
-      {k:'all',l:'Все'},{k:'Top',l:'Top'},{k:'Jungle',l:'JG'},
+      {k:'Top',l:'Top'},{k:'Jungle',l:'JG'},
       {k:'Mid',l:'Mid'},{k:'ADC',l:'ADC'},{k:'Support',l:'Sup'}
     ];
     var roleBtns = roles.map(function(r){
@@ -811,8 +1134,10 @@
   }
 
   // Filtering state
-  var _filterRole = 'all';
+  var _filterRole = 'Top';
   var _filterQuery = '';
+  var _pastGamesExpanded = false;
+  var _draftAssistantOn = false;
 
   function renderGallery(lobby, game, step, mySide, unavail) {
     var grid = document.getElementById('dcoopGallery');
@@ -828,7 +1153,7 @@
     }
     var q = _filterQuery.toLowerCase();
     var list = champs.filter(function(c){
-      if (_filterRole !== 'all' && !c.roles[_filterRole]) return false;
+      if (!c.roles[_filterRole]) return false;
       if (q && c.name.toLowerCase().indexOf(q) === -1) return false;
       return true;
     });
@@ -1035,40 +1360,91 @@
   }
 
   var _autoActionFired = {};
+  // Детерминированный random: одинаковый chamber на всех клиентах
+  function deterministicPick(seed, pool) {
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < seed.length; i++) {
+      h ^= seed.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return pool[h % pool.length];
+  }
+
   function onTimerExpired(lobby, game, step, mySide) {
-    // Только капитан своей стороны делает auto-action
-    if (!step || step.side !== mySide) return;
+    if (!step) return;
+    var uid = _uid();
+    // Фаерят все уполномоченные (капитаны + создатель) — транзакция решит конфликт
+    var blueCapUid = lobby.blueCaptain && lobby.blueCaptain.uid;
+    var redCapUid  = lobby.redCaptain  && lobby.redCaptain.uid;
+    var authorized = uid === lobby.createdBy || uid === blueCapUid || uid === redCapUid;
+    if (!authorized) return;
+
     var key = lobby.id + '-' + game.number + '-' + game.turnIndex;
     if (_autoActionFired[key]) return;
     _autoActionFired[key] = 1;
 
-    if (step.action === 'ban') {
-      // пропуск бана (null)
-      var patch = { turnStartedAt: firebase.firestore.FieldValue.serverTimestamp() };
-      var bans = (game.bans[step.side] || []).slice();
-      bans[step.banIdx] = null;
-      patch['bans.' + step.side] = bans;
-      patch['hover.' + step.side] = null;
-      var nextIdx = game.turnIndex + 1;
-      patch.turnIndex = nextIdx;
-      if (nextIdx >= SEQ_LEN) { patch.phase='done'; patch.finishedAt=firebase.firestore.FieldValue.serverTimestamp(); }
-      else {
-        var ns = WR_DRAFT_SEQUENCE[nextIdx];
-        patch.phase = ns.phase; patch.currentSide = ns.side; patch.currentAction = ns.action;
-      }
-      _db().collection('draftLobbies').doc(lobby.id).collection('games').doc(String(game.number)).update(patch);
-    } else {
-      // Пик: если есть hover — фиксируем, иначе рандом
-      var pick = game.hover && game.hover[step.side];
-      if (!pick) {
-        var fl = lobby.mode==='fearless' ? (lobby.usedChampions||[]) : [];
-        var un = getUnavailable(game, fl);
-        var pool = getAllChamps().map(function(c){return c.name;}).filter(function(n){ return !un[n]; });
-        if (!pool.length) return;
-        pick = pool[Math.floor(Math.random()*pool.length)];
-      }
-      applyLockIn(lobby, game, step, pick, step.side);
-    }
+    // Небольшая задержка, чтобы дать активному капитану шанс нажать Lock In
+    var delay = step.side === mySide ? 0 : (uid === lobby.createdBy ? 1200 : 2400);
+
+    setTimeout(function(){
+      var dbInst = _db();
+      var gameRef = dbInst.collection('draftLobbies').doc(lobby.id).collection('games').doc(String(game.number));
+
+      dbInst.runTransaction(function(tx){
+        return tx.get(gameRef).then(function(snap){
+          if (!snap.exists) return;
+          var g = snap.data();
+          if (g.turnIndex !== game.turnIndex) return; // кто-то уже походил
+          if (g.phase === 'done') return;
+
+          var patch = { turnStartedAt: firebase.firestore.FieldValue.serverTimestamp() };
+          var nextIdx = g.turnIndex + 1;
+          patch.turnIndex = nextIdx;
+          patch['hover.' + step.side] = null;
+
+          if (step.action === 'ban') {
+            var bans = (g.bans[step.side] || []).slice();
+            // Если уже выбрал ховер — забанить его, иначе пустой слот
+            bans[step.banIdx] = g.hover && g.hover[step.side] ? g.hover[step.side] : null;
+            patch['bans.' + step.side] = bans;
+          } else {
+            var pick = g.hover && g.hover[step.side];
+            if (!pick) {
+              var fl = lobby.mode==='fearless' ? (lobby.usedChampions||[]) : [];
+              var un = getUnavailable(g, fl);
+              // Пул в активной роли, иначе fallback на всех
+              var role = step.pickIdx != null ? ['Top','Jungle','Mid','ADC','Support'][step.pickIdx] : null;
+              var allC = getAllChamps();
+              var pool = allC.filter(function(c){ return !un[c.name] && (!role || c.roles[role]); }).map(function(c){return c.name;});
+              if (!pool.length) pool = allC.filter(function(c){ return !un[c.name]; }).map(function(c){return c.name;});
+              if (!pool.length) return;
+              pick = deterministicPick(lobby.id + ':' + g.number + ':' + g.turnIndex, pool);
+            }
+            var picks = (g.picks[step.side] || []).slice();
+            picks[step.pickIdx] = { champ: pick, lockedAt: Date.now(), auto: true };
+            patch['picks.' + step.side] = picks;
+          }
+
+          if (nextIdx >= SEQ_LEN) {
+            patch.phase = 'done';
+            patch.finishedAt = firebase.firestore.FieldValue.serverTimestamp();
+          } else {
+            var ns = WR_DRAFT_SEQUENCE[nextIdx];
+            patch.phase = ns.phase; patch.currentSide = ns.side; patch.currentAction = ns.action;
+          }
+
+          tx.update(gameRef, patch);
+        });
+      }).then(function(){
+        // Если драфт завершён — обновляем статус лобби
+        if (game.turnIndex + 1 >= SEQ_LEN) {
+          dbInst.collection('draftLobbies').doc(lobby.id).update({
+            status: 'finished_game',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }).catch(function(){});
+        }
+      }).catch(function(e){ console.warn('[draft] auto-advance tx', e); });
+    }, delay);
   }
 
   function renderGameFinished(lobby, game) {
@@ -1115,6 +1491,20 @@
       patch.usedChampions = Array.from(new Set(used));
     }
 
+    // Денормализация пиков прошлой игры для быстрого отображения в past games
+    var completedEntry = {
+      number: g.number,
+      winner: side,
+      picksBlue: (g.picks.blue || []).map(function(p){ return p && p.champ ? p.champ : null; }),
+      picksRed:  (g.picks.red  || []).map(function(p){ return p && p.champ ? p.champ : null; }),
+      bansBlue:  (g.bans.blue  || []).slice(),
+      bansRed:   (g.bans.red   || []).slice()
+    };
+    var completedList = (l.completedGames || []).filter(function(e){ return e.number !== g.number; });
+    completedList.push(completedEntry);
+    completedList.sort(function(a,b){ return a.number - b.number; });
+    patch.completedGames = completedList;
+
     // Проверяем — серия завершена?
     var targetWins = { bo1:1, bo3:2, bo5:3, bo7:4, infinite:999 }[l.seriesType] || 1;
     var newBlue = (l.seriesScore && l.seriesScore.blue || 0) + (side==='blue'?1:0);
@@ -1122,14 +1512,71 @@
     var seriesDone = (newBlue >= targetWins || newRed >= targetWins) && l.seriesType !== 'infinite';
 
     if (seriesDone) patch.status = 'series_done';
-    else patch.status = 'finished_game'; // ждём "следующая игра"
+    else patch.status = 'finished_game';
 
-    // Помечаем winner в документе игры
     var lobbyRef = dbInst.collection('draftLobbies').doc(l.id);
     Promise.all([
       lobbyRef.collection('games').doc(String(g.number)).update({ winner: side }),
       lobbyRef.update(patch)
     ]).catch(function(e){ toast('Ошибка: '+e.message); });
+  }
+
+  // ─── Toggles ───
+  function togglePast() {
+    _pastGamesExpanded = !_pastGamesExpanded;
+    var el = document.getElementById('dcoopPast');
+    if (el) el.classList.toggle('open', _pastGamesExpanded);
+    var btn = el && el.querySelector('.dcoop-past-toggle');
+    if (btn) btn.textContent = _pastGamesExpanded ? '⌃' : '⌄';
+  }
+
+  function toggleAssist() {
+    _draftAssistantOn = !_draftAssistantOn;
+    if (_currentLobby && _currentGame) renderDraftUi(_currentLobby, _currentGame);
+  }
+
+  function toggleSpectators() {
+    var l = _currentLobby;
+    if (!l) return;
+    var existing = document.getElementById('dcoopSpecDrop');
+    if (existing) { existing.parentNode.removeChild(existing); return; }
+
+    var specs = l.invitedSpectators || [];
+    var rows = specs.length
+      ? specs.map(function(su){
+          var nick = (l.spectatorNicks && l.spectatorNicks[su]) || su.slice(0,8);
+          return '<div class="dcoop-spec-row">'+escapeHtml(nick)+'</div>';
+        }).join('')
+      : '<div style="color:var(--text-faint);font-size:12px;padding:8px;text-align:center;">Зрителей нет</div>';
+
+    var drop = document.createElement('div');
+    drop.id = 'dcoopSpecDrop';
+    drop.className = 'dcoop-spec-drop';
+    drop.innerHTML = '<div class="dcoop-spec-title">👁 Зрители ('+specs.length+')</div>' + rows;
+    drop.onclick = function(e){ e.stopPropagation(); };
+    document.body.appendChild(drop);
+    setTimeout(function(){
+      document.addEventListener('click', function closer(){
+        document.removeEventListener('click', closer);
+        var el = document.getElementById('dcoopSpecDrop');
+        if (el) el.parentNode.removeChild(el);
+      }, { once: true });
+    }, 10);
+  }
+
+  function closeLobbyConfirm() {
+    var l = _currentLobby;
+    if (!l) return;
+    if (l.createdBy !== _uid()) { toast('Только создатель может закрыть лобби'); return; }
+    if (!confirm('Закрыть лобби? Драфт будет прерван.')) return;
+    _db().collection('draftLobbies').doc(l.id).update({
+      status: 'closed',
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function(){
+      toast('Лобби закрыто');
+      document.body.classList.remove('dcoop-fullscreen');
+      backToList();
+    }).catch(function(e){ toast('Ошибка: '+e.message); });
   }
 
   function nextGame(swapSides) {
@@ -1343,6 +1790,10 @@
   window.dcoopSetWinner = setWinner;
   window.dcoopNextGame = nextGame;
   window.dcoopFinishSeries = finishSeries;
+  window.dcoopTogglePast = togglePast;
+  window.dcoopToggleAssist = toggleAssist;
+  window.dcoopToggleSpectators = toggleSpectators;
+  window.dcoopCloseLobbyConfirm = closeLobbyConfirm;
 
   // ─── START DRAFT (создать games/1 и перейти в drafting) ───
   function startDraft(l) {
@@ -1397,10 +1848,53 @@
   function close() {
     stopMyLobbiesListener();
     stopLobbyListener();
+    stopGameListener();
     closeUserSearch();
     _currentLobbyId = null;
     _currentLobby = null;
+    document.body.classList.remove('dcoop-fullscreen');
   }
+
+  // ─── AUTO-REDIRECT captain to active lobby ───
+  // Если юзер — капитан активного лобби, автоматически открываем его при логине
+  function checkCaptainAutoRedirect() {
+    var uid = _uid();
+    var dbInst = _db();
+    if (!uid || !dbInst) return;
+
+    var lobbyRef = dbInst.collection('draftLobbies');
+    // Параллельно ищем лобби где юзер — blueCap или redCap
+    Promise.all([
+      lobbyRef.where('blueCaptain.uid','==',uid).get(),
+      lobbyRef.where('redCaptain.uid','==',uid).get()
+    ]).then(function(results){
+      var active = [];
+      results.forEach(function(snap){
+        snap.forEach(function(d){
+          var l = d.data(); l.id = d.id;
+          if (l.status === 'drafting' || l.status === 'ready_check' || l.status === 'finished_game' || l.status === 'waiting') {
+            active.push(l);
+          }
+        });
+      });
+      if (!active.length) return;
+      // приоритет: drafting > finished_game > ready_check > waiting, затем свежайший
+      var priority = { drafting: 4, finished_game: 3, ready_check: 2, waiting: 1 };
+      active.sort(function(a,b){
+        var pa = priority[a.status] || 0, pb = priority[b.status] || 0;
+        if (pa !== pb) return pb - pa;
+        var ta = (a.updatedAt && a.updatedAt.toMillis && a.updatedAt.toMillis()) || 0;
+        var tb = (b.updatedAt && b.updatedAt.toMillis && b.updatedAt.toMillis()) || 0;
+        return tb - ta;
+      });
+      var target = active[0];
+      // Не перебиваем, если юзер уже открыл конкретное лобби
+      if (_currentLobbyId) return;
+      if (window.openDraftCoop) window.openDraftCoop();
+      setTimeout(function(){ openLobby(target.id); }, 200);
+    }).catch(function(e){ console.warn('[draft] auto-redirect', e); });
+  }
+  window.dcoopCheckCaptainAutoRedirect = checkCaptainAutoRedirect;
 
   // ─── EXPORTS ───
   window.openDraftCoop = function() {
@@ -1425,13 +1919,24 @@
   window.dcoopCopyInvite = copyInviteLink;
 
   // Переоткрыть при логине, если модалка сейчас открыта
+  // + Автоматический переход на активное капитанское лобби
+  var _autoRedirectChecked = false;
   document.addEventListener('DOMContentLoaded', function(){
     try {
       firebase.auth().onAuthStateChanged(function(user){
         var mask = document.getElementById('draftCoopMask');
         var visible = mask && mask.classList.contains('active');
-        if (!visible) return;
-        if (user) open(); else showAuthGate();
+        if (visible) {
+          if (user) open(); else showAuthGate();
+        }
+        // Авто-редирект капитанов на активное лобби (один раз на сессию)
+        if (user && !_autoRedirectChecked) {
+          _autoRedirectChecked = true;
+          setTimeout(checkCaptainAutoRedirect, 1500);
+        }
+        // Запуск listeners приглашений при логине
+        if (user) startInvitesListeners();
+        else stopInvitesListeners();
       });
     } catch(e) {}
   });
