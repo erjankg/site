@@ -3162,7 +3162,9 @@
         if (!db || !user) return;
         db.collection('users').doc(user.uid).get().then(function(snap){
             var d = snap.exists ? snap.data() : {};
-            var needSetup = !d.role || !d.rank || !d.displayName;
+            // Модалку профиля открываем только если НЕТ роли или ранга.
+            // displayName всегда есть из Google-аккаунта (присутствует в auth.currentUser), проверять его не нужно.
+            var needSetup = !d.role || !d.rank;
             hideSiteAuthGate();
             if (needSetup) {
                 document.body.classList.add('profile-gated');
