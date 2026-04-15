@@ -463,15 +463,41 @@
     }
   }
 
-  // ─── USER SEARCH MODAL (для приглашения капитана/зрителя) ───
-  var _searchMode = null; // 'captainBlue' | 'captainRed' | 'spectator'
+  // ─── UNIFIED USER SEARCH + INVITE MODAL ───
+  // P0: realtime онлайн (onSnapshot), P0: роли прямо в строке, P1: фильтр online,
+  // P1: аватар 40×40, P2: недавние, P2: badge "✉" для pending invites.
   var _searchOverlay = null;
+  var _userList = [];              // realtime snapshot of users
+  var _userListUnsub = null;
+  var _pendingByUid = {};          // uid → { role, side } для моих pending invites в текущем лобби
+  var _pendingUnsub = null;
+  var _onlineOnly = true;          // default ON
+  var _searchQuery = '';
+  var _prefMode = null;            // hint: подсветить какую кнопку
 
-  var _userCache = null; // кэш списка юзеров (TTL 60s)
-  var _userCacheAt = 0;
+  var RECENT_KEY = '_wrsRecentInvites';
+  function getRecent() {
+    try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch(e){ return []; }
+  }
+  function pushRecent(u) {
+    try {
+      var arr = getRecent().filter(function(x){ return x.uid !== u.uid; });
+      arr.unshift({ uid: u.uid, nick: u.displayName || '', photo: u.photoURL || '' });
+      localStorage.setItem(RECENT_KEY, JSON.stringify(arr.slice(0, 5)));
+    } catch(e) {}
+  }
 
-  function openUserSearch(mode) {
-    _searchMode = mode;
+  function computeFresh(u) {
+    if (u.online && u.lastSeen && u.lastSeen.toMillis) {
+      return (Date.now() - u.lastSeen.toMillis()) < 120000;
+    }
+    return !!u.online;
+  }
+
+  function openUserSearch(prefMode) {
+    _prefMode = prefMode || null;
+    _searchQuery = '';
+    _onlineOnly = true;
     closeUserSearch();
 
     var overlay = document.createElement('div');
@@ -479,17 +505,24 @@
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;';
     overlay.onclick = function(e){ if (e.target === overlay) closeUserSearch(); };
 
-    var titles = {
-      captainBlue: '➕ Пригласить капитана синих',
-      captainRed:  '➕ Пригласить капитана красных',
-      spectator:   '➕ Пригласить зрителя'
+    var hintMap = {
+      captainBlue: '🔵 Нужен капитан СИНИХ — нажми 🔵 у выбранного юзера',
+      captainRed:  '🔴 Нужен капитан КРАСНЫХ — нажми 🔴 у выбранного юзера',
+      spectator:   '👁 Нужен зритель — нажми 👁 у выбранного юзера'
     };
+    var hintTxt = hintMap[_prefMode] || 'Выберите юзера и роль — все роли доступны в каждой строке';
+
     overlay.innerHTML = ''
-      + '<div style="background:var(--bg-base);border:1px solid var(--accent-border);border-radius:12px;width:100%;max-width:420px;padding:14px;display:flex;flex-direction:column;gap:10px;max-height:85vh;">'
-      +   '<div style="font-size:14px;font-weight:900;color:#fff;">'+ (titles[mode] || 'Поиск юзера') +'</div>'
+      + '<div style="background:var(--bg-base);border:1px solid var(--accent-border);border-radius:12px;width:100%;max-width:460px;padding:14px;display:flex;flex-direction:column;gap:8px;max-height:88vh;">'
+      +   '<div style="font-size:14px;font-weight:900;color:#fff;">👥 Пригласить в лобби</div>'
+      +   '<div style="font-size:10.5px;color:var(--text-faint);line-height:1.4;">'+escapeHtml(hintTxt)+'</div>'
       +   '<input id="dcoopSearchInput" type="text" placeholder="🔍 Фильтр по нику" style="padding:9px 12px;border:1px solid var(--accent-border);background:var(--bg-primary);color:#fff;border-radius:8px;font-size:13px;outline:none;">'
-      +   '<div id="dcoopSearchResults" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px;min-height:200px;"><div style="color:var(--text-faint);font-size:11px;text-align:center;padding:20px;">Загрузка…</div></div>'
-      +   '<button onclick="dcoopCloseSearch()" style="padding:8px;border:1px solid var(--accent-border);background:transparent;color:#fff;border-radius:8px;cursor:pointer;font-size:12px;">Отмена</button>'
+      +   '<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-faint);cursor:pointer;user-select:none;">'
+      +     '<input id="dcoopSearchOnlineOnly" type="checkbox" checked style="accent-color:#2ecc71;">'
+      +     '<span>Только онлайн</span>'
+      +   '</label>'
+      +   '<div id="dcoopSearchResults" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:4px;min-height:220px;"><div style="color:var(--text-faint);font-size:11px;text-align:center;padding:20px;">Загрузка…</div></div>'
+      +   '<button onclick="dcoopCloseSearch()" style="padding:8px;border:1px solid var(--accent-border);background:transparent;color:#fff;border-radius:8px;cursor:pointer;font-size:12px;">Закрыть</button>'
       + '</div>';
     document.body.appendChild(overlay);
     _searchOverlay = overlay;
@@ -498,35 +531,34 @@
     var timer = null;
     inp.addEventListener('input', function(){
       if (timer) clearTimeout(timer);
-      timer = setTimeout(function(){ renderUserList(inp.value.trim().toLowerCase()); }, 80);
+      timer = setTimeout(function(){
+        _searchQuery = inp.value.trim().toLowerCase();
+        renderUserList();
+      }, 80);
     });
     setTimeout(function(){ inp.focus(); }, 50);
 
-    loadUserList().then(function(){ renderUserList(''); }).catch(function(e){
-      var r = document.getElementById('dcoopSearchResults');
-      if (r) r.innerHTML = '<div style="color:#e74c3c;font-size:11px;text-align:center;padding:20px;">Ошибка загрузки: '+escapeHtml(e.message||'')+'</div>';
+    var onlineCb = document.getElementById('dcoopSearchOnlineOnly');
+    onlineCb.addEventListener('change', function(){
+      _onlineOnly = onlineCb.checked;
+      renderUserList();
     });
+
+    startUserListListener();
+    startPendingInvitesListener();
   }
 
-  function loadUserList() {
+  function startUserListListener() {
+    stopUserListListener();
     var dbInst = _db();
-    if (!dbInst) return Promise.reject(new Error('no db'));
-    if (_userCache && (Date.now() - _userCacheAt) < 60000) return Promise.resolve();
-
-    return dbInst.collection('users').limit(300).get().then(function(snap){
-      var me = _uid();
+    if (!dbInst) return;
+    var me = _uid();
+    _userListUnsub = dbInst.collection('users').limit(300).onSnapshot(function(snap){
       var list = [];
       snap.forEach(function(d){
         var u = d.data(); u.uid = d.id;
         if (u.uid === me) return;
-        // online = реальная метка + updated < 120s
-        var fresh = false;
-        if (u.online && u.lastSeen && u.lastSeen.toMillis) {
-          fresh = (Date.now() - u.lastSeen.toMillis()) < 120000;
-        } else if (u.online) {
-          fresh = true; // запасной вариант если lastSeen нет
-        }
-        u._online = fresh;
+        u._online = computeFresh(u);
         list.push(u);
       });
       list.sort(function(a,b){
@@ -535,44 +567,169 @@
         var nb = (b.displayName || '').toLowerCase();
         return na < nb ? -1 : (na > nb ? 1 : 0);
       });
-      _userCache = list;
-      _userCacheAt = Date.now();
+      _userList = list;
+      renderUserList();
+    }, function(err){
+      console.warn('[draft] user list', err);
+      var r = document.getElementById('dcoopSearchResults');
+      if (r) r.innerHTML = '<div style="color:#e74c3c;font-size:11px;text-align:center;padding:20px;">Ошибка загрузки: '+escapeHtml(err.message||'')+'</div>';
     });
   }
 
-  function renderUserList(filter) {
+  function stopUserListListener() {
+    if (_userListUnsub) { try { _userListUnsub(); } catch(e){} _userListUnsub = null; }
+  }
+
+  function startPendingInvitesListener() {
+    stopPendingInvitesListener();
+    var dbInst = _db();
+    var l = _currentLobby;
+    var me = _uid();
+    if (!dbInst || !l || !me) return;
+    _pendingByUid = {};
+    _pendingUnsub = dbInst.collection('draftInvites')
+      .where('fromUid','==',me)
+      .where('status','==','pending')
+      .onSnapshot(function(snap){
+        var map = {};
+        snap.forEach(function(d){
+          var inv = d.data();
+          if (inv.lobbyId !== l.id) return;
+          map[inv.toUid] = { role: inv.role, side: inv.side || null };
+        });
+        _pendingByUid = map;
+        renderUserList();
+      }, function(err){ console.warn('[draft] pending listener', err); });
+  }
+
+  function stopPendingInvitesListener() {
+    if (_pendingUnsub) { try { _pendingUnsub(); } catch(e){} _pendingUnsub = null; }
+    _pendingByUid = {};
+  }
+
+  // Возвращает { blueDisabled, blueReason, redDisabled, redReason, specDisabled, specReason }
+  function slotStatusFor(u) {
+    var l = _currentLobby || {};
+    var blueCap = l.blueCaptain && l.blueCaptain.uid;
+    var redCap  = l.redCaptain  && l.redCaptain.uid;
+    var specs   = l.invitedSpectators || [];
+    var pend    = _pendingByUid[u.uid];
+
+    var s = { blueDisabled:false, blueReason:'', redDisabled:false, redReason:'', specDisabled:false, specReason:'' };
+
+    // Blue captain
+    if (blueCap) { s.blueDisabled = true; s.blueReason = 'слот занят'; }
+    else if (redCap === u.uid) { s.blueDisabled = true; s.blueReason = 'уже кап. красных'; }
+    else if (pend && pend.role === 'captain' && pend.side === 'blue') { s.blueDisabled = true; s.blueReason = 'уже приглашён'; }
+
+    // Red captain
+    if (redCap) { s.redDisabled = true; s.redReason = 'слот занят'; }
+    else if (blueCap === u.uid) { s.redDisabled = true; s.redReason = 'уже кап. синих'; }
+    else if (pend && pend.role === 'captain' && pend.side === 'red') { s.redDisabled = true; s.redReason = 'уже приглашён'; }
+
+    // Spectator
+    if (specs.indexOf(u.uid) !== -1) { s.specDisabled = true; s.specReason = 'уже зритель'; }
+    else if (specs.length >= 12) { s.specDisabled = true; s.specReason = 'макс. 12'; }
+    else if (blueCap === u.uid || redCap === u.uid) { s.specDisabled = true; s.specReason = 'уже капитан'; }
+    else if (pend && pend.role === 'spectator') { s.specDisabled = true; s.specReason = 'уже приглашён'; }
+
+    return s;
+  }
+
+  function avatarHtml(u, size) {
+    var sz = size || 40;
+    if (u.photoURL || u.photo) {
+      var src = escapeHtml(u.photoURL || u.photo);
+      return '<img src="'+src+'" style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-border-sub);flex-shrink:0;" onerror="this.outerHTML=&quot;<div style=\\&quot;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;\\&quot;>'+escapeHtml((u.displayName||u.nick||'?').charAt(0).toUpperCase())+'</div>&quot;;">';
+    }
+    var ini = escapeHtml((u.displayName || u.nick || '?').charAt(0).toUpperCase());
+    return '<div style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;">'+ini+'</div>';
+  }
+
+  function rowHtml(u) {
+    var nick = escapeHtml(u.displayName || '?');
+    var role = escapeHtml(u.role || '—');
+    var rank = escapeHtml(u.rank || '—');
+    var dot = u._online
+      ? '<span style="color:#2ecc71;font-size:10px;">● онлайн</span>'
+      : '<span style="color:var(--text-faint);font-size:10px;">● оффлайн</span>';
+    var s = slotStatusFor(u);
+    var pend = _pendingByUid[u.uid];
+    var pendBadge = pend ? '<span title="Приглашение отправлено" style="font-size:11px;color:#f1c40f;font-weight:900;" >✉</span>' : '';
+
+    function btn(label, color, disabled, reason, onclick, highlight) {
+      var bg = disabled ? 'rgba(255,255,255,0.04)' : color;
+      var op = disabled ? '0.35' : '1';
+      var cur = disabled ? 'not-allowed' : 'pointer';
+      var title = disabled ? escapeHtml(reason || '') : '';
+      var ring = highlight && !disabled ? 'box-shadow:0 0 0 2px rgba(255,255,255,0.25);' : '';
+      var click = disabled ? '' : ' onclick="'+onclick+'"';
+      return '<button'+click+' title="'+title+'" style="border:none;background:'+bg+';color:#fff;padding:6px 9px;border-radius:6px;font-size:12px;font-weight:800;cursor:'+cur+';opacity:'+op+';'+ring+'">'+label+'</button>';
+    }
+
+    var enc = encodeURIComponent(u.displayName || '');
+    var blueBtn = btn('🔵', '#3498db',  s.blueDisabled, s.blueReason,
+      'dcoopSendInvite(\''+u.uid+'\',\''+enc+'\',\'captain\',\'blue\')',  _prefMode==='captainBlue');
+    var redBtn  = btn('🔴', '#e74c3c',  s.redDisabled,  s.redReason,
+      'dcoopSendInvite(\''+u.uid+'\',\''+enc+'\',\'captain\',\'red\')',   _prefMode==='captainRed');
+    var specBtn = btn('👁', 'var(--accent)', s.specDisabled, s.specReason,
+      'dcoopSendInvite(\''+u.uid+'\',\''+enc+'\',\'spectator\',null)',    _prefMode==='spectator');
+
+    return ''
+      + '<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--accent-border-sub);border-radius:8px;background:rgba(255,255,255,0.02);">'
+      +   avatarHtml(u, 40)
+      +   '<div style="flex:1;min-width:0;">'
+      +     '<div style="display:flex;align-items:center;gap:6px;"><span style="font-weight:700;color:#fff;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">'+nick+'</span>'+pendBadge+'</div>'
+      +     '<div style="font-size:10px;color:var(--text-faint);">'+dot+' · '+role+' · '+rank+'</div>'
+      +   '</div>'
+      +   '<div style="display:flex;gap:4px;flex-shrink:0;">'+blueBtn+redBtn+specBtn+'</div>'
+      + '</div>';
+  }
+
+  function renderUserList() {
     var results = document.getElementById('dcoopSearchResults');
-    if (!results || !_userCache) return;
-    var q = (filter || '').toLowerCase();
-    var list = _userCache.filter(function(u){
+    if (!results) return;
+
+    var q = _searchQuery;
+    var base = _userList.filter(function(u){
+      if (_onlineOnly && !u._online) return false;
       if (!q) return true;
       var n = (u.displayName || '').toLowerCase();
       return n.indexOf(q) !== -1;
     });
-    if (!list.length) {
+
+    // Recent section (filtered by q + presence of user still in _userList)
+    var recent = getRecent();
+    var recentResolved = [];
+    if (recent.length) {
+      var byUid = {};
+      _userList.forEach(function(u){ byUid[u.uid] = u; });
+      recent.forEach(function(r){
+        var u = byUid[r.uid];
+        if (!u) return;
+        if (_onlineOnly && !u._online) return;
+        if (q) {
+          var n = (u.displayName || '').toLowerCase();
+          if (n.indexOf(q) === -1) return;
+        }
+        recentResolved.push(u);
+      });
+    }
+
+    if (!base.length && !recentResolved.length) {
       results.innerHTML = '<div style="color:var(--text-faint);font-size:11px;text-align:center;padding:20px;">Никого не найдено</div>';
       return;
     }
-    var online = list.filter(function(u){ return u._online; });
-    var offline = list.filter(function(u){ return !u._online; });
 
-    function rowHtml(u) {
-      var nick = escapeHtml(u.displayName || '?');
-      var dot = u._online
-        ? '<span style="color:#2ecc71;font-size:10px;">● онлайн</span>'
-        : '<span style="color:var(--text-faint);font-size:10px;">● оффлайн</span>';
-      return ''
-        + '<div onclick="dcoopPickUser(\''+u.uid+'\',\''+encodeURIComponent(u.displayName||'')+'\')" '
-        +   'style="display:flex;align-items:center;gap:10px;padding:7px 10px;border:1px solid var(--accent-border-sub);border-radius:8px;cursor:pointer;background:rgba(255,255,255,0.02);">'
-        +   '<div style="flex:1;min-width:0;">'
-        +     '<div style="font-weight:700;color:#fff;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+nick+'</div>'
-        +     '<div>'+dot+'</div>'
-        +   '</div>'
-        +   '<div style="font-size:14px;color:var(--accent);">→</div>'
-        + '</div>';
-    }
+    var online = base.filter(function(u){ return u._online; });
+    var offline = base.filter(function(u){ return !u._online; });
 
     var html = '';
+    if (recentResolved.length) {
+      html += '<div style="font-size:10px;color:#f39c12;font-weight:900;letter-spacing:0.5px;margin:2px 0;">🕑 НЕДАВНИЕ · '+recentResolved.length+'</div>';
+      html += recentResolved.map(rowHtml).join('');
+      html += '<div style="height:6px;"></div>';
+    }
     if (online.length) {
       html += '<div style="font-size:10px;color:#2ecc71;font-weight:900;letter-spacing:0.5px;margin:2px 0;">🟢 ОНЛАЙН · '+online.length+'</div>';
       html += online.map(rowHtml).join('');
@@ -585,153 +742,67 @@
   }
 
   function closeUserSearch() {
+    stopUserListListener();
+    stopPendingInvitesListener();
     if (_searchOverlay && _searchOverlay.parentNode) {
       _searchOverlay.parentNode.removeChild(_searchOverlay);
     }
     _searchOverlay = null;
+    _prefMode = null;
   }
 
-  // Клик по юзеру в списке поиска → открываем карточку профиля с кнопкой "Пригласить"
-  function pickUser(uid, nickEncoded) {
+  // Прямая отправка инвайта из строки — без карточки-подтверждения.
+  // Синхронная валидация через slotStatusFor + асинхронная проверка активной серии.
+  function sendInviteFromRow(uid, nickEncoded, role, side) {
     var nick = decodeURIComponent(nickEncoded || '');
     var l = _currentLobby;
-    if (!l) { closeUserSearch(); return; }
+    if (!l) { toast('Нет лобби'); return; }
+
+    // Найти user из realtime-списка (или минимальный объект)
     var user = null;
-    if (_userCache) {
-      for (var i = 0; i < _userCache.length; i++) {
-        if (_userCache[i].uid === uid) { user = _userCache[i]; break; }
-      }
+    for (var i = 0; i < _userList.length; i++) {
+      if (_userList[i].uid === uid) { user = _userList[i]; break; }
     }
     if (!user) user = { uid: uid, displayName: nick };
-    showUserInviteCard(user);
-  }
 
-  // ─── Карточка юзера для инвайта ───
-  var _inviteCardOverlay = null;
-
-  function closeInviteCard() {
-    if (_inviteCardOverlay && _inviteCardOverlay.parentNode) {
-      _inviteCardOverlay.parentNode.removeChild(_inviteCardOverlay);
-    }
-    _inviteCardOverlay = null;
-  }
-
-  function showUserInviteCard(user) {
-    closeInviteCard();
-    var l = _currentLobby;
-    if (!l) return;
-    var mode = _searchMode;
-
-    var nick = escapeHtml(user.displayName || '?');
-    var role = escapeHtml(user.role || '—');
-    var rank = escapeHtml(user.rank || '—');
-    var avatar = user.photoURL
-      ? '<img src="'+escapeHtml(user.photoURL)+'" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);" onerror="this.style.display=\'none\';">'
-      : '<div style="width:64px;height:64px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;border:2px solid var(--accent);">'+escapeHtml((user.displayName||'?').charAt(0).toUpperCase())+'</div>';
-
-    var titles = {
-      captainBlue: '➕ Пригласить капитаном СИНИХ',
-      captainRed:  '➕ Пригласить капитаном КРАСНЫХ',
-      spectator:   '➕ Пригласить зрителем'
-    };
-
-    var overlay = document.createElement('div');
-    overlay.id = 'dcoopInviteCardOverlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:9100;display:flex;align-items:center;justify-content:center;padding:20px;';
-    overlay.onclick = function(e){ if (e.target === overlay) closeInviteCard(); };
-
-    overlay.innerHTML = ''
-      + '<div style="background:var(--bg-base);border:1px solid var(--accent-border);border-radius:14px;width:100%;max-width:360px;padding:18px;display:flex;flex-direction:column;gap:12px;align-items:center;">'
-      +   '<div style="font-size:12px;color:var(--text-faint);font-weight:800;letter-spacing:0.5px;">'+ (titles[mode] || 'Приглашение') +'</div>'
-      +   avatar
-      +   '<div style="font-size:16px;font-weight:900;color:#fff;text-align:center;">'+nick+'</div>'
-      +   '<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:11px;">'
-      +     '<div style="padding:4px 10px;border:1px solid var(--accent-border-sub);border-radius:14px;"><span style="color:var(--text-faint);">Роль:</span> <strong style="color:#fff;">'+role+'</strong></div>'
-      +     '<div style="padding:4px 10px;border:1px solid var(--accent-border-sub);border-radius:14px;"><span style="color:var(--text-faint);">Ранг:</span> <strong style="color:#fff;">'+rank+'</strong></div>'
-      +   '</div>'
-      +   '<div id="dcoopInviteCardStatus" style="min-height:20px;font-size:11px;color:var(--text-faint);text-align:center;">Проверка активных серий…</div>'
-      +   '<div style="display:flex;gap:8px;width:100%;">'
-      +     '<button onclick="dcoopCloseInviteCard()" style="flex:1;padding:10px;border:1px solid var(--accent-border);background:transparent;color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;">Отмена</button>'
-      +     '<button id="dcoopInviteConfirmBtn" disabled style="flex:1;padding:10px;border:none;background:var(--accent);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:900;opacity:0.5;">Пригласить</button>'
-      +   '</div>'
-      + '</div>';
-
-    document.body.appendChild(overlay);
-    _inviteCardOverlay = overlay;
-
-    // Валидация: текущее лобби может отказать (уже кап, уже зритель, 12 зрителей)
-    var localErr = null;
-    if (mode === 'captainBlue' || mode === 'captainRed') {
-      var side = mode === 'captainBlue' ? 'blue' : 'red';
-      var capField = side === 'blue' ? 'blueCaptain' : 'redCaptain';
-      var other = side === 'blue' ? l.redCaptain : l.blueCaptain;
-      if (l[capField] && l[capField].uid) localErr = 'Капитан этой стороны уже назначен';
-      else if (other && other.uid === user.uid) localErr = 'Юзер уже капитан другой стороны';
-    } else if (mode === 'spectator') {
-      var list = (l.invitedSpectators || []);
-      if (list.indexOf(user.uid) !== -1) localErr = 'Юзер уже зритель в этом лобби';
-      else if (list.length >= 12) localErr = 'Максимум 12 зрителей';
-      else if (l.blueCaptain && l.blueCaptain.uid === user.uid) localErr = 'Юзер уже капитан этого лобби';
-      else if (l.redCaptain && l.redCaptain.uid === user.uid) localErr = 'Юзер уже капитан этого лобби';
-    }
-
-    var statusEl = document.getElementById('dcoopInviteCardStatus');
-    var btn = document.getElementById('dcoopInviteConfirmBtn');
-
-    function setStatus(text, color, enableBtn) {
-      if (statusEl) { statusEl.textContent = text; statusEl.style.color = color || 'var(--text-faint)'; }
-      if (btn) {
-        btn.disabled = !enableBtn;
-        btn.style.opacity = enableBtn ? '1' : '0.5';
-        btn.style.cursor = enableBtn ? 'pointer' : 'not-allowed';
-      }
-    }
-
-    if (localErr) {
-      setStatus(localErr, '#e74c3c', false);
+    // Повторная локальная проверка (защита от гонок)
+    var s = slotStatusFor(user);
+    var blocked = (role === 'captain' && side === 'blue' && s.blueDisabled)
+      || (role === 'captain' && side === 'red'  && s.redDisabled)
+      || (role === 'spectator' && s.specDisabled);
+    if (blocked) {
+      var reason = (role === 'captain' && side === 'blue') ? s.blueReason
+                 : (role === 'captain' && side === 'red')  ? s.redReason
+                 : s.specReason;
+      toast('Нельзя: '+reason);
       return;
     }
 
-    // Удалённая проверка: юзер в другой активной серии?
-    getActiveSeriesForUser(user.uid, l.id).then(function(series){
+    // Проверка активных серий у получателя
+    getActiveSeriesForUser(uid, l.id).then(function(series){
       if (series.length) {
-        setStatus('Юзер уже в активной серии — приглос придёт после её завершения', '#f1c40f', false);
-      } else {
-        setStatus('Готов принять приглашение', '#2ecc71', true);
-        if (btn) {
-          btn.onclick = function(){
-            btn.disabled = true; btn.style.opacity = '0.6';
-            var roleArg = (mode === 'spectator') ? 'spectator' : 'captain';
-            var sideArg = (mode === 'captainBlue') ? 'blue' : (mode === 'captainRed' ? 'red' : null);
-            sendInvite(user.uid, user.displayName || '', roleArg, sideArg).then(function(msg){
-              toast(msg || 'Приглашение отправлено');
-              closeInviteCard();
-              closeUserSearch();
-            }).catch(function(e){
-              setStatus('Ошибка: '+(e.message||e), '#e74c3c', false);
-            });
-          };
-        }
+        toast('У юзера уже есть активная серия — попробуйте позже');
+        return;
       }
+      return sendInvite(uid, nick, role, side).then(function(msg){
+        toast(msg || 'Приглашение отправлено');
+        pushRecent(user);
+        // onSnapshot на pending invites сам перерисует строку — кнопки дизейблятся
+      }).catch(function(e){
+        toast('Ошибка: '+(e.message||e));
+      });
     }).catch(function(){
-      setStatus('Не удалось проверить активные серии', '#f1c40f', true);
-      if (btn) {
-        btn.onclick = function(){
-          btn.disabled = true; btn.style.opacity = '0.6';
-          var roleArg = (mode === 'spectator') ? 'spectator' : 'captain';
-          var sideArg = (mode === 'captainBlue') ? 'blue' : (mode === 'captainRed' ? 'red' : null);
-          sendInvite(user.uid, user.displayName || '', roleArg, sideArg).then(function(msg){
-            toast(msg || 'Приглашение отправлено');
-            closeInviteCard();
-            closeUserSearch();
-          }).catch(function(e){
-            setStatus('Ошибка: '+(e.message||e), '#e74c3c', false);
-          });
-        };
-      }
+      // Если проверка активных серий упала — всё равно пробуем послать
+      sendInvite(uid, nick, role, side).then(function(msg){
+        toast(msg || 'Приглашение отправлено');
+        pushRecent(user);
+      }).catch(function(e){
+        toast('Ошибка: '+(e.message||e));
+      });
     });
   }
-  window.dcoopCloseInviteCard = closeInviteCard;
+
+  window.dcoopSendInvite = sendInviteFromRow;
 
   // ═══════════════════════════════════════════
   // INVITE SYSTEM — draftInvites collection
@@ -2371,7 +2442,6 @@
   window.dcoopInviteCaptain = function(side){ openUserSearch(side === 'blue' ? 'captainBlue' : 'captainRed'); };
   window.dcoopInviteSpectator = function(){ openUserSearch('spectator'); };
   window.dcoopCloseSearch = closeUserSearch;
-  window.dcoopPickUser = pickUser;
   window.dcoopRemoveSpectator = removeSpectator;
   window.dcoopCopyInvite = copyInviteLink;
 

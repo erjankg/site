@@ -10,7 +10,8 @@
       "Bash(cp -r ~/.claude/skills/gstack/investigate ~/.claude/skills/investigate)",
       "Bash(cp -r ~/.claude/skills/gstack/design-review ~/.claude/skills/design-review)",
       "Bash(cp -r ~/.claude/skills/gstack/qa ~/.claude/skills/qa)",
-      "Bash(cp -r ~/.claude/skills/gstack/health ~/.claude/skills/health)"
+      "Bash(cp -r ~/.claude/skills/gstack/health ~/.claude/skills/health)",
+      "Bash(node -c draft.js)"
     ]
   }
 }
