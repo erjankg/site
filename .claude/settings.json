@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(taskkill //F //PID 494)",
+      "Bash(taskkill //F //PID 425)",
+      "Bash(taskkill //F //PID 423)",
+      "Bash(taskkill //F //IM bunx.exe)",
+      "Bash(grep -E \"CLAUDE_SKILL_DIR|\\\\\\\\.\\\\\\\\./|bin/\" ~/.claude/skills/gstack/freeze/SKILL.md)",
+      "Bash(rm ~/.claude/skills/gstack/SKILL.md ~/.claude/skills/gstack/SKILL.md.tmpl)",
+      "Bash(cp -r ~/.claude/skills/gstack/investigate ~/.claude/skills/investigate)",
+      "Bash(cp -r ~/.claude/skills/gstack/design-review ~/.claude/skills/design-review)",
+      "Bash(cp -r ~/.claude/skills/gstack/qa ~/.claude/skills/qa)",
+      "Bash(cp -r ~/.claude/skills/gstack/health ~/.claude/skills/health)"
+    ]
+  }
+}

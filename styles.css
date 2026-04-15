@@ -3862,6 +3862,35 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
 .dcoop-replay-teams { font-size: 11px; color: var(--text-faint); }
 .dcoop-replay-winner { font-size: 13px; font-weight: 900; flex-shrink: 0; }
 
+.dcoop-replay-nav {
+  display: flex;
+  gap: 6px;
+  padding: 6px 14px;
+  border-bottom: 1px solid var(--accent-border-sub);
+  background: rgba(0,0,0,0.2);
+  flex-wrap: wrap;
+}
+.dcoop-replay-nav-btn {
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--accent-border-sub);
+  color: var(--text-faint);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.dcoop-replay-nav-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+.dcoop-replay-nav-btn.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 .dcoop-replay-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -1042,9 +1042,10 @@
     document.body.classList.add('dcoop-fullscreen');
 
     var uid = _uid();
+    var roles = sideRoles(lobby, game);
     var mySide = null;
-    if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) mySide = 'blue';
-    else if (lobby.redCaptain && lobby.redCaptain.uid === uid) mySide = 'red';
+    if (roles.blue.cap && roles.blue.cap.uid === uid) mySide = 'blue';
+    else if (roles.red.cap && roles.red.cap.uid === uid) mySide = 'red';
     var iAmCaptain = !!mySide;
     var isCreator = lobby.createdBy === uid;
 
@@ -1108,72 +1109,88 @@
 
     var uid = _uid();
     var isCreator = lobby.createdBy === uid;
-    // Мой «лагерь» — я капитан какой стороны (blue/red) в лобби
-    var myCampSide = null;
-    if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) myCampSide = 'blue';
-    else if (lobby.redCaptain && lobby.redCaptain.uid === uid) myCampSide = 'red';
+    // Мой «лагерь» — я капитан какой КОМАНДЫ (blue/red) в лобби
+    var myCampTeam = null;
+    if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) myCampTeam = 'blue';
+    else if (lobby.redCaptain && lobby.redCaptain.uid === uid) myCampTeam = 'red';
 
+    var roles = sideRoles(lobby, game);
     var bar = document.createElement('div');
     bar.id = 'dcoopBottomBar';
     bar.className = 'dcoop-bottom-bar';
 
-    var blueName = escapeHtml(lobby.blueTeamName || 'Blue');
-    var redName  = escapeHtml(lobby.redTeamName  || 'Red');
-    var bScore = (lobby.seriesScore && lobby.seriesScore.blue) || 0;
-    var rScore = (lobby.seriesScore && lobby.seriesScore.red ) || 0;
-    var scoreHtml = '<div class="dcoop-bb-score"><span style="color:#5dade2;">'+bScore+'</span><span style="color:var(--text-faint);"> : </span><span style="color:#e74c3c;">'+rScore+'</span></div>';
+    // Команды: имя берём из исходного лобби (не зависит от позиции)
+    var blueTeamName = escapeHtml(lobby.blueTeamName || 'Blue');
+    var redTeamName  = escapeHtml(lobby.redTeamName  || 'Red');
+    var score = lobby.seriesScore || {};
+    var bScore = score.blue || 0;
+    var rScore = score.red  || 0;
+    var scoreHtml = '<div class="dcoop-bb-score"><span style="color:#5dade2;">'+blueTeamName+' '+bScore+'</span><span style="color:var(--text-faint);"> : </span><span style="color:#e74c3c;">'+rScore+' '+redTeamName+'</span></div>';
+
+    // Таргет побед в серии — для определения «серия закончена»
+    var targetWins = { bo1:1, bo3:2, bo5:3, bo7:4, infinite:999 }[lobby.seriesType] || 1;
+    var seriesOver = (bScore >= targetWins || rScore >= targetWins) && lobby.seriesType !== 'infinite';
 
     if (!game.winner) {
-      // Ещё не выбрали победителя — показываем кнопки обоим капитанам и создателю
-      var canPickWinner = isCreator || !!myCampSide;
+      // Ещё не выбрали победителя — показываем кнопки (позиции, с названиями команд)
+      var canPickWinner = isCreator || !!myCampTeam;
       if (canPickWinner) {
         bar.innerHTML = ''
           + scoreHtml
           + '<div class="dcoop-bb-label">Игра '+game.number+' · кто победил?</div>'
           + '<div class="dcoop-bb-btns">'
-          +   '<button class="dcoop-bb-btn blue" onclick="dcoopSetWinner(\'blue\')">🔵 '+blueName+'</button>'
-          +   '<button class="dcoop-bb-btn red" onclick="dcoopSetWinner(\'red\')">🔴 '+redName+'</button>'
+          +   '<button class="dcoop-bb-btn blue" onclick="dcoopSetWinner(\'blue\')">🔵 '+escapeHtml(roles.blue.teamName)+'</button>'
+          +   '<button class="dcoop-bb-btn red"  onclick="dcoopSetWinner(\'red\')">🔴 '+escapeHtml(roles.red.teamName)+'</button>'
           + '</div>';
       } else {
         bar.innerHTML = scoreHtml + '<div class="dcoop-bb-label">Игра '+game.number+' завершена · ждём решения капитанов…</div>';
       }
     } else {
-      // Победитель выбран — проигравший капитан (или создатель как фолбэк) выбирает сторону
-      var winSide = game.winner;
-      var winName = winSide === 'blue' ? blueName : redName;
-      var winCol = winSide === 'blue' ? '#5dade2' : '#e74c3c';
-      var loserSide = winSide === 'blue' ? 'red' : 'blue';
-      var loserName = loserSide === 'blue' ? blueName : redName;
-      var loserCap = loserSide === 'blue' ? lobby.blueCaptain : lobby.redCaptain;
+      // Победитель выбран — проигравшая КОМАНДА выбирает сторону на след игру.
+      var winPos = game.winner; // 'blue' | 'red' (позиция)
+      var winningTeam = roles[winPos].team; // 'blue' | 'red' (команда)
+      var loserTeam = winningTeam === 'blue' ? 'red' : 'blue';
+      var winTeamName = winningTeam === 'blue' ? blueTeamName : redTeamName;
+      var loserTeamName = loserTeam === 'blue' ? blueTeamName : redTeamName;
+      var winCol = winningTeam === 'blue' ? '#5dade2' : '#e74c3c';
+      var loserCap = loserTeam === 'blue' ? lobby.blueCaptain : lobby.redCaptain;
       var loserCapUid = loserCap && loserCap.uid;
       var iAmLoserCap = !!(loserCapUid && loserCapUid === uid);
-      var winnerHtml = '<div class="dcoop-bb-label">🏆 <span style="color:'+winCol+';font-weight:900;">'+winName+'</span> победили</div>';
+      var winnerHtml = '<div class="dcoop-bb-label">🏆 <span style="color:'+winCol+';font-weight:900;">'+winTeamName+'</span> победили</div>';
 
-      // «Проигравший на синей стороне сейчас» — важно для определения swap
-      var currentBlueSide = lobby.currentGameBlueSide || 'blue';
-      var loserIsOnBlueNow = (loserSide === 'blue' && currentBlueSide === 'blue') || (loserSide === 'red' && currentBlueSide === 'red');
-
-      // Разрешаем жать сторону: проигравшему кэпу или, если его нет, создателю
-      var canPickSide = iAmLoserCap || (isCreator && !loserCapUid);
-      // Кнопка «завершить серию» — только создателю
-      var finishBtn = isCreator ? '<button class="dcoop-bb-btn finish" onclick="dcoopFinishSeries()">🏁 Завершить серию</button>' : '';
-
-      if (canPickSide) {
+      if (seriesOver) {
+        // Серия завершена — никаких кнопок next-game, только итог + "завершить"
+        var finishBtn = isCreator ? '<button class="dcoop-bb-btn finish" onclick="dcoopFinishSeries()">🏁 Завершить серию</button>' : '';
         bar.innerHTML = ''
           + scoreHtml
           + winnerHtml
-          + '<div class="dcoop-bb-sub">'+loserName+' (проигравшие) — выберите сторону на след. игру:</div>'
-          + '<div class="dcoop-bb-btns">'
-          +   '<button class="dcoop-bb-btn blue" onclick="dcoopNextGame('+(loserIsOnBlueNow ? 'false' : 'true')+')">🔵 Синие (FP)</button>'
-          +   '<button class="dcoop-bb-btn red" onclick="dcoopNextGame('+(loserIsOnBlueNow ? 'true' : 'false')+')">🔴 Красные</button>'
-          +   finishBtn
-          + '</div>';
-      } else {
-        bar.innerHTML = ''
-          + scoreHtml
-          + winnerHtml
-          + '<div class="dcoop-bb-sub">Ждём '+loserName+' — выбирают сторону на след. игру…</div>'
+          + '<div class="dcoop-bb-sub">Серия завершена ('+lobby.seriesType+')</div>'
           + (finishBtn ? '<div class="dcoop-bb-btns">'+finishBtn+'</div>' : '');
+      } else {
+        // Какая позиция у ПРОИГРАВШЕЙ команды сейчас?
+        // roles.blue.team === loserTeam → loser на blue-позиции; иначе на red.
+        var loserOnBluePos = roles.blue.team === loserTeam;
+        var canPickSide = iAmLoserCap || (isCreator && !loserCapUid);
+        // «Завершить серию досрочно» — только создателю
+        var finishBtn2 = isCreator ? '<button class="dcoop-bb-btn finish" onclick="dcoopFinishSeries()">🏁 Завершить серию</button>' : '';
+
+        if (canPickSide) {
+          bar.innerHTML = ''
+            + scoreHtml
+            + winnerHtml
+            + '<div class="dcoop-bb-sub">'+loserTeamName+' (проигравшие) — выберите сторону на след. игру:</div>'
+            + '<div class="dcoop-bb-btns">'
+            +   '<button class="dcoop-bb-btn blue" onclick="dcoopNextGame('+(loserOnBluePos ? 'false' : 'true')+')">🔵 Синие (FP)</button>'
+            +   '<button class="dcoop-bb-btn red"  onclick="dcoopNextGame('+(loserOnBluePos ? 'true'  : 'false')+')">🔴 Красные</button>'
+            +   finishBtn2
+            + '</div>';
+        } else {
+          bar.innerHTML = ''
+            + scoreHtml
+            + winnerHtml
+            + '<div class="dcoop-bb-sub">Ждём '+loserTeamName+' — выбирают сторону на след. игру…</div>'
+            + (finishBtn2 ? '<div class="dcoop-bb-btns">'+finishBtn2+'</div>' : '');
+        }
       }
     }
 
@@ -1232,13 +1249,34 @@
     }).join('');
   }
 
+  // Map позиция (blue/red) → team (blue/red) + капитан + teamName.
+  // Используется для корректного свапа сторон между играми серии.
+  // currentGameBlueSide = какая "команда" сейчас играет на синей позиции.
+  function sideRoles(lobby, game) {
+    var bs = (game && game.blueSide) || (lobby && lobby.currentGameBlueSide) || 'blue';
+    if (bs === 'red') {
+      return {
+        blue: { team:'red',  cap: lobby.redCaptain,  teamName: (lobby.redTeamName  || 'Red' ) },
+        red:  { team:'blue', cap: lobby.blueCaptain, teamName: (lobby.blueTeamName || 'Blue') }
+      };
+    }
+    return {
+      blue: { team:'blue', cap: lobby.blueCaptain, teamName: (lobby.blueTeamName || 'Blue') },
+      red:  { team:'red',  cap: lobby.redCaptain,  teamName: (lobby.redTeamName  || 'Red' ) }
+    };
+  }
+
   // ─── Captain block (user-card style) ───
-  function captainBlockHtml(side, cap, lobby, step) {
+  function captainBlockHtml(side, cap, lobby, step, teamNameOverride, scoreOverride) {
     var col = side === 'blue' ? '#5dade2' : '#e74c3c';
     var nick = (cap && cap.nick) ? escapeHtml(cap.nick) : '<span style="color:#f1c40f;">ждём…</span>';
-    var teamName = side === 'blue' ? (lobby.blueTeamName || 'Blue') : (lobby.redTeamName || 'Red');
+    var teamName = teamNameOverride != null
+      ? teamNameOverride
+      : (side === 'blue' ? (lobby.blueTeamName || 'Blue') : (lobby.redTeamName || 'Red'));
     var isActive = step && step.side === side;
-    var score = (lobby.seriesScore && lobby.seriesScore[side]) || 0;
+    var score = scoreOverride != null
+      ? scoreOverride
+      : ((lobby.seriesScore && lobby.seriesScore[side]) || 0);
     return '<div class="dcoop-hdr-cap dcoop-hdr-cap-'+side+(isActive?' active':'')+'" style="--side-col:'+col+';">'
       + '<div class="dcoop-hdr-cap-team">'+escapeHtml(teamName)+'</div>'
       + '<div class="dcoop-hdr-cap-nick">'+nick+'</div>'
@@ -1256,13 +1294,18 @@
     var specBtn = '<button class="dcoop-hdr-spec" onclick="dcoopToggleSpectators()" title="Зрители">👁 '+specCount+'</button>';
     var assistBtn = '<button class="dcoop-hdr-assist" onclick="dcoopToggleAssist()" title="Драфт-помощник" data-on="'+(_draftAssistantOn?'1':'0')+'">🤖</button>';
 
+    var roles = sideRoles(lobby, game);
+    var score = lobby.seriesScore || {};
+    var blueCap = captainBlockHtml('blue', roles.blue.cap, lobby, step, roles.blue.teamName, score[roles.blue.team] || 0);
+    var redCap  = captainBlockHtml('red',  roles.red.cap,  lobby, step, roles.red.teamName,  score[roles.red.team]  || 0);
+
     if (isMobileDraft()) {
       return ''
         + '<div class="dcoop-hdr dcoop-hdr-mobile">'
         +   '<div class="dcoop-hdr-row-caps">'
-        +     captainBlockHtml('blue', lobby.blueCaptain, lobby, step)
+        +     blueCap
         +     '<div class="dcoop-hdr-timer-m" id="dcoopTimer" style="color:'+stepCol+';">—</div>'
-        +     captainBlockHtml('red',  lobby.redCaptain,  lobby, step)
+        +     redCap
         +   '</div>'
         +   '<div class="dcoop-hdr-row-bans">'
         +     '<div class="dcoop-hdr-bans dcoop-hdr-bans-blue">'+banSlotsHtml('blue', game, step, 'mobile')+'</div>'
@@ -1279,9 +1322,9 @@
     // PC: большой таймер по центру + блоки капитанов по краям
     return ''
       + '<div class="dcoop-hdr dcoop-hdr-pc">'
-      +   '<div class="dcoop-hdr-pc-left">'+captainBlockHtml('blue', lobby.blueCaptain, lobby, step)+'</div>'
+      +   '<div class="dcoop-hdr-pc-left">'+blueCap+'</div>'
       +   '<div class="dcoop-hdr-timer-pc" id="dcoopTimer" style="color:'+stepCol+';">—</div>'
-      +   '<div class="dcoop-hdr-pc-right">'+captainBlockHtml('red', lobby.redCaptain, lobby, step)+'</div>'
+      +   '<div class="dcoop-hdr-pc-right">'+redCap+'</div>'
       +   '<div class="dcoop-hdr-corner-pc">'+specBtn+assistBtn+closeBtn+'</div>'
       + '</div>';
   }
@@ -1390,6 +1433,14 @@
       if (!c.roles[_filterRole]) return false;
       if (q && c.name.toLowerCase().indexOf(q) === -1) return false;
       return true;
+    });
+
+    // Стабильная сортировка: сначала доступные (unavail[c]=undefined),
+    // потом banned/picked/fearless — чтобы свободные чемпы были сверху-слева.
+    list.sort(function(a, b){
+      var ua = unavail[a.name] ? 1 : 0;
+      var ub = unavail[b.name] ? 1 : 0;
+      return ua - ub;
     });
 
     grid.innerHTML = list.map(function(c){
@@ -1684,8 +1735,13 @@
   function setWinner(side) {
     var l = _currentLobby, g = _currentGame;
     if (!l || !g) return;
+    // Идемпотентность: не начислять повторно, если winner уже выставлен.
+    if (g.winner) return;
     var dbInst = _db();
-    var scoreField = side === 'blue' ? 'seriesScore.blue' : 'seriesScore.red';
+    // Маппим позицию (side) → TEAM, учитывая swap сторон.
+    var roles = sideRoles(l, g);
+    var winningTeam = roles[side].team; // 'blue' | 'red'
+    var scoreField = 'seriesScore.' + winningTeam;
     var incr = firebase.firestore.FieldValue.increment(1);
     var patch = {}; patch[scoreField] = incr;
     patch.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
@@ -1716,8 +1772,8 @@
 
     // Проверяем — серия завершена?
     var targetWins = { bo1:1, bo3:2, bo5:3, bo7:4, infinite:999 }[l.seriesType] || 1;
-    var newBlue = (l.seriesScore && l.seriesScore.blue || 0) + (side==='blue'?1:0);
-    var newRed  = (l.seriesScore && l.seriesScore.red  || 0) + (side==='red' ?1:0);
+    var newBlue = (l.seriesScore && l.seriesScore.blue || 0) + (winningTeam==='blue'?1:0);
+    var newRed  = (l.seriesScore && l.seriesScore.red  || 0) + (winningTeam==='red' ?1:0);
     var seriesDone = (newBlue >= targetWins || newRed >= targetWins) && l.seriesType !== 'infinite';
 
     if (seriesDone) patch.status = 'series_done';
@@ -1916,6 +1972,18 @@
   function nextGame(swapSides) {
     var l = _currentLobby;
     if (!l) return;
+    // Guard: если серия уже завершена, новых игр не создаём
+    var _target = { bo1:1, bo3:2, bo5:3, bo7:4, infinite:999 }[l.seriesType] || 1;
+    var _b = (l.seriesScore && l.seriesScore.blue) || 0;
+    var _r = (l.seriesScore && l.seriesScore.red)  || 0;
+    if (l.seriesType !== 'infinite' && (_b >= _target || _r >= _target)) {
+      toast('Серия уже завершена');
+      return;
+    }
+    if (l.status === 'series_done' || l.status === 'closed') {
+      toast('Серия закрыта');
+      return;
+    }
     var nextNum = (l.currentGame || 1) + 1;
     var dbInst = _db();
     // Стороны игры: base blue/red, при swap меняем
@@ -2039,25 +2107,33 @@
     if (!pane) return;
     pane.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-faint);">Загрузка…</div>';
 
+    // Тянем и лобби, и ВСЕ игры серии — чтобы в реплее показать навигационные кнопки 1/2/3…
     Promise.all([
       dbInst.collection('draftLobbies').doc(lobbyId).get(),
-      dbInst.collection('draftLobbies').doc(lobbyId).collection('games').doc(gameId).get()
+      dbInst.collection('draftLobbies').doc(lobbyId).collection('games').orderBy('number','asc').get()
     ]).then(function(results){
-      var lSnap = results[0], gSnap = results[1];
-      if (!lSnap.exists || !gSnap.exists) {
+      var lSnap = results[0], gamesSnap = results[1];
+      if (!lSnap.exists || gamesSnap.empty) {
         pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Игра не найдена</div>';
         return;
       }
       var l = lSnap.data(); l.id = lSnap.id;
-      var g = gSnap.data(); g.id = gSnap.id;
-      renderReplay(l, g);
+      var allGames = [];
+      var found = null;
+      gamesSnap.forEach(function(d){
+        var gg = d.data(); gg.id = d.id;
+        allGames.push(gg);
+        if (d.id === gameId) found = gg;
+      });
+      if (!found) { pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Игра не найдена</div>'; return; }
+      renderReplay(l, found, allGames);
     }).catch(function(e){
       pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Ошибка: '+escapeHtml(e.message||'')+'</div>';
     });
   }
 
   // Реплей — точная копия раскладки реалтайм-драфта, но статичная (read-only).
-  function renderReplay(lobby, game) {
+  function renderReplay(lobby, game, allGames) {
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
     stopGameListener();
@@ -2072,10 +2148,23 @@
     document.body.classList.remove('sidebar-open');
     document.body.classList.add('dcoop-fullscreen');
 
-    var winCol = game.winner === 'blue' ? '#5dade2' : (game.winner === 'red' ? '#e74c3c' : 'var(--text-faint)');
-    var winLabel = game.winner === 'blue' ? (lobby.blueTeamName||'Blue')
-                 : (game.winner === 'red' ? (lobby.redTeamName||'Red') : '—');
+    // Победитель: маппим позицию в команду (учитывая swap сторон этой игры)
+    var replayRoles = sideRoles(lobby, game);
+    var winningTeam = game.winner ? replayRoles[game.winner].team : null;
+    var winCol = winningTeam === 'blue' ? '#5dade2' : (winningTeam === 'red' ? '#e74c3c' : 'var(--text-faint)');
+    var winLabel = winningTeam === 'blue' ? (lobby.blueTeamName||'Blue')
+                 : (winningTeam === 'red' ? (lobby.redTeamName||'Red') : '—');
     var isMob = isMobileDraft();
+
+    // Навигация по играм серии (1 / 2 / 3 …)
+    var navHtml = '';
+    if (Array.isArray(allGames) && allGames.length > 1) {
+      var navBtns = allGames.map(function(gg){
+        var activeCls = (gg.id === game.id) ? ' active' : '';
+        return '<button class="dcoop-replay-nav-btn'+activeCls+'" onclick="dcoopReplayGame(\''+lobby.id+'\',\''+gg.id+'\')">Игра '+gg.number+'</button>';
+      }).join('');
+      navHtml = '<div class="dcoop-replay-nav">'+navBtns+'</div>';
+    }
 
     var topBar = ''
       + '<div class="dcoop-replay-topbar">'
@@ -2085,11 +2174,12 @@
       +     '<span class="dcoop-replay-teams">'+escapeHtml(lobby.blueTeamName||'Blue')+' vs '+escapeHtml(lobby.redTeamName||'Red')+'</span>'
       +   '</div>'
       +   '<div class="dcoop-replay-winner" style="color:'+winCol+';">🏆 '+escapeHtml(winLabel)+'</div>'
-      + '</div>';
+      + '</div>'
+      + navHtml;
 
-    // Header — тот же что в реалтайме, но step=null (нет активных слотов), без таймера/кнопок
-    var bCap = captainBlockHtml('blue', lobby.blueCaptain, lobby, null);
-    var rCap = captainBlockHtml('red',  lobby.redCaptain,  lobby, null);
+    // Header — как в реалтайме, но с свапом сторон для этой конкретной игры
+    var bCap = captainBlockHtml('blue', replayRoles.blue.cap, lobby, null, replayRoles.blue.teamName, (lobby.seriesScore && lobby.seriesScore[replayRoles.blue.team]) || 0);
+    var rCap = captainBlockHtml('red',  replayRoles.red.cap,  lobby, null, replayRoles.red.teamName,  (lobby.seriesScore && lobby.seriesScore[replayRoles.red.team])  || 0);
     var header;
     if (isMob) {
       header = ''
