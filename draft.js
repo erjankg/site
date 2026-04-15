@@ -1028,7 +1028,17 @@
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
 
-    // Активируем fullscreen режим для лобби
+    // Активируем fullscreen режим для лобби: срываем PC side-panel режим,
+    // закрываем сайдбар, убираем side-panel-modal позиционирование.
+    document.body.classList.remove('pc-side-mode');
+    document.body.classList.remove('pc-chat-mode');
+    var _mask = document.getElementById('draftCoopMask');
+    if (_mask) _mask.classList.remove('side-panel-modal');
+    var _panel = document.getElementById('sidePanel');
+    if (_panel) _panel.classList.remove('open');
+    var _sover = document.getElementById('sideOverlay');
+    if (_sover) _sover.classList.remove('open');
+    document.body.classList.remove('sidebar-open');
     document.body.classList.add('dcoop-fullscreen');
 
     var uid = _uid();
@@ -1098,6 +1108,11 @@
 
     var uid = _uid();
     var isCreator = lobby.createdBy === uid;
+    // Мой «лагерь» — я капитан какой стороны (blue/red) в лобби
+    var myCampSide = null;
+    if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) myCampSide = 'blue';
+    else if (lobby.redCaptain && lobby.redCaptain.uid === uid) myCampSide = 'red';
+
     var bar = document.createElement('div');
     bar.id = 'dcoopBottomBar';
     bar.className = 'dcoop-bottom-bar';
@@ -1109,8 +1124,9 @@
     var scoreHtml = '<div class="dcoop-bb-score"><span style="color:#5dade2;">'+bScore+'</span><span style="color:var(--text-faint);"> : </span><span style="color:#e74c3c;">'+rScore+'</span></div>';
 
     if (!game.winner) {
-      // Ещё не выбрали победителя
-      if (isCreator) {
+      // Ещё не выбрали победителя — показываем кнопки обоим капитанам и создателю
+      var canPickWinner = isCreator || !!myCampSide;
+      if (canPickWinner) {
         bar.innerHTML = ''
           + scoreHtml
           + '<div class="dcoop-bb-label">Игра '+game.number+' · кто победил?</div>'
@@ -1119,35 +1135,45 @@
           +   '<button class="dcoop-bb-btn red" onclick="dcoopSetWinner(\'red\')">🔴 '+redName+'</button>'
           + '</div>';
       } else {
-        bar.innerHTML = scoreHtml + '<div class="dcoop-bb-label">Игра '+game.number+' завершена · ждём решения создателя…</div>';
+        bar.innerHTML = scoreHtml + '<div class="dcoop-bb-label">Игра '+game.number+' завершена · ждём решения капитанов…</div>';
       }
     } else {
-      // Победитель выбран — управление следующей игрой (только creator)
+      // Победитель выбран — проигравший капитан (или создатель как фолбэк) выбирает сторону
       var winSide = game.winner;
       var winName = winSide === 'blue' ? blueName : redName;
       var winCol = winSide === 'blue' ? '#5dade2' : '#e74c3c';
       var loserSide = winSide === 'blue' ? 'red' : 'blue';
       var loserName = loserSide === 'blue' ? blueName : redName;
+      var loserCap = loserSide === 'blue' ? lobby.blueCaptain : lobby.redCaptain;
+      var loserCapUid = loserCap && loserCap.uid;
+      var iAmLoserCap = !!(loserCapUid && loserCapUid === uid);
       var winnerHtml = '<div class="dcoop-bb-label">🏆 <span style="color:'+winCol+';font-weight:900;">'+winName+'</span> победили</div>';
 
-      if (isCreator) {
-        var currentBlueSide = lobby.currentGameBlueSide || 'blue';
-        // Проигравший выбирает сторону: сохранить (no swap) или поменять (swap)
-        // swap=true → меняет blueSide. "Проигравший на blue" = loser на синей стороне.
-        var loserIsOnBlueNow = (loserSide === 'blue' && currentBlueSide === 'blue') || (loserSide === 'red' && currentBlueSide === 'red');
-        // После "keep" — loser остаётся на той же стороне (т.е. swap=false оставляет currentGameBlueSide)
-        // После "swap" — стороны меняются
+      // «Проигравший на синей стороне сейчас» — важно для определения swap
+      var currentBlueSide = lobby.currentGameBlueSide || 'blue';
+      var loserIsOnBlueNow = (loserSide === 'blue' && currentBlueSide === 'blue') || (loserSide === 'red' && currentBlueSide === 'red');
+
+      // Разрешаем жать сторону: проигравшему кэпу или, если его нет, создателю
+      var canPickSide = iAmLoserCap || (isCreator && !loserCapUid);
+      // Кнопка «завершить серию» — только создателю
+      var finishBtn = isCreator ? '<button class="dcoop-bb-btn finish" onclick="dcoopFinishSeries()">🏁 Завершить серию</button>' : '';
+
+      if (canPickSide) {
         bar.innerHTML = ''
           + scoreHtml
           + winnerHtml
-          + '<div class="dcoop-bb-sub">Проигравший ('+loserName+') выбирает сторону на след. игру:</div>'
+          + '<div class="dcoop-bb-sub">'+loserName+' (проигравшие) — выберите сторону на след. игру:</div>'
           + '<div class="dcoop-bb-btns">'
-          +   '<button class="dcoop-bb-btn blue" onclick="dcoopNextGame('+(loserIsOnBlueNow ? 'false' : 'true')+')">🔵 Синие</button>'
+          +   '<button class="dcoop-bb-btn blue" onclick="dcoopNextGame('+(loserIsOnBlueNow ? 'false' : 'true')+')">🔵 Синие (FP)</button>'
           +   '<button class="dcoop-bb-btn red" onclick="dcoopNextGame('+(loserIsOnBlueNow ? 'true' : 'false')+')">🔴 Красные</button>'
-          +   '<button class="dcoop-bb-btn finish" onclick="dcoopFinishSeries()">🏁 Завершить серию</button>'
+          +   finishBtn
           + '</div>';
       } else {
-        bar.innerHTML = scoreHtml + winnerHtml + '<div class="dcoop-bb-sub">Ждём решения создателя…</div>';
+        bar.innerHTML = ''
+          + scoreHtml
+          + winnerHtml
+          + '<div class="dcoop-bb-sub">Ждём '+loserName+' — выбирают сторону на след. игру…</div>'
+          + (finishBtn ? '<div class="dcoop-bb-btns">'+finishBtn+'</div>' : '');
       }
     }
 
@@ -2035,6 +2061,15 @@
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
     stopGameListener();
+    document.body.classList.remove('pc-side-mode');
+    document.body.classList.remove('pc-chat-mode');
+    var _mask = document.getElementById('draftCoopMask');
+    if (_mask) _mask.classList.remove('side-panel-modal');
+    var _panel = document.getElementById('sidePanel');
+    if (_panel) _panel.classList.remove('open');
+    var _sover = document.getElementById('sideOverlay');
+    if (_sover) _sover.classList.remove('open');
+    document.body.classList.remove('sidebar-open');
     document.body.classList.add('dcoop-fullscreen');
 
     var winCol = game.winner === 'blue' ? '#5dade2' : (game.winner === 'red' ? '#e74c3c' : 'var(--text-faint)');
