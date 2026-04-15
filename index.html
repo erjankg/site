@@ -59,11 +59,20 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
+    <!-- Pre-auth state check: если флаг "был залогинен" отсутствует — сразу блокируем сайт чтобы не просвечивал контент гостю. -->
+    <script>
+      try {
+        var _wasAuthed = localStorage.getItem('_wrsAuthed') === '1';
+        var _wasProfileReady = localStorage.getItem('_wrsProfileReady') === '1';
+        if (!_wasAuthed) document.documentElement.classList.add('pre-guest');
+        if (_wasAuthed && !_wasProfileReady) document.documentElement.classList.add('pre-profile-gate');
+      } catch(e){}
+    </script>
 </head>
-<body class="site-auth-locked">
+<body>
 
 <!-- ══ SITE AUTH GATE (blocks site until user signs in) ══ -->
-<div id="siteAuthGate" class="site-auth-gate" style="display:flex;">
+<div id="siteAuthGate" class="site-auth-gate">
   <div class="site-auth-box">
     <div class="site-auth-icon">⚔️</div>
     <div class="site-auth-title">WILD RIFT STATS</div>

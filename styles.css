@@ -79,6 +79,16 @@
   color: rgba(255,255,255,0.3);
   line-height: 1.5;
 }
+/* Pre-auth: сразу, без JS (через inline script в head), скрываем сайт для гостей — предотвращает flash контента */
+html.pre-guest body > *:not(#siteAuthGate):not(script):not(style):not(#uiTip) {
+  display: none !important;
+}
+html.pre-guest #siteAuthGate { display: flex !important; }
+
+/* По умолчанию gate спрятан (для залогиненного возвращающегося юзера — без flash) */
+#siteAuthGate { display: none; }
+
+/* Legacy класс для совместимости с show/hideSiteAuthGate */
 body.site-auth-locked > *:not(#siteAuthGate):not(script):not(style):not(#uiTip) {
   display: none !important;
 }

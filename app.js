@@ -2680,7 +2680,11 @@
         var confirmBtn = document.createElement('button');
         confirmBtn.style.cssText = 'flex:1;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#e74c3c,#c0392b);color:#fff;font-size:13px;font-weight:800;cursor:pointer;';
         confirmBtn.textContent = t('Выйти');
-        confirmBtn.onclick = function() { overlay.remove(); if(auth) auth.signOut(); };
+        confirmBtn.onclick = function() {
+            overlay.remove();
+            try { localStorage.removeItem('_wrsAuthed'); localStorage.removeItem('_wrsProfileReady'); } catch(e){}
+            if(auth) auth.signOut();
+        };
         btns.appendChild(cancelBtn);
         btns.appendChild(confirmBtn);
         box.appendChild(btns);
@@ -3119,11 +3123,15 @@
         var g = document.getElementById('siteAuthGate');
         if (g) g.style.display = 'flex';
         document.body.classList.add('site-auth-locked');
+        document.documentElement.classList.add('pre-guest');
+        try { localStorage.removeItem('_wrsAuthed'); localStorage.removeItem('_wrsProfileReady'); } catch(e){}
     }
     function hideSiteAuthGate() {
         var g = document.getElementById('siteAuthGate');
         if (g) g.style.display = 'none';
         document.body.classList.remove('site-auth-locked');
+        document.documentElement.classList.remove('pre-guest');
+        try { localStorage.setItem('_wrsAuthed', '1'); } catch(e){}
     }
 
     // Захватываем pending-URL параметры до любых навигаций
@@ -3168,51 +3176,56 @@
         }
 
         function openGate() {
+            try { localStorage.removeItem('_wrsProfileReady'); } catch(e){}
             document.body.classList.add('profile-gated');
+            document.documentElement.classList.add('pre-profile-gate');
             setTimeout(function(){
                 if (window.openProfileSetup) window.openProfileSetup();
             }, 200);
         }
 
         function passGate() {
+            try { localStorage.setItem('_wrsProfileReady', '1'); } catch(e){}
             document.body.classList.remove('profile-gated');
+            document.documentElement.classList.remove('pre-profile-gate');
             applyPendingDeepLink();
         }
+
+        // Fast-path: если локальный флаг "профиль готов" выставлен — сразу пропускаем без modal-flash.
+        // Валидацию с сервером сделаем в фоне — если вдруг данные сброшены, тихо откроем setup.
+        var fastPassed = false;
+        try {
+            if (localStorage.getItem('_wrsProfileReady') === '1') {
+                document.body.classList.remove('profile-gated');
+                applyPendingDeepLink();
+                fastPassed = true;
+            }
+        } catch(e){}
 
         // Пробуем default read (кеш+сервер). Если нашли role+rank — сразу пропускаем.
         var ref = db.collection('users').doc(user.uid);
         ref.get().then(function(snap){
             var d = snap.exists ? (snap.data() || {}) : {};
-            console.log('[profile-gate default]', { exists: snap.exists, role: d.role, rank: d.rank });
             if (hasProfile(d)) { passGate(); return; }
 
             // Возможно данные устарели или ещё не синхронизированы. Пробуем server-read через 800мс
-            // (даём presence-write время на коммит в Firestore).
             setTimeout(function(){
                 ref.get({ source: 'server' }).then(function(s2){
                     var d2 = s2.exists ? (s2.data() || {}) : {};
-                    console.log('[profile-gate server]', { exists: s2.exists, role: d2.role, rank: d2.rank });
                     if (hasProfile(d2)) passGate();
-                    else openGate();
+                    else if (!fastPassed) openGate();
                 }).catch(function(e){
-                    console.warn('[profile-gate] server read failed', e);
-                    // Сервер недоступен — но у нас уже есть чтение из кеша без role/rank.
-                    // Не открываем модалку насильно, чтобы не мешать пользователю.
-                    // Открываем gate только если doc реально не существует (новый юзер).
-                    if (!snap.exists) openGate();
+                    if (!snap.exists && !fastPassed) openGate();
                     else passGate();
                 });
             }, 800);
         }).catch(function(e){
-            console.warn('[profile-gate] default read failed', e);
-            // Ошибка — пробуем только server-read
             ref.get({ source: 'server' }).then(function(s){
                 var d = s.exists ? (s.data() || {}) : {};
                 if (hasProfile(d)) passGate();
-                else openGate();
+                else if (!fastPassed) openGate();
             }).catch(function(){
-                // Всё упало — не блокируем сайт
-                passGate();
+                if (!fastPassed) passGate();
             });
         });
     }
@@ -4365,6 +4378,8 @@
                 btn.style.opacity = '1';
             }
             showToast(t('✓ Профиль сохранён!'));
+            try { localStorage.setItem('_wrsProfileReady', '1'); } catch(e){}
+            document.documentElement.classList.remove('pre-profile-gate');
             setTimeout(function() {
                 document.body.classList.remove('profile-gated');
                 closeProfileSetup();

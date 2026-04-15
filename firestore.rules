@@ -99,14 +99,8 @@ service cloud.firestore {
     // ДРАФТ-ЛОББИ (кооперативный драфт 2×капитана)
     // ═══════════════════════════════════════════
     match /draftLobbies/{lobbyId} {
-      // Читать могут только участники: создатель, капитаны, приглашённые/вошедшие зрители
-      allow read: if request.auth != null && (
-        resource.data.createdBy == request.auth.uid ||
-        resource.data.blueCaptain.uid == request.auth.uid ||
-        (resource.data.redCaptain != null && resource.data.redCaptain.uid == request.auth.uid) ||
-        request.auth.uid in resource.data.invitedSpectators ||
-        request.auth.uid in resource.data.spectators
-      );
+      // Читать могут все авторизованные — лобби шарится по прямой ссылке, любой с линком видит драфт.
+      allow read: if request.auth != null;
 
       // Создавать лобби может любой авторизованный, но только на своё имя
       // Создатель = один из капитанов (синий или красный)
@@ -131,14 +125,8 @@ service cloud.firestore {
 
       // Игры серии (внутри лобби)
       match /games/{gameId} {
-        allow read: if request.auth != null && (
-          get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.createdBy == request.auth.uid ||
-          get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.blueCaptain.uid == request.auth.uid ||
-          (get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.redCaptain != null &&
-           get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.redCaptain.uid == request.auth.uid) ||
-          request.auth.uid in get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.invitedSpectators ||
-          request.auth.uid in get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.spectators
-        );
+        // Читать может любой авторизованный (шаринг драфта по ссылке)
+        allow read: if request.auth != null;
         // Писать — создатель лобби или любой из капитанов (детализированные проверки хода — на клиенте)
         allow write: if request.auth != null && (
           get(/databases/$(database)/documents/draftLobbies/$(lobbyId)).data.createdBy == request.auth.uid ||
@@ -154,8 +142,10 @@ service cloud.firestore {
     // ═══════════════════════════════════════════
     // Документ: { toUid, fromUid, lobbyId, role, side?, status, declineCount, cooldownUntil?, createdAt }
     match /draftInvites/{inviteId} {
-      // Читать могут отправитель и получатель
-      allow read: if request.auth != null && (
+      // get — разрешён любому auth (в т.ч. для несуществующих docs — иначе sendInvite → ref.get() падает с permission denied)
+      allow get: if request.auth != null;
+      // list (запросы) — только по своим invites
+      allow list: if request.auth != null && (
         resource.data.toUid == request.auth.uid ||
         resource.data.fromUid == request.auth.uid
       );
