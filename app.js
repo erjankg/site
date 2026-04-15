@@ -3160,25 +3160,60 @@
 
     function checkProfileGate(user) {
         if (!db || !user) return;
-        db.collection('users').doc(user.uid).get().then(function(snap){
-            var d = snap.exists ? snap.data() : {};
-            // Модалку профиля открываем только если НЕТ роли или ранга.
-            // displayName всегда есть из Google-аккаунта (присутствует в auth.currentUser), проверять его не нужно.
-            var needSetup = !d.role || !d.rank;
-            hideSiteAuthGate();
-            if (needSetup) {
-                document.body.classList.add('profile-gated');
-                setTimeout(function(){
-                    if (window.openProfileSetup) window.openProfileSetup();
-                }, 200);
-            } else {
-                document.body.classList.remove('profile-gated');
-                applyPendingDeepLink();
-            }
-        }).catch(function(e){
-            console.warn('Profile gate check:', e);
-            hideSiteAuthGate();
+        hideSiteAuthGate();
+
+        function hasProfile(d) {
+            return !!(d && typeof d.role === 'string' && d.role
+                   && typeof d.rank === 'string' && d.rank);
+        }
+
+        function openGate() {
+            document.body.classList.add('profile-gated');
+            setTimeout(function(){
+                if (window.openProfileSetup) window.openProfileSetup();
+            }, 200);
+        }
+
+        function passGate() {
+            document.body.classList.remove('profile-gated');
             applyPendingDeepLink();
+        }
+
+        // Пробуем default read (кеш+сервер). Если нашли role+rank — сразу пропускаем.
+        var ref = db.collection('users').doc(user.uid);
+        ref.get().then(function(snap){
+            var d = snap.exists ? (snap.data() || {}) : {};
+            console.log('[profile-gate default]', { exists: snap.exists, role: d.role, rank: d.rank });
+            if (hasProfile(d)) { passGate(); return; }
+
+            // Возможно данные устарели или ещё не синхронизированы. Пробуем server-read через 800мс
+            // (даём presence-write время на коммит в Firestore).
+            setTimeout(function(){
+                ref.get({ source: 'server' }).then(function(s2){
+                    var d2 = s2.exists ? (s2.data() || {}) : {};
+                    console.log('[profile-gate server]', { exists: s2.exists, role: d2.role, rank: d2.rank });
+                    if (hasProfile(d2)) passGate();
+                    else openGate();
+                }).catch(function(e){
+                    console.warn('[profile-gate] server read failed', e);
+                    // Сервер недоступен — но у нас уже есть чтение из кеша без role/rank.
+                    // Не открываем модалку насильно, чтобы не мешать пользователю.
+                    // Открываем gate только если doc реально не существует (новый юзер).
+                    if (!snap.exists) openGate();
+                    else passGate();
+                });
+            }, 800);
+        }).catch(function(e){
+            console.warn('[profile-gate] default read failed', e);
+            // Ошибка — пробуем только server-read
+            ref.get({ source: 'server' }).then(function(s){
+                var d = s.exists ? (s.data() || {}) : {};
+                if (hasProfile(d)) passGate();
+                else openGate();
+            }).catch(function(){
+                // Всё упало — не блокируем сайт
+                passGate();
+            });
         });
     }
 
