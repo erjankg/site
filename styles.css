@@ -3133,6 +3133,10 @@ select.cms-input { cursor: pointer; }
 }
 .dcoop-submit:hover { transform: translateY(-1px); }
 .dcoop-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+@keyframes dcoopPulseBtn {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.0); }
+  50%       { box-shadow: 0 0 0 5px rgba(255,255,255,0.3); }
+}
 
 @media (max-width: 560px) {
   .dcoop-win { width: 100vw; height: 100dvh; max-width: none; border-radius: 0; }

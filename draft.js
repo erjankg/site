@@ -352,12 +352,9 @@
 
     var needBlueCaptain = !l.blueCaptain || !l.blueCaptain.uid;
     var needRedCaptain  = !l.redCaptain  || !l.redCaptain.uid;
-    var inviteCapBtn = '';
-    if (isCreator && needBlueCaptain) {
-      inviteCapBtn = '<button class="dcoop-submit" style="padding:10px;font-size:12px;margin-top:10px;" onclick="dcoopInviteCaptain(\'blue\')">➕ Пригласить капитана синих</button>';
-    } else if (isCreator && needRedCaptain) {
-      inviteCapBtn = '<button class="dcoop-submit" style="padding:10px;font-size:12px;margin-top:10px;" onclick="dcoopInviteCaptain(\'red\')">➕ Пригласить капитана красных</button>';
-    }
+    var inviteCapBtn = isCreator
+      ? '<button class="dcoop-submit" style="padding:11px;font-size:13px;margin-top:12px;width:100%;letter-spacing:0.3px;" onclick="dcoopOpenInvite()">👥 Пригласить игрока</button>'
+      : '';
 
     var myReady = isBlueCap ? l.blueReady : (isRedCap ? l.redReady : false);
     var canReady = (isBlueCap || isRedCap) && l.redCaptain && l.blueCaptain;
@@ -379,9 +376,8 @@
       : '<div style="font-size:11px;color:var(--text-faint);padding:6px 0;">Пока никого</div>';
 
     var specActions = isCreator
-      ? '<div style="margin-top:8px;display:flex;gap:6px;">'
-        + '<button class="dcoop-submit" style="padding:8px 12px;font-size:11px;margin:0;flex:1;" onclick="dcoopInviteSpectator()">➕ Пригласить зрителя</button>'
-        + '<button class="dcoop-submit" style="padding:8px 12px;font-size:11px;margin:0;flex:1;background:var(--accent-dim);color:var(--accent);" onclick="dcoopCopyInvite()">🔗 Копировать ссылку</button>'
+      ? '<div style="margin-top:8px;">'
+        + '<button class="dcoop-submit" style="padding:8px 12px;font-size:11px;margin:0;width:100%;background:var(--accent-dim);color:var(--accent);" onclick="dcoopCopyInvite()">🔗 Копировать ссылку</button>'
         + '</div>'
       : '';
 
@@ -506,11 +502,11 @@
     overlay.onclick = function(e){ if (e.target === overlay) closeUserSearch(); };
 
     var hintMap = {
-      captainBlue: '🔵 Нужен капитан СИНИХ — нажми 🔵 у выбранного юзера',
-      captainRed:  '🔴 Нужен капитан КРАСНЫХ — нажми 🔴 у выбранного юзера',
-      spectator:   '👁 Нужен зритель — нажми 👁 у выбранного юзера'
+      captainBlue: '🔵 Нужен капитан СИНИХ — нажми «🔵 Капитан» у выбранного игрока',
+      captainRed:  '🔴 Нужен капитан КРАСНЫХ — нажми «🔴 Капитан» у выбранного игрока',
+      spectator:   '👁 Нужен зритель — нажми «👁 Зритель» у выбранного игрока'
     };
-    var hintTxt = hintMap[_prefMode] || 'Выберите юзера и роль — все роли доступны в каждой строке';
+    var hintTxt = hintMap[_prefMode] || 'Выберите игрока и роль — «🔵 Капитан», «🔴 Капитан» или «👁 Зритель»';
 
     overlay.innerHTML = ''
       + '<div style="background:var(--bg-base);border:1px solid var(--accent-border);border-radius:12px;width:100%;max-width:460px;padding:14px;display:flex;flex-direction:column;gap:8px;max-height:88vh;">'
@@ -657,23 +653,23 @@
     var pend = _pendingByUid[u.uid];
     var pendBadge = pend ? '<span title="Приглашение отправлено" style="font-size:11px;color:#f1c40f;font-weight:900;" >✉</span>' : '';
 
-    function btn(label, color, disabled, reason, onclick, highlight) {
-      var bg = disabled ? 'rgba(255,255,255,0.04)' : color;
+    function btn(label, bgActive, disabled, reason, onclick, highlight) {
+      var bg = disabled ? 'rgba(255,255,255,0.06)' : bgActive;
       var op = disabled ? '0.35' : '1';
       var cur = disabled ? 'not-allowed' : 'pointer';
       var title = disabled ? escapeHtml(reason || '') : '';
-      var ring = highlight && !disabled ? 'box-shadow:0 0 0 2px rgba(255,255,255,0.25);' : '';
+      var anim = (highlight && !disabled) ? 'animation:dcoopPulseBtn 1.4s ease-in-out infinite;' : '';
       var click = disabled ? '' : ' onclick="'+onclick+'"';
-      return '<button'+click+' title="'+title+'" style="border:none;background:'+bg+';color:#fff;padding:6px 9px;border-radius:6px;font-size:12px;font-weight:800;cursor:'+cur+';opacity:'+op+';'+ring+'">'+label+'</button>';
+      return '<button'+click+' title="'+title+'" style="border:none;background:'+bg+';color:#fff;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:800;cursor:'+cur+';opacity:'+op+';white-space:nowrap;'+anim+'">'+label+'</button>';
     }
 
     var enc = encodeURIComponent(u.displayName || '');
-    var blueBtn = btn('🔵', '#3498db',  s.blueDisabled, s.blueReason,
-      'dcoopSendInvite(\''+u.uid+'\',\''+enc+'\',\'captain\',\'blue\')',  _prefMode==='captainBlue');
-    var redBtn  = btn('🔴', '#e74c3c',  s.redDisabled,  s.redReason,
-      'dcoopSendInvite(\''+u.uid+'\',\''+enc+'\',\'captain\',\'red\')',   _prefMode==='captainRed');
-    var specBtn = btn('👁', 'var(--accent)', s.specDisabled, s.specReason,
-      'dcoopSendInvite(\''+u.uid+'\',\''+enc+'\',\'spectator\',null)',    _prefMode==='spectator');
+    var blueBtn = btn('🔵 Капитан', 'linear-gradient(135deg,#1a6fa8,#3498db)', s.blueDisabled, s.blueReason,
+      'dcoopSendInvite(\''+u.uid+'\',\''+enc+'\',\'captain\',\'blue\')', _prefMode==='captainBlue');
+    var redBtn  = btn('🔴 Капитан', 'linear-gradient(135deg,#922b21,#e74c3c)', s.redDisabled, s.redReason,
+      'dcoopSendInvite(\''+u.uid+'\',\''+enc+'\',\'captain\',\'red\')',  _prefMode==='captainRed');
+    var specBtn = btn('👁 Зритель', 'linear-gradient(135deg,#1c2d3f,#2c4560)', s.specDisabled, s.specReason,
+      'dcoopSendInvite(\''+u.uid+'\',\''+enc+'\',\'spectator\',null)',   _prefMode==='spectator');
 
     return ''
       + '<div style="display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--accent-border-sub);border-radius:8px;background:rgba(255,255,255,0.02);">'
@@ -682,7 +678,7 @@
       +     '<div style="display:flex;align-items:center;gap:6px;"><span style="font-weight:700;color:#fff;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;">'+nick+'</span>'+pendBadge+'</div>'
       +     '<div style="font-size:10px;color:var(--text-faint);">'+dot+' · '+role+' · '+rank+'</div>'
       +   '</div>'
-      +   '<div style="display:flex;gap:4px;flex-shrink:0;">'+blueBtn+redBtn+specBtn+'</div>'
+      +   '<div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;max-width:200px;">'+blueBtn+redBtn+specBtn+'</div>'
       + '</div>';
   }
 
@@ -2441,6 +2437,13 @@
   window.dcoopDeleteLobby = deleteLobby;
   window.dcoopInviteCaptain = function(side){ openUserSearch(side === 'blue' ? 'captainBlue' : 'captainRed'); };
   window.dcoopInviteSpectator = function(){ openUserSearch('spectator'); };
+  window.dcoopOpenInvite = function() {
+    var l = _currentLobby || {};
+    var prefMode = null;
+    if (!l.blueCaptain || !l.blueCaptain.uid) prefMode = 'captainBlue';
+    else if (!l.redCaptain || !l.redCaptain.uid) prefMode = 'captainRed';
+    openUserSearch(prefMode);
+  };
   window.dcoopCloseSearch = closeUserSearch;
   window.dcoopRemoveSpectator = removeSpectator;
   window.dcoopCopyInvite = copyInviteLink;
