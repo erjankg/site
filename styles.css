@@ -1465,6 +1465,24 @@ background: linear-gradient(90deg,var(--accent-glow),var(--accent-dim));
 border: 1px solid var(--accent-border); color: var(--text-secondary); margin-top: 6px;
 }
 .side-btn.side-support:hover { background: linear-gradient(90deg,var(--accent-border-str),var(--accent-border)); }
+
+/* ── PC: сайдбар всегда открыт, кнопка закрытия и гамбургер скрыты ── */
+@media (min-width: 769px) {
+  #sidePanel {
+    transform: translateX(0) !important;
+    transition: none !important;
+  }
+  #sidePanel .side-close { display: none !important; }
+  #menuBtn { display: none !important; }
+  #sideOverlay { display: none !important; }
+  /* Active state: какая модалка открыта из сайдбара */
+  .side-btn.side-active {
+    background: var(--accent-dim) !important;
+    box-shadow: inset 3px 0 0 var(--accent) !important;
+    color: #fff !important;
+  }
+}
+
 /* Hamburger button */
 #menuBtn {
 position: static;

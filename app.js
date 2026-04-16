@@ -740,17 +740,18 @@
 
         // Description block
         if(desc) {
+            var rt = window.parseRichText || function(s){ return s; };
             var descBox = document.createElement('div');
             desc.split('\n').filter(Boolean).forEach(function(line) {
-                var m = line.match(/^([^:]+?):\s*(.+)/);
+                var m = line.match(/^([^:]+?):\s*(.+)/s);
                 var el = document.createElement('div');
                 el.style.marginBottom = '10px';
                 if(m) {
                     el.innerHTML = '<div style="color:var(--sel-text);font-weight:800;font-size:13px;margin-bottom:3px;">' + m[1] + '</div>'
-                                 + '<div style="color:rgba(255,255,255,0.82);font-size:13px;line-height:1.65;">' + m[2] + '</div>';
+                                 + '<div style="color:rgba(255,255,255,0.82);font-size:13px;line-height:1.65;">' + rt(m[2]) + '</div>';
                 } else {
                     el.style.cssText = 'color:rgba(255,255,255,0.7);font-size:13px;line-height:1.65;margin-bottom:8px;';
-                    el.textContent = line;
+                    el.innerHTML = rt(line);
                 }
                 descBox.appendChild(el);
             });
@@ -775,34 +776,58 @@
                 card.style.cursor = 'pointer';
                 card.addEventListener('click', function() {
                     var parts = (card.getAttribute('data-tip') || '').split('\u00A6');
+                    var lang = window._lang || localStorage.getItem('wr_lang') || 'ru';
+                    var descEn = card.getAttribute('data-desc-en') || '';
+                    var descRu = card.getAttribute('data-desc-ru') || parts[3] || '';
+                    var desc = (lang === 'en' && descEn) ? descEn : descRu;
                     var imgSrc = card.querySelector('img') ? card.querySelector('img').src : '';
-                    openItemDetail(parts[0]||'', parts[1]||'', parts[2]||'', parts[3]||'', imgSrc);
+                    openItemDetail(parts[0]||'', parts[1]||'', parts[2]||'', desc, imgSrc);
                 });
             });
         }, 80);
     };
 
     // SIDEBAR
+    // Вспомогательная: PC или нет
+    function _isSidebarPc() { return window.matchMedia('(min-width: 769px)').matches; }
+
+    // Убрать active state со всех кнопок сайдбара
+    function _sidebarClearActive() {
+        document.querySelectorAll('#sidePanel .side-btn').forEach(function(b) {
+            b.classList.remove('side-active');
+        });
+    }
+    // Установить active state по ключу 'what' (совпадение с onclick атрибутом)
+    function _sidebarSetActive(what) {
+        _sidebarClearActive();
+        if (!what) return;
+        document.querySelectorAll('#sidePanel .side-btn').forEach(function(btn) {
+            var oc = btn.getAttribute('onclick') || '';
+            if (oc.indexOf("'" + what + "'") !== -1 || oc.indexOf('"' + what + '"') !== -1) {
+                btn.classList.add('side-active');
+            }
+        });
+    }
+    window._sidebarSetActive = _sidebarSetActive;
+    window._sidebarClearActive = _sidebarClearActive;
+
     window.toggleSidebar = function() {
         var panel = document.getElementById('sidePanel');
         var overlay = document.getElementById('sideOverlay');
         if(!panel) return;
+        var isPc = _isSidebarPc();
+        // PC: сайдбар всегда открыт, toggle ничего не делает
+        if(isPc) return;
         var isOpen = panel.classList.contains('open');
-        var isPc = window.matchMedia('(min-width: 769px)').matches;
-        if(isOpen && isPc) {
-            // PC closing: delegate to closeSidebar so it also closes any open modal
-            closeSidebar();
-            return;
-        }
-        if(!isOpen && !isPc) {
+        if(!isOpen) {
             // Mobile opening: save scroll position
             document.body.dataset.scrollY = window.scrollY;
             document.body.style.top = '-' + window.scrollY + 'px';
         }
         panel.classList.toggle('open', !isOpen);
-        if(overlay) overlay.classList.toggle('open', !isOpen && !isPc);
-        if(!isPc) document.body.classList.toggle('sidebar-open', !isOpen);
-        if(isOpen && !isPc) {
+        if(overlay) overlay.classList.toggle('open', !isOpen);
+        document.body.classList.toggle('sidebar-open', !isOpen);
+        if(isOpen) {
             // Mobile closing: restore scroll position
             var scrollY = parseInt(document.body.dataset.scrollY || '0', 10);
             document.body.style.top = '';
@@ -810,12 +835,27 @@
         }
     };
     window.closeSidebar = function() {
+        var isPc = _isSidebarPc();
         var panel = document.getElementById('sidePanel');
         var overlay = document.getElementById('sideOverlay');
-        if(panel) panel.classList.remove('open');
-        if(overlay) overlay.classList.remove('open');
         document.body.classList.remove('pc-chat-mode');
         document.body.classList.remove('pc-side-mode');
+        _sidebarClearActive();
+
+        if (isPc) {
+            // PC: не закрываем сайдбар, только чистим состояние модалок
+            if (_sidebarModalId && _pcSideMode) {
+                var _el = document.getElementById(_sidebarModalId);
+                if (_el) _el.classList.remove('side-panel-modal');
+                _sidebarModalId = null;
+                _pcSideMode = false;
+            }
+            return;
+        }
+
+        // Mobile: закрываем полностью
+        if(panel) panel.classList.remove('open');
+        if(overlay) overlay.classList.remove('open');
         var wasOpen = document.body.classList.contains('sidebar-open');
         document.body.classList.remove('sidebar-open');
         if(wasOpen) {
@@ -826,13 +866,12 @@
         // Close any modal that was opened in PC side-panel mode
         if (_sidebarModalId && _pcSideMode) {
             var _id = _sidebarModalId;
-            var _el = document.getElementById(_id);
-            if (_el) _el.classList.remove('side-panel-modal');
+            var _el2 = document.getElementById(_id);
+            if (_el2) _el2.classList.remove('side-panel-modal');
             _sidebarModalId = null;
             _pcSideMode = false;
             if (_origCloseModal) _origCloseModal(_id);
         } else {
-            // Also close chat if it's open (e.g. pc-chat-mode was active)
             var _chatEl = document.getElementById('chatSystemMask');
             if (_chatEl && _chatEl.classList.contains('active')) {
                 if (_origCloseModal) _origCloseModal('chatSystemMask');
@@ -1224,8 +1263,12 @@
                 card.style.cursor = 'pointer';
                 card.addEventListener('click', function() {
                     var parts = (card.getAttribute('data-tip')||'').split('\xA6');
+                    var lang = window._lang || localStorage.getItem('wr_lang') || 'ru';
+                    var descEn = card.getAttribute('data-desc-en') || '';
+                    var descRu = card.getAttribute('data-desc-ru') || parts[3] || parts[2] || '';
+                    var desc = (lang === 'en' && descEn) ? descEn : descRu;
                     var imgSrc = card.querySelector('img') ? card.querySelector('img').src : '';
-                    openRuneDetail(parts[0]||'', parts[1]||'', parts[3]||parts[2]||'', imgSrc);
+                    openRuneDetail(parts[0]||'', parts[1]||'', desc, imgSrc);
                 });
             });
         }, 80);
@@ -1997,13 +2040,12 @@
     }
 
     window.sidebarOpen = function(what) {
-        var isPc = window.matchMedia('(min-width: 769px)').matches;
+        var isPc = _isSidebarPc();
         var panel = document.getElementById('sidePanel');
         var sidebarIsOpen = panel && panel.classList.contains('open');
 
         if (isPc && sidebarIsOpen) {
             // PC mode: keep sidebar open, open modal to the RIGHT of sidebar
-            // Close previously opened pc side modal if switching
             if (_sidebarModalId && _pcSideMode) {
                 var prevEl = document.getElementById(_sidebarModalId);
                 if (prevEl) prevEl.classList.remove('side-panel-modal');
@@ -2011,21 +2053,22 @@
                 _origCloseModal(_sidebarModalId);
             }
             _pcSideMode = true;
-            document.body.classList.add('pc-side-mode'); // hides sideOverlay so it can't block clicks
+            document.body.classList.add('pc-side-mode');
             _sidebarModalId = _sidebarModalMap[what] || null;
             if (what === 'globalChat' || what === 'users') {
                 document.body.classList.add('pc-chat-mode');
             }
             _sidebarDoOpen(what);
-            // Tag modal as side-panel-modal for CSS positioning
             if (_sidebarModalId) {
                 var el = document.getElementById(_sidebarModalId);
                 if (el) el.classList.add('side-panel-modal');
             }
+            // Подсвечиваем активную кнопку сайдбара
+            _sidebarSetActive(what);
             return;
         }
 
-        // Mobile or sidebar not open: original behavior — close sidebar first
+        // Mobile: закрываем сайдбар, открываем модалку обычно
         _pcSideMode = false;
         closeSidebar();
         _sidebarModalId = _sidebarModalMap[what] || null;
@@ -2043,6 +2086,7 @@
             document.body.classList.remove('pc-chat-mode');
             document.body.classList.remove('pc-side-mode');
             _sidebarModalId = null;
+            _sidebarClearActive(); // сбрасываем active кнопку при закрытии модалки
             if (_pcSideMode) {
                 // PC: sidebar stays open, just clear state
                 _pcSideMode = false;
@@ -2064,6 +2108,16 @@
         }
     };
     window.closeModal = closeModal;
+
+    // PC: инициализируем сайдбар как открытый с самого начала
+    (function() {
+        if (_isSidebarPc()) {
+            var panel = document.getElementById('sidePanel');
+            if (panel && !panel.classList.contains('open')) {
+                panel.classList.add('open');
+            }
+        }
+    })();
 
     window.toggleP = function(name) {
         if(pinned.has(name)) pinned.delete(name);

@@ -34,14 +34,59 @@
 
   window.cmsLoadData = function(callback) {
     var db = firebase.firestore();
-    var loaded = { items: false, runes: false };
+    var loaded = { items: false, runes: false, icons: false, sidebar: false };
 
     function checkDone() {
-      if (loaded.items && loaded.runes) {
+      if (loaded.items && loaded.runes && loaded.icons && loaded.sidebar) {
         window._cmsLoaded = true;
         if (callback) callback();
       }
     }
+
+    // Загрузка иконок
+    db.collection('siteIcons').orderBy('order', 'asc').get()
+      .then(function(snap) {
+        window._siteIcons = {};
+        snap.forEach(function(doc) {
+          var d = doc.data();
+          window._siteIcons[d.name || doc.id] = d.url || '';
+        });
+        loaded.icons = true;
+        checkDone();
+      })
+      .catch(function() { loaded.icons = true; checkDone(); });
+
+    // Загрузка лейблов сайдбара
+    db.collection('siteConfig').doc('sidebar').get()
+      .then(function(doc) {
+        if (doc.exists && window.cmsLoadSidebarLabels) {
+          // Применяем после рендера DOM
+          setTimeout(function() {
+            var data = doc.data();
+            if (data) {
+              document.querySelectorAll('#sidePanel .side-btn').forEach(function(btn) {
+                var oc = btn.getAttribute('onclick') || '';
+                var keys = ['sideChamps','calc','items','runes','draft','draftCoop','tierMenu','globalChat'];
+                var defaults = { sideChamps:'Чемпионы', calc:'Калькулятор урона', items:'Предметы',
+                  runes:'Руны', draft:'Драфт-помощник', draftCoop:'Драфт (серии)', tierMenu:'Тир-лист', globalChat:'Чат' };
+                keys.forEach(function(k) {
+                  if ((oc.indexOf("'"+k+"'") !== -1 || oc.indexOf('"'+k+'"') !== -1) && data[k]) {
+                    var nodes = btn.childNodes;
+                    for (var i = 0; i < nodes.length; i++) {
+                      if (nodes[i].nodeType === 3 && nodes[i].textContent.trim()) {
+                        nodes[i].textContent = data[k]; break;
+                      }
+                    }
+                  }
+                });
+              });
+            }
+          }, 100);
+        }
+        loaded.sidebar = true;
+        checkDone();
+      })
+      .catch(function() { loaded.sidebar = true; checkDone(); });
 
     // Загрузка предметов
     db.collection('items').get()
@@ -172,10 +217,15 @@
   };
 
   function _createItemCard(item, isAdmin) {
-    var tip = (item.name_ru || '') + '\u00A6' + (item.cost || '') + '\u00A6' + (item.stats || '') + '\u00A6' + (item.description || '');
+    // Описание: description_ru (или legacy description) для data-tip, description_en отдельно
+    var descRu = item.description_ru || item.description || '';
+    var descEn = item.description_en || '';
+    var tip = (item.name_ru || '') + '\u00A6' + (item.cost || '') + '\u00A6' + (item.stats || '') + '\u00A6' + descRu;
     var card = document.createElement('div');
     card.className = 'item-card';
     card.setAttribute('data-tip', tip);
+    card.setAttribute('data-desc-ru', descRu);
+    card.setAttribute('data-desc-en', descEn);
     card.style.position = 'relative';
 
     var img = document.createElement('img');
@@ -274,10 +324,14 @@
   };
 
   function _createRuneCard(rune, isAdmin) {
-    var tip = (rune.name_ru || '') + '\u00A6' + (rune.category || '') + '\u00A6\u00A6' + (rune.description || '');
+    var descRu = rune.description_ru || rune.description || '';
+    var descEn = rune.description_en || '';
+    var tip = (rune.name_ru || '') + '\u00A6' + (rune.category || '') + '\u00A6\u00A6' + descRu;
     var card = document.createElement('div');
     card.className = 'rune-card';
     card.setAttribute('data-tip', tip);
+    card.setAttribute('data-desc-ru', descRu);
+    card.setAttribute('data-desc-en', descEn);
     card.style.position = 'relative';
 
     var img = document.createElement('img');
@@ -327,18 +381,22 @@
   window.cmsOpenItemEditor = function(item, defaultCategory) {
     var isNew = !item;
     var data = item ? Object.assign({}, item) : {
-      name_ru: '', name_en: '', cost: '', stats: '', description: '',
+      name_ru: '', name_en: '', cost: '', stats: '',
+      description_ru: '', description_en: '',
       image: '', category: defaultCategory || 'physical', order: 999
     };
+    // Совместимость: если есть старое поле description — переносим в description_ru
+    if (!data.description_ru && data.description) data.description_ru = data.description;
 
     var modal = _createEditorModal('Предмет', isNew, data, [
       { key: 'name_ru', label: 'Название (RU)', type: 'text' },
       { key: 'name_en', label: 'Название (EN)', type: 'text' },
       { key: 'cost', label: 'Цена', type: 'text', placeholder: '3000 г' },
-      { key: 'stats', label: 'Статы (разделитель: |)', type: 'textarea', placeholder: '+40 Сила атаки  |  +20 Ускорение умений' },
-      { key: 'description', label: 'Описание пассивки', type: 'textarea' },
+      { key: 'stats', label: 'Статы RU (разделитель: |)', type: 'textarea', placeholder: '+40 Сила атаки  |  +20 Ускорение умений' },
       { key: 'image', label: 'URL картинки', type: 'text', placeholder: 'https://...' },
-      { key: 'category', label: 'Категория', type: 'select', options: ITEM_CATEGORIES.map(function(c) { return { value: c.id, label: c.label }; }) }
+      { key: 'category', label: 'Категория', type: 'select', options: ITEM_CATEGORIES.map(function(c) { return { value: c.id, label: c.label }; }) },
+      { key: 'description_ru', label: 'Описание (RU) — поддерживает [текст|ad] и [icon:name]', type: 'richtext' },
+      { key: 'description_en', label: 'Описание (EN) — пусто = авто-перевод', type: 'richtext', placeholder: 'Passive: Deals [50 AD|ad] physical damage.' }
     ], function(newData) {
       _saveItem(newData, item ? item._id : null, isNew);
     }, item ? function() {
@@ -428,16 +486,18 @@
     var isNew = !rune;
     var data = rune ? Object.assign({}, rune) : {
       name_ru: '', name_en: '', category: '', tree: defaultTree || 'keystone',
-      description: '', image: '', order: 999
+      description_ru: '', description_en: '', image: '', order: 999
     };
+    if (!data.description_ru && data.description) data.description_ru = data.description;
 
     var modal = _createEditorModal('Руна', isNew, data, [
       { key: 'name_ru', label: 'Название (RU)', type: 'text' },
       { key: 'name_en', label: 'Название (EN)', type: 'text' },
       { key: 'category', label: 'Тип (Ключевая/Доминация/...)', type: 'text' },
-      { key: 'description', label: 'Описание', type: 'textarea' },
       { key: 'image', label: 'URL картинки', type: 'text', placeholder: 'https://...' },
-      { key: 'tree', label: 'Дерево', type: 'select', options: RUNE_TREES.map(function(t) { return { value: t.id, label: t.label }; }) }
+      { key: 'tree', label: 'Дерево', type: 'select', options: RUNE_TREES.map(function(t) { return { value: t.id, label: t.label }; }) },
+      { key: 'description_ru', label: 'Описание (RU) — поддерживает [текст|ad] и [icon:name]', type: 'richtext' },
+      { key: 'description_en', label: 'Описание (EN) — пусто = авто-перевод', type: 'richtext' }
     ], function(newData) {
       _saveRune(newData, rune ? rune._id : null, isNew);
     }, rune ? function() {
@@ -1704,5 +1764,484 @@
         _showToast('Ошибка: ' + err.message, 'error');
       });
   }
+
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🎨 RICH TEXT — parseRichText, цвета, иконки
+  // ═══════════════════════════════════════════════════════════════
+
+  var _richColors = {
+    'ad':     '#e87f00',
+    'mana':   '#3498db',
+    'hp':     '#2ecc71',
+    'magic':  '#a78bfa',
+    'dmg':    '#e74c3c',
+    'armor':  '#f1c40f',
+    'ms':     '#5dade2',
+    'energy': '#e8e840',
+    'crit':   '#ff9f43',
+    'vamp':   '#e056fd',
+    'true':   '#ffffff',
+    'heal':   '#55efc4'
+  };
+
+  // Иконки загружаются из Firestore siteIcons → {name: url}
+  window._siteIcons = {};
+
+  // parseRichText: [text|color] → <span style="color:..."> / [icon:name] → <img>
+  window.parseRichText = function(text) {
+    if (!text) return '';
+    var safe = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    // [icon:name] → <img>
+    safe = safe.replace(/\[icon:([^\]]+)\]/g, function(_, name) {
+      name = name.trim();
+      var url = window._siteIcons[name] || name;
+      return '<img src="' + url.replace(/"/g, '&quot;') + '" '
+        + 'style="height:1.1em;vertical-align:middle;display:inline-block;margin:0 1px;" '
+        + 'alt="" onerror="this.style.display=\'none\'">';
+    });
+    // [text|colortoken] → <span>
+    safe = safe.replace(/\[([^\]|]+)\|([^\]]+)\]/g, function(_, txt, color) {
+      var col = _richColors[color.trim()] || color.trim();
+      return '<span style="color:' + col.replace(/"/g, '') + ';font-weight:600;">' + txt + '</span>';
+    });
+    return safe;
+  };
+
+  // ── Загрузка иконок из Firestore ──
+  window.cmsLoadIcons = function(callback) {
+    var db = firebase.firestore();
+    db.collection('siteIcons').orderBy('order', 'asc').get()
+      .then(function(snap) {
+        window._siteIcons = {};
+        snap.forEach(function(doc) {
+          var d = doc.data();
+          var name = d.name || doc.id;
+          window._siteIcons[name] = d.url || '';
+        });
+        console.log('[CMS] Иконок загружено: ' + Object.keys(window._siteIcons).length);
+        if (callback) callback();
+      })
+      .catch(function(err) {
+        console.warn('[CMS] Ошибка загрузки иконок:', err);
+        if (callback) callback();
+      });
+  };
+
+  // ── Rich text editor widget ──
+  // Возвращает {group, getValue}
+  function _createRichTextEditor(initialValue, placeholder) {
+    var group = document.createElement('div');
+    var icons = window._siteIcons || {};
+    var iconNames = Object.keys(icons);
+
+    // Тулбар
+    var toolbar = document.createElement('div');
+    toolbar.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;';
+
+    // Цветные кнопки
+    var colorBtns = [
+      { label: 'AD',    key: 'ad' },
+      { label: 'Mana',  key: 'mana' },
+      { label: 'HP',    key: 'hp' },
+      { label: 'Magic', key: 'magic' },
+      { label: 'Dmg',   key: 'dmg' },
+      { label: 'Armor', key: 'armor' },
+      { label: 'MS',    key: 'ms' },
+      { label: 'Crit',  key: 'crit' },
+      { label: 'Vamp',  key: 'vamp' }
+    ];
+
+    colorBtns.forEach(function(cb) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = cb.label;
+      var col = _richColors[cb.key] || '#fff';
+      btn.style.cssText = 'background:rgba(255,255,255,0.06);border:1px solid ' + col + ';color:' + col + ';'
+        + 'font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;cursor:pointer;';
+      btn.title = 'Выделить цветом ' + cb.label;
+      btn.onclick = function() { _applyColorWrap(textarea, cb.key); updatePreview(); };
+      toolbar.appendChild(btn);
+    });
+
+    // Кастомный цвет
+    var colorPicker = document.createElement('input');
+    colorPicker.type = 'color';
+    colorPicker.value = '#ffffff';
+    colorPicker.style.cssText = 'width:28px;height:28px;padding:0;border:1px solid rgba(255,255,255,0.2);border-radius:6px;cursor:pointer;background:none;';
+    colorPicker.title = 'Кастомный цвет';
+    toolbar.appendChild(colorPicker);
+    var applyCustomColor = document.createElement('button');
+    applyCustomColor.type = 'button';
+    applyCustomColor.textContent = '🎨';
+    applyCustomColor.style.cssText = 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:14px;padding:3px 8px;border-radius:6px;cursor:pointer;';
+    applyCustomColor.title = 'Применить выбранный цвет';
+    applyCustomColor.onclick = function() { _applyColorWrap(textarea, colorPicker.value); updatePreview(); };
+    toolbar.appendChild(applyCustomColor);
+
+    // Иконки (если есть)
+    if (iconNames.length > 0) {
+      var sep = document.createElement('div');
+      sep.style.cssText = 'width:1px;background:rgba(255,255,255,0.12);margin:2px 4px;';
+      toolbar.appendChild(sep);
+      iconNames.forEach(function(name) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        var img = document.createElement('img');
+        img.src = icons[name];
+        img.style.cssText = 'height:16px;vertical-align:middle;';
+        img.onerror = function() { btn.textContent = name; };
+        btn.appendChild(img);
+        btn.style.cssText = 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);'
+          + 'padding:3px 6px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;';
+        btn.title = 'Вставить иконку: ' + name;
+        btn.onclick = function() { _insertAtCursor(textarea, '[icon:' + name + ']'); updatePreview(); };
+        toolbar.appendChild(btn);
+      });
+    }
+
+    group.appendChild(toolbar);
+
+    // Textarea
+    var textarea = document.createElement('textarea');
+    textarea.rows = 4;
+    textarea.className = 'cms-input';
+    textarea.value = initialValue || '';
+    if (placeholder) textarea.placeholder = placeholder;
+    textarea.style.cssText = 'font-family:monospace;font-size:12px;';
+    textarea.oninput = updatePreview;
+    group.appendChild(textarea);
+
+    // Live preview
+    var previewLabel = document.createElement('div');
+    previewLabel.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.4);margin-top:6px;margin-bottom:3px;letter-spacing:0.5px;text-transform:uppercase;';
+    previewLabel.textContent = 'Превью:';
+    group.appendChild(previewLabel);
+
+    var preview = document.createElement('div');
+    preview.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);'
+      + 'border-radius:8px;padding:8px 12px;font-size:13px;color:rgba(255,255,255,0.8);'
+      + 'line-height:1.6;min-height:36px;';
+    group.appendChild(preview);
+
+    function updatePreview() {
+      var html = window.parseRichText ? window.parseRichText(textarea.value) : textarea.value;
+      preview.innerHTML = html || '<span style="color:rgba(255,255,255,0.2);font-style:italic;">пусто</span>';
+    }
+    updatePreview();
+
+    return {
+      group: group,
+      getValue: function() { return textarea.value; }
+    };
+  }
+
+  function _applyColorWrap(textarea, colorKey) {
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var val = textarea.value;
+    if (start === end) { _insertAtCursor(textarea, '[текст|' + colorKey + ']'); return; }
+    var selected = val.substring(start, end);
+    var wrapped = '[' + selected + '|' + colorKey + ']';
+    textarea.value = val.substring(0, start) + wrapped + val.substring(end);
+    textarea.selectionStart = start;
+    textarea.selectionEnd = start + wrapped.length;
+    textarea.focus();
+  }
+
+  function _insertAtCursor(textarea, text) {
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var val = textarea.value;
+    textarea.value = val.substring(0, start) + text + val.substring(end);
+    textarea.selectionStart = textarea.selectionEnd = start + text.length;
+    textarea.focus();
+  }
+
+  // ── Добавить тип 'richtext' в _createEditorModal ──
+  // Патчим уже существующую функцию через wrapper
+  var _origCreateEditorModal = _createEditorModal;
+  _createEditorModal = function(entityName, isNew, data, fields, onSave, onDelete) {
+    // Убираем поля richtext из fields для оригинальной функции,
+    // добавим их вручную после
+    var normalFields = [];
+    var richFields = [];
+    fields.forEach(function(f) {
+      if (f.type === 'richtext') richFields.push(f);
+      else normalFields.push(f);
+    });
+
+    // Вызываем оригинальную функцию без richtext полей
+    var overlay = _origCreateEditorModal(entityName, isNew, data, normalFields, function() {}, onDelete);
+    var win = overlay.querySelector('.cms-modal-win');
+
+    // Собираем editors для richtext полей
+    var rtEditors = {};
+    richFields.forEach(function(f) {
+      var group = document.createElement('div');
+      group.style.marginBottom = '12px';
+
+      var lbl = document.createElement('label');
+      lbl.style.cssText = 'display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;';
+      lbl.textContent = f.label;
+      group.appendChild(lbl);
+
+      var editor = _createRichTextEditor(data[f.key] || '', f.placeholder || '');
+      rtEditors[f.key] = editor;
+      group.appendChild(editor.group);
+
+      // Вставляем перед кнопками
+      var btnRow = win.querySelector('div[style*="margin-top:18px"]');
+      if (btnRow) win.insertBefore(group, btnRow);
+      else win.appendChild(group);
+    });
+
+    // Перепривязываем кнопку сохранения чтобы захватить richtext значения
+    var saveBtn = win.querySelector('.cms-btn-save');
+    if (saveBtn) {
+      saveBtn.onclick = function() {
+        // Собираем все обычные поля
+        var newData = {};
+        normalFields.forEach(function(f) {
+          if (f.type === 'select') {
+            var sel = win.querySelector('select.cms-input');
+            newData[f.key] = sel ? sel.value : (data[f.key] || '');
+          } else {
+            var inputs = win.querySelectorAll('input.cms-input, textarea.cms-input');
+            inputs.forEach(function(el) {
+              var parentLabel = el.previousElementSibling;
+              if (parentLabel && parentLabel.textContent === f.label) newData[f.key] = el.value.trim();
+            });
+          }
+        });
+        // Richtext поля
+        richFields.forEach(function(f) {
+          newData[f.key] = rtEditors[f.key].getValue();
+        });
+        // order
+        newData.order = data.order || 0;
+        onSave(newData);
+        overlay.remove();
+      };
+    }
+
+    return overlay;
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🖼 ICON REGISTRY — управление иконками (Firestore siteIcons)
+  // ═══════════════════════════════════════════════════════════════
+
+  window.cmsOpenIconsEditor = function() {
+    var db = firebase.firestore();
+    var overlay = document.createElement('div');
+    overlay.className = 'cms-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var win = document.createElement('div');
+    win.className = 'cms-modal-win';
+    win.style.maxWidth = '560px';
+
+    win.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
+      + '<h3 style="margin:0;color:#fff;font-size:18px;">🖼 Иконки</h3>'
+      + '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button></div>'
+      + '<div id="cmsIconsList" style="display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto;margin-bottom:16px;"></div>'
+      + '<div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:14px;">'
+      + '<div style="color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;margin-bottom:8px;">ДОБАВИТЬ ИКОНКУ</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;">'
+      + '<div><label style="display:block;font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:3px;">ИМЯ (без пробелов)</label>'
+      + '<input id="cmsIconName" class="cms-input" placeholder="ad" style="margin:0;"></div>'
+      + '<div><label style="display:block;font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:3px;">URL иконки</label>'
+      + '<input id="cmsIconUrl" class="cms-input" placeholder="https://..." style="margin:0;"></div>'
+      + '<button onclick="cmsAddIcon()" class="cms-btn-save" style="margin:0;padding:8px 14px;">+ Добавить</button>'
+      + '</div>'
+      + '<div id="cmsIconPreview" style="margin-top:8px;min-height:28px;"></div>'
+      + '</div>';
+
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+
+    // Preview URL при вводе
+    var urlInput = win.querySelector('#cmsIconUrl');
+    var previewDiv = win.querySelector('#cmsIconPreview');
+    urlInput.addEventListener('input', function() {
+      var url = urlInput.value.trim();
+      if (url) previewDiv.innerHTML = '<img src="' + url + '" style="height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display=\'none\'">';
+      else previewDiv.innerHTML = '';
+    });
+
+    _refreshIconsList(db, win);
+
+    window.cmsAddIcon = function() {
+      var name = (win.querySelector('#cmsIconName').value || '').trim().replace(/\s+/g, '_');
+      var url = (win.querySelector('#cmsIconUrl').value || '').trim();
+      if (!name || !url) { _showToast('Заполни имя и URL', 'error'); return; }
+
+      var existingCount = Object.keys(window._siteIcons || {}).length;
+      db.collection('siteIcons').doc(name).set({ name: name, url: url, order: existingCount })
+        .then(function() {
+          window._siteIcons[name] = url;
+          win.querySelector('#cmsIconName').value = '';
+          win.querySelector('#cmsIconUrl').value = '';
+          previewDiv.innerHTML = '';
+          _refreshIconsList(db, win);
+          _showToast('Иконка добавлена!', 'success');
+        })
+        .catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); });
+    };
+  };
+
+  function _refreshIconsList(db, win) {
+    db.collection('siteIcons').orderBy('order', 'asc').get()
+      .then(function(snap) {
+        var list = win.querySelector('#cmsIconsList');
+        if (!list) return;
+        if (snap.empty) {
+          list.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:12px;text-align:center;padding:16px;">Иконок нет. Добавь первую!</div>';
+          return;
+        }
+        list.innerHTML = '';
+        snap.forEach(function(doc) {
+          var d = doc.data();
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.08);';
+          row.innerHTML = '<img src="' + (d.url||'') + '" style="height:22px;flex-shrink:0;" onerror="this.style.display=\'none\'">'
+            + '<code style="color:var(--accent-light);font-size:12px;flex:1;">[icon:' + (d.name||doc.id) + ']</code>'
+            + '<div style="font-size:11px;color:rgba(255,255,255,0.3);flex:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (d.url||'') + '</div>'
+            + '<button style="background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;" '
+            + 'onclick="cmsDeleteIcon(\'' + doc.id + '\',\'' + (d.name||doc.id) + '\')">✕</button>';
+          list.appendChild(row);
+        });
+      });
+  }
+
+  window.cmsDeleteIcon = function(docId, name) {
+    if (!confirm('Удалить иконку "' + name + '"?')) return;
+    var db = firebase.firestore();
+    db.collection('siteIcons').doc(docId).delete()
+      .then(function() {
+        delete window._siteIcons[name];
+        _showToast('Иконка удалена', 'success');
+        var win = document.querySelector('.cms-modal-overlay .cms-modal-win');
+        if (win) _refreshIconsList(db, win);
+      })
+      .catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); });
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🔤 SIDEBAR LABELS — редактирование кнопок сайдбара
+  // ═══════════════════════════════════════════════════════════════
+
+  var _SIDEBAR_KEYS = [
+    { key: 'sideChamps', default: 'Чемпионы' },
+    { key: 'calc',       default: 'Калькулятор урона' },
+    { key: 'items',      default: 'Предметы' },
+    { key: 'runes',      default: 'Руны' },
+    { key: 'draft',      default: 'Драфт-помощник' },
+    { key: 'draftCoop', default: 'Драфт (серии)' },
+    { key: 'tierMenu',   default: 'Тир-лист' },
+    { key: 'globalChat', default: 'Чат' }
+  ];
+
+  window.cmsLoadSidebarLabels = function(callback) {
+    var db = firebase.firestore();
+    db.collection('siteConfig').doc('sidebar').get()
+      .then(function(doc) {
+        var data = doc.exists ? doc.data() : {};
+        _applySidebarLabels(data);
+        if (callback) callback();
+      })
+      .catch(function() { if (callback) callback(); });
+  };
+
+  function _applySidebarLabels(data) {
+    if (!data) return;
+    document.querySelectorAll('#sidePanel .side-btn').forEach(function(btn) {
+      var oc = btn.getAttribute('onclick') || '';
+      _SIDEBAR_KEYS.forEach(function(sk) {
+        if (oc.indexOf("'" + sk.key + "'") !== -1 || oc.indexOf('"' + sk.key + '"') !== -1) {
+          var label = data[sk.key];
+          if (label) {
+            // Меняем текстовый узел (после иконки)
+            var nodes = btn.childNodes;
+            for (var i = 0; i < nodes.length; i++) {
+              if (nodes[i].nodeType === 3 && nodes[i].textContent.trim()) {
+                nodes[i].textContent = label;
+                break;
+              }
+            }
+          }
+        }
+      });
+    });
+  }
+
+  window.cmsOpenSidebarEditor = function() {
+    var db = firebase.firestore();
+    var overlay = document.createElement('div');
+    overlay.className = 'cms-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var win = document.createElement('div');
+    win.className = 'cms-modal-win';
+    win.style.maxWidth = '440px';
+
+    var titleHtml = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
+      + '<h3 style="margin:0;color:#fff;font-size:18px;">🔤 Кнопки сайдбара</h3>'
+      + '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button></div>';
+    win.innerHTML = titleHtml;
+
+    // Загружаем текущие значения
+    db.collection('siteConfig').doc('sidebar').get()
+      .then(function(doc) {
+        var saved = doc.exists ? doc.data() : {};
+        var inputs = {};
+
+        _SIDEBAR_KEYS.forEach(function(sk) {
+          var group = document.createElement('div');
+          group.style.marginBottom = '10px';
+
+          var lbl = document.createElement('label');
+          lbl.style.cssText = 'display:block;color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;margin-bottom:3px;';
+          lbl.textContent = sk.key;
+          group.appendChild(lbl);
+
+          var inp = document.createElement('input');
+          inp.type = 'text';
+          inp.className = 'cms-input';
+          inp.value = saved[sk.key] || sk.default;
+          inp.placeholder = sk.default;
+          inp.style.margin = '0';
+          inputs[sk.key] = inp;
+          group.appendChild(inp);
+          win.appendChild(group);
+        });
+
+        var saveBtn = document.createElement('button');
+        saveBtn.className = 'cms-btn-save';
+        saveBtn.style.marginTop = '14px';
+        saveBtn.textContent = '💾 Сохранить';
+        saveBtn.onclick = function() {
+          var newData = {};
+          _SIDEBAR_KEYS.forEach(function(sk) {
+            newData[sk.key] = inputs[sk.key].value.trim() || sk.default;
+          });
+          db.collection('siteConfig').doc('sidebar').set(newData)
+            .then(function() {
+              _applySidebarLabels(newData);
+              _showToast('Сайдбар обновлён!', 'success');
+              overlay.remove();
+            })
+            .catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); });
+        };
+        win.appendChild(saveBtn);
+      });
+
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+  };
 
 })();

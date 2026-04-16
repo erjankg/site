@@ -265,6 +265,7 @@
   }
 
   function openLobby(id) {
+    _replayCache = null; // сбрасываем кэш при смене лобби
     _currentLobbyId = id;
     stopLobbyListener();
     switchTab('lobby');
@@ -2182,14 +2183,28 @@
   }
 
   // ─── REPLAY (read-only просмотр отдельной игры) ───
+  // Кэш: лобби + все игры серии. Сброс при смене лобби или выходе.
+  var _replayCache = null; // { lobbyId, lobby, allGames }
+
   function replayGame(lobbyId, gameId) {
-    var dbInst = _db();
-    if (!dbInst) return;
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
+
+    // Если данные этой серии уже загружены — рендерим без Firestore запроса (без flash)
+    if (_replayCache && _replayCache.lobbyId === lobbyId) {
+      var cached = _replayCache;
+      var found = null;
+      for (var i = 0; i < cached.allGames.length; i++) {
+        if (cached.allGames[i].id === gameId) { found = cached.allGames[i]; break; }
+      }
+      if (found) { renderReplay(cached.lobby, found, cached.allGames); return; }
+    }
+
+    // Первая загрузка — тянем из Firestore
+    var dbInst = _db();
+    if (!dbInst) return;
     pane.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-faint);">Загрузка…</div>';
 
-    // Тянем и лобби, и ВСЕ игры серии — чтобы в реплее показать навигационные кнопки 1/2/3…
     Promise.all([
       dbInst.collection('draftLobbies').doc(lobbyId).get(),
       dbInst.collection('draftLobbies').doc(lobbyId).collection('games').orderBy('number','asc').get()
@@ -2208,6 +2223,8 @@
         if (d.id === gameId) found = gg;
       });
       if (!found) { pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Игра не найдена</div>'; return; }
+      // Сохраняем в кэш — следующие переключения будут мгновенными
+      _replayCache = { lobbyId: lobbyId, lobby: l, allGames: allGames };
       renderReplay(l, found, allGames);
     }).catch(function(e){
       pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Ошибка: '+escapeHtml(e.message||'')+'</div>';
