@@ -15,7 +15,16 @@
       "Read(//c/Users/OMEN/.openclaw/**)",
       "Bash(./setup --host claude --no-prefix --no-team --quiet)",
       "Skill(design-review)",
-      "Skill(design-review:*)"
+      "Skill(design-review:*)",
+      "WebFetch(domain:www.cloudflare.com)",
+      "WebFetch(domain:who.is)",
+      "WebFetch(domain:www.whois.com)",
+      "WebFetch(domain:cfdomainpricing.com)",
+      "WebFetch(domain:lookup.icann.org)",
+      "WebFetch(domain:tld-list.com)",
+      "WebFetch(domain:hostinger.com)",
+      "WebFetch(domain:rdap.org)",
+      "WebFetch(domain:rdap.verisign.com)"
     ]
   }
 }
