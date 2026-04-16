@@ -11,7 +11,9 @@
       "Bash(cp -r ~/.claude/skills/gstack/design-review ~/.claude/skills/design-review)",
       "Bash(cp -r ~/.claude/skills/gstack/qa ~/.claude/skills/qa)",
       "Bash(cp -r ~/.claude/skills/gstack/health ~/.claude/skills/health)",
-      "Bash(node -c draft.js)"
+      "Bash(node -c draft.js)",
+      "Read(//c/Users/OMEN/.openclaw/**)",
+      "Bash(./setup --host claude --no-prefix --no-team --quiet)"
     ]
   }
 }
