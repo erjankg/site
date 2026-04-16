@@ -2941,17 +2941,18 @@ select.cms-input { cursor: pointer; }
 }
 .dcoop-tab {
   flex: 1;
-  padding: 11px;
+  padding: 12px;
   background: transparent;
   border: none;
-  color: var(--text-faint);
+  color: rgba(255,255,255,0.5);
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  transition: all 0.15s;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  letter-spacing: 0.3px;
 }
-.dcoop-tab:hover { color: #fff; }
+.dcoop-tab:hover { color: rgba(255,255,255,0.85); }
 .dcoop-tab.active {
   color: var(--accent);
   background: var(--accent-dim);
@@ -2972,6 +2973,11 @@ select.cms-input { cursor: pointer; }
   overflow-x: hidden;
   padding: 14px 16px;
   box-sizing: border-box;
+  animation: dcoopPaneIn 0.18s ease;
+}
+@keyframes dcoopPaneIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .dcoop-pane * { max-width: 100%; box-sizing: border-box; }
 .dcoop-pane .dcoop-players { min-width: 0; }
@@ -2991,11 +2997,13 @@ select.cms-input { cursor: pointer; }
 }
 .dcoop-empty {
   font-size: 12px;
-  color: rgba(255,255,255,0.25);
-  padding: 12px;
+  color: rgba(255,255,255,0.45);
+  padding: 20px 12px;
   text-align: center;
   border: 1px dashed var(--accent-border-sub);
-  border-radius: 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.015);
+  line-height: 1.6;
 }
 .dcoop-lobby-card {
   display: flex;
@@ -3066,8 +3074,9 @@ select.cms-input { cursor: pointer; }
 .dcoop-field > label {
   font-size: 11px;
   font-weight: 800;
-  color: var(--text-faint);
+  color: rgba(255,255,255,0.6);
   letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 .dcoop-field input[type="text"],
 .dcoop-field select {
@@ -3141,6 +3150,63 @@ select.cms-input { cursor: pointer; }
 @media (max-width: 560px) {
   .dcoop-win { width: 100vw; height: 100dvh; max-width: none; border-radius: 0; }
   .dcoop-players { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── WAITING ROOM TEAM PANELS ── */
+.dcoop-team-panel {
+  border-radius: 12px;
+  padding: 14px;
+  transition: box-shadow 0.2s;
+}
+.dcoop-team-panel.blue {
+  border: 1px solid rgba(93,173,226,0.3);
+  background: rgba(93,173,226,0.06);
+}
+.dcoop-team-panel.red {
+  border: 1px solid rgba(231,76,60,0.3);
+  background: rgba(231,76,60,0.06);
+}
+.dcoop-team-panel.ready {
+  box-shadow: 0 0 12px rgba(46,204,113,0.15);
+}
+.dcoop-tp-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.dcoop-tp-name {
+  font-size: 13px;
+  font-weight: 900;
+  flex: 1;
+}
+.dcoop-tp-name.blue { color: #5dade2; }
+.dcoop-tp-name.red  { color: #e74c3c; }
+.dcoop-tp-ready-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+.dcoop-tp-ready-badge.ready   { color: #2ecc71; background: rgba(46,204,113,0.12); border: 1px solid rgba(46,204,113,0.3); }
+.dcoop-tp-ready-badge.waiting { color: var(--text-faint); }
+.dcoop-tp-label { font-size: 10px; color: var(--text-faint); letter-spacing: 0.5px; margin-bottom: 3px; text-transform: uppercase; }
+.dcoop-tp-cap   { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+.dcoop-tp-cap.waiting { color: #f1c40f; font-style: italic; }
+/* ── LOBBY SPECTATORS SECTION ── */
+.dcoop-spec-section {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--accent-border-sub);
+  border-radius: 10px;
+}
+.dcoop-spec-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 /* ── DRAFT CORE LAYOUT ── */

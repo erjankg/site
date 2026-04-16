@@ -13,6 +13,7 @@
   var _currentTab = 'my'; // 'my' | 'create' | 'lobby'
   var _currentLobbyId = null;
   var _currentLobby = null;
+  var _lastWaitingKey = '';
 
   function _db() {
     if (db) return db;
@@ -311,6 +312,19 @@
   }
 
   function renderWaitingRoom(l, pane) {
+    // Skip full rerender if nothing visually relevant changed (prevents button jitter)
+    var key = [
+      l.blueCaptain && l.blueCaptain.uid || '',
+      l.redCaptain  && l.redCaptain.uid  || '',
+      l.blueReady ? '1' : '0',
+      l.redReady  ? '1' : '0',
+      (l.invitedSpectators || []).join(','),
+      l.status,
+      l.seriesScore ? l.seriesScore.blue + '-' + l.seriesScore.red : '0-0',
+      l.id
+    ].join('|');
+    if (key === _lastWaitingKey) { wireWaitingRoom(l); return; }
+    _lastWaitingKey = key;
     pane.innerHTML = renderWaitingRoomHtml(l);
     wireWaitingRoom(l);
   }
@@ -325,27 +339,27 @@
     var redNick  = (l.redCaptain  && l.redCaptain.nick)  || '<span style="color:#f1c40f;">ждём…</span>';
 
     function teamPanel(side, cap, teamName, players, isReady) {
-      var col = side === 'blue' ? '#5dade2' : '#e74c3c';
       var emoji = side === 'blue' ? '🔵' : '🔴';
       var readyBadge = isReady
-        ? '<span style="color:#2ecc71;font-weight:900;">✓ Готов</span>'
-        : '<span style="color:var(--text-faint);">—</span>';
+        ? '<span class="dcoop-tp-ready-badge ready">✓ Готов</span>'
+        : '<span class="dcoop-tp-ready-badge waiting">ожидание</span>';
       var capHtml = cap && cap.nick
         ? escapeHtml(cap.nick)
-        : '<span style="color:#f1c40f;">ждём капитана…</span>';
+        : '<span class="dcoop-tp-cap waiting">ждём капитана…</span>';
+      var capClass = (cap && cap.nick) ? 'dcoop-tp-cap' : '';
       var playersHtml = (players && players.length)
         ? players.map(function(p,i){ return '<li>'+(i+1)+'. '+escapeHtml(p)+'</li>'; }).join('')
-        : '<li style="color:var(--text-faint);list-style:none;">игроки не указаны</li>';
+        : '<li style="color:var(--text-faint);list-style:none;font-size:11px;">игроки не указаны</li>';
       return ''
-        + '<div class="dcoop-team-panel" style="border:1px solid '+col+'33;border-radius:10px;padding:12px;background:'+col+'0a;">'
-        +   '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
+        + '<div class="dcoop-team-panel '+side+(isReady?' ready':'')+'">'
+        +   '<div class="dcoop-tp-header">'
         +     '<span style="font-size:16px;">'+emoji+'</span>'
-        +     '<div style="font-size:13px;font-weight:900;color:'+col+';flex:1;">'+escapeHtml(teamName)+'</div>'
+        +     '<div class="dcoop-tp-name '+side+'">'+escapeHtml(teamName)+'</div>'
         +     readyBadge
         +   '</div>'
-        +   '<div style="font-size:11px;color:var(--text-faint);margin-bottom:4px;">Капитан:</div>'
-        +   '<div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:10px;">'+capHtml+'</div>'
-        +   '<div style="font-size:11px;color:var(--text-faint);margin-bottom:4px;">Игроки:</div>'
+        +   '<div class="dcoop-tp-label">Капитан</div>'
+        +   '<div class="'+capClass+'" style="margin-bottom:10px;">'+capHtml+'</div>'
+        +   '<div class="dcoop-tp-label">Игроки</div>'
         +   '<ul style="margin:0;padding:0 0 0 18px;font-size:12px;color:#fff;">'+playersHtml+'</ul>'
         + '</div>';
     }
@@ -396,8 +410,8 @@
       +   teamPanel('red',  l.redCaptain,  l.redTeamName  || 'Red',  l.redPlayers,  l.redReady)
       + '</div>'
       + inviteCapBtn
-      + '<div style="margin-top:14px;padding:10px 12px;border:1px solid var(--accent-border-sub);border-radius:8px;">'
-      +   '<div style="font-size:11px;font-weight:800;color:var(--accent);margin-bottom:6px;">👁 ЗРИТЕЛИ ('+spectators.length+'/12)</div>'
+      + '<div class="dcoop-spec-section">'
+      +   '<div class="dcoop-spec-title">👁 Зрители ('+spectators.length+'/12)</div>'
       +   specList
       +   specActions
       + '</div>'
@@ -441,6 +455,7 @@
   function backToList() {
     stopLobbyListener();
     stopGameListener();
+    _lastWaitingKey = '';
     document.body.classList.remove('dcoop-fullscreen');
     var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
     _currentLobbyId = null;
