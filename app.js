@@ -2646,16 +2646,22 @@
         }
     });
 
+    var _authInProgress = false;
     function authSignIn() {
         if (!auth || !_provider) {
             alert(t('Firebase не загружен. Проверьте подключение к интернету.'));
             return;
         }
+        if (_authInProgress) return;
+        _authInProgress = true;
         auth.signInWithPopup(_provider).catch(function(err) {
-            if (err.code !== 'auth/popup-closed-by-user') {
+            var ignored = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
+            if (ignored.indexOf(err.code) === -1) {
                 console.error('Auth error:', err);
                 alert(t('Ошибка авторизации: ') + err.message);
             }
+        }).finally(function() {
+            _authInProgress = false;
         });
     }
 
@@ -3111,11 +3117,16 @@
             alert(t('Firebase не загружен. Проверьте подключение к интернету.'));
             return;
         }
+        if (_authInProgress) return;
+        _authInProgress = true;
         auth.signInWithPopup(_provider).catch(function(err){
-            if (err.code !== 'auth/popup-closed-by-user') {
+            var ignored = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
+            if (ignored.indexOf(err.code) === -1) {
                 console.error('Auth error:', err);
                 alert(t('Ошибка авторизации: ') + (err.message || ''));
             }
+        }).finally(function() {
+            _authInProgress = false;
         });
     };
 
