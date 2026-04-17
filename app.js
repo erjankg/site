@@ -4766,13 +4766,20 @@
         var actions = document.createElement('div');
         actions.style.cssText = 'padding:12px 16px;display:flex;flex-direction:column;gap:6px;';
 
-        // "Данные" button — show copy button based on dataVisible flag
-        // dataVisible: undefined means visible (default), false means hidden
+        // Copy buttons — show based on dataVisible flag
         var isDataHidden = user.dataVisible === false;
         if (!isDataHidden || _isAdmin) {
-            addCardBtn(actions, t('📋 Скопировать данные'), '#2ecc71', function() {
-                copyUserData(user);
-                closeUserCard();
+            var copyTypes = [
+                { key: 'matchups',    label: '⚔ Контрматчапы & комбо', color: '#e67e22' },
+                { key: 'tierData',    label: '🏆 Тир-лист чемпионов',   color: '#f1c40f' },
+                { key: 'itemTierData',label: '⚙ Тир-лист предметов',    color: '#5dade2' },
+                { key: 'runeTierData',label: '✨ Тир-лист рун',          color: '#c39bd3' }
+            ];
+            copyTypes.forEach(function(ct) {
+                addCardBtn(actions, t(ct.label), ct.color, function() {
+                    copyUserDataPartial(user, ct.key);
+                    closeUserCard();
+                });
             });
         }
 
@@ -4780,6 +4787,30 @@
         container.appendChild(actions);
 
         openModal('userCardMask');
+    }
+
+    // Copy a single data type from another user
+    function copyUserDataPartial(user, key) {
+        if (!db) { showToast(t('Firebase не подключён')); return; }
+        db.collection('users').doc(user._uid).get().then(function(doc) {
+            if (!doc.exists) { showToast(t('Данные не найдены')); return; }
+            var d = doc.data();
+            if (d.dataVisible === false && !_isAdmin) { showToast(t('🙈 Игрок скрыл свои данные')); return; }
+            if (!d[key] || d[key] === '{}') { showToast(t('У игрока нет этих данных')); return; }
+            var labels = { matchups: t('Контрматчапы'), tierData: t('Тир-лист чемпионов'), itemTierData: t('Тир-лист предметов'), runeTierData: t('Тир-лист рун') };
+            // Apply directly — partial copy merges into active data, doesn't create a slot
+            if (key === 'matchups') {
+                localStorage.setItem('matchups', d[key]);
+            } else if (key === 'tierData') {
+                localStorage.setItem('tierData', d[key]); loadTierData();
+            } else if (key === 'itemTierData') {
+                localStorage.setItem('itemTierData', d[key]); loadItemTierData();
+            } else if (key === 'runeTierData') {
+                localStorage.setItem('runeTierData', d[key]); loadRuneTierData();
+            }
+            var nick = user.displayName || user.email || '???';
+            showToast(t('✓ Скопировано: ') + labels[key] + ' · ' + nick);
+        }).catch(function(err) { showToast(t('Ошибка: ') + (err.code || err.message)); });
     }
 
     // Copy another user's data and store it as "copied dataset"
