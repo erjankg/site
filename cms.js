@@ -450,7 +450,9 @@
   }
 
   function _deleteItem(docId, name) {
-    if (!confirm('Удалить предмет "' + name + '"?')) return;
+    window._showConfirm({ msg: 'Предмет «' + name + '» будет удалён без возможности восстановления.', title: 'Удалить предмет?', confirmText: 'Удалить' }, function() { _deleteItemConfirmed(docId, name); });
+  }
+  function _deleteItemConfirmed(docId, name) {
 
     var db = firebase.firestore();
     var oldItem = window._cmsItems.find(function(i) { return i._id === docId; });
@@ -546,8 +548,9 @@
   }
 
   function _deleteRune(docId, name) {
-    if (!confirm('Удалить руну "' + name + '"?')) return;
-
+    window._showConfirm({ msg: 'Руна «' + name + '» будет удалена.', title: 'Удалить руну?', confirmText: 'Удалить' }, function() { _deleteRuneConfirmed(docId, name); });
+  }
+  function _deleteRuneConfirmed(docId, name) {
     var db = firebase.firestore();
     var oldRune = window._cmsRunes.find(function(r) { return r._id === docId; });
 
@@ -633,8 +636,9 @@
   };
 
   function _rollbackChange(changeData, changeDocId) {
-    if (!confirm('Откатить изменение для "' + changeData.name + '"?')) return;
-
+    window._showConfirm({ msg: 'Данные «' + changeData.name + '» откатятся к предыдущей версии.', title: 'Откатить изменение?', confirmText: 'Откатить', icon: '↩️', danger: false }, function() { _rollbackChangeConfirmed(changeData, changeDocId); });
+  }
+  function _rollbackChangeConfirmed(changeData, changeDocId) {
     var db = firebase.firestore();
     var collection = changeData.entity === 'item' ? 'items' : 'runes';
     var oldData = JSON.parse(changeData.oldData);
@@ -990,11 +994,14 @@
       var delBtn = document.createElement('button');
       delBtn.className = 'cms-btn-delete';
       delBtn.textContent = '🗑 Удалить';
-      delBtn.onclick = function() {
-        if (!confirm('Удалить "' + data.name + '" из винрейтов?')) return;
-        _deleteWinrateEntry(entry, rank, role);
-        overlay.remove();
-      };
+      (function(_data, _entry, _rank, _role, _overlay) {
+        delBtn.onclick = function() {
+          window._showConfirm({ msg: '«' + _data.name + '» будет убран из винрейтов.', title: 'Удалить запись?', confirmText: 'Удалить' }, function() {
+            _deleteWinrateEntry(_entry, _rank, _role);
+            _overlay.remove();
+          });
+        };
+      }(data, entry, rank, role, overlay));
       btnRow.appendChild(delBtn);
     }
 
@@ -1237,11 +1244,14 @@
       var delBtn = document.createElement('button');
       delBtn.className = 'cms-btn-delete';
       delBtn.textContent = '🗑 Удалить';
-      delBtn.onclick = function() {
-        if (!confirm('Удалить патч-нот для "' + champName + '"?')) return;
-        _deletePatchnote(existingNote._id, champName);
-        overlay.remove();
-      };
+      (function(_champName, _noteId, _overlay) {
+        delBtn.onclick = function() {
+          window._showConfirm({ msg: 'Патч-нот для «' + _champName + '» будет удалён.', title: 'Удалить патч-нот?', confirmText: 'Удалить' }, function() {
+            _deletePatchnote(_noteId, _champName);
+            _overlay.remove();
+          });
+        };
+      }(champName, existingNote._id, overlay));
       btnRow.appendChild(delBtn);
     }
 
@@ -1335,9 +1345,13 @@
       _showToast('Нет патч-нотов для удаления', 'error');
       return;
     }
-    if (!confirm('Удалить ВСЕ патч-ноты (' + count + ' шт.)? Это нельзя отменить (только через changelog).')) return;
-    if (!confirm('Точно? Все бафф/нерф/корректировки исчезнут у всех пользователей.')) return;
-
+    window._showConfirm({ msg: 'Удалить ВСЕ патч-ноты (' + count + ' шт.)? Откат возможен только через changelog.', title: 'Удалить ВСЕ патч-ноты?', confirmText: 'Да, удалить все', icon: '⚠️' }, function() {
+      window._showConfirm({ msg: 'Финальное подтверждение: все бафф/нерф/корректировки исчезнут у всех пользователей.', title: 'Точно удалить?', confirmText: '🗑 Удалить всё', icon: '🔥' }, function() {
+        _cmsClearAllPatchnotesConfirmed(count);
+      });
+    });
+  };
+  function _cmsClearAllPatchnotesConfirmed(count) {
     var db = firebase.firestore();
     var batch = db.batch();
     var notes = window._cmsPatchnotes.slice();
@@ -2181,16 +2195,17 @@
   }
 
   window.cmsDeleteIcon = function(docId, name) {
-    if (!confirm('Удалить иконку "' + name + '"?')) return;
-    var db = firebase.firestore();
-    db.collection('siteIcons').doc(docId).delete()
-      .then(function() {
-        delete window._siteIcons[name];
-        _showToast('Иконка удалена', 'success');
-        var win = document.querySelector('.cms-modal-overlay .cms-modal-win');
-        if (win) _refreshIconsList(db, win);
-      })
-      .catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); });
+    window._showConfirm({ msg: 'Иконка «' + name + '» будет удалена.', title: 'Удалить иконку?', confirmText: 'Удалить' }, function() {
+      var db = firebase.firestore();
+      db.collection('siteIcons').doc(docId).delete()
+        .then(function() {
+          delete window._siteIcons[name];
+          _showToast('Иконка удалена', 'success');
+          var win = document.querySelector('.cms-modal-overlay .cms-modal-win');
+          if (win) _refreshIconsList(db, win);
+        })
+        .catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); });
+    });
   };
 
   // ═══════════════════════════════════════════════════════════════
@@ -2428,27 +2443,30 @@
       delBtn.className = 'cms-btn-delete';
       delBtn.style.margin = '0';
       delBtn.textContent = '🗑 Удалить';
-      delBtn.onclick = function() {
-        if (!confirm('Удалить категорию "' + (cat.name || 'без имени') + '"?')) return;
-        if (cat._id) {
-          db.collection('champCategories').doc(cat._id).delete()
-            .then(function() {
-              cats.splice(idx, 1);
+      (function(_cat, _idx) {
+        delBtn.onclick = function() {
+          window._showConfirm({ msg: 'Категория «' + (_cat.name || 'без имени') + '» будет удалена.', title: 'Удалить категорию?', confirmText: 'Удалить' }, function() {
+            if (_cat._id) {
+              db.collection('champCategories').doc(_cat._id).delete()
+                .then(function() {
+                  cats.splice(_idx, 1);
+                  window._champCategories = cats.map(function(c) { return Object.assign({}, c); });
+                  selectedIdx = -1;
+                  editorPanel.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px 0;font-size:13px;">← Выбери категорию</div>';
+                  renderList();
+                  _showToast('Категория удалена', 'success');
+                })
+                .catch(function(e) { _showToast('Ошибка: ' + e.message, 'error'); });
+            } else {
+              cats.splice(_idx, 1);
               window._champCategories = cats.map(function(c) { return Object.assign({}, c); });
               selectedIdx = -1;
               editorPanel.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px 0;font-size:13px;">← Выбери категорию</div>';
               renderList();
-              _showToast('Категория удалена', 'success');
-            })
-            .catch(function(e) { _showToast('Ошибка: ' + e.message, 'error'); });
-        } else {
-          cats.splice(idx, 1);
-          window._champCategories = cats.map(function(c) { return Object.assign({}, c); });
-          selectedIdx = -1;
-          editorPanel.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px 0;font-size:13px;">← Выбери категорию</div>';
-          renderList();
-        }
-      };
+            }
+          });
+        };
+      }(cat, idx));
 
       row1.appendChild(nameG);
       row1.appendChild(colorG);

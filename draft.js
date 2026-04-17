@@ -304,9 +304,8 @@
         + '</div>';
       wireWaitingRoom(l);
     } else if (l.status === 'series_done' || l.status === 'closed') {
-      pane.innerHTML = renderWaitingRoomHtml(l)
-        + '<div style="padding:20px;text-align:center;color:var(--text-faint);">Серия завершена</div>';
-      wireWaitingRoom(l);
+      stopGameListener();
+      replayGame(l.id, null);
     } else {
       pane.innerHTML = '<pre style="padding:20px;color:#fff;font-size:11px;">'+escapeHtml(JSON.stringify(l,null,2))+'</pre>';
     }
@@ -406,7 +405,7 @@
       +   '<div style="flex:1;font-size:14px;font-weight:900;color:#fff;">'+escapeHtml(l.blueTeamName || 'Blue')+' vs '+escapeHtml(l.redTeamName || 'Red')+'</div>'
       +   '<div style="font-size:11px;color:var(--text-faint);">'+(l.mode==='fearless'?'Fearless':'Normal')+' · '+(l.seriesType||'bo1').toUpperCase()+' · ⏱'+l.timerSeconds+'с</div>'
       + '</div>'
-      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+      + '<div class="dcoop-teams-grid">'
       +   teamPanel('blue', l.blueCaptain, l.blueTeamName || 'Blue', l.bluePlayers, l.blueReady)
       +   teamPanel('red',  l.redCaptain,  l.redTeamName  || 'Red',  l.redPlayers,  l.redReady)
       + '</div>'
@@ -447,10 +446,12 @@
     var l = _currentLobby;
     if (!l) return;
     if (l.createdBy !== _uid()) { toast('Только создатель может удалить'); return; }
-    if (!confirm('Удалить лобби?')) return;
-    _db().collection('draftLobbies').doc(l.id).delete()
-      .then(function(){ toast('Лобби удалено'); backToList(); })
-      .catch(function(e){ toast('Ошибка: '+e.message); });
+    var _lid = l.id;
+    window._showConfirm({ msg: 'Лобби «' + (l.blueTeamName||'Blue') + ' vs ' + (l.redTeamName||'Red') + '» будет удалено без возможности восстановления.', title: 'Удалить лобби?', confirmText: 'Удалить' }, function() {
+      _db().collection('draftLobbies').doc(_lid).delete()
+        .then(function(){ toast('Лобби удалено'); backToList(); })
+        .catch(function(e){ toast('Ошибка: '+e.message); });
+    });
   }
 
   function backToList() {
@@ -2040,16 +2041,18 @@
     var l = _currentLobby;
     if (!l) return;
     if (l.createdBy !== _uid()) { toast('Только создатель может закрыть лобби'); return; }
-    if (!confirm('Закрыть лобби? Драфт будет прерван.')) return;
-    _db().collection('draftLobbies').doc(l.id).update({
-      status: 'closed',
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(function(){
-      toast('Лобби закрыто');
-      document.body.classList.remove('dcoop-fullscreen');
-    var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
-      backToList();
-    }).catch(function(e){ toast('Ошибка: '+e.message); });
+    var _cl = l;
+    window._showConfirm({ msg: 'Текущий драфт будет прерван и лобби закроется.', title: 'Закрыть лобби?', confirmText: 'Закрыть', icon: '🚫' }, function() {
+      _db().collection('draftLobbies').doc(_cl.id).update({
+        status: 'closed',
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function(){
+        toast('Лобби закрыто');
+        document.body.classList.remove('dcoop-fullscreen');
+        var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
+        backToList();
+      }).catch(function(e){ toast('Ошибка: '+e.message); });
+    });
   }
 
   function nextGame(swapSides) {
@@ -2194,8 +2197,12 @@
     if (_replayCache && _replayCache.lobbyId === lobbyId) {
       var cached = _replayCache;
       var found = null;
-      for (var i = 0; i < cached.allGames.length; i++) {
-        if (cached.allGames[i].id === gameId) { found = cached.allGames[i]; break; }
+      if (!gameId) {
+        found = cached.allGames[0] || null;
+      } else {
+        for (var i = 0; i < cached.allGames.length; i++) {
+          if (cached.allGames[i].id === gameId) { found = cached.allGames[i]; break; }
+        }
       }
       if (found) { renderReplay(cached.lobby, found, cached.allGames); return; }
     }
@@ -2220,8 +2227,9 @@
       gamesSnap.forEach(function(d){
         var gg = d.data(); gg.id = d.id;
         allGames.push(gg);
-        if (d.id === gameId) found = gg;
+        if (gameId && d.id === gameId) found = gg;
       });
+      if (!found) found = allGames[0] || null; // null gameId → first game
       if (!found) { pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Игра не найдена</div>'; return; }
       // Сохраняем в кэш — следующие переключения будут мгновенными
       _replayCache = { lobbyId: lobbyId, lobby: l, allGames: allGames };

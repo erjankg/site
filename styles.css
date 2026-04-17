@@ -2299,9 +2299,16 @@ font-size: 12px;
 /* PC sidebar panel mode: modals open to the RIGHT of the sidebar — fullscreen right panel */
 @media (min-width: 769px) {
   /* All active modals in pc-side-mode go above the overlay (8000) and sidebar (8001).
-     DOM order ensures sub-modals (detail cards etc.) paint on top of parent modals. */
+     All modals (primary + sub) are constrained to the right panel area. */
   body.pc-side-mode .m-mask.active {
     z-index: 8010 !important;
+    left: 240px !important;
+    width: calc(100% - 240px) !important;
+  }
+  /* Драфт серии — всегда на весь экран */
+  body.pc-side-mode #draftCoopMask.active {
+    left: 0 !important;
+    width: 100% !important;
   }
   .m-mask.side-panel-modal {
     left: 240px !important;
@@ -3170,6 +3177,16 @@ select.cms-input { cursor: pointer; }
 @media (max-width: 560px) {
   .dcoop-win { width: 100vw; height: 100dvh; max-width: none; border-radius: 0; }
   .dcoop-players { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── WAITING ROOM TEAMS GRID ── */
+.dcoop-teams-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 520px) {
+  .dcoop-teams-grid { grid-template-columns: 1fr; }
 }
 
 /* ── WAITING ROOM TEAM PANELS ── */

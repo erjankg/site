@@ -2660,6 +2660,40 @@
     }
     window.showToast = showToast;
 
+    // ── Styled confirm dialog (replaces native window.confirm) ──
+    window._showConfirm = function(opts, onConfirm) {
+        if (typeof opts === 'string') opts = { msg: opts };
+        var msg = opts.msg || '';
+        var title = opts.title || 'Подтверди действие';
+        var confirmText = opts.confirmText || 'Подтвердить';
+        var isDanger = opts.danger !== false; // default true
+        var icon = opts.icon || (isDanger ? '🗑' : '⚠️');
+        var btnBg = isDanger
+            ? 'linear-gradient(135deg,#e74c3c,#c0392b)'
+            : 'linear-gradient(135deg,#f39c12,#e67e22)';
+
+        var overlay = document.createElement('div');
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);';
+
+        var box = document.createElement('div');
+        box.style.cssText = 'background:var(--bg-secondary,#1a1a2e);border:1px solid rgba(109,63,245,0.3);border-radius:16px;padding:28px 24px 20px;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);';
+        box.innerHTML = ''
+            + '<div style="font-size:36px;margin-bottom:12px;">'+icon+'</div>'
+            + '<div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:8px;">'+title+'</div>'
+            + '<div style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5;">'+msg+'</div>'
+            + '<div style="display:flex;gap:10px;">'
+            +   '<button class="_conf-cancel" style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;cursor:pointer;">Отмена</button>'
+            +   '<button class="_conf-ok" style="flex:1;padding:12px;border-radius:10px;border:none;background:'+btnBg+';color:#fff;font-size:13px;font-weight:800;cursor:pointer;">'+confirmText+'</button>'
+            + '</div>';
+
+        box.querySelector('._conf-cancel').onclick = function() { overlay.remove(); };
+        box.querySelector('._conf-ok').onclick = function() { overlay.remove(); onConfirm(); };
+        overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+        overlay.appendChild(box);
+        document.body.appendChild(overlay);
+    };
+
     // ═══════════════════════════════════════
     // FIREBASE CONFIG
     // ═══════════════════════════════════════
@@ -5540,10 +5574,11 @@
         };
         win.querySelector('#colCloseBtn').onclick = function(){ overlay.remove(); };
         win.querySelector('#colResetBtn').onclick = function(){
-            if(!confirm('Сбросить порядок и видимость столбцов к дефолту?')) return;
-            resetConfig(tableId);
-            overlay.remove();
-            if(onApply) onApply();
+            window._showConfirm({ msg: 'Сбросить порядок и видимость столбцов к дефолту?', title: 'Сброс настроек', confirmText: 'Сбросить', icon: '🔄', danger: false }, function(){
+                resetConfig(tableId);
+                overlay.remove();
+                if(onApply) onApply();
+            });
         };
     }
 
