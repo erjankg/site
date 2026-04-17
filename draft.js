@@ -1647,8 +1647,10 @@
     var l = _currentLobby, g = _currentGame;
     if (!l || !g || !_hoverLocal) return;
     var uid = _uid();
-    var mySide = (l.blueCaptain && l.blueCaptain.uid === uid) ? 'blue'
-               : ((l.redCaptain && l.redCaptain.uid === uid) ? 'red' : null);
+    var roles = sideRoles(l, g);
+    var mySide = null;
+    if (roles.blue.cap && roles.blue.cap.uid === uid) mySide = 'blue';
+    else if (roles.red.cap && roles.red.cap.uid === uid) mySide = 'red';
     if (!mySide) return;
     var step = WR_DRAFT_SEQUENCE[g.turnIndex];
     if (!step || step.side !== mySide) return;
