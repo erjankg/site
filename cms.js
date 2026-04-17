@@ -1963,6 +1963,36 @@
     textarea.focus();
   }
 
+  // ── Авто-перевод описания RU → EN через MyMemory (бесплатный API) ──
+  function _autoTranslateDesc(ruText, onDone) {
+    if (!ruText || !ruText.trim()) { onDone(''); return; }
+    // Защищаем [текст|цвет] и [icon:name] от перевода ASCII-безопасными плейсхолдерами
+    var placeholders = [];
+    var protected_text = ruText.replace(/\[[^\]]+\]/g, function(match) {
+      placeholders.push(match);
+      return '__PH' + (placeholders.length - 1) + '__';
+    });
+    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(protected_text) + '&langpair=ru|en';
+    fetch(url)
+      .then(function(r) { return r.json(); })
+      .then(function(json) {
+        var translated = (json.responseData && json.responseData.translatedText) || '';
+        // Проверяем что это не ошибка лимита MyMemory
+        if (!translated || translated.indexOf('[MYMEMORY') === 0 || translated.indexOf('MYMEMORY WARNING') !== -1) {
+          _showToast('Лимит перевода исчерпан — заполни EN вручную', 'error');
+          onDone('');
+          return;
+        }
+        // Восстанавливаем плейсхолдеры
+        translated = translated.replace(/__PH(\d+)__/g, function(_, i) { return placeholders[parseInt(i)] || ''; });
+        onDone(translated);
+      })
+      .catch(function() {
+        _showToast('Ошибка перевода — сохранено без EN', 'error');
+        onDone('');
+      });
+  }
+
   // ── Добавить тип 'richtext' в _createEditorModal ──
   // Патчим уже существующую функцию через wrapper
   var _origCreateEditorModal = _createEditorModal;
@@ -2021,8 +2051,22 @@
         });
         // order
         newData.order = data.order || 0;
-        onSave(newData);
-        overlay.remove();
+
+        // Авто-перевод: если description_en пустое, переводим из description_ru
+        var hasDescRu = typeof newData.description_ru === 'string' && newData.description_ru.trim();
+        var hasDescEn = typeof newData.description_en === 'string' && newData.description_en.trim();
+        if (hasDescRu && !hasDescEn) {
+          saveBtn.textContent = '⏳ Перевожу...';
+          saveBtn.disabled = true;
+          _autoTranslateDesc(newData.description_ru, function(translated) {
+            newData.description_en = translated;
+            onSave(newData);
+            overlay.remove();
+          });
+        } else {
+          onSave(newData);
+          overlay.remove();
+        }
       };
     }
 
@@ -2389,7 +2433,14 @@
       // ── Star slots ──
       var STAR_LEVELS = [3, 2, 1];
       var STAR_LABELS = { 3: '⭐⭐⭐', 2: '⭐⭐', 1: '⭐' };
-      var champStars = Object.assign({}, cat.champStars || {});
+      // Миграция: старый формат { "1": "ChampName" } → новый { "1": ["ChampName"] }
+      var champStars = {};
+      [1,2,3].forEach(function(s) {
+        var v = (cat.champStars || {})[String(s)];
+        if (!v) champStars[String(s)] = [];
+        else if (Array.isArray(v)) champStars[String(s)] = v.slice();
+        else champStars[String(s)] = [v];
+      });
       var activePicker = null;
 
       var slotsWrap = document.createElement('div');
@@ -2401,51 +2452,67 @@
       slotsWrap.appendChild(slotsLbl);
 
       function renderStarSlots() {
-        // Remove old slot rows (keep label)
         while (slotsWrap.children.length > 1) slotsWrap.removeChild(slotsWrap.lastChild);
         STAR_LEVELS.forEach(function(stars) {
           var row = document.createElement('div');
-          row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);margin-bottom:6px;cursor:pointer;transition:background 0.15s;';
-          row.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.06)'; };
-          row.onmouseout  = function() { this.style.background = 'rgba(255,255,255,0.03)'; };
+          row.style.cssText = 'padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);margin-bottom:6px;';
+
+          // Первая строка: звезда + кнопка добавить
+          var topLine = document.createElement('div');
+          topLine.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
 
           var starLbl = document.createElement('div');
-          starLbl.style.cssText = 'font-size:13px;min-width:54px;';
+          starLbl.style.cssText = 'font-size:13px;min-width:54px;flex-shrink:0;';
           starLbl.textContent = STAR_LABELS[stars];
-          row.appendChild(starLbl);
+          topLine.appendChild(starLbl);
 
-          var champName = champStars[String(stars)];
-          if (champName) {
-            var img = document.createElement('img');
-            img.src = window._champIcon ? window._champIcon(champName) : '';
-            img.style.cssText = 'width:30px;height:30px;border-radius:6px;object-fit:cover;flex-shrink:0;';
-            img.onerror = function() { this.style.display = 'none'; };
-            row.appendChild(img);
-            var nm = document.createElement('span');
-            nm.style.cssText = 'flex:1;font-size:12px;color:#fff;font-weight:700;';
-            nm.textContent = champName;
-            row.appendChild(nm);
-            var xBtn = document.createElement('button');
-            xBtn.textContent = '×';
-            xBtn.style.cssText = 'width:22px;height:22px;border-radius:50%;border:none;background:rgba(231,76,60,0.7);color:#fff;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
-            (function(s) {
-              xBtn.onclick = function(e) {
-                e.stopPropagation();
-                delete champStars[String(s)];
-                if (activePicker) { activePicker.remove(); activePicker = null; }
-                renderStarSlots();
-              };
-            }(stars));
-            row.appendChild(xBtn);
-          } else {
-            var ph = document.createElement('span');
-            ph.style.cssText = 'flex:1;font-size:11px;color:rgba(255,255,255,0.2);font-style:italic;';
-            ph.textContent = 'Нажми чтобы выбрать...';
-            row.appendChild(ph);
-          }
+          var addBtn = document.createElement('button');
+          addBtn.textContent = '+ Добавить';
+          addBtn.style.cssText = 'padding:3px 10px;border-radius:6px;border:1px solid rgba(109,63,245,0.5);background:rgba(109,63,245,0.15);color:#c4a7ff;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;';
           (function(s) {
-            row.onclick = function() { openStarPicker(s); };
+            addBtn.onclick = function(e) { e.stopPropagation(); openStarPicker(s); };
           }(stars));
+          topLine.appendChild(addBtn);
+          row.appendChild(topLine);
+
+          // Чипы чемпов
+          var chipsLine = document.createElement('div');
+          chipsLine.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+          var arr = champStars[String(stars)] || [];
+          if (arr.length === 0) {
+            var ph = document.createElement('span');
+            ph.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.2);font-style:italic;';
+            ph.textContent = 'Нет чемпов';
+            chipsLine.appendChild(ph);
+          } else {
+            arr.forEach(function(cn) {
+              var chip = document.createElement('div');
+              chip.style.cssText = 'display:flex;align-items:center;gap:4px;padding:3px 6px 3px 4px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(109,63,245,0.35);';
+              var chipImg = document.createElement('img');
+              chipImg.src = window._champIcon ? window._champIcon(cn) : '';
+              chipImg.style.cssText = 'width:22px;height:22px;border-radius:4px;object-fit:cover;flex-shrink:0;';
+              chipImg.onerror = function() { this.style.display = 'none'; };
+              var chipName = document.createElement('span');
+              chipName.style.cssText = 'font-size:11px;color:#fff;font-weight:600;';
+              chipName.textContent = cn;
+              var chipX = document.createElement('button');
+              chipX.textContent = '×';
+              chipX.style.cssText = 'width:16px;height:16px;border-radius:50%;border:none;background:rgba(231,76,60,0.7);color:#fff;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;';
+              (function(s, name) {
+                chipX.onclick = function(e) {
+                  e.stopPropagation();
+                  champStars[String(s)] = champStars[String(s)].filter(function(n) { return n !== name; });
+                  if (activePicker) { activePicker.remove(); activePicker = null; }
+                  renderStarSlots();
+                };
+              }(stars, cn));
+              chip.appendChild(chipImg);
+              chip.appendChild(chipName);
+              chip.appendChild(chipX);
+              chipsLine.appendChild(chip);
+            });
+          }
+          row.appendChild(chipsLine);
           slotsWrap.appendChild(row);
         });
       }
@@ -2458,7 +2525,7 @@
 
         var ptitle = document.createElement('div');
         ptitle.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.5);font-weight:700;margin-bottom:8px;';
-        ptitle.textContent = 'Выбери чемпа для ' + STAR_LABELS[stars];
+        ptitle.textContent = 'Выбери чемпионов для ' + STAR_LABELS[stars] + ' (можно несколько)';
         picker.appendChild(ptitle);
 
         var roleFilter = 'all';
@@ -2487,6 +2554,15 @@
         srch.placeholder = '🔍 Поиск...';
         srch.style.cssText = 'margin-bottom:8px;font-size:12px;';
 
+        function isInThisStar(cn) {
+          return (champStars[String(stars)] || []).indexOf(cn) !== -1;
+        }
+        function isInOtherStar(cn) {
+          return [1,2,3].some(function(s) {
+            return s !== stars && (champStars[String(s)] || []).indexOf(cn) !== -1;
+          });
+        }
+
         function renderPickerGrid(q) {
           pickerGrid.innerHTML = '';
           var all = window._champsRaw || [];
@@ -2498,6 +2574,10 @@
           filtered.forEach(function(c) {
             var cell = document.createElement('div');
             cell.className = 'cms-cat-champ-cell';
+            var selected = isInThisStar(c.name);
+            var otherStar = isInOtherStar(c.name);
+            if (selected) cell.style.cssText = 'outline:2px solid #6D3FF5;background:rgba(109,63,245,0.25);border-radius:7px;';
+            else if (otherStar) cell.style.opacity = '0.4';
             var img2 = document.createElement('img');
             img2.src = window._champIcon ? window._champIcon(c.name) : '';
             img2.style.cssText = 'width:38px;height:38px;border-radius:5px;object-fit:cover;';
@@ -2509,9 +2589,22 @@
             cell.appendChild(lbl2);
             (function(cn) {
               cell.onclick = function() {
-                champStars[String(stars)] = cn;
-                picker.remove(); activePicker = null;
+                var arr = champStars[String(stars)] || [];
+                var idx2 = arr.indexOf(cn);
+                if (idx2 !== -1) {
+                  // Уже выбран — убираем
+                  champStars[String(stars)] = arr.filter(function(n) { return n !== cn; });
+                } else {
+                  // Убираем из других звёзд (чемп может быть только в одной звезде)
+                  [1,2,3].forEach(function(s) {
+                    if (s !== stars) {
+                      champStars[String(s)] = (champStars[String(s)] || []).filter(function(n) { return n !== cn; });
+                    }
+                  });
+                  champStars[String(stars)] = arr.concat([cn]);
+                }
                 renderStarSlots();
+                renderPickerGrid(srch.value);
               };
             }(c.name));
             pickerGrid.appendChild(cell);
@@ -2526,7 +2619,7 @@
         srch.oninput = function() { renderPickerGrid(this.value); };
 
         var closeP = document.createElement('button');
-        closeP.textContent = '✕ Закрыть';
+        closeP.textContent = '✕ Готово';
         closeP.style.cssText = 'margin-top:8px;padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.35);font-size:11px;cursor:pointer;';
         closeP.onclick = function() { picker.remove(); activePicker = null; };
         picker.appendChild(closeP);
@@ -2604,7 +2697,10 @@
         cat.name = newName;
         cat.color = colorInp.value;
         cat.champStars = champStars;
-        cat.champions = [1,2,3].map(function(s){return champStars[String(s)];}).filter(Boolean);
+        // Flat список всех чемпов из всех звёзд
+        cat.champions = [1,2,3].reduce(function(acc, s) {
+          return acc.concat(champStars[String(s)] || []);
+        }, []);
         cat.strongAgainst = strongPicker.get();
         cat.weakAgainst   = weakPicker.get();
         cat.combo         = comboPicker.get();

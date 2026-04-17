@@ -1475,6 +1475,8 @@ border: 1px solid var(--accent-border); color: var(--text-secondary); margin-top
   #sidePanel .side-close { display: none !important; }
   #menuBtn { display: none !important; }
   #sideOverlay { display: none !important; }
+  /* Header: без гамбургера — 3 колонки: центр (1fr) + язык (44px) + авторизация (44px) */
+  header { grid-template-columns: 1fr 44px 44px; }
   /* Active state: какая модалка открыта из сайдбара */
   .side-btn.side-active {
     background: var(--accent-dim) !important;
