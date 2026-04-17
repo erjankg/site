@@ -1869,19 +1869,39 @@
       toolbar.appendChild(btn);
     });
 
-    // Кастомный цвет
+    // Кастомный цвет — сохраняем выделение до открытия нативного пикера
+    var _savedSel = { start: 0, end: 0 };
     var colorPicker = document.createElement('input');
     colorPicker.type = 'color';
     colorPicker.value = '#ffffff';
-    colorPicker.style.cssText = 'width:28px;height:28px;padding:0;border:1px solid rgba(255,255,255,0.2);border-radius:6px;cursor:pointer;background:none;';
-    colorPicker.title = 'Кастомный цвет';
+    colorPicker.style.cssText = 'width:28px;height:28px;padding:0;border:1px solid rgba(255,255,255,0.2);border-radius:6px;cursor:pointer;';
+    colorPicker.title = 'Кастомный цвет — выдели текст и выбери цвет';
+    // Сохраняем выделение ПЕРЕД открытием нативного диалога (mousedown срабатывает до потери фокуса)
+    colorPicker.addEventListener('mousedown', function() {
+      _savedSel = { start: textarea.selectionStart, end: textarea.selectionEnd };
+    });
+    // Авто-применяем когда пользователь закрыл нативный пикер
+    colorPicker.addEventListener('change', function() {
+      textarea.focus();
+      textarea.setSelectionRange(_savedSel.start, _savedSel.end);
+      _applyColorWrap(textarea, colorPicker.value);
+      updatePreview();
+    });
     toolbar.appendChild(colorPicker);
     var applyCustomColor = document.createElement('button');
     applyCustomColor.type = 'button';
     applyCustomColor.textContent = '🎨';
     applyCustomColor.style.cssText = 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:14px;padding:3px 8px;border-radius:6px;cursor:pointer;';
-    applyCustomColor.title = 'Применить выбранный цвет';
-    applyCustomColor.onclick = function() { _applyColorWrap(textarea, colorPicker.value); updatePreview(); };
+    applyCustomColor.title = 'Применить текущий цвет к выделенному тексту';
+    applyCustomColor.addEventListener('mousedown', function() {
+      _savedSel = { start: textarea.selectionStart, end: textarea.selectionEnd };
+    });
+    applyCustomColor.onclick = function() {
+      textarea.focus();
+      textarea.setSelectionRange(_savedSel.start, _savedSel.end);
+      _applyColorWrap(textarea, colorPicker.value);
+      updatePreview();
+    };
     toolbar.appendChild(applyCustomColor);
 
     // Иконки (если есть)
@@ -2350,8 +2370,8 @@
       listPanel.innerHTML = '';
       var addBtn = document.createElement('button');
       addBtn.className = 'cms-btn-save';
-      addBtn.style.cssText = 'width:100%;margin-bottom:10px;font-size:12px;padding:7px;';
-      addBtn.textContent = '+ Добавить категорию';
+      addBtn.style.cssText = 'margin-bottom:8px;font-size:11px;padding:5px 10px;width:auto;align-self:flex-start;';
+      addBtn.textContent = '+ Добавить';
       addBtn.onclick = function() {
         cats.push({ name: '', color: '#6D3FF5', champions: [], strongAgainst: [], weakAgainst: [], combo: [], order: cats.length });
         selectedIdx = cats.length - 1;
@@ -2396,7 +2416,12 @@
       var colorInp = document.createElement('input');
       colorInp.type = 'color';
       colorInp.value = cat.color || '#6D3FF5';
-      colorInp.style.cssText = 'width:44px;height:38px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);cursor:pointer;padding:2px;background:transparent;';
+      colorInp.style.cssText = 'width:44px;height:38px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);cursor:pointer;padding:2px;';
+      // Live preview: обновляем цвет точки в списке сразу при выборе
+      colorInp.addEventListener('input', function() {
+        var dot = listPanel.querySelector('.cms-cat-btn.active span:first-child');
+        if (dot) dot.style.background = this.value;
+      });
       colorG.appendChild(colorInp);
 
       var delBtn = document.createElement('button');
@@ -2477,7 +2502,7 @@
 
           // Чипы чемпов
           var chipsLine = document.createElement('div');
-          chipsLine.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+          chipsLine.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;padding:2px 0;';
           var arr = champStars[String(stars)] || [];
           if (arr.length === 0) {
             var ph = document.createElement('span');
@@ -2487,17 +2512,15 @@
           } else {
             arr.forEach(function(cn) {
               var chip = document.createElement('div');
-              chip.style.cssText = 'display:flex;align-items:center;gap:4px;padding:3px 6px 3px 4px;border-radius:8px;background:rgba(109,63,245,0.2);border:1px solid rgba(109,63,245,0.35);';
+              chip.style.cssText = 'position:relative;display:inline-block;border-radius:6px;border:1.5px solid rgba(109,63,245,0.5);overflow:visible;';
+              chip.title = cn;
               var chipImg = document.createElement('img');
               chipImg.src = window._champIcon ? window._champIcon(cn) : '';
-              chipImg.style.cssText = 'width:22px;height:22px;border-radius:4px;object-fit:cover;flex-shrink:0;';
-              chipImg.onerror = function() { this.style.display = 'none'; };
-              var chipName = document.createElement('span');
-              chipName.style.cssText = 'font-size:11px;color:#fff;font-weight:600;';
-              chipName.textContent = cn;
+              chipImg.style.cssText = 'width:34px;height:34px;border-radius:5px;object-fit:cover;display:block;';
+              chipImg.onerror = function() { this.style.background = 'rgba(109,63,245,0.3)'; };
               var chipX = document.createElement('button');
               chipX.textContent = '×';
-              chipX.style.cssText = 'width:16px;height:16px;border-radius:50%;border:none;background:rgba(231,76,60,0.7);color:#fff;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;';
+              chipX.style.cssText = 'position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:50%;border:none;background:rgba(231,76,60,0.9);color:#fff;font-size:10px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;z-index:1;';
               (function(s, name) {
                 chipX.onclick = function(e) {
                   e.stopPropagation();
@@ -2507,7 +2530,6 @@
                 };
               }(stars, cn));
               chip.appendChild(chipImg);
-              chip.appendChild(chipName);
               chip.appendChild(chipX);
               chipsLine.appendChild(chip);
             });
