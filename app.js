@@ -1792,16 +1792,21 @@
         }
         // Category tags
         if(window._champCategories && window._champCategories.length){
-            var champCats=(window._champCategories||[]).filter(function(c){return(c.champions||[]).indexOf(name)!==-1;});
+            var champCats=(window._champCategories||[]).filter(function(c){
+                if(c.champStars){var found=false;[1,2,3].forEach(function(s){if(c.champStars[String(s)]===name)found=true;});return found;}
+                return(c.champions||[]).indexOf(name)!==-1;
+            });
             if(champCats.length){
                 var tagsRow=document.createElement('div');
                 tagsRow.style.cssText='display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;';
                 champCats.forEach(function(cat){
+                    var starLevel=null;
+                    if(cat.champStars){[1,2,3].forEach(function(s){if(cat.champStars[String(s)]===name)starLevel=s;});}
                     var tag=document.createElement('span');
                     tag.className='champ-cat-tag';
                     var col=cat.color||'#6D3FF5';
                     tag.style.cssText='background:'+col+'1a;color:'+col+';border:1px solid '+col+'44;';
-                    tag.textContent=cat.name;
+                    tag.textContent=cat.name+(starLevel?(' '+'⭐'.repeat(starLevel)):'');
                     tagsRow.appendChild(tag);
                 });
                 nameBlock.appendChild(tagsRow);

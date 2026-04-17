@@ -2298,7 +2298,7 @@
     editorPanel.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px 0;font-size:13px;">← Выбери категорию</div>';
 
     // Working copy of categories
-    var cats = (window._champCategories || []).map(function(c) { return Object.assign({}, c, { champions: (c.champions || []).slice(), strongAgainst: (c.strongAgainst || []).slice(), weakAgainst: (c.weakAgainst || []).slice(), combo: (c.combo || []).slice() }); });
+    var cats = (window._champCategories || []).map(function(c) { return Object.assign({}, c, { champions: (c.champions || []).slice(), champStars: Object.assign({}, c.champStars || {}), strongAgainst: (c.strongAgainst || []).slice(), weakAgainst: (c.weakAgainst || []).slice(), combo: (c.combo || []).slice() }); });
     var selectedIdx = -1;
 
     // ── Render list ──
@@ -2322,7 +2322,7 @@
         var dot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + (cat.color || '#6D3FF5') + ';margin-right:8px;flex-shrink:0;"></span>';
         btn.innerHTML = dot
           + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (cat.name || '<em style="opacity:0.4">Без имени</em>') + '</span>'
-          + '<span style="font-size:10px;color:rgba(255,255,255,0.3);margin-left:6px;">' + (cat.champions || []).length + '</span>';
+          + '<span style="font-size:10px;color:rgba(255,255,255,0.3);margin-left:6px;">' + [1,2,3].filter(function(s){return cat.champStars&&cat.champStars[String(s)];}).length + '★</span>';
         btn.onclick = function() { selectedIdx = idx; renderList(); openEditor(idx); };
         listPanel.appendChild(btn);
       });
@@ -2386,55 +2386,157 @@
       row1.appendChild(delBtn);
       editorPanel.appendChild(row1);
 
-      // ── Champions grid ──
-      var champCountLbl = document.createElement('label');
-      champCountLbl.style.cssText = 'display:block;color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;margin-bottom:6px;';
-      champCountLbl.textContent = 'ЧЕМПИОНЫ (' + (cat.champions || []).length + ' выбрано)';
-      editorPanel.appendChild(champCountLbl);
+      // ── Star slots ──
+      var STAR_LEVELS = [3, 2, 1];
+      var STAR_LABELS = { 3: '⭐⭐⭐', 2: '⭐⭐', 1: '⭐' };
+      var champStars = Object.assign({}, cat.champStars || {});
+      var activePicker = null;
 
-      var champSearch = document.createElement('input');
-      champSearch.type = 'text';
-      champSearch.className = 'cms-input';
-      champSearch.placeholder = '🔍 Поиск чемпиона...';
-      champSearch.style.cssText = 'margin-bottom:8px;font-size:12px;';
-      editorPanel.appendChild(champSearch);
+      var slotsWrap = document.createElement('div');
+      slotsWrap.style.cssText = 'margin-bottom:6px;';
 
-      var champGrid = document.createElement('div');
-      champGrid.className = 'cms-cat-champ-grid';
-      editorPanel.appendChild(champGrid);
-      editorPanel.appendChild(document.createElement('br'));
+      var slotsLbl = document.createElement('div');
+      slotsLbl.style.cssText = 'color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;margin-bottom:8px;';
+      slotsLbl.textContent = 'ЧЕМПИОНЫ ПО ЗВЁЗДАМ';
+      slotsWrap.appendChild(slotsLbl);
 
-      var selectedChamps = new Set(cat.champions || []);
+      function renderStarSlots() {
+        // Remove old slot rows (keep label)
+        while (slotsWrap.children.length > 1) slotsWrap.removeChild(slotsWrap.lastChild);
+        STAR_LEVELS.forEach(function(stars) {
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);margin-bottom:6px;cursor:pointer;transition:background 0.15s;';
+          row.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.06)'; };
+          row.onmouseout  = function() { this.style.background = 'rgba(255,255,255,0.03)'; };
 
-      function renderChampGrid(q) {
-        champGrid.innerHTML = '';
-        var all = window._champsRaw || [];
-        var filtered = q ? all.filter(function(c) { return c.name.toLowerCase().indexOf(q.toLowerCase()) !== -1; }) : all;
-        filtered.forEach(function(c) {
-          var isOn = selectedChamps.has(c.name);
-          var cell = document.createElement('div');
-          cell.className = 'cms-cat-champ-cell' + (isOn ? ' selected' : '');
-          if (isOn) cell.style.borderColor = colorInp.value;
-          var img = document.createElement('img');
-          img.src = window._champIcon ? window._champIcon(c.name) : ('https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/' + c.name + '.png');
-          img.style.cssText = 'width:38px;height:38px;border-radius:5px;object-fit:cover;';
-          img.onerror = function() { this.style.background = 'rgba(109,63,245,0.2)'; this.src = ''; };
-          var lbl = document.createElement('div');
-          lbl.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.55);text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
-          lbl.textContent = c.name;
-          cell.appendChild(img);
-          cell.appendChild(lbl);
-          cell.onclick = function() {
-            if (selectedChamps.has(c.name)) selectedChamps.delete(c.name);
-            else selectedChamps.add(c.name);
-            champCountLbl.textContent = 'ЧЕМПИОНЫ (' + selectedChamps.size + ' выбрано)';
-            renderChampGrid(champSearch.value);
-          };
-          champGrid.appendChild(cell);
+          var starLbl = document.createElement('div');
+          starLbl.style.cssText = 'font-size:13px;min-width:54px;';
+          starLbl.textContent = STAR_LABELS[stars];
+          row.appendChild(starLbl);
+
+          var champName = champStars[String(stars)];
+          if (champName) {
+            var img = document.createElement('img');
+            img.src = window._champIcon ? window._champIcon(champName) : '';
+            img.style.cssText = 'width:30px;height:30px;border-radius:6px;object-fit:cover;flex-shrink:0;';
+            img.onerror = function() { this.style.display = 'none'; };
+            row.appendChild(img);
+            var nm = document.createElement('span');
+            nm.style.cssText = 'flex:1;font-size:12px;color:#fff;font-weight:700;';
+            nm.textContent = champName;
+            row.appendChild(nm);
+            var xBtn = document.createElement('button');
+            xBtn.textContent = '×';
+            xBtn.style.cssText = 'width:22px;height:22px;border-radius:50%;border:none;background:rgba(231,76,60,0.7);color:#fff;font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+            (function(s) {
+              xBtn.onclick = function(e) {
+                e.stopPropagation();
+                delete champStars[String(s)];
+                if (activePicker) { activePicker.remove(); activePicker = null; }
+                renderStarSlots();
+              };
+            }(stars));
+            row.appendChild(xBtn);
+          } else {
+            var ph = document.createElement('span');
+            ph.style.cssText = 'flex:1;font-size:11px;color:rgba(255,255,255,0.2);font-style:italic;';
+            ph.textContent = 'Нажми чтобы выбрать...';
+            row.appendChild(ph);
+          }
+          (function(s) {
+            row.onclick = function() { openStarPicker(s); };
+          }(stars));
+          slotsWrap.appendChild(row);
         });
       }
-      renderChampGrid('');
-      champSearch.oninput = function() { renderChampGrid(this.value); };
+
+      function openStarPicker(stars) {
+        if (activePicker) { activePicker.remove(); activePicker = null; }
+        var picker = document.createElement('div');
+        activePicker = picker;
+        picker.style.cssText = 'border:1px solid rgba(109,63,245,0.4);border-radius:10px;padding:10px;margin-bottom:12px;background:rgba(0,0,0,0.4);';
+
+        var ptitle = document.createElement('div');
+        ptitle.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.5);font-weight:700;margin-bottom:8px;';
+        ptitle.textContent = 'Выбери чемпа для ' + STAR_LABELS[stars];
+        picker.appendChild(ptitle);
+
+        var roleFilter = 'all';
+        var roles = [{k:'all',l:'Все'},{k:'Top',l:'Топ'},{k:'Jungle',l:'Лес'},{k:'Mid',l:'Мид'},{k:'ADC',l:'АДК'},{k:'Support',l:'Сап'}];
+        var roleRow = document.createElement('div');
+        roleRow.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;';
+
+        var pickerGrid = document.createElement('div');
+        pickerGrid.className = 'cms-cat-champ-grid';
+
+        function buildRoleBtns() {
+          roleRow.innerHTML = '';
+          roles.forEach(function(r) {
+            var rb = document.createElement('button');
+            rb.textContent = r.l;
+            var on = r.k === roleFilter;
+            rb.style.cssText = 'padding:3px 9px;border-radius:6px;border:1px solid '+(on?'var(--accent)':'rgba(255,255,255,0.15)')+';background:'+(on?'rgba(109,63,245,0.3)':'transparent')+';color:'+(on?'#c4a7ff':'rgba(255,255,255,0.45)')+';font-size:10px;font-weight:700;cursor:pointer;';
+            rb.onclick = function() { roleFilter = r.k; buildRoleBtns(); renderPickerGrid(srch.value); };
+            roleRow.appendChild(rb);
+          });
+        }
+
+        var srch = document.createElement('input');
+        srch.type = 'text';
+        srch.className = 'cms-input';
+        srch.placeholder = '🔍 Поиск...';
+        srch.style.cssText = 'margin-bottom:8px;font-size:12px;';
+
+        function renderPickerGrid(q) {
+          pickerGrid.innerHTML = '';
+          var all = window._champsRaw || [];
+          var filtered = all.filter(function(c) {
+            var okRole = roleFilter === 'all' || (c.is && c.is[roleFilter]);
+            var okQ    = !q || c.name.toLowerCase().indexOf(q.toLowerCase()) !== -1;
+            return okRole && okQ;
+          });
+          filtered.forEach(function(c) {
+            var cell = document.createElement('div');
+            cell.className = 'cms-cat-champ-cell';
+            var img2 = document.createElement('img');
+            img2.src = window._champIcon ? window._champIcon(c.name) : '';
+            img2.style.cssText = 'width:38px;height:38px;border-radius:5px;object-fit:cover;';
+            img2.onerror = function() { this.style.background = 'rgba(109,63,245,0.2)'; this.src = ''; };
+            var lbl2 = document.createElement('div');
+            lbl2.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.55);text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
+            lbl2.textContent = c.name;
+            cell.appendChild(img2);
+            cell.appendChild(lbl2);
+            (function(cn) {
+              cell.onclick = function() {
+                champStars[String(stars)] = cn;
+                picker.remove(); activePicker = null;
+                renderStarSlots();
+              };
+            }(c.name));
+            pickerGrid.appendChild(cell);
+          });
+        }
+
+        buildRoleBtns();
+        picker.appendChild(roleRow);
+        picker.appendChild(srch);
+        picker.appendChild(pickerGrid);
+        renderPickerGrid('');
+        srch.oninput = function() { renderPickerGrid(this.value); };
+
+        var closeP = document.createElement('button');
+        closeP.textContent = '✕ Закрыть';
+        closeP.style.cssText = 'margin-top:8px;padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.35);font-size:11px;cursor:pointer;';
+        closeP.onclick = function() { picker.remove(); activePicker = null; };
+        picker.appendChild(closeP);
+
+        slotsWrap.insertAdjacentElement('afterend', picker);
+      }
+
+      renderStarSlots();
+      editorPanel.appendChild(slotsWrap);
+      editorPanel.appendChild(document.createElement('br'));
 
       // ── Matchup pickers (by category name) ──
       function makeMatchupPicker(labelText, icon, key) {
@@ -2501,13 +2603,14 @@
 
         cat.name = newName;
         cat.color = colorInp.value;
-        cat.champions = Array.from(selectedChamps);
+        cat.champStars = champStars;
+        cat.champions = [1,2,3].map(function(s){return champStars[String(s)];}).filter(Boolean);
         cat.strongAgainst = strongPicker.get();
         cat.weakAgainst   = weakPicker.get();
         cat.combo         = comboPicker.get();
         if (cat.order === undefined) cat.order = cats.length - 1;
 
-        var docData = { name: cat.name, color: cat.color, champions: cat.champions, strongAgainst: cat.strongAgainst, weakAgainst: cat.weakAgainst, combo: cat.combo, order: cat.order };
+        var docData = { name: cat.name, color: cat.color, champStars: cat.champStars, champions: cat.champions, strongAgainst: cat.strongAgainst, weakAgainst: cat.weakAgainst, combo: cat.combo, order: cat.order };
 
         var saveP;
         if (cat._id) {
@@ -2518,7 +2621,6 @@
         saveP.then(function() {
           window._champCategories = cats.map(function(c) { return Object.assign({}, c); });
           renderList();
-          champCountLbl.textContent = 'ЧЕМПИОНЫ (' + cat.champions.length + ' выбрано)';
           _showToast('Категория "' + cat.name + '" сохранена!', 'success');
         }).catch(function(e) { _showToast('Ошибка: ' + e.message, 'error'); });
       };

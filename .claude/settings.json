@@ -33,7 +33,8 @@
       "WebFetch(domain:www.namecheap.com)",
       "WebFetch(domain:tldspy.com)",
       "Skill(browse)",
-      "Skill(browse:*)"
+      "Skill(browse:*)",
+      "Bash(node --check cms.js)"
     ]
   }
 }
