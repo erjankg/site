@@ -670,6 +670,7 @@
   function _createEditorModal(entityName, isNew, data, fields, onSave, onDelete) {
     var overlay = document.createElement('div');
     overlay.className = 'cms-modal-overlay';
+    if (window.innerWidth >= 769) overlay.classList.add('cms-fullscreen-editor');
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
@@ -722,6 +723,7 @@
       }
 
       input.className = 'cms-input';
+      input.setAttribute('data-field-key', field.key);
       if (field.placeholder) input.placeholder = field.placeholder;
       if (field.type !== 'select') input.value = data[field.key] || '';
 
@@ -2003,18 +2005,14 @@
     var saveBtn = win.querySelector('.cms-btn-save');
     if (saveBtn) {
       saveBtn.onclick = function() {
-        // Собираем все обычные поля
+        // Собираем все обычные поля по data-field-key атрибуту
         var newData = {};
         normalFields.forEach(function(f) {
-          if (f.type === 'select') {
-            var sel = win.querySelector('select.cms-input');
-            newData[f.key] = sel ? sel.value : (data[f.key] || '');
+          var el = win.querySelector('[data-field-key="' + f.key + '"]');
+          if (el) {
+            newData[f.key] = el.value.trim ? el.value.trim() : el.value;
           } else {
-            var inputs = win.querySelectorAll('input.cms-input, textarea.cms-input');
-            inputs.forEach(function(el) {
-              var parentLabel = el.previousElementSibling;
-              if (parentLabel && parentLabel.textContent === f.label) newData[f.key] = el.value.trim();
-            });
+            newData[f.key] = data[f.key] || '';
           }
         });
         // Richtext поля
@@ -2242,6 +2240,307 @@
 
     overlay.appendChild(win);
     document.body.appendChild(overlay);
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🏷 CHAMPION CATEGORIES — Firestore `champCategories`
+  // ═══════════════════════════════════════════════════════════════
+
+  window._champCategories = window._champCategories || [];
+
+  window.cmsLoadCategories = function(callback) {
+    var db = firebase.firestore();
+    db.collection('champCategories').get()
+      .then(function(snap) {
+        var cats = [];
+        snap.forEach(function(doc) {
+          var d = doc.data();
+          d._id = doc.id;
+          cats.push(d);
+        });
+        cats.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+        window._champCategories = cats;
+        if (callback) callback();
+      })
+      .catch(function() { if (callback) callback(); });
+  };
+
+  // ── Admin: открыть редактор категорий ──
+  window.cmsOpenCategoriesEditor = function() {
+    var db = firebase.firestore();
+
+    var overlay = document.createElement('div');
+    overlay.className = 'cms-modal-overlay';
+    if (window.innerWidth >= 769) overlay.classList.add('cms-fullscreen-editor');
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var win = document.createElement('div');
+    win.className = 'cms-modal-win';
+    win.style.cssText = 'display:flex;flex-direction:column;padding:0;max-width:none;';
+    if (window.innerWidth >= 769) win.style.height = '100vh';
+
+    // Header
+    var hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;';
+    hdr.innerHTML = '<h3 style="margin:0;color:#fff;font-size:18px;">🏷 Категории чемпионов</h3>'
+      + '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>';
+    win.appendChild(hdr);
+
+    // Body: two-column
+    var body = document.createElement('div');
+    body.className = 'cms-cat-editor-body';
+
+    var listPanel = document.createElement('div');
+    listPanel.className = 'cms-cat-list-panel';
+
+    var editorPanel = document.createElement('div');
+    editorPanel.className = 'cms-cat-editor-panel';
+    editorPanel.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px 0;font-size:13px;">← Выбери категорию</div>';
+
+    // Working copy of categories
+    var cats = (window._champCategories || []).map(function(c) { return Object.assign({}, c, { champions: (c.champions || []).slice(), strongAgainst: (c.strongAgainst || []).slice(), weakAgainst: (c.weakAgainst || []).slice(), combo: (c.combo || []).slice() }); });
+    var selectedIdx = -1;
+
+    // ── Render list ──
+    function renderList() {
+      listPanel.innerHTML = '';
+      var addBtn = document.createElement('button');
+      addBtn.className = 'cms-btn-save';
+      addBtn.style.cssText = 'width:100%;margin-bottom:10px;font-size:12px;padding:7px;';
+      addBtn.textContent = '+ Добавить категорию';
+      addBtn.onclick = function() {
+        cats.push({ name: '', color: '#6D3FF5', champions: [], strongAgainst: [], weakAgainst: [], combo: [], order: cats.length });
+        selectedIdx = cats.length - 1;
+        renderList();
+        openEditor(selectedIdx);
+      };
+      listPanel.appendChild(addBtn);
+
+      cats.forEach(function(cat, idx) {
+        var btn = document.createElement('button');
+        btn.className = 'cms-cat-btn' + (idx === selectedIdx ? ' active' : '');
+        var dot = '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + (cat.color || '#6D3FF5') + ';margin-right:8px;flex-shrink:0;"></span>';
+        btn.innerHTML = dot
+          + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (cat.name || '<em style="opacity:0.4">Без имени</em>') + '</span>'
+          + '<span style="font-size:10px;color:rgba(255,255,255,0.3);margin-left:6px;">' + (cat.champions || []).length + '</span>';
+        btn.onclick = function() { selectedIdx = idx; renderList(); openEditor(idx); };
+        listPanel.appendChild(btn);
+      });
+    }
+
+    // ── Category editor ──
+    function openEditor(idx) {
+      var cat = cats[idx];
+      editorPanel.innerHTML = '';
+
+      // Row 1: Name + Color + Delete
+      var row1 = document.createElement('div');
+      row1.style.cssText = 'display:flex;gap:10px;align-items:flex-end;margin-bottom:16px;';
+
+      var nameG = document.createElement('div');
+      nameG.style.flex = '1';
+      nameG.innerHTML = '<label style="display:block;color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;margin-bottom:4px;">НАЗВАНИЕ</label>';
+      var nameInp = document.createElement('input');
+      nameInp.type = 'text';
+      nameInp.className = 'cms-input';
+      nameInp.value = cat.name || '';
+      nameInp.style.margin = '0';
+      nameG.appendChild(nameInp);
+
+      var colorG = document.createElement('div');
+      colorG.innerHTML = '<label style="display:block;color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;margin-bottom:4px;">ЦВЕТ</label>';
+      var colorInp = document.createElement('input');
+      colorInp.type = 'color';
+      colorInp.value = cat.color || '#6D3FF5';
+      colorInp.style.cssText = 'width:44px;height:38px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);cursor:pointer;padding:2px;background:transparent;';
+      colorG.appendChild(colorInp);
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'cms-btn-delete';
+      delBtn.style.margin = '0';
+      delBtn.textContent = '🗑 Удалить';
+      delBtn.onclick = function() {
+        if (!confirm('Удалить категорию "' + (cat.name || 'без имени') + '"?')) return;
+        if (cat._id) {
+          db.collection('champCategories').doc(cat._id).delete()
+            .then(function() {
+              cats.splice(idx, 1);
+              window._champCategories = cats.map(function(c) { return Object.assign({}, c); });
+              selectedIdx = -1;
+              editorPanel.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px 0;font-size:13px;">← Выбери категорию</div>';
+              renderList();
+              _showToast('Категория удалена', 'success');
+            })
+            .catch(function(e) { _showToast('Ошибка: ' + e.message, 'error'); });
+        } else {
+          cats.splice(idx, 1);
+          window._champCategories = cats.map(function(c) { return Object.assign({}, c); });
+          selectedIdx = -1;
+          editorPanel.innerHTML = '<div style="color:rgba(255,255,255,0.3);text-align:center;padding:60px 0;font-size:13px;">← Выбери категорию</div>';
+          renderList();
+        }
+      };
+
+      row1.appendChild(nameG);
+      row1.appendChild(colorG);
+      row1.appendChild(delBtn);
+      editorPanel.appendChild(row1);
+
+      // ── Champions grid ──
+      var champCountLbl = document.createElement('label');
+      champCountLbl.style.cssText = 'display:block;color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;margin-bottom:6px;';
+      champCountLbl.textContent = 'ЧЕМПИОНЫ (' + (cat.champions || []).length + ' выбрано)';
+      editorPanel.appendChild(champCountLbl);
+
+      var champSearch = document.createElement('input');
+      champSearch.type = 'text';
+      champSearch.className = 'cms-input';
+      champSearch.placeholder = '🔍 Поиск чемпиона...';
+      champSearch.style.cssText = 'margin-bottom:8px;font-size:12px;';
+      editorPanel.appendChild(champSearch);
+
+      var champGrid = document.createElement('div');
+      champGrid.className = 'cms-cat-champ-grid';
+      editorPanel.appendChild(champGrid);
+      editorPanel.appendChild(document.createElement('br'));
+
+      var selectedChamps = new Set(cat.champions || []);
+
+      function renderChampGrid(q) {
+        champGrid.innerHTML = '';
+        var all = window._champsRaw || [];
+        var filtered = q ? all.filter(function(c) { return c.name.toLowerCase().indexOf(q.toLowerCase()) !== -1; }) : all;
+        filtered.forEach(function(c) {
+          var isOn = selectedChamps.has(c.name);
+          var cell = document.createElement('div');
+          cell.className = 'cms-cat-champ-cell' + (isOn ? ' selected' : '');
+          if (isOn) cell.style.borderColor = colorInp.value;
+          var img = document.createElement('img');
+          img.src = window._champIcon ? window._champIcon(c.name) : ('https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/' + c.name + '.png');
+          img.style.cssText = 'width:38px;height:38px;border-radius:5px;object-fit:cover;';
+          img.onerror = function() { this.style.background = 'rgba(109,63,245,0.2)'; this.src = ''; };
+          var lbl = document.createElement('div');
+          lbl.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.55);text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
+          lbl.textContent = c.name;
+          cell.appendChild(img);
+          cell.appendChild(lbl);
+          cell.onclick = function() {
+            if (selectedChamps.has(c.name)) selectedChamps.delete(c.name);
+            else selectedChamps.add(c.name);
+            champCountLbl.textContent = 'ЧЕМПИОНЫ (' + selectedChamps.size + ' выбрано)';
+            renderChampGrid(champSearch.value);
+          };
+          champGrid.appendChild(cell);
+        });
+      }
+      renderChampGrid('');
+      champSearch.oninput = function() { renderChampGrid(this.value); };
+
+      // ── Matchup pickers (by category name) ──
+      function makeMatchupPicker(labelText, icon, key) {
+        var sect = document.createElement('div');
+        sect.style.marginBottom = '14px';
+        var lbl = document.createElement('div');
+        lbl.style.cssText = 'color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;margin-bottom:6px;';
+        lbl.textContent = icon + ' ' + labelText;
+        sect.appendChild(lbl);
+
+        var chips = document.createElement('div');
+        chips.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+
+        var currentSet = new Set(cat[key] || []);
+
+        function rebuildChips() {
+          chips.innerHTML = '';
+          cats.forEach(function(otherCat, otherIdx) {
+            if (otherIdx === idx) return;
+            var catName = otherCat.name;
+            if (!catName) return;
+            var isOn = currentSet.has(catName);
+            var chip = document.createElement('button');
+            chip.className = 'cms-cat-matchup-chip' + (isOn ? ' active' : '');
+            chip.style.borderColor = isOn ? (otherCat.color || '#6D3FF5') : 'rgba(255,255,255,0.12)';
+            chip.style.background = isOn ? (otherCat.color || '#6D3FF5') + '22' : 'transparent';
+            chip.style.color = isOn ? '#fff' : 'rgba(255,255,255,0.5)';
+            var dot = document.createElement('span');
+            dot.style.cssText = 'display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (otherCat.color || '#6D3FF5') + ';';
+            chip.appendChild(dot);
+            chip.appendChild(document.createTextNode(catName));
+            chip.onclick = function() {
+              if (currentSet.has(catName)) currentSet.delete(catName);
+              else currentSet.add(catName);
+              cat[key] = Array.from(currentSet);
+              rebuildChips();
+            };
+            chips.appendChild(chip);
+          });
+          if (!chips.children.length) {
+            chips.innerHTML = '<span style="font-size:12px;color:rgba(255,255,255,0.2);">Нет других категорий</span>';
+          }
+        }
+        rebuildChips();
+        sect.appendChild(chips);
+        return { el: sect, get: function() { return Array.from(currentSet); } };
+      }
+
+      var strongPicker = makeMatchupPicker('Сильнее против', '⚔', 'strongAgainst');
+      var weakPicker   = makeMatchupPicker('Слабее против',  '💀', 'weakAgainst');
+      var comboPicker  = makeMatchupPicker('Комбо с',        '🤝', 'combo');
+      editorPanel.appendChild(strongPicker.el);
+      editorPanel.appendChild(weakPicker.el);
+      editorPanel.appendChild(comboPicker.el);
+
+      // Save button
+      var saveBtn = document.createElement('button');
+      saveBtn.className = 'cms-btn-save';
+      saveBtn.style.marginTop = '16px';
+      saveBtn.textContent = '💾 Сохранить категорию';
+      saveBtn.onclick = function() {
+        var newName = nameInp.value.trim();
+        if (!newName) { _showToast('Введи название категории', 'error'); return; }
+
+        cat.name = newName;
+        cat.color = colorInp.value;
+        cat.champions = Array.from(selectedChamps);
+        cat.strongAgainst = strongPicker.get();
+        cat.weakAgainst   = weakPicker.get();
+        cat.combo         = comboPicker.get();
+        if (cat.order === undefined) cat.order = cats.length - 1;
+
+        var docData = { name: cat.name, color: cat.color, champions: cat.champions, strongAgainst: cat.strongAgainst, weakAgainst: cat.weakAgainst, combo: cat.combo, order: cat.order };
+
+        var saveP;
+        if (cat._id) {
+          saveP = db.collection('champCategories').doc(cat._id).set(docData, { merge: true });
+        } else {
+          saveP = db.collection('champCategories').add(docData).then(function(ref) { cat._id = ref.id; });
+        }
+        saveP.then(function() {
+          window._champCategories = cats.map(function(c) { return Object.assign({}, c); });
+          renderList();
+          champCountLbl.textContent = 'ЧЕМПИОНЫ (' + cat.champions.length + ' выбрано)';
+          _showToast('Категория "' + cat.name + '" сохранена!', 'success');
+        }).catch(function(e) { _showToast('Ошибка: ' + e.message, 'error'); });
+      };
+      editorPanel.appendChild(saveBtn);
+    }
+
+    renderList();
+    body.appendChild(listPanel);
+    body.appendChild(editorPanel);
+    win.appendChild(body);
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+  };
+
+  // ── Загружаем категории вместе с остальными данными ──
+  var _origCmsLoadData = window.cmsLoadData;
+  window.cmsLoadData = function(callback) {
+    _origCmsLoadData(function() {
+      window.cmsLoadCategories(function() {
+        if (callback) callback();
+      });
+    });
   };
 
 })();

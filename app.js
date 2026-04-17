@@ -1790,6 +1790,23 @@
             rd.textContent=roles.join(' \u00b7 ')||'\u2014';
             nameBlock.appendChild(rd);
         }
+        // Category tags
+        if(window._champCategories && window._champCategories.length){
+            var champCats=(window._champCategories||[]).filter(function(c){return(c.champions||[]).indexOf(name)!==-1;});
+            if(champCats.length){
+                var tagsRow=document.createElement('div');
+                tagsRow.style.cssText='display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;';
+                champCats.forEach(function(cat){
+                    var tag=document.createElement('span');
+                    tag.className='champ-cat-tag';
+                    var col=cat.color||'#6D3FF5';
+                    tag.style.cssText='background:'+col+'1a;color:'+col+';border:1px solid '+col+'44;';
+                    tag.textContent=cat.name;
+                    tagsRow.appendChild(tag);
+                });
+                nameBlock.appendChild(tagsRow);
+            }
+        }
         header.appendChild(nameBlock);
         leftCol.appendChild(header);
 
@@ -1919,6 +1936,62 @@
             rightCol.appendChild(makeSection('cdStrongVs', t('⚔ СИЛЁН ПРОТИВ'), '#2ecc71', '39,174,96', 'strongVs', t('⚔ Силён против')));
             rightCol.appendChild(makeSection('cdWeakVs', t('💀 СЛАБ ПРОТИВ'), '#e74c3c', '231,76,60', 'weakVs', t('💀 Слаб против')));
             rightCol.appendChild(makeSection('cdCombos', t('🤝 КОМБО'), '#5dade2', '93,173,226', 'combos', t('🤝 Комбо с')));
+
+            // Category-derived matchups (read-only, from champCategories)
+            (function() {
+                var allCats = window._champCategories || [];
+                if (!allCats.length) return;
+                var champCatsArr = allCats.filter(function(c){ return (c.champions||[]).indexOf(name) !== -1; });
+                if (!champCatsArr.length) return;
+
+                var derivedStrong = new Set();
+                var derivedWeak   = new Set();
+                var derivedCombo  = new Set();
+
+                champCatsArr.forEach(function(cat) {
+                    (cat.strongAgainst||[]).forEach(function(cn) {
+                        var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
+                        if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedStrong.add(x); });
+                    });
+                    (cat.weakAgainst||[]).forEach(function(cn) {
+                        var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
+                        if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedWeak.add(x); });
+                    });
+                    (cat.combo||[]).forEach(function(cn) {
+                        var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
+                        if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedCombo.add(x); });
+                    });
+                });
+
+                if (!derivedStrong.size && !derivedWeak.size && !derivedCombo.size) return;
+
+                var catBox = document.createElement('div');
+                catBox.style.cssText = 'background:rgba(109,63,245,0.05);border:1px solid rgba(109,63,245,0.2);border-radius:10px;padding:10px;';
+                catBox.innerHTML = '<div style="font-size:10px;color:rgba(109,63,245,0.9);font-weight:800;letter-spacing:0.5px;margin-bottom:8px;">🏷 ' + t('ПО КАТЕГОРИЯМ') + '</div>';
+
+                function makeDerivedRow(label, set, rgb) {
+                    if (!set.size) return;
+                    var row = document.createElement('div');
+                    row.style.marginBottom = '6px';
+                    row.innerHTML = '<div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:4px;">' + label + '</div>';
+                    var chips = document.createElement('div');
+                    chips.style.cssText = 'display:flex;flex-wrap:wrap;gap:3px;';
+                    set.forEach(function(cn) {
+                        var chip = document.createElement('div');
+                        chip.style.cssText = 'display:flex;align-items:center;background:rgba('+rgb+',0.08);border:1px solid rgba('+rgb+',0.2);border-radius:5px;padding:2px 4px;cursor:pointer;';
+                        chip.innerHTML = '<img src="'+champIcon(cn)+'" title="'+cn+'" style="width:24px;height:24px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'">';
+                        chip.title = cn;
+                        chip.onclick = function(){ openChampDetail(cn); };
+                        chips.appendChild(chip);
+                    });
+                    row.appendChild(chips);
+                    catBox.appendChild(row);
+                }
+                makeDerivedRow(t('⚔ Силён против'), derivedStrong, '39,174,96');
+                makeDerivedRow(t('💀 Слаб против'),  derivedWeak,   '231,76,60');
+                makeDerivedRow(t('🤝 Комбо'),        derivedCombo,  '93,173,226');
+                rightCol.appendChild(catBox);
+            })();
 
             function renderMatchups(n) {
                 var sections = [
