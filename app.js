@@ -1953,18 +1953,33 @@
                 var derivedWeak   = new Set();
                 var derivedCombo  = new Set();
 
+                var _allChampNames = (window._champsRaw || []).map(function(c){ return c.name; });
                 champCatsArr.forEach(function(cat) {
                     (cat.strongAgainst||[]).forEach(function(cn) {
-                        var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
-                        if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedStrong.add(x); });
+                        if (_allChampNames.indexOf(cn) !== -1) {
+                            // New format: direct champion name
+                            if (cn !== name) derivedStrong.add(cn);
+                        } else {
+                            // Old format: category name — look up its champions
+                            var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
+                            if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedStrong.add(x); });
+                        }
                     });
                     (cat.weakAgainst||[]).forEach(function(cn) {
-                        var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
-                        if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedWeak.add(x); });
+                        if (_allChampNames.indexOf(cn) !== -1) {
+                            if (cn !== name) derivedWeak.add(cn);
+                        } else {
+                            var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
+                            if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedWeak.add(x); });
+                        }
                     });
                     (cat.combo||[]).forEach(function(cn) {
-                        var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
-                        if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedCombo.add(x); });
+                        if (_allChampNames.indexOf(cn) !== -1) {
+                            if (cn !== name) derivedCombo.add(cn);
+                        } else {
+                            var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
+                            if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedCombo.add(x); });
+                        }
                     });
                 });
 
