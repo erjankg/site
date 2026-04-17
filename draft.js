@@ -2275,7 +2275,7 @@
 
     var topBar = ''
       + '<div class="dcoop-replay-topbar">'
-      +   '<button onclick="dcoopOpenLobby(\''+lobby.id+'\')" class="dcoop-back-btn">← К серии</button>'
+      +   '<button onclick="dcoopSeriesSummary(\''+lobby.id+'\')" class="dcoop-back-btn">← К серии</button>'
       +   '<div class="dcoop-replay-info">'
       +     '<span class="dcoop-replay-title">Игра '+game.number+' · реплей</span>'
       +     '<span class="dcoop-replay-teams">'+escapeHtml(lobby.blueTeamName||'Blue')+' vs '+escapeHtml(lobby.redTeamName||'Red')+'</span>'
@@ -2332,6 +2332,26 @@
   }
 
   window.dcoopReplayGame = replayGame;
+
+  // Показать итоговый экран серии (трофей + список игр) — без перезагрузки из Firestore если данные закэшированы
+  window.dcoopSeriesSummary = function(lobbyId) {
+    var pane = document.getElementById('dcoopPaneLobby');
+    if (!pane) return;
+    if (_replayCache && _replayCache.lobbyId === lobbyId) {
+      renderSeriesDone(_replayCache.lobby, pane);
+      return;
+    }
+    var dbInst = _db();
+    if (!dbInst) return;
+    pane.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-faint);">Загрузка…</div>';
+    dbInst.collection('draftLobbies').doc(lobbyId).get().then(function(snap) {
+      if (!snap.exists) { pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Лобби не найдено</div>'; return; }
+      var l = snap.data(); l.id = snap.id;
+      renderSeriesDone(l, pane);
+    }).catch(function(e) {
+      pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Ошибка: '+escapeHtml(e.message||'')+'</div>';
+    });
+  };
 
   // ─── EXPORTS (draft core) ───
   window.dcoopChampClick = champClick;
