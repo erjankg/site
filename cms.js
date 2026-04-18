@@ -2671,8 +2671,7 @@
       editorPanel.appendChild(slotsWrap);
       editorPanel.appendChild(document.createElement('br'));
 
-      // ── Matchup pickers (by individual champion) ──
-      var _activeMatchupPicker = null;
+      // ── Matchup pickers (by category) ──
       function makeMatchupPicker(labelText, icon, key) {
         var sect = document.createElement('div');
         sect.style.marginBottom = '14px';
@@ -2681,141 +2680,75 @@
         lbl.textContent = icon + ' ' + labelText;
         sect.appendChild(lbl);
 
-        // Migrate old format (category names → skip if no champion found in _champsRaw)
-        var rawVal = cat[key] || [];
-        var allChampNames = (window._champsRaw || []).map(function(c) { return c.name; });
-        var migratedVal = rawVal.filter(function(v) { return allChampNames.indexOf(v) !== -1; });
-        var currentSet = new Set(migratedVal);
+        var currentSet = new Set(cat[key] || []);
 
-        // Selected chips row
         var chipsRow = document.createElement('div');
         chipsRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:5px;min-height:18px;margin-bottom:6px;';
 
-        function renderSelectedChips() {
+        function renderChips() {
           chipsRow.innerHTML = '';
           if (!currentSet.size) {
             chipsRow.innerHTML = '<span style="font-size:11px;color:rgba(255,255,255,0.2);">Не выбрано</span>';
             return;
           }
-          currentSet.forEach(function(cn) {
+          currentSet.forEach(function(catName) {
+            var catObj = cats.find(function(c) { return c.name === catName; });
+            var col = (catObj && catObj.color) || '#6D3FF5';
             var chip = document.createElement('div');
-            chip.style.cssText = 'position:relative;display:inline-block;border-radius:6px;border:1.5px solid rgba(109,63,245,0.5);overflow:visible;cursor:pointer;';
-            chip.title = cn;
-            var img = document.createElement('img');
-            img.src = window._champIcon ? window._champIcon(cn) : '';
-            img.style.cssText = 'width:30px;height:30px;border-radius:5px;object-fit:cover;display:block;';
-            img.onerror = function() { this.style.background = 'rgba(109,63,245,0.2)'; this.src = ''; };
+            chip.style.cssText = 'display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:6px;background:' + col + '22;border:1.5px solid ' + col + '66;';
+            var nameSpan = document.createElement('span');
+            nameSpan.style.cssText = 'font-size:11px;color:' + col + ';font-weight:700;';
+            nameSpan.textContent = catName;
             var xBtn = document.createElement('button');
-            xBtn.style.cssText = 'position:absolute;top:-5px;right:-5px;width:14px;height:14px;border-radius:50%;background:#e53;border:none;color:#fff;font-size:8px;line-height:14px;text-align:center;cursor:pointer;padding:0;z-index:1;';
+            xBtn.style.cssText = 'background:none;border:none;color:' + col + ';font-size:13px;cursor:pointer;padding:0;line-height:1;';
             xBtn.textContent = '×';
-            (function(name) {
-              xBtn.onclick = function(e) { e.stopPropagation(); currentSet.delete(name); renderSelectedChips(); };
-            }(cn));
-            chip.appendChild(img);
+            (function(cn) {
+              xBtn.onclick = function() { currentSet.delete(cn); renderChips(); };
+            }(catName));
+            chip.appendChild(nameSpan);
             chip.appendChild(xBtn);
             chipsRow.appendChild(chip);
           });
         }
-        renderSelectedChips();
+        renderChips();
         sect.appendChild(chipsRow);
 
-        // Open picker button
-        var openBtn = document.createElement('button');
-        openBtn.style.cssText = 'font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid rgba(109,63,245,0.35);background:rgba(109,63,245,0.1);color:rgba(255,255,255,0.6);cursor:pointer;';
-        openBtn.textContent = '+ Добавить';
-        openBtn.onclick = function() {
-          if (_activeMatchupPicker) { _activeMatchupPicker.remove(); _activeMatchupPicker = null; }
-          openMatchupChampPicker(sect, key, currentSet, function() { renderSelectedChips(); });
+        var addBtn = document.createElement('button');
+        addBtn.style.cssText = 'font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid rgba(109,63,245,0.35);background:rgba(109,63,245,0.1);color:rgba(255,255,255,0.6);cursor:pointer;';
+        addBtn.textContent = '+ Категорию';
+        addBtn.onclick = function() {
+          editorPanel.querySelectorAll('.cat-mp-dropdown').forEach(function(d) { d.remove(); });
+          var dropdown = document.createElement('div');
+          dropdown.className = 'cat-mp-dropdown';
+          dropdown.style.cssText = 'border:1px solid rgba(109,63,245,0.4);border-radius:8px;padding:8px;margin-top:6px;background:rgba(10,10,20,0.97);max-height:160px;overflow-y:auto;';
+          var others = cats.filter(function(c) { return c.name && c.name !== cat.name; });
+          if (!others.length) {
+            dropdown.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.3);padding:4px;">Нет других категорий</div>';
+          } else {
+            others.forEach(function(c) {
+              var col = c.color || '#6D3FF5';
+              var sel = currentSet.has(c.name);
+              var row = document.createElement('div');
+              row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;background:' + (sel ? col + '22' : 'transparent') + ';';
+              row.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:' + col + ';flex-shrink:0;"></div>'
+                + '<span style="font-size:12px;color:' + (sel ? col : 'rgba(255,255,255,0.7)') + ';font-weight:' + (sel ? '700' : '400') + ';flex:1;">' + (c.name || '—') + '</span>'
+                + (sel ? '<span style="font-size:10px;color:' + col + ';">✓</span>' : '');
+              (function(cn) {
+                row.onclick = function() {
+                  if (currentSet.has(cn)) currentSet.delete(cn);
+                  else currentSet.add(cn);
+                  renderChips();
+                  dropdown.remove();
+                };
+              }(c.name));
+              dropdown.appendChild(row);
+            });
+          }
+          sect.appendChild(dropdown);
         };
-        sect.appendChild(openBtn);
+        sect.appendChild(addBtn);
 
         return { el: sect, get: function() { return Array.from(currentSet); } };
-      }
-
-      function openMatchupChampPicker(afterEl, key, currentSet, onChange) {
-        var picker = document.createElement('div');
-        _activeMatchupPicker = picker;
-        picker.style.cssText = 'border:1px solid rgba(109,63,245,0.4);border-radius:10px;padding:10px;margin:6px 0 12px;background:rgba(0,0,0,0.4);';
-
-        var ptitle = document.createElement('div');
-        ptitle.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.5);font-weight:700;margin-bottom:8px;';
-        ptitle.textContent = 'Выбери чемпионов (можно несколько)';
-        picker.appendChild(ptitle);
-
-        var roleFilter = 'all';
-        var roles = [{k:'all',l:'Все'},{k:'Top',l:'Топ'},{k:'Jungle',l:'Лес'},{k:'Mid',l:'Мид'},{k:'ADC',l:'АДК'},{k:'Support',l:'Сап'}];
-        var roleRow = document.createElement('div');
-        roleRow.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;';
-
-        var pickerGrid = document.createElement('div');
-        pickerGrid.className = 'cms-cat-champ-grid';
-
-        function buildRoleBtns() {
-          roleRow.innerHTML = '';
-          roles.forEach(function(r) {
-            var rb = document.createElement('button');
-            rb.textContent = r.l;
-            var on = r.k === roleFilter;
-            rb.style.cssText = 'padding:3px 9px;border-radius:6px;border:1px solid '+(on?'var(--accent)':'rgba(255,255,255,0.15)')+';background:'+(on?'rgba(109,63,245,0.3)':'transparent')+';color:'+(on?'#c4a7ff':'rgba(255,255,255,0.45)')+';font-size:10px;font-weight:700;cursor:pointer;';
-            rb.onclick = function() { roleFilter = r.k; buildRoleBtns(); renderPickerGrid(srch.value); };
-            roleRow.appendChild(rb);
-          });
-        }
-
-        var srch = document.createElement('input');
-        srch.type = 'text';
-        srch.className = 'cms-input';
-        srch.placeholder = '🔍 Поиск...';
-        srch.style.cssText = 'margin-bottom:8px;font-size:12px;';
-
-        function renderPickerGrid(q) {
-          pickerGrid.innerHTML = '';
-          var all = window._champsRaw || [];
-          var filtered = all.filter(function(c) {
-            var okRole = roleFilter === 'all' || (c.is && c.is[roleFilter]);
-            var okQ    = !q || c.name.toLowerCase().indexOf(q.toLowerCase()) !== -1;
-            return okRole && okQ;
-          });
-          filtered.forEach(function(c) {
-            var cell = document.createElement('div');
-            cell.className = 'cms-cat-champ-cell';
-            var selected = currentSet.has(c.name);
-            if (selected) cell.style.cssText = 'outline:2px solid #6D3FF5;background:rgba(109,63,245,0.25);border-radius:7px;';
-            var img2 = document.createElement('img');
-            img2.src = window._champIcon ? window._champIcon(c.name) : '';
-            img2.style.cssText = 'width:38px;height:38px;border-radius:5px;object-fit:cover;';
-            img2.onerror = function() { this.style.background = 'rgba(109,63,245,0.2)'; this.src = ''; };
-            var lbl2 = document.createElement('div');
-            lbl2.style.cssText = 'font-size:7px;color:rgba(255,255,255,0.55);text-align:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
-            lbl2.textContent = c.name;
-            cell.appendChild(img2);
-            cell.appendChild(lbl2);
-            (function(cn) {
-              cell.onclick = function() {
-                if (currentSet.has(cn)) currentSet.delete(cn);
-                else currentSet.add(cn);
-                onChange();
-                renderPickerGrid(srch.value);
-              };
-            }(c.name));
-            pickerGrid.appendChild(cell);
-          });
-        }
-
-        buildRoleBtns();
-        picker.appendChild(roleRow);
-        picker.appendChild(srch);
-        picker.appendChild(pickerGrid);
-        renderPickerGrid('');
-        srch.oninput = function() { renderPickerGrid(this.value); };
-
-        var closeP = document.createElement('button');
-        closeP.textContent = '✕ Готово';
-        closeP.style.cssText = 'margin-top:8px;padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.35);font-size:11px;cursor:pointer;';
-        closeP.onclick = function() { picker.remove(); _activeMatchupPicker = null; };
-        picker.appendChild(closeP);
-
-        afterEl.insertAdjacentElement('afterend', picker);
       }
 
       var strongPicker = makeMatchupPicker('Сильнее против', '⚔', 'strongAgainst');
