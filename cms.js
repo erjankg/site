@@ -2346,9 +2346,12 @@
 
   // ── Admin: открыть редактор категорий ──
   window.cmsOpenCategoriesEditor = function() {
+    var existing = document.getElementById('cmsCatEditorOverlay');
+    if (existing) { existing.remove(); return; }
     var db = firebase.firestore();
 
     var overlay = document.createElement('div');
+    overlay.id = 'cmsCatEditorOverlay';
     overlay.className = 'cms-modal-overlay';
     if (window.innerWidth >= 769) overlay.classList.add('cms-fullscreen-editor');
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };

@@ -2133,6 +2133,8 @@
     }
 
     window.sidebarOpen = function(what) {
+        var _catOverlay = document.getElementById('cmsCatEditorOverlay');
+        if (_catOverlay) _catOverlay.remove();
         var isPc = _isSidebarPc();
         var panel = document.getElementById('sidePanel');
         var sidebarIsOpen = panel && panel.classList.contains('open');

@@ -2128,7 +2128,7 @@
     }
     if (l.status === 'series_done' || l.status === 'closed') {
       stopGameListener();
-      renderSeriesDone(l, pane);
+      replayGame(l.id, null);
       return;
     }
     pane.innerHTML = '<pre style="padding:20px;color:#fff;font-size:11px;">'+escapeHtml(JSON.stringify(l,null,2))+'</pre>';
