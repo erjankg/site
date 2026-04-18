@@ -130,7 +130,7 @@
             'Lee Sin':'LeeSin','Master Yi':'MasterYi','Miss Fortune':'MissFortune',
             'Twisted Fate':'TwistedFate','Xin Zhao':'XinZhao','Nunu & Willump':'Nunu',
             "Cho'Gath":'Chogath',"Vel'Koz":'Velkoz',"Kai'Sa":'Kaisa',"Kha'Zix":'Khazix',"Kog'Maw":'KogMaw',
-            "Rek'Sai":'RekSai','Tahm Kench':'TahmKench','Wukong':'MonkeyKing',
+            "K'Sante":'KSante',"Rek'Sai":'RekSai','Tahm Kench':'TahmKench','Wukong':'MonkeyKing',
             // Shortened WR names
             'M.Fortune':'MissFortune','Tw. Fate':'TwistedFate','Au. Sol':'AurelionSol',
             'Jarvan':'JarvanIV','XinZhao':'XinZhao','KhaZix':'Khazix','KogMaw':'KogMaw',
