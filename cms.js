@@ -1971,7 +1971,9 @@
 
     return {
       group: group,
-      getValue: function() { return textarea.value; }
+      toolbar: toolbar,
+      getValue: function() { return textarea.value; },
+      setValue: function(v) { textarea.value = v; updatePreview(); }
     };
   }
 
@@ -2006,7 +2008,7 @@
       placeholders.push(match);
       return '__PH' + (placeholders.length - 1) + '__';
     });
-    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(protected_text) + '&langpair=ru|en';
+    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(protected_text) + '&langpair=ru|en&de=satyndyeverjanadylbekovich@gmail.com';
     fetch(url)
       .then(function(r) { return r.json(); })
       .then(function(json) {
