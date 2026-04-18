@@ -3458,6 +3458,9 @@
     var _chatListener = null;
     var _chatMessages = [];
     var _allUsers = [];
+    var _chatOpen = false;
+    var _chatLastSeenTs = parseInt(localStorage.getItem('chatLastSeenTs') || '0', 10);
+    var _chatBadgeInitialized = false;
 
     function updateChatUI(loggedIn) {
         var inputArea = document.getElementById('chatInputArea');
@@ -3468,15 +3471,19 @@
 
     // ═══ OPEN / CLOSE ═══
     window.openChatSystem = function() {
+        _chatOpen = true;
         openModal('chatSystemMask');
         updateChatUI(!!_currentUser);
         switchToGlobal();
         loadUsersToSidebar();
         fixMobileKeyboard();
+        clearChatBadge();
     };
     window.openGlobalChat = window.openChatSystem;
 
     window.closeChatSystem = function() {
+        _chatOpen = false;
+        clearChatBadge();
         closeModal('chatSystemMask');
         if (_chatListener) { _chatListener(); _chatListener = null; }
         var sb = document.getElementById('tgSidebar');
@@ -3491,6 +3498,45 @@
         }
     };
     window.closeGlobalChat = window.closeChatSystem;
+
+    // ═══ SIDEBAR CHAT BADGE ═══
+    function getMsgTs(msg) {
+        if (!msg.ts) return 0;
+        return msg.ts.toMillis ? msg.ts.toMillis() : Number(msg.ts);
+    }
+    function clearChatBadge() {
+        var badge = document.getElementById('sidebarChatBadge');
+        if (badge) { badge.style.display = 'none'; badge.textContent = ''; }
+        var lastTs = _chatMessages.length ? getMsgTs(_chatMessages[_chatMessages.length - 1]) : Date.now();
+        _chatLastSeenTs = lastTs;
+        localStorage.setItem('chatLastSeenTs', _chatLastSeenTs);
+    }
+    function updateSidebarChatBadge() {
+        var badge = document.getElementById('sidebarChatBadge');
+        if (!badge) return;
+        if (_chatOpen) { badge.style.display = 'none'; badge.textContent = ''; return; }
+        if (!_chatMessages.length) return;
+        var lastTs = getMsgTs(_chatMessages[_chatMessages.length - 1]);
+        if (!_chatBadgeInitialized) {
+            _chatBadgeInitialized = true;
+            if (!_chatLastSeenTs) {
+                _chatLastSeenTs = lastTs;
+                localStorage.setItem('chatLastSeenTs', _chatLastSeenTs);
+            }
+            // re-check after init
+        }
+        if (lastTs > _chatLastSeenTs) {
+            var unread = 0;
+            _chatMessages.forEach(function(msg) {
+                if (getMsgTs(msg) > _chatLastSeenTs) unread++;
+            });
+            badge.textContent = unread > 9 ? '9+' : String(unread);
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+            badge.textContent = '';
+        }
+    }
 
     // ═══ OPEN GLOBAL CHAT ═══
     function switchToGlobal() {
@@ -3672,6 +3718,7 @@
                 snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; _chatMessages.push(d); });
                 _chatMessages.reverse(); // oldest first for display
                 renderGlobalChat();
+                updateSidebarChatBadge();
             }, function(err) {
                 console.error('Chat listener error:', err);
                 // Reset so startChatListener() can retry next time
