@@ -2067,6 +2067,35 @@
       else win.appendChild(group);
     });
 
+    // Кнопка авто-перевода RU→EN в тулбаре EN-поля
+    if (rtEditors['description_ru'] && rtEditors['description_en']) {
+      var trSep = document.createElement('div');
+      trSep.style.cssText = 'width:1px;background:rgba(255,255,255,0.12);margin:2px 4px;';
+      rtEditors['description_en'].toolbar.appendChild(trSep);
+
+      var btnTr = document.createElement('button');
+      btnTr.type = 'button';
+      btnTr.textContent = '🌐 RU→EN';
+      btnTr.style.cssText = 'background:rgba(30,120,255,0.12);border:1px solid rgba(30,120,255,0.35);'
+        + 'color:#6bb5ff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;cursor:pointer;';
+      btnTr.title = 'Автоперевод RU-описания в EN';
+      btnTr.onclick = function() {
+        var ruText = rtEditors['description_ru'].getValue();
+        if (!ruText || !ruText.trim()) { _showToast('Заполни RU-описание сначала', 'error'); return; }
+        btnTr.disabled = true;
+        btnTr.textContent = '⏳ Перевожу...';
+        _autoTranslateDesc(ruText, function(translated) {
+          if (translated) {
+            rtEditors['description_en'].setValue(translated);
+            _showToast('Перевод готов! ✓', 'success');
+          }
+          btnTr.disabled = false;
+          btnTr.textContent = '🌐 RU→EN';
+        });
+      };
+      rtEditors['description_en'].toolbar.appendChild(btnTr);
+    }
+
     // Перепривязываем кнопку сохранения чтобы захватить richtext значения
     var saveBtn = win.querySelector('.cms-btn-save');
     if (saveBtn) {

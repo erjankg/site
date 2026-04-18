@@ -1938,80 +1938,35 @@
                 return box;
             }
 
-            rightCol.appendChild(makeSection('cdStrongVs', t('⚔ СИЛЁН ПРОТИВ'), '#2ecc71', '39,174,96', 'strongVs', t('⚔ Силён против')));
-            rightCol.appendChild(makeSection('cdWeakVs', t('💀 СЛАБ ПРОТИВ'), '#e74c3c', '231,76,60', 'weakVs', t('💀 Слаб против')));
-            rightCol.appendChild(makeSection('cdCombos', t('🤝 КОМБО'), '#5dade2', '93,173,226', 'combos', t('🤝 Комбо с')));
-
-            // Category-derived matchups (read-only, from champCategories)
+            // Вычисляем авто-чемпов из категорий (доступно в renderMatchups)
+            var _derivedStrong = new Set();
+            var _derivedWeak   = new Set();
+            var _derivedCombo  = new Set();
             (function() {
                 var allCats = window._champCategories || [];
                 if (!allCats.length) return;
                 var champCatsArr = allCats.filter(function(c){ return (c.champions||[]).indexOf(name) !== -1; });
                 if (!champCatsArr.length) return;
-
-                var derivedStrong = new Set();
-                var derivedWeak   = new Set();
-                var derivedCombo  = new Set();
-
                 var _allChampNames = (window._champsRaw || []).map(function(c){ return c.name; });
                 champCatsArr.forEach(function(cat) {
                     (cat.strongAgainst||[]).forEach(function(cn) {
-                        if (_allChampNames.indexOf(cn) !== -1) {
-                            // New format: direct champion name
-                            if (cn !== name) derivedStrong.add(cn);
-                        } else {
-                            // Old format: category name — look up its champions
-                            var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
-                            if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedStrong.add(x); });
-                        }
+                        if (_allChampNames.indexOf(cn) !== -1) { if (cn !== name) _derivedStrong.add(cn); }
+                        else { var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; }); if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) _derivedStrong.add(x); }); }
                     });
                     (cat.weakAgainst||[]).forEach(function(cn) {
-                        if (_allChampNames.indexOf(cn) !== -1) {
-                            if (cn !== name) derivedWeak.add(cn);
-                        } else {
-                            var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
-                            if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedWeak.add(x); });
-                        }
+                        if (_allChampNames.indexOf(cn) !== -1) { if (cn !== name) _derivedWeak.add(cn); }
+                        else { var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; }); if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) _derivedWeak.add(x); }); }
                     });
                     (cat.combo||[]).forEach(function(cn) {
-                        if (_allChampNames.indexOf(cn) !== -1) {
-                            if (cn !== name) derivedCombo.add(cn);
-                        } else {
-                            var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; });
-                            if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) derivedCombo.add(x); });
-                        }
+                        if (_allChampNames.indexOf(cn) !== -1) { if (cn !== name) _derivedCombo.add(cn); }
+                        else { var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; }); if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) _derivedCombo.add(x); }); }
                     });
                 });
-
-                if (!derivedStrong.size && !derivedWeak.size && !derivedCombo.size) return;
-
-                var catBox = document.createElement('div');
-                catBox.style.cssText = 'background:rgba(109,63,245,0.05);border:1px solid rgba(109,63,245,0.2);border-radius:10px;padding:10px;';
-                catBox.innerHTML = '<div style="font-size:10px;color:rgba(109,63,245,0.9);font-weight:800;letter-spacing:0.5px;margin-bottom:8px;">🏷 ' + t('ПО КАТЕГОРИЯМ') + '</div>';
-
-                function makeDerivedRow(label, set, rgb) {
-                    if (!set.size) return;
-                    var row = document.createElement('div');
-                    row.style.marginBottom = '6px';
-                    row.innerHTML = '<div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:4px;">' + label + '</div>';
-                    var chips = document.createElement('div');
-                    chips.style.cssText = 'display:flex;flex-wrap:wrap;gap:3px;';
-                    set.forEach(function(cn) {
-                        var chip = document.createElement('div');
-                        chip.style.cssText = 'display:flex;align-items:center;background:rgba('+rgb+',0.08);border:1px solid rgba('+rgb+',0.2);border-radius:5px;padding:2px 4px;cursor:pointer;';
-                        chip.innerHTML = '<img src="'+champIcon(cn)+'" title="'+cn+'" style="width:24px;height:24px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'">';
-                        chip.title = cn;
-                        chip.onclick = function(){ openChampDetail(cn); };
-                        chips.appendChild(chip);
-                    });
-                    row.appendChild(chips);
-                    catBox.appendChild(row);
-                }
-                makeDerivedRow(t('⚔ Силён против'), derivedStrong, '39,174,96');
-                makeDerivedRow(t('💀 Слаб против'),  derivedWeak,   '231,76,60');
-                makeDerivedRow(t('🤝 Комбо'),        derivedCombo,  '93,173,226');
-                rightCol.appendChild(catBox);
             })();
+
+            rightCol.appendChild(makeSection('cdStrongVs', t('⚔ СИЛЁН ПРОТИВ'), '#2ecc71', '39,174,96', 'strongVs', t('⚔ Силён против')));
+            rightCol.appendChild(makeSection('cdWeakVs', t('💀 СЛАБ ПРОТИВ'), '#e74c3c', '231,76,60', 'weakVs', t('💀 Слаб против')));
+            rightCol.appendChild(makeSection('cdCombos', t('🤝 КОМБО'), '#5dade2', '93,173,226', 'combos', t('🤝 Комбо с')));
 
             function renderMatchups(n) {
                 var sections = [
@@ -2036,6 +1991,17 @@
                         xBtn.textContent = '\u00d7';
                         xBtn.onclick = function(e) { e.stopPropagation(); removeFrom(n, sec.key, cn); renderMatchups(n); };
                         chip.appendChild(xBtn);
+                        el2.appendChild(chip);
+                    });
+                    // Авто-чемпы из категорий (read-only, без ×)
+                    var derivedSet = sec.key === 'strongVs' ? _derivedStrong : sec.key === 'weakVs' ? _derivedWeak : _derivedCombo;
+                    derivedSet.forEach(function(cn) {
+                        if (data.indexOf(cn) !== -1) return; // уже добавлен вручную
+                        var chip = document.createElement('div');
+                        chip.style.cssText = 'display:flex;align-items:center;background:rgba('+sec.bgRgb+',0.07);border:1px solid rgba('+sec.bgRgb+',0.18);border-radius:6px;padding:2px;cursor:pointer;opacity:0.8;';
+                        chip.innerHTML = '<img src="'+champIcon(cn)+'" title="'+cn+'" style="width:29px;height:29px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'">';
+                        chip.title = cn + ' (авто)';
+                        chip.onclick = function(){ openChampDetail(cn); };
                         el2.appendChild(chip);
                     });
                 });
