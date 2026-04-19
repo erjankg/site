@@ -67,7 +67,8 @@
     }
     window.openModal = openModal;
 
-    function closeModal(id) {
+    // skipSidebar=true используется внутри самого sidebar-кода чтобы не вызвать петлю
+    function closeModal(id, skipSidebar) {
         var el = document.getElementById(id);
         if(el) {
             el.classList.remove('active');
@@ -93,7 +94,33 @@
         } else {
             document.body.classList.remove('modal-open');
         }
+
+        // Sidebar: при закрытии основной модалки восстанавливаем sidebar-состояние
+        if(!skipSidebar && _sidebarModalId && id === _sidebarModalId) {
+            if (el) el.classList.remove('side-panel-modal');
+            document.body.classList.remove('pc-chat-mode');
+            document.body.classList.remove('pc-side-mode');
+            _sidebarModalId = null;
+            _sidebarClearActive();
+            if (_pcSideMode) {
+                _pcSideMode = false;
+            } else {
+                setTimeout(function() {
+                    var anyOpen = _modalStack && _modalStack.length > 0;
+                    if(!anyOpen) {
+                        var stillActive = MODAL_IDS.some(function(mid) {
+                            var mel = document.getElementById(mid);
+                            return mel && mel.classList.contains('active');
+                        });
+                        if(!stillActive) {
+                            toggleSidebar();
+                        }
+                    }
+                }, 150);
+            }
+        }
     }
+    window.closeModal = closeModal;
 
     // ── Global fullscreen spinner ──
     function showGlobalSpinner() {
@@ -888,11 +915,11 @@
             if (_el2) _el2.classList.remove('side-panel-modal');
             _sidebarModalId = null;
             _pcSideMode = false;
-            if (_origCloseModal) _origCloseModal(_id);
+            closeModal(_id);
         } else {
             var _chatEl = document.getElementById('chatSystemMask');
             if (_chatEl && _chatEl.classList.contains('active')) {
-                if (_origCloseModal) _origCloseModal('chatSystemMask');
+                closeModal('chatSystemMask', true); // skipSidebar: не реопенить sidebar при его же закрытии
             }
         }
     };
@@ -2174,7 +2201,7 @@
                 var prevEl = document.getElementById(_sidebarModalId);
                 if (prevEl) prevEl.classList.remove('side-panel-modal');
                 document.body.classList.remove('pc-chat-mode');
-                _origCloseModal(_sidebarModalId);
+                closeModal(_sidebarModalId, true); // skipSidebar: переключаем модалку, не реопеним sidebar
             }
             _pcSideMode = true;
             document.body.classList.add('pc-side-mode');
@@ -2199,39 +2226,6 @@
         _sidebarDoOpen(what);
     };
 
-    // Hook into closeModal to reopen sidebar ONLY for main modals
-    var _origCloseModal = closeModal;
-    closeModal = function(id) {
-        _origCloseModal(id);
-        // Only act if closing the MAIN modal that was opened from sidebar
-        if(_sidebarModalId && id === _sidebarModalId) {
-            var el = document.getElementById(id);
-            if (el) el.classList.remove('side-panel-modal');
-            document.body.classList.remove('pc-chat-mode');
-            document.body.classList.remove('pc-side-mode');
-            _sidebarModalId = null;
-            _sidebarClearActive(); // сбрасываем active кнопку при закрытии модалки
-            if (_pcSideMode) {
-                // PC: sidebar stays open, just clear state
-                _pcSideMode = false;
-            } else {
-                // Mobile: reopen sidebar after modal closes
-                setTimeout(function() {
-                    var anyOpen = _modalStack && _modalStack.length > 0;
-                    if(!anyOpen) {
-                        var stillActive = MODAL_IDS.some(function(mid) {
-                            var mel = document.getElementById(mid);
-                            return mel && mel.classList.contains('active');
-                        });
-                        if(!stillActive) {
-                            toggleSidebar();
-                        }
-                    }
-                }, 150);
-            }
-        }
-    };
-    window.closeModal = closeModal;
 
     // PC: инициализируем сайдбар как открытый с самого начала
     (function() {
@@ -3508,8 +3502,6 @@
         fixMobileKeyboard();
         clearChatBadge();
     };
-    window.openGlobalChat = window.openChatSystem;
-
     window.closeChatSystem = function() {
         _chatOpen = false;
         clearChatBadge();
@@ -3526,8 +3518,6 @@
             if (sPanel) sPanel.classList.remove('open');
         }
     };
-    window.closeGlobalChat = window.closeChatSystem;
-
     // ═══ SIDEBAR CHAT BADGE ═══
     function getMsgTs(msg) {
         if (!msg.ts) return 0;

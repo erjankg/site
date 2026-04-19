@@ -39,7 +39,11 @@
     function checkDone() {
       if (loaded.items && loaded.runes && loaded.icons && loaded.sidebar) {
         window._cmsLoaded = true;
-        if (callback) callback();
+        if (window.cmsLoadCategories) {
+          window.cmsLoadCategories(function() { if (callback) callback(); });
+        } else {
+          if (callback) callback();
+        }
       }
     }
 
@@ -2838,14 +2842,4 @@
     document.body.appendChild(overlay);
   };
 
-  // ── Загружаем категории вместе с остальными данными ──
-  var _origCmsLoadData = window.cmsLoadData;
-  window.cmsLoadData = function(callback) {
-    _origCmsLoadData(function() {
-      window.cmsLoadCategories(function() {
-        if (callback) callback();
-      });
-    });
-  };
-
-})();
+})();;
