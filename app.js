@@ -133,7 +133,7 @@
             "K'Sante":'KSante',"Rek'Sai":'RekSai','Tahm Kench':'TahmKench','Wukong':'MonkeyKing',
             // Shortened WR names
             'M.Fortune':'MissFortune','Tw. Fate':'TwistedFate','Au. Sol':'AurelionSol',
-            'Jarvan':'JarvanIV','XinZhao':'XinZhao','KhaZix':'Khazix','KogMaw':'KogMaw',
+            'Jarvan':'JarvanIV','XinZhao':'XinZhao','KhaZix':'Khazix','KogMaw':'KogMaw','Ksante':'KSante',
             'KaiSa':'Kaisa','Morde':'Mordekaiser','Seraph':'Seraphine',
             'Fiddle':'Fiddlesticks','Fiddles':'Fiddlesticks','FiddleSticks':'Fiddlesticks','Fiddlesticks':'Fiddlesticks','Trynda':'Tryndamere','Trynd':'Tryndamere','Trinda':'Tryndamere','Heimer':'Heimerdinger',
             'Mundo':'DrMundo','Nunu':'Nunu',
@@ -234,6 +234,24 @@
         var rk = key==='strongVs' ? 'weakVs' : key==='weakVs' ? 'strongVs' : 'combos';
         if(m[val] && m[val][rk]) m[val][rk] = m[val][rk].filter(function(c){ return c !== name; });
         saveMatchups(m);
+    }
+    // Исключения для авто-чемпов из категорий
+    function getMatchupExclusions() {
+        try { return JSON.parse(localStorage.getItem('matchup_exclusions') || '{}'); } catch(e) { return {}; }
+    }
+    function saveMatchupExclusions(d) {
+        try { localStorage.setItem('matchup_exclusions', JSON.stringify(d)); } catch(e) {}
+    }
+    function addExclusion(champName, key, val) {
+        var d = getMatchupExclusions();
+        if (!d[champName]) d[champName] = {};
+        if (!d[champName][key]) d[champName][key] = [];
+        if (d[champName][key].indexOf(val) === -1) d[champName][key].push(val);
+        saveMatchupExclusions(d);
+    }
+    function isExcluded(champName, key, val) {
+        var d = getMatchupExclusions();
+        return d[champName] && d[champName][key] && d[champName][key].indexOf(val) !== -1;
     } // {champName: {patch, change, type}}
     let selected = new Set();
     let pinned = new Set();
@@ -1827,7 +1845,7 @@
         // Category tags
         if(window._champCategories && window._champCategories.length){
             var champCats=(window._champCategories||[]).filter(function(c){
-                if(c.champStars){var found=false;[1,2,3].forEach(function(s){if(c.champStars[String(s)]===name)found=true;});return found;}
+                if(c.champStars){var found=false;[1,2,3].forEach(function(s){if((c.champStars[String(s)]||[]).indexOf(name)!==-1)found=true;});return found;}
                 return(c.champions||[]).indexOf(name)!==-1;
             });
             if(champCats.length){
@@ -1835,7 +1853,7 @@
                 tagsRow.style.cssText='display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;';
                 champCats.forEach(function(cat){
                     var starLevel=null;
-                    if(cat.champStars){[1,2,3].forEach(function(s){if(cat.champStars[String(s)]===name)starLevel=s;});}
+                    if(cat.champStars){[1,2,3].forEach(function(s){if((cat.champStars[String(s)]||[]).indexOf(name)!==-1)starLevel=s;});}
                     var tag=document.createElement('span');
                     tag.className='champ-cat-tag';
                     var col=cat.color||'#6D3FF5';
@@ -2027,15 +2045,26 @@
                         chip.appendChild(xBtn);
                         el2.appendChild(chip);
                     });
-                    // Авто-чемпы из категорий (read-only, без ×)
+                    // Авто-чемпы из категорий (с возможностью исключить)
                     var derivedSet = sec.key === 'strongVs' ? _derivedStrong : sec.key === 'weakVs' ? _derivedWeak : _derivedCombo;
                     derivedSet.forEach(function(cn) {
                         if (data.indexOf(cn) !== -1) return; // уже добавлен вручную
+                        if (isExcluded(n, sec.key, cn)) return; // исключён пользователем
                         var chip = document.createElement('div');
-                        chip.style.cssText = 'display:flex;align-items:center;background:rgba('+sec.bgRgb+',0.07);border:1px solid rgba('+sec.bgRgb+',0.18);border-radius:6px;padding:2px;cursor:pointer;opacity:0.8;';
-                        chip.innerHTML = '<img src="'+champIcon(cn)+'" title="'+cn+'" style="width:29px;height:29px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'">';
-                        chip.title = cn + ' (авто)';
-                        chip.onclick = function(){ openChampDetail(cn); };
+                        chip.style.cssText = 'display:flex;align-items:center;gap:2px;background:rgba('+sec.bgRgb+',0.07);border:1px solid rgba('+sec.bgRgb+',0.18);border-radius:6px;padding:2px;cursor:pointer;opacity:0.8;';
+                        var img = document.createElement('img');
+                        img.src = champIcon(cn); img.title = cn + ' (авто)';
+                        img.style.cssText = 'width:29px;height:29px;border-radius:4px;object-fit:cover;';
+                        img.onerror = function(){ this.style.display='none'; };
+                        img.onclick = function(e){ e.stopPropagation(); openChampDetail(cn); };
+                        chip.appendChild(img);
+                        var xBtn = document.createElement('span');
+                        xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;line-height:1;';
+                        xBtn.textContent = '\u00d7';
+                        (function(champN, sKey, champVal) {
+                            xBtn.onclick = function(e) { e.stopPropagation(); addExclusion(champN, sKey, champVal); renderMatchups(champN); };
+                        }(n, sec.key, cn));
+                        chip.appendChild(xBtn);
                         el2.appendChild(chip);
                     });
                 });
