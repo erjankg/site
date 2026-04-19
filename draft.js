@@ -304,8 +304,9 @@
         + '</div>';
       wireWaitingRoom(l);
     } else if (l.status === 'series_done' || l.status === 'closed') {
+      stopLobbyListener();
       stopGameListener();
-      replayGame(l.id, null);
+      renderSeriesDone(l, pane);
     } else {
       pane.innerHTML = '<pre style="padding:20px;color:#fff;font-size:11px;">'+escapeHtml(JSON.stringify(l,null,2))+'</pre>';
     }
@@ -1083,6 +1084,7 @@
   // ─── Game state listener ───
   var _unsubGame = null;
   var _currentGame = null;
+  var _currentListenGameKey = null; // lobby.id + '/' + gameId — чтобы не рестартовать лишний раз
   var _timerInterval = null;
   var _hoverLocal = null; // локальное значение hover (для throttle)
   var _hoverWriteTimer = null;
@@ -1090,13 +1092,18 @@
   function stopGameListener() {
     if (_unsubGame) { try { _unsubGame(); } catch(e){} _unsubGame = null; }
     if (_timerInterval) { clearInterval(_timerInterval); _timerInterval = null; }
+    _currentListenGameKey = null;
   }
 
   function listenToCurrentGame(lobby) {
-    stopGameListener();
     var dbInst = _db();
     if (!dbInst || !lobby) return;
     var gameId = String(lobby.currentGame || 1);
+    var key = lobby.id + '/' + gameId;
+    // Не перезапускаем слушатель если уже подписаны на эту игру
+    if (_currentListenGameKey === key && _unsubGame) return;
+    stopGameListener();
+    _currentListenGameKey = key;
     _unsubGame = dbInst.collection('draftLobbies').doc(lobby.id)
       .collection('games').doc(gameId)
       .onSnapshot(function(snap){
@@ -1173,6 +1180,7 @@
 
     if (game.phase === 'done' || game.turnIndex >= SEQ_LEN) {
       if (lobby.status === 'series_done' || lobby.status === 'closed') {
+        stopGameListener(); // серия кончилась — больше не нужен
         renderSeriesDone(lobby, pane);
         return;
       }
@@ -2127,8 +2135,9 @@
       return;
     }
     if (l.status === 'series_done' || l.status === 'closed') {
+      stopLobbyListener(); // серия кончилась — lobby-слушатель больше не нужен, не даём ему перерисовывать
       stopGameListener();
-      replayGame(l.id, null);
+      renderSeriesDone(l, pane);
       return;
     }
     pane.innerHTML = '<pre style="padding:20px;color:#fff;font-size:11px;">'+escapeHtml(JSON.stringify(l,null,2))+'</pre>';
