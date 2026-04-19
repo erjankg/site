@@ -2435,6 +2435,14 @@
     _currentLobbyId = null;
     _currentLobby = null;
     document.body.classList.remove('dcoop-fullscreen');
+    // Restore sidebar open state on PC — renderDraftUi/renderReplay remove the
+    // 'open' class to hide the sidebar during fullscreen draft mode. Without
+    // restoring it, sidebarOpen() thinks the sidebar is closed and opens the
+    // next modal in mobile (full-screen) mode instead of side-panel mode.
+    if (window.matchMedia && window.matchMedia('(min-width: 769px)').matches) {
+      var _sPanel = document.getElementById('sidePanel');
+      if (_sPanel) _sPanel.classList.add('open');
+    }
     var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
   }
 
