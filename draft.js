@@ -289,29 +289,6 @@
     });
   }
 
-  // ─── RENDER LOBBY (router по статусу) ───
-  function renderLobby(l) {
-    var pane = document.getElementById('dcoopPaneLobby');
-    if (!pane) return;
-
-    if (l.status === 'waiting' || l.status === 'ready_check') {
-      renderWaitingRoom(l, pane);
-    } else if (l.status === 'drafting' || l.status === 'paused' || l.status === 'finished_game') {
-      // Этап 3+ подставит UI драфта
-      pane.innerHTML = renderWaitingRoomHtml(l)
-        + '<div style="padding:20px;text-align:center;color:var(--text-faint);border-top:1px solid var(--accent-border-sub);margin-top:20px;">'
-        + '⏳ UI драфта появится в Этапе 3'
-        + '</div>';
-      wireWaitingRoom(l);
-    } else if (l.status === 'series_done' || l.status === 'closed') {
-      stopLobbyListener();
-      stopGameListener();
-      replayGame(l.id, null);
-    } else {
-      pane.innerHTML = '<pre style="padding:20px;color:#fff;font-size:11px;">'+escapeHtml(JSON.stringify(l,null,2))+'</pre>';
-    }
-  }
-
   function renderWaitingRoom(l, pane) {
     // Skip full rerender if nothing visually relevant changed (prevents button jitter)
     var key = [
@@ -2118,9 +2095,8 @@
     });
   }
 
-  // ─── Переопределяем renderLobby: поддержка drafting / finished_game ───
-  // (Старая реализация уже была; расширяем через хук)
-  renderLobby = function(l) {
+  // ─── RENDER LOBBY (router по статусу) ───
+  function renderLobby(l) {
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
     if (l.status === 'waiting' || l.status === 'ready_check') {
@@ -2130,18 +2106,16 @@
     }
     if (l.status === 'drafting' || l.status === 'paused' || l.status === 'finished_game') {
       listenToCurrentGame(l);
-      // UI отрисовывается в onSnapshot игры (renderDraftUi),
-      // который при status='finished_game' + game.winner покажет "между играми".
       return;
     }
     if (l.status === 'series_done' || l.status === 'closed') {
-      stopLobbyListener(); // серия кончилась — lobby-слушатель больше не нужен, не даём ему перерисовывать
+      stopLobbyListener();
       stopGameListener();
-      replayGame(l.id, null); // сразу реплей игры 1, без промежуточного трофейного экрана
+      replayGame(l.id, null);
       return;
     }
     pane.innerHTML = '<pre style="padding:20px;color:#fff;font-size:11px;">'+escapeHtml(JSON.stringify(l,null,2))+'</pre>';
-  };
+  }
 
   // ─── REPLAY (read-only просмотр отдельной игры) ───
   // Кэш: лобби + все игры серии. Сброс при смене лобби или выходе.
