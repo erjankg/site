@@ -306,7 +306,7 @@
     } else if (l.status === 'series_done' || l.status === 'closed') {
       stopLobbyListener();
       stopGameListener();
-      renderSeriesDone(l, pane);
+      replayGame(l.id, null);
     } else {
       pane.innerHTML = '<pre style="padding:20px;color:#fff;font-size:11px;">'+escapeHtml(JSON.stringify(l,null,2))+'</pre>';
     }
@@ -1181,7 +1181,7 @@
     if (game.phase === 'done' || game.turnIndex >= SEQ_LEN) {
       if (lobby.status === 'series_done' || lobby.status === 'closed') {
         stopGameListener(); // серия кончилась — больше не нужен
-        renderSeriesDone(lobby, pane);
+        replayGame(lobby.id, null); // сразу реплей игры 1
         return;
       }
       renderBottomBar(lobby, game);
@@ -2137,64 +2137,11 @@
     if (l.status === 'series_done' || l.status === 'closed') {
       stopLobbyListener(); // серия кончилась — lobby-слушатель больше не нужен, не даём ему перерисовывать
       stopGameListener();
-      renderSeriesDone(l, pane);
+      replayGame(l.id, null); // сразу реплей игры 1, без промежуточного трофейного экрана
       return;
     }
     pane.innerHTML = '<pre style="padding:20px;color:#fff;font-size:11px;">'+escapeHtml(JSON.stringify(l,null,2))+'</pre>';
   };
-
-  function renderSeriesDone(lobby, pane) {
-    var blue = lobby.seriesScore && lobby.seriesScore.blue || 0;
-    var red  = lobby.seriesScore && lobby.seriesScore.red  || 0;
-    var isTie = blue === red;
-    var winnerName = isTie ? 'Ничья' : (blue > red ? (lobby.blueTeamName||'Blue') : (lobby.redTeamName||'Red'));
-    var winnerCol = isTie ? 'var(--text-faint)' : (blue > red ? '#5dade2' : '#e74c3c');
-    var uid = _uid();
-    var isCreator = lobby.createdBy === uid;
-    var deleteBtn = isCreator
-      ? '<button onclick="dcoopDeleteLobby()" style="margin-top:20px;padding:8px 14px;border:1px solid #e74c3c;background:rgba(231,76,60,0.1);color:#e74c3c;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;">🗑 Удалить из истории</button>'
-      : '';
-    pane.innerHTML = ''
-      + '<div style="padding:24px;text-align:center;">'
-      +   '<button onclick="dcoopBackToList()" style="position:absolute;top:12px;left:12px;background:none;border:1px solid var(--accent-border);color:#fff;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;">← К списку</button>'
-      +   '<div style="font-size:56px;margin-bottom:10px;">🏆</div>'
-      +   '<div style="font-size:22px;font-weight:900;color:'+winnerCol+';margin-bottom:8px;">'+escapeHtml(winnerName)+(isTie?'':' победили')+'</div>'
-      +   '<div style="font-size:32px;font-weight:900;margin-bottom:8px;">'
-      +     '<span style="color:#5dade2;">'+blue+'</span><span style="color:var(--text-faint);font-size:20px;"> : </span><span style="color:#e74c3c;">'+red+'</span>'
-      +   '</div>'
-      +   '<div style="color:var(--text-faint);margin-bottom:20px;">'+escapeHtml(lobby.blueTeamName||'Blue')+' vs '+escapeHtml(lobby.redTeamName||'Red')+'</div>'
-      +   '<div id="dcoopGamesList" style="max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:6px;">'
-      +     '<div style="color:var(--text-faint);font-size:11px;">Загрузка списка игр…</div>'
-      +   '</div>'
-      +   deleteBtn
-      + '</div>';
-
-    // Подгружаем список игр серии
-    _db().collection('draftLobbies').doc(lobby.id).collection('games').orderBy('number','asc').get()
-      .then(function(snap){
-        var list = document.getElementById('dcoopGamesList');
-        if (!list) return;
-        if (snap.empty) { list.innerHTML = '<div style="color:var(--text-faint);font-size:11px;">Игр нет</div>'; return; }
-        var rows = [];
-        snap.forEach(function(d){
-          var g = d.data(); g.id = d.id;
-          var winCol = g.winner === 'blue' ? '#5dade2' : (g.winner === 'red' ? '#e74c3c' : 'var(--text-faint)');
-          var winLabel = g.winner === 'blue' ? (lobby.blueTeamName||'Blue')
-                       : (g.winner === 'red' ? (lobby.redTeamName||'Red') : '—');
-          rows.push(''
-            + '<div class="dcoop-game-row" onclick="dcoopReplayGame(\''+lobby.id+'\',\''+g.id+'\')" '
-            +   'style="display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--accent-border-sub);border-radius:8px;cursor:pointer;background:rgba(255,255,255,0.02);">'
-            +   '<div style="font-weight:900;color:#fff;">Игра '+g.number+'</div>'
-            +   '<div style="flex:1;text-align:left;font-size:11px;color:var(--text-faint);">победа: <span style="color:'+winCol+';font-weight:700;">'+escapeHtml(winLabel)+'</span></div>'
-            +   '<div style="font-size:13px;color:var(--accent);">▶</div>'
-            + '</div>');
-        });
-        list.innerHTML = rows.join('');
-      })
-      .catch(function(e){
-        console.warn('[draft] series games list', e);
-      });
-  }
 
   // ─── REPLAY (read-only просмотр отдельной игры) ───
   // Кэш: лобби + все игры серии. Сброс при смене лобби или выходе.
@@ -2286,7 +2233,7 @@
 
     var topBar = ''
       + '<div class="dcoop-replay-topbar">'
-      +   '<button onclick="dcoopSeriesSummary(\''+lobby.id+'\')" class="dcoop-back-btn">← К серии</button>'
+      +   '<button onclick="dcoopBackToList()" class="dcoop-back-btn">← К списку</button>'
       +   '<div class="dcoop-replay-info">'
       +     '<span class="dcoop-replay-title">Игра '+game.number+' · реплей</span>'
       +     '<span class="dcoop-replay-teams">'+escapeHtml(lobby.blueTeamName||'Blue')+' vs '+escapeHtml(lobby.redTeamName||'Red')+'</span>'
@@ -2343,26 +2290,6 @@
   }
 
   window.dcoopReplayGame = replayGame;
-
-  // Показать итоговый экран серии (трофей + список игр) — без перезагрузки из Firestore если данные закэшированы
-  window.dcoopSeriesSummary = function(lobbyId) {
-    var pane = document.getElementById('dcoopPaneLobby');
-    if (!pane) return;
-    if (_replayCache && _replayCache.lobbyId === lobbyId) {
-      renderSeriesDone(_replayCache.lobby, pane);
-      return;
-    }
-    var dbInst = _db();
-    if (!dbInst) return;
-    pane.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-faint);">Загрузка…</div>';
-    dbInst.collection('draftLobbies').doc(lobbyId).get().then(function(snap) {
-      if (!snap.exists) { pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Лобби не найдено</div>'; return; }
-      var l = snap.data(); l.id = snap.id;
-      renderSeriesDone(l, pane);
-    }).catch(function(e) {
-      pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Ошибка: '+escapeHtml(e.message||'')+'</div>';
-    });
-  };
 
   // ─── EXPORTS (draft core) ───
   window.dcoopChampClick = champClick;
