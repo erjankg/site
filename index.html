@@ -842,66 +842,75 @@ Stormarrow: При максимальных зарядах следующая б
     <!-- Tab: Создать лобби -->
     <div id="dcoopPaneCreate" class="dcoop-pane" style="display:none;">
       <form id="dcoopCreateForm" class="dcoop-form" onsubmit="event.preventDefault();dcoopCreateLobby();">
-        <div class="dcoop-field">
-          <label data-i18n="Режим">Режим</label>
-          <div class="dcoop-radio-row">
-            <label><input type="radio" name="dcoopMode" value="normal" checked><span data-i18n="Обычный">Обычный</span></label>
-            <label><input type="radio" name="dcoopMode" value="fearless"><span>Fearless</span></label>
+        <div class="dcoop-form-cols">
+          <!-- Левая колонка: настройки -->
+          <div class="dcoop-form-col">
+            <div class="dcoop-field">
+              <label data-i18n="Режим">Режим</label>
+              <div class="dcoop-radio-row">
+                <label><input type="radio" name="dcoopMode" value="normal" checked><span data-i18n="Обычный">Обычный</span></label>
+                <label><input type="radio" name="dcoopMode" value="fearless"><span>Fearless</span></label>
+              </div>
+            </div>
+            <div class="dcoop-field">
+              <label data-i18n="Серия">Серия</label>
+              <select id="dcoopSeries">
+                <option value="bo1">Bo1</option>
+                <option value="bo3" selected>Bo3</option>
+                <option value="bo5">Bo5</option>
+                <option value="bo7">Bo7</option>
+                <option value="infinite" data-i18n="Бесконечная (только Fearless)">Бесконечная (только Fearless)</option>
+              </select>
+            </div>
+            <div class="dcoop-field">
+              <label data-i18n="Таймер на ход, сек">Таймер на ход, сек</label>
+              <div class="dcoop-radio-row">
+                <label><input type="radio" name="dcoopTimer" value="30"><span>30</span></label>
+                <label><input type="radio" name="dcoopTimer" value="45" checked><span>45</span></label>
+                <label><input type="radio" name="dcoopTimer" value="60"><span>60</span></label>
+              </div>
+            </div>
+            <div class="dcoop-field">
+              <label data-i18n="Моя сторона">Моя сторона</label>
+              <div class="dcoop-radio-row">
+                <label><input type="radio" name="dcoopSide" value="blue" checked><span style="color:#5dade2;" data-i18n="Синие">Синие</span></label>
+                <label><input type="radio" name="dcoopSide" value="red"><span style="color:#e74c3c;" data-i18n="Красные">Красные</span></label>
+              </div>
+            </div>
+          </div>
+          <!-- Правая колонка: команды -->
+          <div class="dcoop-form-col">
+            <div class="dcoop-field">
+              <label data-i18n="Название синей команды">Название синей команды</label>
+              <input type="text" id="dcoopBlueName" maxlength="32" placeholder="Blue Team" data-i18n="Blue Team" data-i18n-attr="placeholder">
+            </div>
+            <div class="dcoop-field">
+              <label data-i18n="Игроки синих (опционально)">Игроки синих (опционально)</label>
+              <div class="dcoop-players">
+                <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="1">
+                <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="2">
+                <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="3">
+                <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="4">
+                <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="5">
+              </div>
+            </div>
+            <div class="dcoop-field">
+              <label data-i18n="Название красной команды">Название красной команды</label>
+              <input type="text" id="dcoopRedName" maxlength="32" placeholder="Red Team" data-i18n="Red Team" data-i18n-attr="placeholder">
+            </div>
+            <div class="dcoop-field">
+              <label data-i18n="Игроки красных (опционально)">Игроки красных (опционально)</label>
+              <div class="dcoop-players">
+                <input type="text" class="dcoop-player-red" maxlength="24" placeholder="1">
+                <input type="text" class="dcoop-player-red" maxlength="24" placeholder="2">
+                <input type="text" class="dcoop-player-red" maxlength="24" placeholder="3">
+                <input type="text" class="dcoop-player-red" maxlength="24" placeholder="4">
+                <input type="text" class="dcoop-player-red" maxlength="24" placeholder="5">
+              </div>
+            </div>
           </div>
         </div>
-        <div class="dcoop-field">
-          <label data-i18n="Серия">Серия</label>
-          <select id="dcoopSeries">
-            <option value="bo1">Bo1</option>
-            <option value="bo3" selected>Bo3</option>
-            <option value="bo5">Bo5</option>
-            <option value="bo7">Bo7</option>
-            <option value="infinite" data-i18n="Бесконечная (только Fearless)">Бесконечная (только Fearless)</option>
-          </select>
-        </div>
-        <div class="dcoop-field">
-          <label data-i18n="Таймер на ход, сек">Таймер на ход, сек</label>
-          <div class="dcoop-radio-row">
-            <label><input type="radio" name="dcoopTimer" value="30"><span>30</span></label>
-            <label><input type="radio" name="dcoopTimer" value="45" checked><span>45</span></label>
-            <label><input type="radio" name="dcoopTimer" value="60"><span>60</span></label>
-          </div>
-        </div>
-        <div class="dcoop-field">
-          <label data-i18n="Моя сторона">Моя сторона</label>
-          <div class="dcoop-radio-row">
-            <label><input type="radio" name="dcoopSide" value="blue" checked><span style="color:#5dade2;" data-i18n="Синие">Синие</span></label>
-            <label><input type="radio" name="dcoopSide" value="red"><span style="color:#e74c3c;" data-i18n="Красные">Красные</span></label>
-          </div>
-        </div>
-        <div class="dcoop-field">
-          <label data-i18n="Название синей команды">Название синей команды</label>
-          <input type="text" id="dcoopBlueName" maxlength="32" placeholder="Blue Team" data-i18n="Blue Team" data-i18n-attr="placeholder">
-        </div>
-        <div class="dcoop-field">
-          <label data-i18n="Название красной команды">Название красной команды</label>
-          <input type="text" id="dcoopRedName" maxlength="32" placeholder="Red Team" data-i18n="Red Team" data-i18n-attr="placeholder">
-        </div>
-        <div class="dcoop-field">
-          <label data-i18n="Игроки синих (опционально)">Игроки синих (опционально)</label>
-          <div class="dcoop-players">
-            <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="1">
-            <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="2">
-            <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="3">
-            <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="4">
-            <input type="text" class="dcoop-player-blue" maxlength="24" placeholder="5">
-          </div>
-        </div>
-        <div class="dcoop-field">
-          <label data-i18n="Игроки красных (опционально)">Игроки красных (опционально)</label>
-          <div class="dcoop-players">
-            <input type="text" class="dcoop-player-red" maxlength="24" placeholder="1">
-            <input type="text" class="dcoop-player-red" maxlength="24" placeholder="2">
-            <input type="text" class="dcoop-player-red" maxlength="24" placeholder="3">
-            <input type="text" class="dcoop-player-red" maxlength="24" placeholder="4">
-            <input type="text" class="dcoop-player-red" maxlength="24" placeholder="5">
-          </div>
-        </div>
+        <!-- Глобальные баны — на всю ширину -->
         <div class="dcoop-field">
           <label>⛔ Глобальные баны серии</label>
           <div id="dcoopGlobalBansPreview" style="display:flex;gap:6px;flex-wrap:wrap;min-height:20px;margin-bottom:8px;"><span style="color:var(--text-faint);font-size:11px;">Не выбрано</span></div>
