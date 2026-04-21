@@ -640,7 +640,11 @@ function t(s) {
 function applyLang() {
     // 1. Update lang button
     var btn = document.getElementById('langLabel');
-    if (btn) btn.textContent = _lang === 'ru' ? 'EN' : 'RU';
+    if (btn) btn.textContent = _lang === 'ru' ? 'RU' : 'EN';
+    var optRu = document.getElementById('langOptRu');
+    var optEn = document.getElementById('langOptEn');
+    if (optRu) optRu.classList.toggle('active', _lang === 'ru');
+    if (optEn) optEn.classList.toggle('active', _lang === 'en');
 
     // 2. html lang attribute
     document.documentElement.lang = _lang === 'ru' ? 'ru' : 'en';
@@ -757,10 +761,39 @@ function toggleLang() {
     applyLang();
 }
 
+function setLang(lang) {
+    _lang = lang;
+    localStorage.setItem('wr_lang', _lang);
+    window._lang = _lang;
+    applyLang();
+    var dd = document.getElementById('langDropdown');
+    if (dd) dd.classList.remove('open');
+}
+
+function openLangDropdown(e) {
+    e.stopPropagation();
+    var dd = document.getElementById('langDropdown');
+    if (!dd) return;
+    var isOpen = dd.classList.contains('open');
+    dd.classList.toggle('open', !isOpen);
+    if (!isOpen) {
+        function _close(ev) {
+            var wrapper = document.getElementById('langWrapper');
+            if (wrapper && !wrapper.contains(ev.target)) {
+                dd.classList.remove('open');
+                document.removeEventListener('click', _close, true);
+            }
+        }
+        setTimeout(function() { document.addEventListener('click', _close, true); }, 0);
+    }
+}
+
 // ═══ EXPORTS ═══
 window.t = t;
 window.applyLang = applyLang;
 window.toggleLang = toggleLang;
+window.setLang = setLang;
+window.openLangDropdown = openLangDropdown;
 window._i18nLang = function() { return _lang; };
 window._lang = _lang;
 window._itemNameEN = _itemName;

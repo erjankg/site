@@ -14,6 +14,7 @@
   var _currentLobbyId = null;
   var _currentLobby = null;
   var _lastWaitingKey = '';
+  var _globalBansList = [];
 
   function _db() {
     if (db) return db;
@@ -198,6 +199,44 @@
       + '</div>';
   }
 
+  // ─── GLOBAL BANS PICKER (create form) ───
+  function renderGlobalBansPreview() {
+    var el = document.getElementById('dcoopGlobalBansPreview');
+    if (!el) return;
+    if (!_globalBansList.length) {
+      el.innerHTML = '<span style="color:var(--text-faint);font-size:11px;">Не выбрано</span>';
+      return;
+    }
+    el.innerHTML = _globalBansList.map(function(n){
+      var img = window._champIcon ? window._champIcon(n) : '';
+      return '<div onclick="dcoopRemoveGlobalBan(\''+encodeURIComponent(n)+'\')" title="'+escapeHtml(n)+' — убрать" style="position:relative;cursor:pointer;width:36px;height:36px;flex-shrink:0;">'
+        + '<img src="'+img+'" style="width:36px;height:36px;border-radius:6px;border:1.5px solid rgba(231,76,60,0.6);" onerror="this.style.display=\'none\'">'
+        + '<div style="position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#e74c3c;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:900;pointer-events:none;">✕</div>'
+        + '</div>';
+    }).join('');
+  }
+
+  window.dcoopOpenGlobalBansPicker = function() {
+    if (!window.openChampPicker) { toast('Загрузка…'); return; }
+    openChampPicker('⛔ Глобальные баны серии', function(c) {
+      if (_globalBansList.indexOf(c.name) === -1) _globalBansList.push(c.name);
+      renderGlobalBansPreview();
+    }, {
+      multi: true,
+      getSelected: function() { return _globalBansList.slice(); },
+      onRemove: function(c) {
+        _globalBansList = _globalBansList.filter(function(n){ return n !== c.name; });
+        renderGlobalBansPreview();
+      }
+    });
+  };
+
+  window.dcoopRemoveGlobalBan = function(nameEncoded) {
+    var name = decodeURIComponent(nameEncoded);
+    _globalBansList = _globalBansList.filter(function(n){ return n !== name; });
+    renderGlobalBansPreview();
+  };
+
   // ─── CREATE LOBBY ───
   function createLobby() {
     var uid = _uid();
@@ -247,10 +286,13 @@
       pausedBy: null,
       shareToken: Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10),
       seriesScore: { blue: 0, red: 0 },
+      globalBans: _globalBansList.slice(),
       creatorSide: mySide
     };
 
     dbInst.collection('draftLobbies').add(lobby).then(function(ref){
+      _globalBansList = [];
+      renderGlobalBansPreview();
       toast('Лобби создано');
       openLobby(ref.id);
     }).catch(function(err){
@@ -299,6 +341,7 @@
       (l.invitedSpectators || []).join(','),
       l.status,
       l.seriesScore ? l.seriesScore.blue + '-' + l.seriesScore.red : '0-0',
+      (l.globalBans || []).join(','),
       l.id
     ].join('|');
     if (key === _lastWaitingKey) { wireWaitingRoom(l); return; }
@@ -377,12 +420,28 @@
       ? '<button onclick="dcoopDeleteLobby()" style="width:100%;margin-top:14px;padding:10px;border:1px solid #e74c3c;background:rgba(231,76,60,0.1);color:#e74c3c;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;">🗑 Удалить лобби</button>'
       : '';
 
+    var globalBansHtml = '';
+    if (l.globalBans && l.globalBans.length) {
+      var gbIcons = l.globalBans.map(function(n){
+        var img = window._champIcon ? window._champIcon(n) : '';
+        return '<div title="'+escapeHtml(n)+'" style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
+          + '<img src="'+img+'" style="width:32px;height:32px;border-radius:6px;border:1.5px solid rgba(231,76,60,0.5);filter:grayscale(1) brightness(0.45);" onerror="this.style.display=\'none\'">'
+          + '<div style="font-size:9px;color:rgba(231,76,60,0.7);max-width:36px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;">'+escapeHtml(n)+'</div>'
+          + '</div>';
+      }).join('');
+      globalBansHtml = '<div style="margin-bottom:12px;padding:10px 12px;background:rgba(231,76,60,0.07);border:1px solid rgba(231,76,60,0.2);border-radius:10px;">'
+        + '<div style="font-size:11px;font-weight:900;color:rgba(231,76,60,0.8);margin-bottom:8px;">⛔ Глобальные баны серии</div>'
+        + '<div style="display:flex;gap:10px;flex-wrap:wrap;">'+gbIcons+'</div>'
+        + '</div>';
+    }
+
     return ''
       + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">'
       +   '<button onclick="dcoopBackToList()" style="background:none;border:1px solid var(--accent-border);color:#fff;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;">← К списку</button>'
       +   '<div style="flex:1;font-size:14px;font-weight:900;color:#fff;">'+escapeHtml(l.blueTeamName || 'Blue')+' vs '+escapeHtml(l.redTeamName || 'Red')+'</div>'
       +   '<div style="font-size:11px;color:var(--text-faint);">'+(l.mode==='fearless'?'Fearless':'Normal')+' · '+(l.seriesType||'bo1').toUpperCase()+' · ⏱'+l.timerSeconds+'с</div>'
       + '</div>'
+      + globalBansHtml
       + '<div class="dcoop-teams-grid">'
       +   teamPanel('blue', l.blueCaptain, l.blueTeamName || 'Blue', l.bluePlayers, l.blueReady)
       +   teamPanel('red',  l.redCaptain,  l.redTeamName  || 'Red',  l.redPlayers,  l.redReady)
@@ -1055,14 +1114,15 @@
     });
   }
 
-  // Чемпионы, недоступные в текущем состоянии (забанены/запикнуты/fearless-lock)
-  function getUnavailable(game, fearlessLock) {
+  // Чемпионы, недоступные в текущем состоянии (забанены/запикнуты/fearless-lock/global-ban)
+  function getUnavailable(game, fearlessLock, globalBans) {
     var set = {};
     (game.bans.blue || []).forEach(function(n){ if (n) set[n] = 'banned'; });
     (game.bans.red  || []).forEach(function(n){ if (n) set[n] = 'banned'; });
     (game.picks.blue || []).forEach(function(p){ if (p && p.champ) set[p.champ] = 'picked'; });
     (game.picks.red  || []).forEach(function(p){ if (p && p.champ) set[p.champ] = 'picked'; });
     (fearlessLock || []).forEach(function(n){ if (!set[n]) set[n] = 'fearless'; });
+    (globalBans || []).forEach(function(n){ if (!set[n]) set[n] = 'global'; });
     return set;
   }
 
@@ -1101,6 +1161,23 @@
       }, function(err){ console.warn('[draft] game listener', err); });
   }
 
+  // ─── Global bans bar (shown during draft) ───
+  function globalBansBarHtml(lobby) {
+    var bans = lobby.globalBans || [];
+    if (!bans.length) return '';
+    var icons = bans.map(function(n){
+      var img = window._champIcon ? window._champIcon(n) : '';
+      return '<div title="'+escapeHtml(n)+'" style="position:relative;width:26px;height:26px;flex-shrink:0;">'
+        + '<img src="'+img+'" style="width:26px;height:26px;border-radius:5px;filter:grayscale(1) brightness(0.3);" onerror="this.style.display=\'none\'">'
+        + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;pointer-events:none;">⛔</div>'
+        + '</div>';
+    }).join('');
+    return '<div style="display:flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(231,76,60,0.07);border-bottom:1px solid rgba(231,76,60,0.18);overflow:hidden;">'
+      + '<span style="font-size:9px;color:rgba(231,76,60,0.75);font-weight:900;white-space:nowrap;letter-spacing:0.4px;flex-shrink:0;">⛔</span>'
+      + '<div style="display:flex;gap:4px;align-items:center;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;">'+icons+'</div>'
+      + '</div>';
+  }
+
   // ─── DRAFT UI RENDER ───
   function renderDraftUi(lobby, game) {
     var pane = document.getElementById('dcoopPaneLobby');
@@ -1130,7 +1207,7 @@
     var step = WR_DRAFT_SEQUENCE[game.turnIndex] || null;
     var myTurn = iAmCaptain && step && step.side === mySide && game.phase !== 'done';
     var fearlessLock = lobby.mode === 'fearless' ? (lobby.usedChampions || []) : [];
-    var unavail = getUnavailable(game, fearlessLock);
+    var unavail = getUnavailable(game, fearlessLock, lobby.globalBans || []);
 
     // Если hover невалиден (ход ушёл / чемп недоступен) — сбрасываем локально
     if (_hoverLocal && (!myTurn || unavail[_hoverLocal])) _hoverLocal = null;
@@ -1138,6 +1215,7 @@
     var isMob = isMobileDraft();
     pane.innerHTML = ''
       + draftHeaderHtml(lobby, game, step, mySide, isCreator)
+      + (isMob ? '' : globalBansBarHtml(lobby))
       + (isMob ? pastGamesHtml(lobby, game) : '')
       + '<div class="dcoop-draft-layout">'
       +   sidePanelHtml('blue', lobby, game, step)
@@ -1533,7 +1611,7 @@
       grid.innerHTML = '<div style="color:var(--text-faint);padding:20px;text-align:center;">Загрузка чемпионов…</div>';
       document.addEventListener('champsLoaded', function once(){
         document.removeEventListener('champsLoaded', once);
-        renderGallery(lobby, game, step, mySide, getUnavailable(game, lobby.mode==='fearless'?lobby.usedChampions||[]:[]));
+        renderGallery(lobby, game, step, mySide, getUnavailable(game, lobby.mode==='fearless'?lobby.usedChampions||[]:[], lobby.globalBans||[]));
       });
       return;
     }
@@ -1558,6 +1636,7 @@
       if (st === 'banned') cls += ' banned';
       else if (st === 'picked') cls += ' picked';
       else if (st === 'fearless') cls += ' fearless-locked';
+      else if (st === 'global') cls += ' global-banned';
       return '<div class="'+cls+'" data-champ="'+escapeHtml(c.name)+'" onclick="dcoopChampClick(\''+encodeURIComponent(c.name)+'\')" title="'+escapeHtml(c.name)+'">'
         +   '<img src="'+c.img+'" alt="'+escapeHtml(c.name)+'" onerror="this.style.display=\'none\'">'
         +   '<div class="dcoop-champ-name">'+escapeHtml(c.name)+'</div>'
@@ -1584,7 +1663,7 @@
     _filterRole = r;
     if (_currentLobby && _currentGame) {
       var fl = _currentLobby.mode==='fearless' ? (_currentLobby.usedChampions||[]) : [];
-      renderGallery(_currentLobby, _currentGame, WR_DRAFT_SEQUENCE[_currentGame.turnIndex], null, getUnavailable(_currentGame, fl));
+      renderGallery(_currentLobby, _currentGame, WR_DRAFT_SEQUENCE[_currentGame.turnIndex], null, getUnavailable(_currentGame, fl, _currentLobby.globalBans||[]));
     }
   }
 
@@ -1592,7 +1671,7 @@
     _filterQuery = v || '';
     if (_currentLobby && _currentGame) {
       var fl = _currentLobby.mode==='fearless' ? (_currentLobby.usedChampions||[]) : [];
-      renderGallery(_currentLobby, _currentGame, WR_DRAFT_SEQUENCE[_currentGame.turnIndex], null, getUnavailable(_currentGame, fl));
+      renderGallery(_currentLobby, _currentGame, WR_DRAFT_SEQUENCE[_currentGame.turnIndex], null, getUnavailable(_currentGame, fl, _currentLobby.globalBans||[]));
     }
   }
 
@@ -1611,7 +1690,7 @@
     if (!step || step.side !== mySide) return;
 
     var fl = l.mode==='fearless' ? (l.usedChampions||[]) : [];
-    var unavail = getUnavailable(g, fl);
+    var unavail = getUnavailable(g, fl, l.globalBans||[]);
     if (unavail[name]) return;
 
     _hoverLocal = name;
@@ -1684,7 +1763,7 @@
     var champ = _hoverLocal;
 
     var fl = l.mode==='fearless' ? (l.usedChampions||[]) : [];
-    if (getUnavailable(g, fl)[champ]) { toast('Недоступен'); return; }
+    if (getUnavailable(g, fl, l.globalBans||[])[champ]) { toast('Недоступен'); return; }
 
     applyLockIn(l, g, step, champ, mySide);
   }
@@ -1809,7 +1888,7 @@
             var pick = g.hover && g.hover[step.side];
             if (!pick) {
               var fl = lobby.mode==='fearless' ? (lobby.usedChampions||[]) : [];
-              var un = getUnavailable(g, fl);
+              var un = getUnavailable(g, fl, lobby.globalBans||[]);
               // Пул в активной роли, иначе fallback на всех
               var role = step.pickIdx != null ? ['Top','Jungle','Mid','ADC','Support'][step.pickIdx] : null;
               var allC = getAllChamps();
@@ -1940,7 +2019,7 @@
     var allyPicks = ((game.picks && game.picks[mySide]) || []).map(function(p){ return p && p.champ; }).filter(Boolean);
     var enemyPicks = ((game.picks && game.picks[enemySide]) || []).map(function(p){ return p && p.champ; }).filter(Boolean);
     var fearlessLock = lobby.mode === 'fearless' ? (lobby.usedChampions || []) : [];
-    var unavail = getUnavailable(game, fearlessLock);
+    var unavail = getUnavailable(game, fearlessLock, lobby.globalBans || []);
 
     var goodMap = {};   // что стоит пикнуть нам
     var dangerMap = {}; // чего ждать/банить/бояться

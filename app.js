@@ -4768,7 +4768,7 @@
         var isDataHidden = user.dataVisible === false;
         if (!isDataHidden || _isAdmin) {
             var copyBtn = document.createElement('button');
-            copyBtn.style.cssText = 'width:100%;padding:8px;border-radius:8px;border:1px solid rgba(46,204,113,0.3);background:rgba(46,204,113,0.08);color:#2ecc71;font-size:11px;font-weight:700;cursor:pointer;';
+            copyBtn.style.cssText = 'display:none;width:100%;padding:8px;border-radius:8px;border:1px solid rgba(46,204,113,0.3);background:rgba(46,204,113,0.08);color:#2ecc71;font-size:11px;font-weight:700;cursor:pointer;';
             copyBtn.textContent = t('📋 Скопировать данные');
             copyBtn.onclick = function(e) {
                 e.stopPropagation();
