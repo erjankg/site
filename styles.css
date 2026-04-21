@@ -863,6 +863,11 @@ height: 100dvh;
 overscroll-behavior: contain;
 touch-action: pan-y;
 }
+/* Пикер чемпионов открывается поверх другой модалки — убираем двойной чёрный слой */
+#champPickerModal {
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(3px);
+}
 
 .m-mask.active {
 display: flex;
@@ -3139,8 +3144,17 @@ select.cms-input { cursor: pointer; }
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-width: 560px;
-  margin: 0 auto;
+}
+.dcoop-form-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.dcoop-form-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 .dcoop-field { display: flex; flex-direction: column; gap: 6px; }
 .dcoop-field > label {
@@ -3222,6 +3236,7 @@ select.cms-input { cursor: pointer; }
 @media (max-width: 560px) {
   .dcoop-win { width: 100vw; height: 100dvh; max-width: none; border-radius: 0; }
   .dcoop-players { grid-template-columns: repeat(2, 1fr); }
+  .dcoop-form-cols { grid-template-columns: 1fr; }
 }
 
 /* ── WAITING ROOM TEAMS GRID ── */
