@@ -437,6 +437,14 @@
     stopGameListener();
     _lastWaitingKey = '';
     document.body.classList.remove('dcoop-fullscreen');
+    // Restore sidebar open state on PC — same as close() does.
+    // renderDraftUi removes the 'open' class for fullscreen mode; without
+    // restoring it, sidebarOpen() thinks sidebar is closed and subsequent
+    // modals open fullscreen instead of side-panel mode.
+    if (window.matchMedia && window.matchMedia('(min-width: 769px)').matches) {
+      var _sPanel = document.getElementById('sidePanel');
+      if (_sPanel) _sPanel.classList.add('open');
+    }
     var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
     _currentLobbyId = null;
     _currentLobby = null;
@@ -1069,7 +1077,9 @@
   function stopGameListener() {
     if (_unsubGame) { try { _unsubGame(); } catch(e){} _unsubGame = null; }
     if (_timerInterval) { clearInterval(_timerInterval); _timerInterval = null; }
+    if (_hoverWriteTimer) { clearTimeout(_hoverWriteTimer); _hoverWriteTimer = null; }
     _currentListenGameKey = null;
+    _hoverLocal = null; // сбрасываем hover при переходе на новую игру
   }
 
   function listenToCurrentGame(lobby) {
@@ -1414,14 +1424,44 @@
       return out;
     }
 
+    // currentBlueSide = кто СЕЙЧАС на синей стороне ('blue' или 'red')
+    // Прошлые игры отображаем так, чтобы пики/баны были на той стороне,
+    // где СЕЙЧАС находится эта команда (relative to current game positions).
+    var currentBlueSide = (game && game.blueSide) || (lobby && lobby.currentGameBlueSide) || 'blue';
+
+    function banSlot(n) {
+      if (!n) return '<div class="dcoop-past-ban empty" title="пусто">✕</div>';
+      var img = window._champIcon ? window._champIcon(n) : '';
+      return '<div class="dcoop-past-ban" title="'+escapeHtml(n)+'"><img src="'+img+'" alt="'+escapeHtml(n)+'" onerror="this.style.display=\'none\'"></div>';
+    }
+
     var rowsHtml = completed.map(function(g){
-      var blue = padRow(g.picksBlue).map(slot).join('');
-      var red  = padRow(g.picksRed ).map(slot).join('');
+      // Если blueSide прошлой игры не совпадает с текущим — свапаем отображение,
+      // чтобы каждая команда всегда была на своей НЫНЕШНЕЙ стороне.
+      var needSwap = (g.blueSide || 'blue') !== currentBlueSide;
+      var bluePicks = padRow(needSwap ? g.picksRed  : g.picksBlue).map(slot).join('');
+      var redPicks  = padRow(needSwap ? g.picksBlue : g.picksRed ).map(slot).join('');
+      var blueBans  = (needSwap ? (g.bansRed  || []) : (g.bansBlue || [])).map(banSlot).join('');
+      var redBans   = (needSwap ? (g.bansBlue || []) : (g.bansRed  || [])).map(banSlot).join('');
+      // Маппим позицию победителя на текущую сторону отображения
+      var winnerPos = g.winner; // 'blue'|'red' (позиция победителя)
+      var winnerDisplay = winnerPos
+        ? (needSwap ? (winnerPos === 'blue' ? 'red' : 'blue') : winnerPos)
+        : null;
+      var divContent = winnerDisplay
+        ? '<span style="color:'+(winnerDisplay==='blue'?'#5dade2':'#e74c3c')+';font-size:9px;line-height:1;">▲</span>'
+        : '';
       return '<div class="dcoop-past-row">'
-        + '<div class="dcoop-past-num">Игра '+g.number+'</div>'
-        + '<div class="dcoop-past-side blue">'+blue+'</div>'
-        + '<div class="dcoop-past-divider"></div>'
-        + '<div class="dcoop-past-side red">'+red+'</div>'
+        + '<div class="dcoop-past-num">G'+g.number+'</div>'
+        + '<div class="dcoop-past-col blue">'
+        +   '<div class="dcoop-past-bans">'+blueBans+'</div>'
+        +   '<div class="dcoop-past-picks">'+bluePicks+'</div>'
+        + '</div>'
+        + '<div class="dcoop-past-divider">'+divContent+'</div>'
+        + '<div class="dcoop-past-col red">'
+        +   '<div class="dcoop-past-picks">'+redPicks+'</div>'
+        +   '<div class="dcoop-past-bans">'+redBans+'</div>'
+        + '</div>'
         + '</div>';
     }).join('');
 
@@ -1562,8 +1602,10 @@
     var l = _currentLobby, g = _currentGame;
     if (!l || !g) return;
     var uid = _uid();
-    var mySide = (l.blueCaptain && l.blueCaptain.uid === uid) ? 'blue'
-               : ((l.redCaptain && l.redCaptain.uid === uid) ? 'red' : null);
+    var roles = sideRoles(l, g);
+    var mySide = null;
+    if (roles.blue.cap && roles.blue.cap.uid === uid) mySide = 'blue';
+    else if (roles.red.cap && roles.red.cap.uid === uid) mySide = 'red';
     if (!mySide) return;
     var step = WR_DRAFT_SEQUENCE[g.turnIndex];
     if (!step || step.side !== mySide) return;
@@ -1831,6 +1873,7 @@
     var completedEntry = {
       number: g.number,
       winner: side,
+      blueSide: g.blueSide || 'blue',
       picksBlue: (g.picks.blue || []).map(function(p){ return p && p.champ ? p.champ : null; }),
       picksRed:  (g.picks.red  || []).map(function(p){ return p && p.champ ? p.champ : null; }),
       bansBlue:  (g.bans.blue  || []).slice(),

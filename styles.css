@@ -3757,15 +3757,30 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
   white-space: nowrap;
   padding-right: 4px;
 }
-.dcoop-past-side { display: flex; gap: 2px; }
-.dcoop-past-side.blue { justify-content: flex-start; }
-.dcoop-past-side.red { justify-content: flex-end; }
-.dcoop-past-divider {
-  width: 2px;
-  height: 22px;
-  background: rgba(255,255,255,0.12);
-  justify-self: center;
+/* Колонка (баны + пики) для одной стороны */
+.dcoop-past-col { display: flex; flex-direction: column; gap: 2px; }
+.dcoop-past-col.blue { align-items: flex-start; }
+.dcoop-past-col.red  { align-items: flex-end; }
+.dcoop-past-bans  { display: flex; gap: 2px; }
+.dcoop-past-picks { display: flex; gap: 2px; }
+/* Слот бана — меньше пика */
+.dcoop-past-ban {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid rgba(255,100,100,0.25);
+  background: rgba(255,255,255,0.04);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 7px;
+  color: rgba(255,255,255,0.2);
 }
+.dcoop-past-ban.empty { color: rgba(255,255,255,0.15); }
+.dcoop-past-ban img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Слот пика */
 .dcoop-past-slot {
   width: 26px;
   height: 26px;
@@ -3776,19 +3791,33 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
 }
 .dcoop-past-slot.empty { background: rgba(255,255,255,0.05); }
 .dcoop-past-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Разделитель */
+.dcoop-past-divider {
+  width: 2px;
+  min-height: 40px;
+  background: rgba(255,255,255,0.12);
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+}
 
 @media (max-width: 760px) {
   .dcoop-past { margin: 4px 6px; }
-  .dcoop-past-slot { width: 22px; height: 22px; }
+  .dcoop-past-slot { width: 20px; height: 20px; }
+  .dcoop-past-ban  { width: 13px; height: 13px; }
   .dcoop-past-num { font-size: 9px; padding-right: 2px; }
-  .dcoop-past-side { gap: 1px; }
   .dcoop-past-row { gap: 3px; }
+  .dcoop-past-col { gap: 1px; }
+  .dcoop-past-bans, .dcoop-past-picks { gap: 1px; }
 }
 @media (min-width: 761px) {
   .dcoop-past-pc { margin: 10px 14px 14px; }
   .dcoop-past-pc .dcoop-past-drawer { display: flex !important; }
-  .dcoop-past-slot { width: 36px; height: 36px; }
-  .dcoop-past-divider { height: 28px; }
+  .dcoop-past-slot { width: 34px; height: 34px; }
+  .dcoop-past-ban  { width: 18px; height: 18px; }
+  .dcoop-past-divider { min-height: 52px; }
 }
 
 /* ─── Spectators dropdown ─── */
