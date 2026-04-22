@@ -1296,15 +1296,17 @@
     var seriesOver = (bScore >= targetWins || rScore >= targetWins) && lobby.seriesType !== 'infinite';
 
     if (!game.winner) {
-      // Ещё не выбрали победителя — показываем кнопки (позиции, с названиями команд)
+      // Ещё не выбрали победителя — показываем кнопки по КОМАНДАМ (не по позиции).
+      // Синяя кнопка = всегда blueTeam (blueCaptain's team), красная = всегда redTeam.
+      // Это гарантирует правильный счёт независимо от свапа сторон.
       var canPickWinner = isCreator || !!myCampTeam;
       if (canPickWinner) {
         bar.innerHTML = ''
           + scoreHtml
           + '<div class="dcoop-bb-label">Игра '+game.number+' · кто победил?</div>'
           + '<div class="dcoop-bb-btns">'
-          +   '<button class="dcoop-bb-btn blue" onclick="dcoopSetWinner(\'blue\')">🔵 '+escapeHtml(roles.blue.teamName)+'</button>'
-          +   '<button class="dcoop-bb-btn red"  onclick="dcoopSetWinner(\'red\')">🔴 '+escapeHtml(roles.red.teamName)+'</button>'
+          +   '<button class="dcoop-bb-btn blue" onclick="dcoopSetWinner(\'blue\')">🔵 '+blueTeamName+'</button>'
+          +   '<button class="dcoop-bb-btn red"  onclick="dcoopSetWinner(\'red\')">🔴 '+redTeamName+'</button>'
           + '</div>';
       } else {
         bar.innerHTML = scoreHtml + '<div class="dcoop-bb-label">Игра '+game.number+' завершена · ждём решения капитанов…</div>';
@@ -1944,15 +1946,17 @@
     }, delay);
   }
 
-  function setWinner(side) {
+  function setWinner(winningTeam) {
+    // winningTeam = 'blue' | 'red' — ИДЕНТИФИКАТОР КОМАНДЫ в лобби, не позиция.
+    // Команда 'blue' = blueCaptain's team, 'red' = redCaptain's team — не меняется при свапах.
     var l = _currentLobby, g = _currentGame;
     if (!l || !g) return;
     // Идемпотентность: не начислять повторно, если winner уже выставлен.
     if (g.winner) return;
     var dbInst = _db();
-    // Маппим позицию (side) → TEAM, учитывая swap сторон.
+    // Вычисляем, на какой ПОЗИЦИИ сейчас стоит выигравшая КОМАНДА (для хранения в game.winner).
     var roles = sideRoles(l, g);
-    var winningTeam = roles[side].team; // 'blue' | 'red'
+    var winningSide = (roles.blue.team === winningTeam) ? 'blue' : 'red';
     var scoreField = 'seriesScore.' + winningTeam;
     var incr = firebase.firestore.FieldValue.increment(1);
     var patch = {}; patch[scoreField] = incr;
@@ -1971,7 +1975,7 @@
     // Денормализация пиков прошлой игры для быстрого отображения в past games
     var completedEntry = {
       number: g.number,
-      winner: side,
+      winner: winningSide,  // позиция победителя (для отображения в past games / replay)
       blueSide: g.blueSide || 'blue',
       picksBlue: (g.picks.blue || []).map(function(p){ return p && p.champ ? p.champ : null; }),
       picksRed:  (g.picks.red  || []).map(function(p){ return p && p.champ ? p.champ : null; }),
@@ -1994,7 +1998,7 @@
 
     var lobbyRef = dbInst.collection('draftLobbies').doc(l.id);
     Promise.all([
-      lobbyRef.collection('games').doc(String(g.number)).update({ winner: side }),
+      lobbyRef.collection('games').doc(String(g.number)).update({ winner: winningSide }),
       lobbyRef.update(patch)
     ]).catch(function(e){ toast('Ошибка: '+e.message); });
   }
