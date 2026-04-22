@@ -3566,7 +3566,7 @@ select.cms-input { cursor: pointer; }
 .dcoop-lock-btn {
   flex-shrink: 0;
   padding: 14px;
-  border: none;
+  border: 2px solid transparent;
   border-radius: 10px;
   background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
   color: #fff;
@@ -3574,7 +3574,11 @@ select.cms-input { cursor: pointer; }
   font-weight: 900;
   cursor: pointer;
   letter-spacing: 1px;
+  transition: opacity 0.2s ease, transform 0.15s ease, background 0.2s ease,
+              border-color 0.2s ease, box-shadow 0.2s ease;
 }
+.dcoop-lock-btn:not(:disabled):hover  { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46,204,113,0.35); }
+.dcoop-lock-btn:not(:disabled):active { transform: scale(0.97); }
 .dcoop-lock-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .dcoop-lock-hint {
   flex-shrink: 0;
@@ -4430,3 +4434,199 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
 }
 .cms-cat-matchup-chip.active { color: #fff; }
 
+
+/* ══════════════════════════════════════════
+   📰 CHANGES FEED
+   ══════════════════════════════════════════ */
+
+/* Панель — используем стандартный m-win, но с кастомным layout */
+.changes-win {
+  width: 96vw;
+  max-width: 680px;
+  height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+.changes-win .mhdr {
+  flex-shrink: 0;
+}
+.changes-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Карточка записи */
+.cf-card {
+  position: relative;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.cf-card-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 7px;
+}
+.cf-type-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+.cf-patch-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #f1c40f;
+  background: rgba(241,196,15,0.12);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+.cf-date {
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  margin-left: auto;
+}
+.cf-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 5px;
+  line-height: 1.3;
+}
+.cf-card-text {
+  font-size: 12px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.55;
+}
+
+/* Список изменений чемпионов */
+.cf-champ-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 6px;
+}
+.cf-champ-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  font-size: 12px;
+}
+.cf-champ-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.cf-champ-name {
+  color: #fff;
+  font-weight: 600;
+  min-width: 80px;
+  flex-shrink: 0;
+}
+.cf-champ-change {
+  color: rgba(255,255,255,0.5);
+  line-height: 1.4;
+}
+
+/* Admin кнопки внутри карточки */
+.cf-admin-btns {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+}
+.cf-admin-btns button {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+.cf-admin-btns button:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+/* Кнопка добавить (Admin) */
+.cf-add-btn {
+  background: rgba(109,63,245,0.1);
+  border: 1.5px dashed rgba(109,63,245,0.4);
+  color: var(--accent-light);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s;
+  margin-bottom: 4px;
+}
+.cf-add-btn:hover {
+  background: rgba(109,63,245,0.18);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* Empty state */
+.cf-empty {
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 14px;
+  padding: 40px 20px;
+  line-height: 1.8;
+}
+.changes-loading {
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 13px;
+  padding: 40px 0;
+}
+
+/* Кнопка сайдбара */
+.side-btn-changes {
+  position: relative;
+}
+
+/* Бейдж — красный кружок на кнопке сайдбара */
+#sidebarChangesBadge {
+  background: #e74c3c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* PC: changes panel — та же ширина что и другие side panels */
+@media (min-width: 769px) {
+  body.pc-side-mode #changesMask.active {
+    left: 240px !important;
+    width: calc(100% - 240px) !important;
+  }
+  .changes-win {
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  }
+}
