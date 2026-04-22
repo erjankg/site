@@ -1222,7 +1222,7 @@
       +   '<div class="dcoop-gallery-col">'
       +     gallerySearchHtml()
       +     '<div id="dcoopGallery" class="dcoop-gallery"></div>'
-      +     lockInBtnHtml(myTurn, game, step)
+      +     lockInBtnHtml(myTurn, game, step, mySide, iAmCaptain)
       +   '</div>'
       +   sidePanelHtml('red', lobby, game, step)
       + '</div>'
@@ -1591,8 +1591,19 @@
       + '</div>';
   }
 
-  function lockInBtnHtml(myTurn, game, step) {
+  function lockInBtnHtml(myTurn, game, step, mySide, iAmCaptain) {
     if (game.phase === 'done') return '';
+    // Оба кэпа ещё не нажали "Готов" — показываем кнопку готовности вместо Lock In
+    if (!game.readyBlue || !game.readyRed) {
+      if (iAmCaptain) {
+        var myReady = mySide === 'blue' ? !!game.readyBlue : !!game.readyRed;
+        if (myReady) {
+          return '<button class="dcoop-lock-btn" disabled style="background:rgba(46,204,113,0.18);color:#2ecc71;border-color:#2ecc71;cursor:default;">✓ Готов — ждём соперника…</button>';
+        }
+        return '<button id="dcoopDraftReadyBtn" class="dcoop-lock-btn" onclick="dcoopDraftCapReady()" style="background:#2ecc71;color:#000;border-color:#2ecc71;">✅ Готов</button>';
+      }
+      return '<div class="dcoop-lock-hint">Ждём готовности капитанов…</div>';
+    }
     if (!myTurn) return '<div class="dcoop-lock-hint">Ход соперника…</div>';
     return '<button id="dcoopLockIn" class="dcoop-lock-btn" onclick="dcoopLockIn()" disabled>🔒 LOCK IN</button>';
   }
@@ -1818,6 +1829,8 @@
     var tEl = document.getElementById('dcoopTimer');
     if (!tEl) return;
     if (!step || game.phase === 'done') { tEl.textContent = '—'; return; }
+    // Не тикаем пока оба капитана не нажали "Готов"
+    if (!game.readyBlue || !game.readyRed) { tEl.textContent = '—'; return; }
 
     var total = lobby.timerSeconds || 45;
     var startMs = (game.turnStartedAt && game.turnStartedAt.toMillis) ? game.turnStartedAt.toMillis() : Date.now();
@@ -2190,7 +2203,9 @@
       turnIndex: 0,
       currentSide: 'blue',
       currentAction: 'ban',
-      turnStartedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      turnStartedAt: null, // запустится когда оба кэпа нажмут "Готов" в драфте
+      readyBlue: false,
+      readyRed: false,
       bans: { blue: [null,null,null,null,null], red: [null,null,null,null,null] },
       picks: { blue: [], red: [] },
       hover: { blue: null, red: null },
@@ -2387,6 +2402,44 @@
 
   window.dcoopReplayGame = replayGame;
 
+  // ─── DRAFT CAP READY (замена Lock In до старта таймера) ───
+  function draftCapReady() {
+    var l = _currentLobby, g = _currentGame;
+    if (!l || !g) return;
+    var uid = _uid();
+    var isBlue = l.blueCaptain && l.blueCaptain.uid === uid;
+    var isRed  = l.redCaptain  && l.redCaptain.uid  === uid;
+    if (!isBlue && !isRed) return;
+
+    // Disable кнопку сразу чтобы не нажали дважды
+    var btn = document.getElementById('dcoopDraftReadyBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+    var dbInst = _db();
+    var gameRef = dbInst.collection('draftLobbies').doc(l.id)
+      .collection('games').doc(String(g.number));
+
+    dbInst.runTransaction(function(tx) {
+      return tx.get(gameRef).then(function(snap) {
+        if (!snap.exists) return;
+        var data = snap.data();
+        var patch = {};
+        if (isBlue) patch.readyBlue = true;
+        if (isRed)  patch.readyRed  = true;
+
+        var newBlue = isBlue ? true : !!data.readyBlue;
+        var newRed  = isRed  ? true : !!data.readyRed;
+
+        // Когда оба готовы — стартуем таймер
+        if (newBlue && newRed) {
+          patch.turnStartedAt = firebase.firestore.FieldValue.serverTimestamp();
+        }
+        tx.update(gameRef, patch);
+      });
+    }).catch(function(e) { toast('Ошибка: ' + e.message); });
+  }
+  window.dcoopDraftCapReady = draftCapReady;
+
   // ─── EXPORTS (draft core) ───
   window.dcoopChampClick = champClick;
   window.dcoopLockIn = lockIn;
@@ -2415,7 +2468,9 @@
       turnIndex: 0,
       currentSide: 'blue',
       currentAction: 'ban',
-      turnStartedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      turnStartedAt: null, // запустится когда оба кэпа нажмут "Готов" в драфте
+      readyBlue: false,
+      readyRed: false,
       bans: { blue: [null,null,null,null,null], red: [null,null,null,null,null] },
       picks: { blue: [], red: [] },
       hover: { blue: null, red: null },

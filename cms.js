@@ -34,14 +34,23 @@
 
   window.cmsLoadData = function(callback) {
     var db = firebase.firestore();
-    var loaded = { items: false, runes: false, icons: false, sidebar: false };
+    var loaded = { items: false, runes: false, icons: false, sidebar: false, texts: false };
 
     function checkDone() {
-      if (loaded.items && loaded.runes && loaded.icons && loaded.sidebar) {
+      if (loaded.items && loaded.runes && loaded.icons && loaded.sidebar && loaded.texts) {
         window._cmsLoaded = true;
         if (window.cmsLoadCategories) {
-          window.cmsLoadCategories(function() { if (callback) callback(); });
+          window.cmsLoadCategories(function() {
+            // Применяем misc-тексты после полного рендера DOM
+            setTimeout(function() {
+              if (window._siteTexts && window.cmsApplyAllSiteTexts) window.cmsApplyAllSiteTexts();
+            }, 200);
+            if (callback) callback();
+          });
         } else {
+          setTimeout(function() {
+            if (window._siteTexts && window.cmsApplyAllSiteTexts) window.cmsApplyAllSiteTexts();
+          }, 200);
           if (callback) callback();
         }
       }
@@ -91,6 +100,15 @@
         checkDone();
       })
       .catch(function() { loaded.sidebar = true; checkDone(); });
+
+    // Загрузка глобальных текстов
+    db.collection('siteConfig').doc('texts').get()
+      .then(function(doc) {
+        window._siteTexts = doc.exists ? doc.data() : {};
+        loaded.texts = true;
+        checkDone();
+      })
+      .catch(function() { window._siteTexts = {}; loaded.texts = true; checkDone(); });
 
     // Загрузка предметов
     db.collection('items').get()
@@ -183,14 +201,29 @@
       // Заголовок секции
       var label = document.createElement('div');
       label.className = 'items-section-label';
+      label.setAttribute('data-cat-id', cat.id);
       if (cat.id === 'enchants') label.style.marginTop = '16px';
-      label.textContent = (typeof t === 'function' && localStorage.getItem('wr_lang') === 'en') ? cat.labelEn : cat.label;
+      // Применяем сохранённые тексты если есть
+      var _savedCatText = window._siteTexts && window._siteTexts.itemCats && window._siteTexts.itemCats[cat.id];
+      var _catLang = localStorage.getItem('wr_lang') || 'ru';
+      if (_savedCatText) {
+        label.textContent = _catLang === 'en' ? (_savedCatText.en || cat.labelEn) : _savedCatText.ru;
+        if (_savedCatText.color) label.style.color = _savedCatText.color;
+      } else {
+        label.textContent = (typeof t === 'function' && _catLang === 'en') ? cat.labelEn : cat.label;
+      }
       container.appendChild(label);
 
       if (cat.id === 'enchants') {
         var sub = document.createElement('div');
         sub.className = 'items-section-sublabel';
-        sub.textContent = (typeof t === 'function') ? t('Можно добавить к любым ботинкам') : 'Можно добавить к любым ботинкам';
+        var _encSaved = window._siteTexts && window._siteTexts.misc && window._siteTexts.misc.enchantsSubLabel;
+        var _encLang = localStorage.getItem('wr_lang') || 'ru';
+        if (_encSaved) {
+          sub.textContent = _encLang === 'en' ? (_encSaved.en || _encSaved.ru) : _encSaved.ru;
+        } else {
+          sub.textContent = (typeof t === 'function') ? t('Можно добавить к любым ботинкам') : 'Можно добавить к любым ботинкам';
+        }
         container.appendChild(sub);
       }
 
@@ -292,9 +325,18 @@
       // Заголовок секции
       var section = document.createElement('div');
       section.className = 'side-section';
+      section.setAttribute('data-tree-id', tree.id);
       section.style.cssText = 'padding:0;margin:' + (tree.id === 'keystone' ? '0 0 8px' : '16px 0 8px') + ';';
-      if (tree.color) section.style.color = tree.color;
-      section.textContent = (typeof t === 'function' && localStorage.getItem('wr_lang') === 'en') ? tree.labelEn : tree.label;
+      // Применяем сохранённые тексты если есть
+      var _savedTreeText = window._siteTexts && window._siteTexts.runeTrees && window._siteTexts.runeTrees[tree.id];
+      var _treeLang = localStorage.getItem('wr_lang') || 'ru';
+      if (_savedTreeText) {
+        section.textContent = _treeLang === 'en' ? (_savedTreeText.en || tree.labelEn) : _savedTreeText.ru;
+        section.style.color = _savedTreeText.color !== undefined ? _savedTreeText.color : (tree.color || '');
+      } else {
+        if (tree.color) section.style.color = tree.color;
+        section.textContent = (typeof t === 'function' && _treeLang === 'en') ? tree.labelEn : tree.label;
+      }
       container.appendChild(section);
 
       // Grid
@@ -2169,15 +2211,27 @@
       + '<input id="cmsIconUrl" class="cms-input" placeholder="https://..." style="margin:0;"></div>'
       + '<button onclick="cmsAddIcon()" class="cms-btn-save" style="margin:0;padding:8px 14px;">+ Добавить</button>'
       + '</div>'
+      + '<div id="cmsIconUploadRow" style="margin-top:8px;display:flex;align-items:center;gap:8px;"></div>'
       + '<div id="cmsIconPreview" style="margin-top:8px;min-height:28px;"></div>'
       + '</div>';
 
     overlay.appendChild(win);
     document.body.appendChild(overlay);
 
-    // Preview URL при вводе
+    // Кнопка загрузки файла
+    var uploadRow = win.querySelector('#cmsIconUploadRow');
     var urlInput = win.querySelector('#cmsIconUrl');
     var previewDiv = win.querySelector('#cmsIconPreview');
+    if (window.cmsCreateUploadButton) {
+      var uploadWidget = window.cmsCreateUploadButton(urlInput, 'icons');
+      var lbl = document.createElement('span');
+      lbl.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.35);';
+      lbl.textContent = 'или загрузить файл:';
+      uploadRow.appendChild(lbl);
+      uploadRow.appendChild(uploadWidget);
+    }
+
+    // Preview URL при вводе
     urlInput.addEventListener('input', function() {
       var url = urlInput.value.trim();
       if (url) previewDiv.innerHTML = '<img src="' + url + '" style="height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display=\'none\'">';
@@ -2840,6 +2894,348 @@
     win.appendChild(body);
     overlay.appendChild(win);
     document.body.appendChild(overlay);
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // 📝 GLOBAL TEXTS EDITOR — редактирование любых текстов сайта
+  // Хранение: siteConfig/texts в Firestore
+  // Структура: { itemCats: {physical:{label,labelEn,color},...}, runeTrees: {...}, misc: {...} }
+  // ═══════════════════════════════════════════════════════════════
+
+  // Схема всех редактируемых текстов
+  var _TEXTS_SCHEMA = [
+    {
+      section: 'Категории предметов',
+      key: 'itemCats',
+      icon: '⚔',
+      entries: [
+        { id: 'physical',  label: 'Физические',    defaultRu: '⚔ Физические',    defaultEn: '⚔ Physical' },
+        { id: 'magic',     label: 'Магические',     defaultRu: '🔮 Магические',   defaultEn: '🔮 Magic' },
+        { id: 'defensive', label: 'Защитные',       defaultRu: '🛡 Защитные',     defaultEn: '🛡 Defensive' },
+        { id: 'support',   label: 'Поддержка',      defaultRu: '💛 Поддержка',    defaultEn: '💛 Support' },
+        { id: 'boots',     label: 'Ботинки',        defaultRu: '👟 Ботинки',      defaultEn: '👟 Boots' },
+        { id: 'enchants',  label: 'Зачарования',    defaultRu: '✨ Зачарования ботинок', defaultEn: '✨ Boot Enchants' }
+      ]
+    },
+    {
+      section: 'Деревья рун',
+      key: 'runeTrees',
+      icon: '🔮',
+      entries: [
+        { id: 'keystone',    label: 'Основные',    defaultRu: '⭐ ОСНОВНЫЕ РУНЫ', defaultEn: '⭐ KEYSTONE RUNES', defaultColor: '' },
+        { id: 'domination',  label: 'Доминация',   defaultRu: '🔴 ДОМИНАЦИЯ',    defaultEn: '🔴 DOMINATION',    defaultColor: '#e74c3c' },
+        { id: 'precision',   label: 'Точность',    defaultRu: '🟡 ТОЧНОСТЬ',     defaultEn: '🟡 PRECISION',     defaultColor: '#f1c40f' },
+        { id: 'resolve',     label: 'Стойкость',   defaultRu: '🟢 СТОЙКОСТЬ',    defaultEn: '🟢 RESOLVE',       defaultColor: '#2ecc71' },
+        { id: 'inspiration', label: 'Вдохновение', defaultRu: '🔵 ВДОХНОВЕНИЕ',  defaultEn: '🔵 INSPIRATION',   defaultColor: '#5dade2' }
+      ]
+    },
+    {
+      section: 'Разное',
+      key: 'misc',
+      icon: '🔤',
+      entries: [
+        { id: 'enchantsSubLabel', label: 'Подпись зачарований', defaultRu: 'Можно добавить к любым ботинкам', defaultEn: 'Can be added to any boots' },
+        { id: 'headerTitle',      label: 'Название сайта (логотип)', defaultRu: 'PRO-WILDRIFT', defaultEn: 'PRO-WILDRIFT' },
+        { id: 'viewBtnMain',      label: 'Кнопка хедера: Stats',     defaultRu: 'Stats', defaultEn: 'Stats' },
+        { id: 'viewBtnWrpr',      label: 'Кнопка хедера: WinRate',   defaultRu: 'WinRate', defaultEn: 'WinRate' },
+        { id: 'patchBadge',       label: 'Патч-бейдж',               defaultRu: 'Patch 7.0f', defaultEn: 'Patch 7.0f' }
+      ]
+    }
+  ];
+
+  window.cmsOpenTextsEditor = function() {
+    var db = firebase.firestore();
+    var overlay = document.createElement('div');
+    overlay.className = 'cms-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var win = document.createElement('div');
+    win.className = 'cms-modal-win';
+    win.style.cssText = 'max-width:680px;max-height:90vh;display:flex;flex-direction:column;padding:0;';
+
+    // Header
+    var hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;';
+    hdr.innerHTML = '<h3 style="margin:0;color:#fff;font-size:18px;">📝 Тексты сайта</h3>'
+      + '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>';
+    win.appendChild(hdr);
+
+    // Scrollable body
+    var body = document.createElement('div');
+    body.style.cssText = 'flex:1;overflow-y:auto;padding:16px 20px;';
+
+    var saved = window._siteTexts || {};
+    var inputs = {}; // inputs[sectionKey][entryId] = {ru, en, color}
+
+    _TEXTS_SCHEMA.forEach(function(sec) {
+      var secDiv = document.createElement('div');
+      secDiv.style.marginBottom = '24px';
+
+      var secLabel = document.createElement('div');
+      secLabel.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.06);';
+      secLabel.textContent = sec.icon + ' ' + sec.section;
+      secDiv.appendChild(secLabel);
+
+      var savedSec = saved[sec.key] || {};
+      inputs[sec.key] = {};
+
+      sec.entries.forEach(function(entry) {
+        var savedEntry = savedSec[entry.id] || {};
+        var row = document.createElement('div');
+        row.style.cssText = 'display:grid;gap:6px;margin-bottom:12px;padding:10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);';
+
+        // Entry name
+        var entryLbl = document.createElement('div');
+        entryLbl.style.cssText = 'font-size:10px;font-weight:700;color:rgba(255,255,255,0.4);margin-bottom:2px;';
+        entryLbl.textContent = entry.label;
+        row.appendChild(entryLbl);
+
+        // RU input
+        var ruWrap = _makeTextInputWithIconPicker('RU', savedEntry.ru || entry.defaultRu || '');
+        row.appendChild(ruWrap.wrap);
+
+        // EN input
+        var enWrap = _makeTextInputWithIconPicker('EN', savedEntry.en || entry.defaultEn || '');
+        row.appendChild(enWrap.wrap);
+
+        // Color picker row (если есть defaultColor или для runeTrees)
+        var colorPicker = null;
+        var colorWrap = document.createElement('div');
+        colorWrap.style.cssText = 'display:flex;align-items:center;gap:8px;';
+        var colorLbl = document.createElement('span');
+        colorLbl.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.4);min-width:40px;';
+        colorLbl.textContent = 'Цвет:';
+        colorWrap.appendChild(colorLbl);
+        colorPicker = document.createElement('input');
+        colorPicker.type = 'color';
+        colorPicker.value = savedEntry.color || entry.defaultColor || '#ffffff';
+        colorPicker.style.cssText = 'width:32px;height:28px;padding:0;border:1px solid rgba(255,255,255,0.2);border-radius:6px;cursor:pointer;background:transparent;';
+        colorPicker.title = 'Цвет текста';
+        colorWrap.appendChild(colorPicker);
+        var colorPreview = document.createElement('span');
+        colorPreview.style.cssText = 'font-size:12px;font-weight:700;';
+        colorPreview.style.color = colorPicker.value;
+        colorPreview.textContent = 'Предпросмотр ' + entry.label;
+        colorPicker.addEventListener('input', function() {
+          colorPreview.style.color = colorPicker.value;
+        });
+        colorWrap.appendChild(colorPreview);
+        row.appendChild(colorWrap);
+
+        inputs[sec.key][entry.id] = {
+          getRu: ruWrap.getValue,
+          getEn: enWrap.getValue,
+          getColor: function() { return colorPicker.value; }
+        };
+
+        secDiv.appendChild(row);
+      });
+
+      body.appendChild(secDiv);
+    });
+
+    win.appendChild(body);
+
+    // Footer: save button
+    var footer = document.createElement('div');
+    footer.style.cssText = 'padding:14px 20px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0;display:flex;gap:10px;';
+
+    var saveBtn = document.createElement('button');
+    saveBtn.className = 'cms-btn-save';
+    saveBtn.textContent = '💾 Сохранить все тексты';
+    saveBtn.onclick = function() {
+      var newData = {};
+      _TEXTS_SCHEMA.forEach(function(sec) {
+        newData[sec.key] = {};
+        sec.entries.forEach(function(entry) {
+          var inp = inputs[sec.key][entry.id];
+          newData[sec.key][entry.id] = {
+            ru: inp.getRu(),
+            en: inp.getEn(),
+            color: inp.getColor()
+          };
+        });
+      });
+      saveBtn.textContent = '⏳ Сохраняю...';
+      saveBtn.disabled = true;
+      db.collection('siteConfig').doc('texts').set(newData)
+        .then(function() {
+          window._siteTexts = newData;
+          _applyAllSiteTexts(newData);
+          _showToast('Тексты сохранены!', 'success');
+          saveBtn.textContent = '💾 Сохранить все тексты';
+          saveBtn.disabled = false;
+        })
+        .catch(function(err) {
+          _showToast('Ошибка: ' + err.message, 'error');
+          saveBtn.textContent = '💾 Сохранить все тексты';
+          saveBtn.disabled = false;
+        });
+    };
+    footer.appendChild(saveBtn);
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'cms-btn-cancel';
+    cancelBtn.textContent = 'Закрыть';
+    cancelBtn.onclick = function() { overlay.remove(); };
+    footer.appendChild(cancelBtn);
+
+    win.appendChild(footer);
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+  };
+
+  // Хелпер: input с кнопками вставки иконки
+  function _makeTextInputWithIconPicker(lang, value) {
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;gap:3px;';
+
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;';
+
+    var lbl = document.createElement('span');
+    lbl.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.3);min-width:20px;';
+    lbl.textContent = lang + ':';
+    row.appendChild(lbl);
+
+    var inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'cms-input';
+    inp.value = value || '';
+    inp.style.cssText = 'margin:0;flex:1;';
+    row.appendChild(inp);
+
+    // Иконки кнопки
+    var icons = window._siteIcons || {};
+    var iconNames = Object.keys(icons);
+    if (iconNames.length > 0) {
+      var iconsRow = document.createElement('div');
+      iconsRow.style.cssText = 'display:flex;flex-wrap:wrap;gap:3px;padding-left:26px;';
+      iconNames.forEach(function(name) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.cssText = 'background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);'
+          + 'padding:2px 5px;border-radius:5px;cursor:pointer;display:inline-flex;align-items:center;gap:3px;';
+        btn.title = 'Вставить [icon:' + name + ']';
+        var img = document.createElement('img');
+        img.src = icons[name];
+        img.style.cssText = 'height:14px;vertical-align:middle;';
+        img.onerror = function() { btn.textContent = name; };
+        btn.appendChild(img);
+        btn.onclick = function() {
+          var pos = inp.selectionStart || inp.value.length;
+          var tag = '[icon:' + name + ']';
+          inp.value = inp.value.slice(0, pos) + tag + inp.value.slice(pos);
+          inp.focus();
+          inp.setSelectionRange(pos + tag.length, pos + tag.length);
+        };
+        iconsRow.appendChild(btn);
+      });
+      wrap.appendChild(row);
+      wrap.appendChild(iconsRow);
+    } else {
+      wrap.appendChild(row);
+    }
+
+    return {
+      wrap: wrap,
+      getValue: function() { return inp.value.trim(); }
+    };
+  }
+
+  // Применить тексты из Firestore к DOM
+  function _applyAllSiteTexts(data) {
+    if (!data) return;
+    var lang = localStorage.getItem('wr_lang') || 'ru';
+
+    // Категории предметов (ITEM_CATEGORIES — обновляем массив + перерисовываем если открыто)
+    if (data.itemCats) {
+      ITEM_CATEGORIES.forEach(function(cat) {
+        var saved = data.itemCats[cat.id];
+        if (!saved) return;
+        if (saved.ru) cat.label = saved.ru;
+        if (saved.en) cat.labelEn = saved.en;
+        if (saved.color) cat._color = saved.color;
+      });
+      // Перерисовываем секционные лейблы в DOM если предметы открыты
+      document.querySelectorAll('.items-section-label').forEach(function(el) {
+        var catId = el.getAttribute('data-cat-id');
+        if (!catId) return;
+        var saved = data.itemCats[catId];
+        if (!saved) return;
+        var text = lang === 'en' ? (saved.en || saved.ru) : saved.ru;
+        if (text) el.textContent = text;
+        if (saved.color) el.style.color = saved.color;
+      });
+    }
+
+    // Деревья рун
+    if (data.runeTrees) {
+      RUNE_TREES.forEach(function(tree) {
+        var saved = data.runeTrees[tree.id];
+        if (!saved) return;
+        if (saved.ru) tree.label = saved.ru;
+        if (saved.en) tree.labelEn = saved.en;
+        if (saved.color !== undefined) tree.color = saved.color || '';
+      });
+      document.querySelectorAll('.side-section[data-tree-id]').forEach(function(el) {
+        var treeId = el.getAttribute('data-tree-id');
+        var saved = data.runeTrees[treeId];
+        if (!saved) return;
+        var text = lang === 'en' ? (saved.en || saved.ru) : saved.ru;
+        if (text) el.textContent = text;
+        if (saved.color !== undefined) el.style.color = saved.color || '';
+      });
+    }
+
+    // Разное
+    if (data.misc) {
+      // Подпись зачарований
+      var encSub = data.misc.enchantsSubLabel;
+      if (encSub) {
+        document.querySelectorAll('.items-section-sublabel').forEach(function(el) {
+          el.textContent = lang === 'en' ? (encSub.en || encSub.ru) : encSub.ru;
+        });
+      }
+      // Логотип
+      var hTitle = data.misc.headerTitle;
+      if (hTitle) {
+        var nick = document.getElementById('nickname');
+        if (nick) nick.textContent = lang === 'en' ? (hTitle.en || hTitle.ru) : hTitle.ru;
+      }
+      // Кнопки хедера
+      var vBtnMain = data.misc.viewBtnMain;
+      if (vBtnMain) {
+        var el = document.getElementById('viewBtnMain');
+        if (el) el.textContent = lang === 'en' ? (vBtnMain.en || vBtnMain.ru) : vBtnMain.ru;
+      }
+      var vBtnWrpr = data.misc.viewBtnWrpr;
+      if (vBtnWrpr) {
+        var elW = document.getElementById('viewBtnWrpr');
+        if (elW) elW.textContent = lang === 'en' ? (vBtnWrpr.en || vBtnWrpr.ru) : vBtnWrpr.ru;
+      }
+      // Патч-бейдж
+      var pb = data.misc.patchBadge;
+      if (pb) {
+        document.querySelectorAll('.patch-badge').forEach(function(el) {
+          el.textContent = lang === 'en' ? (pb.en || pb.ru) : pb.ru;
+        });
+      }
+    }
+  }
+
+  // Применять тексты при смене языка (патчим setLang)
+  var _origSetLangForTexts = window.setLang;
+  if (typeof _origSetLangForTexts === 'function') {
+    window.setLang = function(lang) {
+      _origSetLangForTexts(lang);
+      if (window._siteTexts) _applyAllSiteTexts(window._siteTexts);
+    };
+  }
+
+  // Экспортируем для вызова из cmsLoadData callback
+  window.cmsApplyAllSiteTexts = function() {
+    if (window._siteTexts) _applyAllSiteTexts(window._siteTexts);
   };
 
 })();;
