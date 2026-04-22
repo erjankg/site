@@ -57,6 +57,9 @@
         _modalStack.forEach(function(mid, idx) {
             var mel = document.getElementById(mid);
             if(mel) {
+                // Отмена pending-close если модалка переоткрывается
+                if (mel._closeTimer) { clearTimeout(mel._closeTimer); mel._closeTimer = null; }
+                mel.classList.remove('closing');
                 mel.classList.add('active');
                 mel.style.zIndex = String(_baseZIndex + (idx * 100));
                 mel.style.visibility = '';
@@ -71,12 +74,19 @@
     function closeModal(id, skipSidebar) {
         var el = document.getElementById(id);
         if(el) {
-            el.classList.remove('active');
-            el.style.display = '';
-            el.style.zIndex = '';
-            el.style.visibility = '';
-            // Reset any visual-viewport sizing applied when keyboard was open
-            if (window._resetModalVV) window._resetModalVV(el);
+            // Плавное закрытие: добавляем .closing, после анимации убираем .active
+            el.classList.add('closing');
+            var _closeTimer = setTimeout(function() {
+                if (el) {
+                    el.classList.remove('active');
+                    el.classList.remove('closing');
+                    el.style.display = '';
+                    el.style.zIndex = '';
+                    el.style.visibility = '';
+                    if (window._resetModalVV) window._resetModalVV(el);
+                }
+            }, 180);
+            el._closeTimer = _closeTimer;
         }
 
         // Убираем из стека
@@ -931,6 +941,12 @@
 
     window.openCalc = function() { openModal('calcMask'); setTimeout(calcRun, 50); };
     window.closeCalc = function() { closeModal('calcMask'); };
+
+    window.openChanges = function() {
+        openModal('changesMask');
+        if (window.changesRender) window.changesRender();
+    };
+    window.closeChanges = function() { closeModal('changesMask'); };
 
     // Pick my champ
     window._calcPickMy = function(c) {
@@ -2159,14 +2175,14 @@
     // Sidebar → modal → close modal → sidebar reopens
     var _sidebarModalId = null; // which MAIN modal was opened from sidebar
     var _pcSideMode = false;    // true when on PC sidebar stays open + modal to the right
-    var _mainSidebarModals = ['sideChampsMask','calcMask','itemCalcMenuMask','itemsMask','runesMask','draftMask','draftCoopMask','tierlistMask'];
+    var _mainSidebarModals = ['sideChampsMask','calcMask','itemCalcMenuMask','itemsMask','runesMask','draftMask','draftCoopMask','tierlistMask','changesMask'];
 
     var _sidebarModalMap = {
         'sideChamps':'sideChampsMask', 'calc':'calcMask', 'itemCalcMenu':'itemCalcMenuMask',
         'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask', 'draftCoop':'draftCoopMask',
         'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask',
         'tierMenu':'tierlistMenuMask', 'globalChat':'chatSystemMask',
-        'users':'chatSystemMask'
+        'users':'chatSystemMask', 'changes':'changesMask'
     };
 
     function _sidebarDoOpen(what) {
@@ -2185,6 +2201,7 @@
             case 'globalChat': openChatSystem(); break;
             case 'users': openChatSystem('users'); break;
             case 'wrpr': window.switchMainView('wrpr'); break;
+            case 'changes': if(window.openChanges) openChanges(); break;
         }
     }
 
