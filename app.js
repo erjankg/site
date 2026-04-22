@@ -1569,7 +1569,7 @@
         var tEl=document.getElementById('tierlistTitle');
         if(tEl) tEl.textContent=titles[_tierType]||t('Тир-лист');
         var editBtn=document.getElementById('tierlistEditBtn');
-        if(editBtn){ editBtn.textContent=t('✏ Изменить'); editBtn.style.background='rgba(255,215,0,0.08)'; editBtn.style.borderColor='rgba(255,215,0,0.4)'; editBtn.style.color='#FFD700'; }
+        if(editBtn){ editBtn.style.display=window._isAdmin?'':'none'; editBtn.textContent=t('✏ Изменить'); editBtn.style.background='rgba(255,215,0,0.08)'; editBtn.style.borderColor='rgba(255,215,0,0.4)'; editBtn.style.color='#FFD700'; }
         var pcBtn=document.getElementById('tierlistPCBtn');
         if(pcBtn){
             pcBtn.style.display=window._isAdmin?'':'none';

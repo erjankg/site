@@ -1213,6 +1213,8 @@
     if (_hoverLocal && (!myTurn || unavail[_hoverLocal])) _hoverLocal = null;
 
     var isMob = isMobileDraft();
+    // Запоминаем, был ли layout уже на экране — на ре-рендере глушим анимацию появления
+    var _wasRendered = !!pane.querySelector('.dcoop-draft-layout');
     pane.innerHTML = ''
       + draftHeaderHtml(lobby, game, step, mySide, isCreator)
       + (isMob ? '' : globalBansBarHtml(lobby))
@@ -1227,6 +1229,11 @@
       +   sidePanelHtml('red', lobby, game, step)
       + '</div>'
       + (isMob ? '' : pastGamesHtml(lobby, game));
+    // Подавляем анимацию на ре-рендерах (каждый пик/бан) — иначе layout дёргается
+    if (_wasRendered) {
+      var _layout = pane.querySelector('.dcoop-draft-layout');
+      if (_layout) _layout.style.animation = 'none';
+    }
 
     // Render gallery
     renderGallery(lobby, game, step, mySide, unavail);
