@@ -32,6 +32,16 @@
   // ЗАГРУЗКА ДАННЫХ ИЗ FIRESTORE
   // ═══════════════════════════════════
 
+  function _cmsLoadChangelogCache() {
+    var db = firebase.firestore();
+    db.collection('changelog').orderBy('timestamp', 'desc').limit(20).get()
+      .then(function(snap) {
+        window._cmsChangelogCache = [];
+        snap.forEach(function(doc) { var d = doc.data(); d._id = doc.id; window._cmsChangelogCache.push(d); });
+      })
+      .catch(function() {});
+  }
+
   window.cmsLoadData = function(callback) {
     var db = firebase.firestore();
     var loaded = { items: false, runes: false, icons: false, sidebar: false, texts: false };
@@ -41,17 +51,21 @@
         window._cmsLoaded = true;
         if (window.cmsLoadCategories) {
           window.cmsLoadCategories(function() {
-            // Применяем misc-тексты после полного рендера DOM
             setTimeout(function() {
               if (window._siteTexts && window.cmsApplyAllSiteTexts) window.cmsApplyAllSiteTexts();
             }, 200);
             if (callback) callback();
+            // Грузим changesFeed и changelog в фоне (не блокируем основную загрузку)
+            window.cmsLoadChangesFeed && window.cmsLoadChangesFeed();
+            _cmsLoadChangelogCache();
           });
         } else {
           setTimeout(function() {
             if (window._siteTexts && window.cmsApplyAllSiteTexts) window.cmsApplyAllSiteTexts();
           }, 200);
           if (callback) callback();
+          window.cmsLoadChangesFeed && window.cmsLoadChangesFeed();
+          _cmsLoadChangelogCache();
         }
       }
     }
@@ -102,6 +116,7 @@
       .catch(function() { loaded.sidebar = true; checkDone(); });
 
     // Загрузка глобальных текстов
+    window._cmsChangelogCache = window._cmsChangelogCache || [];
     db.collection('siteConfig').doc('texts').get()
       .then(function(doc) {
         window._siteTexts = doc.exists ? doc.data() : {};
@@ -3236,6 +3251,386 @@
   // Экспортируем для вызова из cmsLoadData callback
   window.cmsApplyAllSiteTexts = function() {
     if (window._siteTexts) _applyAllSiteTexts(window._siteTexts);
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // 📰 CHANGES FEED — лента изменений и патч-нотов
+  // Источники: changesFeed (новости), patchnotes (чемпионы), changelog (предметы/руны)
+  // ═══════════════════════════════════════════════════════════════
+
+  window._changesFeed = null; // admin-added entries from Firestore
+
+  // Загрузка changesFeed при старте
+  window.cmsLoadChangesFeed = function(callback) {
+    var db = firebase.firestore();
+    db.collection('changesFeed').orderBy('timestamp', 'desc').limit(50).get()
+      .then(function(snap) {
+        window._changesFeed = [];
+        snap.forEach(function(doc) {
+          var d = doc.data();
+          d._id = doc.id;
+          window._changesFeed.push(d);
+        });
+        _updateChangesBadge();
+        if (callback) callback();
+      })
+      .catch(function() { window._changesFeed = []; if (callback) callback(); });
+  };
+
+  // Бейдж на кнопке сайдбара (показывает кол-во непрочитанных)
+  function _updateChangesBadge() {
+    var badge = document.getElementById('sidebarChangesBadge');
+    if (!badge) return;
+    var lastSeen = parseInt(localStorage.getItem('_changesLastSeen') || '0', 10);
+    var entries = window._changesFeed || [];
+    var unseen = entries.filter(function(e) {
+      var ts = e.timestamp && e.timestamp.seconds ? e.timestamp.seconds * 1000 : 0;
+      return ts > lastSeen;
+    }).length;
+    if (unseen > 0) {
+      badge.textContent = unseen;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+
+  // Рендеринг ленты
+  window.changesRender = function() {
+    var body = document.getElementById('changesFeedBody');
+    if (!body) return;
+    body.innerHTML = '';
+
+    // Обнуляем бейдж: пользователь открыл панель
+    localStorage.setItem('_changesLastSeen', Date.now().toString());
+    _updateChangesBadge();
+
+    var lang = localStorage.getItem('wr_lang') || 'ru';
+    var isAdmin = window._isAdmin;
+    var allItems = []; // { ts, html }
+
+    // ── 1. Admin-added news из changesFeed ──
+    (window._changesFeed || []).forEach(function(e) {
+      var ts = e.timestamp && e.timestamp.seconds ? e.timestamp.seconds * 1000 : 0;
+      var typeColors = { news: '#6D3FF5', buff: '#2ecc71', nerf: '#e74c3c', adjust: '#f1c40f', patch: '#f1c40f' };
+      var typeLabels = { news: '📣 Новость', buff: '🟢 Бафф', nerf: '🔴 Нерф', adjust: '🟡 Корректировка', patch: '🔖 Патч' };
+      var color = typeColors[e.type || 'news'] || '#6D3FF5';
+      var typeLabel = typeLabels[e.type || 'news'] || '📣 Новость';
+      var title = e.title || '';
+      var text = (lang === 'en' && e.text_en) ? e.text_en : (e.text || '');
+      var patchBadge = e.patch ? '<span class="cf-patch-badge">Patch ' + e.patch + '</span>' : '';
+      var adminBtns = isAdmin ? '<div class="cf-admin-btns">'
+        + '<button onclick="cmsEditChangesEntry(\'' + e._id + '\')" title="Редактировать">✏</button>'
+        + '<button onclick="cmsDeleteChangesEntry(\'' + e._id + '\')" title="Удалить">🗑</button>'
+        + '</div>' : '';
+
+      var html = '<div class="cf-card" style="border-left-color:' + color + ';">'
+        + adminBtns
+        + '<div class="cf-card-top">'
+        + '<span class="cf-type-badge" style="background:' + color + '20;color:' + color + ';">' + typeLabel + '</span>'
+        + patchBadge
+        + '<span class="cf-date">' + _formatDate(ts) + '</span>'
+        + '</div>'
+        + (title ? '<div class="cf-card-title">' + _escHtml(title) + '</div>' : '')
+        + (text ? '<div class="cf-card-text">' + _renderCfText(text) + '</div>' : '')
+        + '</div>';
+
+      allItems.push({ ts: ts, html: html });
+    });
+
+    // ── 2. Патч-ноты чемпионов из _cmsPatchnotes ──
+    var patchGroups = {}; // groupBy patch version
+    (window._cmsPatchnotes || []).forEach(function(note) {
+      if (!note.champion || !note.type) return;
+      var p = note.patch || 'Unknown';
+      if (!patchGroups[p]) patchGroups[p] = { buff: [], nerf: [], adjust: [], ts: note.timestamp && note.timestamp.seconds ? note.timestamp.seconds * 1000 : 0 };
+      patchGroups[p][note.type] = patchGroups[p][note.type] || [];
+      patchGroups[p][note.type].push(note);
+      if (patchGroups[p].ts < (note.timestamp && note.timestamp.seconds ? note.timestamp.seconds * 1000 : 0)) {
+        patchGroups[p].ts = note.timestamp.seconds * 1000;
+      }
+    });
+
+    Object.keys(patchGroups).forEach(function(patch) {
+      var g = patchGroups[patch];
+      var rows = '';
+
+      function renderChampRow(note, color, emoji) {
+        var chText = (lang === 'en' && note.change_en) ? note.change_en : (note.change || '');
+        return '<div class="cf-champ-row">'
+          + '<span class="cf-champ-dot" style="background:' + color + ';"></span>'
+          + '<span class="cf-champ-name">' + _escHtml(note.champion) + '</span>'
+          + (chText ? '<span class="cf-champ-change">' + _escHtml(chText) + '</span>' : '')
+          + '</div>';
+      }
+
+      (g.buff || []).forEach(function(n) { rows += renderChampRow(n, '#2ecc71', '🟢'); });
+      (g.nerf || []).forEach(function(n) { rows += renderChampRow(n, '#e74c3c', '🔴'); });
+      (g.adjust || []).forEach(function(n) { rows += renderChampRow(n, '#f1c40f', '🟡'); });
+
+      if (!rows) return;
+
+      var totalCount = (g.buff||[]).length + (g.nerf||[]).length + (g.adjust||[]).length;
+      var html = '<div class="cf-card" style="border-left-color:#5dade2;">'
+        + '<div class="cf-card-top">'
+        + '<span class="cf-type-badge" style="background:#5dade220;color:#5dade2;">⚔ Чемпионы</span>'
+        + '<span class="cf-patch-badge">Patch ' + _escHtml(patch) + '</span>'
+        + '<span class="cf-date">' + (g.buff||[]).length + '🟢 ' + (g.nerf||[]).length + '🔴 ' + (g.adjust||[]).length + '🟡</span>'
+        + '</div>'
+        + '<div class="cf-card-title">Изменения чемпионов · ' + totalCount + ' героев</div>'
+        + '<div class="cf-champ-list">' + rows + '</div>'
+        + '</div>';
+
+      allItems.push({ ts: g.ts, html: html });
+    });
+
+    // ── 3. Изменения предметов/рун из changelog ──
+    // Берём только последние 20 из localStorage/memory (changelog уже был загружен отдельно)
+    // Нет смысла перегружать, показываем только add/edit записи предметов/рун
+    var clItems = [];
+    if (window._cmsChangelogCache) {
+      window._cmsChangelogCache.forEach(function(entry) {
+        if (entry.entity !== 'item' && entry.entity !== 'rune') return;
+        var ts = entry.timestamp && entry.timestamp.seconds ? entry.timestamp.seconds * 1000 : 0;
+        var color = entry.type === 'add' ? '#2ecc71' : entry.type === 'delete' ? '#e74c3c' : '#6D3FF5';
+        var typeStr = entry.type === 'add' ? '➕ Добавлено' : entry.type === 'delete' ? '🗑 Удалено' : '✏ Изменено';
+        var entityStr = entry.entity === 'item' ? '📦 Предмет' : '💎 Руна';
+        var html = '<div class="cf-card" style="border-left-color:' + color + ';">'
+          + '<div class="cf-card-top">'
+          + '<span class="cf-type-badge" style="background:' + color + '20;color:' + color + ';">' + typeStr + '</span>'
+          + '<span class="cf-type-badge" style="background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);">' + entityStr + '</span>'
+          + '<span class="cf-date">' + _formatDate(ts) + '</span>'
+          + '</div>'
+          + '<div class="cf-card-title">' + _escHtml(entry.name || '—') + '</div>'
+          + '</div>';
+        clItems.push({ ts: ts, html: html });
+      });
+    }
+    // Добавляем только последние 10 changelog записей
+    clItems.sort(function(a, b) { return b.ts - a.ts; });
+    allItems = allItems.concat(clItems.slice(0, 10));
+
+    // ── Сортируем по времени убыванию ──
+    allItems.sort(function(a, b) { return b.ts - a.ts; });
+
+    if (allItems.length === 0) {
+      body.innerHTML = '<div class="cf-empty">Пока нет изменений.<br><span style="font-size:12px;color:rgba(255,255,255,0.3);">Обновляется после каждого патча</span></div>';
+    } else {
+      allItems.forEach(function(item) {
+        var div = document.createElement('div');
+        div.innerHTML = item.html;
+        while (div.firstChild) body.appendChild(div.firstChild);
+      });
+    }
+
+    // ── Admin: кнопка добавить новость ──
+    if (isAdmin) {
+      var addBtn = document.createElement('button');
+      addBtn.className = 'cf-add-btn';
+      addBtn.innerHTML = '➕ Добавить новость / патч-запись';
+      addBtn.onclick = function() { cmsOpenChangesEntryEditor(null); };
+      body.insertBefore(addBtn, body.firstChild);
+    }
+  };
+
+  // ── Хелперы ──
+  function _formatDate(ts) {
+    if (!ts) return '';
+    var d = new Date(ts);
+    var now = new Date();
+    var diff = Math.floor((now - d) / 1000);
+    if (diff < 60) return 'только что';
+    if (diff < 3600) return Math.floor(diff / 60) + ' мин назад';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' ч назад';
+    if (diff < 86400 * 7) return Math.floor(diff / 86400) + ' дн назад';
+    return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear();
+  }
+
+  function _escHtml(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function _renderCfText(text) {
+    // Простой render: переносы строк → <br>, иконки
+    var escaped = _escHtml(text).replace(/\n/g, '<br>');
+    // [icon:name]
+    escaped = escaped.replace(/\[icon:([^\]]+)\]/g, function(_, name) {
+      var url = (window._siteIcons || {})[name];
+      return url ? '<img src="' + url + '" style="height:16px;vertical-align:middle;margin:0 2px;">' : '[' + name + ']';
+    });
+    return escaped;
+  }
+
+  // ── Admin: редактор записи changesFeed ──
+  window.cmsOpenChangesEntryEditor = function(entry) {
+    var isNew = !entry;
+    var db = firebase.firestore();
+    var data = entry ? Object.assign({}, entry) : {
+      type: 'news', title: '', text: '', text_en: '', patch: '', pinned: false
+    };
+
+    var overlay = document.createElement('div');
+    overlay.className = 'cms-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var win = document.createElement('div');
+    win.className = 'cms-modal-win';
+    win.style.maxWidth = '500px';
+
+    win.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
+      + '<h3 style="margin:0;color:#fff;font-size:18px;">' + (isNew ? '➕ Новая запись' : '✏ Редактировать') + '</h3>'
+      + '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>'
+      + '</div>';
+
+    // Type select
+    var typeGroup = document.createElement('div');
+    typeGroup.style.marginBottom = '12px';
+    typeGroup.innerHTML = '<label style="display:block;color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;margin-bottom:4px;">ТИП ЗАПИСИ</label>';
+    var typeSelect = document.createElement('select');
+    typeSelect.className = 'cms-input';
+    typeSelect.style.margin = '0';
+    [
+      { v: 'news', l: '📣 Новость' }, { v: 'patch', l: '🔖 Патч' },
+      { v: 'buff', l: '🟢 Бафф' }, { v: 'nerf', l: '🔴 Нерф' }, { v: 'adjust', l: '🟡 Корректировка' }
+    ].forEach(function(o) {
+      var opt = document.createElement('option');
+      opt.value = o.v; opt.textContent = o.l;
+      if (data.type === o.v) opt.selected = true;
+      typeSelect.appendChild(opt);
+    });
+    typeGroup.appendChild(typeSelect);
+    win.appendChild(typeGroup);
+
+    // Fields
+    function _mkField(label, key, isTextarea) {
+      var g = document.createElement('div');
+      g.style.marginBottom = '12px';
+      g.innerHTML = '<label style="display:block;color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;margin-bottom:4px;">' + label + '</label>';
+      var el = isTextarea ? document.createElement('textarea') : document.createElement('input');
+      el.className = 'cms-input';
+      el.style.margin = '0';
+      if (isTextarea) el.rows = 4;
+      else el.type = 'text';
+      el.value = data[key] || '';
+      el.setAttribute('data-key', key);
+      if (isTextarea) el.style.resize = 'vertical';
+      g.appendChild(el);
+      win.appendChild(g);
+      return el;
+    }
+
+    var titleEl = _mkField('ЗАГОЛОВОК', 'title', false);
+    var patchEl = _mkField('ПАТЧ (напр. 7.0g)', 'patch', false);
+    var textEl  = _mkField('ТЕКСТ (RU) — поддерживает [icon:name]', 'text', true);
+    var textEnEl = _mkField('ТЕКСТ (EN) — необязательно', 'text_en', true);
+
+    // Pinned
+    var pinnedRow = document.createElement('div');
+    pinnedRow.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:16px;';
+    var pinnedCb = document.createElement('input');
+    pinnedCb.type = 'checkbox';
+    pinnedCb.checked = !!data.pinned;
+    pinnedCb.id = 'cfPinnedCb';
+    var pinnedLbl = document.createElement('label');
+    pinnedLbl.htmlFor = 'cfPinnedCb';
+    pinnedLbl.style.cssText = 'color:rgba(255,255,255,0.6);font-size:13px;cursor:pointer;';
+    pinnedLbl.textContent = '📌 Закрепить вверху';
+    pinnedRow.appendChild(pinnedCb);
+    pinnedRow.appendChild(pinnedLbl);
+    win.appendChild(pinnedRow);
+
+    // Buttons
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:10px;';
+
+    var saveBtn = document.createElement('button');
+    saveBtn.className = 'cms-btn-save';
+    saveBtn.textContent = isNew ? '➕ Добавить' : '💾 Сохранить';
+    saveBtn.onclick = function() {
+      var newData = {
+        type: typeSelect.value,
+        title: titleEl.value.trim(),
+        patch: patchEl.value.trim(),
+        text: textEl.value.trim(),
+        text_en: textEnEl.value.trim(),
+        pinned: pinnedCb.checked,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = '⏳...';
+
+      var ref = isNew
+        ? db.collection('changesFeed').add(newData)
+        : db.collection('changesFeed').doc(entry._id).set(newData, { merge: true });
+
+      ref.then(function(docRef) {
+          if (isNew && docRef) newData._id = docRef.id;
+          else if (!isNew) newData._id = entry._id;
+
+          if (!window._changesFeed) window._changesFeed = [];
+          if (isNew) {
+            window._changesFeed.unshift(newData);
+          } else {
+            var idx = window._changesFeed.findIndex(function(e) { return e._id === entry._id; });
+            if (idx !== -1) window._changesFeed[idx] = newData;
+          }
+
+          _showToast(isNew ? 'Запись добавлена!' : 'Запись обновлена!', 'success');
+          overlay.remove();
+          if (window.changesRender) window.changesRender();
+        })
+        .catch(function(err) {
+          _showToast('Ошибка: ' + err.message, 'error');
+          saveBtn.disabled = false;
+          saveBtn.textContent = isNew ? '➕ Добавить' : '💾 Сохранить';
+        });
+    };
+    btnRow.appendChild(saveBtn);
+
+    if (!isNew) {
+      var delBtn = document.createElement('button');
+      delBtn.className = 'cms-btn-delete';
+      delBtn.textContent = '🗑 Удалить';
+      delBtn.onclick = function() {
+        window._showConfirm({ msg: 'Запись будет удалена.', title: 'Удалить?', confirmText: 'Удалить' }, function() {
+          db.collection('changesFeed').doc(entry._id).delete().then(function() {
+            window._changesFeed = (window._changesFeed || []).filter(function(e) { return e._id !== entry._id; });
+            _showToast('Удалено', 'success');
+            overlay.remove();
+            if (window.changesRender) window.changesRender();
+          }).catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); });
+        });
+      };
+      btnRow.appendChild(delBtn);
+    }
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'cms-btn-cancel';
+    cancelBtn.textContent = 'Отмена';
+    cancelBtn.onclick = function() { overlay.remove(); };
+    btnRow.appendChild(cancelBtn);
+
+    win.appendChild(btnRow);
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+  };
+
+  window.cmsEditChangesEntry = function(id) {
+    var entry = (window._changesFeed || []).find(function(e) { return e._id === id; });
+    if (entry) cmsOpenChangesEntryEditor(entry);
+  };
+
+  window.cmsDeleteChangesEntry = function(id) {
+    var entry = (window._changesFeed || []).find(function(e) { return e._id === id; });
+    if (!entry) return;
+    window._showConfirm({ msg: 'Запись «' + (entry.title || 'без названия') + '» будет удалена.', title: 'Удалить?', confirmText: 'Удалить' }, function() {
+      firebase.firestore().collection('changesFeed').doc(id).delete().then(function() {
+        window._changesFeed = (window._changesFeed || []).filter(function(e) { return e._id !== id; });
+        _showToast('Удалено', 'success');
+        if (window.changesRender) window.changesRender();
+      }).catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); });
+    });
   };
 
 })();;

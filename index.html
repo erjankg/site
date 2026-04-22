@@ -481,6 +481,9 @@ Stormarrow: При максимальных зарядах следующая б
 
   <button class="side-btn admin-only" id="sideBtnCategories" onclick="if(window.cmsOpenCategoriesEditor)cmsOpenCategoriesEditor()" style="display:none"><span class="side-icon">🏷</span>Категории</button>
 
+  <div class="side-section" style="margin-top:8px;">Новости</div>
+  <button class="side-btn side-btn-changes" onclick="sidebarOpen('changes')"><span class="side-icon">📰</span>Изменения<span id="sidebarChangesBadge" style="display:none;background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:auto;"></span></button>
+
   <div class="side-section" style="margin-top:8px;">Сообщество</div>
   <button class="side-btn side-btn-chat" onclick="sidebarOpen('globalChat')"><span class="side-icon">💬</span>Чат<span id="sidebarChatBadge" style="display:none;"></span></button>
 
@@ -964,6 +967,19 @@ Stormarrow: При максимальных зарядах следующая б
 </div>
 
 <!-- wrprMask removed — WinRate is now an inline section (#wrprSection) -->
+
+<!-- ══ CHANGES FEED ══ -->
+<div class="m-mask" id="changesMask" onclick="if(event.target===this)closeChanges()">
+  <div class="m-win changes-win">
+    <div class="mhdr">
+      <button class="btn-close-x" onclick="closeChanges()">←</button>
+      <span class="mhdr-t" data-i18n="📰 Изменения и патч-ноты">📰 Изменения и патч-ноты</span>
+    </div>
+    <div class="changes-feed" id="changesFeedBody">
+      <div class="changes-loading">Загрузка...</div>
+    </div>
+  </div>
+</div>
 
 <!-- ══ TELEGRAM-STYLE UNIFIED CHAT ══ -->
 <div class="m-mask" id="chatSystemMask" onclick="if(event.target===this)closeChatSystem()">
