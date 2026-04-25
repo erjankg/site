@@ -453,7 +453,7 @@
       { key: 'name_ru', label: 'Название (RU)', type: 'text' },
       { key: 'name_en', label: 'Название (EN)', type: 'text' },
       { key: 'cost', label: 'Цена', type: 'text', placeholder: '3000 г' },
-      { key: 'stats', label: 'Статы RU (разделитель: |)', type: 'textarea', placeholder: '+40 Сила атаки  |  +20 Ускорение умений' },
+      { key: 'stats', label: 'Статы RU (разделитель: |) — поддерживает [текст|ad] и [icon:name]', type: 'richtext', placeholder: '+40 [Сила атаки|ad]  |  +20 Ускорение умений' },
       { key: 'image', label: 'URL картинки', type: 'text', placeholder: 'https://...' },
       { key: 'category', label: 'Категория', type: 'select', options: ITEM_CATEGORIES.map(function(c) { return { value: c.id, label: c.label }; }) },
       { key: 'description_ru', label: 'Описание (RU) — поддерживает [текст|ad] и [icon:name]', type: 'richtext' },

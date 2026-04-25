@@ -15,6 +15,7 @@
   var _currentLobby = null;
   var _lastWaitingKey = '';
   var _globalBansList = [];
+  var _pendingShareToken = null; // shareToken из ?t= при открытии по ссылке
 
   function _db() {
     if (db) return db;
@@ -306,9 +307,10 @@
     if (_unsubLobby) { try { _unsubLobby(); } catch(e){} _unsubLobby = null; }
   }
 
-  function openLobby(id) {
+  function openLobby(id, shareToken) {
     _replayCache = null; // сбрасываем кэш при смене лобби
     _currentLobbyId = id;
+    _pendingShareToken = shareToken || null;
     stopLobbyListener();
     switchTab('lobby');
 
@@ -324,11 +326,70 @@
       }
       var l = snap.data(); l.id = snap.id;
       _currentLobby = l;
+
+      // Авто-вход как зритель по share-ссылке (один раз на открытие)
+      if (_pendingShareToken) {
+        var token = _pendingShareToken;
+        _pendingShareToken = null;
+        var uid = _uid();
+        if (uid && l.shareToken && l.shareToken === token) {
+          var isCap = (l.blueCaptain && l.blueCaptain.uid === uid) || (l.redCaptain && l.redCaptain.uid === uid);
+          var isCreator = l.createdBy === uid;
+          var alreadySpec = (l.invitedSpectators || []).indexOf(uid) !== -1;
+          if (!isCap && !isCreator && !alreadySpec && (l.invitedSpectators || []).length < 12) {
+            joinAsSpectatorViaLink(l, uid);
+          }
+        }
+      }
+
       renderLobby(l);
     }, function(err){
       console.warn('[draft] lobby listener', err);
       if (pane) pane.innerHTML = '<div style="padding:30px;text-align:center;color:#e74c3c;">Нет доступа к лобби</div>';
     });
+  }
+
+  // Зритель добавляет себя по shareToken (server-side проверит совпадение токена)
+  function joinAsSpectatorViaLink(l, uid) {
+    var nick = _myNick();
+    var list = (l.invitedSpectators || []).slice();
+    if (list.indexOf(uid) !== -1) return;
+    list.push(uid);
+    var nicks = Object.assign({}, l.spectatorNicks || {});
+    nicks[uid] = nick;
+    _db().collection('draftLobbies').doc(l.id).update({
+      invitedSpectators: list,
+      spectatorNicks: nicks,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function(){
+      console.info('[draft] joined as spectator via link');
+    }).catch(function(e){ console.warn('[draft] join-spectator-via-link', e); });
+  }
+
+  // Получатель сам финализирует принятый инвайт-спектатор (без ожидания отправителя)
+  function selfAddSpectatorViaInvite(invite) {
+    var dbInst = _db();
+    if (!dbInst || !invite) return;
+    var uid = _uid();
+    if (!uid || uid !== invite.toUid || invite.role !== 'spectator') return;
+    var lobbyRef = dbInst.collection('draftLobbies').doc(invite.lobbyId);
+    lobbyRef.get().then(function(snap){
+      if (!snap.exists) return;
+      var l = snap.data();
+      var list = (l.invitedSpectators || []).slice();
+      if (list.indexOf(uid) !== -1) return; // уже в списке
+      list.push(uid);
+      var nicks = Object.assign({}, l.spectatorNicks || {});
+      nicks[uid] = invite.toNick || _myNick();
+      lobbyRef.update({
+        invitedSpectators: list,
+        spectatorNicks: nicks,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function(){
+        dbInst.collection('draftInvites').doc(invite.id).update({ status: 'finalized' }).catch(function(){});
+        console.info('[draft] self-finalized spectator invite');
+      }).catch(function(e){ console.warn('[draft] self-add-spectator-via-invite', e); });
+    }).catch(function(e){ console.warn('[draft] self-add-spectator get', e); });
   }
 
   function renderWaitingRoom(l, pane) {
@@ -1037,20 +1098,14 @@
     acceptInvite(id).then(function(){
       var el = document.getElementById('dcoopInviteToast-' + id);
       if (el) el.remove();
-      toast('Приглашение принято — ждём подтверждения от создателя…');
+      toast('Приглашение принято!');
       _db().collection('draftInvites').doc(id).get().then(function(snap){
         if (!snap.exists) return;
-        var d = snap.data();
+        var d = snap.data(); d.id = snap.id;
+        // Для зрителя — сразу финализируем сами, не ждём отправителя
+        if (d.role === 'spectator') selfAddSpectatorViaInvite(d);
         if (window.openDraftCoop) window.openDraftCoop();
-        // Ретраим открытие лобби пока не получим доступ (создатель финализирует)
-        var tries = 0;
-        (function tryOpen() {
-          _db().collection('draftLobbies').doc(d.lobbyId).get().then(function(s){
-            if (s.exists) { openLobby(d.lobbyId); return; }
-          }).catch(function(){
-            if (tries++ < 15) setTimeout(tryOpen, 1000);
-          });
-        })();
+        setTimeout(function(){ openLobby(d.lobbyId); }, 400);
       });
     }).catch(function(e){ toast('Ошибка: '+e.message); });
   };

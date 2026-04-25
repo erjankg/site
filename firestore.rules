@@ -125,12 +125,32 @@ service cloud.firestore {
           || (request.resource.data.redCaptain != null && request.resource.data.redCaptain.uid == request.auth.uid)
         );
 
-      // Обновлять может создатель, любой из капитанов, либо зритель (только поле spectators — для входа по ссылке)
+      // Обновлять может создатель, любой из капитанов, зритель (уже в списке),
+      // либо пользователь с валидным shareToken или accepted-инвайтом (для входа по ссылке/приглашению)
       allow update: if request.auth != null && (
         resource.data.createdBy == request.auth.uid ||
         resource.data.blueCaptain.uid == request.auth.uid ||
         (resource.data.redCaptain != null && resource.data.redCaptain.uid == request.auth.uid) ||
-        (request.auth.uid in resource.data.invitedSpectators)
+        (request.auth.uid in resource.data.invitedSpectators) ||
+        // Самодобавление зрителя по share-ссылке: токен совпадает, слот свободен
+        (
+          resource.data.shareToken != null &&
+          request.resource.data.shareToken == resource.data.shareToken &&
+          request.auth.uid in request.resource.data.invitedSpectators &&
+          !(request.auth.uid in resource.data.invitedSpectators) &&
+          request.resource.data.invitedSpectators.size() == resource.data.invitedSpectators.size() + 1 &&
+          resource.data.invitedSpectators.size() < 12
+        ) ||
+        // Самодобавление зрителя по accepted-инвайту (если отправитель офлайн)
+        (
+          request.auth.uid in request.resource.data.invitedSpectators &&
+          !(request.auth.uid in resource.data.invitedSpectators) &&
+          request.resource.data.invitedSpectators.size() == resource.data.invitedSpectators.size() + 1 &&
+          resource.data.invitedSpectators.size() < 12 &&
+          exists(/databases/$(database)/documents/draftInvites/$(lobbyId + '__' + request.auth.uid)) &&
+          get(/databases/$(database)/documents/draftInvites/$(lobbyId + '__' + request.auth.uid)).data.toUid == request.auth.uid &&
+          get(/databases/$(database)/documents/draftInvites/$(lobbyId + '__' + request.auth.uid)).data.status == 'accepted'
+        )
       );
 
       // Удалять — только создатель

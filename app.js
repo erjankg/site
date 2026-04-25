@@ -782,12 +782,13 @@
 
         // Stats block
         if(stats) {
+            var rt = window.parseRichText || function(s){ return s; };
             var statsBox = document.createElement('div');
             statsBox.style.cssText = 'margin-bottom:14px;background:rgba(255,255,255,0.03);border-radius:10px;padding:4px 10px;';
             stats.split('  |  ').filter(Boolean).forEach(function(s) {
                 var row = document.createElement('div');
                 row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);';
-                row.innerHTML = '<span style="color:var(--accent-light);font-weight:700;font-size:14px;">' + s.trim() + '</span>';
+                row.innerHTML = '<span style="color:var(--accent-light);font-weight:700;font-size:14px;">' + rt(s.trim()) + '</span>';
                 statsBox.appendChild(row);
             });
             box.appendChild(statsBox);
@@ -3394,7 +3395,7 @@
             setTimeout(function(){
                 if (window.openDraftCoop) window.openDraftCoop();
                 setTimeout(function(){
-                    if (window.dcoopOpenLobby) window.dcoopOpenLobby(dl.id);
+                    if (window.dcoopOpenLobby) window.dcoopOpenLobby(dl.id, dl.token);
                 }, 300);
             }, 200);
         }
