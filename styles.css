@@ -4907,6 +4907,8 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   padding: 16px;
+  overflow-y: auto;
+  max-height: calc(92vh - 52px);
 }
 @keyframes menuCardIn {
   from { opacity: 0; transform: translateY(14px); }
