@@ -1238,14 +1238,13 @@
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
 
-    // Активируем fullscreen режим для лобби: срываем PC side-panel режим,
-    // закрываем сайдбар, убираем side-panel-modal позиционирование.
-    document.body.classList.remove('pc-side-mode');
-    document.body.classList.remove('pc-chat-mode');
-    var _mask = document.getElementById('draftCoopMask');
-    if (_mask) _mask.classList.remove('side-panel-modal');
+    // Активируем fullscreen режим для лобби.
+    // closeSidebar() сбрасывает JS-состояние (_pcSideMode, _sidebarModalId)
+    // и убирает pc-side-mode / side-panel-modal — иначе после выхода из драфта
+    // sidebarOpen() думает что предыдущий sidebar-modal всё ещё открыт.
+    if (window.closeSidebar) window.closeSidebar();
     var _panel = document.getElementById('sidePanel');
-    if (_panel) _panel.classList.remove('open');
+    if (_panel) _panel.classList.remove('open'); // физически скрываем сайдбар для fullscreen
     var _sover = document.getElementById('sideOverlay');
     if (_sover) _sover.classList.remove('open');
     document.body.classList.remove('sidebar-open');
@@ -1510,7 +1509,8 @@
     var stepCol = step ? (step.side === 'blue' ? '#5dade2' : '#e74c3c') : '#fff';
     var closeBtn = isCreator
       ? '<button class="dcoop-hdr-close" onclick="dcoopCloseLobbyConfirm()" title="Закрыть лобби">✕</button>'
-      : '';
+      // Не-создатель (зритель / некреаторский кап): кнопка «назад к списку» вместо ✕
+      : '<button class="dcoop-hdr-close" onclick="dcoopBackToList()" title="К списку" style="font-size:16px;">←</button>';
     var specCount = (lobby.invitedSpectators || []).length;
     var specBtn = '<button class="dcoop-hdr-spec" onclick="dcoopToggleSpectators()" title="Зрители">👁 '+specCount+'</button>';
     var assistBtn = '<button class="dcoop-hdr-assist" onclick="dcoopToggleAssist()" title="Драфт-помощник" data-on="'+(_draftAssistantOn?'1':'0')+'">🤖</button>';
@@ -2202,18 +2202,30 @@
     var existing = document.getElementById('dcoopSpecDrop');
     if (existing) { existing.parentNode.removeChild(existing); return; }
 
+    var uid = _uid();
+    var isCreator = l.createdBy === uid;
     var specs = l.invitedSpectators || [];
     var rows = specs.length
       ? specs.map(function(su){
           var nick = (l.spectatorNicks && l.spectatorNicks[su]) || su.slice(0,8);
-          return '<div class="dcoop-spec-row">'+escapeHtml(nick)+'</div>';
+          var rmBtn = isCreator
+            ? '<button onclick="dcoopRemoveSpectator(\''+su+'\')" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:11px;padding:0 4px;">✕</button>'
+            : '';
+          return '<div class="dcoop-spec-row" style="display:flex;align-items:center;gap:6px;justify-content:space-between;">'+escapeHtml(nick)+rmBtn+'</div>';
         }).join('')
       : '<div style="color:var(--text-faint);font-size:12px;padding:8px;text-align:center;">Зрителей нет</div>';
+
+    var inviteBtn = isCreator
+      ? '<button onclick="dcoopInviteSpectator();var e=document.getElementById(\'dcoopSpecDrop\');if(e)e.parentNode.removeChild(e);" style="margin-top:8px;width:100%;padding:7px;border:1px solid var(--accent-border);background:var(--accent-dim);color:var(--accent);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;">+ Пригласить зрителя</button>'
+      : '';
+    var linkBtn = isCreator
+      ? '<button onclick="dcoopCopyInvite();var e=document.getElementById(\'dcoopSpecDrop\');if(e)e.parentNode.removeChild(e);" style="margin-top:4px;width:100%;padding:7px;border:1px solid var(--accent-border);background:transparent;color:#fff;border-radius:7px;font-size:12px;cursor:pointer;">🔗 Скопировать ссылку</button>'
+      : '';
 
     var drop = document.createElement('div');
     drop.id = 'dcoopSpecDrop';
     drop.className = 'dcoop-spec-drop';
-    drop.innerHTML = '<div class="dcoop-spec-title">👁 Зрители ('+specs.length+')</div>' + rows;
+    drop.innerHTML = '<div class="dcoop-spec-title">👁 Зрители ('+specs.length+'/12)</div>' + rows + inviteBtn + linkBtn;
     drop.onclick = function(e){ e.stopPropagation(); };
     document.body.appendChild(drop);
     setTimeout(function(){
@@ -2379,10 +2391,7 @@
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
     stopGameListener();
-    document.body.classList.remove('pc-side-mode');
-    document.body.classList.remove('pc-chat-mode');
-    var _mask = document.getElementById('draftCoopMask');
-    if (_mask) _mask.classList.remove('side-panel-modal');
+    if (window.closeSidebar) window.closeSidebar(); // сброс _pcSideMode/_sidebarModalId JS-состояния
     var _panel = document.getElementById('sidePanel');
     if (_panel) _panel.classList.remove('open');
     var _sover = document.getElementById('sideOverlay');

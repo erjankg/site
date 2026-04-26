@@ -1016,6 +1016,33 @@
         calcRun();
     };
 
+    // Counter animation for damage number
+    var _dmgAnimPrev = 0, _dmgAnimRaf = null;
+    function animateDmgVal(target) {
+        var el = document.getElementById('rDmg');
+        if (!el) return;
+        var start = _dmgAnimPrev;
+        var end = Math.round(target);
+        if (_dmgAnimRaf) cancelAnimationFrame(_dmgAnimRaf);
+        if (Math.abs(end - start) < 2) { el.textContent = end; _dmgAnimPrev = end; return; }
+        var startTs = null, dur = 280;
+        function step(ts) {
+            if (!startTs) startTs = ts;
+            var p = Math.min((ts - startTs) / dur, 1);
+            var e = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.round(start + (end - start) * e);
+            if (p < 1) { _dmgAnimRaf = requestAnimationFrame(step); }
+            else {
+                el.textContent = end;
+                el.classList.remove('pop');
+                void el.offsetWidth; // reflow to restart
+                el.classList.add('pop');
+                _dmgAnimPrev = end;
+            }
+        }
+        _dmgAnimRaf = requestAnimationFrame(step);
+    }
+
     // Main calc
     window.calcRun = function() {
         var ad = (+document.getElementById('cMyAD').value||0) + (+document.getElementById('cMyADBonus').value||0);
@@ -1029,7 +1056,7 @@
         var mit = ad > 0 ? ((ad-finalDmg)/ad*100) : 0;
         document.getElementById('rEff').textContent = Math.round(effArmor*10)/10;
         document.getElementById('rMit').textContent = mit.toFixed(1)+'%';
-        document.getElementById('rDmg').textContent = Math.round(finalDmg);
+        animateDmgVal(finalDmg);
         document.getElementById('rFormula').textContent = ad+' × 100/(100+'+Math.round(effArmor*10)/10+') = '+Math.round(finalDmg);
         if(hpMax > 0) {
             var pct = Math.min(100, finalDmg/hpMax*100);
@@ -1037,7 +1064,7 @@
             document.getElementById('rHpFill').style.width = pct.toFixed(1)+'%';
             document.getElementById('rHpPct').textContent = pct.toFixed(1)+'% HP';
         } else { document.getElementById('rHpBar').style.display = 'none'; }
-        res.style.display = 'block';
+        res.style.display = 'flex';
     };
 
     // ═══ ITEM CALC MENU ═══
@@ -1291,9 +1318,9 @@
         window._liandryPct = pct;
         document.querySelectorAll('.lp-btn').forEach(function(b){
             var active = +b.dataset.pct === pct;
-            b.style.background = active ? 'var(--sel-placeholder)' : 'transparent';
-            b.style.borderColor = active ? 'var(--sel-text)' : 'var(--sel-border)';
-            b.style.color = active ? '#fff' : 'rgba(255,255,255,0.5)';
+            b.classList.toggle('lp-btn-v2--active', active);
+            // legacy inline style cleanup
+            b.style.background = ''; b.style.borderColor = ''; b.style.color = '';
         });
         var modal = document.getElementById('itemSubModal');
         if(modal && modal._calcKey) runItemCalc(modal._calcKey);
@@ -1302,8 +1329,8 @@
     window.setCalcRange = function(type) {
         _calcRange = type;
         var m=document.getElementById('icBtnMelee'), r=document.getElementById('icBtnRanged');
-        if(m){ m.style.background=type==='melee'?'var(--sel-hover)':'transparent'; m.style.borderColor=type==='melee'?'var(--sel-border-str)':'var(--sel-border)'; m.style.color=type==='melee'?'#fff':'rgba(255,255,255,0.5)'; }
-        if(r){ r.style.background=type==='ranged'?'var(--sel-hover)':'transparent'; r.style.borderColor=type==='ranged'?'var(--sel-border-str)':'var(--sel-border)'; r.style.color=type==='ranged'?'#fff':'rgba(255,255,255,0.5)'; }
+        if(m){ m.classList.toggle('ic-range-btn-v2--active', type==='melee'); m.style.background=''; m.style.borderColor=''; m.style.color=''; }
+        if(r){ r.classList.toggle('ic-range-btn-v2--active', type==='ranged'); r.style.background=''; r.style.borderColor=''; r.style.color=''; }
         var modal = document.getElementById('itemSubModal');
         if(modal && modal._calcKey) runItemCalc(modal._calcKey);
     };
@@ -2211,6 +2238,12 @@
         if (_catOverlay) _catOverlay.remove();
         var isPc = _isSidebarPc();
         var panel = document.getElementById('sidePanel');
+        // На ПК CSS всегда показывает сайдбар (transform:translateX(0) !important).
+        // Класс 'open' мог быть снят renderDraftUi/renderReplay для fullscreen-режима драфта.
+        // Восстанавливаем его здесь, чтобы _sidebarModalId-логика работала корректно.
+        if (isPc && panel && !panel.classList.contains('open')) {
+            panel.classList.add('open');
+        }
         var sidebarIsOpen = panel && panel.classList.contains('open');
 
         if (isPc && sidebarIsOpen) {

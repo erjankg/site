@@ -1,13 +1,48 @@
-[2026-04-22T11:11:49.046Z] [log] Fetching champions from: https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv
-[2026-04-22T11:11:49.056Z] [log] [CMS] Загружаем винрейты...
-[2026-04-22T11:11:50.354Z] [log] [CMS] Загружено предметов: 99
-[2026-04-22T11:11:50.393Z] [log] [CMS] Загружено рун: 55
-[2026-04-22T11:11:50.396Z] [log] [CMS] Загружено рангов винрейтов: 5
-[2026-04-22T11:11:50.398Z] [log] [CMS] cmsWR загружен, ранги: [алмаз, грандмастер, мастер, суверен, чалик]
-[2026-04-22T11:11:50.398Z] [log] [CMS] WR_DATA обновлён из Firestore
-[2026-04-22T11:11:50.398Z] [log] [CMS] Загружено патч-нотов: 1
-[2026-04-22T11:11:50.398Z] [log] [CMS] Патч-ноты загружены, patchMap обновлён
-[2026-04-22T11:11:50.398Z] [log] [CMS] Конфигурация лейаута загружена
-[2026-04-22T11:11:50.914Z] [log] Data received, length: 9058
-[2026-04-22T11:11:50.916Z] [log] Champions loaded: 136
-[2026-04-22T11:12:32.755Z] [log] opened
+[2026-04-26T00:00:35.242Z] [warning] Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+[2026-04-26T00:00:38.074Z] [log] 
+ %c %c %c Pixi.js 3.0.7 - ✰ WebGL ✰  %c  %c  http://www.pixijs.com/  %c %c ♥%c♥%c♥ 
+
+ background: #ff66a5; padding:5px 0; background: #ff66a5; padding:5px 0; color: #ff66a5; background: #030307; padding:5px 0; background: #ff66a5; padding:5px 0; background: #ffc3dc; padding:5px 0; background: #ff66a5; padding:5px 0; color: #ff2424; background: #fff; padding:5px 0; color: #ff2424; background: #fff; padding:5px 0; color: #ff2424; background: #fff; padding:5px 0;
+[2026-04-26T00:00:50.647Z] [warning] [.WebGL-0x5e9c00792a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[2026-04-26T00:00:50.688Z] [warning] Google Maps JavaScript API warning: SensorNotRequired https://developers.google.com/maps/documentation/javascript/error-messages#sensor-not-required
+[2026-04-26T00:00:50.689Z] [warning] [.WebGL-0x5e9c00792a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[2026-04-26T00:00:50.713Z] [warning] [.WebGL-0x5e9c00792a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[2026-04-26T00:00:50.735Z] [warning] [.WebGL-0x5e9c00792a00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+[2026-04-26T00:01:22.544Z] [warning] Google Maps JavaScript API has been loaded directly without loading=async. This can result in suboptimal performance. For best-practice loading patterns please see https://goo.gle/js-api-loading
+[2026-04-26T00:01:22.780Z] [log] 
+ %c %c %c Pixi.js 3.0.7 - ✰ WebGL ✰  %c  %c  http://www.pixijs.com/  %c %c ♥%c♥%c♥ 
+
+ background: #ff66a5; padding:5px 0; background: #ff66a5; padding:5px 0; color: #ff66a5; background: #030307; padding:5px 0; background: #ff66a5; padding:5px 0; background: #ffc3dc; padding:5px 0; background: #ff66a5; padding:5px 0; color: #ff2424; background: #fff; padding:5px 0; color: #ff2424; background: #fff; padding:5px 0; color: #ff2424; background: #fff; padding:5px 0;
+[2026-04-26T00:01:27.600Z] [warning] Google Maps JavaScript API warning: SensorNotRequired https://developers.google.com/maps/documentation/javascript/error-messages#sensor-not-required
+[2026-04-26T00:10:12.567Z] [log] Fetching champions from: https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv
+[2026-04-26T00:10:12.582Z] [log] [CMS] Загружаем винрейты...
+[2026-04-26T00:10:13.968Z] [error] Access to fetch at 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv' from origin 'null' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[2026-04-26T00:10:13.970Z] [error] Failed to load resource: net::ERR_FAILED
+[2026-04-26T00:10:13.973Z] [error] Fetch failed: TypeError: Failed to fetch
+    at start (file:///D:/Flutter%20ERjanKG/site/app.js:329:23)
+    at file:///D:/Flutter%20ERjanKG/site/app.js:2650:5
+    at file:///D:/Flutter%20ERjanKG/site/app.js:2707:3
+[2026-04-26T00:10:14.135Z] [log] [CMS] Загружено предметов: 99
+[2026-04-26T00:10:14.139Z] [log] [CMS] Загружено рун: 55
+[2026-04-26T00:10:14.144Z] [log] [CMS] Загружено рангов винрейтов: 5
+[2026-04-26T00:10:14.146Z] [log] [CMS] cmsWR загружен, ранги: [алмаз, грандмастер, мастер, суверен, чалик]
+[2026-04-26T00:10:14.146Z] [log] [CMS] WR_DATA обновлён из Firestore
+[2026-04-26T00:10:14.147Z] [log] [CMS] Загружено патч-нотов: 1
+[2026-04-26T00:10:14.147Z] [log] [CMS] Патч-ноты загружены, patchMap обновлён
+[2026-04-26T00:10:14.150Z] [log] [CMS] Конфигурация лейаута загружена
+[2026-04-26T00:11:52.921Z] [log] Fetching champions from: https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv
+[2026-04-26T00:11:52.922Z] [log] [CMS] Загружаем винрейты...
+[2026-04-26T00:11:54.079Z] [error] Access to fetch at 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv' from origin 'null' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+[2026-04-26T00:11:54.079Z] [error] Failed to load resource: net::ERR_FAILED
+[2026-04-26T00:11:54.079Z] [error] Fetch failed: TypeError: Failed to fetch
+    at start (file:///D:/Flutter%20ERjanKG/site/app.js:329:23)
+    at file:///D:/Flutter%20ERjanKG/site/app.js:2650:5
+    at file:///D:/Flutter%20ERjanKG/site/app.js:2707:3
+[2026-04-26T00:11:54.087Z] [log] [CMS] Загружено предметов: 99
+[2026-04-26T00:11:54.090Z] [log] [CMS] Загружено рун: 55
+[2026-04-26T00:11:54.092Z] [log] [CMS] Загружено рангов винрейтов: 5
+[2026-04-26T00:11:54.092Z] [log] [CMS] cmsWR загружен, ранги: [алмаз, грандмастер, мастер, суверен, чалик]
+[2026-04-26T00:11:54.092Z] [log] [CMS] WR_DATA обновлён из Firestore
+[2026-04-26T00:11:54.092Z] [log] [CMS] Загружено патч-нотов: 1
+[2026-04-26T00:11:54.092Z] [log] [CMS] Патч-ноты загружены, patchMap обновлён
+[2026-04-26T00:11:54.092Z] [log] [CMS] Конфигурация лейаута загружена
