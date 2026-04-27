@@ -5716,6 +5716,37 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
 .cs-tp-role     { font-size: 11px; color: var(--text-muted); }
 .cs-tp-empty    { color: var(--text-faint); font-size: 12px; text-align: center; padding: 12px 0; }
 
+/* ── Double Elimination ── */
+.cs-de-wrap { padding-bottom: 16px; }
+.cs-de-section-hdr {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 10px 14px 4px;
+  border-top: 1px solid var(--accent-border-sub);
+  margin-top: 8px;
+}
+.cs-de-wrap .cs-bracket-wrap:first-of-type { border-bottom: none; }
+
+.cs-de-gf {
+  padding: 12px 16px 20px;
+  text-align: center;
+}
+.cs-de-gf-label {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.cs-de-gf .cs-br-match {
+  max-width: 260px;
+  margin: 0 auto;
+}
+
 /* PC side-panel mode */
 @media (min-width: 900px) {
   #cybersportMask.side-panel-modal .cs-win {

@@ -14,6 +14,7 @@
     // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
     var _modalStack = [];
     var _baseZIndex = 6000;
+    var _closingFromPopstate = false; // предотвращает loop при popstate → closeModal → history.back()
 
     // Модалки которые ВСЕГДА открываются поверх (не закрывая родителя)
     var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask','profileSetupMask','userCardMask',
@@ -67,6 +68,13 @@
         });
 
         document.body.classList.add('modal-open');
+
+        // History API: каждое открытие модалки = новая запись истории.
+        // Android back-кнопка и браузерный back теперь будут закрывать модалку,
+        // а не уходить с сайта.
+        if (history && history.pushState) {
+            history.pushState({ modal: id }, '');
+        }
     }
     window.openModal = openModal;
 
@@ -129,8 +137,24 @@
                 }, 150);
             }
         }
+
+        // History API: при программном закрытии модалки «поглощаем» запись истории,
+        // чтобы следующий back уже не наткнулся на неё.
+        if (!_closingFromPopstate && history && history.back) {
+            history.back();
+        }
     }
     window.closeModal = closeModal;
+
+    // ── Back-button / Android back: перехватываем popstate ──
+    window.addEventListener('popstate', function(e) {
+        if (_modalStack.length > 0) {
+            _closingFromPopstate = true;
+            var topId = _modalStack[_modalStack.length - 1];
+            closeModal(topId);
+            _closingFromPopstate = false;
+        }
+    });
 
     // ── Global fullscreen spinner ──
     function showGlobalSpinner() {

@@ -281,10 +281,9 @@
 
   window._csStep1Next = function () {
     var name = (_q('#csTName') || {}).value || '';
-    var fmt  = document.querySelector('#csFmts input[name="csFmt"]:checked');
     _draftData.name      = name.trim();
-    if (fmt) _draftData.format = fmt.value;
     _draftData.prizePool = ((_q('#csPrize') || {}).value || '').trim();
+    // format и teamCount уже сохранены в _draftData через _csSelectFmt/_csSetCount
     if (!_draftData.name)      { alert('Введите название турнира'); return; }
     if (!_draftData.format)    { alert('Выберите формат'); return; }
     if (!_draftData.teamCount) { alert('Выберите количество команд'); return; }
@@ -576,13 +575,16 @@
       return '<div class="cs-empty">Нет матчей</div>';
     }
 
-    if (t && (t.format === 'single_elim' || t.format === 'double_elim')) {
+    if (t && t.format === 'double_elim') {
+      return _renderDEBracket(matchArr);
+    }
+    if (t && t.format === 'single_elim') {
       return _renderSEBracket(matchArr);
     }
     if (t && t.format === 'group_elim') {
       return _renderGroupBracket(matchArr);
     }
-    // Fallback: single elim rendering
+    // Fallback
     return _renderSEBracket(matchArr);
   }
 
@@ -662,6 +664,110 @@
     }
 
     return '<div class="cs-bracket-wrap"><div class="cs-bracket">' + cols + '</div></div>';
+  }
+
+  /* ── Double Elimination ── */
+  function _renderDEBracket(matchArr) {
+    var isCreator = _uid() && _currentT && _currentT.createdBy === _uid();
+
+    // Split matches by phase
+    var ubMatches = {}, lbMatches = {}, gfMatch = null;
+    matchArr.forEach(function (m) {
+      if (m.phase === 'upper') {
+        if (!ubMatches[m.round]) ubMatches[m.round] = [];
+        ubMatches[m.round].push(m);
+      } else if (m.phase === 'lower') {
+        if (!lbMatches[m.round]) lbMatches[m.round] = [];
+        lbMatches[m.round].push(m);
+      } else if (m.phase === 'final' || m.id === 'grand_final') {
+        gfMatch = m;
+      }
+    });
+
+    // Sort within rounds
+    [ubMatches, lbMatches].forEach(function (obj) {
+      Object.keys(obj).forEach(function (r) {
+        obj[r].sort(function (a, b) { return (a.matchNum || 0) - (b.matchNum || 0); });
+      });
+    });
+
+    /* ── Upper Bracket ── */
+    function _buildBracketCols(roundObj, labelPrefix, heightPerSlot) {
+      var rounds   = Object.keys(roundObj).map(Number).sort(function (a, b) { return a - b; });
+      var maxRound = rounds[rounds.length - 1] || 1;
+      var r1cnt    = (roundObj[rounds[0]] || []).length;
+      var totalH   = r1cnt * heightPerSlot;
+      var cols     = '';
+
+      rounds.forEach(function (round) {
+        var rm    = roundObj[round] || [];
+        var slotH = totalH / rm.length;
+        var matchesHtml = rm.map(function (m) {
+          return '<div class="cs-br-slot-wrap" style="height:' + slotH + 'px">' +
+            _htmlSEMatch(m, isCreator) + '</div>';
+        }).join('');
+
+        // Round label
+        var lbl;
+        if (labelPrefix === 'UB') {
+          if (round === maxRound)     lbl = 'UB Финал';
+          else if (round === maxRound - 1) lbl = 'UB Полуфинал';
+          else                        lbl = 'UB Раунд ' + round;
+        } else {
+          var lbTotal = Object.keys(roundObj).length;
+          if (round === lbTotal)      lbl = 'LB Финал';
+          else                        lbl = 'LB Раунд ' + round;
+        }
+
+        cols += '<div class="cs-br-col">' +
+          '<div class="cs-br-rlabel">' + lbl + '</div>' +
+          '<div class="cs-br-matches" style="height:' + totalH + 'px">' + matchesHtml + '</div></div>';
+
+        // Connector
+        if (round < maxRound) {
+          var nextCnt   = (roundObj[round + 1] || []).length || 1;
+          var connPairs = rm.length / 2;
+          var connHtml  = '';
+          for (var ci = 0; ci < connPairs; ci++) {
+            connHtml += '<div class="cs-conn-pair" style="height:' + (totalH / connPairs) + 'px">' +
+              '<div class="cs-conn-top"></div><div class="cs-conn-bot"></div></div>';
+          }
+          cols += '<div class="cs-br-conn" style="height:' + totalH + 'px;margin-top:28px">' + connHtml + '</div>';
+        }
+      });
+
+      return { cols: cols, totalH: totalH };
+    }
+
+    var ubSlotH = 96;
+    var ubRes   = _buildBracketCols(ubMatches, 'UB', ubSlotH);
+
+    // LB may have different round count — use uniform slot height
+    var lbSlotH = 84;
+    var lbRes   = _buildBracketCols(lbMatches, 'LB', lbSlotH);
+
+    /* ── Grand Final ── */
+    var gfHtml = '';
+    if (gfMatch) {
+      gfHtml = '<div class="cs-de-gf">' +
+        '<div class="cs-de-gf-label">Гранд Финал</div>' +
+        _htmlSEMatch(gfMatch, isCreator) +
+        (gfMatch.winnerId ? (function () {
+          var w = _teams[gfMatch.winnerId];
+          return w ? '<div class="cs-br-winner-card" style="margin:12px auto 0;width:140px">' +
+            _logoEl(w, 50) + '<div class="cs-bw-name">' + _e(w.name) + '</div>' +
+            '<div class="cs-bw-crown">🏆</div></div>' : '';
+        })() : '') +
+        '</div>';
+    }
+
+    return '<div class="cs-de-wrap">' +
+      '<div class="cs-de-section-hdr">Upper Bracket</div>' +
+      '<div class="cs-bracket-wrap"><div class="cs-bracket">' + ubRes.cols + '</div></div>' +
+      '<div class="cs-de-section-hdr">Lower Bracket</div>' +
+      '<div class="cs-bracket-wrap"><div class="cs-bracket">' + lbRes.cols + '</div></div>' +
+      gfHtml +
+      '</div>';
   }
 
   function _htmlSEMatch(m, isCreator) {
@@ -767,12 +873,14 @@
     var teamArr = _teamsSorted();
     if (teamArr.length < 2) { alert('Добавьте хотя бы 2 команды'); return; }
 
-    if (t.format === 'single_elim' || t.format === 'double_elim') {
+    if (t.format === 'single_elim') {
       _generateSE(teamArr, db);
+    } else if (t.format === 'double_elim') {
+      _generateDE(teamArr, db);
     } else if (t.format === 'group_elim') {
       _generateGroups(teamArr, db);
     } else {
-      alert('Формат "' + (FORMAT_LABELS[t.format] || t.format) + '" — генерация скоро. Пока используйте Single Elimination или Группы + Плей-офф');
+      alert('Формат "' + (FORMAT_LABELS[t.format] || t.format) + '" — генерация скоро. Пока используйте Single Elimination, Double Elimination или Группы + Плей-офф');
     }
   };
 
@@ -858,6 +966,131 @@
     batch.commit().then(function () {
       _currentT.status = 'active'; _bracketTab = 'bracket'; _render();
     }).catch(function (e) { alert('Ошибка старта: ' + e.message); });
+  }
+
+  /* ── Generate Double Elimination ── */
+  function _generateDE(teamArr, db) {
+    var n    = _pow2(teamArr.length);
+    var k    = Math.log2(n);      // number of UB rounds (e.g. 8 teams → k=3)
+    var bo   = _currentT.bo || 3;
+    var pairs    = _seedPairs(n);
+    var seedMap  = {};
+    teamArr.forEach(function (t, i) { seedMap[i + 1] = t.id; });
+
+    var batch = db.batch();
+    var mRef  = db.collection('tournaments').doc(_currentTId).collection('matches');
+    var r2Pre = {}; // {matchId: {field: teamId}} — prefill from byes/advance
+
+    function _set(matchId, data) {
+      batch.set(mRef.doc(matchId), Object.assign({
+        score1: 0, score2: 0, winnerId: null, status: 'upcoming',
+        nextMatchId: null, nextMatchSlot: 1,
+        loserNextMatchId: null, loserNextMatchSlot: 1,
+        bo: bo
+      }, data));
+    }
+
+    /* ═══ UPPER BRACKET ════════════════════════════════════ */
+    var pairIdx = 0;
+    for (var r = 1; r <= k; r++) {
+      var cnt = n / Math.pow(2, r);
+      for (var m = 1; m <= cnt; m++) {
+        var mId = 'ub_r' + r + '_m' + m;
+
+        // Winner destination
+        var wId    = r < k   ? 'ub_r' + (r + 1) + '_m' + Math.ceil(m / 2) : 'grand_final';
+        var wSlot  = r < k   ? (m % 2 === 1 ? 1 : 2) : 1;
+
+        // Loser destination
+        var lId, lSlot;
+        if (r === 1) {
+          // UB R1 → LB R1 (pairs: matches 1&2 → lb_r1_m1, matches 3&4 → lb_r1_m2, …)
+          lId   = 'lb_r1_m' + Math.ceil(m / 2);
+          lSlot = m % 2 === 1 ? 1 : 2;
+        } else if (r < k) {
+          // UB R{r} → LB R{2*(r-1)} slot 2
+          lId   = 'lb_r' + (2 * (r - 1)) + '_m' + m;
+          lSlot = 2;
+        } else {
+          // UB Final → LB Final slot 2
+          lId   = 'lb_r' + (2 * (k - 1)) + '_m1';
+          lSlot = 2;
+        }
+
+        var t1Id = null, t2Id = null;
+        if (r === 1) {
+          var pair = pairs[pairIdx] || [];
+          t1Id = seedMap[pair[0]] || null;
+          t2Id = seedMap[pair[1]] || null;
+          pairIdx++;
+        }
+
+        // Handle bye
+        var byeW = (t1Id && !t2Id) ? t1Id : (!t1Id && t2Id) ? t2Id : null;
+        _set(mId, {
+          phase: 'upper', round: r, matchNum: m,
+          team1Id: t1Id, team2Id: t2Id,
+          score1: byeW ? (t1Id ? 1 : 0) : 0,
+          score2: byeW ? (t2Id ? 1 : 0) : 0,
+          winnerId: byeW, status: byeW ? 'completed' : 'upcoming',
+          nextMatchId: wId, nextMatchSlot: wSlot,
+          loserNextMatchId: lId, loserNextMatchSlot: lSlot
+        });
+        if (byeW) {
+          if (!r2Pre[wId]) r2Pre[wId] = {};
+          r2Pre[wId][wSlot === 1 ? 'team1Id' : 'team2Id'] = byeW;
+        }
+      }
+    }
+
+    /* ═══ LOWER BRACKET ════════════════════════════════════ */
+    var totalLBR = 2 * (k - 1);
+    for (var lr = 1; lr <= totalLBR; lr++) {
+      // Count matches in this LB round
+      var jj   = Math.ceil(lr / 2);
+      var lCnt = Math.pow(2, k - 1 - jj);
+
+      for (var lm = 1; lm <= lCnt; lm++) {
+        var lmId = 'lb_r' + lr + '_m' + lm;
+
+        // Winner destination
+        var lwId, lwSlot;
+        if (lr === totalLBR) {
+          lwId   = 'grand_final';
+          lwSlot = 2;
+        } else if (lr % 2 === 0) {
+          // Even → next odd (pure): pair into one match
+          lwId   = 'lb_r' + (lr + 1) + '_m' + Math.ceil(lm / 2);
+          lwSlot = lm % 2 === 1 ? 1 : 2;
+        } else {
+          // Odd → next even (drop-in): same match number, slot 1
+          lwId   = 'lb_r' + (lr + 1) + '_m' + lm;
+          lwSlot = 1;
+        }
+
+        _set(lmId, {
+          phase: 'lower', round: lr, matchNum: lm,
+          team1Id: null, team2Id: null,
+          nextMatchId: lwId, nextMatchSlot: lwSlot
+        });
+      }
+    }
+
+    /* ═══ GRAND FINAL ══════════════════════════════════════ */
+    _set('grand_final', {
+      phase: 'final', round: 1, matchNum: 1,
+      team1Id: null, team2Id: null
+    });
+
+    // Apply bye prefills
+    Object.keys(r2Pre).forEach(function (mid) {
+      batch.update(mRef.doc(mid), r2Pre[mid]);
+    });
+
+    batch.update(db.collection('tournaments').doc(_currentTId), { status: 'active' });
+    batch.commit().then(function () {
+      _currentT.status = 'active'; _bracketTab = 'bracket'; _render();
+    }).catch(function (e) { alert('Ошибка старта DE: ' + e.message); });
   }
 
   /* ── Generate Group Stage (Round Robin) ── */
@@ -949,15 +1182,22 @@
     }
 
     var winnerId = s1 > s2 ? m.team1Id : m.team2Id;
+    var loserId  = s1 > s2 ? m.team2Id : m.team1Id;
     var batch    = db.batch();
     var mRef     = db.collection('tournaments').doc(_currentTId).collection('matches').doc(matchId);
     batch.update(mRef, { score1: s1, score2: s2, winnerId: winnerId, status: 'completed' });
 
+    // Winner path (SE + DE upper)
     if (m.nextMatchId) {
       var nRef  = db.collection('tournaments').doc(_currentTId).collection('matches').doc(m.nextMatchId);
-      var field = m.nextMatchSlot === 1 ? 'team1Id' : 'team2Id';
-      var upd   = {}; upd[field] = winnerId;
+      var upd   = {}; upd[m.nextMatchSlot === 1 ? 'team1Id' : 'team2Id'] = winnerId;
       batch.update(nRef, upd);
+    }
+    // Loser path (DE only — loser drops to lower bracket)
+    if (m.loserNextMatchId && loserId) {
+      var lRef  = db.collection('tournaments').doc(_currentTId).collection('matches').doc(m.loserNextMatchId);
+      var lupd  = {}; lupd[m.loserNextMatchSlot === 1 ? 'team1Id' : 'team2Id'] = loserId;
+      batch.update(lRef, lupd);
     }
 
     batch.commit().then(function () {
@@ -973,11 +1213,17 @@
     var batch = db.batch();
     var mRef  = db.collection('tournaments').doc(_currentTId).collection('matches').doc(matchId);
     batch.update(mRef, { score1: 0, score2: 0, winnerId: null, status: 'upcoming' });
+    // Clear winner path
     if (m.nextMatchId) {
-      var nRef  = db.collection('tournaments').doc(_currentTId).collection('matches').doc(m.nextMatchId);
-      var field = m.nextMatchSlot === 1 ? 'team1Id' : 'team2Id';
-      var upd   = {}; upd[field] = null;
+      var nRef = db.collection('tournaments').doc(_currentTId).collection('matches').doc(m.nextMatchId);
+      var upd  = {}; upd[m.nextMatchSlot === 1 ? 'team1Id' : 'team2Id'] = null;
       batch.update(nRef, upd);
+    }
+    // Clear loser path (DE)
+    if (m.loserNextMatchId) {
+      var lRef = db.collection('tournaments').doc(_currentTId).collection('matches').doc(m.loserNextMatchId);
+      var lupd = {}; lupd[m.loserNextMatchSlot === 1 ? 'team1Id' : 'team2Id'] = null;
+      batch.update(lRef, lupd);
     }
     batch.commit().catch(function (e) { alert('Ошибка: ' + e.message); });
   };
