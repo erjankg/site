@@ -2203,14 +2203,15 @@
     // Sidebar → modal → close modal → sidebar reopens
     var _sidebarModalId = null; // which MAIN modal was opened from sidebar
     var _pcSideMode = false;    // true when on PC sidebar stays open + modal to the right
-    var _mainSidebarModals = ['sideChampsMask','calcMask','itemCalcMenuMask','itemsMask','runesMask','draftMask','draftCoopMask','tierlistMask','changesMask'];
+    var _mainSidebarModals = ['sideChampsMask','calcMask','itemCalcMenuMask','itemsMask','runesMask','draftMask','draftCoopMask','tierlistMask','changesMask','cybersportMask'];
 
     var _sidebarModalMap = {
         'sideChamps':'sideChampsMask', 'calc':'calcMask', 'itemCalcMenu':'itemCalcMenuMask',
         'items':'itemsMask', 'runes':'runesMask', 'draft':'draftMask', 'draftCoop':'draftCoopMask',
         'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask',
         'tierMenu':'tierlistMenuMask', 'globalChat':'chatSystemMask',
-        'users':'chatSystemMask', 'changes':'changesMask'
+        'users':'chatSystemMask', 'changes':'changesMask',
+        'cybersport':'cybersportMask'
     };
 
     function _sidebarDoOpen(what) {
@@ -2222,6 +2223,7 @@
             case 'runes': openRunes(); break;
             case 'draft': openDraft(); break;
             case 'draftCoop': if(window.openDraftCoop)openDraftCoop(); break;
+            case 'cybersport': if(window.openCybersport)openCybersport(); break;
             case 'tierChamps': openTierlist('champs'); break;
             case 'tierItems': openTierlist('items'); break;
             case 'tierRunes': openTierlist('runes'); break;

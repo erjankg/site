@@ -492,6 +492,7 @@ Stormarrow: При максимальных зарядах следующая б
 
   <div class="side-section" style="margin-top:8px;">Сообщество</div>
   <button class="side-btn side-btn-chat" onclick="sidebarOpen('globalChat')"><span class="side-icon">💬</span>Чат<span id="sidebarChatBadge" style="display:none;"></span></button>
+  <button class="side-btn side-btn-cs" onclick="sidebarOpen('cybersport')"><span class="side-icon">🏆</span>Киберспорт</button>
 
   <div style="flex:1;"></div>
   <div style="padding:0 8px;">
@@ -1177,11 +1178,23 @@ Stormarrow: При максимальных зарядах следующая б
   <div class="global-spinner"></div>
 </div>
 
+<!-- ══ CYBERSPORT MODAL ══ -->
+<div class="m-mask" id="cybersportMask" onclick="if(event.target===this)closeCybersport()">
+  <div class="m-win cs-win">
+    <div class="mhdr">
+      <button class="btn-close-x" onclick="closeCybersport()">←</button>
+      <span class="mhdr-t">🏆 Киберспорт</span>
+    </div>
+    <div id="csRoot" class="cs-root"></div>
+  </div>
+</div>
+
 <!-- ══ FIREBASE + AUTH + SYNC ══ -->
 
 <script src="cms.js"></script>
 <script src="app.js"></script>
 <script src="draft.js"></script>
+<script src="cybersport.js"></script>
 
 </body>
 </html>
