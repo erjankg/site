@@ -93,9 +93,9 @@
             <span></span><span></span><span></span>
         </button>
         <div id="headerCenter">
-            <button id="viewBtnMain" class="header-view-btn active" onclick="switchMainView('main')">Stats</button>
-            <div class="logo"><a id="nickname" href="#" aria-label="PRO-WILDRIFT">PRO-WILDRIFT</a></div>
-            <button id="viewBtnWrpr" class="header-view-btn" onclick="switchMainView('wrpr')">WinRate</button>
+            <button id="viewBtnMain" class="header-view-btn active" data-cms-inline="misc.viewBtnMain" onclick="switchMainView('main')">Stats</button>
+            <div class="logo"><a id="nickname" href="#" data-cms-inline="misc.headerTitle" aria-label="PRO-WILDRIFT">PRO-WILDRIFT</a></div>
+            <button id="viewBtnWrpr" class="header-view-btn" data-cms-inline="misc.viewBtnWrpr" onclick="switchMainView('wrpr')">WinRate</button>
         </div>
         <div class="lang-wrapper" id="langWrapper">
             <button class="lang-btn" id="langBtn" onclick="openLangDropdown(event)" aria-label="Switch language" title="RU / EN">
@@ -130,7 +130,7 @@
         <div class="lvl-info">
             <span class="lvl-label" data-i18n="УРОВЕНЬ">УРОВЕНЬ</span>
             <span id="lvlLabel" class="lvl-num">10</span>
-            <span class="patch-badge">Patch 7.0f</span>
+            <span class="patch-badge" data-cms-inline="misc.patchBadge">Patch 7.0f</span>
             <button class="lvl-col-cfg-btn" onclick="openStatsColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button>
         </div>
         <div class="slider-wrapper">
@@ -446,8 +446,8 @@ Stormarrow: При максимальных зарядах следующая б
     </div>
 
     <!-- ══ ЗАЧАРОВАНИЯ БОТИНОК ══ -->
-    <div class="items-section-label" style="margin-top:16px;">✨ Зачарования ботинок</div>
-    <div class="items-section-sublabel">Можно добавить к любым ботинкам</div>
+    <div class="items-section-label" data-cat-id="enchants" data-cms-inline="itemCats.enchants" style="margin-top:16px;">✨ Зачарования ботинок</div>
+    <div class="items-section-sublabel" data-cms-inline="misc.enchantsSubLabel">Можно добавить к любым ботинкам</div>
     <div class="items-grid">
       <div class="item-card" data-tip="Гейлфорс¦500 г¦—¦Облачный взрыв: Рывок к цели (325), затем 3 снаряда по самому раненому врагу (600). Каждый наносит 13–40 (+ 45% бонусного AD) физ. урона. Итого 40–120 (зависит от уровня) (+ 45% бонусного AD). Перезарядка 50с."><img src="https://www.wildriftfire.com/images/items/galeforce.png" alt="Гейлфорс" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:var(--accent-border);border-radius:6px;display:block;'"></div>
       <div class="item-card" data-tip="Великолепное очарование¦500 г¦—¦Слава: +30% скорости передвижения на 4с. При достижении врага — ударная волна замедляет на 60% на 2с. Также +20% стойкости и +20% сопротивления замедлению. Перезарядка 45с, дальность 250."><img src="https://www.wildriftfire.com/images/items/glorious.png" alt="Великолепное очарование" loading="lazy" onerror="this.src='';this.style.cssText='width:44px;height:44px;background:var(--accent-border);border-radius:6px;display:block;'"></div>
@@ -848,7 +848,7 @@ Stormarrow: При максимальных зарядах следующая б
     <!-- Tab: Мои драфты -->
     <div id="dcoopPaneMy" class="dcoop-pane" style="display:none;">
       <div id="dcoopMyActive" class="dcoop-list-block">
-        <div class="dcoop-block-title">⚡ Активные лобби</div>
+        <div class="dcoop-block-title" data-i18n="⚡ Активные лобби">⚡ Активные лобби</div>
         <div id="dcoopMyActiveList" class="dcoop-list">
           <div class="dcoop-empty" data-i18n="Нет активных лобби">Нет активных лобби</div>
         </div>

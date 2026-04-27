@@ -2873,6 +2873,12 @@
             if (doc.exists && doc.data().isAdmin === true) { _isAdmin = true; }
             window._isAdmin = _isAdmin;
             console.log('[checkAdmin] final _isAdmin:', _isAdmin);
+            if (_isAdmin) {
+                document.body.classList.add('cms-admin-mode');
+                window.cmsSetupInlineEditing && window.cmsSetupInlineEditing();
+            } else {
+                document.body.classList.remove('cms-admin-mode');
+            }
             renderGlobalChat();
             // CMS: перерисовать с кнопками редактирования для админа
             if (_isAdmin && window._cmsLoaded) {
@@ -3541,6 +3547,7 @@
                 updateChatUI(false);
                 _isAdmin = false;
                 window._isAdmin = false;
+                document.body.classList.remove('cms-admin-mode');
                 document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = 'none'; });
                 document.body.classList.remove('profile-gated');
                 showSiteAuthGate();

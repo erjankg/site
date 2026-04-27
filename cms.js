@@ -44,15 +44,16 @@
 
   window.cmsLoadData = function(callback) {
     var db = firebase.firestore();
-    var loaded = { items: false, runes: false, icons: false, sidebar: false, texts: false };
+    var loaded = { items: false, runes: false, icons: false, sidebar: false, texts: false, customTexts: false };
 
     function checkDone() {
-      if (loaded.items && loaded.runes && loaded.icons && loaded.sidebar && loaded.texts) {
+      if (loaded.items && loaded.runes && loaded.icons && loaded.sidebar && loaded.texts && loaded.customTexts) {
         window._cmsLoaded = true;
         if (window.cmsLoadCategories) {
           window.cmsLoadCategories(function() {
             setTimeout(function() {
               if (window._siteTexts && window.cmsApplyAllSiteTexts) window.cmsApplyAllSiteTexts();
+              if (window.cmsApplyCustomTexts) window.cmsApplyCustomTexts();
             }, 200);
             if (callback) callback();
             // Грузим changesFeed и changelog в фоне (не блокируем основную загрузку)
@@ -62,6 +63,7 @@
         } else {
           setTimeout(function() {
             if (window._siteTexts && window.cmsApplyAllSiteTexts) window.cmsApplyAllSiteTexts();
+            if (window.cmsApplyCustomTexts) window.cmsApplyCustomTexts();
           }, 200);
           if (callback) callback();
           window.cmsLoadChangesFeed && window.cmsLoadChangesFeed();
@@ -124,6 +126,15 @@
         checkDone();
       })
       .catch(function() { window._siteTexts = {}; loaded.texts = true; checkDone(); });
+
+    // Загрузка кастомных текстов (все [data-i18n] переопределения)
+    db.collection('siteConfig').doc('customTexts').get()
+      .then(function(doc) {
+        window._customTexts = doc.exists ? doc.data() : {};
+        loaded.customTexts = true;
+        checkDone();
+      })
+      .catch(function() { window._customTexts = {}; loaded.customTexts = true; checkDone(); });
 
     // Загрузка предметов
     db.collection('items').get()
@@ -217,6 +228,7 @@
       var label = document.createElement('div');
       label.className = 'items-section-label';
       label.setAttribute('data-cat-id', cat.id);
+      label.setAttribute('data-cms-inline', 'itemCats.' + cat.id);
       if (cat.id === 'enchants') label.style.marginTop = '16px';
       // Применяем сохранённые тексты если есть
       var _savedCatText = window._siteTexts && window._siteTexts.itemCats && window._siteTexts.itemCats[cat.id];
@@ -341,6 +353,7 @@
       var section = document.createElement('div');
       section.className = 'side-section';
       section.setAttribute('data-tree-id', tree.id);
+      section.setAttribute('data-cms-inline', 'runeTrees.' + tree.id);
       section.style.cssText = 'padding:0;margin:' + (tree.id === 'keystone' ? '0 0 8px' : '16px 0 8px') + ';';
       // Применяем сохранённые тексты если есть
       var _savedTreeText = window._siteTexts && window._siteTexts.runeTrees && window._siteTexts.runeTrees[tree.id];
@@ -3176,6 +3189,7 @@
       document.querySelectorAll('.items-section-label').forEach(function(el) {
         var catId = el.getAttribute('data-cat-id');
         if (!catId) return;
+        el.setAttribute('data-cms-inline', 'itemCats.' + catId);
         var saved = data.itemCats[catId];
         if (!saved) return;
         var text = lang === 'en' ? (saved.en || saved.ru) : saved.ru;
@@ -3195,6 +3209,7 @@
       });
       document.querySelectorAll('.side-section[data-tree-id]').forEach(function(el) {
         var treeId = el.getAttribute('data-tree-id');
+        el.setAttribute('data-cms-inline', 'runeTrees.' + treeId);
         var saved = data.runeTrees[treeId];
         if (!saved) return;
         var text = lang === 'en' ? (saved.en || saved.ru) : saved.ru;
@@ -3209,6 +3224,7 @@
       var encSub = data.misc.enchantsSubLabel;
       if (encSub) {
         document.querySelectorAll('.items-section-sublabel').forEach(function(el) {
+          el.setAttribute('data-cms-inline', 'misc.enchantsSubLabel');
           el.textContent = lang === 'en' ? (encSub.en || encSub.ru) : encSub.ru;
         });
       }
@@ -3239,18 +3255,268 @@
     }
   }
 
+  // Применить кастомные тексты ко всем [data-i18n] элементам
+  function _applyCustomTexts() {
+    var data = window._customTexts;
+    if (!data) return;
+    var lang = localStorage.getItem('wr_lang') || 'ru';
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      var ct = data[key];
+      if (!ct) return;
+      var isAttr = el.getAttribute('data-i18n-attr');
+      var text = lang === 'en' ? (ct.en || ct.ru || key) : (ct.ru || key);
+      if (isAttr === 'placeholder') el.placeholder = text;
+      else if (isAttr === 'title') el.title = text;
+      else el.textContent = text;
+    });
+  }
+
   // Применять тексты при смене языка (патчим setLang)
   var _origSetLangForTexts = window.setLang;
   if (typeof _origSetLangForTexts === 'function') {
     window.setLang = function(lang) {
       _origSetLangForTexts(lang);
       if (window._siteTexts) _applyAllSiteTexts(window._siteTexts);
+      _applyCustomTexts();
     };
   }
 
   // Экспортируем для вызова из cmsLoadData callback
   window.cmsApplyAllSiteTexts = function() {
     if (window._siteTexts) _applyAllSiteTexts(window._siteTexts);
+  };
+  window.cmsApplyCustomTexts = function() { _applyCustomTexts(); };
+
+  // ═══════════════════════════════════════════════════════════════
+  // ✏ INLINE TEXT EDITING — прямо на месте, без модалки
+  // ═══════════════════════════════════════════════════════════════
+
+  // Помечаем элементы атрибутом data-cms-inline
+  function _markStaticInlineElements() {
+    // Элементы из _TEXTS_SCHEMA (специфичные)
+    var nick = document.getElementById('nickname');
+    if (nick) nick.setAttribute('data-cms-inline', 'misc.headerTitle');
+    var btn1 = document.getElementById('viewBtnMain');
+    if (btn1) btn1.setAttribute('data-cms-inline', 'misc.viewBtnMain');
+    var btn2 = document.getElementById('viewBtnWrpr');
+    if (btn2) btn2.setAttribute('data-cms-inline', 'misc.viewBtnWrpr');
+    document.querySelectorAll('.patch-badge').forEach(function(el) {
+      el.setAttribute('data-cms-inline', 'misc.patchBadge');
+    });
+    document.querySelectorAll('.items-section-sublabel').forEach(function(el) {
+      el.setAttribute('data-cms-inline', 'misc.enchantsSubLabel');
+    });
+    // Все [data-i18n] элементы (кроме inputs/selects с data-i18n-attr)
+    document.querySelectorAll('[data-i18n]:not(input):not(select):not(textarea):not([data-i18n-attr])').forEach(function(el) {
+      if (!el.hasAttribute('data-cms-inline')) {
+        el.setAttribute('data-cms-inline', 'i18n:' + el.getAttribute('data-i18n'));
+      }
+    });
+  }
+
+  window.cmsSetupInlineEditing = function() {
+    if (window._inlineEditingSetup) return;
+    window._inlineEditingSetup = true;
+
+    // CSS
+    var style = document.createElement('style');
+    style.id = 'cms-inline-style';
+    style.textContent = [
+      'body.cms-admin-mode [data-cms-inline]{',
+      '  outline:1px dashed rgba(255,215,0,0.35);outline-offset:2px;cursor:pointer;',
+      '}',
+      'body.cms-admin-mode [data-cms-inline]:hover{',
+      '  outline:2px solid rgba(255,215,0,0.9);outline-offset:2px;',
+      '  position:relative;',
+      '}',
+      '.cms-ipop{',
+      '  position:fixed;background:#161625;border:1px solid rgba(255,215,0,0.45);',
+      '  border-radius:10px;padding:14px 16px;z-index:100000;min-width:270px;max-width:320px;',
+      '  box-shadow:0 10px 40px rgba(0,0,0,0.7);',
+      '}',
+      '.cms-ipop h4{margin:0 0 10px;font-size:11px;color:rgba(255,215,0,0.85);',
+      '  font-weight:700;text-transform:uppercase;letter-spacing:.6px;}',
+      '.cms-ipop .irow{display:flex;align-items:center;gap:6px;margin-bottom:6px;}',
+      '.cms-ipop .ilbl{font-size:10px;color:rgba(255,255,255,0.38);min-width:24px;}',
+      '.cms-ipop input[type=text]{flex:1;background:rgba(255,255,255,0.07);',
+      '  border:1px solid rgba(255,255,255,0.15);border-radius:6px;color:#fff;',
+      '  font-size:13px;padding:5px 8px;outline:none;width:0;}',
+      '.cms-ipop input[type=text]:focus{border-color:rgba(255,215,0,0.5);}',
+      '.cms-ipop input[type=color]{width:30px;height:26px;padding:0;',
+      '  border:1px solid rgba(255,255,255,0.2);border-radius:5px;',
+      '  cursor:pointer;background:transparent;}',
+      '.cms-ipop .ibtns{display:flex;gap:6px;margin-top:10px;}',
+      '.cms-ipop .ibtn-save{flex:1;background:rgba(255,215,0,0.13);',
+      '  border:1px solid rgba(255,215,0,0.45);color:#FFD700;border-radius:6px;',
+      '  padding:6px 10px;cursor:pointer;font-size:12px;font-weight:700;}',
+      '.cms-ipop .ibtn-save:hover{background:rgba(255,215,0,0.25);}',
+      '.cms-ipop .ibtn-cancel{background:rgba(255,255,255,0.06);',
+      '  border:1px solid rgba(255,255,255,0.14);color:rgba(255,255,255,0.55);',
+      '  border-radius:6px;padding:6px 10px;cursor:pointer;font-size:12px;}',
+    ].join('\n');
+    document.head.appendChild(style);
+
+    _markStaticInlineElements();
+
+    // MutationObserver: автоматически помечаем новые [data-i18n] элементы
+    var _i18nObs = new MutationObserver(function(muts) {
+      if (!window._isAdmin) return;
+      muts.forEach(function(m) {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType !== 1) return;
+          var els = [];
+          if (node.hasAttribute('data-i18n') && !node.matches('input,select,textarea') && !node.hasAttribute('data-i18n-attr')) els.push(node);
+          node.querySelectorAll('[data-i18n]:not(input):not(select):not(textarea):not([data-i18n-attr])').forEach(function(el) { els.push(el); });
+          els.forEach(function(el) {
+            if (!el.hasAttribute('data-cms-inline'))
+              el.setAttribute('data-cms-inline', 'i18n:' + el.getAttribute('data-i18n'));
+          });
+        });
+      });
+    });
+    _i18nObs.observe(document.body, { childList: true, subtree: true });
+
+    var _pop = null;
+
+    function _closePop() { if (_pop) { _pop.remove(); _pop = null; } }
+
+    function _findEntry(key) {
+      // Кастомный i18n-текст
+      if (key.indexOf('i18n:') === 0) {
+        var k = key.slice(5);
+        return { secKey: 'i18n', entry: { id: k, label: k.length > 45 ? k.slice(0, 42) + '…' : k, defaultRu: k, defaultEn: '' } };
+      }
+      var parts = key.split('.');
+      var secKey = parts[0], entryId = parts.slice(1).join('.');
+      for (var i = 0; i < _TEXTS_SCHEMA.length; i++) {
+        if (_TEXTS_SCHEMA[i].key !== secKey) continue;
+        for (var j = 0; j < _TEXTS_SCHEMA[i].entries.length; j++) {
+          if (_TEXTS_SCHEMA[i].entries[j].id === entryId)
+            return { secKey: secKey, entry: _TEXTS_SCHEMA[i].entries[j] };
+        }
+      }
+      return null;
+    }
+
+    function _openPop(el, key) {
+      _closePop();
+      var found = _findEntry(key);
+      if (!found) return;
+      var secKey = found.secKey, entry = found.entry;
+      var isI18n = secKey === 'i18n';
+      var saved = isI18n
+        ? ((window._customTexts || {})[entry.id] || {})
+        : (((window._siteTexts || {})[secKey] || {})[entry.id] || {});
+
+      var pop = document.createElement('div');
+      pop.className = 'cms-ipop';
+      _pop = pop;
+
+      var title = document.createElement('h4');
+      title.textContent = '✏ ' + entry.label;
+      pop.appendChild(title);
+
+      function makeRow(lbl, val) {
+        var row = document.createElement('div'); row.className = 'irow';
+        var l = document.createElement('span'); l.className = 'ilbl'; l.textContent = lbl;
+        var inp = document.createElement('input'); inp.type = 'text'; inp.value = val;
+        row.appendChild(l); row.appendChild(inp);
+        pop.appendChild(row);
+        return inp;
+      }
+
+      var ruInp = makeRow('RU:', saved.ru || (isI18n ? el.textContent.trim() : entry.defaultRu) || '');
+      var enInp = makeRow('EN:', saved.en || (isI18n ? '' : entry.defaultEn) || '');
+
+      // Цвет — только для _TEXTS_SCHEMA элементов
+      var ci = null;
+      if (!isI18n) {
+        var crow = document.createElement('div'); crow.className = 'irow';
+        var cl = document.createElement('span'); cl.className = 'ilbl'; cl.textContent = 'Цвет:';
+        ci = document.createElement('input'); ci.type = 'color';
+        ci.value = saved.color || entry.defaultColor || '#ffffff';
+        crow.appendChild(cl); crow.appendChild(ci);
+        pop.appendChild(crow);
+      }
+
+      var btns = document.createElement('div'); btns.className = 'ibtns';
+      var saveBtn = document.createElement('button'); saveBtn.className = 'ibtn-save'; saveBtn.textContent = '💾 Сохранить';
+      var cancelBtn = document.createElement('button'); cancelBtn.className = 'ibtn-cancel'; cancelBtn.textContent = 'Закрыть';
+      cancelBtn.onclick = _closePop;
+      btns.appendChild(saveBtn); btns.appendChild(cancelBtn);
+      pop.appendChild(btns);
+
+      saveBtn.onclick = function() {
+        var db = firebase.firestore();
+        saveBtn.textContent = '⏳'; saveBtn.disabled = true;
+        if (isI18n) {
+          var newData = JSON.parse(JSON.stringify(window._customTexts || {}));
+          newData[entry.id] = { ru: ruInp.value.trim(), en: enInp.value.trim() };
+          db.collection('siteConfig').doc('customTexts').set(newData)
+            .then(function() {
+              window._customTexts = newData;
+              _applyCustomTexts();
+              _showToast('Сохранено!', 'success');
+              _closePop();
+            })
+            .catch(function(err) {
+              _showToast('Ошибка: ' + err.message, 'error');
+              saveBtn.textContent = '💾 Сохранить'; saveBtn.disabled = false;
+            });
+        } else {
+          var newData = JSON.parse(JSON.stringify(window._siteTexts || {}));
+          if (!newData[secKey]) newData[secKey] = {};
+          newData[secKey][entry.id] = { ru: ruInp.value.trim(), en: enInp.value.trim(), color: ci ? ci.value : '' };
+          db.collection('siteConfig').doc('texts').set(newData)
+            .then(function() {
+              window._siteTexts = newData;
+              _applyAllSiteTexts(newData);
+              _markStaticInlineElements();
+              _showToast('Сохранено!', 'success');
+              _closePop();
+            })
+            .catch(function(err) {
+              _showToast('Ошибка: ' + err.message, 'error');
+              saveBtn.textContent = '💾 Сохранить'; saveBtn.disabled = false;
+            });
+        }
+      };
+
+      document.body.appendChild(pop);
+
+      // Позиционирование — под элементом, не выходим за края
+      var rect = el.getBoundingClientRect();
+      var ph = pop.offsetHeight, pw = pop.offsetWidth;
+      var top = rect.bottom + 8, left = rect.left;
+      if (left + pw > window.innerWidth - 10) left = window.innerWidth - pw - 10;
+      if (left < 8) left = 8;
+      if (top + ph > window.innerHeight - 10) top = rect.top - ph - 8;
+      if (top < 8) top = 8;
+      pop.style.top = top + 'px';
+      pop.style.left = left + 'px';
+
+      ruInp.focus(); ruInp.select();
+    }
+
+    // Глобальный обработчик в capture-фазе — перехватываем клик на [data-cms-inline]
+    document.addEventListener('click', function(e) {
+      if (!window._isAdmin) return;
+
+      // Клик вне попоувера — закрыть
+      if (_pop && !_pop.contains(e.target)) _closePop();
+
+      var target = e.target.closest('[data-cms-inline]');
+      if (!target) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      _openPop(target, target.getAttribute('data-cms-inline'));
+    }, true);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && _pop) _closePop();
+    });
   };
 
   // ═══════════════════════════════════════════════════════════════
