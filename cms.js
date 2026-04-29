@@ -4038,15 +4038,14 @@
   };
 
   // ═══════════════════════════════════════════
-  // INLINE TEXT EDITOR (scoped per container)
+  // INLINE TEXT EDITOR (event delegation, scoped)
   // ═══════════════════════════════════════════
 
   (function() {
     var _inlineTexts = {};
     var _activeEdit  = null;
-    var _modalCounter = 0;
 
-    // Tags that are never editable (interactive or structural)
+    // Interactive tags — never intercept clicks on these
     var _SKIP = { SCRIPT:1,STYLE:1,INPUT:1,TEXTAREA:1,SELECT:1,OPTION:1,SVG:1,PATH:1,IMG:1,CANVAS:1,BUTTON:1,A:1 };
 
     /* ── helpers ── */
@@ -4065,18 +4064,9 @@
       el.textContent = text;
     }
 
-    function _isTarget(el) {
-      if (!el || !el.tagName) return false;
-      if (_SKIP[el.tagName]) return false;
-      if (el.isContentEditable) return false;
-      if (el.getAttribute('onclick')) return false;
-      if (el.dataset && el.dataset.cmsInlineSkip) return false;
-      return _directText(el).length > 1;
-    }
-
     function _makeKey(el) {
-      if (el.dataset.cmsKey) return el.dataset.cmsKey;
-      if (el.dataset.i18n)   return 'i18n__' + el.dataset.i18n;
+      if (el.dataset && el.dataset.cmsKey) return el.dataset.cmsKey;
+      if (el.dataset && el.dataset.i18n)   return 'i18n__' + el.dataset.i18n;
       var parts = [], curr = el;
       while (curr && curr !== document.body && parts.length < 5) {
         var seg = curr.tagName.toLowerCase();
@@ -4097,7 +4087,6 @@
       return parts.join('>');
     }
 
-    /* ── apply saved overrides to a container ── */
     function _applyOverrides(root) {
       Object.keys(_inlineTexts).forEach(function(key) {
         var text = _inlineTexts[key];
@@ -4122,10 +4111,8 @@
     function _openPopup(el, key) {
       _closePopup();
       var text = _directText(el);
-
       var popup = document.createElement('div');
       popup.className = 'cms-inline-edit-popup';
-      popup.dataset.cmsInlineSkip = '1';
 
       var input = document.createElement('textarea');
       input.className = 'cms-inline-edit-input';
@@ -4152,7 +4139,10 @@
             _closePopup();
             _showToast('Текст сохранён!', 'success');
           })
-          .catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); saveBtn.disabled = false; saveBtn.textContent = '💾 Сохранить'; });
+          .catch(function(err) {
+            _showToast('Ошибка: ' + err.message, 'error');
+            saveBtn.disabled = false; saveBtn.textContent = '💾 Сохранить';
+          });
       };
 
       var cancelBtn = document.createElement('button');
@@ -4167,9 +4157,8 @@
       btnRow.appendChild(saveBtn); btnRow.appendChild(cancelBtn);
       popup.appendChild(input); popup.appendChild(btnRow); popup.appendChild(keyLbl);
 
-      // Position near element
       var rect = el.getBoundingClientRect();
-      var top  = rect.bottom + 6;
+      var top = rect.bottom + 6;
       if (top + 130 > window.innerHeight) top = Math.max(4, rect.top - 136);
       popup.style.top  = top + 'px';
       popup.style.left = Math.max(4, Math.min(rect.left, window.innerWidth - 270)) + 'px';
@@ -4179,113 +4168,133 @@
       _activeEdit = { popup: popup, el: el, key: key };
     }
 
+    // Close popup when clicking outside it
     document.addEventListener('click', function(e) {
       if (_activeEdit && !_activeEdit.popup.contains(e.target)) _closePopup();
     });
 
-    /* ── scan container and attach click listeners ── */
-    function _scanAndAttach(container, getScopeActive) {
-      var all = container.querySelectorAll('*');
-      for (var i = 0; i < all.length; i++) {
-        (function(el) {
-          if (el.dataset.cmsInlineReady) return;
-          if (!_isTarget(el)) return;
-          el.dataset.cmsInlineReady = '1';
-          var key = _makeKey(el);
-          el.dataset.cmsKey = key;
-          el.addEventListener('click', function(e) {
-            if (!getScopeActive()) return;
-            e.stopPropagation(); e.preventDefault();
-            _openPopup(el, key);
-          }, true);
-        })(all[i]);
+    /* ── walk up from click target to find a valid text element ──
+       Returns null if we hit an interactive element first (preserves normal clicks). */
+    function _findTextTarget(clickTarget, stopEl) {
+      var el = clickTarget;
+      while (el && el !== stopEl) {
+        if (_SKIP[el.tagName])                          return null; // button/a/input etc — don't intercept
+        if (el.getAttribute && el.getAttribute('onclick')) return null; // has onclick attr
+        if (el.dataset && el.dataset.cmsInlineSkip)     return null; // explicitly excluded
+        if (_directText(el).length > 1)                 return el;   // valid text target
+        el = el.parentElement;
       }
+      return null;
     }
 
-    /* ── per-modal edit toggle (injected into each modal header) ── */
+    /* ── per-modal edit toggle ──
+       Injected as a small ✏ button in each modal's header.
+       Adds ONE click listener to the modal win — removed when toggled off. */
     function _injectModalToggle(overlay) {
       if (!window._isAdmin) return;
       var win = overlay.querySelector('.cms-modal-win');
       if (!win || win.dataset.cmsModalToggleAdded) return;
       win.dataset.cmsModalToggleAdded = '1';
 
-      var mid = 'cmsModal_' + (++_modalCounter);
       var editOn = false;
+      var listener = null;
 
       var toggleBtn = document.createElement('button');
       toggleBtn.className = 'cms-modal-edit-toggle';
       toggleBtn.textContent = '✏';
-      toggleBtn.title = 'Редактировать тексты';
-      toggleBtn.dataset.cmsInlineSkip = '1';
+      toggleBtn.title = 'Редактировать тексты в этой модалке';
 
       toggleBtn.onclick = function(e) {
         e.stopPropagation();
         editOn = !editOn;
         toggleBtn.classList.toggle('active', editOn);
         win.classList.toggle('cms-edit-mode', editOn);
+
         if (editOn) {
-          _scanAndAttach(win, function() { return editOn; });
           _applyOverrides(win);
+          listener = function(e) {
+            if (!editOn) return;
+            var target = _findTextTarget(e.target, win);
+            if (!target) return;
+            e.stopPropagation(); e.preventDefault();
+            var key = _makeKey(target);
+            target.dataset.cmsKey = key;
+            _openPopup(target, key);
+          };
+          win.addEventListener('click', listener, true);
         } else {
+          if (listener) { win.removeEventListener('click', listener, true); listener = null; }
           _closePopup();
         }
       };
 
-      // Insert before close button in the first div (modal header)
+      // Insert ✏ before the close button in the first child div (header)
       var hdr = win.querySelector('div');
       if (hdr) {
         var closeBtn = hdr.querySelector('button');
         if (closeBtn) hdr.insertBefore(toggleBtn, closeBtn);
-        else hdr.appendChild(toggleBtn);
+        else          hdr.appendChild(toggleBtn);
       }
     }
 
-    /* ── watch for new modals being opened ── */
+    /* ── watch for modals being appended to body ── */
     function _watchForModals() {
       new MutationObserver(function(mutations) {
         mutations.forEach(function(m) {
           m.addedNodes.forEach(function(node) {
             if (node.nodeType !== 1) return;
             if (node.classList && node.classList.contains('cms-modal-overlay')) {
-              _injectModalToggle(node);
-              _applyOverrides(node);
+              // Tiny delay so modal's own JS finishes building the DOM first
+              setTimeout(function() {
+                _injectModalToggle(node);
+                _applyOverrides(node);
+              }, 30);
             }
           });
         });
       }).observe(document.body, { childList: true });
     }
 
-    /* ── main page floating toggle ── */
+    /* ── main page floating toggle ──
+       ONE listener on document.body — added/removed with edit mode.
+       Explicitly skips clicks inside .cms-modal-overlay so modals stay interactive. */
     window.cmsInitInlineEdit = function() {
       if (document.getElementById('cmsEditModeToggle')) return;
       window.cmsLoadInlineTexts();
       _watchForModals();
 
       var mainEditOn = false;
+      var mainListener = null;
 
       var btn = document.createElement('button');
       btn.id = 'cmsEditModeToggle';
       btn.className = 'cms-edit-mode-toggle';
-      btn.dataset.cmsInlineSkip = '1';
       btn.innerHTML = '<span class="cms-edit-toggle-icon">✏</span>'
         + '<span class="cms-edit-toggle-label">Редактировать тексты</span>';
 
       btn.onclick = function() {
         mainEditOn = !mainEditOn;
         btn.classList.toggle('active', mainEditOn);
-        btn.querySelector('.cms-edit-toggle-label').textContent = mainEditOn ? 'Редактирование ВКЛ' : 'Редактировать тексты';
+        btn.querySelector('.cms-edit-toggle-label').textContent =
+          mainEditOn ? 'Редактирование ВКЛ' : 'Редактировать тексты';
         document.body.classList.toggle('cms-edit-mode', mainEditOn);
 
         if (mainEditOn) {
-          // Scan main page elements only (skip modal overlays)
-          var roots = document.body.querySelectorAll('body > *:not(.cms-modal-overlay):not(#cmsEditModeToggle):not(.cms-inline-edit-popup)');
-          roots.forEach(function(root) {
-            _scanAndAttach(root, function() {
-              // Only fire if main edit is on AND element is not inside a modal
-              return mainEditOn && !root.classList.contains('cms-modal-overlay');
-            });
-          });
+          mainListener = function(e) {
+            // Skip if inside a modal overlay — modals have their own toggle
+            if (e.target.closest && e.target.closest('.cms-modal-overlay')) return;
+            // Skip the toggle button itself
+            if (e.target.closest && e.target.closest('#cmsEditModeToggle')) return;
+            var target = _findTextTarget(e.target, document.body);
+            if (!target) return;
+            e.stopPropagation(); e.preventDefault();
+            var key = _makeKey(target);
+            target.dataset.cmsKey = key;
+            _openPopup(target, key);
+          };
+          document.body.addEventListener('click', mainListener, true);
         } else {
+          if (mainListener) { document.body.removeEventListener('click', mainListener, true); mainListener = null; }
           _closePopup();
         }
       };
