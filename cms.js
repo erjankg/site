@@ -3899,4 +3899,400 @@
     });
   };
 
+  // ═══════════════════════════════════════════
+  // FONT SWITCHER
+  // ═══════════════════════════════════════════
+
+  var _FONT_OPTIONS = [
+    { id: 'default',    label: 'По умолчанию',  family: null,                              google: null },
+    { id: 'inter',      label: 'Inter',          family: "'Inter', sans-serif",             google: 'Inter:wght@400;600;700;900' },
+    { id: 'roboto',     label: 'Roboto',         family: "'Roboto', sans-serif",            google: 'Roboto:wght@400;700;900' },
+    { id: 'montserrat', label: 'Montserrat',     family: "'Montserrat', sans-serif",        google: 'Montserrat:wght@400;700;900' },
+    { id: 'oswald',     label: 'Oswald',         family: "'Oswald', sans-serif",            google: 'Oswald:wght@400;700' },
+    { id: 'rajdhani',   label: 'Rajdhani',       family: "'Rajdhani', sans-serif",          google: 'Rajdhani:wght@400;700' },
+    { id: 'orbitron',   label: 'Orbitron',       family: "'Orbitron', sans-serif",          google: 'Orbitron:wght@400;700;900' },
+    { id: 'exo2',       label: 'Exo 2',          family: "'Exo 2', sans-serif",             google: 'Exo+2:wght@400;700;900' },
+    { id: 'bebas',      label: 'Bebas Neue',     family: "'Bebas Neue', sans-serif",        google: 'Bebas+Neue' },
+    { id: 'nunito',     label: 'Nunito',         family: "'Nunito', sans-serif",            google: 'Nunito:wght@400;700;900' },
+    { id: 'pressstart', label: 'Press Start 2P', family: "'Press Start 2P', monospace",     google: 'Press+Start+2P' }
+  ];
+
+  function _applyFont(fontId) {
+    var opt = null;
+    for (var i = 0; i < _FONT_OPTIONS.length; i++) {
+      if (_FONT_OPTIONS[i].id === fontId) { opt = _FONT_OPTIONS[i]; break; }
+    }
+    if (!opt) opt = _FONT_OPTIONS[0];
+    var linkEl = document.getElementById('cms-google-font');
+    if (!linkEl) {
+      linkEl = document.createElement('link');
+      linkEl.id = 'cms-google-font';
+      linkEl.rel = 'stylesheet';
+      document.head.appendChild(linkEl);
+    }
+    linkEl.href = opt.google ? 'https://fonts.googleapis.com/css2?family=' + opt.google + '&display=swap' : '';
+    document.documentElement.style.setProperty(
+      '--site-font',
+      opt.family || '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    );
+  }
+
+  window.cmsLoadFonts = function() {
+    firebase.firestore().collection('siteConfig').doc('fonts').get()
+      .then(function(doc) { if (doc.exists && doc.data().bodyFont) _applyFont(doc.data().bodyFont); })
+      .catch(function() {});
+  };
+
+  window.cmsOpenFontEditor = function() {
+    var db = firebase.firestore();
+    db.collection('siteConfig').doc('fonts').get().then(function(docSnap) {
+      var currentFont = docSnap.exists ? (docSnap.data().bodyFont || 'default') : 'default';
+      var selectedFont = currentFont;
+
+      var overlay = document.createElement('div');
+      overlay.className = 'cms-modal-overlay';
+      overlay.onclick = function(e) { if (e.target === overlay) { _applyFont(currentFont); overlay.remove(); } };
+
+      var win = document.createElement('div');
+      win.className = 'cms-modal-win';
+      win.style.cssText = 'max-width:580px;max-height:90vh;display:flex;flex-direction:column;padding:0;';
+
+      var hdr = document.createElement('div');
+      hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;';
+      hdr.innerHTML = '<h3 style="margin:0;color:#fff;font-size:18px;">🔤 Шрифты сайта</h3>';
+      var closeBtn = document.createElement('button');
+      closeBtn.style.cssText = 'background:none;border:none;color:#fff;font-size:22px;cursor:pointer;';
+      closeBtn.textContent = '✕';
+      closeBtn.onclick = function() { _applyFont(currentFont); overlay.remove(); };
+      hdr.appendChild(closeBtn);
+      win.appendChild(hdr);
+
+      // Load all preview fonts at once
+      var allGFonts = _FONT_OPTIONS.filter(function(f) { return f.google; }).map(function(f) { return f.google; });
+      var previewLink = document.createElement('link');
+      previewLink.rel = 'stylesheet';
+      previewLink.href = 'https://fonts.googleapis.com/css2?family=' + allGFonts.join('&family=') + '&display=swap';
+      document.head.appendChild(previewLink);
+
+      var grid = document.createElement('div');
+      grid.style.cssText = 'flex:1;overflow-y:auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;';
+
+      _FONT_OPTIONS.forEach(function(font) {
+        var card = document.createElement('div');
+        card.dataset.fontCard = font.id;
+        var sel = font.id === selectedFont;
+        card.style.cssText = 'padding:14px 10px;border-radius:12px;border:2px solid '
+          + (sel ? 'var(--accent)' : 'rgba(255,255,255,0.1)') + ';background:'
+          + (sel ? 'rgba(11,196,227,0.08)' : 'rgba(255,255,255,0.03)')
+          + ';cursor:pointer;text-align:center;transition:all 0.2s;user-select:none;';
+
+        var previewTxt = document.createElement('div');
+        previewTxt.style.cssText = 'font-size:30px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1;';
+        previewTxt.style.fontFamily = font.family || 'inherit';
+        previewTxt.textContent = 'Aa';
+
+        var nameTxt = document.createElement('div');
+        nameTxt.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.55);font-weight:600;line-height:1.3;';
+        nameTxt.textContent = font.label;
+
+        card.appendChild(previewTxt);
+        card.appendChild(nameTxt);
+
+        card.onmouseenter = function() { if (font.id !== selectedFont) card.style.borderColor = 'rgba(255,255,255,0.3)'; };
+        card.onmouseleave = function() { if (font.id !== selectedFont) card.style.borderColor = 'rgba(255,255,255,0.1)'; };
+        card.onclick = function() {
+          selectedFont = font.id;
+          grid.querySelectorAll('[data-font-card]').forEach(function(c) {
+            var now = c.dataset.fontCard === selectedFont;
+            c.style.borderColor = now ? 'var(--accent)' : 'rgba(255,255,255,0.1)';
+            c.style.background  = now ? 'rgba(11,196,227,0.08)' : 'rgba(255,255,255,0.03)';
+          });
+          _applyFont(font.id);
+        };
+        grid.appendChild(card);
+      });
+      win.appendChild(grid);
+
+      var footer = document.createElement('div');
+      footer.style.cssText = 'display:flex;gap:8px;padding:14px 20px;border-top:1px solid rgba(255,255,255,0.08);flex-shrink:0;';
+
+      var saveBtn = document.createElement('button');
+      saveBtn.className = 'cms-btn-save';
+      saveBtn.textContent = '💾 Сохранить';
+      saveBtn.onclick = function() {
+        saveBtn.disabled = true; saveBtn.textContent = '⏳...';
+        db.collection('siteConfig').doc('fonts').set({ bodyFont: selectedFont }, { merge: true })
+          .then(function() { _showToast('Шрифт сохранён!', 'success'); overlay.remove(); })
+          .catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); saveBtn.disabled = false; saveBtn.textContent = '💾 Сохранить'; });
+      };
+      var cancelBtn = document.createElement('button');
+      cancelBtn.className = 'cms-btn-cancel';
+      cancelBtn.textContent = 'Отмена';
+      cancelBtn.onclick = function() { _applyFont(currentFont); overlay.remove(); };
+      footer.appendChild(saveBtn);
+      footer.appendChild(cancelBtn);
+      win.appendChild(footer);
+      overlay.appendChild(win);
+      document.body.appendChild(overlay);
+    });
+  };
+
+  // ═══════════════════════════════════════════
+  // INLINE TEXT EDITOR (scoped per container)
+  // ═══════════════════════════════════════════
+
+  (function() {
+    var _inlineTexts = {};
+    var _activeEdit  = null;
+    var _modalCounter = 0;
+
+    // Tags that are never editable (interactive or structural)
+    var _SKIP = { SCRIPT:1,STYLE:1,INPUT:1,TEXTAREA:1,SELECT:1,OPTION:1,SVG:1,PATH:1,IMG:1,CANVAS:1,BUTTON:1,A:1 };
+
+    /* ── helpers ── */
+    function _directText(el) {
+      var t = '';
+      for (var i = 0; i < el.childNodes.length; i++)
+        if (el.childNodes[i].nodeType === 3) t += el.childNodes[i].textContent;
+      return t.trim();
+    }
+
+    function _applyText(el, text) {
+      for (var i = 0; i < el.childNodes.length; i++) {
+        var n = el.childNodes[i];
+        if (n.nodeType === 3 && n.textContent.trim().length > 0) { n.textContent = text; return; }
+      }
+      el.textContent = text;
+    }
+
+    function _isTarget(el) {
+      if (!el || !el.tagName) return false;
+      if (_SKIP[el.tagName]) return false;
+      if (el.isContentEditable) return false;
+      if (el.getAttribute('onclick')) return false;
+      if (el.dataset && el.dataset.cmsInlineSkip) return false;
+      return _directText(el).length > 1;
+    }
+
+    function _makeKey(el) {
+      if (el.dataset.cmsKey) return el.dataset.cmsKey;
+      if (el.dataset.i18n)   return 'i18n__' + el.dataset.i18n;
+      var parts = [], curr = el;
+      while (curr && curr !== document.body && parts.length < 5) {
+        var seg = curr.tagName.toLowerCase();
+        if (curr.id) { parts.unshift('#' + curr.id); break; }
+        if (curr.className && typeof curr.className === 'string') {
+          var cls = curr.className.trim().split(/\s+/).filter(function(c) {
+            return c && !c.startsWith('cms-') && c.length < 28;
+          }).slice(0, 2).join('.');
+          if (cls) seg += '.' + cls;
+        }
+        if (curr.parentElement) {
+          var sib = [].filter.call(curr.parentElement.children, function(s) { return s.tagName === curr.tagName; });
+          if (sib.length > 1) seg += ':nth-of-type(' + ([].indexOf.call(sib, curr) + 1) + ')';
+        }
+        parts.unshift(seg);
+        curr = curr.parentElement;
+      }
+      return parts.join('>');
+    }
+
+    /* ── apply saved overrides to a container ── */
+    function _applyOverrides(root) {
+      Object.keys(_inlineTexts).forEach(function(key) {
+        var text = _inlineTexts[key];
+        if (!text) return;
+        var sel = key.startsWith('i18n__') ? '[data-i18n="' + key.slice(6) + '"]' : key;
+        try { root.querySelectorAll(sel).forEach(function(el) { _applyText(el, text); }); } catch(e) {}
+      });
+    }
+
+    window.cmsLoadInlineTexts = function() {
+      firebase.firestore().collection('siteConfig').doc('inlineTexts').get()
+        .then(function(doc) {
+          if (doc.exists) { _inlineTexts = doc.data() || {}; _applyOverrides(document); }
+        }).catch(function() {});
+    };
+
+    /* ── popup ── */
+    function _closePopup() {
+      if (_activeEdit) { _activeEdit.popup.remove(); _activeEdit = null; }
+    }
+
+    function _openPopup(el, key) {
+      _closePopup();
+      var text = _directText(el);
+
+      var popup = document.createElement('div');
+      popup.className = 'cms-inline-edit-popup';
+      popup.dataset.cmsInlineSkip = '1';
+
+      var input = document.createElement('textarea');
+      input.className = 'cms-inline-edit-input';
+      input.value = text;
+      input.rows = Math.min(Math.max(1, Math.ceil(text.length / 35)), 5);
+
+      var btnRow = document.createElement('div');
+      btnRow.className = 'cms-inline-edit-btnrow';
+
+      var saveBtn = document.createElement('button');
+      saveBtn.className = 'cms-inline-save-btn';
+      saveBtn.textContent = '💾 Сохранить';
+      saveBtn.onclick = function(e) {
+        e.stopPropagation();
+        saveBtn.disabled = true; saveBtn.textContent = '⏳...';
+        var val = input.value;
+        var upd = {}; upd[key] = val;
+        firebase.firestore().collection('siteConfig').doc('inlineTexts').set(upd, { merge: true })
+          .then(function() {
+            _inlineTexts[key] = val;
+            _applyText(el, val);
+            var sel = key.startsWith('i18n__') ? '[data-i18n="' + key.slice(6) + '"]' : key;
+            try { document.querySelectorAll(sel).forEach(function(e2) { _applyText(e2, val); }); } catch(ex) {}
+            _closePopup();
+            _showToast('Текст сохранён!', 'success');
+          })
+          .catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); saveBtn.disabled = false; saveBtn.textContent = '💾 Сохранить'; });
+      };
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.className = 'cms-inline-cancel-btn';
+      cancelBtn.textContent = '✕';
+      cancelBtn.onclick = function(e) { e.stopPropagation(); _closePopup(); };
+
+      var keyLbl = document.createElement('div');
+      keyLbl.className = 'cms-inline-key-label';
+      keyLbl.textContent = key.length > 55 ? key.slice(0, 52) + '…' : key;
+
+      btnRow.appendChild(saveBtn); btnRow.appendChild(cancelBtn);
+      popup.appendChild(input); popup.appendChild(btnRow); popup.appendChild(keyLbl);
+
+      // Position near element
+      var rect = el.getBoundingClientRect();
+      var top  = rect.bottom + 6;
+      if (top + 130 > window.innerHeight) top = Math.max(4, rect.top - 136);
+      popup.style.top  = top + 'px';
+      popup.style.left = Math.max(4, Math.min(rect.left, window.innerWidth - 270)) + 'px';
+
+      document.body.appendChild(popup);
+      input.focus(); input.select();
+      _activeEdit = { popup: popup, el: el, key: key };
+    }
+
+    document.addEventListener('click', function(e) {
+      if (_activeEdit && !_activeEdit.popup.contains(e.target)) _closePopup();
+    });
+
+    /* ── scan container and attach click listeners ── */
+    function _scanAndAttach(container, getScopeActive) {
+      var all = container.querySelectorAll('*');
+      for (var i = 0; i < all.length; i++) {
+        (function(el) {
+          if (el.dataset.cmsInlineReady) return;
+          if (!_isTarget(el)) return;
+          el.dataset.cmsInlineReady = '1';
+          var key = _makeKey(el);
+          el.dataset.cmsKey = key;
+          el.addEventListener('click', function(e) {
+            if (!getScopeActive()) return;
+            e.stopPropagation(); e.preventDefault();
+            _openPopup(el, key);
+          }, true);
+        })(all[i]);
+      }
+    }
+
+    /* ── per-modal edit toggle (injected into each modal header) ── */
+    function _injectModalToggle(overlay) {
+      if (!window._isAdmin) return;
+      var win = overlay.querySelector('.cms-modal-win');
+      if (!win || win.dataset.cmsModalToggleAdded) return;
+      win.dataset.cmsModalToggleAdded = '1';
+
+      var mid = 'cmsModal_' + (++_modalCounter);
+      var editOn = false;
+
+      var toggleBtn = document.createElement('button');
+      toggleBtn.className = 'cms-modal-edit-toggle';
+      toggleBtn.textContent = '✏';
+      toggleBtn.title = 'Редактировать тексты';
+      toggleBtn.dataset.cmsInlineSkip = '1';
+
+      toggleBtn.onclick = function(e) {
+        e.stopPropagation();
+        editOn = !editOn;
+        toggleBtn.classList.toggle('active', editOn);
+        win.classList.toggle('cms-edit-mode', editOn);
+        if (editOn) {
+          _scanAndAttach(win, function() { return editOn; });
+          _applyOverrides(win);
+        } else {
+          _closePopup();
+        }
+      };
+
+      // Insert before close button in the first div (modal header)
+      var hdr = win.querySelector('div');
+      if (hdr) {
+        var closeBtn = hdr.querySelector('button');
+        if (closeBtn) hdr.insertBefore(toggleBtn, closeBtn);
+        else hdr.appendChild(toggleBtn);
+      }
+    }
+
+    /* ── watch for new modals being opened ── */
+    function _watchForModals() {
+      new MutationObserver(function(mutations) {
+        mutations.forEach(function(m) {
+          m.addedNodes.forEach(function(node) {
+            if (node.nodeType !== 1) return;
+            if (node.classList && node.classList.contains('cms-modal-overlay')) {
+              _injectModalToggle(node);
+              _applyOverrides(node);
+            }
+          });
+        });
+      }).observe(document.body, { childList: true });
+    }
+
+    /* ── main page floating toggle ── */
+    window.cmsInitInlineEdit = function() {
+      if (document.getElementById('cmsEditModeToggle')) return;
+      window.cmsLoadInlineTexts();
+      _watchForModals();
+
+      var mainEditOn = false;
+
+      var btn = document.createElement('button');
+      btn.id = 'cmsEditModeToggle';
+      btn.className = 'cms-edit-mode-toggle';
+      btn.dataset.cmsInlineSkip = '1';
+      btn.innerHTML = '<span class="cms-edit-toggle-icon">✏</span>'
+        + '<span class="cms-edit-toggle-label">Редактировать тексты</span>';
+
+      btn.onclick = function() {
+        mainEditOn = !mainEditOn;
+        btn.classList.toggle('active', mainEditOn);
+        btn.querySelector('.cms-edit-toggle-label').textContent = mainEditOn ? 'Редактирование ВКЛ' : 'Редактировать тексты';
+        document.body.classList.toggle('cms-edit-mode', mainEditOn);
+
+        if (mainEditOn) {
+          // Scan main page elements only (skip modal overlays)
+          var roots = document.body.querySelectorAll('body > *:not(.cms-modal-overlay):not(#cmsEditModeToggle):not(.cms-inline-edit-popup)');
+          roots.forEach(function(root) {
+            _scanAndAttach(root, function() {
+              // Only fire if main edit is on AND element is not inside a modal
+              return mainEditOn && !root.classList.contains('cms-modal-overlay');
+            });
+          });
+        } else {
+          _closePopup();
+        }
+      };
+
+      document.body.appendChild(btn);
+    };
+
+  })();
+
 })();;

@@ -2822,6 +2822,11 @@
     var db   = (typeof firebase !== 'undefined') ? firebase.firestore() : null;
     var _currentUser = null;
 
+    // CMS: шрифт сайта — грузим сразу, независимо от авторизации
+    if (db && typeof window.cmsLoadFonts === 'function') {
+        window.cmsLoadFonts();
+    }
+
     // CMS: загрузка данных предметов и рун из Firestore
     if (db && typeof window.cmsLoadData === 'function') {
         window.cmsLoadData(function() {
@@ -2891,6 +2896,8 @@
             document.querySelectorAll('.admin-only').forEach(function(el) {
                 el.style.display = _isAdmin ? '' : 'none';
             });
+            // Инициализировать inline-редактор текстов для админа
+            if (_isAdmin && window.cmsInitInlineEdit) window.cmsInitInlineEdit();
         }).catch(function(err) { console.error('[checkAdmin] ERROR:', err); _isAdmin = false; window._isAdmin = false; });
     }
 
