@@ -4176,15 +4176,18 @@
     /* ── walk up from click target to find a valid text element ──
        Returns null if we hit an interactive element first (preserves normal clicks). */
     function _findTextTarget(clickTarget, stopEl) {
+      // Walk ALL the way up first — if ANY ancestor is interactive, abort.
+      // Only return a text element if the entire chain is non-interactive.
+      var textTarget = null;
       var el = clickTarget;
       while (el && el !== stopEl) {
-        if (_SKIP[el.tagName])                          return null; // button/a/input etc — don't intercept
-        if (el.getAttribute && el.getAttribute('onclick')) return null; // has onclick attr
-        if (el.dataset && el.dataset.cmsInlineSkip)     return null; // explicitly excluded
-        if (_directText(el).length > 1)                 return el;   // valid text target
+        if (_SKIP[el.tagName])                             return null; // button/a/input — abort
+        if (el.getAttribute && el.getAttribute('onclick')) return null; // has onclick — abort
+        if (el.dataset && el.dataset.cmsInlineSkip)        return null; // skip marker — abort
+        if (!textTarget && _directText(el).length > 1)     textTarget = el; // record first text hit
         el = el.parentElement;
       }
-      return null;
+      return textTarget;
     }
 
     /* ── per-modal edit toggle ──
@@ -4281,8 +4284,11 @@
 
         if (mainEditOn) {
           mainListener = function(e) {
-            // Skip if inside a modal overlay — modals have their own toggle
-            if (e.target.closest && e.target.closest('.cms-modal-overlay')) return;
+            // Skip clicks inside any modal (site uses .m-mask, CMS uses .cms-modal-overlay)
+            if (e.target.closest && (
+              e.target.closest('.m-mask') ||
+              e.target.closest('.cms-modal-overlay')
+            )) return;
             // Skip the toggle button itself
             if (e.target.closest && e.target.closest('#cmsEditModeToggle')) return;
             var target = _findTextTarget(e.target, document.body);
