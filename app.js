@@ -140,7 +140,9 @@
 
         // History API: при программном закрытии модалки «поглощаем» запись истории,
         // чтобы следующий back уже не наткнулся на неё.
-        if (!_closingFromPopstate && history && history.back) {
+        // skipSidebar = переключение sidebar-модалок: не дёргаем back(),
+        // иначе async popstate закроет следующую модалку.
+        if (!_closingFromPopstate && !skipSidebar && history && history.back) {
             history.back();
         }
     }
