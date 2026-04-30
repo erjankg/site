@@ -3509,6 +3509,10 @@
       var target = e.target.closest('[data-cms-inline]');
       if (!target) return;
 
+      // Не перехватываем клики внутри интерактивных элементов (кнопок, ссылок, onclick)
+      var interactive = e.target.closest('button, a, [onclick]');
+      if (interactive && interactive !== target && interactive.contains(target)) return;
+
       e.preventDefault();
       e.stopPropagation();
       _openPop(target, target.getAttribute('data-cms-inline'));

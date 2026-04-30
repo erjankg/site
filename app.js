@@ -2879,10 +2879,7 @@
             window._isAdmin = _isAdmin;
             console.log('[checkAdmin] final _isAdmin:', _isAdmin);
             if (_isAdmin) {
-                document.body.classList.add('cms-admin-mode');
-                window.cmsSetupInlineEditing && window.cmsSetupInlineEditing();
-            } else {
-                document.body.classList.remove('cms-admin-mode');
+                // Inline-редактирование управляется кнопкой ✏ (cmsInitInlineEdit)
             }
             renderGlobalChat();
             // CMS: перерисовать с кнопками редактирования для админа
@@ -3554,7 +3551,6 @@
                 updateChatUI(false);
                 _isAdmin = false;
                 window._isAdmin = false;
-                document.body.classList.remove('cms-admin-mode');
                 document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = 'none'; });
                 document.body.classList.remove('profile-gated');
                 showSiteAuthGate();
