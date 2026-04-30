@@ -5770,7 +5770,9 @@ body.cms-edit-mode :not(button):not(a):not(input):not(textarea):not(select):hove
   cursor: text;
 }
 /* Cancel highlight inside modal overlays (they have their own mode) */
-body.cms-edit-mode .cms-modal-overlay :not(button):not(a):not(input):not(textarea):not(select):hover {
+body.cms-edit-mode .cms-modal-overlay :not(button):not(a):not(input):not(textarea):not(select):hover,
+body.cms-edit-mode .m-mask :not(button):not(a):not(input):not(textarea):not(select):hover,
+body.cms-edit-mode #sidePanel :not(button):not(a):not(input):not(textarea):not(select):hover {
   outline: none !important;
   cursor: auto !important;
 }

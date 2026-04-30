@@ -4284,23 +4284,23 @@
 
         if (mainEditOn) {
           mainListener = function(e) {
-            // Skip clicks inside any modal (site uses .m-mask, CMS uses .cms-modal-overlay)
+            // Skip clicks inside any modal, sidebar, or the toggle itself
             if (e.target.closest && (
               e.target.closest('.m-mask') ||
-              e.target.closest('.cms-modal-overlay')
+              e.target.closest('.cms-modal-overlay') ||
+              e.target.closest('#sidePanel') ||
+              e.target.closest('#cmsEditModeToggle')
             )) return;
-            // Skip the toggle button itself
-            if (e.target.closest && e.target.closest('#cmsEditModeToggle')) return;
             var target = _findTextTarget(e.target, document.body);
             if (!target) return;
-            e.stopPropagation(); e.preventDefault();
+            e.preventDefault();
             var key = _makeKey(target);
             target.dataset.cmsKey = key;
             _openPopup(target, key);
           };
-          document.body.addEventListener('click', mainListener, true);
+          document.body.addEventListener('click', mainListener, false);
         } else {
-          if (mainListener) { document.body.removeEventListener('click', mainListener, true); mainListener = null; }
+          if (mainListener) { document.body.removeEventListener('click', mainListener, false); mainListener = null; }
           _closePopup();
         }
       };
