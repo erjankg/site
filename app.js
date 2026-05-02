@@ -16,6 +16,7 @@
     var _baseZIndex = 6000;
     var _closingFromPopstate = false; // предотвращает loop при popstate → closeModal → history.back()
     var _popstateGuard = 0; // timestamp: popstate игнорируется если модалка только что открылась
+    var _consumeNextPopstate = false; // guard: программный history.back() из closeModal — игнорировать следующий popstate
 
     // Модалки которые ВСЕГДА открываются поверх (не закрывая родителя)
     var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask','profileSetupMask','userCardMask',
@@ -147,6 +148,7 @@
         // skipSidebar = переключение sidebar-модалок: не дёргаем back(),
         // иначе async popstate закроет следующую модалку.
         if (!_closingFromPopstate && !skipSidebar && history && history.back) {
+            _consumeNextPopstate = true; // предотвращает каскадное закрытие родительской модалки
             history.back();
         }
     }
@@ -154,6 +156,15 @@
 
     // ── Back-button / Android back: перехватываем popstate ──
     window.addEventListener('popstate', function(e) {
+        // Guard: программный history.back() из closeModal — не закрываем следующую модалку
+        if (_consumeNextPopstate) {
+            _consumeNextPopstate = false;
+            // Восстанавливаем history entry для оставшейся верхней модалки
+            if (_modalStack.length > 0 && history && history.pushState) {
+                history.pushState({ modal: _modalStack[_modalStack.length - 1] }, '');
+            }
+            return;
+        }
         // Защита от гонки: если модалка открылась < 300ms назад,
         // этот popstate — «мусор» от предыдущего closeModal → history.back().
         if (_popstateGuard && Date.now() - _popstateGuard < 300) {
@@ -1899,7 +1910,7 @@
             lbl.style.cssText='font-size:8px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.15;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
             lbl.textContent=ch.name;
             div.appendChild(img); div.appendChild(lbl);
-            div.onclick=function(){window._lastClickedChampEl=this;openChampDetail(ch.name);};
+            div.onclick=function(){openChampDetail(ch.name);};
             // Patch dot in champ list + tooltip
             var pI = patchMap[ch.name];
             if(pI) {
@@ -2167,7 +2178,7 @@
                         img.src = champIcon(cn); img.title = cn + ' (авто)';
                         img.style.cssText = 'width:29px;height:29px;border-radius:4px;object-fit:cover;';
                         img.onerror = function(){ this.style.display='none'; };
-                        img.onclick = function(e){ e.stopPropagation(); window._lastClickedChampEl=this; openChampDetail(cn); };
+                        img.onclick = function(e){ e.stopPropagation(); openChampDetail(cn); };
                         chip.appendChild(img);
                         var xBtn = document.createElement('span');
                         xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;line-height:1;';
@@ -2184,21 +2195,6 @@
         }
         el.appendChild(mainGrid);
         renderMatchups(name);
-        // FLIP: animate modal from clicked element
-        var mask = document.getElementById('champDetailMask');
-        if (mask && window._lastClickedChampEl) {
-            var srcRect = window._lastClickedChampEl.getBoundingClientRect();
-            mask.classList.add('flip-opening');
-            var win = mask.querySelector('.m-win');
-            if (win) {
-                win.style.transformOrigin = srcRect.left + 'px ' + srcRect.top + 'px';
-            }
-            setTimeout(function() {
-                mask.classList.remove('flip-opening');
-                if (win) win.style.transformOrigin = '';
-            }, 450);
-            window._lastClickedChampEl = null;
-        }
         openModal('champDetailMask');
     };
     window.closeChampDetail=function(){closeModal('champDetailMask');};
