@@ -1642,10 +1642,10 @@
         var tEl=document.getElementById('tierlistTitle');
         if(tEl) tEl.textContent=titles[_tierType]||t('Тир-лист');
         var editBtn=document.getElementById('tierlistEditBtn');
-        if(editBtn){ editBtn.style.display=window._isAdmin?'':'none'; editBtn.textContent=t('✏ Изменить'); editBtn.style.background='rgba(255,215,0,0.08)'; editBtn.style.borderColor='rgba(255,215,0,0.4)'; editBtn.style.color='#FFD700'; }
+        if(editBtn){ editBtn.style.display=''; editBtn.textContent=t('✏ Изменить'); editBtn.style.background='rgba(255,215,0,0.08)'; editBtn.style.borderColor='rgba(255,215,0,0.4)'; editBtn.style.color='#FFD700'; }
         var pcBtn=document.getElementById('tierlistPCBtn');
         if(pcBtn){
-            pcBtn.style.display=window._isAdmin?'':'none';
+            pcBtn.style.display='';
             pcBtn.textContent=_tierPCMode?'☰ Строки':'⊞ Колонки';
             pcBtn.style.background=_tierPCMode?'rgba(100,180,255,0.22)':'rgba(100,180,255,0.08)';
             pcBtn.style.borderColor=_tierPCMode?'rgba(100,180,255,0.8)':'rgba(100,180,255,0.4)';
@@ -2900,7 +2900,7 @@
             window._isAdmin = _isAdmin;
             console.log('[checkAdmin] final _isAdmin:', _isAdmin);
             if (_isAdmin) {
-                // Inline-редактирование управляется кнопкой ✏ (cmsInitInlineEdit)
+                // Текстовый редактор включается только кнопкой ✏ (cmsInitInlineEdit)
             }
             renderGlobalChat();
             // CMS: перерисовать с кнопками редактирования для админа

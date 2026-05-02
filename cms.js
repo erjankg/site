@@ -3509,9 +3509,9 @@
       var target = e.target.closest('[data-cms-inline]');
       if (!target) return;
 
-      // Не перехватываем клики внутри интерактивных элементов (кнопок, ссылок, onclick)
-      var interactive = e.target.closest('button, a, [onclick]');
-      if (interactive && interactive !== target && interactive.contains(target)) return;
+      // Не перехватываем клики внутри кнопок/ссылок — чтобы onclick кнопки срабатывал
+      var btn = e.target.closest('button, a');
+      if (btn && btn !== target && btn.contains(target)) return;
 
       e.preventDefault();
       e.stopPropagation();
@@ -4049,8 +4049,9 @@
     var _inlineTexts = {};
     var _activeEdit  = null;
 
-    // Interactive tags — never intercept clicks on these
-    var _SKIP = { SCRIPT:1,STYLE:1,INPUT:1,TEXTAREA:1,SELECT:1,OPTION:1,SVG:1,PATH:1,IMG:1,CANVAS:1,BUTTON:1,A:1 };
+    // Tags that should never be treated as text targets (form elements, media, scripts)
+    // BUTTON and A are NOT here — in edit mode their text IS editable
+    var _SKIP = { SCRIPT:1,STYLE:1,INPUT:1,TEXTAREA:1,SELECT:1,OPTION:1,SVG:1,PATH:1,IMG:1,CANVAS:1 };
 
     /* ── helpers ── */
     function _directText(el) {
@@ -4180,26 +4181,24 @@
     /* ── walk up from click target to find a valid text element ──
        Returns null if we hit an interactive element first (preserves normal clicks). */
     function _findTextTarget(clickTarget, stopEl) {
-      // Walk ALL the way up first — if ANY ancestor is interactive, abort.
-      // Only return a text element if the entire chain is non-interactive.
       var textTarget = null;
       var el = clickTarget;
       while (el && el !== stopEl) {
-        if (_SKIP[el.tagName])                             return null; // button/a/input — abort
-        if (el.getAttribute && el.getAttribute('onclick')) return null; // has onclick — abort
-        if (el.dataset && el.dataset.cmsInlineSkip)        return null; // skip marker — abort
-        if (!textTarget && _directText(el).length > 1)     textTarget = el; // record first text hit
+        if (_SKIP[el.tagName])                             return null;
+        if (el.dataset && el.dataset.cmsInlineSkip)        return null;
+        if (!textTarget && _directText(el).length > 1)     textTarget = el;
         el = el.parentElement;
       }
       return textTarget;
     }
 
     /* ── per-modal edit toggle ──
-       Injected as a small ✏ button in each modal's header.
-       Adds ONE click listener to the modal win — removed when toggled off. */
-    function _injectModalToggle(overlay) {
+       Works with both .cms-modal-overlay (.cms-modal-win) and .m-mask (.m-win).
+       Adds ONE click listener to the win — removed when toggled off. */
+    function _injectModalToggle(container) {
       if (!window._isAdmin) return;
-      var win = overlay.querySelector('.cms-modal-win');
+      // Поддержка обоих типов модалок
+      var win = container.querySelector('.cms-modal-win') || container.querySelector('.m-win');
       if (!win || win.dataset.cmsModalToggleAdded) return;
       win.dataset.cmsModalToggleAdded = '1';
 
@@ -4210,6 +4209,7 @@
       toggleBtn.className = 'cms-modal-edit-toggle';
       toggleBtn.textContent = '✏';
       toggleBtn.title = 'Редактировать тексты в этой модалке';
+      toggleBtn.setAttribute('data-cms-inline-skip', '1');
 
       toggleBtn.onclick = function(e) {
         e.stopPropagation();
@@ -4221,6 +4221,8 @@
           _applyOverrides(win);
           listener = function(e) {
             if (!editOn) return;
+            // Не перехватываем саму ✏ кнопку
+            if (e.target.closest && e.target.closest('.cms-modal-edit-toggle')) return;
             var target = _findTextTarget(e.target, win);
             if (!target) return;
             e.stopPropagation(); e.preventDefault();
@@ -4235,10 +4237,10 @@
         }
       };
 
-      // Insert ✏ before the close button in the first child div (header)
-      var hdr = win.querySelector('div');
+      // Header: .mhdr (m-mask) or first div (cms-modal)
+      var hdr = win.querySelector('.mhdr') || win.querySelector('div');
       if (hdr) {
-        var closeBtn = hdr.querySelector('button');
+        var closeBtn = hdr.querySelector('.btn-close-x') || hdr.querySelector('button');
         if (closeBtn) hdr.insertBefore(toggleBtn, closeBtn);
         else          hdr.appendChild(toggleBtn);
       }
@@ -4270,6 +4272,11 @@
       window.cmsLoadInlineTexts();
       _watchForModals();
 
+      // Inject ✏ into all existing .m-mask modals (they're always in the DOM)
+      document.querySelectorAll('.m-mask').forEach(function(mask) {
+        _injectModalToggle(mask);
+      });
+
       var mainEditOn = false;
       var mainListener = null;
 
@@ -4288,7 +4295,8 @@
 
         if (mainEditOn) {
           mainListener = function(e) {
-            // Skip clicks inside any modal, sidebar, or the toggle itself
+            // Эти зоны работают нормально даже в edit-mode:
+            // модалки (свой ✏), сайдбар (навигация), кнопка toggle
             if (e.target.closest && (
               e.target.closest('.m-mask') ||
               e.target.closest('.cms-modal-overlay') ||
@@ -4297,14 +4305,18 @@
             )) return;
             var target = _findTextTarget(e.target, document.body);
             if (!target) return;
+            // capture phase: перехватываем ДО onclick кнопок
+            e.stopPropagation();
             e.preventDefault();
             var key = _makeKey(target);
             target.dataset.cmsKey = key;
             _openPopup(target, key);
           };
-          document.body.addEventListener('click', mainListener, false);
+          // capture=true, но ТОЛЬКО пока edit mode ON
+          document.body.addEventListener('click', mainListener, true);
         } else {
-          if (mainListener) { document.body.removeEventListener('click', mainListener, false); mainListener = null; }
+          // Полностью убираем listener — сайт работает как обычно
+          if (mainListener) { document.body.removeEventListener('click', mainListener, true); mainListener = null; }
           _closePopup();
         }
       };
