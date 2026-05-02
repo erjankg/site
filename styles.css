@@ -5764,31 +5764,19 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
    ═══════════════════════════════════════════ */
 
 /* Main page edit mode: highlight non-interactive elements on hover */
-body.cms-edit-mode :not(button):not(a):not(input):not(textarea):not(select):hover {
+/* Edit mode: outline на ВСЁМ (главная, модалки, везде) */
+body.cms-edit-mode :not(input):not(textarea):not(select):not(#cmsEditModeToggle):hover {
   outline: 2px dashed rgba(11, 196, 227, 0.45);
   outline-offset: 2px;
   cursor: text;
 }
-/* Cancel highlight inside modal overlays (they have their own mode) */
-body.cms-edit-mode .cms-modal-overlay :not(button):not(a):not(input):not(textarea):not(select):hover,
-body.cms-edit-mode .m-mask :not(button):not(a):not(input):not(textarea):not(select):hover,
-body.cms-edit-mode #sidePanel :not(button):not(a):not(input):not(textarea):not(select):hover {
-  outline: none !important;
-  cursor: auto !important;
-}
-/* Modal-scoped edit mode highlight */
-.cms-modal-win.cms-edit-mode :not(button):not(a):not(input):not(textarea):not(select):hover {
-  outline: 2px dashed rgba(11, 196, 227, 0.45) !important;
-  outline-offset: 2px;
-  cursor: text !important;
-}
 
-/* Floating toggle button (main page) */
+/* Floating toggle button — ПОВЕРХ ВСЕГО */
 .cms-edit-mode-toggle {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 9998;
+  z-index: 999999;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -5901,4 +5889,406 @@ body.cms-edit-mode #sidePanel :not(button):not(a):not(input):not(textarea):not(s
   color: rgba(255,255,255,0.18);
   word-break: break-all;
   line-height: 1.3;
+}
+
+/* ═══════════════════════════════════════════
+   DESIGN UPGRADE 2026 — animations, glass, etc.
+   ═══════════════════════════════════════════ */
+
+/* ── 1. RIPPLE EFFECT on buttons ── */
+button, .header-view-btn, .btn-calc-main, .side-btn, .m-btn,
+.lang-btn, .auth-btn, .btn-support, .btn-close-x, .btn-champ-cfg,
+.calc-range-btn, .calc-lvl-btn, .site-auth-btn {
+  position: relative;
+  overflow: hidden;
+}
+.ripple-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  transform: scale(0);
+  animation: rippleExpand 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes rippleExpand {
+  0%   { transform: scale(0); opacity: 0.5; }
+  100% { transform: scale(4); opacity: 0; }
+}
+
+/* ── 4. SPRING PHYSICS — custom easing for bouncy feel ── */
+:root {
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-soft: cubic-bezier(0.22, 1.2, 0.36, 1);
+  --spring-modal: cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+/* ── 5. MODAL backdrop-blur TRANSITION ── */
+.m-mask {
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition: backdrop-filter 0.3s ease, -webkit-backdrop-filter 0.3s ease;
+}
+.m-mask.active {
+  animation: maskFadeBlurIn 0.3s ease forwards;
+}
+@keyframes maskFadeBlurIn {
+  0%   { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
+  100% { opacity: 1; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+}
+.m-mask.active > .m-win {
+  animation: modalContentInSpring 0.35s var(--spring-modal);
+}
+@keyframes modalContentInSpring {
+  0%   { opacity: 0; transform: scale(0.92) translateY(18px); }
+  60%  { opacity: 1; transform: scale(1.02) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.m-mask.closing {
+  animation: maskFadeBlurOut 0.2s ease forwards;
+}
+@keyframes maskFadeBlurOut {
+  0%   { opacity: 1; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  100% { opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
+}
+.m-mask.closing > .m-win {
+  animation: modalContentOutSpring 0.2s ease forwards;
+}
+@keyframes modalContentOutSpring {
+  0%   { opacity: 1; transform: scale(1) translateY(0); }
+  100% { opacity: 0; transform: scale(0.94) translateY(14px); }
+}
+
+/* ── 7. GRADIENT BORDERS on cards ── */
+.item-card,
+.rune-card {
+  border: none !important;
+  background: rgba(255,255,255,0.03);
+  position: relative;
+}
+.item-card::before,
+.rune-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg,
+    rgba(11,196,227,0.2) 0%,
+    rgba(200,155,60,0.15) 50%,
+    rgba(11,196,227,0.2) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+.item-card:hover::before,
+.rune-card:hover::before {
+  background: linear-gradient(135deg,
+    var(--accent) 0%,
+    var(--gold) 50%,
+    var(--accent) 100%);
+}
+
+/* ── 9. STICKY HEADER with blur on scroll ── */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 10px 0;
+  transition: background 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+}
+header.scrolled {
+  background: rgba(1,10,19,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+  padding: 6px 0;
+}
+header.scrolled .logo { font-size: 18px; }
+
+/* ── 10. GLASSMORPHISM 2.0 on cards ── */
+.m-win {
+  background: linear-gradient(135deg,
+    rgba(1,13,24,0.92) 0%,
+    rgba(1,10,19,0.95) 100%) !important;
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.85),
+              inset 0 1px 0 rgba(255,255,255,0.06) !important;
+}
+.item-card,
+.rune-card {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background: rgba(255,255,255,0.03);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2),
+              inset 0 1px 0 rgba(255,255,255,0.04);
+  transition: transform 0.25s var(--spring), box-shadow 0.25s ease,
+              background 0.25s ease;
+}
+.item-card:hover,
+.rune-card:hover {
+  box-shadow: 0 8px 24px rgba(11,196,227,0.15),
+              0 2px 8px rgba(0,0,0,0.3),
+              inset 0 1px 0 rgba(255,255,255,0.08);
+  background: rgba(11,196,227,0.06);
+}
+
+/* ── 11. TOOLTIPS with animation & arrow ── */
+#uiTip,
+#runeTooltip,
+#itemTooltip {
+  transform-origin: center bottom;
+  animation: tipIn 0.2s var(--spring-soft) forwards;
+  border: 1px solid rgba(11,196,227,0.3) !important;
+  background: rgba(1,13,24,0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.7),
+              0 0 0 1px rgba(255,255,255,0.05) !important;
+}
+@keyframes tipIn {
+  0%   { opacity: 0; transform: translate(-50%, -100%) scale(0.9); }
+  100% { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+}
+#runeTooltip,
+#itemTooltip {
+  transform-origin: top left;
+}
+@keyframes tipInAlt {
+  0%   { opacity: 0; transform: scale(0.92) translateY(4px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+#runeTooltip,
+#itemTooltip {
+  animation: tipInAlt 0.2s var(--spring-soft) forwards;
+}
+
+/* ── 3D TILT on champion cards — GPU layer ── */
+.champ-cell,
+.tierlist-champ-icon {
+  transition: transform 0.2s var(--spring-soft), box-shadow 0.2s ease;
+  will-change: transform;
+}
+.tierlist-champ-icon:hover {
+  transform: scale(1.12) !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+/* ── 3. SKELETON → CONTENT morphing ── */
+.skeleton-cell {
+  transition: opacity 0.4s ease, transform 0.4s var(--spring-soft);
+}
+.skeleton-cell.fade-out {
+  opacity: 0;
+  transform: scale(0.95);
+}
+/* New rows appearing after skeleton */
+#statTable tbody tr {
+  animation: rowAppear 0.35s var(--spring-soft) both;
+}
+@keyframes rowAppear {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+#statTable tbody tr:nth-child(1)  { animation-delay: 0.00s; }
+#statTable tbody tr:nth-child(2)  { animation-delay: 0.02s; }
+#statTable tbody tr:nth-child(3)  { animation-delay: 0.04s; }
+#statTable tbody tr:nth-child(4)  { animation-delay: 0.06s; }
+#statTable tbody tr:nth-child(5)  { animation-delay: 0.08s; }
+#statTable tbody tr:nth-child(6)  { animation-delay: 0.10s; }
+#statTable tbody tr:nth-child(7)  { animation-delay: 0.12s; }
+#statTable tbody tr:nth-child(8)  { animation-delay: 0.14s; }
+#statTable tbody tr:nth-child(9)  { animation-delay: 0.16s; }
+#statTable tbody tr:nth-child(10) { animation-delay: 0.18s; }
+#statTable tbody tr:nth-child(n+11) { animation-delay: 0.20s; }
+
+/* ── 20. VIEW TOGGLE slide transitions (Stats ↔ WinRate) ── */
+.table-wrap-outer,
+#wrprSection {
+  transition: opacity 0.3s ease, transform 0.3s var(--spring-soft);
+}
+.view-slide-out-left {
+  animation: slideOutLeft 0.25s ease forwards;
+}
+.view-slide-in-right {
+  animation: slideInRight 0.3s var(--spring-soft) forwards;
+}
+.view-slide-out-right {
+  animation: slideOutRight 0.25s ease forwards;
+}
+.view-slide-in-left {
+  animation: slideInLeft 0.3s var(--spring-soft) forwards;
+}
+@keyframes slideOutLeft {
+  0%   { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-40px); }
+}
+@keyframes slideInRight {
+  0%   { opacity: 0; transform: translateX(40px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideOutRight {
+  0%   { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(40px); }
+}
+@keyframes slideInLeft {
+  0%   { opacity: 0; transform: translateX(-40px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* ── SPRING hover effects (replacing ease on buttons) ── */
+.header-view-btn {
+  transition: all 0.25s var(--spring) !important;
+}
+.header-view-btn:hover {
+  transform: translateY(-1px) scale(1.03);
+}
+.header-view-btn:active {
+  transform: scale(0.93) !important;
+  transition-duration: 0.1s !important;
+}
+.btn-close-x {
+  transition: transform 0.2s var(--spring), background 0.15s, border-color 0.15s !important;
+}
+.btn-close-x:hover {
+  transform: scale(1.1) rotate(5deg) !important;
+}
+.btn-close-x:active {
+  transform: scale(0.88) !important;
+}
+.lang-btn {
+  transition: transform 0.25s var(--spring), filter 0.2s !important;
+}
+.lang-btn:hover {
+  transform: scale(1.06) !important;
+}
+.lang-btn:active {
+  transform: scale(0.92) !important;
+}
+#menuBtn {
+  transition: transform 0.2s var(--spring), background 0.15s !important;
+}
+#menuBtn:hover {
+  transform: scale(1.08) !important;
+}
+.side-btn {
+  transition: all 0.2s var(--spring-soft) !important;
+}
+.side-btn:hover {
+  transform: translateX(4px);
+}
+.side-btn:active {
+  transform: translateX(2px) scale(0.97);
+}
+
+/* ── 12. BOTTOM NAVIGATION BAR (mobile) ── */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 5500;
+  background: rgba(1,10,19,0.92);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border-top: 1px solid rgba(11,196,227,0.15);
+  padding: 4px 0;
+  padding-bottom: max(4px, env(safe-area-inset-bottom));
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+}
+@media (max-width: 768px) {
+  .bottom-nav { display: flex; }
+  .app-wrapper { padding-bottom: 80px !important; }
+  #menuBtn { display: none !important; }
+}
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s var(--spring), transform 0.2s var(--spring);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom-nav-item .nav-icon {
+  font-size: 20px;
+  line-height: 1;
+  transition: transform 0.25s var(--spring);
+}
+.bottom-nav-item.active {
+  color: var(--accent);
+}
+.bottom-nav-item.active .nav-icon {
+  transform: scale(1.15) translateY(-2px);
+  filter: drop-shadow(0 2px 6px rgba(11,196,227,0.4));
+}
+.bottom-nav-item:active {
+  transform: scale(0.9);
+}
+.bottom-nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 24px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 0 0 2px 2px;
+  transition: transform 0.25s var(--spring);
+}
+.bottom-nav-item.active::before {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* ── DRAG & DROP for tierlist ── */
+.tierlist-champs.drag-over {
+  background: rgba(11,196,227,0.08) !important;
+  outline: 2px dashed rgba(11,196,227,0.4);
+  outline-offset: -2px;
+  transition: background 0.2s ease, outline 0.2s ease;
+}
+.tier-drag-ghost {
+  opacity: 0.85;
+  transform: scale(1.1) rotate(3deg);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 0 2px var(--accent);
+  border-radius: 8px;
+  z-index: 99999;
+}
+.tier-drop-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 2px dashed rgba(11,196,227,0.5);
+  background: rgba(11,196,227,0.06);
+  transition: all 0.15s var(--spring-soft);
+}
+
+/* ── Shared Element Transition — FLIP origin marker ── */
+.flip-origin {
+  view-transition-name: hero-card;
+}
+.m-mask.flip-opening {
+  animation: none;
+}
+.m-mask.flip-opening > .m-win {
+  animation: flipModalIn 0.4s var(--spring-modal) forwards;
+}
+@keyframes flipModalIn {
+  0%   { opacity: 0; transform: scale(0.5) translateY(30px); }
+  50%  { opacity: 1; }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }

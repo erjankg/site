@@ -4192,131 +4192,49 @@
       return textTarget;
     }
 
-    /* ── per-modal edit toggle ──
-       Works with both .cms-modal-overlay (.cms-modal-win) and .m-mask (.m-win).
-       Adds ONE click listener to the win — removed when toggled off. */
-    function _injectModalToggle(container) {
-      if (!window._isAdmin) return;
-      // Поддержка обоих типов модалок
-      var win = container.querySelector('.cms-modal-win') || container.querySelector('.m-win');
-      if (!win || win.dataset.cmsModalToggleAdded) return;
-      win.dataset.cmsModalToggleAdded = '1';
+    /* ── ОДИН глобальный floating toggle ──
+       Поверх всего (z-index: 999999). ВКЛ → весь текст на экране редактируется
+       (главная, модалки, всё). ВЫКЛ → ничего не перехватывается. */
+    window.cmsInitInlineEdit = function() {
+      if (document.getElementById('cmsEditModeToggle')) return;
+      window.cmsLoadInlineTexts();
 
       var editOn = false;
       var listener = null;
 
-      var toggleBtn = document.createElement('button');
-      toggleBtn.className = 'cms-modal-edit-toggle';
-      toggleBtn.textContent = '✏';
-      toggleBtn.title = 'Редактировать тексты в этой модалке';
-      toggleBtn.setAttribute('data-cms-inline-skip', '1');
-
-      toggleBtn.onclick = function(e) {
-        e.stopPropagation();
-        editOn = !editOn;
-        toggleBtn.classList.toggle('active', editOn);
-        win.classList.toggle('cms-edit-mode', editOn);
-
-        if (editOn) {
-          _applyOverrides(win);
-          listener = function(e) {
-            if (!editOn) return;
-            // Не перехватываем саму ✏ кнопку
-            if (e.target.closest && e.target.closest('.cms-modal-edit-toggle')) return;
-            var target = _findTextTarget(e.target, win);
-            if (!target) return;
-            e.stopPropagation(); e.preventDefault();
-            var key = _makeKey(target);
-            target.dataset.cmsKey = key;
-            _openPopup(target, key);
-          };
-          win.addEventListener('click', listener, true);
-        } else {
-          if (listener) { win.removeEventListener('click', listener, true); listener = null; }
-          _closePopup();
-        }
-      };
-
-      // Header: .mhdr (m-mask) or first div (cms-modal)
-      var hdr = win.querySelector('.mhdr') || win.querySelector('div');
-      if (hdr) {
-        var closeBtn = hdr.querySelector('.btn-close-x') || hdr.querySelector('button');
-        if (closeBtn) hdr.insertBefore(toggleBtn, closeBtn);
-        else          hdr.appendChild(toggleBtn);
-      }
-    }
-
-    /* ── watch for modals being appended to body ── */
-    function _watchForModals() {
-      new MutationObserver(function(mutations) {
-        mutations.forEach(function(m) {
-          m.addedNodes.forEach(function(node) {
-            if (node.nodeType !== 1) return;
-            if (node.classList && node.classList.contains('cms-modal-overlay')) {
-              // Tiny delay so modal's own JS finishes building the DOM first
-              setTimeout(function() {
-                _injectModalToggle(node);
-                _applyOverrides(node);
-              }, 30);
-            }
-          });
-        });
-      }).observe(document.body, { childList: true });
-    }
-
-    /* ── main page floating toggle ──
-       ONE listener on document.body — added/removed with edit mode.
-       Explicitly skips clicks inside .cms-modal-overlay so modals stay interactive. */
-    window.cmsInitInlineEdit = function() {
-      if (document.getElementById('cmsEditModeToggle')) return;
-      window.cmsLoadInlineTexts();
-      _watchForModals();
-
-      // Inject ✏ into all existing .m-mask modals (they're always in the DOM)
-      document.querySelectorAll('.m-mask').forEach(function(mask) {
-        _injectModalToggle(mask);
-      });
-
-      var mainEditOn = false;
-      var mainListener = null;
-
       var btn = document.createElement('button');
       btn.id = 'cmsEditModeToggle';
       btn.className = 'cms-edit-mode-toggle';
+      btn.setAttribute('data-cms-inline-skip', '1');
       btn.innerHTML = '<span class="cms-edit-toggle-icon">✏</span>'
         + '<span class="cms-edit-toggle-label">Редактировать тексты</span>';
 
-      btn.onclick = function() {
-        mainEditOn = !mainEditOn;
-        btn.classList.toggle('active', mainEditOn);
+      btn.onclick = function(e) {
+        e.stopPropagation();
+        editOn = !editOn;
+        btn.classList.toggle('active', editOn);
         btn.querySelector('.cms-edit-toggle-label').textContent =
-          mainEditOn ? 'Редактирование ВКЛ' : 'Редактировать тексты';
-        document.body.classList.toggle('cms-edit-mode', mainEditOn);
+          editOn ? 'Редактирование ВКЛ' : 'Редактировать тексты';
+        document.body.classList.toggle('cms-edit-mode', editOn);
 
-        if (mainEditOn) {
-          mainListener = function(e) {
-            // Эти зоны работают нормально даже в edit-mode:
-            // модалки (свой ✏), сайдбар (навигация), кнопка toggle
-            if (e.target.closest && (
-              e.target.closest('.m-mask') ||
-              e.target.closest('.cms-modal-overlay') ||
-              e.target.closest('#sidePanel') ||
-              e.target.closest('#cmsEditModeToggle')
-            )) return;
+        if (editOn) {
+          listener = function(e) {
+            // Пропускаем только саму кнопку toggle и popup редактора
+            if (e.target.closest && e.target.closest('#cmsEditModeToggle')) return;
+            if (e.target.closest && e.target.closest('.cms-inline-edit-popup')) return;
             var target = _findTextTarget(e.target, document.body);
             if (!target) return;
-            // capture phase: перехватываем ДО onclick кнопок
+            // capture phase: перехватываем ДО onclick
             e.stopPropagation();
             e.preventDefault();
             var key = _makeKey(target);
             target.dataset.cmsKey = key;
             _openPopup(target, key);
           };
-          // capture=true, но ТОЛЬКО пока edit mode ON
-          document.body.addEventListener('click', mainListener, true);
+          // capture=true на document — ловим ВСЁ, включая модалки
+          document.addEventListener('click', listener, true);
         } else {
-          // Полностью убираем listener — сайт работает как обычно
-          if (mainListener) { document.body.removeEventListener('click', mainListener, true); mainListener = null; }
+          if (listener) { document.removeEventListener('click', listener, true); listener = null; }
           _closePopup();
         }
       };

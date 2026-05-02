@@ -35,8 +35,6 @@
     }
 
     function openModal(id) {
-        console.log('%c[MODAL] openModal("' + id + '") stack=' + JSON.stringify(_modalStack), 'color:#0f0');
-        console.trace('[MODAL] openModal trace');
         // Скрываем тултипы
         ['itemTooltip','runeTooltip','uiTip'].forEach(function(tid){
             var t=document.getElementById(tid); if(t) t.style.display='none';
@@ -86,8 +84,6 @@
 
     // skipSidebar=true используется внутри самого sidebar-кода чтобы не вызвать петлю
     function closeModal(id, skipSidebar) {
-        console.log('%c[MODAL] closeModal("' + id + '", skipSidebar=' + skipSidebar + ') stack=' + JSON.stringify(_modalStack), 'color:#f55');
-        console.trace('[MODAL] closeModal trace');
         var el = document.getElementById(id);
         if(el) {
             // Плавное закрытие: добавляем .closing, после анимации убираем .active
@@ -158,7 +154,6 @@
 
     // ── Back-button / Android back: перехватываем popstate ──
     window.addEventListener('popstate', function(e) {
-        console.log('%c[MODAL] POPSTATE fired, stack=' + JSON.stringify(_modalStack) + ' guard=' + (Date.now() - _popstateGuard) + 'ms ago', 'color:#ff0;background:#333');
         // Защита от гонки: если модалка открылась < 300ms назад,
         // этот popstate — «мусор» от предыдущего closeModal → history.back().
         if (_popstateGuard && Date.now() - _popstateGuard < 300) {
