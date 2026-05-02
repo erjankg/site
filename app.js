@@ -15,6 +15,7 @@
     var _modalStack = [];
     var _baseZIndex = 6000;
     var _closingFromPopstate = false; // предотвращает loop при popstate → closeModal → history.back()
+    var _popstateGuard = 0; // timestamp: popstate игнорируется если модалка только что открылась
 
     // Модалки которые ВСЕГДА открываются поверх (не закрывая родителя)
     var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask','profileSetupMask','userCardMask',
@@ -34,6 +35,8 @@
     }
 
     function openModal(id) {
+        console.log('%c[MODAL] openModal("' + id + '") stack=' + JSON.stringify(_modalStack), 'color:#0f0');
+        console.trace('[MODAL] openModal trace');
         // Скрываем тултипы
         ['itemTooltip','runeTooltip','uiTip'].forEach(function(tid){
             var t=document.getElementById(tid); if(t) t.style.display='none';
@@ -75,11 +78,16 @@
         if (history && history.pushState) {
             history.pushState({ modal: id }, '');
         }
+        // Guard: если сразу после открытия придёт async popstate (от предыдущего back()),
+        // игнорируем его — иначе новая модалка мгновенно закроется.
+        _popstateGuard = Date.now();
     }
     window.openModal = openModal;
 
     // skipSidebar=true используется внутри самого sidebar-кода чтобы не вызвать петлю
     function closeModal(id, skipSidebar) {
+        console.log('%c[MODAL] closeModal("' + id + '", skipSidebar=' + skipSidebar + ') stack=' + JSON.stringify(_modalStack), 'color:#f55');
+        console.trace('[MODAL] closeModal trace');
         var el = document.getElementById(id);
         if(el) {
             // Плавное закрытие: добавляем .closing, после анимации убираем .active
@@ -150,6 +158,17 @@
 
     // ── Back-button / Android back: перехватываем popstate ──
     window.addEventListener('popstate', function(e) {
+        console.log('%c[MODAL] POPSTATE fired, stack=' + JSON.stringify(_modalStack) + ' guard=' + (Date.now() - _popstateGuard) + 'ms ago', 'color:#ff0;background:#333');
+        // Защита от гонки: если модалка открылась < 300ms назад,
+        // этот popstate — «мусор» от предыдущего closeModal → history.back().
+        if (_popstateGuard && Date.now() - _popstateGuard < 300) {
+            _popstateGuard = 0;
+            // Восстанавливаем history entry, который back() только что съел
+            if (_modalStack.length > 0 && history && history.pushState) {
+                history.pushState({ modal: _modalStack[_modalStack.length - 1] }, '');
+            }
+            return;
+        }
         if (_modalStack.length > 0) {
             _closingFromPopstate = true;
             var topId = _modalStack[_modalStack.length - 1];
