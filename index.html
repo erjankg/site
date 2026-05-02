@@ -1189,6 +1189,30 @@ Stormarrow: При максимальных зарядах следующая б
   </div>
 </div>
 
+<!-- ══ BOTTOM NAVIGATION BAR (mobile) ══ -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="bottom-nav-item active" data-nav="home" onclick="bottomNavGo('home')">
+    <span class="nav-icon">📊</span>
+    <span>Stats</span>
+  </button>
+  <button class="bottom-nav-item" data-nav="champs" onclick="bottomNavGo('champs')">
+    <span class="nav-icon">👥</span>
+    <span data-i18n="Герои">Герои</span>
+  </button>
+  <button class="bottom-nav-item" data-nav="items" onclick="bottomNavGo('items')">
+    <span class="nav-icon">📦</span>
+    <span data-i18n="Предметы">Предметы</span>
+  </button>
+  <button class="bottom-nav-item" data-nav="tier" onclick="bottomNavGo('tier')">
+    <span class="nav-icon">🏆</span>
+    <span data-i18n="Тир">Тир</span>
+  </button>
+  <button class="bottom-nav-item" data-nav="more" onclick="bottomNavGo('more')">
+    <span class="nav-icon">☰</span>
+    <span data-i18n="Ещё">Ещё</span>
+  </button>
+</nav>
+
 <!-- ══ FIREBASE + AUTH + SYNC ══ -->
 
 <script src="cms.js"></script>

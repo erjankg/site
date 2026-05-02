@@ -1899,7 +1899,7 @@
             lbl.style.cssText='font-size:8px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.15;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
             lbl.textContent=ch.name;
             div.appendChild(img); div.appendChild(lbl);
-            div.onclick=function(){openChampDetail(ch.name);};
+            div.onclick=function(){window._lastClickedChampEl=this;openChampDetail(ch.name);};
             // Patch dot in champ list + tooltip
             var pI = patchMap[ch.name];
             if(pI) {
@@ -2167,7 +2167,7 @@
                         img.src = champIcon(cn); img.title = cn + ' (авто)';
                         img.style.cssText = 'width:29px;height:29px;border-radius:4px;object-fit:cover;';
                         img.onerror = function(){ this.style.display='none'; };
-                        img.onclick = function(e){ e.stopPropagation(); openChampDetail(cn); };
+                        img.onclick = function(e){ e.stopPropagation(); window._lastClickedChampEl=this; openChampDetail(cn); };
                         chip.appendChild(img);
                         var xBtn = document.createElement('span');
                         xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;line-height:1;';
@@ -2184,6 +2184,21 @@
         }
         el.appendChild(mainGrid);
         renderMatchups(name);
+        // FLIP: animate modal from clicked element
+        var mask = document.getElementById('champDetailMask');
+        if (mask && window._lastClickedChampEl) {
+            var srcRect = window._lastClickedChampEl.getBoundingClientRect();
+            mask.classList.add('flip-opening');
+            var win = mask.querySelector('.m-win');
+            if (win) {
+                win.style.transformOrigin = srcRect.left + 'px ' + srcRect.top + 'px';
+            }
+            setTimeout(function() {
+                mask.classList.remove('flip-opening');
+                if (win) win.style.transformOrigin = '';
+            }, 450);
+            window._lastClickedChampEl = null;
+        }
         openModal('champDetailMask');
     };
     window.closeChampDetail=function(){closeModal('champDetailMask');};
@@ -5759,4 +5774,277 @@
         reset: resetConfig,
         open: openModal
     };
+})();
+
+// ═══════════════════════════════════════════
+// DESIGN UPGRADE 2026 — JS enhancements
+// ═══════════════════════════════════════════
+(function() {
+
+    // ── 1. RIPPLE EFFECT on buttons ──
+    function createRipple(e) {
+        var btn = e.currentTarget;
+        if (!btn || btn.closest('.tierlist-champs')) return; // skip drag containers
+        var rect = btn.getBoundingClientRect();
+        var size = Math.max(rect.width, rect.height) * 2;
+        var x = e.clientX - rect.left - size / 2;
+        var y = e.clientY - rect.top - size / 2;
+        var circle = document.createElement('span');
+        circle.className = 'ripple-circle';
+        circle.style.width = circle.style.height = size + 'px';
+        circle.style.left = x + 'px';
+        circle.style.top = y + 'px';
+        btn.appendChild(circle);
+        circle.addEventListener('animationend', function() { circle.remove(); });
+    }
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('button, .header-view-btn, .btn-calc-main, .side-btn, .m-btn, .btn-support, .site-auth-btn, .calc-range-btn, .calc-lvl-btn');
+        if (btn) {
+            createRipple({ currentTarget: btn, clientX: e.clientX, clientY: e.clientY });
+        }
+    });
+
+    // ── 4. 3D TILT on champion cards (champ-cell) ──
+    var _tiltEls = [];
+    function initTilt() {
+        _tiltEls = Array.from(document.querySelectorAll('.champ-icon'));
+    }
+    document.addEventListener('mousemove', function(e) {
+        var el = e.target.closest('.champ-icon');
+        if (!el) return;
+        var rect = el.getBoundingClientRect();
+        var x = (e.clientX - rect.left) / rect.width - 0.5;
+        var y = (e.clientY - rect.top) / rect.height - 0.5;
+        el.style.transform = 'perspective(600px) rotateY(' + (x * 12) + 'deg) rotateX(' + (-y * 12) + 'deg) scale(1.08)';
+        el.style.transition = 'transform 0.1s ease';
+    });
+    document.addEventListener('mouseleave', function(e) {
+        var el = e.target.closest('.champ-icon');
+        if (el) {
+            el.style.transform = '';
+            el.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        }
+    }, true);
+
+    // ── 9. STICKY HEADER — blur on scroll ──
+    var _header = document.querySelector('header');
+    if (_header) {
+        var _scrollTick = false;
+        window.addEventListener('scroll', function() {
+            if (!_scrollTick) {
+                _scrollTick = true;
+                requestAnimationFrame(function() {
+                    if (window.scrollY > 30) {
+                        _header.classList.add('scrolled');
+                    } else {
+                        _header.classList.remove('scrolled');
+                    }
+                    _scrollTick = false;
+                });
+            }
+        });
+    }
+
+    // ── 12. BOTTOM NAV BAR logic ──
+    window.bottomNavGo = function(nav) {
+        // Update active state
+        var items = document.querySelectorAll('.bottom-nav-item');
+        items.forEach(function(it) {
+            it.classList.toggle('active', it.dataset.nav === nav);
+        });
+
+        // Close any open modal first
+        if (window.closeAllModals) window.closeAllModals();
+
+        switch(nav) {
+            case 'home':
+                // Scroll to top, show main view
+                if (window.switchMainView) window.switchMainView('main');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                break;
+            case 'champs':
+                if (window.sidebarOpen) window.sidebarOpen('sideChamps');
+                else if (window.openSideChamps) window.openSideChamps();
+                break;
+            case 'items':
+                if (window.sidebarOpen) window.sidebarOpen('items');
+                else if (window.openItems) window.openItems();
+                break;
+            case 'tier':
+                if (window.openTierlistMenu) window.openTierlistMenu();
+                else if (window.openTierlist) window.openTierlist('champs');
+                break;
+            case 'more':
+                if (window.toggleSidebar) window.toggleSidebar();
+                break;
+        }
+    };
+
+    // ── 20. VIEW TOGGLE slide transitions ──
+    var _origSwitchView = window.switchMainView;
+    if (_origSwitchView) {
+        window.switchMainView = function(view) {
+            var mainEl = document.querySelector('.table-wrap-outer');
+            var wrprEl = document.getElementById('wrprSection');
+            if (!mainEl || !wrprEl) { _origSwitchView(view); return; }
+
+            var currentIsWrpr = wrprEl.style.display !== 'none' && wrprEl.style.display !== '';
+
+            if (view === 'wrpr' && !currentIsWrpr) {
+                // Stats → WinRate: slide out left, slide in right
+                mainEl.classList.add('view-slide-out-left');
+                setTimeout(function() {
+                    mainEl.classList.remove('view-slide-out-left');
+                    _origSwitchView(view);
+                    wrprEl.classList.add('view-slide-in-right');
+                    setTimeout(function() { wrprEl.classList.remove('view-slide-in-right'); }, 350);
+                }, 250);
+            } else if (view === 'main' && currentIsWrpr) {
+                // WinRate → Stats: slide out right, slide in left
+                wrprEl.classList.add('view-slide-out-right');
+                setTimeout(function() {
+                    wrprEl.classList.remove('view-slide-out-right');
+                    _origSwitchView(view);
+                    mainEl.classList.add('view-slide-in-left');
+                    setTimeout(function() { mainEl.classList.remove('view-slide-in-left'); }, 350);
+                }, 250);
+            } else {
+                _origSwitchView(view);
+            }
+        };
+    }
+
+    // ── 18. DRAG & DROP for tierlist ──
+    (function initTierDragDrop() {
+        var _dragItem = null;
+        var _dragTier = null;
+        var _dragType = null;
+        var _placeholder = null;
+
+        function createPlaceholder() {
+            var ph = document.createElement('div');
+            ph.className = 'tier-drop-placeholder';
+            return ph;
+        }
+
+        // Use event delegation on tierlist content
+        document.addEventListener('mousedown', handleDragStart);
+        document.addEventListener('touchstart', handleDragStart, { passive: false });
+
+        function handleDragStart(e) {
+            // Only in edit mode
+            if (!window._tierEditMode && !document.querySelector('.tierlist-champs')) return;
+
+            var chip = e.target.closest('.tierlist-champs > div');
+            if (!chip) return;
+            var img = chip.querySelector('img');
+            if (!img) return;
+
+            // Find parent tier container
+            var tierChamps = chip.parentElement;
+            if (!tierChamps || !tierChamps.classList.contains('tierlist-champs')) {
+                // Dynamically-built tier containers may not have the class
+                var parent = chip.parentElement;
+                if (!parent) return;
+                tierChamps = parent;
+            }
+
+            // Find the tier key (S/A/B/C) from sibling label
+            var row = tierChamps.parentElement;
+            if (!row) return;
+            var label = row.querySelector('.tierlist-label, div:first-child');
+            if (!label) return;
+            _dragTier = label.textContent.trim();
+            _dragItem = img.alt || img.title;
+
+            var touch = e.touches ? e.touches[0] : e;
+            var rect = chip.getBoundingClientRect();
+
+            // Clone for ghost
+            var ghost = chip.cloneNode(true);
+            ghost.className = 'tier-drag-ghost';
+            ghost.style.position = 'fixed';
+            ghost.style.width = rect.width + 'px';
+            ghost.style.height = rect.height + 'px';
+            ghost.style.left = rect.left + 'px';
+            ghost.style.top = rect.top + 'px';
+            ghost.style.pointerEvents = 'none';
+            ghost.style.zIndex = '99999';
+            document.body.appendChild(ghost);
+
+            // Placeholder
+            _placeholder = createPlaceholder();
+            chip.style.opacity = '0.3';
+
+            var offsetX = touch.clientX - rect.left;
+            var offsetY = touch.clientY - rect.top;
+
+            function onMove(ev) {
+                var t = ev.touches ? ev.touches[0] : ev;
+                ghost.style.left = (t.clientX - offsetX) + 'px';
+                ghost.style.top = (t.clientY - offsetY) + 'px';
+
+                // Find drop target
+                ghost.style.display = 'none';
+                var under = document.elementFromPoint(t.clientX, t.clientY);
+                ghost.style.display = '';
+
+                if (under) {
+                    var dropZone = under.closest('[style*="flex-wrap"]');
+                    if (dropZone && dropZone !== tierChamps) {
+                        // Remove old highlight
+                        document.querySelectorAll('.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
+                        dropZone.classList.add('drag-over');
+                        if (!dropZone.contains(_placeholder)) {
+                            dropZone.appendChild(_placeholder);
+                        }
+                    }
+                }
+
+                ev.preventDefault();
+            }
+
+            function onEnd(ev) {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onEnd);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend', onEnd);
+
+                ghost.remove();
+                chip.style.opacity = '';
+                if (_placeholder && _placeholder.parentNode) _placeholder.remove();
+                document.querySelectorAll('.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
+
+                // Find where we dropped
+                var t = ev.changedTouches ? ev.changedTouches[0] : ev;
+                var under = document.elementFromPoint(t.clientX, t.clientY);
+                if (under && _dragItem) {
+                    var dropZone = under.closest('[style*="flex-wrap"]');
+                    if (dropZone) {
+                        var dropRow = dropZone.parentElement;
+                        if (dropRow) {
+                            var dropLabel = dropRow.querySelector('div:first-child');
+                            var newTier = dropLabel ? dropLabel.textContent.trim() : null;
+                            if (newTier && newTier !== _dragTier && ['S','A','B','C'].indexOf(newTier) !== -1) {
+                                // Move between tiers using existing functions
+                                if (window.removeFromTier) window.removeFromTier(_dragTier, _dragItem);
+                                if (window.addToTier) window.addToTier(newTier, _dragItem);
+                                // For tierlists built with renderTierlist, trigger rerender
+                                if (window.renderTierlist) window.renderTierlist();
+                            }
+                        }
+                    }
+                }
+
+                _dragItem = null;
+                _dragTier = null;
+            }
+
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onEnd);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onEnd);
+        }
+    })();
+
 })();
