@@ -5836,8 +5836,8 @@ body.cms-edit-mode :not(input):not(textarea):not(select):not(#cmsEditModeToggle)
   background: #0d1b2a;
   border: 1.5px solid rgba(11, 196, 227, 0.5);
   border-radius: 12px;
-  padding: 10px;
-  width: 260px;
+  padding: 12px;
+  width: 310px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;

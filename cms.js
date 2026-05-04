@@ -4092,10 +4092,23 @@
       return parts.join('>');
     }
 
+    // Старый формат: значение — строка (трактуем как RU)
+    // Новый формат: { ru, en }. Пустая строка для другого языка ⇒ не применяем оверрайд.
+    function _getLangText(val, lang) {
+      if (val == null) return null;
+      if (typeof val === 'string') return lang === 'ru' ? val : null;
+      if (typeof val === 'object') {
+        var t = val[lang];
+        return (typeof t === 'string' && t.length > 0) ? t : null;
+      }
+      return null;
+    }
+
     function _applyOverrides(root) {
+      var lang = (window._lang === 'en') ? 'en' : 'ru';
       Object.keys(_inlineTexts).forEach(function(key) {
-        var text = _inlineTexts[key];
-        if (!text) return;
+        var text = _getLangText(_inlineTexts[key], lang);
+        if (text == null) return;
         var sel = key.startsWith('i18n__') ? '[data-i18n="' + key.slice(6) + '"]' : key;
         try { root.querySelectorAll(sel).forEach(function(el) { _applyText(el, text); }); } catch(e) {}
       });
@@ -4108,6 +4121,9 @@
         }).catch(function() {});
     };
 
+    // Вызывается из i18n.js после applyLang(), чтобы перезаписать DOM нужным языком
+    window.cmsApplyInlineOverrides = function() { _applyOverrides(document); };
+
     /* ── popup ── */
     function _closePopup() {
       if (_activeEdit) { _activeEdit.popup.remove(); _activeEdit = null; }
@@ -4115,14 +4131,35 @@
 
     function _openPopup(el, key) {
       _closePopup();
-      var text = _directText(el);
+      var domText = _directText(el);
+      var currentLang = (window._lang === 'en') ? 'en' : 'ru';
+
+      // Распаковываем сохранённое значение в RU/EN, остальное — берём из DOM для текущего языка
+      var saved = _inlineTexts[key];
+      var ruVal = '', enVal = '';
+      if (saved != null) {
+        if (typeof saved === 'string')      { ruVal = saved; }
+        else if (typeof saved === 'object') { ruVal = saved.ru || ''; enVal = saved.en || ''; }
+      }
+      if (currentLang === 'ru' && !ruVal) ruVal = domText;
+      if (currentLang === 'en' && !enVal) enVal = domText;
+
       var popup = document.createElement('div');
       popup.className = 'cms-inline-edit-popup';
 
-      var input = document.createElement('textarea');
-      input.className = 'cms-inline-edit-input';
-      input.value = text;
-      input.rows = Math.min(Math.max(1, Math.ceil(text.length / 35)), 5);
+      function _makeField(labelText, value) {
+        var lbl = document.createElement('div');
+        lbl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.55);font-weight:700;letter-spacing:0.5px;margin-bottom:-3px;';
+        lbl.textContent = labelText;
+        var ta = document.createElement('textarea');
+        ta.className = 'cms-inline-edit-input';
+        ta.value = value;
+        ta.rows = Math.min(Math.max(1, Math.ceil((value.length || 1) / 35)), 4);
+        return { label: lbl, input: ta };
+      }
+
+      var ruField = _makeField('🇷🇺 RU', ruVal);
+      var enField = _makeField('🇺🇸 EN', enVal);
 
       var btnRow = document.createElement('div');
       btnRow.className = 'cms-inline-edit-btnrow';
@@ -4133,16 +4170,19 @@
       saveBtn.onclick = function(e) {
         e.stopPropagation();
         saveBtn.disabled = true; saveBtn.textContent = '⏳...';
-        var val = input.value;
-        var upd = {}; upd[key] = val;
+        var newVal = { ru: ruField.input.value, en: enField.input.value };
+        var upd = {}; upd[key] = newVal;
         firebase.firestore().collection('siteConfig').doc('inlineTexts').set(upd, { merge: true })
           .then(function() {
-            _inlineTexts[key] = val;
-            _applyText(el, val);
-            var sel = key.startsWith('i18n__') ? '[data-i18n="' + key.slice(6) + '"]' : key;
-            try { document.querySelectorAll(sel).forEach(function(e2) { _applyText(e2, val); }); } catch(ex) {}
+            _inlineTexts[key] = newVal;
+            var displayText = _getLangText(newVal, currentLang);
+            if (displayText != null) {
+              _applyText(el, displayText);
+              var sel = key.startsWith('i18n__') ? '[data-i18n="' + key.slice(6) + '"]' : key;
+              try { document.querySelectorAll(sel).forEach(function(e2) { _applyText(e2, displayText); }); } catch(ex) {}
+            }
             _closePopup();
-            _showToast('Текст сохранён!', 'success');
+            _showToast('Текст сохранён (RU + EN)!', 'success');
           })
           .catch(function(err) {
             _showToast('Ошибка: ' + err.message, 'error');
@@ -4160,16 +4200,19 @@
       keyLbl.textContent = key.length > 55 ? key.slice(0, 52) + '…' : key;
 
       btnRow.appendChild(saveBtn); btnRow.appendChild(cancelBtn);
-      popup.appendChild(input); popup.appendChild(btnRow); popup.appendChild(keyLbl);
+      popup.appendChild(ruField.label); popup.appendChild(ruField.input);
+      popup.appendChild(enField.label); popup.appendChild(enField.input);
+      popup.appendChild(btnRow); popup.appendChild(keyLbl);
 
       var rect = el.getBoundingClientRect();
       var top = rect.bottom + 6;
-      if (top + 130 > window.innerHeight) top = Math.max(4, rect.top - 136);
+      if (top + 220 > window.innerHeight) top = Math.max(4, rect.top - 226);
       popup.style.top  = top + 'px';
-      popup.style.left = Math.max(4, Math.min(rect.left, window.innerWidth - 270)) + 'px';
+      popup.style.left = Math.max(4, Math.min(rect.left, window.innerWidth - 320)) + 'px';
 
       document.body.appendChild(popup);
-      input.focus(); input.select();
+      var focusInput = (currentLang === 'en') ? enField.input : ruField.input;
+      focusInput.focus(); focusInput.select();
       _activeEdit = { popup: popup, el: el, key: key };
     }
 

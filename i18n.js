@@ -751,6 +751,9 @@ function applyLang() {
             }
         }
     });
+
+    // Применяем CMS inline-оверрайды поверх стандартных переводов
+    if (window.cmsApplyInlineOverrides) window.cmsApplyInlineOverrides();
 }
 
 // ═══ TOGGLE LANGUAGE ═══
