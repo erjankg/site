@@ -6086,27 +6086,16 @@ header.scrolled .logo { font-size: 18px; }
   transform: scale(0.95);
 }
 
-/* ── content-visibility: skip rendering off-screen long lists ── */
-/* Tier-list rows: рендерятся только когда видны */
-.tierlist-row {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 60px;
-}
-/* Items grid и rune-grid: каждая карточка может быть пропущена */
-.items-grid .item-card,
-.rune-grid .rune-card {
+/* ── content-visibility: ускоряем скролл для длинных статичных списков ── */
+/* Items grid — длинный список предметов в модалке */
+.items-grid .item-card {
   content-visibility: auto;
   contain-intrinsic-size: 52px 60px;
 }
-/* Champion grid (mGrid) — длинный список чемпионов */
-#mGrid > * {
+/* Rune grid — длинный список рун */
+.rune-grid .rune-card {
   content-visibility: auto;
-  contain-intrinsic-size: auto 80px;
-}
-/* Stat table rows — для длинных таблиц */
-#statTable tbody tr {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 48px;
+  contain-intrinsic-size: 52px 60px;
 }
 
 /* ── prefers-reduced-motion: отключаем все анимации для пользователей с настройкой ── */
@@ -6153,51 +6142,6 @@ header.scrolled .logo { font-size: 18px; }
   }
 }
 
-/* ── Popover API: top-layer rendering for modals ── */
-.m-mask[popover] {
-  /* override UA stylesheet defaults that fight our layout */
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: var(--bg-overlay); /* matches our existing modal background */
-  color: inherit;
-  max-width: none;
-  max-height: none;
-  width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  inset: 0;
-  overflow: visible;
-}
-/* Когда popover закрыт — display:none через UA, наша .active поверх */
-.m-mask[popover]:not(:popover-open):not(.active) { display: none; }
-.m-mask[popover].active { display: flex; }
-/* Backdrop за popover-модалкой */
-.m-mask[popover]::backdrop {
-  background: transparent; /* фон рисуем сами через .m-mask */
-}
-
-/* @starting-style: плавное появление модалки в popover-режиме */
-@supports (transition-behavior: allow-discrete) {
-  .m-mask[popover] {
-    transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-                display 0.3s allow-discrete, overlay 0.3s allow-discrete;
-  }
-}
-
-/* ── VIEW TRANSITIONS API: native page transitions ── */
-::view-transition-old(root) {
-  animation: 220ms cubic-bezier(0.4, 0, 0.2, 1) both vtFadeOut;
-}
-::view-transition-new(root) {
-  animation: 280ms cubic-bezier(0.22, 1, 0.36, 1) both vtFadeIn;
-}
-@keyframes vtFadeOut {
-  to { opacity: 0; transform: translateY(-6px); }
-}
-@keyframes vtFadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-}
 
 
 /* ── 12. BOTTOM NAVIGATION BAR (mobile) ── */

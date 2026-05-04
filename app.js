@@ -35,20 +35,6 @@
         if(!except) document.body.classList.remove('modal-open');
     }
 
-    // Popover API: top-layer rendering (нативно, выше всех z-index)
-    function _ensurePopoverAttr(el) {
-        if (!el || !('popover' in el)) return; // no support
-        if (!el.hasAttribute('popover')) el.setAttribute('popover', 'manual');
-    }
-    function _showPopover(el) {
-        if (!el || typeof el.showPopover !== 'function') return;
-        try { if (!el.matches(':popover-open')) el.showPopover(); } catch(e){}
-    }
-    function _hidePopover(el) {
-        if (!el || typeof el.hidePopover !== 'function') return;
-        try { if (el.matches(':popover-open')) el.hidePopover(); } catch(e){}
-    }
-
     function openModal(id) {
         // Скрываем тултипы
         ['itemTooltip','runeTooltip','uiTip'].forEach(function(tid){
@@ -80,9 +66,6 @@
                 mel.classList.add('active');
                 mel.style.zIndex = String(_baseZIndex + (idx * 100));
                 mel.style.visibility = '';
-                // Popover API: top-layer rendering (нативный z-index выше всех)
-                _ensurePopoverAttr(mel);
-                _showPopover(mel);
             }
         });
 
@@ -114,7 +97,6 @@
                     el.style.zIndex = '';
                     el.style.visibility = '';
                     if (window._resetModalVV) window._resetModalVV(el);
-                    _hidePopover(el); // снимаем popover top-layer
                 }
             }, 180);
             el._closeTimer = _closeTimer;
@@ -5940,33 +5922,5 @@
         }
     };
 
-    // ── VIEW TRANSITIONS API: Stats ↔ WinRate (native, hardware-accelerated) ──
-    var _origSwitchView = window.switchMainView;
-    if (_origSwitchView) {
-        window.switchMainView = function(view) {
-            // Fallback for browsers without View Transitions API (Firefox <147)
-            if (!document.startViewTransition) {
-                _origSwitchView(view);
-                return;
-            }
-            document.startViewTransition(function(){
-                _origSwitchView(view);
-            });
-        };
-    }
-
-    // ── VIEW TRANSITIONS API: champion modal (shared element from clicked card) ──
-    var _origOpenChampDetail = window.openChampDetail;
-    if (_origOpenChampDetail) {
-        window.openChampDetail = function(name) {
-            if (!document.startViewTransition) {
-                _origOpenChampDetail(name);
-                return;
-            }
-            document.startViewTransition(function(){
-                _origOpenChampDetail(name);
-            });
-        };
-    }
 
 })();
