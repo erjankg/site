@@ -35,6 +35,20 @@
         if(!except) document.body.classList.remove('modal-open');
     }
 
+    // Popover API: top-layer rendering (нативно, выше всех z-index)
+    function _ensurePopoverAttr(el) {
+        if (!el || !('popover' in el)) return; // no support
+        if (!el.hasAttribute('popover')) el.setAttribute('popover', 'manual');
+    }
+    function _showPopover(el) {
+        if (!el || typeof el.showPopover !== 'function') return;
+        try { if (!el.matches(':popover-open')) el.showPopover(); } catch(e){}
+    }
+    function _hidePopover(el) {
+        if (!el || typeof el.hidePopover !== 'function') return;
+        try { if (el.matches(':popover-open')) el.hidePopover(); } catch(e){}
+    }
+
     function openModal(id) {
         // Скрываем тултипы
         ['itemTooltip','runeTooltip','uiTip'].forEach(function(tid){
@@ -66,6 +80,9 @@
                 mel.classList.add('active');
                 mel.style.zIndex = String(_baseZIndex + (idx * 100));
                 mel.style.visibility = '';
+                // Popover API: top-layer rendering (нативный z-index выше всех)
+                _ensurePopoverAttr(mel);
+                _showPopover(mel);
             }
         });
 
@@ -97,6 +114,7 @@
                     el.style.zIndex = '';
                     el.style.visibility = '';
                     if (window._resetModalVV) window._resetModalVV(el);
+                    _hidePopover(el); // снимаем popover top-layer
                 }
             }, 180);
             el._closeTimer = _closeTimer;
@@ -667,6 +685,22 @@
             });
             body.appendChild(tr);
         });
+
+        // GSAP: staggered entrance — только при первом рендере, не при сортировке
+        if (!window._statTableAnimated && window.gsap) {
+            window._statTableAnimated = true;
+            var rows = body.querySelectorAll('tr');
+            if (rows.length) {
+                window.gsap.from(rows, {
+                    opacity: 0,
+                    y: 8,
+                    duration: 0.35,
+                    stagger: 0.025,
+                    ease: 'power2.out',
+                    clearProps: 'transform,opacity'
+                });
+            }
+        }
     }
 
     // render() = full rebuild (used everywhere except level slider)
@@ -1772,6 +1806,8 @@
                 };}(tk,tData,addFn,removeFn,pickerType));
             }
             var cd=document.createElement('div');
+            cd.className='tier-drop-zone';
+            cd.dataset.tier=tk;
             if(isPCColumns){
                 cd.style.cssText='display:flex;flex-wrap:wrap;gap:5px;align-items:flex-start;align-content:flex-start;justify-content:flex-start;padding:5px;background:rgba(255,255,255,0.02);border-radius:8px;min-height:'+cdMinHeight+'px;flex:1;';
             } else {
@@ -1779,9 +1815,11 @@
             }
             (tData[tk]||[]).forEach(function(cname){
                 var chip=document.createElement('div');
-                chip.style.cssText='position:relative;display:inline-block;';
+                chip.className='tier-chip';
+                chip.dataset.name=cname;
+                chip.style.cssText='position:relative;display:inline-block;cursor:'+(_tierEditMode?'grab':'default')+';';
                 var img=document.createElement('img');
-                img.style.cssText='width:'+iconSize+'px;height:'+iconSize+'px;border-radius:'+iconRadius+'px;object-fit:cover;display:block;';
+                img.style.cssText='width:'+iconSize+'px;height:'+iconSize+'px;border-radius:'+iconRadius+'px;object-fit:cover;display:block;pointer-events:none;';
                 img.src=imgFn(cname); img.alt=img.title=cname;
                 img.onerror=function(){this.style.display='none';};
                 chip.appendChild(img);
@@ -1798,6 +1836,41 @@
             row.appendChild(lbl); row.appendChild(cd);
             el.appendChild(row);
         });
+
+        // Sortable.js: enable drag&drop between tiers (only in edit mode)
+        if (window.Sortable && _tierEditMode) {
+            el.querySelectorAll('.tier-drop-zone').forEach(function(zone){
+                if (zone._sortable) zone._sortable.destroy();
+                zone._sortable = new window.Sortable(zone, {
+                    group: 'tier-' + _tierType,
+                    animation: 180,
+                    ghostClass: 'tier-chip-ghost',
+                    chosenClass: 'tier-chip-chosen',
+                    dragClass:   'tier-chip-drag',
+                    forceFallback: true,
+                    fallbackOnBody: true,
+                    delay: 80,
+                    delayOnTouchOnly: true,
+                    onEnd: function(evt){
+                        var fromTier = evt.from.dataset.tier;
+                        var toTier   = evt.to.dataset.tier;
+                        var name     = evt.item.dataset.name;
+                        if (!fromTier || !toTier || !name) return;
+                        if (fromTier === toTier) return;
+                        if (_tierType === 'items') {
+                            removeFromItemTier(fromTier, name);
+                            addToItemTier(toTier, name);
+                        } else if (_tierType === 'runes') {
+                            removeFromRuneTier(fromTier, name);
+                            addToRuneTier(toTier, name);
+                        } else {
+                            removeFromTier(_tierRole, fromTier, name);
+                            addToTier(_tierRole, toTier, name);
+                        }
+                    }
+                });
+            });
+        }
     }
     function addToTier(role,tier,name){
         _TIER_KEYS.forEach(function(tk){ if(tk!==tier) TIER_DATA[role][tk]=(TIER_DATA[role][tk]||[]).filter(function(n){return n!==name;}); });
@@ -2696,6 +2769,19 @@
         });
         if(!list.length) {
             grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:rgba(255,255,255,0.3);font-size:12px;">'+t('Ничего не найдено')+'</div>';
+        }
+
+        // GSAP: staggered entrance для champ picker grid
+        if (window.gsap && grid.children.length) {
+            window.gsap.from(grid.children, {
+                opacity: 0,
+                y: 6,
+                scale: 0.94,
+                duration: 0.28,
+                stagger: { each: 0.012, from: 'start' },
+                ease: 'power2.out',
+                clearProps: 'transform,opacity'
+            });
         }
     }
 
@@ -5800,28 +5886,6 @@
         }
     });
 
-    // ── 4. 3D TILT on champion cards (champ-cell) ──
-    var _tiltEls = [];
-    function initTilt() {
-        _tiltEls = Array.from(document.querySelectorAll('.champ-icon'));
-    }
-    document.addEventListener('mousemove', function(e) {
-        var el = e.target.closest('.champ-icon');
-        if (!el) return;
-        var rect = el.getBoundingClientRect();
-        var x = (e.clientX - rect.left) / rect.width - 0.5;
-        var y = (e.clientY - rect.top) / rect.height - 0.5;
-        el.style.transform = 'perspective(600px) rotateY(' + (x * 12) + 'deg) rotateX(' + (-y * 12) + 'deg) scale(1.08)';
-        el.style.transition = 'transform 0.1s ease';
-    });
-    document.addEventListener('mouseleave', function(e) {
-        var el = e.target.closest('.champ-icon');
-        if (el) {
-            el.style.transform = '';
-            el.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        }
-    }, true);
-
     // ── 9. STICKY HEADER — blur on scroll ──
     var _header = document.querySelector('header');
     if (_header) {
@@ -5876,171 +5940,33 @@
         }
     };
 
-    // ── 20. VIEW TOGGLE slide transitions ──
+    // ── VIEW TRANSITIONS API: Stats ↔ WinRate (native, hardware-accelerated) ──
     var _origSwitchView = window.switchMainView;
     if (_origSwitchView) {
         window.switchMainView = function(view) {
-            var mainEl = document.querySelector('.table-wrap-outer');
-            var wrprEl = document.getElementById('wrprSection');
-            if (!mainEl || !wrprEl) { _origSwitchView(view); return; }
-
-            var currentIsWrpr = wrprEl.style.display !== 'none' && wrprEl.style.display !== '';
-
-            if (view === 'wrpr' && !currentIsWrpr) {
-                // Stats → WinRate: slide out left, slide in right
-                mainEl.classList.add('view-slide-out-left');
-                setTimeout(function() {
-                    mainEl.classList.remove('view-slide-out-left');
-                    _origSwitchView(view);
-                    wrprEl.classList.add('view-slide-in-right');
-                    setTimeout(function() { wrprEl.classList.remove('view-slide-in-right'); }, 350);
-                }, 250);
-            } else if (view === 'main' && currentIsWrpr) {
-                // WinRate → Stats: slide out right, slide in left
-                wrprEl.classList.add('view-slide-out-right');
-                setTimeout(function() {
-                    wrprEl.classList.remove('view-slide-out-right');
-                    _origSwitchView(view);
-                    mainEl.classList.add('view-slide-in-left');
-                    setTimeout(function() { mainEl.classList.remove('view-slide-in-left'); }, 350);
-                }, 250);
-            } else {
+            // Fallback for browsers without View Transitions API (Firefox <147)
+            if (!document.startViewTransition) {
                 _origSwitchView(view);
+                return;
             }
+            document.startViewTransition(function(){
+                _origSwitchView(view);
+            });
         };
     }
 
-    // ── 18. DRAG & DROP for tierlist ──
-    (function initTierDragDrop() {
-        var _dragItem = null;
-        var _dragTier = null;
-        var _dragType = null;
-        var _placeholder = null;
-
-        function createPlaceholder() {
-            var ph = document.createElement('div');
-            ph.className = 'tier-drop-placeholder';
-            return ph;
-        }
-
-        // Use event delegation on tierlist content
-        document.addEventListener('mousedown', handleDragStart);
-        document.addEventListener('touchstart', handleDragStart, { passive: false });
-
-        function handleDragStart(e) {
-            // Only in edit mode
-            if (!window._tierEditMode && !document.querySelector('.tierlist-champs')) return;
-
-            var chip = e.target.closest('.tierlist-champs > div');
-            if (!chip) return;
-            var img = chip.querySelector('img');
-            if (!img) return;
-
-            // Find parent tier container
-            var tierChamps = chip.parentElement;
-            if (!tierChamps || !tierChamps.classList.contains('tierlist-champs')) {
-                // Dynamically-built tier containers may not have the class
-                var parent = chip.parentElement;
-                if (!parent) return;
-                tierChamps = parent;
+    // ── VIEW TRANSITIONS API: champion modal (shared element from clicked card) ──
+    var _origOpenChampDetail = window.openChampDetail;
+    if (_origOpenChampDetail) {
+        window.openChampDetail = function(name) {
+            if (!document.startViewTransition) {
+                _origOpenChampDetail(name);
+                return;
             }
-
-            // Find the tier key (S/A/B/C) from sibling label
-            var row = tierChamps.parentElement;
-            if (!row) return;
-            var label = row.querySelector('.tierlist-label, div:first-child');
-            if (!label) return;
-            _dragTier = label.textContent.trim();
-            _dragItem = img.alt || img.title;
-
-            var touch = e.touches ? e.touches[0] : e;
-            var rect = chip.getBoundingClientRect();
-
-            // Clone for ghost
-            var ghost = chip.cloneNode(true);
-            ghost.className = 'tier-drag-ghost';
-            ghost.style.position = 'fixed';
-            ghost.style.width = rect.width + 'px';
-            ghost.style.height = rect.height + 'px';
-            ghost.style.left = rect.left + 'px';
-            ghost.style.top = rect.top + 'px';
-            ghost.style.pointerEvents = 'none';
-            ghost.style.zIndex = '99999';
-            document.body.appendChild(ghost);
-
-            // Placeholder
-            _placeholder = createPlaceholder();
-            chip.style.opacity = '0.3';
-
-            var offsetX = touch.clientX - rect.left;
-            var offsetY = touch.clientY - rect.top;
-
-            function onMove(ev) {
-                var t = ev.touches ? ev.touches[0] : ev;
-                ghost.style.left = (t.clientX - offsetX) + 'px';
-                ghost.style.top = (t.clientY - offsetY) + 'px';
-
-                // Find drop target
-                ghost.style.display = 'none';
-                var under = document.elementFromPoint(t.clientX, t.clientY);
-                ghost.style.display = '';
-
-                if (under) {
-                    var dropZone = under.closest('[style*="flex-wrap"]');
-                    if (dropZone && dropZone !== tierChamps) {
-                        // Remove old highlight
-                        document.querySelectorAll('.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
-                        dropZone.classList.add('drag-over');
-                        if (!dropZone.contains(_placeholder)) {
-                            dropZone.appendChild(_placeholder);
-                        }
-                    }
-                }
-
-                ev.preventDefault();
-            }
-
-            function onEnd(ev) {
-                document.removeEventListener('mousemove', onMove);
-                document.removeEventListener('mouseup', onEnd);
-                document.removeEventListener('touchmove', onMove);
-                document.removeEventListener('touchend', onEnd);
-
-                ghost.remove();
-                chip.style.opacity = '';
-                if (_placeholder && _placeholder.parentNode) _placeholder.remove();
-                document.querySelectorAll('.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
-
-                // Find where we dropped
-                var t = ev.changedTouches ? ev.changedTouches[0] : ev;
-                var under = document.elementFromPoint(t.clientX, t.clientY);
-                if (under && _dragItem) {
-                    var dropZone = under.closest('[style*="flex-wrap"]');
-                    if (dropZone) {
-                        var dropRow = dropZone.parentElement;
-                        if (dropRow) {
-                            var dropLabel = dropRow.querySelector('div:first-child');
-                            var newTier = dropLabel ? dropLabel.textContent.trim() : null;
-                            if (newTier && newTier !== _dragTier && ['S','A','B','C'].indexOf(newTier) !== -1) {
-                                // Move between tiers using existing functions
-                                if (window.removeFromTier) window.removeFromTier(_dragTier, _dragItem);
-                                if (window.addToTier) window.addToTier(newTier, _dragItem);
-                                // For tierlists built with renderTierlist, trigger rerender
-                                if (window.renderTierlist) window.renderTierlist();
-                            }
-                        }
-                    }
-                }
-
-                _dragItem = null;
-                _dragTier = null;
-            }
-
-            document.addEventListener('mousemove', onMove);
-            document.addEventListener('mouseup', onEnd);
-            document.addEventListener('touchmove', onMove, { passive: false });
-            document.addEventListener('touchend', onEnd);
-        }
-    })();
+            document.startViewTransition(function(){
+                _origOpenChampDetail(name);
+            });
+        };
+    }
 
 })();

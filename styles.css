@@ -6077,66 +6077,126 @@ header.scrolled .logo { font-size: 18px; }
   box-shadow: 0 8px 20px rgba(0,0,0,0.4);
 }
 
-/* ── 3. SKELETON → CONTENT morphing ── */
+/* ── Skeleton fade-out (GSAP управляет stagger в JS) ── */
 .skeleton-cell {
-  transition: opacity 0.4s ease, transform 0.4s var(--spring-soft);
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 .skeleton-cell.fade-out {
   opacity: 0;
   transform: scale(0.95);
 }
-/* New rows appearing after skeleton */
-#statTable tbody tr {
-  animation: rowAppear 0.35s var(--spring-soft) both;
-}
-@keyframes rowAppear {
-  0%   { opacity: 0; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-#statTable tbody tr:nth-child(1)  { animation-delay: 0.00s; }
-#statTable tbody tr:nth-child(2)  { animation-delay: 0.02s; }
-#statTable tbody tr:nth-child(3)  { animation-delay: 0.04s; }
-#statTable tbody tr:nth-child(4)  { animation-delay: 0.06s; }
-#statTable tbody tr:nth-child(5)  { animation-delay: 0.08s; }
-#statTable tbody tr:nth-child(6)  { animation-delay: 0.10s; }
-#statTable tbody tr:nth-child(7)  { animation-delay: 0.12s; }
-#statTable tbody tr:nth-child(8)  { animation-delay: 0.14s; }
-#statTable tbody tr:nth-child(9)  { animation-delay: 0.16s; }
-#statTable tbody tr:nth-child(10) { animation-delay: 0.18s; }
-#statTable tbody tr:nth-child(n+11) { animation-delay: 0.20s; }
 
-/* ── 20. VIEW TOGGLE slide transitions (Stats ↔ WinRate) ── */
-.table-wrap-outer,
-#wrprSection {
-  transition: opacity 0.3s ease, transform 0.3s var(--spring-soft);
+/* ── content-visibility: skip rendering off-screen long lists ── */
+/* Tier-list rows: рендерятся только когда видны */
+.tierlist-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 60px;
 }
-.view-slide-out-left {
-  animation: slideOutLeft 0.25s ease forwards;
+/* Items grid и rune-grid: каждая карточка может быть пропущена */
+.items-grid .item-card,
+.rune-grid .rune-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 52px 60px;
 }
-.view-slide-in-right {
-  animation: slideInRight 0.3s var(--spring-soft) forwards;
+/* Champion grid (mGrid) — длинный список чемпионов */
+#mGrid > * {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 80px;
 }
-.view-slide-out-right {
-  animation: slideOutRight 0.25s ease forwards;
+/* Stat table rows — для длинных таблиц */
+#statTable tbody tr {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 48px;
 }
-.view-slide-in-left {
-  animation: slideInLeft 0.3s var(--spring-soft) forwards;
+
+/* ── prefers-reduced-motion: отключаем все анимации для пользователей с настройкой ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* View Transitions: тоже отключаем */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
 }
-@keyframes slideOutLeft {
-  0%   { opacity: 1; transform: translateX(0); }
-  100% { opacity: 0; transform: translateX(-40px); }
+
+/* ── CSS Anchor Positioning: lang dropdown + user menu без ручного JS ── */
+@supports (anchor-name: --x) {
+  .lang-btn {
+    anchor-name: --lang-anchor;
+  }
+  .lang-dropdown {
+    position: fixed;
+    position-anchor: --lang-anchor;
+    top: anchor(--lang-anchor bottom);
+    right: anchor(--lang-anchor right);
+    margin-top: 6px;
+    /* fallback: если справа нет места — слева */
+    position-try-fallbacks: flip-inline, flip-block;
+  }
+  #authBtn {
+    anchor-name: --auth-anchor;
+  }
+  .user-menu {
+    position: fixed;
+    position-anchor: --auth-anchor;
+    top: anchor(--auth-anchor bottom);
+    right: anchor(--auth-anchor right);
+    margin-top: 8px;
+    position-try-fallbacks: flip-inline, flip-block;
+  }
 }
-@keyframes slideInRight {
-  0%   { opacity: 0; transform: translateX(40px); }
-  100% { opacity: 1; transform: translateX(0); }
+
+/* ── Popover API: top-layer rendering for modals ── */
+.m-mask[popover] {
+  /* override UA stylesheet defaults that fight our layout */
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: var(--bg-overlay); /* matches our existing modal background */
+  color: inherit;
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  inset: 0;
+  overflow: visible;
 }
-@keyframes slideOutRight {
-  0%   { opacity: 1; transform: translateX(0); }
-  100% { opacity: 0; transform: translateX(40px); }
+/* Когда popover закрыт — display:none через UA, наша .active поверх */
+.m-mask[popover]:not(:popover-open):not(.active) { display: none; }
+.m-mask[popover].active { display: flex; }
+/* Backdrop за popover-модалкой */
+.m-mask[popover]::backdrop {
+  background: transparent; /* фон рисуем сами через .m-mask */
 }
-@keyframes slideInLeft {
-  0%   { opacity: 0; transform: translateX(-40px); }
-  100% { opacity: 1; transform: translateX(0); }
+
+/* @starting-style: плавное появление модалки в popover-режиме */
+@supports (transition-behavior: allow-discrete) {
+  .m-mask[popover] {
+    transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                display 0.3s allow-discrete, overlay 0.3s allow-discrete;
+  }
+}
+
+/* ── VIEW TRANSITIONS API: native page transitions ── */
+::view-transition-old(root) {
+  animation: 220ms cubic-bezier(0.4, 0, 0.2, 1) both vtFadeOut;
+}
+::view-transition-new(root) {
+  animation: 280ms cubic-bezier(0.22, 1, 0.36, 1) both vtFadeIn;
+}
+@keyframes vtFadeOut {
+  to { opacity: 0; transform: translateY(-6px); }
+}
+@keyframes vtFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
 }
 
 
@@ -6209,26 +6269,20 @@ header.scrolled .logo { font-size: 18px; }
   transform: translateX(-50%) scaleX(1);
 }
 
-/* ── DRAG & DROP for tierlist ── */
-.tierlist-champs.drag-over {
-  background: rgba(11,196,227,0.08) !important;
-  outline: 2px dashed rgba(11,196,227,0.4);
-  outline-offset: -2px;
-  transition: background 0.2s ease, outline 0.2s ease;
+/* ── Sortable.js drag classes ── */
+.tier-chip { transition: transform 0.18s ease; }
+.tier-chip-ghost {
+  opacity: 0.3;
+  filter: grayscale(0.5);
 }
-.tier-drag-ghost {
-  opacity: 0.85;
-  transform: scale(1.1) rotate(3deg);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6), 0 0 0 2px var(--accent);
-  border-radius: 8px;
-  z-index: 99999;
+.tier-chip-chosen {
+  cursor: grabbing !important;
 }
-.tier-drop-placeholder {
-  width: 44px;
-  height: 44px;
-  border-radius: 8px;
-  border: 2px dashed rgba(11,196,227,0.5);
-  background: rgba(11,196,227,0.06);
-  transition: all 0.15s var(--spring-soft);
+.tier-chip-drag {
+  opacity: 0.95 !important;
+  transform: scale(1.08) rotate(2deg);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.6),
+              0 0 0 2px var(--accent);
+  border-radius: 10px;
 }
 
