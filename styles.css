@@ -5892,31 +5892,10 @@ body.cms-edit-mode :not(input):not(textarea):not(select):not(#cmsEditModeToggle)
 }
 
 /* ═══════════════════════════════════════════
-   DESIGN UPGRADE 2026 — animations, glass, etc.
+   PERFORMANCE FIXES 2026 (no visual changes)
    ═══════════════════════════════════════════ */
 
-/* ── 1. RIPPLE EFFECT on buttons ── */
-button, .header-view-btn, .btn-calc-main, .side-btn, .m-btn,
-.lang-btn, .auth-btn, .btn-support, .btn-close-x, .btn-champ-cfg,
-.calc-range-btn, .calc-lvl-btn, .site-auth-btn {
-  position: relative;
-  overflow: hidden;
-}
-.ripple-circle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.25);
-  transform: scale(0);
-  animation: rippleExpand 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-  pointer-events: none;
-  z-index: 1;
-}
-@keyframes rippleExpand {
-  0%   { transform: scale(0); opacity: 0.5; }
-  100% { transform: scale(4); opacity: 0; }
-}
-
-/* ── 4. Apple-style easing curves (real iOS values) ── */
+/* ── Apple-style easing curves (real iOS values) ── */
 :root {
   --ease-apple:        cubic-bezier(0.32, 0.72, 0, 1);    /* iOS standard */
   --ease-apple-out:    cubic-bezier(0.16, 1, 0.3, 1);     /* expo-out feel */
@@ -5926,238 +5905,36 @@ button, .header-view-btn, .btn-calc-main, .side-btn, .m-btn,
   --spring-modal:  var(--ease-apple);
 }
 
-/* ── 5. MODAL: jank-free animation (blur STATIC, only opacity+transform) ── */
-.m-mask {
-  /* Static blur — НЕ анимируем (это убивало FPS) */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  /* GPU compositor: только opacity + transform */
-  will-change: opacity;
-  contain: layout paint;
-}
+/* ── MODAL: jank-free animation (blur STATIC — это была причина дёрганья) ── */
 .m-mask.active {
-  animation: maskFadeIn2026 0.28s var(--ease-apple) forwards;
+  animation: maskFadeIn2026 0.22s ease forwards;
+  will-change: opacity;
 }
 @keyframes maskFadeIn2026 {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 .m-mask.active > .m-win {
-  animation: modalContentIn2026 0.4s var(--ease-apple-out) both;
+  animation: modalContentIn2026 0.28s var(--ease-apple-out) both;
   will-change: transform, opacity;
-  /* GPU layer hint */
-  transform: translateZ(0);
 }
 @keyframes modalContentIn2026 {
-  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 .m-mask.closing {
-  animation: maskFadeOut2026 0.2s var(--ease-apple) forwards;
+  animation: maskFadeOut2026 0.18s ease forwards;
 }
 @keyframes maskFadeOut2026 {
   from { opacity: 1; }
   to   { opacity: 0; }
 }
 .m-mask.closing > .m-win {
-  animation: modalContentOut2026 0.2s var(--ease-apple) forwards;
+  animation: modalContentOut2026 0.18s ease forwards;
 }
 @keyframes modalContentOut2026 {
   from { opacity: 1; transform: translateY(0) scale(1); }
   to   { opacity: 0; transform: translateY(8px) scale(0.97); }
-}
-
-/* ── 7. GRADIENT BORDERS on cards ── */
-.item-card,
-.rune-card {
-  border: none !important;
-  background: rgba(255,255,255,0.03);
-  position: relative;
-}
-.item-card::before,
-.rune-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: linear-gradient(135deg,
-    rgba(11,196,227,0.2) 0%,
-    rgba(200,155,60,0.15) 50%,
-    rgba(11,196,227,0.2) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  transition: background 0.3s ease;
-}
-.item-card:hover::before,
-.rune-card:hover::before {
-  background: linear-gradient(135deg,
-    var(--accent) 0%,
-    var(--gold) 50%,
-    var(--accent) 100%);
-}
-
-/* ── 9. STICKY HEADER (без blur по умолчанию — он дорогой при скролле) ── */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  padding: 10px 0;
-  /* Анимируем только background + box-shadow + padding (cheap properties) */
-  transition: background 0.3s var(--ease-apple),
-              box-shadow 0.3s var(--ease-apple),
-              padding 0.3s var(--ease-apple);
-}
-header.scrolled {
-  background: rgba(1,10,19,0.92);
-  /* Blur появляется ВМЕСТЕ с .scrolled, без transition (instant — не дёргается) */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.5);
-  padding: 6px 0;
-}
-header.scrolled .logo { font-size: 18px; }
-
-/* ── 10. GLASSMORPHISM 2.0 on cards ── */
-.m-win {
-  background: linear-gradient(135deg,
-    rgba(1,13,24,0.92) 0%,
-    rgba(1,10,19,0.95) 100%) !important;
-  backdrop-filter: blur(16px) saturate(1.3);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  box-shadow: 0 24px 70px rgba(0,0,0,0.85),
-              inset 0 1px 0 rgba(255,255,255,0.06) !important;
-}
-.item-card,
-.rune-card {
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  background: rgba(255,255,255,0.03);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2),
-              inset 0 1px 0 rgba(255,255,255,0.04);
-  transition: transform 0.25s var(--spring), box-shadow 0.25s ease,
-              background 0.25s ease;
-}
-.item-card:hover,
-.rune-card:hover {
-  box-shadow: 0 8px 24px rgba(11,196,227,0.15),
-              0 2px 8px rgba(0,0,0,0.3),
-              inset 0 1px 0 rgba(255,255,255,0.08);
-  background: rgba(11,196,227,0.06);
-}
-
-/* ── 11. TOOLTIPS with animation & arrow ── */
-#uiTip,
-#runeTooltip,
-#itemTooltip {
-  transform-origin: center bottom;
-  animation: tipIn 0.2s var(--spring-soft) forwards;
-  border: 1px solid rgba(11,196,227,0.3) !important;
-  background: rgba(1,13,24,0.95) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.7),
-              0 0 0 1px rgba(255,255,255,0.05) !important;
-}
-@keyframes tipIn {
-  0%   { opacity: 0; transform: translate(-50%, -100%) scale(0.9); }
-  100% { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-}
-#runeTooltip,
-#itemTooltip {
-  transform-origin: top left;
-}
-@keyframes tipInAlt {
-  0%   { opacity: 0; transform: scale(0.92) translateY(4px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
-}
-#runeTooltip,
-#itemTooltip {
-  animation: tipInAlt 0.2s var(--spring-soft) forwards;
-}
-
-/* ── 3D TILT on champion cards — GPU layer ── */
-.champ-cell,
-.tierlist-champ-icon {
-  transition: transform 0.2s var(--spring-soft), box-shadow 0.2s ease;
-  will-change: transform;
-}
-.tierlist-champ-icon:hover {
-  transform: scale(1.12) !important;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-}
-
-/* ── Skeleton fade-out (GSAP управляет stagger в JS) ── */
-.skeleton-cell {
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.skeleton-cell.fade-out {
-  opacity: 0;
-  transform: scale(0.95);
-}
-
-/* ── CURSOR BLOB: luxury follow cursor ── */
-#cursorBlob {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 300px;
-  height: 300px;
-  pointer-events: none;
-  z-index: 9999;
-  background: radial-gradient(circle,
-    rgba(11,196,227,0.18) 0%,
-    rgba(11,196,227,0.08) 30%,
-    transparent 60%);
-  filter: blur(40px);
-  mix-blend-mode: screen;
-  transform: translate3d(-300px, -300px, 0);
-  transition: opacity 0.3s ease;
-  opacity: 0.8;
-  will-change: transform;
-}
-#cursorBlob.hover {
-  opacity: 1;
-  background: radial-gradient(circle,
-    rgba(11,196,227,0.28) 0%,
-    rgba(200,155,60,0.12) 35%,
-    transparent 60%);
-}
-@media (max-width: 768px) {
-  #cursorBlob { display: none; }
-}
-
-/* ── MAGNETIC BUTTONS smooth return ── */
-.btn-support,
-.lang-btn,
-.auth-btn,
-.header-view-btn {
-  transition: transform 0.4s var(--ease-apple);
-}
-
-/* ── Search input "searching" state ── */
-input.searching {
-  background-image: linear-gradient(90deg,
-    transparent 0%,
-    rgba(11,196,227,0.1) 50%,
-    transparent 100%);
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
-  animation: searchShimmer 1s linear infinite;
-}
-@keyframes searchShimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* ── LONG-PRESS visual feedback ── */
-.long-pressed {
-  transform: scale(0.95);
-  filter: brightness(1.2);
-  transition: transform 0.2s var(--ease-apple), filter 0.2s var(--ease-apple);
 }
 
 /* ── content-visibility: ускоряем скролл для длинных статичных списков ── */
@@ -6187,104 +5964,6 @@ input.searching {
   ::view-transition-new(root) {
     animation: none !important;
   }
-}
-
-/* ── CSS Anchor Positioning: lang dropdown + user menu без ручного JS ── */
-@supports (anchor-name: --x) {
-  .lang-btn {
-    anchor-name: --lang-anchor;
-  }
-  .lang-dropdown {
-    position: fixed;
-    position-anchor: --lang-anchor;
-    top: anchor(--lang-anchor bottom);
-    right: anchor(--lang-anchor right);
-    margin-top: 6px;
-    /* fallback: если справа нет места — слева */
-    position-try-fallbacks: flip-inline, flip-block;
-  }
-  #authBtn {
-    anchor-name: --auth-anchor;
-  }
-  .user-menu {
-    position: fixed;
-    position-anchor: --auth-anchor;
-    top: anchor(--auth-anchor bottom);
-    right: anchor(--auth-anchor right);
-    margin-top: 8px;
-    position-try-fallbacks: flip-inline, flip-block;
-  }
-}
-
-
-
-/* ── 12. BOTTOM NAVIGATION BAR (mobile) ── */
-.bottom-nav {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 5500;
-  background: rgba(1,10,19,0.92);
-  backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
-  border-top: 1px solid rgba(11,196,227,0.15);
-  padding: 4px 0;
-  padding-bottom: max(4px, env(safe-area-inset-bottom));
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
-}
-@media (max-width: 768px) {
-  .bottom-nav { display: flex; }
-  .app-wrapper { padding-bottom: 80px !important; }
-  #menuBtn { display: none !important; }
-}
-.bottom-nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 0;
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.4);
-  font-size: 9px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.2s var(--spring), transform 0.2s var(--spring);
-  position: relative;
-  -webkit-tap-highlight-color: transparent;
-}
-.bottom-nav-item .nav-icon {
-  font-size: 20px;
-  line-height: 1;
-  transition: transform 0.25s var(--spring);
-}
-.bottom-nav-item.active {
-  color: var(--accent);
-}
-.bottom-nav-item.active .nav-icon {
-  transform: scale(1.15) translateY(-2px);
-  filter: drop-shadow(0 2px 6px rgba(11,196,227,0.4));
-}
-.bottom-nav-item:active {
-  transform: scale(0.9);
-}
-.bottom-nav-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%) scaleX(0);
-  width: 24px;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 0 0 2px 2px;
-  transition: transform 0.25s var(--spring);
-}
-.bottom-nav-item.active::before {
-  transform: translateX(-50%) scaleX(1);
 }
 
 /* ── Sortable.js drag classes ── */
