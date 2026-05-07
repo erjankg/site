@@ -374,12 +374,12 @@
         if(skEl) skEl.style.display = 'block';
         document.getElementById('statTable').style.visibility = 'hidden';
 
-        let t;
+        let tsv;
         try {
             console.log('Fetching champions from:', G_URL);
-            t = await fetch(G_URL).then(function(r){ return r.text(); });
-            console.log('Data received, length:', t.length);
-            if(t.trim().startsWith('<!') || t.trim().startsWith('<html')) {
+            tsv = await fetch(G_URL).then(function(r){ return r.text(); });
+            console.log('Data received, length:', tsv.length);
+            if(tsv.trim().startsWith('<!') || tsv.trim().startsWith('<html')) {
                 throw new Error('Google Sheet вернул HTML вместо TSV — лист не опубликован!');
             }
             // Патч-ноты теперь грузятся из Firestore через cmsLoadPatchnotes()
@@ -392,7 +392,7 @@
             return;
         }
 
-        const lines = t.trim().split('\n');
+        const lines = tsv.trim().split('\n');
         const heads = lines[0].split('\t').map(h => h.trim());
         
         raw = lines.slice(1).map(l => {
