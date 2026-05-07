@@ -3093,8 +3093,16 @@
         if (!btn) return;
 
         if (user) {
-            btn.innerHTML = '<img src="' + (user.photoURL || '') + '" alt="' + (user.displayName || '') + '" onerror="this.style.display=\'none\'">'
-                + '<span id="authNotifDot" style="display:none;position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ffd700;border-radius:50%;border:2px solid #0f0520;"></span>';
+            btn.innerHTML = '';
+            var aImg = document.createElement('img');
+            aImg.src = user.photoURL || '';
+            aImg.alt = user.displayName || '';
+            aImg.onerror = function(){ this.style.display='none'; };
+            btn.appendChild(aImg);
+            var aDot = document.createElement('span');
+            aDot.id = 'authNotifDot';
+            aDot.style.cssText = 'display:none;position:absolute;top:-2px;right:-2px;width:14px;height:14px;background:#ffd700;border-radius:50%;border:2px solid #0f0520;';
+            btn.appendChild(aDot);
             btn.title = user.displayName || user.email || t('Профиль');
             if (emailEl) emailEl.textContent = user.email || '';
         } else {
@@ -3319,15 +3327,25 @@
 
             var av = document.createElement('div');
             av.style.cssText = 'width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;color:#fff;font-weight:900;';
-            if (inf.avatar) { av.innerHTML='<img src="'+inf.avatar+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'; }
-            else { av.textContent = (inf.name||'?').charAt(0).toUpperCase(); }
+            if (inf.avatar) {
+                var infImg = document.createElement('img');
+                infImg.src = inf.avatar;
+                infImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+                infImg.onerror = function(){ this.style.display='none'; };
+                av.appendChild(infImg);
+            } else { av.textContent = (inf.name||'?').charAt(0).toUpperCase(); }
             card.appendChild(av);
 
             var info = document.createElement('div');
             info.style.cssText = 'flex:1;min-width:0;';
-            info.innerHTML = '<div style="font-size:14px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(inf.name||'—')+'</div>'
-                +'<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">'
-                +(_platIcons[inf.platform]||'●')+' '+(_platLabels[inf.platform]||'')+' · '+(inf.role||'')+'</div>';
+            var infNameDiv = document.createElement('div');
+            infNameDiv.style.cssText = 'font-size:14px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+            infNameDiv.textContent = inf.name || '—';
+            info.appendChild(infNameDiv);
+            var infMetaDiv = document.createElement('div');
+            infMetaDiv.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;';
+            infMetaDiv.textContent = (_platIcons[inf.platform]||'●') + ' ' + (_platLabels[inf.platform]||'') + ' · ' + (inf.role||'');
+            info.appendChild(infMetaDiv);
             card.appendChild(info);
 
             if (inf.rank) {
@@ -3368,10 +3386,20 @@
         else { rk.style.display='none'; }
 
         var avEl = document.getElementById('infDetailAvatar');
-        if(inf.avatar){ avEl.innerHTML='<img src="'+inf.avatar+'" style="width:100%;height:100%;object-fit:cover;">'; }
-        else { avEl.innerHTML=''; avEl.textContent=(inf.name||'?').charAt(0).toUpperCase(); }
+        avEl.innerHTML = '';
+        if(inf.avatar){
+            var infDImg = document.createElement('img');
+            infDImg.src = inf.avatar;
+            infDImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            avEl.appendChild(infDImg);
+        } else {
+            avEl.textContent=(inf.name||'?').charAt(0).toUpperCase();
+        }
 
-        document.getElementById('infDetailMeta').innerHTML = (_platIcons[inf.platform]||'●')+' '+(_platLabels[inf.platform]||'')+'<br>🎮 '+(inf.role||t('Не указана'));
+        var infMetaEl = document.getElementById('infDetailMeta');
+        infMetaEl.textContent = (_platIcons[inf.platform]||'●') + ' ' + (_platLabels[inf.platform]||'');
+        infMetaEl.appendChild(document.createElement('br'));
+        infMetaEl.appendChild(document.createTextNode('🎮 ' + (inf.role||t('Не указана'))));
         var infLink = document.getElementById('infDetailLink');
         infLink.href = '#';
         infLink.onclick = (function(url, name) { return function(e) { e.preventDefault(); if(url && url !== '#') openExternalLink(url, name); }; })(inf.url||'#', inf.name||'');
@@ -3881,8 +3909,12 @@
             avWrap.className = 'user-av-wrap';
             var av = document.createElement('div');
             av.className = 'user-av';
-            if (u.photoURL) av.innerHTML = '<img src="'+u.photoURL+'" onerror="this.style.display=\'none\'">';
-            else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
+            if (u.photoURL) {
+                var avImg = document.createElement('img');
+                avImg.src = u.photoURL;
+                avImg.onerror = function(){ this.style.display='none'; };
+                av.appendChild(avImg);
+            } else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
             avWrap.appendChild(av);
             var dot = document.createElement('div');
             dot.className = 'user-status-dot ' + (u._online ? 'online' : 'offline');
@@ -3891,16 +3923,26 @@
 
             var info = document.createElement('div');
             info.className = 'user-info';
-            var nameHtml = '<div class="user-name">'+(u.displayName||u.email||'???')+'</div>';
-            var statusHtml = '<div class="user-email">'+(u._online ? t('🟢 Онлайн') : t('Оффлайн'));
-            // Show role & rank inline
-            if (u.role) statusHtml += ' · ' + u.role;
+            var nameDiv = document.createElement('div');
+            nameDiv.className = 'user-name';
+            nameDiv.textContent = u.displayName || u.email || '???';
+            info.appendChild(nameDiv);
+            var statusDiv = document.createElement('div');
+            statusDiv.className = 'user-email';
+            var statusTxt = (u._online ? t('🟢 Онлайн') : t('Оффлайн'));
+            if (u.role) statusTxt += ' · ' + u.role;
+            statusDiv.textContent = statusTxt;
             if (u.rank) {
                 var rk = RANKS.find(function(r) { return r.id === u.rank; });
-                if (rk) statusHtml += ' · <span style="color:'+rk.color+'">'+rk.name+'</span>';
+                if (rk) {
+                    statusDiv.appendChild(document.createTextNode(' · '));
+                    var rkSpan = document.createElement('span');
+                    rkSpan.style.color = rk.color;
+                    rkSpan.textContent = rk.name;
+                    statusDiv.appendChild(rkSpan);
+                }
             }
-            statusHtml += '</div>';
-            info.innerHTML = nameHtml + statusHtml;
+            info.appendChild(statusDiv);
             card.appendChild(info);
 
             container.appendChild(card);
@@ -3967,8 +4009,12 @@
 
         var av = document.createElement('div');
         av.className = 'chat-bubble-av';
-        if (msg.photoURL) av.innerHTML = '<img src="' + msg.photoURL + '" onerror="this.style.display=\'none\'">';
-        else av.textContent = (msg.name || '?').charAt(0).toUpperCase();
+        if (msg.photoURL) {
+            var avImg = document.createElement('img');
+            avImg.src = msg.photoURL;
+            avImg.onerror = function(){ this.style.display='none'; };
+            av.appendChild(avImg);
+        } else av.textContent = (msg.name || '?').charAt(0).toUpperCase();
         row.appendChild(av);
 
         var bubble = document.createElement('div');
@@ -4876,8 +4922,13 @@
         row.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:10px;';
         var avEl = document.createElement('div');
         avEl.style.cssText = 'width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;font-weight:900;overflow:hidden;flex-shrink:0;border:2px solid var(--sel-glow-30);';
-        if (user.photoURL) avEl.innerHTML = '<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">';
-        else avEl.textContent = (user.displayName||'?').charAt(0).toUpperCase();
+        if (user.photoURL) {
+            var ttImg = document.createElement('img');
+            ttImg.src = user.photoURL;
+            ttImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            ttImg.onerror = function(){ this.style.display='none'; };
+            avEl.appendChild(ttImg);
+        } else avEl.textContent = (user.displayName||'?').charAt(0).toUpperCase();
         var infoDiv = document.createElement('div');
         var nameEl = document.createElement('div');
         nameEl.style.cssText = 'font-size:13px;font-weight:900;color:#fff;line-height:1.2;';
@@ -4988,8 +5039,13 @@
 
         var av = document.createElement('div');
         av.style.cssText = 'width:64px;height:64px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,var(--sel-base),var(--sel-stat));display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff;font-weight:900;overflow:hidden;border:3px solid var(--sel-glow-30);';
-        if (user.photoURL) av.innerHTML = '<img src="'+user.photoURL+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">';
-        else av.textContent = (user.displayName||'?').charAt(0).toUpperCase();
+        if (user.photoURL) {
+            var ucImg = document.createElement('img');
+            ucImg.src = user.photoURL;
+            ucImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+            ucImg.onerror = function(){ this.style.display='none'; };
+            av.appendChild(ucImg);
+        } else av.textContent = (user.displayName||'?').charAt(0).toUpperCase();
         header.appendChild(av);
 
         var nameEl = document.createElement('div');

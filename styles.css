@@ -358,6 +358,50 @@ animation: twinkle2 4.5s ease-in-out infinite alternate;
   --sel-glow-30:     rgba(var(--sel-light-rgb), 0.3);
   --sel-glow-sub:    rgba(var(--sel-light-rgb), 0.2);
   --accent-light:    #7ec8e3;                          /* светлый циан для стат-строк */
+
+  /* ══════════════════════════════════════════════════
+     DESIGN TOKENS (2026-05-07) — единая шкала отступов,
+     радиусов, easing и теней. Использовать через
+     var(--r-md), var(--s-3), var(--ease-snap) и т.д.
+     ══════════════════════════════════════════════════ */
+  /* Радиусы */
+  --r-xs:    6px;
+  --r-sm:    8px;
+  --r-md:    12px;
+  --r-lg:    16px;
+  --r-xl:    24px;
+  --r-pill:  999px;
+
+  /* Отступы (шкала 4-base) */
+  --s-1:     4px;
+  --s-2:     8px;
+  --s-3:     12px;
+  --s-4:     16px;
+  --s-5:     24px;
+  --s-6:     32px;
+  --s-7:     48px;
+  --s-8:     64px;
+
+  /* Easing — Figma/Linear-style */
+  --ease-snap:    cubic-bezier(0.32, 0.72, 0, 1);     /* iOS-style snap для UI */
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);  /* лёгкий overshoot */
+  --ease-soft:    cubic-bezier(0.16, 1, 0.3, 1);      /* плавное замедление */
+  --ease-mat:     cubic-bezier(0.4, 0, 0.2, 1);       /* material standard */
+  --ease-out:     cubic-bezier(0, 0, 0.2, 1);
+
+  /* Длительности */
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-mid:     300ms;
+  --dur-slow:    500ms;
+
+  /* Тени */
+  --shadow-sm:        0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:        0 8px 24px rgba(0,0,0,0.4);
+  --shadow-lg:        0 16px 48px rgba(0,0,0,0.5);
+  --shadow-glow:      0 0 24px var(--accent-glow);
+  --shadow-glow-sel:  0 0 28px rgba(var(--sel-light-rgb), 0.45);
+  --shadow-lift:      0 12px 32px rgba(0,0,0,0.45), 0 0 0 1px var(--sel-border);
 }
 
 @keyframes fadeIn {
@@ -5981,5 +6025,126 @@ body.cms-edit-mode :not(input):not(textarea):not(select):not(#cmsEditModeToggle)
   box-shadow: 0 10px 28px rgba(0,0,0,0.6),
               0 0 0 2px var(--accent);
   border-radius: 10px;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ✨ MICROINTERACTIONS LAYER (2026-05-07)
+   Применяет design tokens к ключевым элементам.
+   Spring/snap easing, shine-sweep, lift, glow.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Primary buttons: lift + glow + spring on press ── */
+.btn-calc-main {
+  transition:
+    transform   var(--dur-base) var(--ease-spring),
+    background  var(--dur-base) var(--ease-snap),
+    box-shadow  var(--dur-base) var(--ease-snap),
+    border-color var(--dur-base) var(--ease-snap);
+}
+.btn-calc-main:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md), 0 0 18px var(--accent-glow);
+}
+.btn-calc-main:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: var(--dur-fast);
+}
+
+.site-auth-btn {
+  transition:
+    transform  var(--dur-base) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-snap);
+}
+.site-auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(109, 63, 245, 0.55);
+}
+.site-auth-btn:active {
+  transform: translateY(0) scale(0.97);
+  transition-duration: var(--dur-fast);
+}
+
+/* ── Rune card: shine-sweep + smoother lift ── */
+.rune-card {
+  transition:
+    transform   var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-snap),
+    background  var(--dur-base) var(--ease-snap),
+    box-shadow  var(--dur-base) var(--ease-snap);
+  overflow: hidden;
+}
+.rune-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 70%
+  );
+  transform: translateX(-110%);
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity   var(--dur-fast) var(--ease-snap),
+    transform 0.65s var(--ease-soft);
+  border-radius: inherit;
+}
+.rune-card:hover::after {
+  opacity: 1;
+  transform: translateX(110%);
+}
+.rune-card:hover {
+  box-shadow: var(--shadow-md), 0 0 18px var(--accent-glow);
+}
+
+/* ── Tabs: sliding underline indicator ── */
+.cs-tab {
+  position: relative;
+  transition: color var(--dur-base) var(--ease-snap);
+  border-bottom-color: transparent !important;
+}
+.cs-tab::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform var(--dur-base) var(--ease-spring),
+              background var(--dur-base) var(--ease-snap);
+}
+.cs-tab.active::after { transform: scaleX(1); }
+.cs-tab:hover::after  { transform: scaleX(0.6); background: var(--text-secondary); }
+.cs-tab.active:hover::after { transform: scaleX(1); background: var(--accent); }
+
+/* ── Stagger appearance utility ──
+   Использование: <div class="stagger-in"> ... </div>
+   В JS/HTML задавать --stagger-i: 0,1,2... для дочерних */
+@keyframes stagger-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stagger-in > * {
+  opacity: 0;
+  animation: stagger-fade-in var(--dur-mid) var(--ease-soft) forwards;
+  animation-delay: calc(var(--stagger-i, 0) * 30ms);
+}
+
+/* ── Focus-visible ring: accessibility + polish ── */
+.btn-calc-main:focus-visible,
+.site-auth-btn:focus-visible,
+.cs-tab:focus-visible,
+.rune-card:focus-visible,
+.btn-support:focus-visible,
+.btn-swap:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
 }
 
