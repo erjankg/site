@@ -597,8 +597,8 @@ transform: scale(0.97);
 /* SLIDER */
 .lvl-container {
 background: var(--bg-card-glass);
-backdrop-filter: blur(20px);
--webkit-backdrop-filter: blur(20px);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
 padding: 5px 16px 17px 16px;
 border-radius: 18px;
 border: 1px solid var(--accent-border);
@@ -1372,8 +1372,8 @@ animation: shimmer 1.4s infinite;
 .table-wrap-outer {
 position: relative;
 background: var(--bg-card-glass);
-backdrop-filter: blur(20px);
--webkit-backdrop-filter: blur(20px);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
 border-radius: 18px;
 border: 1px solid var(--accent-border-sub);
 box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
@@ -3101,10 +3101,9 @@ select.cms-input { cursor: pointer; }
   flex-direction: column;
   overflow: hidden;
   box-sizing: border-box;
-  transition: width 0.32s cubic-bezier(0.22,1,0.36,1),
-              height 0.32s cubic-bezier(0.22,1,0.36,1),
-              border-radius 0.32s cubic-bezier(0.22,1,0.36,1),
-              max-width 0.32s cubic-bezier(0.22,1,0.36,1);
+  /* Убрана анимация height/max-width: конфликтовала с applyVVFix
+     (mobile keyboard) — каждое движение клавы запускало 320ms transition. */
+  transition: border-radius 0.32s cubic-bezier(0.22,1,0.36,1);
 }
 /* Вход в драфт-UI — анимация смены контента */
 @keyframes dcoopDraftIn {

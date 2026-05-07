@@ -3845,8 +3845,18 @@
             if (win) { win.style.height = ''; win.style.maxHeight = ''; }
         }
 
-        vv.addEventListener('resize', applyVVFix);
-        vv.addEventListener('scroll', applyVVFix);
+        // rAF-throttle: max 1 call per frame, не дёргает forced reflow на каждое событие
+        var _vvRaf = false;
+        function applyVVFixThrottled() {
+            if (_vvRaf) return;
+            _vvRaf = true;
+            requestAnimationFrame(function() {
+                _vvRaf = false;
+                applyVVFix();
+            });
+        }
+        vv.addEventListener('resize', applyVVFixThrottled, { passive: true });
+        vv.addEventListener('scroll', applyVVFixThrottled, { passive: true });
         // Expose reset so closeModal can clean up
         window._resetModalVV = resetVVFix;
     })();
