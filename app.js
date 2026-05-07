@@ -4798,7 +4798,19 @@
         renderProfileSocialLinks();
     };
 
+    function _safeExternalUrl(raw) {
+        if (typeof raw !== 'string') return '';
+        var s = raw.trim();
+        if (!s) return '';
+        // Защита от javascript:/data:/vbscript:/file: и пр. опасных схем
+        try {
+            var u = new URL(s, window.location.href);
+            if (u.protocol === 'http:' || u.protocol === 'https:' || u.protocol === 'mailto:') return u.href;
+            return '';
+        } catch(e) { return ''; }
+    }
     window.openExternalLink = function(url, label) {
+        var safe = _safeExternalUrl(url);
         var content = document.getElementById('socialLinkConfirmContent');
         if (!content) return;
         content.innerHTML = '';
@@ -4808,13 +4820,17 @@
         content.appendChild(titleEl);
         var urlEl = document.createElement('div');
         urlEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.45);word-break:break-all;padding:0 4px;';
-        urlEl.textContent = url;
+        urlEl.textContent = safe || t('(некорректная ссылка)');
         content.appendChild(urlEl);
         var goBtn = document.getElementById('socialLinkGoBtn');
-        if (goBtn) goBtn.onclick = function() { window.open(url, '_blank', 'noopener,noreferrer'); closeSocialLinkConfirm(); };
+        if (goBtn) {
+            goBtn.disabled = !safe;
+            goBtn.onclick = function() { if (safe) window.open(safe, '_blank', 'noopener,noreferrer'); closeSocialLinkConfirm(); };
+        }
         openModal('socialLinkConfirmMask');
     };
     window.openSocialLinkConfirm = function(url, platformId) {
+        var safe = _safeExternalUrl(url);
         var p = SOCIAL_PLATFORMS.find(function(pl) { return pl.id === platformId; });
         var content = document.getElementById('socialLinkConfirmContent');
         if (!content) return;
@@ -4831,10 +4847,13 @@
         content.appendChild(titleEl);
         var urlEl = document.createElement('div');
         urlEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.45);word-break:break-all;padding:0 4px;';
-        urlEl.textContent = url;
+        urlEl.textContent = safe || t('(некорректная ссылка)');
         content.appendChild(urlEl);
         var goBtn = document.getElementById('socialLinkGoBtn');
-        if (goBtn) goBtn.onclick = function() { window.open(url, '_blank', 'noopener,noreferrer'); closeSocialLinkConfirm(); };
+        if (goBtn) {
+            goBtn.disabled = !safe;
+            goBtn.onclick = function() { if (safe) window.open(safe, '_blank', 'noopener,noreferrer'); closeSocialLinkConfirm(); };
+        }
         openModal('socialLinkConfirmMask');
     };
     window.closeSocialLinkConfirm = function() { closeModal('socialLinkConfirmMask'); };
