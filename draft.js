@@ -352,15 +352,27 @@
   // Зритель добавляет себя по shareToken (server-side проверит совпадение токена)
   function joinAsSpectatorViaLink(l, uid) {
     var nick = _myNick();
-    var list = (l.invitedSpectators || []).slice();
-    if (list.indexOf(uid) !== -1) return;
-    list.push(uid);
-    var nicks = Object.assign({}, l.spectatorNicks || {});
-    nicks[uid] = nick;
-    _db().collection('draftLobbies').doc(l.id).update({
-      invitedSpectators: list,
-      spectatorNicks: nicks,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    var dbInst = _db();
+    if (!dbInst) return;
+    var lobbyRef = dbInst.collection('draftLobbies').doc(l.id);
+    // Транзакция: read-modify-write атомарно — иначе при гонке двух зрителей
+    // последний перезатрёт первого.
+    dbInst.runTransaction(function(tx){
+      return tx.get(lobbyRef).then(function(snap){
+        if (!snap.exists) return;
+        var data = snap.data();
+        var list = (data.invitedSpectators || []).slice();
+        if (list.indexOf(uid) !== -1) return; // уже зашёл
+        if (list.length >= 12) return; // слот переполнен
+        list.push(uid);
+        var nicks = Object.assign({}, data.spectatorNicks || {});
+        nicks[uid] = nick;
+        tx.update(lobbyRef, {
+          invitedSpectators: list,
+          spectatorNicks: nicks,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
     }).then(function(){
       console.info('[draft] joined as spectator via link');
     }).catch(function(e){ console.warn('[draft] join-spectator-via-link', e); });
@@ -373,36 +385,51 @@
     var uid = _uid();
     if (!uid || uid !== invite.toUid || invite.role !== 'spectator') return;
     var lobbyRef = dbInst.collection('draftLobbies').doc(invite.lobbyId);
-    lobbyRef.get().then(function(snap){
-      if (!snap.exists) return;
-      var l = snap.data();
-      var list = (l.invitedSpectators || []).slice();
-      if (list.indexOf(uid) !== -1) return; // уже в списке
-      list.push(uid);
-      var nicks = Object.assign({}, l.spectatorNicks || {});
-      nicks[uid] = invite.toNick || _myNick();
-      lobbyRef.update({
-        invitedSpectators: list,
-        spectatorNicks: nicks,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function(){
-        dbInst.collection('draftInvites').doc(invite.id).update({ status: 'finalized' }).catch(function(){});
-        console.info('[draft] self-finalized spectator invite');
-      }).catch(function(e){ console.warn('[draft] self-add-spectator-via-invite', e); });
-    }).catch(function(e){ console.warn('[draft] self-add-spectator get', e); });
+    // Транзакция (race-safe): два зрителя одновременно жмут "Принять" — оба попадут
+    dbInst.runTransaction(function(tx){
+      return tx.get(lobbyRef).then(function(snap){
+        if (!snap.exists) return;
+        var l = snap.data();
+        var list = (l.invitedSpectators || []).slice();
+        if (list.indexOf(uid) !== -1) return; // уже в списке
+        if (list.length >= 12) return; // слот переполнен
+        list.push(uid);
+        var nicks = Object.assign({}, l.spectatorNicks || {});
+        nicks[uid] = invite.toNick || _myNick();
+        tx.update(lobbyRef, {
+          invitedSpectators: list,
+          spectatorNicks: nicks,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+    }).then(function(){
+      dbInst.collection('draftInvites').doc(invite.id).update({ status: 'finalized' }).catch(function(){});
+      console.info('[draft] self-finalized spectator invite');
+    }).catch(function(e){ console.warn('[draft] self-add-spectator-via-invite', e); });
   }
 
   function renderWaitingRoom(l, pane) {
     // Skip full rerender if nothing visually relevant changed (prevents button jitter)
     var key = [
       l.blueCaptain && l.blueCaptain.uid || '',
+      l.blueCaptain && l.blueCaptain.nick || '',
       l.redCaptain  && l.redCaptain.uid  || '',
+      l.redCaptain  && l.redCaptain.nick || '',
+      l.blueTeamName || '',
+      l.redTeamName  || '',
+      (l.bluePlayers || []).join(','),
+      (l.redPlayers  || []).join(','),
       l.blueReady ? '1' : '0',
       l.redReady  ? '1' : '0',
       (l.invitedSpectators || []).join(','),
+      // ники зрителей: если кэп изменит nick зрителю — UI обновится
+      Object.keys(l.spectatorNicks || {}).sort().map(function(k){ return k+':'+l.spectatorNicks[k]; }).join(','),
       l.status,
       l.seriesScore ? l.seriesScore.blue + '-' + l.seriesScore.red : '0-0',
       (l.globalBans || []).join(','),
+      l.mode || '',
+      l.seriesType || '',
+      l.timerSeconds || '',
       l.id
     ].join('|');
     if (key === _lastWaitingKey) { wireWaitingRoom(l); return; }
@@ -496,9 +523,14 @@
         + '</div>';
     }
 
+    var iAmSpec = (l.invitedSpectators || []).indexOf(uid) !== -1 && !isCreator && !isBlueCap && !isRedCap;
+    var leaveBtn = iAmSpec
+      ? '<button onclick="dcoopLeaveLobby()" style="background:none;border:1px solid rgba(231,76,60,0.4);color:#e74c3c;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;">🚪 Выйти</button>'
+      : '';
     return ''
-      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;">'
       +   '<button onclick="dcoopBackToList()" style="background:none;border:1px solid var(--accent-border);color:#fff;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;">← К списку</button>'
+      +   leaveBtn
       +   '<div style="flex:1;font-size:14px;font-weight:900;color:#fff;">'+escapeHtml(l.blueTeamName || 'Blue')+' vs '+escapeHtml(l.redTeamName || 'Red')+'</div>'
       +   '<div style="font-size:11px;color:var(--text-faint);">'+(l.mode==='fearless'?'Fearless':'Normal')+' · '+(l.seriesType||'bo1').toUpperCase()+' · ⏱'+l.timerSeconds+'с</div>'
       + '</div>'
@@ -945,6 +977,10 @@
       if (prev.status === 'pending') {
         return Promise.reject(new Error('Приглашение уже ожидает ответа'));
       }
+      // Уже принят и финализирован — не дёргать повторно
+      if (prev.status === 'finalized' && prev.lobbyId === l.id) {
+        return Promise.reject(new Error('Юзер уже в этом лобби'));
+      }
       return ref.set({
         toUid: toUid,
         toNick: toNick || '',
@@ -1121,14 +1157,42 @@
   function removeSpectator(uid) {
     var l = _currentLobby;
     if (!l) return;
-    var list = (l.invitedSpectators || []).filter(function(u){ return u !== uid; });
-    var nicks = Object.assign({}, l.spectatorNicks || {});
-    delete nicks[uid];
-    _db().collection('draftLobbies').doc(l.id).update({
-      invitedSpectators: list,
-      spectatorNicks: nicks,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    var dbInst = _db();
+    if (!dbInst) return;
+    var lobbyRef = dbInst.collection('draftLobbies').doc(l.id);
+    // Транзакция: атомарный read-modify-write
+    dbInst.runTransaction(function(tx){
+      return tx.get(lobbyRef).then(function(snap){
+        if (!snap.exists) return;
+        var data = snap.data();
+        var list = (data.invitedSpectators || []).filter(function(u){ return u !== uid; });
+        if (list.length === (data.invitedSpectators || []).length) return; // не было
+        var nicks = Object.assign({}, data.spectatorNicks || {});
+        delete nicks[uid];
+        tx.update(lobbyRef, {
+          invitedSpectators: list,
+          spectatorNicks: nicks,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+    }).catch(function(e){ console.warn('[draft] removeSpectator', e); });
+  }
+
+  // Зритель сам выходит из лобби (Fix 4). Использует то же removeSpectator,
+  // но затем закрывает экран и возвращает в "Мои лобби".
+  function leaveLobby() {
+    var l = _currentLobby;
+    var uid = _uid();
+    if (!l || !uid) return;
+    if (!confirm('Покинуть лобби?')) return;
+    var isSpec = (l.invitedSpectators || []).indexOf(uid) !== -1;
+    if (!isSpec) {
+      toast('Только зритель может выйти. Капитан/создатель — закройте лобби или удалите.');
+      return;
+    }
+    removeSpectator(uid);
+    toast('Вы покинули лобби');
+    setTimeout(function(){ backToList(); }, 300);
   }
 
   // ═══════════════════════════════════════════
@@ -1292,10 +1356,18 @@
     // Render gallery
     renderGallery(lobby, game, step, mySide, unavail);
 
-    // Restore LockIn button state after re-render (fix "двойной клик")
+    // Restore LockIn button state and hover preview after re-render
     if (_hoverLocal && myTurn) {
       var lockBtn = document.getElementById('dcoopLockIn');
       if (lockBtn) lockBtn.disabled = false;
+      // Восстанавливаем локальный hover preview (он не в Firestore)
+      renderSlotsHoverPreview(mySide, _hoverLocal);
+      // Подсветка в галерее
+      var grid2 = document.getElementById('dcoopGallery');
+      if (grid2) {
+        var el2 = grid2.querySelector('[data-champ="'+cssEscape(_hoverLocal)+'"]');
+        if (el2) el2.classList.add('selected');
+      }
     }
 
     // Start timer
@@ -1507,10 +1579,17 @@
   // ─── Header (mobile vs PC) ───
   function draftHeaderHtml(lobby, game, step, mySide, isCreator) {
     var stepCol = step ? (step.side === 'blue' ? '#5dade2' : '#e74c3c') : '#fff';
+    var _meUid = _uid();
+    var iAmSpecHdr = (lobby.invitedSpectators || []).indexOf(_meUid) !== -1
+      && !isCreator
+      && !(lobby.blueCaptain && lobby.blueCaptain.uid === _meUid)
+      && !(lobby.redCaptain  && lobby.redCaptain.uid  === _meUid);
     var closeBtn = isCreator
       ? '<button class="dcoop-hdr-close" onclick="dcoopCloseLobbyConfirm()" title="Закрыть лобби">✕</button>'
-      // Не-создатель (зритель / некреаторский кап): кнопка «назад к списку» вместо ✕
-      : '<button class="dcoop-hdr-close" onclick="dcoopBackToList()" title="К списку" style="font-size:16px;">←</button>';
+      : (iAmSpecHdr
+          ? '<button class="dcoop-hdr-close" onclick="dcoopLeaveLobby()" title="Покинуть лобби" style="font-size:16px;color:#e74c3c;">🚪</button>'
+          // Не-создатель и не-зритель (запасной кап без позиции): кнопка "назад"
+          : '<button class="dcoop-hdr-close" onclick="dcoopBackToList()" title="К списку" style="font-size:16px;">←</button>');
     var specCount = (lobby.invitedSpectators || []).length;
     var specBtn = '<button class="dcoop-hdr-spec" onclick="dcoopToggleSpectators()" title="Зрители">👁 '+specCount+'</button>';
     var assistBtn = '<button class="dcoop-hdr-assist" onclick="dcoopToggleAssist()" title="Драфт-помощник" data-on="'+(_draftAssistantOn?'1':'0')+'">🤖</button>';
@@ -1782,17 +1861,11 @@
     var btn = document.getElementById('dcoopLockIn');
     if (btn) btn.disabled = false;
 
-    // Throttled write
-    if (_hoverWriteTimer) clearTimeout(_hoverWriteTimer);
-    _hoverWriteTimer = setTimeout(function(){
-      var patch = {};
-      patch['hover.' + mySide] = name;
-      _db().collection('draftLobbies').doc(l.id)
-        .collection('games').doc(String(g.number))
-        .update(patch).catch(function(e){ console.warn('[draft] hover update', e); });
-    }, 250);
+    // Hover остаётся ЛОКАЛЬНЫМ — НЕ пишем в Firestore.
+    // Иначе соперник видит выбор капитана до Lock In (спойлер).
+    // Если время истечёт — onTimerExpired сделает random fallback (deterministicPick).
 
-    // Обновить preview slots
+    // Обновить preview slots (только в DOM текущего клиента)
     renderSlotsHoverPreview(mySide, name);
   }
 
@@ -1856,8 +1929,8 @@
       picks[step.pickIdx] = { champ: champ, lockedAt: Date.now() };
       patch['picks.' + side] = picks;
     }
-    // Сбрасываем hover
-    patch['hover.' + side] = null;
+    // hover больше не пишется в Firestore — он чисто локальный, чтобы соперник
+    // не видел выбор до Lock In. Очищать в Firestore не нужно.
     // Инкремент turnIndex
     var nextIdx = game.turnIndex + 1;
     patch.turnIndex = nextIdx;
@@ -2270,6 +2343,8 @@
       toast('Серия закрыта');
       return;
     }
+    // Сброс кэша автодействий — чтобы не накапливать ключи прошлых игр
+    _autoActionFired = {};
     var nextNum = (l.currentGame || 1) + 1;
     var dbInst = _db();
     // Стороны игры: base blue/red, при swap меняем
@@ -2529,10 +2604,13 @@
   window.dcoopCloseLobbyConfirm = closeLobbyConfirm;
 
   // ─── START DRAFT (создать games/1 и перейти в drafting) ───
+  // Модульный флаг (а не l._startingDraft на snapshot-объекте, который сбрасывается
+  // на каждый onSnapshot) — гарантирует одноразовый старт даже если snapshot
+  // прилетел между лок. set(games/1) и update(status:drafting).
+  var _startingDraftId = null;
   function startDraft(l) {
-    // Защита от двойного запуска
-    if (l._startingDraft) return;
-    l._startingDraft = true;
+    if (_startingDraftId === l.id) return;
+    _startingDraftId = l.id;
 
     var dbInst = _db();
     // creatorSide определяет стартовую сторону; если создатель = red, меняем blueSide игры
@@ -2563,6 +2641,8 @@
       });
     }).catch(function(e){
       console.warn('[draft] startDraft', e);
+      // Сбрасываем флаг при ошибке, чтобы можно было попробовать снова
+      if (_startingDraftId === l.id) _startingDraftId = null;
     });
   }
 
@@ -2678,6 +2758,7 @@
   };
   window.dcoopCloseSearch = closeUserSearch;
   window.dcoopRemoveSpectator = removeSpectator;
+  window.dcoopLeaveLobby = leaveLobby;
   window.dcoopCopyInvite = copyInviteLink;
 
   // Переоткрыть при логине, если модалка сейчас открыта

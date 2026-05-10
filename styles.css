@@ -5961,14 +5961,13 @@ body.cms-edit-mode :not(input):not(textarea):not(select):not(#cmsEditModeToggle)
   --spring-modal:  var(--ease-apple);
 }
 
-/* ── MODAL: jank-free animation (blur STATIC — это была причина дёрганья) ── */
+/* ── MODAL TRANSITIONS (2026-05-07 — flash-free A→B переходы) ──
+   Backdrop мгновенный (без opacity animation) — чтобы при переходе
+   между модалками не был виден главный экран сквозь обе полупрозрачные
+   маски. Анимируется ТОЛЬКО контент (.m-win). */
 .m-mask.active {
-  animation: maskFadeIn2026 0.22s ease forwards;
-  will-change: opacity;
-}
-@keyframes maskFadeIn2026 {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  animation: none;
+  opacity: 1;
 }
 .m-mask.active > .m-win {
   animation: modalContentIn2026 0.28s var(--ease-apple-out) both;
@@ -5979,11 +5978,9 @@ body.cms-edit-mode :not(input):not(textarea):not(select):not(#cmsEditModeToggle)
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 .m-mask.closing {
-  animation: maskFadeOut2026 0.18s ease forwards;
-}
-@keyframes maskFadeOut2026 {
-  from { opacity: 1; }
-  to   { opacity: 0; }
+  animation: none;
+  opacity: 1;
+  pointer-events: none;
 }
 .m-mask.closing > .m-win {
   animation: modalContentOut2026 0.18s ease forwards;

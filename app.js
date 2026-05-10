@@ -27,9 +27,30 @@
             if(id === except) return;
             var el = document.getElementById(id);
             if(!el) return;
-            el.classList.remove('active');
-            el.style.display = '';
-            el.style.zIndex = '';
+            // Если модалка не активна — мгновенный сброс (не было перехода)
+            if (!el.classList.contains('active')) {
+                el.style.display = '';
+                el.style.zIndex = '';
+                return;
+            }
+            // Активная модалка → плавное закрытие через .closing,
+            // чтобы при переходе A→B не было flash главного экрана между ними
+            if (el._closeTimer) { clearTimeout(el._closeTimer); el._closeTimer = null; }
+            el.classList.remove('closing');  // на случай если уже было
+            // Опускаем z-index чуть ниже новой модалки, чтобы новая была сверху
+            el.style.zIndex = String(_baseZIndex - 1);
+            el.classList.add('closing');
+            var oldEl = el;
+            var _t = setTimeout(function() {
+                if (!oldEl) return;
+                oldEl.classList.remove('active');
+                oldEl.classList.remove('closing');
+                oldEl.style.display = '';
+                oldEl.style.zIndex = '';
+                oldEl._closeTimer = null;
+                if (window._resetModalVV) window._resetModalVV(oldEl);
+            }, 180);
+            el._closeTimer = _t;
         });
         _modalStack = [];
         if(!except) document.body.classList.remove('modal-open');
@@ -2100,7 +2121,8 @@
                     {id:'cd_hp',label:'\u271a HP',val:f(c.hp_b,c.hp_g),color:'#2ecc71'},
                     {id:'cd_mn',label:'\ud83d\udca7 '+(c.res==='Energy'?'Energy':'Mana'),val:c.res==='Energy'?'150':String(f(c.mn_b,c.mn_g)),color:'#5dade2'},
                     {id:'cd_ar',label:'\ud83d\udee1 \u0411\u0440\u043e\u043d\u044f',val:f(c.ar_b,c.ar_g),color:'#f1c40f'},
-                    {id:'cd_mr',label:'\u2726 \u041c\u0421',val:f(c.mr_b,c.mr_g),color:'var(--sel-stat)'}
+                    {id:'cd_mr',label:'\u2726 \u041c\u0421',val:f(c.mr_b,c.mr_g),color:'var(--sel-stat)'},
+                    {id:'cd_rng',label:'\ud83c\udff9 RNG',val:f(c.rng_b||0,c.rng_g||0),color:'#bb8fce'}
                 ];
                 var grid=document.getElementById('cdStatsGrid')||sg;
                 if(!grid.children.length){
