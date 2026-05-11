@@ -82,6 +82,35 @@
     return (u && u.displayName) || (u && u.email) || 'anon';
   }
 
+  // ─── Server time sync (anti-clock-skew для таймера драфта) ──────────────
+  // Часы устройств могут расходиться на секунды от NTP/провайдера. Без коррекции
+  // таймер у двух кэпов идёт с разной скоростью: один видит "5с", другой "8с".
+  // Замеряем offset (Date.now() - serverTime) один раз при открытии лобби,
+  // и потом везде используем `_serverNow()` вместо `Date.now()`.
+  var _serverOffsetMs = 0;
+  function _serverNow() { return Date.now() - _serverOffsetMs; }
+  function _measureServerOffset() {
+    var dbInst = _db();
+    var uid = _uid();
+    if (!dbInst || !uid) return;
+    var ref = dbInst.collection('users').doc(uid);
+    var t0 = Date.now();
+    // merge:true — не затираем остальные поля юзера
+    ref.set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true })
+      .then(function(){ return ref.get(); })
+      .then(function(snap){
+        var t1 = Date.now();
+        var data = snap.exists ? snap.data() : null;
+        var ls = data && data.lastSeen;
+        if (!ls || !ls.toMillis) return;
+        var serverTs = ls.toMillis();
+        // Локальное время в момент когда сервер записал штамп ≈ t0 + (t1 - t0) / 2.
+        var localAtServerWrite = t0 + (t1 - t0) / 2;
+        _serverOffsetMs = localAtServerWrite - serverTs;
+      })
+      .catch(function(){ /* fallback offset=0 — текущее поведение */ });
+  }
+
   function escapeHtml(s) {
     return String(s == null ? '' : s)
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -363,6 +392,9 @@
 
     var dbInst = _db();
     if (!dbInst) return;
+    // Сверяем локальные часы с серверными — иначе таймер драфта идёт с разной
+    // скоростью у двух игроков (расхождение часов устройств ≈ секунды).
+    _measureServerOffset();
     var pane = document.getElementById('dcoopPaneLobby');
     if (pane) pane.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-faint);">Загрузка лобби…</div>';
 
@@ -2481,10 +2513,12 @@
     _soundLastSecond = null;
 
     var total = lobby.timerSeconds || 45;
-    var startMs = (game.turnStartedAt && game.turnStartedAt.toMillis) ? game.turnStartedAt.toMillis() : Date.now();
+    var startMs = (game.turnStartedAt && game.turnStartedAt.toMillis) ? game.turnStartedAt.toMillis() : _serverNow();
 
     function tick() {
-      var left = total - (Date.now() - startMs) / 1000;
+      // _serverNow() = Date.now() - clock-skew offset. Без коррекции таймер
+      // у двух кэпов идёт по-разному (часы их устройств не синхронны).
+      var left = total - (_serverNow() - startMs) / 1000;
       if (left < 0) left = 0;
       var sec = Math.ceil(left);
       tEl.textContent = sec + 'с';
