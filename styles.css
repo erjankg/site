@@ -2,6 +2,17 @@
    Wild Rift Stats — Styles
    ═══════════════════════════════════════════ */
 
+/* SEO-блок: видим Googlebot'у в DOM, но off-screen для людей (sr-only паттерн).
+   Контент совпадает с темой страницы — это легитимная техника, не cloaking. */
+.seo-content {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 /* Range column — desktop only */
 @media (max-width: 900px) {
   #statTable th.col-range,
@@ -4192,71 +4203,34 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
   to   { box-shadow: 0 6px 22px rgba(0,0,0,0.5), 0 0 0 8px rgba(241,196,15,0); }
 }
 
-/* ─── F6: Coin flip overlay ─── */
-.dcoop-coinflip-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.78);
-  backdrop-filter: blur(8px);
-  z-index: 9100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  animation: dcoopCoinIn 0.25s ease-out;
-}
-@keyframes dcoopCoinIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-.dcoop-coinflip-box {
-  background: var(--bg-base);
+/* ─── Game 1 side pick (inline в waiting room) ─── */
+.dcoop-side-pick {
+  margin-top: 14px;
+  padding: 16px 18px;
   border: 1px solid var(--accent-border);
-  border-radius: 16px;
-  padding: 28px 32px;
-  width: 100%;
-  max-width: 420px;
+  border-radius: 12px;
+  background: rgba(46,204,113,0.06);
   text-align: center;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
 }
-.dcoop-coinflip-anim {
-  perspective: 800px;
-  height: 100px;
+.dcoop-side-pick-title {
+  font-size: 14px;
+  font-weight: 900;
+  color: #2ecc71;
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+.dcoop-side-pick-sub {
+  font-size: 12px;
+  color: var(--text-faint);
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+.dcoop-side-pick-btns {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 14px;
+  flex-direction: column;
+  gap: 8px;
 }
-.dcoop-coin {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  transform-style: preserve-3d;
-  animation: dcoopCoinFlip 1.6s cubic-bezier(0.22,1,0.36,1) 1;
-}
-@keyframes dcoopCoinFlip {
-  0%   { transform: rotateY(0deg)    scale(0.7); }
-  60%  { transform: rotateY(1080deg) scale(1.1); }
-  100% { transform: rotateY(1080deg) scale(1);   }
-}
-.dcoop-coin-side {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 44px;
-  backface-visibility: hidden;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-}
-.dcoop-coin-blue { background: linear-gradient(135deg, #1a6fa8, #3498db); }
-.dcoop-coin-red  { background: linear-gradient(135deg, #922b21, #e74c3c); transform: rotateY(180deg); }
-.dcoop-coinflip-title { font-size: 15px; font-weight: 900; color: #fff; margin-bottom: 6px; }
-.dcoop-coinflip-result { font-size: 18px; font-weight: 900; margin-bottom: 8px; letter-spacing: 0.5px; }
-.dcoop-coinflip-sub { font-size: 12px; color: var(--text-faint); margin-bottom: 16px; line-height: 1.4; }
-.dcoop-coinflip-btns { display: flex; flex-direction: column; gap: 8px; }
-.dcoop-coinflip-btn {
+.dcoop-side-pick-btn {
   padding: 12px 16px;
   border-radius: 10px;
   border: none;
@@ -4266,10 +4240,10 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
   cursor: pointer;
   transition: transform 0.12s, filter 0.12s;
 }
-.dcoop-coinflip-btn.blue { background: linear-gradient(135deg, #1a6fa8, #3498db); }
-.dcoop-coinflip-btn.red  { background: linear-gradient(135deg, #922b21, #e74c3c); }
-.dcoop-coinflip-btn:hover { transform: translateY(-1px); filter: brightness(1.15); }
-.dcoop-coinflip-btn:active { transform: scale(0.97); }
+.dcoop-side-pick-btn.blue { background: linear-gradient(135deg, #1a6fa8, #3498db); }
+.dcoop-side-pick-btn.red  { background: linear-gradient(135deg, #922b21, #e74c3c); }
+.dcoop-side-pick-btn:hover { transform: translateY(-1px); filter: brightness(1.15); }
+.dcoop-side-pick-btn:active { transform: scale(0.97); }
 
 /* ─── Lobby chat panel (F3) ─── */
 .dcoop-chat-panel {

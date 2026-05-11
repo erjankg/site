@@ -548,9 +548,26 @@
       ? '<button class="dcoop-submit" style="background:' + (myReady ? 'rgba(46,204,113,0.2);color:#2ecc71;border:2px solid #2ecc71;' : '') + '" onclick="dcoopToggleReady()">' + (myReady ? '✓ Готов (отменить)' : '✅ Готов') + '</button>'
       : '';
 
-    var startNote = (l.blueReady && l.redReady)
-      ? '<div style="padding:10px;text-align:center;color:#2ecc71;font-weight:800;">Оба готовы — начинаем…</div>'
-      : (canReady ? '' : '<div style="padding:10px;text-align:center;color:var(--text-faint);font-size:11px;">Кнопка готовности появится когда оба капитана подключены</div>');
+    var bothReady = !!(l.blueReady && l.redReady);
+    var sideAlreadyChosen = !!l.currentGameBlueSide;
+    var startNote;
+    if (!bothReady) {
+      startNote = canReady ? '' : '<div style="padding:10px;text-align:center;color:var(--text-faint);font-size:11px;">Кнопка готовности появится когда оба капитана подключены</div>';
+    } else if (isCreator && !sideAlreadyChosen) {
+      startNote = ''
+        + '<div class="dcoop-side-pick">'
+        +   '<div class="dcoop-side-pick-title">Оба готовы — выбери сторону на 1-ю игру</div>'
+        +   '<div class="dcoop-side-pick-sub">Команда «'+escapeHtml(l.blueTeamName || 'Blue')+'» — на какой стороне играет в первой игре серии?</div>'
+        +   '<div class="dcoop-side-pick-btns">'
+        +     '<button class="dcoop-side-pick-btn blue" onclick="dcoopPickGame1Side(\'blue\')">🔵 Синие (First Pick)</button>'
+        +     '<button class="dcoop-side-pick-btn red"  onclick="dcoopPickGame1Side(\'red\')">🔴 Красные (counter-pick)</button>'
+        +   '</div>'
+        + '</div>';
+    } else if (!isCreator && !sideAlreadyChosen) {
+      startNote = '<div style="padding:10px;text-align:center;color:var(--text-faint);font-weight:700;">Ждём капитана-создателя — выбирает сторону на 1-ю игру…</div>';
+    } else {
+      startNote = '<div style="padding:10px;text-align:center;color:#2ecc71;font-weight:800;">Сторона выбрана — начинаем…</div>';
+    }
 
     var spectators = l.invitedSpectators || [];
     var specList = spectators.length
@@ -617,118 +634,27 @@
   }
 
   function wireWaitingRoom(l) {
-    // F6: Side coin flip — после двойной готовности перед стартом game 1.
-    // Если флипа ещё нет — детерминированно (lobby.id) определяем победителя
-    // и записываем coinFlip.winnerTeam (без choice). Создатель пишет один раз.
-    if (l.blueReady && l.redReady && l.status === 'waiting') {
-      var meUid = _uid();
-      if (!l.coinFlip && l.createdBy === meUid) {
-        var winnerTeam = _coinFlipWinner(l.id);
-        _db().collection('draftLobbies').doc(l.id).update({
-          coinFlip: {
-            winnerTeam: winnerTeam,
-            choice: null,
-            resolvedAt: firebase.firestore.FieldValue.serverTimestamp()
-          },
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).catch(function(e){ console.warn('[draft] coin-flip set', e); });
-      }
-      // Открываем coin-flip UI (overlay) если флип уже записан и ещё не выбрана сторона
-      if (l.coinFlip && !l.coinFlip.choice) {
-        showCoinFlipOverlay(l);
-      } else if (l.coinFlip && l.coinFlip.choice && l.createdBy === meUid) {
-        // Победитель выбрал — стартуем драфт с этой стороной
-        startDraft(l);
-      } else {
-        // Старый путь без флипа (на случай миграции лобби) — только если нет coinFlip
-        if (!l.coinFlip && l.createdBy === meUid) startDraft(l);
-      }
-    } else {
-      // Статус снова стал не-ready — закроем overlay
-      hideCoinFlipOverlay();
+    // Старт game 1: создатель выбирает сторону кнопкой (см. dcoopPickGame1Side).
+    // Когда currentGameBlueSide уже записан и оба готовы — создатель пушит startDraft.
+    if (l.blueReady && l.redReady && l.status === 'waiting'
+        && l.currentGameBlueSide && l.createdBy === _uid()) {
+      startDraft(l);
     }
   }
 
-  // Детерминированный coin flip из id лобби — оба клиента получат одинаковый результат
-  function _coinFlipWinner(lobbyId) {
-    var h = 0;
-    for (var i = 0; i < lobbyId.length; i++) {
-      h = ((h << 5) - h + lobbyId.charCodeAt(i)) | 0;
-    }
-    return (Math.abs(h) % 2 === 0) ? 'blue' : 'red';
-  }
-
-  function showCoinFlipOverlay(l) {
-    var existing = document.getElementById('dcoopCoinFlipOverlay');
-    if (existing) {
-      // Обновляем содержимое если уже открыт
-      _renderCoinFlipContent(l, existing);
-      return;
-    }
-    var ov = document.createElement('div');
-    ov.id = 'dcoopCoinFlipOverlay';
-    ov.className = 'dcoop-coinflip-overlay';
-    document.body.appendChild(ov);
-    _renderCoinFlipContent(l, ov);
-  }
-  function hideCoinFlipOverlay() {
-    var el = document.getElementById('dcoopCoinFlipOverlay');
-    if (el) el.remove();
-  }
-  function _renderCoinFlipContent(l, ov) {
-    var meUid = _uid();
-    var winner = l.coinFlip && l.coinFlip.winnerTeam;
-    if (!winner) return;
-    var winnerCap = winner === 'blue' ? l.blueCaptain : l.redCaptain;
-    var winnerName = (winner === 'blue' ? l.blueTeamName : l.redTeamName) || winner;
-    var iAmWinner = winnerCap && winnerCap.uid === meUid;
-    var winCol = winner === 'blue' ? '#5dade2' : '#e74c3c';
-    ov.innerHTML = ''
-      + '<div class="dcoop-coinflip-box">'
-      +   '<div class="dcoop-coinflip-anim">'
-      +     '<div class="dcoop-coin">'
-      +       '<div class="dcoop-coin-side dcoop-coin-blue">🔵</div>'
-      +       '<div class="dcoop-coin-side dcoop-coin-red">🔴</div>'
-      +     '</div>'
-      +   '</div>'
-      +   '<div class="dcoop-coinflip-title">🪙 Подбрасываем монетку…</div>'
-      +   '<div class="dcoop-coinflip-result" style="color:'+winCol+';">Победили: '+escapeHtml(winnerName)+'</div>'
-      +   '<div class="dcoop-coinflip-sub">'
-      +     (iAmWinner
-        ? 'Выбери, на какой стороне ты хочешь играть в первой игре'
-        : 'Ждём решения капитана «'+escapeHtml(winnerName)+'»…')
-      +   '</div>'
-      +   (iAmWinner
-        ? '<div class="dcoop-coinflip-btns">'
-          +   '<button class="dcoop-coinflip-btn blue" data-coin-side="blue">🔵 Синие (First Pick)</button>'
-          +   '<button class="dcoop-coinflip-btn red" data-coin-side="red">🔴 Красные (counter-pick)</button>'
-          + '</div>'
-        : '')
-      + '</div>';
-    if (iAmWinner) {
-      ov.querySelectorAll('[data-coin-side]').forEach(function(b){
-        b.addEventListener('click', function(){
-          var side = b.getAttribute('data-coin-side');
-          _resolveCoinFlip(l, side);
-        });
-      });
-    }
-  }
-  function _resolveCoinFlip(l, chosenSide) {
-    var dbInst = _db();
-    if (!dbInst) return;
-    // Победитель выбирает «сторону для своей команды» (blue или red).
-    // Лобби обновляет coinFlip.choice и creatorSideForGame1 — какая команда играет на синей.
-    var winnerTeam = l.coinFlip && l.coinFlip.winnerTeam;
-    if (!winnerTeam) return;
-    // currentGameBlueSide пишется так, чтобы winner-team сидела на chosenSide.
-    // sideRoles читает game.blueSide ('blue' = blueCaptain's team на blue, 'red' = свап).
-    // Если winner=blue и выбрал blue → game.blueSide = 'blue'.
-    // Если winner=blue и выбрал red  → game.blueSide = 'red' (значит на blue сидит redCaptain's team).
-    var game1BlueSide = (winnerTeam === chosenSide) ? 'blue' : 'red';
-    dbInst.collection('draftLobbies').doc(l.id).update({
-      'coinFlip.choice': chosenSide,
-      currentGameBlueSide: game1BlueSide,
+  // Создатель выбирает, на какой стороне (blue/red) играет команда blueCaptain в 1-й игре.
+  // game.blueSide = 'blue' — команда blueCaptain на синей позиции (имеет first pick).
+  // game.blueSide = 'red'  — команда blueCaptain на красной позиции (свап).
+  function pickGame1Side(chosenSide) {
+    var l = _currentLobby;
+    if (!l) return;
+    if (l.createdBy !== _uid()) { toast('Сторону выбирает создатель лобби'); return; }
+    if (!l.blueReady || !l.redReady) { toast('Сначала оба капитана должны быть готовы'); return; }
+    if (l.status !== 'waiting') return;
+    if (l.currentGameBlueSide) return;
+    if (chosenSide !== 'blue' && chosenSide !== 'red') return;
+    _db().collection('draftLobbies').doc(l.id).update({
+      currentGameBlueSide: chosenSide,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(function(e){ toast('Ошибка: '+e.message); });
   }
@@ -741,8 +667,14 @@
     if (l.blueCaptain && l.blueCaptain.uid === uid) field = 'blueReady';
     else if (l.redCaptain && l.redCaptain.uid === uid) field = 'redReady';
     if (!field) return;
-    var patch = {}; patch[field] = !l[field];
+    var newReady = !l[field];
+    var patch = {}; patch[field] = newReady;
     patch.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    // Если кто-то снимает готовность в waiting — сбрасываем уже выбранную сторону на 1-ю игру,
+    // чтобы создатель смог выбрать заново после повторной готовности.
+    if (!newReady && l.status === 'waiting' && l.currentGameBlueSide) {
+      patch.currentGameBlueSide = null;
+    }
     _db().collection('draftLobbies').doc(l.id).update(patch)
       .catch(function(e){ toast('Ошибка: '+e.message); });
   }
@@ -3751,7 +3683,6 @@
 
     var lobbyRef = dbInst.collection('draftLobbies').doc(l.id);
     lobbyRef.collection('games').doc('1').set(game1).then(function(){
-      hideCoinFlipOverlay();
       return lobbyRef.update({
         status: 'drafting',
         currentGame: 1,
@@ -3866,6 +3797,7 @@
   window.dcoopOpenLobby = openLobby;
   window.dcoopBackToList = backToList;
   window.dcoopToggleReady = toggleReady;
+  window.dcoopPickGame1Side = pickGame1Side;
   window.dcoopDeleteLobby = deleteLobby;
   window.dcoopInviteCaptain = function(side){ openUserSearch(side === 'blue' ? 'captainBlue' : 'captainRed'); };
   window.dcoopInviteSpectator = function(){ openUserSearch('spectator'); };
