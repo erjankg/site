@@ -1,14 +1,26 @@
 /* ═══════════════════════════════════════════════════════════════
-   CYBERSPORT — Турнирная система
+   CYBERSPORT — турнирная система
    Firestore:
-     /tournaments/{id}
-     /tournaments/{id}/teams/{teamId}
-     /tournaments/{id}/matches/{matchId}
+     /tournaments/{id}                       — { name, format, teamCount, bo,
+                                                 prizePool, isPublic, shareToken,
+                                                 thirdPlace, status, createdBy,
+                                                 createdAt, groupConfig?, playoffStarted? }
+     /tournaments/{id}/teams/{teamId}        — { name, logoUrl, players[], seed }
+     /tournaments/{id}/matches/{matchId}     — { phase, group?, round, matchNum, label,
+                                                 team1Id, team2Id,
+                                                 team1Source, team2Source,
+                                                 score1, score2, winnerId,
+                                                 status, bo }
+   Модель связей:
+     team1Source / team2Source = { matchId, takes: 'winner'|'loser' } | null
+     Источник истины — receiver-side: каждый матч знает откуда приходят слоты.
    ═══════════════════════════════════════════════════════════════ */
 (function () {
   'use strict';
 
-  /* ── CONSTANTS ───────────────────────────────────────────── */
+  /* ══════════════════════════════════════════════════════════
+     CONSTANTS
+  ══════════════════════════════════════════════════════════ */
   var ROLES = {
     top:     '🗡️ Топ',
     jungle:  '🌿 Джангл',
@@ -19,62 +31,565 @@
   var ROLE_KEYS = ['top', 'jungle', 'mid', 'adc', 'support'];
 
   var FORMAT_LABELS = {
-    single_elim:       'Single Elimination',
-    double_elim:       'Double Elimination',
-    group_elim:        'Группы + Плей-офф',
-    playin_group_elim: 'Play-in → Группы → Плей-офф'
+    single_elim: 'Single Elimination',
+    double_elim: 'Double Elimination',
+    group_elim:  'Группы + Плей-офф'
   };
 
-  /* ── STATE ───────────────────────────────────────────────── */
-  var _view        = 'list';    // list | create | tournament
-  var _tab         = 'active';  // active | upcoming | completed
-  var _bracketTab  = 'bracket'; // bracket | teams | schedule
-  var _step        = 1;         // wizard step 1-3
-  var _draftData   = {};        // wizard in-progress data
-  var _tournaments = [];
-  var _currentTId  = null;
-  var _currentT    = null;
-  var _teams       = {};        // {teamId: teamData}
-  var _matches     = {};        // {matchId: matchData}
-  var _unsubTeams   = null;
-  var _unsubMatches = null;
-  var _editingTeamIdx = null;   // index in _draftData.teams for wizard editing
+  /* ══════════════════════════════════════════════════════════
+     STATE
+  ══════════════════════════════════════════════════════════ */
+  var S = {
+    view: 'list',         // list | create | tournament
+    tab: 'active',        // active | upcoming | completed
+    bracketTab: 'bracket',
+    step: 1,
+    draftData: {},
+    tournaments: [],
+    currentTId: null,
+    currentT: null,
+    teams: {},
+    matches: {},
+    unsubT: null,
+    unsubTeams: null,
+    unsubMatches: null,
+    editingTeamIdx: null,
+    pendingDeepLinkId: null
+  };
 
-  /* ── FIREBASE ────────────────────────────────────────────── */
-  function _db() {
-    if (typeof firebase !== 'undefined' && firebase.firestore) return firebase.firestore();
-    return null;
+  /* ══════════════════════════════════════════════════════════
+     LOW-LEVEL HELPERS
+  ══════════════════════════════════════════════════════════ */
+  function _e(s)  { if (s == null) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function _q(sel) { return document.querySelector(sel); }
+  function _qa(sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); }
+  function _db()  { try { return firebase.firestore(); } catch (e) { return null; } }
+  function _uid() { try { return firebase.auth().currentUser && firebase.auth().currentUser.uid; } catch (e) { return null; } }
+  function _ts()  { return firebase.firestore.FieldValue.serverTimestamp(); }
+  function _toast(msg) {
+    if (window.toast) return window.toast(msg);
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);padding:10px 18px;background:rgba(0,0,0,0.85);color:#fff;border-radius:10px;z-index:99999;font-size:13px;';
+    document.body.appendChild(t);
+    setTimeout(function () { t.remove(); }, 2200);
   }
-  function _uid() {
-    try { return firebase.auth().currentUser && firebase.auth().currentUser.uid; } catch (e) { return null; }
+  function _isCreator() { var u = _uid(); return !!(S.currentT && u && S.currentT.createdBy === u); }
+  function _canEdit()   { return _isCreator(); }
+  function _isPublicMode() {
+    return document.documentElement.classList.contains('cs-public-mode');
   }
-  function _ts() { return firebase.firestore.FieldValue.serverTimestamp(); }
+  function _randomToken() {
+    return Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 10);
+  }
+  function _exitPublicMode() {
+    document.documentElement.classList.remove('cs-public-mode');
+    document.documentElement.classList.add('pre-guest');
+    if (window.showSiteAuthGate) window.showSiteAuthGate();
+  }
+  /* Вход в Google — для CTA «Войти» в публичном режиме */
+  window._csPublicSignIn = function () {
+    // siteAuthSignIn() уже определён в index.html; пробуем его в первую очередь
+    if (typeof window.siteAuthSignIn === 'function') {
+      window.siteAuthSignIn();
+    } else if (typeof window.signInWithGoogle === 'function') {
+      window.signInWithGoogle();
+    } else {
+      // Fallback: открываем auth-gate, чтобы юзер нажал кнопку
+      _exitPublicMode();
+    }
+  };
 
-  /* ── OPEN / CLOSE ────────────────────────────────────────── */
+  /* ─── h(): мини template helper ────────────────────────────
+     Использование:
+       h('div', { class: 'foo', onclick: 'bar()' }, 'inner')
+       h('div', { class: 'wrap' }, [ h('span', null, 'a'), h('span', null, 'b') ])
+     children — строка ИЛИ массив строк; считается готовым HTML
+     (использующий код сам экранирует пользовательские данные через _e()).
+  ─────────────────────────────────────────────────────────── */
+  function h(tag, attrs, children) {
+    var out = '<' + tag;
+    if (attrs) {
+      for (var k in attrs) {
+        var v = attrs[k];
+        if (v == null || v === false) continue;
+        if (k === 'class' || k === 'className') {
+          out += ' class="' + _e(v) + '"';
+        } else if (k === 'style' && typeof v === 'object') {
+          var s = '';
+          for (var sk in v) { s += sk + ':' + v[sk] + ';'; }
+          out += ' style="' + _e(s) + '"';
+        } else if (v === true) {
+          out += ' ' + k;
+        } else {
+          out += ' ' + k + '="' + _e(v) + '"';
+        }
+      }
+    }
+    out += '>';
+    if (children == null) {
+      // void
+    } else if (Array.isArray(children)) {
+      for (var i = 0; i < children.length; i++) {
+        if (children[i] == null || children[i] === false) continue;
+        out += children[i];
+      }
+    } else {
+      out += children;
+    }
+    out += '</' + tag + '>';
+    return out;
+  }
+
+  function _field(label, inputHtml) {
+    return h('div', { class: 'cs-field' },
+      h('label', { class: 'cs-label' }, _e(label)) + inputHtml);
+  }
+
+  function _logoEl(team, size) {
+    if (team && team.logoUrl) {
+      return h('img', { class: 'cs-logo-img', src: team.logoUrl, style: { width: size + 'px', height: size + 'px' } }, '');
+    }
+    var letter = (team && team.name) ? team.name[0].toUpperCase() : '?';
+    return h('div', {
+      class: 'cs-logo-ph',
+      style: { width: size + 'px', height: size + 'px', 'font-size': Math.round(size * 0.45) + 'px' }
+    }, _e(letter));
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     ENGINE — чистый генератор сетки
+     Не знает про Firestore. На вход — teams[], opts.
+     На выход — матчи с team{1,2}Source-связями.
+  ══════════════════════════════════════════════════════════ */
+  var Engine = (function () {
+    function pow2(n) { var p = 1; while (p < n) p *= 2; return p; }
+    function log2(n) { return Math.log(n) / Math.log(2); }
+
+    /* Standard tournament seeding: для n=8 → [[1,8],[4,5],[3,6],[2,7]] */
+    function seedPairs(n) {
+      var seeds = [1, 2];
+      var rounds = log2(n);
+      for (var r = 1; r < rounds; r++) {
+        var ns = [];
+        for (var i = 0; i < seeds.length; i++) {
+          ns.push(seeds[i]); ns.push(n + 1 - seeds[i]);
+        }
+        seeds = ns;
+      }
+      var pairs = [];
+      for (var j = 0; j < seeds.length; j += 2) pairs.push([seeds[j], seeds[j + 1]]);
+      return pairs;
+    }
+
+    function _seRoundLabel(r, totalRnd, cnt) {
+      if (r === totalRnd)         return 'Финал';
+      if (r === totalRnd - 1)     return 'Полуфинал';
+      if (r === totalRnd - 2)     return 'Четвертьфинал';
+      return '1/' + (cnt * 2) + ' финала';
+    }
+
+    /* ─── Single Elimination ─── */
+    function genSE(teams, opts) {
+      opts = opts || {};
+      var bo = opts.bo || 3;
+      var n = pow2(teams.length);
+      var totalRnd = log2(n);
+      var pairs = seedPairs(n);
+      var seedMap = {};
+      teams.forEach(function (t, i) { seedMap[i + 1] = t.id; });
+
+      var matches = [];
+      for (var r = 1; r <= totalRnd; r++) {
+        var cnt = n / Math.pow(2, r);
+        for (var mn = 1; mn <= cnt; mn++) {
+          var t1Id = null, t2Id = null;
+          var t1Src = null, t2Src = null;
+
+          if (r === 1) {
+            var pair = pairs[mn - 1];
+            t1Id = seedMap[pair[0]] || null;
+            t2Id = seedMap[pair[1]] || null;
+          } else {
+            t1Src = { matchId: 'r' + (r - 1) + 'm' + (mn * 2 - 1), takes: 'winner' };
+            t2Src = { matchId: 'r' + (r - 1) + 'm' + (mn * 2), takes: 'winner' };
+          }
+
+          // Bye в первом раунде
+          var winnerId = null, status = 'upcoming', s1 = 0, s2 = 0;
+          if (r === 1) {
+            if (t1Id && !t2Id)  { winnerId = t1Id; status = 'completed'; s1 = Math.ceil(bo / 2); }
+            else if (!t1Id && t2Id) { winnerId = t2Id; status = 'completed'; s2 = Math.ceil(bo / 2); }
+          }
+
+          matches.push({
+            id: 'r' + r + 'm' + mn,
+            phase: 'bracket',
+            round: r, matchNum: mn,
+            label: _seRoundLabel(r, totalRnd, cnt),
+            team1Id: t1Id, team2Id: t2Id,
+            team1Source: t1Src, team2Source: t2Src,
+            score1: s1, score2: s2,
+            winnerId: winnerId, status: status,
+            bo: bo
+          });
+        }
+      }
+
+      // Матч за 3-е место
+      if (opts.thirdPlace && totalRnd >= 2) {
+        matches.push({
+          id: 'third_place',
+          phase: 'third_place',
+          round: totalRnd, matchNum: 99,
+          label: 'Матч за 3-е место',
+          team1Id: null, team2Id: null,
+          team1Source: { matchId: 'r' + (totalRnd - 1) + 'm1', takes: 'loser' },
+          team2Source: { matchId: 'r' + (totalRnd - 1) + 'm2', takes: 'loser' },
+          score1: 0, score2: 0, winnerId: null, status: 'upcoming',
+          bo: bo
+        });
+      }
+
+      _autoResolveByes(matches);
+      return matches;
+    }
+
+    /* ─── Double Elimination ─── */
+    function _ubLabel(r, k) {
+      if (r === k)     return 'UB Финал';
+      if (r === k - 1) return 'UB Полуфинал';
+      return 'UB Раунд ' + r;
+    }
+    function _lbLabel(r, total) {
+      if (r === total) return 'LB Финал';
+      return 'LB Раунд ' + r;
+    }
+
+    function genDE(teams, opts) {
+      opts = opts || {};
+      var bo = opts.bo || 3;
+      var n = pow2(teams.length);
+      var k = log2(n);
+      var pairs = seedPairs(n);
+      var seedMap = {};
+      teams.forEach(function (t, i) { seedMap[i + 1] = t.id; });
+
+      var matches = [];
+
+      // ─── Upper Bracket ───
+      for (var r = 1; r <= k; r++) {
+        var cnt = n / Math.pow(2, r);
+        for (var m = 1; m <= cnt; m++) {
+          var id = 'ub_r' + r + '_m' + m;
+          var t1Id = null, t2Id = null;
+          var t1Src = null, t2Src = null;
+
+          if (r === 1) {
+            var pair = pairs[m - 1];
+            t1Id = seedMap[pair[0]] || null;
+            t2Id = seedMap[pair[1]] || null;
+          } else {
+            t1Src = { matchId: 'ub_r' + (r - 1) + '_m' + (m * 2 - 1), takes: 'winner' };
+            t2Src = { matchId: 'ub_r' + (r - 1) + '_m' + (m * 2), takes: 'winner' };
+          }
+
+          var winnerId = null, status = 'upcoming', s1 = 0, s2 = 0;
+          if (r === 1) {
+            if (t1Id && !t2Id)  { winnerId = t1Id; status = 'completed'; s1 = Math.ceil(bo / 2); }
+            else if (!t1Id && t2Id) { winnerId = t2Id; status = 'completed'; s2 = Math.ceil(bo / 2); }
+          }
+
+          matches.push({
+            id: id,
+            phase: 'upper',
+            round: r, matchNum: m,
+            label: _ubLabel(r, k),
+            team1Id: t1Id, team2Id: t2Id,
+            team1Source: t1Src, team2Source: t2Src,
+            score1: s1, score2: s2,
+            winnerId: winnerId, status: status,
+            bo: bo
+          });
+        }
+      }
+
+      // ─── Lower Bracket ───
+      var totalLBR = 2 * (k - 1);
+      for (var lr = 1; lr <= totalLBR; lr++) {
+        var jj = Math.ceil(lr / 2);
+        var lCnt = Math.pow(2, k - 1 - jj);
+        for (var lm = 1; lm <= lCnt; lm++) {
+          var lid = 'lb_r' + lr + '_m' + lm;
+          var lt1Src = null, lt2Src = null;
+
+          if (lr === 1) {
+            // UB R1 проигравшие: пары
+            lt1Src = { matchId: 'ub_r1_m' + (lm * 2 - 1), takes: 'loser' };
+            lt2Src = { matchId: 'ub_r1_m' + (lm * 2), takes: 'loser' };
+          } else if (lr % 2 === 1) {
+            // Pure: пары победителей предыдущего раунда LB
+            lt1Src = { matchId: 'lb_r' + (lr - 1) + '_m' + (lm * 2 - 1), takes: 'winner' };
+            lt2Src = { matchId: 'lb_r' + (lr - 1) + '_m' + (lm * 2), takes: 'winner' };
+          } else {
+            // Drop-in: победитель LB + проигравший UB того же номера
+            lt1Src = { matchId: 'lb_r' + (lr - 1) + '_m' + lm, takes: 'winner' };
+            lt2Src = { matchId: 'ub_r' + (lr / 2 + 1) + '_m' + lm, takes: 'loser' };
+          }
+
+          matches.push({
+            id: lid,
+            phase: 'lower',
+            round: lr, matchNum: lm,
+            label: _lbLabel(lr, totalLBR),
+            team1Id: null, team2Id: null,
+            team1Source: lt1Src, team2Source: lt2Src,
+            score1: 0, score2: 0, winnerId: null, status: 'upcoming',
+            bo: bo
+          });
+        }
+      }
+
+      // ─── Grand Final ───
+      matches.push({
+        id: 'grand_final',
+        phase: 'final',
+        round: 1, matchNum: 1,
+        label: 'Гранд Финал',
+        team1Id: null, team2Id: null,
+        team1Source: { matchId: 'ub_r' + k + '_m1', takes: 'winner' },
+        team2Source: { matchId: 'lb_r' + totalLBR + '_m1', takes: 'winner' },
+        score1: 0, score2: 0, winnerId: null, status: 'upcoming',
+        bo: bo
+      });
+
+      _autoResolveByes(matches);
+      return matches;
+    }
+
+    /* ─── Group Stage (round-robin внутри групп) ─── */
+    function genGroup(teams, opts) {
+      opts = opts || {};
+      var bo = opts.bo || 3;
+      var numGroups = teams.length <= 8 ? 2 : teams.length <= 16 ? 4 : 8;
+      var labels = 'ABCDEFGH';
+      var groups = {};
+      for (var i = 0; i < numGroups; i++) groups[labels[i]] = [];
+      teams.forEach(function (t, idx) { groups[labels[idx % numGroups]].push(t); });
+
+      var matches = [];
+      var mNum = 1;
+      Object.keys(groups).forEach(function (g) {
+        var gt = groups[g];
+        for (var a = 0; a < gt.length; a++) {
+          for (var b = a + 1; b < gt.length; b++) {
+            matches.push({
+              id: 'g_' + g + '_m' + mNum,
+              phase: 'group',
+              group: g,
+              round: 1, matchNum: mNum,
+              label: 'Группа ' + g,
+              team1Id: gt[a].id, team2Id: gt[b].id,
+              team1Source: null, team2Source: null,
+              score1: 0, score2: 0, winnerId: null, status: 'upcoming',
+              bo: bo
+            });
+            mNum++;
+          }
+        }
+      });
+
+      var groupConfig = {};
+      Object.keys(groups).forEach(function (g) {
+        groupConfig[g] = groups[g].map(function (t) { return t.id; });
+      });
+
+      return { matches: matches, groupConfig: groupConfig };
+    }
+
+    /* ─── Plаy-off из топ-2 групп (single-elim, кросс-пары) ─── */
+    function genGroupPlayoff(groupConfig, currentMatches, opts) {
+      opts = opts || {};
+      var bo = opts.bo || 3;
+      var groups = Object.keys(groupConfig).sort();
+
+      // Считаем стандинги для каждой группы
+      var standings = {};
+      groups.forEach(function (g) {
+        var gMatches = currentMatches.filter(function (m) { return m.group === g; });
+        standings[g] = computeStandings(gMatches, groupConfig[g]);
+      });
+
+      // Топ-2 каждой группы → seed list: A1, B1, ..., A2, B2, ...
+      // (cross-bracket гарантирует что 1-е места не встречаются раньше финала)
+      var qualifiers = [];
+      groups.forEach(function (g) {
+        if (standings[g][0]) qualifiers.push({ id: standings[g][0].teamId });
+      });
+      groups.forEach(function (g) {
+        if (standings[g][1]) qualifiers.push({ id: standings[g][1].teamId });
+      });
+
+      if (qualifiers.length < 2) return [];
+
+      // Используем тот же SE-генератор, но переименовываем ID чтобы не пересеклись с групповыми
+      var seMatches = genSE(qualifiers, { bo: bo });
+      seMatches.forEach(function (m) {
+        m.id = 'po_' + m.id;
+        m.phase = 'playoff';
+        if (m.team1Source) m.team1Source.matchId = 'po_' + m.team1Source.matchId;
+        if (m.team2Source) m.team2Source.matchId = 'po_' + m.team2Source.matchId;
+      });
+
+      return seMatches;
+    }
+
+    /* ─── Стандинги в группе ─── */
+    function computeStandings(groupMatches, teamIds) {
+      var stats = {};
+      (teamIds || []).forEach(function (id) {
+        stats[id] = { teamId: id, wins: 0, losses: 0, scoreFor: 0, scoreAgainst: 0 };
+      });
+      groupMatches.forEach(function (m) {
+        [m.team1Id, m.team2Id].forEach(function (id) {
+          if (id && !stats[id]) stats[id] = { teamId: id, wins: 0, losses: 0, scoreFor: 0, scoreAgainst: 0 };
+        });
+        if (m.winnerId && stats[m.winnerId]) {
+          stats[m.winnerId].wins++;
+          var loserId = m.winnerId === m.team1Id ? m.team2Id : m.team1Id;
+          if (loserId && stats[loserId]) stats[loserId].losses++;
+          if (stats[m.team1Id]) { stats[m.team1Id].scoreFor += (m.score1 || 0); stats[m.team1Id].scoreAgainst += (m.score2 || 0); }
+          if (stats[m.team2Id]) { stats[m.team2Id].scoreFor += (m.score2 || 0); stats[m.team2Id].scoreAgainst += (m.score1 || 0); }
+        }
+      });
+      return Object.keys(stats).map(function (k) { return stats[k]; }).sort(function (a, b) {
+        return (b.wins - a.wins) || (a.losses - b.losses)
+          || ((b.scoreFor - b.scoreAgainst) - (a.scoreFor - a.scoreAgainst));
+      });
+    }
+
+    /* ─── Автоматическое разрешение byes (рекурсивно тянет источники) ─── */
+    function _autoResolveByes(matches) {
+      var byId = {};
+      matches.forEach(function (m) { byId[m.id] = m; });
+      var changed = true;
+      var safety = 0;
+      while (changed && safety < 50) {
+        changed = false; safety++;
+        matches.forEach(function (m) {
+          if (m.winnerId) return;
+          if (!m.team1Id && m.team1Source) {
+            var src = byId[m.team1Source.matchId];
+            if (src && src.winnerId) {
+              m.team1Id = m.team1Source.takes === 'winner'
+                ? src.winnerId
+                : (src.team1Id === src.winnerId ? src.team2Id : src.team1Id);
+              changed = true;
+            }
+          }
+          if (!m.team2Id && m.team2Source) {
+            var src2 = byId[m.team2Source.matchId];
+            if (src2 && src2.winnerId) {
+              m.team2Id = m.team2Source.takes === 'winner'
+                ? src2.winnerId
+                : (src2.team1Id === src2.winnerId ? src2.team2Id : src2.team1Id);
+              changed = true;
+            }
+          }
+        });
+      }
+    }
+
+    /* ─── Какие матчи обновить когда completed получил winnerId ─── */
+    function propagateMatchResult(allMatches, completed) {
+      var winnerId = completed.winnerId;
+      var loserId = completed.team1Id === winnerId ? completed.team2Id : completed.team1Id;
+      var updates = {};
+      allMatches.forEach(function (d) {
+        if (d.team1Source && d.team1Source.matchId === completed.id) {
+          updates[d.id] = updates[d.id] || {};
+          updates[d.id].team1Id = d.team1Source.takes === 'winner' ? winnerId : loserId;
+        }
+        if (d.team2Source && d.team2Source.matchId === completed.id) {
+          updates[d.id] = updates[d.id] || {};
+          updates[d.id].team2Id = d.team2Source.takes === 'winner' ? winnerId : loserId;
+        }
+      });
+      return updates;
+    }
+
+    /* ─── Обнуление вниз по сетке (для undo) ─── */
+    function clearDownstream(allMatches, completedId) {
+      var updates = {};
+      allMatches.forEach(function (d) {
+        if (d.team1Source && d.team1Source.matchId === completedId) {
+          updates[d.id] = updates[d.id] || {};
+          updates[d.id].team1Id = null;
+        }
+        if (d.team2Source && d.team2Source.matchId === completedId) {
+          updates[d.id] = updates[d.id] || {};
+          updates[d.id].team2Id = null;
+        }
+      });
+      return updates;
+    }
+
+    return {
+      pow2: pow2, log2: log2, seedPairs: seedPairs,
+      genSE: genSE, genDE: genDE, genGroup: genGroup,
+      genGroupPlayoff: genGroupPlayoff,
+      computeStandings: computeStandings,
+      propagateMatchResult: propagateMatchResult,
+      clearDownstream: clearDownstream
+    };
+  })();
+
+  /* ══════════════════════════════════════════════════════════
+     OPEN / CLOSE
+  ══════════════════════════════════════════════════════════ */
   window.openCybersport = function () {
     if (window.openModal) window.openModal('cybersportMask');
-    _view = 'list'; _tab = 'active'; _tournaments = [];
+    S.view = 'list'; S.tab = 'active'; S.tournaments = [];
     _render();
     _loadList();
+  };
+
+  window.openCybersportTournament = function (id) {
+    if (window.openModal) window.openModal('cybersportMask');
+    S.view = 'tournament';
+    S.currentTId = id; S.currentT = null; S.teams = {}; S.matches = {};
+    S.bracketTab = 'bracket';
+    _render();
+    _loadTournament(id);
   };
 
   window.closeCybersport = function () {
     _unsubAll();
     if (window.closeModal) window.closeModal('cybersportMask');
+    // В публичном режиме «закрытие» = «уйти из публичного просмотра» → показываем auth-gate
+    if (_isPublicMode()) _exitPublicMode();
   };
 
   function _unsubAll() {
-    if (_unsubTeams)   { try { _unsubTeams();   } catch (e) {} _unsubTeams   = null; }
-    if (_unsubMatches) { try { _unsubMatches(); } catch (e) {} _unsubMatches = null; }
+    if (S.unsubT)       { try { S.unsubT();       } catch (e) {} S.unsubT = null; }
+    if (S.unsubTeams)   { try { S.unsubTeams();   } catch (e) {} S.unsubTeams = null; }
+    if (S.unsubMatches) { try { S.unsubMatches(); } catch (e) {} S.unsubMatches = null; }
   }
 
-  /* ── RENDER ROUTER ───────────────────────────────────────── */
+  /* ══════════════════════════════════════════════════════════
+     RENDER ROUTER
+  ══════════════════════════════════════════════════════════ */
   function _render() {
     var root = document.getElementById('csRoot');
     if (!root) return;
-    if      (_view === 'list')       root.innerHTML = _htmlList();
-    else if (_view === 'create')     root.innerHTML = _htmlCreate();
-    else if (_view === 'tournament') root.innerHTML = _htmlTournament();
+    if      (S.view === 'list')       root.innerHTML = _htmlList();
+    else if (S.view === 'create')     root.innerHTML = _htmlCreate();
+    else if (S.view === 'tournament') root.innerHTML = _htmlTournament();
+
+    // Постпроцесс: рисуем SVG-коннекторы для сеток
+    if (S.view === 'tournament' && S.bracketTab === 'bracket') {
+      _drawConnectors();
+    }
   }
   window._csRender = _render;
 
@@ -85,71 +600,85 @@
     var db = _db(); if (!db) return;
     db.collection('tournaments').orderBy('createdAt', 'desc').limit(60).get()
       .then(function (snap) {
-        _tournaments = [];
+        S.tournaments = [];
         snap.forEach(function (doc) {
-          _tournaments.push(Object.assign({ id: doc.id }, doc.data()));
+          S.tournaments.push(Object.assign({ id: doc.id }, doc.data()));
         });
-        _renderList();
+        if (S.view === 'list') _render();
       }).catch(function (e) { console.warn('CS loadList:', e); });
-  }
-
-  function _renderList() {
-    var root = document.getElementById('csRoot');
-    if (!root || _view !== 'list') return;
-    root.innerHTML = _htmlList();
   }
 
   function _htmlList() {
     var TAB_INFO = [
-      { key: 'active',    label: 'Активные'     },
-      { key: 'upcoming',  label: 'Предстоящие'  },
-      { key: 'completed', label: 'Завершённые'  }
+      { key: 'active',    label: 'Активные'    },
+      { key: 'upcoming',  label: 'Предстоящие' },
+      { key: 'completed', label: 'Завершённые' }
     ];
     var tabsHtml = TAB_INFO.map(function (ti) {
-      var cnt = _tournaments.filter(function (t) { return t.status === ti.key; }).length;
-      return '<button class="cs-tab' + (_tab === ti.key ? ' active' : '') +
-        '" onclick="window._csSetTab(\'' + ti.key + '\')">' + ti.label +
-        (cnt ? ' <span class="cs-tab-badge">' + cnt + '</span>' : '') + '</button>';
+      var cnt = S.tournaments.filter(function (t) { return t.status === ti.key; }).length;
+      return h('button', {
+        class: 'cs-tab' + (S.tab === ti.key ? ' active' : ''),
+        onclick: 'window._csSetTab(\'' + ti.key + '\')'
+      }, _e(ti.label) + (cnt ? ' ' + h('span', { class: 'cs-tab-badge' }, String(cnt)) : ''));
     }).join('');
 
-    var filtered = _tournaments.filter(function (t) { return t.status === _tab; });
+    var filtered = S.tournaments.filter(function (t) { return t.status === S.tab; });
     var listHtml;
-    if (!_tournaments.length) {
-      listHtml = '<div class="cs-empty"><div class="cs-empty-icon">🏆</div>Нет турниров. Создайте первый!</div>';
+    if (!S.tournaments.length) {
+      listHtml = h('div', { class: 'cs-empty' },
+        h('div', { class: 'cs-empty-icon' }, '🏆') + 'Нет турниров. Создайте первый!');
     } else if (!filtered.length) {
-      listHtml = '<div class="cs-empty"><div class="cs-empty-icon">📭</div>Нет турниров в этой категории</div>';
+      listHtml = h('div', { class: 'cs-empty' },
+        h('div', { class: 'cs-empty-icon' }, '📭') + 'Нет турниров в этой категории');
     } else {
       listHtml = filtered.map(_htmlTCard).join('');
     }
 
-    return '<div class="cs-list-view">' +
-      '<div class="cs-list-top"><span class="cs-list-title">🏆 Турниры</span>' +
-      '<button class="cs-btn-add" onclick="window._csShowCreate()">＋</button></div>' +
-      '<div class="cs-tabs">' + tabsHtml + '</div>' +
-      '<div class="cs-list-body">' + listHtml + '</div></div>';
+    var addBtn = _uid()
+      ? h('button', { class: 'cs-btn-add', onclick: 'window._csShowCreate()' }, '＋')
+      : '';
+
+    return h('div', { class: 'cs-list-view' },
+      h('div', { class: 'cs-list-top' },
+        h('span', { class: 'cs-list-title' }, '🏆 Турниры') + addBtn) +
+      h('div', { class: 'cs-tabs' }, tabsHtml) +
+      h('div', { class: 'cs-list-body' }, listHtml));
   }
 
   function _htmlTCard(t) {
-    var badge = {
-      active:    '<span class="cs-badge cs-badge-live">Идёт</span>',
-      upcoming:  '<span class="cs-badge cs-badge-up">Скоро</span>',
-      completed: '<span class="cs-badge cs-badge-done">Завершён</span>'
-    }[t.status] || '';
-    return '<div class="cs-card" onclick="window._csOpenTournament(\'' + t.id + '\')">' +
-      '<div class="cs-card-ico">' + (t.logoUrl ? '<img src="' + _ea(t.logoUrl) + '">' : '🏆') + '</div>' +
-      '<div class="cs-card-body">' +
-      '<div class="cs-card-name">' + _e(t.name) + ' ' + badge + '</div>' +
-      '<div class="cs-card-meta">' + (FORMAT_LABELS[t.format] || t.format) + ' · ' + (t.teamCount || '?') + ' команд' +
-      (t.prizePool ? ' · 🏅 ' + _e(t.prizePool) : '') + '</div>' +
-      '</div><div class="cs-card-arr">›</div></div>';
+    var badge = ({
+      active:    h('span', { class: 'cs-badge cs-badge-live' }, 'Идёт'),
+      upcoming:  h('span', { class: 'cs-badge cs-badge-up' }, 'Скоро'),
+      completed: h('span', { class: 'cs-badge cs-badge-done' }, 'Завершён')
+    })[t.status] || '';
+    var icoHtml = t.logoUrl
+      ? h('img', { src: t.logoUrl }, '')
+      : '🏆';
+    return h('div', { class: 'cs-card', onclick: 'window._csOpenTournament(\'' + _e(t.id) + '\')' },
+      h('div', { class: 'cs-card-ico' }, icoHtml) +
+      h('div', { class: 'cs-card-body' },
+        h('div', { class: 'cs-card-name' }, _e(t.name) + ' ' + badge) +
+        h('div', { class: 'cs-card-meta' },
+          (FORMAT_LABELS[t.format] || _e(t.format)) +
+          ' · ' + (t.teamCount || '?') + ' команд' +
+          (t.prizePool ? ' · 🏅 ' + _e(t.prizePool) : ''))) +
+      h('div', { class: 'cs-card-arr' }, '›'));
   }
 
-  window._csSetTab = function (tab) { _tab = tab; _renderList(); };
-  window._csShowCreate = function () { _view = 'create'; _step = 1; _draftData = {}; _render(); };
+  window._csSetTab        = function (tab) { S.tab = tab; _render(); };
+  window._csShowCreate    = function () { S.view = 'create'; S.step = 1; S.draftData = {}; _render(); };
   window._csOpenTournament = function (id) {
-    _unsubAll(); _view = 'tournament'; _currentTId = id;
-    _currentT = null; _teams = {}; _matches = {}; _bracketTab = 'bracket';
-    _render(); _loadTournament(id);
+    _unsubAll();
+    S.view = 'tournament'; S.currentTId = id;
+    S.currentT = null; S.teams = {}; S.matches = {}; S.bracketTab = 'bracket';
+    _render();
+    _loadTournament(id);
+  };
+  window._csBackToList = function () {
+    _unsubAll();
+    S.view = 'list'; S.currentTId = null; S.currentT = null;
+    S.teams = {}; S.matches = {};
+    _render(); _loadList();
   };
 
   /* ══════════════════════════════════════════════════════════
@@ -158,146 +687,160 @@
   function _htmlCreate() {
     var stepsHtml = ['Настройки', 'Команды', 'Запуск'].map(function (s, i) {
       var n = i + 1;
-      var cls = 'cs-wiz-step' + (_step === n ? ' active' : (_step > n ? ' done' : ''));
-      return '<div class="' + cls + '"><div class="cs-wiz-num">' + n +
-        '</div><div class="cs-wiz-lbl">' + s + '</div></div>' +
-        (i < 2 ? '<div class="cs-wiz-line' + (_step > n ? ' done' : '') + '"></div>' : '');
+      var cls = 'cs-wiz-step' + (S.step === n ? ' active' : (S.step > n ? ' done' : ''));
+      return h('div', { class: cls },
+        h('div', { class: 'cs-wiz-num' }, String(n)) +
+        h('div', { class: 'cs-wiz-lbl' }, _e(s))) +
+        (i < 2 ? h('div', { class: 'cs-wiz-line' + (S.step > n ? ' done' : '') }, '') : '');
     }).join('');
 
-    var body = _step === 1 ? _htmlStep1() : _step === 2 ? _htmlStep2() : _htmlStep3();
-    return '<div class="cs-create-view">' +
-      '<div class="cs-wiz-steps">' + stepsHtml + '</div>' +
-      '<div class="cs-create-body">' + body + '</div></div>';
+    var body = S.step === 1 ? _htmlStep1() : S.step === 2 ? _htmlStep2() : _htmlStep3();
+    return h('div', { class: 'cs-create-view' },
+      h('div', { class: 'cs-wiz-steps' }, stepsHtml) +
+      h('div', { class: 'cs-create-body' }, body));
   }
 
   function _htmlStep1() {
     var fmtHtml = Object.keys(FORMAT_LABELS).map(function (k) {
-      var sel = _draftData.format === k;
-      return '<div class="cs-fmt-opt' + (sel ? ' sel' : '') + '" data-fmt="' + k + '" onclick="window._csSelectFmt(\'' + k + '\')">' +
-        '<span class="cs-fmt-name">' + FORMAT_LABELS[k] + '</span></div>';
+      var sel = S.draftData.format === k;
+      return h('div', {
+        class: 'cs-fmt-opt' + (sel ? ' sel' : ''),
+        'data-fmt': k,
+        onclick: 'window._csSelectFmt(\'' + k + '\')'
+      }, h('span', { class: 'cs-fmt-name' }, _e(FORMAT_LABELS[k])));
     }).join('');
 
-    var cntHtml = [8, 12, 16, 24, 32].map(function (n) {
-      return '<button class="cs-cnt-btn' + (_draftData.teamCount === n ? ' sel' : '') +
-        '" data-n="' + n + '" onclick="window._csSetCount(' + n + ')">' + n + '</button>';
+    var cntHtml = [4, 8, 12, 16, 24, 32].map(function (n) {
+      return h('button', {
+        class: 'cs-cnt-btn' + (S.draftData.teamCount === n ? ' sel' : ''),
+        'data-n': String(n),
+        onclick: 'window._csSetCount(' + n + ')'
+      }, String(n));
     }).join('');
 
     var boHtml = [1, 3, 5].map(function (n) {
-      return '<button class="cs-bo-btn' + ((_draftData.bo || 3) === n ? ' sel' : '') +
-        '" data-bo="' + n + '" onclick="window._csSetBo(' + n + ')">BO' + n + '</button>';
+      return h('button', {
+        class: 'cs-bo-btn' + ((S.draftData.bo || 3) === n ? ' sel' : ''),
+        'data-bo': String(n),
+        onclick: 'window._csSetBo(' + n + ')'
+      }, 'BO' + n);
     }).join('');
 
-    return '<div class="cs-step-body">' +
-      _field('Название турнира', '<input class="cs-input" id="csTName" placeholder="HFX Invitational 2026" value="' + _e(_draftData.name || '') + '">') +
-      _field('Формат', '<div class="cs-fmts" id="csFmts">' + fmtHtml + '</div>') +
-      _field('Количество команд', '<div class="cs-cnt-row">' + cntHtml + '</div>') +
-      _field('Плей-офф формат', '<div class="cs-bo-row">' + boHtml + '</div>') +
-      _field('Призовой фонд (опционально)', '<input class="cs-input" id="csPrize" placeholder="10 000 руб" value="' + _e(_draftData.prizePool || '') + '">') +
-      '<div class="cs-step-actions">' +
-      '<button class="cs-btn cs-btn-sec" onclick="window._csBackToList()">Отмена</button>' +
-      '<button class="cs-btn cs-btn-pri" onclick="window._csStep1Next()">Далее →</button>' +
-      '</div></div>';
+    var thirdChecked = S.draftData.thirdPlace ? 'checked' : '';
+    var publicChecked = S.draftData.isPublic !== false ? 'checked' : '';
+
+    return h('div', { class: 'cs-step-body' },
+      _field('Название турнира',
+        h('input', { class: 'cs-input', id: 'csTName', placeholder: 'HFX Invitational 2026', value: S.draftData.name || '' }, '')) +
+      _field('Формат',  h('div', { class: 'cs-fmts',  id: 'csFmts' }, fmtHtml)) +
+      _field('Количество команд', h('div', { class: 'cs-cnt-row' }, cntHtml)) +
+      _field('Плей-офф формат',   h('div', { class: 'cs-bo-row' }, boHtml)) +
+      _field('Призовой фонд (опционально)',
+        h('input', { class: 'cs-input', id: 'csPrize', placeholder: '10 000 руб', value: S.draftData.prizePool || '' }, '')) +
+      h('label', { class: 'cs-checkrow' },
+        '<input type="checkbox" id="csThirdPlace" ' + thirdChecked + '>' +
+        '<span>Матч за 3-е место (только для Single Elimination)</span>') +
+      h('label', { class: 'cs-checkrow' },
+        '<input type="checkbox" id="csIsPublic" ' + publicChecked + '>' +
+        '<span>Публичный — доступен по прямой ссылке без авторизации</span>') +
+      h('div', { class: 'cs-step-actions' },
+        h('button', { class: 'cs-btn cs-btn-sec', onclick: 'window._csBackToList()' }, 'Отмена') +
+        h('button', { class: 'cs-btn cs-btn-pri', onclick: 'window._csStep1Next()' }, 'Далее →')));
   }
 
   function _htmlStep2() {
-    var teams  = _draftData.teams || [];
-    var maxT   = _draftData.teamCount || 8;
+    var teams  = S.draftData.teams || [];
+    var maxT   = S.draftData.teamCount || 8;
     var canAdd = teams.length < maxT;
 
     var listHtml = teams.length
       ? teams.map(function (t, i) {
-          return '<div class="cs-wiz-team-row">' +
-            (t.logoUrl ? '<img class="cs-wiz-logo" src="' + _ea(t.logoUrl) + '">' :
-              '<div class="cs-wiz-logo-ph">' + (t.name ? t.name[0].toUpperCase() : '?') + '</div>') +
-            '<span class="cs-wiz-tname">' + _e(t.name) + '</span>' +
-            '<span class="cs-seed-badge">#' + (i + 1) + '</span>' +
-            '<button class="cs-btn-ico" onclick="window._csWizEditTeam(' + i + ')">✏</button>' +
-            '<button class="cs-btn-ico cs-btn-del" onclick="window._csWizDelTeam(' + i + ')">✕</button>' +
-            '</div>';
+          var logo = t.logoUrl
+            ? h('img', { class: 'cs-wiz-logo', src: t.logoUrl }, '')
+            : h('div', { class: 'cs-wiz-logo-ph' }, _e(t.name ? t.name[0].toUpperCase() : '?'));
+          return h('div', { class: 'cs-wiz-team-row' },
+            logo +
+            h('span', { class: 'cs-wiz-tname' }, _e(t.name)) +
+            h('span', { class: 'cs-seed-badge' }, '#' + (i + 1)) +
+            h('button', { class: 'cs-btn-ico', onclick: 'window._csWizEditTeam(' + i + ')' }, '✏') +
+            h('button', { class: 'cs-btn-ico cs-btn-del', onclick: 'window._csWizDelTeam(' + i + ')' }, '✕'));
         }).join('')
-      : '<div class="cs-empty-sm">Добавьте команды</div>';
+      : h('div', { class: 'cs-empty-sm' }, 'Добавьте команды');
 
-    return '<div class="cs-step-body">' +
-      '<div class="cs-step2-hdr">' +
-      '<span class="cs-teams-cnt">' + teams.length + ' / ' + maxT + ' команд</span>' +
-      (canAdd ? '<button class="cs-btn cs-btn-sm cs-btn-pri" onclick="window._csWizAddTeam()">+ Команда</button>' : '') +
-      '</div>' +
-      '<div class="cs-wiz-teams-list">' + listHtml + '</div>' +
-      '<div id="csWizTeamForm"></div>' +
-      '<div class="cs-step-actions">' +
-      '<button class="cs-btn cs-btn-sec" onclick="window._csStep(1)">← Назад</button>' +
-      '<button class="cs-btn cs-btn-pri" onclick="window._csStep2Next()">Далее →</button>' +
-      '</div></div>';
+    return h('div', { class: 'cs-step-body' },
+      h('div', { class: 'cs-step2-hdr' },
+        h('span', { class: 'cs-teams-cnt' }, teams.length + ' / ' + maxT + ' команд') +
+        (canAdd ? h('button', { class: 'cs-btn cs-btn-sm cs-btn-pri', onclick: 'window._csWizAddTeam()' }, '+ Команда') : '')) +
+      h('div', { class: 'cs-wiz-teams-list' }, listHtml) +
+      h('div', { id: 'csWizTeamForm' }, '') +
+      h('div', { class: 'cs-step-actions' },
+        h('button', { class: 'cs-btn cs-btn-sec', onclick: 'window._csStep(1)' }, '← Назад') +
+        h('button', { class: 'cs-btn cs-btn-pri', onclick: 'window._csStep2Next()' }, 'Далее →')));
   }
 
   function _htmlStep3() {
-    var teams = _draftData.teams || [];
-    return '<div class="cs-step-body">' +
-      '<div class="cs-summary">' +
-      _sumRow('Название',       _e(_draftData.name)) +
-      _sumRow('Формат',         FORMAT_LABELS[_draftData.format] || '—') +
-      _sumRow('Команд',         teams.length + ' / ' + _draftData.teamCount) +
-      _sumRow('Плей-офф',       'BO' + (_draftData.bo || 3)) +
-      (_draftData.prizePool ? _sumRow('Призовой фонд', _e(_draftData.prizePool)) : '') +
-      '</div>' +
-      '<div class="cs-step3-note">После создания можно продолжать добавлять команды и редактировать их.</div>' +
-      '<div class="cs-step-actions">' +
-      '<button class="cs-btn cs-btn-sec" onclick="window._csStep(2)">← Назад</button>' +
-      '<button class="cs-btn cs-btn-pri" id="csCreateBtn" onclick="window._csCreate()">Создать турнир 🚀</button>' +
-      '</div></div>';
+    var teams = S.draftData.teams || [];
+    function _sumRow(label, val) {
+      return h('div', { class: 'cs-sum-row' },
+        h('span', null, _e(label)) + h('strong', null, val));
+    }
+    return h('div', { class: 'cs-step-body' },
+      h('div', { class: 'cs-summary' },
+        _sumRow('Название', _e(S.draftData.name)) +
+        _sumRow('Формат',   _e(FORMAT_LABELS[S.draftData.format] || '—')) +
+        _sumRow('Команд',   teams.length + ' / ' + S.draftData.teamCount) +
+        _sumRow('Плей-офф', 'BO' + (S.draftData.bo || 3)) +
+        (S.draftData.thirdPlace ? _sumRow('Матч за 3-е место', 'Да') : '') +
+        _sumRow('Видимость', S.draftData.isPublic !== false ? '🌐 Публичный' : '🔒 Только по доступу') +
+        (S.draftData.prizePool ? _sumRow('Призовой фонд', _e(S.draftData.prizePool)) : '')) +
+      h('div', { class: 'cs-step3-note' }, 'После создания можно продолжать добавлять команды и редактировать их.') +
+      h('div', { class: 'cs-step-actions' },
+        h('button', { class: 'cs-btn cs-btn-sec', onclick: 'window._csStep(2)' }, '← Назад') +
+        h('button', { class: 'cs-btn cs-btn-pri', id: 'csCreateBtn', onclick: 'window._csCreate()' }, 'Создать турнир 🚀')));
   }
 
-  function _sumRow(label, val) {
-    return '<div class="cs-sum-row"><span>' + label + '</span><strong>' + val + '</strong></div>';
-  }
+  window._csStep = function (n) { S.step = n; _render(); };
 
-  window._csStep       = function (n) { _step = n; _render(); };
-
-  /* Выбор формата — только обновляем классы, без ре-рендера */
-  window._csSelectFmt  = function (k) {
-    _draftData.format = k;
-    document.querySelectorAll('.cs-fmt-opt').forEach(function (el) {
+  window._csSelectFmt = function (k) {
+    S.draftData.format = k;
+    _qa('.cs-fmt-opt').forEach(function (el) {
       el.classList.toggle('sel', el.dataset.fmt === k);
     });
   };
-
-  /* Кол-во команд — обновляем кнопки без ре-рендера */
-  window._csSetCount   = function (n) {
-    _draftData.teamCount = n;
-    document.querySelectorAll('.cs-cnt-btn').forEach(function (btn) {
+  window._csSetCount = function (n) {
+    S.draftData.teamCount = n;
+    _qa('.cs-cnt-btn').forEach(function (btn) {
       btn.classList.toggle('sel', parseInt(btn.dataset.n, 10) === n);
     });
   };
-
-  /* BO — обновляем кнопки без ре-рендера */
-  window._csSetBo      = function (n) {
-    _draftData.bo = n;
-    document.querySelectorAll('.cs-bo-btn').forEach(function (btn) {
+  window._csSetBo = function (n) {
+    S.draftData.bo = n;
+    _qa('.cs-bo-btn').forEach(function (btn) {
       btn.classList.toggle('sel', parseInt(btn.dataset.bo, 10) === n);
     });
   };
 
-  window._csBackToList = function () { _unsubAll(); _view = 'list'; _currentTId = null; _currentT = null; _render(); _loadList(); };
-
   window._csStep1Next = function () {
     var name = (_q('#csTName') || {}).value || '';
-    _draftData.name      = name.trim();
-    _draftData.prizePool = ((_q('#csPrize') || {}).value || '').trim();
-    // format и teamCount уже сохранены в _draftData через _csSelectFmt/_csSetCount
-    if (!_draftData.name)      { alert('Введите название турнира'); return; }
-    if (!_draftData.format)    { alert('Выберите формат'); return; }
-    if (!_draftData.teamCount) { alert('Выберите количество команд'); return; }
-    _step = 2; _render();
+    S.draftData.name      = name.trim();
+    S.draftData.prizePool = ((_q('#csPrize') || {}).value || '').trim();
+    S.draftData.thirdPlace = !!(_q('#csThirdPlace') && _q('#csThirdPlace').checked);
+    S.draftData.isPublic   = !!(_q('#csIsPublic') && _q('#csIsPublic').checked);
+
+    if (!S.draftData.name)      { alert('Введите название турнира'); return; }
+    if (!S.draftData.format)    { alert('Выберите формат'); return; }
+    if (!S.draftData.teamCount) { alert('Выберите количество команд'); return; }
+    S.step = 2; _render();
   };
 
   window._csStep2Next = function () {
-    if (!(_draftData.teams || []).length || _draftData.teams.length < 2) {
+    if (!(S.draftData.teams || []).length || S.draftData.teams.length < 2) {
       alert('Добавьте хотя бы 2 команды'); return;
     }
-    _step = 3; _render();
+    S.step = 3; _render();
   };
 
-  /* ── Wizard team form ── */
+  /* ─── Wizard team form ─── */
   function _renderWizTeamForm(team) {
     var wrap = _q('#csWizTeamForm'); if (!wrap) return;
     var t = team || { name: '', logoUrl: '' };
@@ -306,41 +849,55 @@
 
     var playersHtml = players.map(function (p, i) {
       var lbl = ROLES[p.role] || p.role;
-      return '<div class="cs-pl-row">' +
-        '<span class="cs-rl-ico">' + lbl.split(' ')[0] + '</span>' +
-        '<span class="cs-rl-lbl">' + lbl.split(' ').slice(1).join(' ') + '</span>' +
-        '<input class="cs-input cs-pl-inp" data-pi="' + i + '" placeholder="Ник" value="' + _e(p.nick || '') + '">' +
-        '</div>';
+      return h('div', { class: 'cs-pl-row' },
+        h('span', { class: 'cs-rl-ico' }, lbl.split(' ')[0]) +
+        h('span', { class: 'cs-rl-lbl' }, lbl.split(' ').slice(1).join(' ')) +
+        h('input', {
+          class: 'cs-input cs-pl-inp',
+          'data-pi': String(i),
+          placeholder: 'Ник',
+          value: p.nick || ''
+        }, ''));
     }).join('');
 
-    wrap.innerHTML = '<div class="cs-team-form">' +
-      '<div class="cs-tf-hdr"><strong>' + (_editingTeamIdx !== null ? 'Редактировать' : 'Новая') + ' команда</strong>' +
-      '<button class="cs-btn-ico" onclick="window._csCancelWizForm()">✕</button></div>' +
-      _field('Название', '<input class="cs-input" id="csTfName" value="' + _e(t.name || '') + '" placeholder="Team Name">') +
-      _field('Лого (URL)', '<input class="cs-input" id="csTfLogo" value="' + _e(t.logoUrl || '') + '" placeholder="https://...">') +
-      _field('Состав', '<div class="cs-players-wrap">' + playersHtml + '</div>') +
-      '<button class="cs-btn cs-btn-pri" style="width:100%;margin-top:8px" onclick="window._csSaveWizTeam()">Сохранить</button>' +
-      '</div>';
+    wrap.innerHTML = h('div', { class: 'cs-team-form' },
+      h('div', { class: 'cs-tf-hdr' },
+        h('strong', null, S.editingTeamIdx !== null ? 'Редактировать команду' : 'Новая команда') +
+        h('button', { class: 'cs-btn-ico', onclick: 'window._csCancelWizForm()' }, '✕')) +
+      _field('Название',
+        h('input', { class: 'cs-input', id: 'csTfName', value: t.name || '', placeholder: 'Team Name' }, '')) +
+      _field('Лого (URL)',
+        h('input', { class: 'cs-input', id: 'csTfLogo', value: t.logoUrl || '', placeholder: 'https://...' }, '')) +
+      _field('Состав', h('div', { class: 'cs-players-wrap' }, playersHtml)) +
+      h('button', { class: 'cs-btn cs-btn-pri', style: { width: '100%', 'margin-top': '8px' }, onclick: 'window._csSaveWizTeam()' }, 'Сохранить'));
   }
 
-  window._csWizAddTeam  = function () { _editingTeamIdx = null; _renderWizTeamForm(null); };
-  window._csWizEditTeam = function (i) { _editingTeamIdx = i; _renderWizTeamForm((_draftData.teams || [])[i]); };
-  window._csWizDelTeam  = function (i) { if (_draftData.teams) _draftData.teams.splice(i, 1); _render(); };
+  window._csWizAddTeam   = function () { S.editingTeamIdx = null; _renderWizTeamForm(null); };
+  window._csWizEditTeam  = function (i) { S.editingTeamIdx = i; _renderWizTeamForm((S.draftData.teams || [])[i]); };
+  window._csWizDelTeam   = function (i) { if (S.draftData.teams) S.draftData.teams.splice(i, 1); _render(); };
   window._csCancelWizForm = function () { var w = _q('#csWizTeamForm'); if (w) w.innerHTML = ''; };
 
   window._csSaveWizTeam = function () {
     var name = (_q('#csTfName') || {}).value || '';
     if (!name.trim()) { alert('Введите название команды'); return; }
-    var logo    = (_q('#csTfLogo') || {}).value || '';
+    var logo = (_q('#csTfLogo') || {}).value || '';
     var players = _collectPlayers();
     var team = { name: name.trim(), logoUrl: logo.trim(), players: players };
-    if (!_draftData.teams) _draftData.teams = [];
-    if (_editingTeamIdx !== null) _draftData.teams[_editingTeamIdx] = team;
-    else _draftData.teams.push(team);
+    if (!S.draftData.teams) S.draftData.teams = [];
+    if (S.editingTeamIdx !== null) S.draftData.teams[S.editingTeamIdx] = team;
+    else S.draftData.teams.push(team);
     _render();
   };
 
-  /* ── Create tournament in Firestore ── */
+  function _collectPlayers() {
+    var players = [];
+    _qa('[data-pi]').forEach(function (inp, i) {
+      players.push({ nick: inp.value.trim(), role: ROLE_KEYS[i] || 'top' });
+    });
+    return players;
+  }
+
+  /* ─── Создание в Firestore ─── */
   window._csCreate = function () {
     var db  = _db(); if (!db) return;
     var uid = _uid(); if (!uid) { alert('Войдите для создания турнира'); return; }
@@ -348,23 +905,30 @@
     if (btn) { btn.disabled = true; btn.textContent = 'Создание...'; }
 
     var data = {
-      name: _draftData.name, format: _draftData.format,
-      teamCount: _draftData.teamCount, bo: _draftData.bo || 3,
-      prizePool: _draftData.prizePool || '', createdBy: uid,
-      createdAt: _ts(), status: 'upcoming'
+      name:        S.draftData.name,
+      format:      S.draftData.format,
+      teamCount:   S.draftData.teamCount,
+      bo:          S.draftData.bo || 3,
+      prizePool:   S.draftData.prizePool || '',
+      thirdPlace:  !!S.draftData.thirdPlace,
+      isPublic:    S.draftData.isPublic !== false,
+      shareToken:  _randomToken(),
+      createdBy:   uid,
+      createdAt:   _ts(),
+      status:      'upcoming'
     };
 
     db.collection('tournaments').add(data).then(function (ref) {
       var id = ref.id;
       var batch = db.batch();
-      (_draftData.teams || []).forEach(function (t, i) {
+      (S.draftData.teams || []).forEach(function (t, i) {
         var tRef = db.collection('tournaments').doc(id).collection('teams').doc();
         batch.set(tRef, Object.assign({}, t, { seed: i + 1, createdAt: _ts() }));
       });
       return batch.commit().then(function () { return id; });
     }).then(function (id) {
-      _view = 'tournament'; _currentTId = id; _currentT = null;
-      _teams = {}; _matches = {}; _bracketTab = 'teams';
+      S.view = 'tournament'; S.currentTId = id; S.currentT = null;
+      S.teams = {}; S.matches = {}; S.bracketTab = 'teams';
       _render(); _loadTournament(id);
     }).catch(function (e) {
       console.error('CS create:', e);
@@ -380,110 +944,137 @@
     var db = _db(); if (!db) return;
     _unsubAll();
 
-    db.collection('tournaments').doc(id).get().then(function (doc) {
-      if (!doc.exists) { alert('Турнир не найден'); window._csBackToList(); return; }
-      _currentT = Object.assign({ id: doc.id }, doc.data()); _render();
+    S.unsubT = db.collection('tournaments').doc(id).onSnapshot(function (doc) {
+      if (!doc.exists) {
+        alert('Турнир не найден или удалён');
+        window._csBackToList();
+        return;
+      }
+      S.currentT = Object.assign({ id: doc.id }, doc.data());
+      _render();
+    }, function (e) {
+      console.warn('CS tourn:', e);
+      var root = document.getElementById('csRoot');
+      if (root) root.innerHTML = h('div', { class: 'cs-empty' },
+        h('div', { class: 'cs-empty-icon' }, '🔒') +
+        'Нет доступа к этому турниру или его не существует.');
     });
 
-    _unsubTeams = db.collection('tournaments').doc(id).collection('teams')
+    S.unsubTeams = db.collection('tournaments').doc(id).collection('teams')
       .orderBy('seed').onSnapshot(function (snap) {
-        _teams = {};
-        snap.forEach(function (d) { _teams[d.id] = Object.assign({ id: d.id }, d.data()); });
+        S.teams = {};
+        snap.forEach(function (d) { S.teams[d.id] = Object.assign({ id: d.id }, d.data()); });
         _render();
       }, function (e) { console.warn('CS teams:', e); });
 
-    _unsubMatches = db.collection('tournaments').doc(id).collection('matches')
+    S.unsubMatches = db.collection('tournaments').doc(id).collection('matches')
       .onSnapshot(function (snap) {
-        _matches = {};
-        snap.forEach(function (d) { _matches[d.id] = Object.assign({ id: d.id }, d.data()); });
+        S.matches = {};
+        snap.forEach(function (d) { S.matches[d.id] = Object.assign({ id: d.id }, d.data()); });
         _render();
       }, function (e) { console.warn('CS matches:', e); });
   }
 
   function _htmlTournament() {
-    var t         = _currentT;
-    var loading   = !t;
-    var isCreator = t && _uid() && t.createdBy === _uid();
-    var name      = loading ? 'Загрузка...' : t.name;
+    var t = S.currentT;
+    var loading = !t;
+    var name = loading ? 'Загрузка...' : t.name;
 
     var tabsHtml = [['bracket','🏆 Сетка'],['teams','👥 Команды'],['schedule','📅 Расписание']].map(function (tb) {
-      return '<button class="cs-tab' + (_bracketTab === tb[0] ? ' active' : '') +
-        '" onclick="window._csBrTab(\'' + tb[0] + '\')">' + tb[1] + '</button>';
+      return h('button', {
+        class: 'cs-tab' + (S.bracketTab === tb[0] ? ' active' : ''),
+        onclick: 'window._csBrTab(\'' + tb[0] + '\')'
+      }, tb[1]);
     }).join('');
 
-    var startBtn = (isCreator && t && t.status === 'upcoming' && !Object.keys(_matches).length)
-      ? '<button class="cs-btn cs-btn-sm cs-btn-pri" onclick="window._csStart()">▶ Старт</button>' : '';
-    var editBtn = isCreator
-      ? '<button class="cs-btn cs-btn-sm cs-btn-sec" onclick="window._csTEditSettings()">✏</button>' : '';
+    var canEdit = _canEdit();
+    var hasMatches = Object.keys(S.matches).length > 0;
+    var startBtn = (canEdit && t && t.status === 'upcoming' && !hasMatches)
+      ? h('button', { class: 'cs-btn cs-btn-sm cs-btn-pri', onclick: 'window._csStart()' }, '▶ Старт')
+      : '';
+    var shareBtn = t
+      ? h('button', { class: 'cs-btn cs-btn-sm cs-btn-sec', onclick: 'window._csShare()' }, '🔗')
+      : '';
+    var editBtn = canEdit
+      ? h('button', { class: 'cs-btn cs-btn-sm cs-btn-sec', onclick: 'window._csTEditSettings()' }, '✏')
+      : '';
 
-    var status = t ? ({active:'Идёт',upcoming:'Скоро',completed:'Завершён'}[t.status] || '') : '';
-    var statusBadge = t ? (' <span class="cs-badge cs-badge-' + t.status + '">' + status + '</span>') : '';
+    var statusLabel = t ? ({active:'Идёт',upcoming:'Скоро',completed:'Завершён'}[t.status] || '') : '';
+    var statusBadge = t ? ' ' + h('span', { class: 'cs-badge cs-badge-' + t.status }, _e(statusLabel)) : '';
+
+    var publicBadge = (t && t.isPublic) ? ' ' + h('span', { class: 'cs-badge cs-badge-public', title: 'Открыт по ссылке' }, '🌐') : '';
 
     var body = '';
     if (!loading) {
-      if (_bracketTab === 'bracket')  body = _htmlBracket();
-      if (_bracketTab === 'teams')    body = _htmlTeamsTab();
-      if (_bracketTab === 'schedule') body = _htmlSchedule();
+      if (S.bracketTab === 'bracket')  body = _htmlBracket();
+      if (S.bracketTab === 'teams')    body = _htmlTeamsTab();
+      if (S.bracketTab === 'schedule') body = _htmlSchedule();
     } else {
-      body = '<div class="cs-loading">Загрузка...</div>';
+      body = h('div', { class: 'cs-loading' }, 'Загрузка...');
     }
 
-    return '<div class="cs-tourn-view">' +
-      '<div class="cs-tourn-hdr">' +
-      '<button class="cs-btn-ico cs-back" onclick="window._csBackToList()">←</button>' +
-      '<span class="cs-tourn-name">' + _e(name) + statusBadge + '</span>' +
-      '<div class="cs-tourn-acts">' + startBtn + editBtn + '</div>' +
-      '</div>' +
-      (t ? '<div class="cs-tourn-meta">' +
-        (FORMAT_LABELS[t.format] || t.format) + ' · ' + (t.teamCount || '?') + ' команд · BO' + (t.bo || 3) +
-        (t.prizePool ? ' · 🏅 ' + _e(t.prizePool) : '') + '</div>' : '') +
-      '<div class="cs-tabs">' + tabsHtml + '</div>' +
-      '<div class="cs-tourn-body">' + body + '</div>' +
-      '</div>';
+    return h('div', { class: 'cs-tourn-view' },
+      h('div', { class: 'cs-tourn-hdr' },
+        h('button', { class: 'cs-btn-ico cs-back', onclick: 'window._csBackToList()' }, '←') +
+        h('span', { class: 'cs-tourn-name' }, _e(name) + statusBadge + publicBadge) +
+        h('div', { class: 'cs-tourn-acts' }, startBtn + shareBtn + editBtn)) +
+      (t ? h('div', { class: 'cs-tourn-meta' },
+        _e(FORMAT_LABELS[t.format] || t.format) +
+        ' · ' + (t.teamCount || '?') + ' команд · BO' + (t.bo || 3) +
+        (t.prizePool ? ' · 🏅 ' + _e(t.prizePool) : '')) : '') +
+      h('div', { class: 'cs-tabs' }, tabsHtml) +
+      h('div', { class: 'cs-tourn-body' }, body));
   }
 
-  window._csBrTab = function (tab) { _bracketTab = tab; _render(); };
+  window._csBrTab = function (tab) { S.bracketTab = tab; _render(); };
 
   /* ══════════════════════════════════════════════════════════
      TEAMS TAB
   ══════════════════════════════════════════════════════════ */
   function _htmlTeamsTab() {
-    var t         = _currentT;
-    var isCreator = t && _uid() && t.createdBy === _uid();
-    var teamArr   = _teamsSorted();
-    var maxT      = t ? (t.teamCount || 32) : 32;
+    var t       = S.currentT;
+    var canEdit = _canEdit();
+    var teamArr = _teamsSorted();
+    var maxT    = t ? (t.teamCount || 32) : 32;
 
-    var addBtn = (isCreator && teamArr.length < maxT)
-      ? '<button class="cs-btn cs-btn-pri" style="margin:12px 16px 4px" onclick="window._csShowAddTeam()">+ Добавить команду</button>' : '';
+    var addBtn = (canEdit && teamArr.length < maxT)
+      ? h('button', {
+          class: 'cs-btn cs-btn-pri',
+          style: { margin: '12px 16px 4px' },
+          onclick: 'window._csShowAddTeam()'
+        }, '+ Добавить команду')
+      : '';
 
     var html = teamArr.length
-      ? teamArr.map(function (team) { return _htmlTeamCardFull(team, isCreator); }).join('')
-      : '<div class="cs-empty">Нет команд</div>';
+      ? teamArr.map(function (team) { return _htmlTeamCardFull(team, canEdit); }).join('')
+      : h('div', { class: 'cs-empty' }, 'Нет команд');
 
-    return '<div class="cs-teams-view">' + addBtn +
-      '<div id="csAddTeamWrap"></div>' + html + '</div>';
+    return h('div', { class: 'cs-teams-view' },
+      addBtn + h('div', { id: 'csAddTeamWrap' }, '') + html);
   }
 
-  function _htmlTeamCardFull(team, isCreator) {
+  function _htmlTeamCardFull(team, canEdit) {
     var players = (team.players || []).filter(function (p) { return p.nick; }).map(function (p) {
       var lbl = ROLES[p.role] || p.role;
-      return '<div class="cs-pl-card-row">' +
-        '<span class="cs-rl-ico">' + lbl.split(' ')[0] + '</span>' +
-        '<span class="cs-pl-nick">' + _e(p.nick) + '</span>' +
-        '<span class="cs-pl-role">' + lbl.split(' ').slice(1).join(' ') + '</span>' +
-        '</div>';
+      return h('div', { class: 'cs-pl-card-row' },
+        h('span', { class: 'cs-rl-ico' }, lbl.split(' ')[0]) +
+        h('span', { class: 'cs-pl-nick' }, _e(p.nick)) +
+        h('span', { class: 'cs-pl-role' }, lbl.split(' ').slice(1).join(' ')));
     }).join('');
 
-    return '<div class="cs-team-card-full">' +
-      '<div class="cs-tc-hdr">' +
-      _logoEl(team, 40) +
-      '<div class="cs-tc-info"><div class="cs-tc-name">' + _e(team.name) + '</div>' +
-      '<div class="cs-tc-seed">Посев #' + (team.seed || '?') + '</div></div>' +
-      (isCreator ? '<button class="cs-btn-ico" onclick="window._csEditTeamFs(\'' + team.id + '\')">✏</button>' : '') +
-      (isCreator ? '<button class="cs-btn-ico cs-btn-del" onclick="window._csDeleteTeam(\'' + team.id + '\')">✕</button>' : '') +
-      '</div>' +
-      (players ? '<div class="cs-tc-players">' + players + '</div>' : '') +
-      '</div>';
+    var editBtns = canEdit
+      ? h('button', { class: 'cs-btn-ico', onclick: 'window._csEditTeamFs(\'' + _e(team.id) + '\')' }, '✏') +
+        h('button', { class: 'cs-btn-ico cs-btn-del', onclick: 'window._csDeleteTeam(\'' + _e(team.id) + '\')' }, '✕')
+      : '';
+
+    return h('div', { class: 'cs-team-card-full' },
+      h('div', { class: 'cs-tc-hdr' },
+        _logoEl(team, 40) +
+        h('div', { class: 'cs-tc-info' },
+          h('div', { class: 'cs-tc-name' }, _e(team.name)) +
+          h('div', { class: 'cs-tc-seed' }, 'Посев #' + (team.seed || '?'))) +
+        editBtns) +
+      (players ? h('div', { class: 'cs-tc-players' }, players) : ''));
   }
 
   window._csShowAddTeam = function () {
@@ -493,9 +1084,9 @@
   };
 
   window._csEditTeamFs = function (teamId) {
-    var team = _teams[teamId]; if (!team) return;
+    var team = S.teams[teamId]; if (!team) return;
     var wrap = _q('#csAddTeamWrap'); if (!wrap) return;
-    wrap.innerHTML = _teamFormHtml(team, team.seed, '_csSaveEditTeam(\'' + teamId + '\')');
+    wrap.innerHTML = _teamFormHtml(team, team.seed, "_csSaveEditTeam('" + teamId + "')");
   };
 
   function _teamFormHtml(team, seed, saveCmd) {
@@ -505,21 +1096,31 @@
 
     var plHtml = players.map(function (p, i) {
       var lbl = ROLES[p.role] || p.role;
-      return '<div class="cs-pl-row">' +
-        '<span class="cs-rl-ico">' + lbl.split(' ')[0] + '</span>' +
-        '<span class="cs-rl-lbl">' + lbl.split(' ').slice(1).join(' ') + '</span>' +
-        '<input class="cs-input cs-pl-inp" data-pi="' + i + '" placeholder="Ник" value="' + _e(p.nick || '') + '">' +
-        '</div>';
+      return h('div', { class: 'cs-pl-row' },
+        h('span', { class: 'cs-rl-ico' }, lbl.split(' ')[0]) +
+        h('span', { class: 'cs-rl-lbl' }, lbl.split(' ').slice(1).join(' ')) +
+        h('input', {
+          class: 'cs-input cs-pl-inp',
+          'data-pi': String(i),
+          placeholder: 'Ник',
+          value: p.nick || ''
+        }, ''));
     }).join('');
 
-    return '<div class="cs-team-form">' +
-      '<div class="cs-tf-hdr"><strong>' + (team ? 'Редактировать' : 'Новая') + ' команда</strong>' +
-      '<button class="cs-btn-ico" onclick="window._csCancelAddTeam()">✕</button></div>' +
-      _field('Название', '<input class="cs-input" id="csFsName" value="' + _e(t.name || '') + '" placeholder="Team Name">') +
-      _field('Лого (URL)', '<input class="cs-input" id="csFsLogo" value="' + _e(t.logoUrl || '') + '" placeholder="https://...">') +
-      _field('Состав', '<div class="cs-players-wrap">' + plHtml + '</div>') +
-      '<button class="cs-btn cs-btn-pri" style="width:100%;margin-top:8px" onclick="window.' + saveCmd + '">Сохранить</button>' +
-      '</div>';
+    return h('div', { class: 'cs-team-form' },
+      h('div', { class: 'cs-tf-hdr' },
+        h('strong', null, team ? 'Редактировать команду' : 'Новая команда') +
+        h('button', { class: 'cs-btn-ico', onclick: 'window._csCancelAddTeam()' }, '✕')) +
+      _field('Название',
+        h('input', { class: 'cs-input', id: 'csFsName', value: t.name || '', placeholder: 'Team Name' }, '')) +
+      _field('Лого (URL)',
+        h('input', { class: 'cs-input', id: 'csFsLogo', value: t.logoUrl || '', placeholder: 'https://...' }, '')) +
+      _field('Состав', h('div', { class: 'cs-players-wrap' }, plHtml)) +
+      h('button', {
+        class: 'cs-btn cs-btn-pri',
+        style: { width: '100%', 'margin-top': '8px' },
+        onclick: 'window.' + saveCmd
+      }, 'Сохранить'));
   }
 
   window._csCancelAddTeam = function () { var w = _q('#csAddTeamWrap'); if (w) w.innerHTML = ''; };
@@ -528,10 +1129,10 @@
     var db = _db(); if (!db) return;
     var name = (_q('#csFsName') || {}).value || '';
     if (!name.trim()) { alert('Введите название'); return; }
-    var logo    = (_q('#csFsLogo') || {}).value || '';
+    var logo = (_q('#csFsLogo') || {}).value || '';
     var players = _collectPlayers();
     var nextSeed = _teamsSorted().reduce(function (m, t) { return Math.max(m, t.seed || 0); }, 0) + 1;
-    db.collection('tournaments').doc(_currentTId).collection('teams')
+    db.collection('tournaments').doc(S.currentTId).collection('teams')
       .add({ name: name.trim(), logoUrl: logo.trim(), players: players, seed: nextSeed, createdAt: _ts() })
       .then(function () { window._csCancelAddTeam(); })
       .catch(function (e) { alert('Ошибка: ' + e.message); });
@@ -541,9 +1142,9 @@
     var db = _db(); if (!db) return;
     var name = (_q('#csFsName') || {}).value || '';
     if (!name.trim()) { alert('Введите название'); return; }
-    var logo    = (_q('#csFsLogo') || {}).value || '';
+    var logo = (_q('#csFsLogo') || {}).value || '';
     var players = _collectPlayers();
-    db.collection('tournaments').doc(_currentTId).collection('teams').doc(teamId)
+    db.collection('tournaments').doc(S.currentTId).collection('teams').doc(teamId)
       .update({ name: name.trim(), logoUrl: logo.trim(), players: players })
       .then(function () { window._csCancelAddTeam(); })
       .catch(function (e) { alert('Ошибка: ' + e.message); });
@@ -552,7 +1153,7 @@
   window._csDeleteTeam = function (teamId) {
     if (!confirm('Удалить команду из турнира?')) return;
     var db = _db(); if (!db) return;
-    db.collection('tournaments').doc(_currentTId).collection('teams').doc(teamId)
+    db.collection('tournaments').doc(S.currentTId).collection('teams').doc(teamId)
       .delete().catch(function (e) { alert('Ошибка: ' + e.message); });
   };
 
@@ -560,606 +1161,406 @@
      BRACKET TAB
   ══════════════════════════════════════════════════════════ */
   function _htmlBracket() {
-    var t       = _currentT;
-    var matchArr = Object.values(_matches);
+    var t = S.currentT;
+    var matchArr = Object.values(S.matches);
 
     if (!matchArr.length) {
       if (t && t.status === 'upcoming') {
-        var startBtnHtml = (_uid() === (t && t.createdBy))
-          ? '<button class="cs-btn cs-btn-pri" style="margin-top:12px" onclick="window._csStart()">▶ Запустить турнир</button>' : '';
-        return '<div class="cs-empty">' +
-          '<div class="cs-empty-icon">📋</div>' +
-          '<div>Турнир ещё не запущен.<br>Добавьте команды и нажмите «Старт».</div>' +
-          startBtnHtml + '</div>';
+        var startBtn = _canEdit()
+          ? h('button', { class: 'cs-btn cs-btn-pri', style: { 'margin-top': '12px' }, onclick: 'window._csStart()' }, '▶ Запустить турнир')
+          : '';
+        return h('div', { class: 'cs-empty' },
+          h('div', { class: 'cs-empty-icon' }, '📋') +
+          'Турнир ещё не запущен.<br>Добавьте команды и нажмите «Старт».' + startBtn);
       }
-      return '<div class="cs-empty">Нет матчей</div>';
+      return h('div', { class: 'cs-empty' }, 'Нет матчей');
     }
 
-    if (t && t.format === 'double_elim') {
-      return _renderDEBracket(matchArr);
-    }
-    if (t && t.format === 'single_elim') {
-      return _renderSEBracket(matchArr);
-    }
-    if (t && t.format === 'group_elim') {
-      return _renderGroupBracket(matchArr);
-    }
-    // Fallback
+    if (t && t.format === 'double_elim') return _renderDEBracket(matchArr);
+    if (t && t.format === 'group_elim')  return _renderGroupView(matchArr);
     return _renderSEBracket(matchArr);
   }
 
-  /* ── Single Elimination ── */
+  /* ─── SE рендер ─── */
   function _renderSEBracket(matchArr) {
-    var rounds   = {};
+    var canEdit = _canEdit();
+
+    // Делим на основную сетку и матч за 3-е место
+    var bracketM = matchArr.filter(function (m) { return m.phase !== 'third_place'; });
+    var thirdM   = matchArr.filter(function (m) { return m.phase === 'third_place'; })[0];
+
+    var rounds = {};
     var maxRound = 0;
-    matchArr.forEach(function (m) {
+    bracketM.forEach(function (m) {
       var r = m.round || 1;
       if (!rounds[r]) rounds[r] = [];
       rounds[r].push(m);
       if (r > maxRound) maxRound = r;
     });
-
-    // Sort matches within each round
-    for (var r in rounds) {
+    Object.keys(rounds).forEach(function (r) {
       rounds[r].sort(function (a, b) { return (a.matchNum || 0) - (b.matchNum || 0); });
-    }
+    });
 
-    var roundLabels = {};
-    for (var rr = 1; rr <= maxRound; rr++) {
-      var cnt = (rounds[rr] || []).length;
-      if (rr === maxRound)     roundLabels[rr] = 'Финал';
-      else if (rr === maxRound - 1) roundLabels[rr] = 'Полуфинал';
-      else if (rr === maxRound - 2) roundLabels[rr] = 'Четвертьфинал';
-      else                     roundLabels[rr] = '1/' + (cnt * 2) + ' финала';
-    }
-
-    var isCreator = _uid() && _currentT && _currentT.createdBy === _uid();
-
-    // Use round 1 count to determine slot heights
-    var r1cnt      = (rounds[1] || []).length;
-    var SLOT_H     = 96; // px per slot in round 1
-    var totalH     = r1cnt * SLOT_H;
+    var r1cnt = (rounds[1] || []).length;
+    var SLOT_H = 96;
+    var totalH = r1cnt * SLOT_H;
 
     var cols = '';
     for (var round = 1; round <= maxRound; round++) {
-      var rm        = rounds[round] || [];
-      var slotH     = totalH / rm.length;
+      var rm = rounds[round] || [];
+      var slotH = totalH / rm.length;
       var matchesHtml = rm.map(function (m) {
-        return '<div class="cs-br-slot-wrap" style="height:' + slotH + 'px">' +
-          _htmlSEMatch(m, isCreator) + '</div>';
+        return h('div', { class: 'cs-br-slot-wrap', style: { height: slotH + 'px' } },
+          _htmlMatchCard(m, canEdit));
       }).join('');
-
-      cols += '<div class="cs-br-col">' +
-        '<div class="cs-br-rlabel">' + roundLabels[round] + '</div>' +
-        '<div class="cs-br-matches" style="height:' + totalH + 'px">' + matchesHtml + '</div>' +
-        '</div>';
-
-      // Connector column (not last round)
-      if (round < maxRound) {
-        var nextCnt = (rounds[round + 1] || []).length;
-        var connPairs = rm.length / 2;
-        var connHtml = '';
-        for (var ci = 0; ci < connPairs; ci++) {
-          connHtml += '<div class="cs-conn-pair" style="height:' + (totalH / connPairs) + 'px">' +
-            '<div class="cs-conn-top"></div><div class="cs-conn-bot"></div></div>';
-        }
-        cols += '<div class="cs-br-conn" style="height:' + totalH + 'px;margin-top:' +
-          (/* label height */ 28) + 'px">' + connHtml + '</div>';
-      }
+      cols += h('div', { class: 'cs-br-col' },
+        h('div', { class: 'cs-br-rlabel' }, _e((rm[0] && rm[0].label) || ('Раунд ' + round))) +
+        h('div', { class: 'cs-br-matches', style: { height: totalH + 'px' } }, matchesHtml));
     }
 
-    // Winner column
-    var finalMatch  = maxRound && rounds[maxRound] && rounds[maxRound][0];
-    var winTeam     = finalMatch && finalMatch.winnerId ? (_teams[finalMatch.winnerId] || null) : null;
+    // Победитель
+    var finalMatch = maxRound && rounds[maxRound] && rounds[maxRound][0];
+    var winTeam = finalMatch && finalMatch.winnerId ? (S.teams[finalMatch.winnerId] || null) : null;
     if (winTeam) {
-      cols += '<div class="cs-br-col cs-br-winner-col">' +
-        '<div class="cs-br-rlabel">Победитель</div>' +
-        '<div class="cs-br-matches" style="height:' + totalH + 'px">' +
-        '<div class="cs-br-slot-wrap" style="height:' + totalH + 'px">' +
-        '<div class="cs-br-winner-card">' +
-        _logoEl(winTeam, 54) +
-        '<div class="cs-bw-name">' + _e(winTeam.name) + '</div>' +
-        '<div class="cs-bw-crown">🏆</div>' +
-        '</div></div></div></div>';
+      cols += h('div', { class: 'cs-br-col cs-br-winner-col' },
+        h('div', { class: 'cs-br-rlabel' }, 'Победитель') +
+        h('div', { class: 'cs-br-matches', style: { height: totalH + 'px' } },
+          h('div', { class: 'cs-br-slot-wrap', style: { height: totalH + 'px' } },
+            h('div', { class: 'cs-br-winner-card' },
+              _logoEl(winTeam, 54) +
+              h('div', { class: 'cs-bw-name' }, _e(winTeam.name)) +
+              h('div', { class: 'cs-bw-crown' }, '🏆')))));
     }
 
-    return '<div class="cs-bracket-wrap"><div class="cs-bracket">' + cols + '</div></div>';
+    // SVG-слой будет дорисован в _drawConnectors
+    var bracketHtml = h('div', { class: 'cs-bracket-wrap' },
+      h('div', { class: 'cs-bracket', 'data-bracket': 'se' },
+        cols + '<svg class="cs-bracket-svg" data-svg="se"></svg>'));
+
+    // Матч за 3-е место (если есть)
+    var thirdHtml = '';
+    if (thirdM) {
+      thirdHtml = h('div', { class: 'cs-third-place' },
+        h('div', { class: 'cs-de-section-hdr' }, 'Матч за 3-е место') +
+        h('div', { class: 'cs-third-place-match' }, _htmlMatchCard(thirdM, canEdit)));
+    }
+
+    return bracketHtml + thirdHtml;
   }
 
-  /* ── Double Elimination ── */
+  /* ─── DE рендер ─── */
   function _renderDEBracket(matchArr) {
-    var isCreator = _uid() && _currentT && _currentT.createdBy === _uid();
-
-    // Split matches by phase
-    var ubMatches = {}, lbMatches = {}, gfMatch = null;
+    var canEdit = _canEdit();
+    var ubM = {}, lbM = {}, gfMatch = null;
     matchArr.forEach(function (m) {
       if (m.phase === 'upper') {
-        if (!ubMatches[m.round]) ubMatches[m.round] = [];
-        ubMatches[m.round].push(m);
+        if (!ubM[m.round]) ubM[m.round] = [];
+        ubM[m.round].push(m);
       } else if (m.phase === 'lower') {
-        if (!lbMatches[m.round]) lbMatches[m.round] = [];
-        lbMatches[m.round].push(m);
+        if (!lbM[m.round]) lbM[m.round] = [];
+        lbM[m.round].push(m);
       } else if (m.phase === 'final' || m.id === 'grand_final') {
         gfMatch = m;
       }
     });
-
-    // Sort within rounds
-    [ubMatches, lbMatches].forEach(function (obj) {
+    [ubM, lbM].forEach(function (obj) {
       Object.keys(obj).forEach(function (r) {
         obj[r].sort(function (a, b) { return (a.matchNum || 0) - (b.matchNum || 0); });
       });
     });
 
-    /* ── Upper Bracket ── */
-    function _buildBracketCols(roundObj, labelPrefix, heightPerSlot) {
-      var rounds   = Object.keys(roundObj).map(Number).sort(function (a, b) { return a - b; });
-      var maxRound = rounds[rounds.length - 1] || 1;
-      var r1cnt    = (roundObj[rounds[0]] || []).length;
-      var totalH   = r1cnt * heightPerSlot;
-      var cols     = '';
-
+    function _buildCols(roundObj, slotH, svgKey) {
+      var rounds = Object.keys(roundObj).map(Number).sort(function (a, b) { return a - b; });
+      var r1cnt  = (roundObj[rounds[0]] || []).length;
+      var totalH = r1cnt * slotH;
+      var cols   = '';
       rounds.forEach(function (round) {
-        var rm    = roundObj[round] || [];
-        var slotH = totalH / rm.length;
+        var rm = roundObj[round] || [];
+        var s  = totalH / rm.length;
         var matchesHtml = rm.map(function (m) {
-          return '<div class="cs-br-slot-wrap" style="height:' + slotH + 'px">' +
-            _htmlSEMatch(m, isCreator) + '</div>';
+          return h('div', { class: 'cs-br-slot-wrap', style: { height: s + 'px' } },
+            _htmlMatchCard(m, canEdit));
         }).join('');
-
-        // Round label
-        var lbl;
-        if (labelPrefix === 'UB') {
-          if (round === maxRound)     lbl = 'UB Финал';
-          else if (round === maxRound - 1) lbl = 'UB Полуфинал';
-          else                        lbl = 'UB Раунд ' + round;
-        } else {
-          var lbTotal = Object.keys(roundObj).length;
-          if (round === lbTotal)      lbl = 'LB Финал';
-          else                        lbl = 'LB Раунд ' + round;
-        }
-
-        cols += '<div class="cs-br-col">' +
-          '<div class="cs-br-rlabel">' + lbl + '</div>' +
-          '<div class="cs-br-matches" style="height:' + totalH + 'px">' + matchesHtml + '</div></div>';
-
-        // Connector
-        if (round < maxRound) {
-          var nextCnt   = (roundObj[round + 1] || []).length || 1;
-          var connPairs = rm.length / 2;
-          var connHtml  = '';
-          for (var ci = 0; ci < connPairs; ci++) {
-            connHtml += '<div class="cs-conn-pair" style="height:' + (totalH / connPairs) + 'px">' +
-              '<div class="cs-conn-top"></div><div class="cs-conn-bot"></div></div>';
-          }
-          cols += '<div class="cs-br-conn" style="height:' + totalH + 'px;margin-top:28px">' + connHtml + '</div>';
-        }
+        cols += h('div', { class: 'cs-br-col' },
+          h('div', { class: 'cs-br-rlabel' }, _e((rm[0] && rm[0].label) || '')) +
+          h('div', { class: 'cs-br-matches', style: { height: totalH + 'px' } }, matchesHtml));
       });
-
-      return { cols: cols, totalH: totalH };
+      return h('div', { class: 'cs-bracket-wrap' },
+        h('div', { class: 'cs-bracket', 'data-bracket': svgKey },
+          cols + '<svg class="cs-bracket-svg" data-svg="' + svgKey + '"></svg>'));
     }
 
-    var ubSlotH = 96;
-    var ubRes   = _buildBracketCols(ubMatches, 'UB', ubSlotH);
+    var ubHtml = _buildCols(ubM, 96, 'ub');
+    var lbHtml = _buildCols(lbM, 84, 'lb');
 
-    // LB may have different round count — use uniform slot height
-    var lbSlotH = 84;
-    var lbRes   = _buildBracketCols(lbMatches, 'LB', lbSlotH);
-
-    /* ── Grand Final ── */
     var gfHtml = '';
     if (gfMatch) {
-      gfHtml = '<div class="cs-de-gf">' +
-        '<div class="cs-de-gf-label">Гранд Финал</div>' +
-        _htmlSEMatch(gfMatch, isCreator) +
-        (gfMatch.winnerId ? (function () {
-          var w = _teams[gfMatch.winnerId];
-          return w ? '<div class="cs-br-winner-card" style="margin:12px auto 0;width:140px">' +
-            _logoEl(w, 50) + '<div class="cs-bw-name">' + _e(w.name) + '</div>' +
-            '<div class="cs-bw-crown">🏆</div></div>' : '';
-        })() : '') +
-        '</div>';
+      gfHtml = h('div', { class: 'cs-de-gf' },
+        h('div', { class: 'cs-de-gf-label' }, 'Гранд Финал') +
+        _htmlMatchCard(gfMatch, canEdit) +
+        (gfMatch.winnerId && S.teams[gfMatch.winnerId]
+          ? h('div', { class: 'cs-br-winner-card', style: { margin: '12px auto 0', width: '140px' } },
+              _logoEl(S.teams[gfMatch.winnerId], 50) +
+              h('div', { class: 'cs-bw-name' }, _e(S.teams[gfMatch.winnerId].name)) +
+              h('div', { class: 'cs-bw-crown' }, '🏆'))
+          : ''));
     }
 
-    return '<div class="cs-de-wrap">' +
-      '<div class="cs-de-section-hdr">Upper Bracket</div>' +
-      '<div class="cs-bracket-wrap"><div class="cs-bracket">' + ubRes.cols + '</div></div>' +
-      '<div class="cs-de-section-hdr">Lower Bracket</div>' +
-      '<div class="cs-bracket-wrap"><div class="cs-bracket">' + lbRes.cols + '</div></div>' +
-      gfHtml +
-      '</div>';
+    return h('div', { class: 'cs-de-wrap' },
+      h('div', { class: 'cs-de-section-hdr' }, 'Upper Bracket') + ubHtml +
+      h('div', { class: 'cs-de-section-hdr' }, 'Lower Bracket') + lbHtml +
+      gfHtml);
   }
 
-  function _htmlSEMatch(m, isCreator) {
-    var t1    = m.team1Id ? (_teams[m.team1Id] || null) : null;
-    var t2    = m.team2Id ? (_teams[m.team2Id] || null) : null;
-    var done  = !!(m.winnerId);
-    var t1Win = done && m.winnerId === m.team1Id;
-    var t2Win = done && m.winnerId === m.team2Id;
+  /* ─── Group + Playoff рендер ─── */
+  function _renderGroupView(matchArr) {
+    var canEdit = _canEdit();
+    var groupM = matchArr.filter(function (m) { return m.phase === 'group'; });
+    var poM    = matchArr.filter(function (m) { return m.phase === 'playoff'; });
 
-    var s1Html = _slotHtml(t1, m.score1, t1Win, done);
-    var s2Html = _slotHtml(t2, m.score2, t2Win, done);
-
-    var liveBadge = m.status === 'live' ? '<div class="cs-br-live">LIVE</div>' : '';
-    var editBtn   = '';
-    if (isCreator && t1 && t2 && !done) {
-      editBtn = '<button class="cs-br-edit" onclick="window._csMatchEdit(\'' + m.id + '\')">Ввести счёт</button>';
-    } else if (isCreator && done) {
-      editBtn = '<button class="cs-br-edit cs-br-undo" onclick="window._csUndoMatch(\'' + m.id + '\')">↩ Отменить</button>';
-    }
-
-    return '<div class="cs-br-match">' + liveBadge + s1Html +
-      '<div class="cs-br-vs">vs</div>' + s2Html + editBtn + '</div>';
-  }
-
-  function _slotHtml(team, score, isWin, showScore) {
-    var cls = 'cs-br-team' + (isWin ? ' win' : '') + (!team ? ' tbd' : '');
-    var logoHtml = team
-      ? '<div class="cs-br-logo-wrap" onclick="window._csTeamPopup(\'' + team.id + '\')">' + _logoEl(team, 26) + '</div>'
-      : '<div class="cs-br-logo-wrap"><div class="cs-logo-ph" style="width:26px;height:26px;font-size:11px">?</div></div>';
-    var nameHtml = team
-      ? '<span class="cs-br-tname" onclick="window._csTeamPopup(\'' + team.id + '\')">' + _e(team.name) + '</span>'
-      : '<span class="cs-br-tname tbd">TBD</span>';
-    var scoreHtml = showScore
-      ? '<span class="cs-br-score' + (isWin ? ' win' : '') + '">' + (score || 0) + '</span>' : '';
-    return '<div class="' + cls + '">' + logoHtml + nameHtml + scoreHtml + '</div>';
-  }
-
-  /* ── Group Stage ── */
-  function _renderGroupBracket(matchArr) {
+    // Группы
     var groups = {};
-    matchArr.forEach(function (m) {
+    groupM.forEach(function (m) {
       var g = m.group || 'A';
       if (!groups[g]) groups[g] = [];
       groups[g].push(m);
     });
+    var groupConfig = {};
+    try { groupConfig = JSON.parse(S.currentT.groupConfig || '{}'); } catch (e) { groupConfig = {}; }
 
-    var isCreator = _uid() && _currentT && _currentT.createdBy === _uid();
     var html = '';
-
     Object.keys(groups).sort().forEach(function (g) {
       var gm = groups[g];
-      var standings = _groupStandings(gm);
-      var maxWins = 0;
-      if (standings.length) maxWins = standings[0].wins;
+      var standings = Engine.computeStandings(gm, groupConfig[g] || []);
 
       var standHtml = '<table class="cs-grp-table"><thead><tr>' +
         '<th>#</th><th>Команда</th><th>В</th><th>П</th></tr></thead><tbody>' +
         standings.map(function (row, i) {
-          var team = _teams[row.teamId];
-          var qualified = i < 2; // top 2 advance
+          var team = S.teams[row.teamId];
+          var qualified = i < 2;
           return '<tr class="' + (qualified ? 'cs-qualified' : '') + '">' +
             '<td>' + (i + 1) + '</td>' +
             '<td>' + (team ? _e(team.name) : '—') + '</td>' +
             '<td>' + row.wins + '</td>' +
-            '<td>' + row.losses + '</td>' +
-            '</tr>';
+            '<td>' + row.losses + '</td></tr>';
         }).join('') + '</tbody></table>';
 
-      var mHtml = gm.map(function (m) { return _htmlSEMatch(m, isCreator); }).join('');
+      var mHtml = gm.map(function (m) { return _htmlMatchCard(m, canEdit); }).join('');
 
-      html += '<div class="cs-grp-block">' +
-        '<div class="cs-grp-hdr">Группа ' + g + '</div>' +
-        '<div class="cs-grp-content">' +
-        '<div class="cs-grp-stand">' + standHtml + '</div>' +
-        '<div class="cs-grp-matches">' + mHtml + '</div>' +
-        '</div></div>';
+      html += h('div', { class: 'cs-grp-block' },
+        h('div', { class: 'cs-grp-hdr' }, 'Группа ' + _e(g)) +
+        h('div', { class: 'cs-grp-content' },
+          h('div', { class: 'cs-grp-stand' }, standHtml) +
+          h('div', { class: 'cs-grp-matches' }, mHtml)));
     });
 
-    return '<div class="cs-groups-wrap">' + html + '</div>';
+    // Кнопка запуска плей-офф
+    var allGroupsDone = groupM.length > 0 && groupM.every(function (m) { return !!m.winnerId; });
+    var poBtnHtml = '';
+    if (allGroupsDone && !poM.length && canEdit) {
+      poBtnHtml = h('div', { style: { padding: '12px 16px', 'text-align': 'center' } },
+        h('button', { class: 'cs-btn cs-btn-pri', onclick: 'window._csStartPlayoff()' }, '▶ Запустить плей-офф'));
+    }
+
+    // Plаy-off сетка (если уже создана)
+    var poHtml = '';
+    if (poM.length) {
+      poHtml = h('div', { class: 'cs-de-section-hdr' }, 'Плей-офф') +
+        _renderSEBracket(poM);
+    }
+
+    return h('div', { class: 'cs-groups-wrap' }, html + poBtnHtml) + poHtml;
   }
 
-  function _groupStandings(matches) {
-    var stats = {};
-    matches.forEach(function (m) {
-      [m.team1Id, m.team2Id].forEach(function (id) {
-        if (id && !stats[id]) stats[id] = { teamId: id, wins: 0, losses: 0 };
+  /* ─── Карточка матча ─── */
+  function _htmlMatchCard(m, canEdit) {
+    var t1 = m.team1Id ? (S.teams[m.team1Id] || null) : null;
+    var t2 = m.team2Id ? (S.teams[m.team2Id] || null) : null;
+    var done = !!m.winnerId;
+    var t1Win = done && m.winnerId === m.team1Id;
+    var t2Win = done && m.winnerId === m.team2Id;
+
+    var liveBadge = m.status === 'live' ? h('div', { class: 'cs-br-live' }, 'LIVE') : '';
+    var editBtn = '';
+    if (canEdit && t1 && t2 && !done) {
+      editBtn = h('button', { class: 'cs-br-edit', onclick: 'window._csMatchEdit(\'' + _e(m.id) + '\')' }, 'Ввести счёт');
+    } else if (canEdit && done) {
+      editBtn = h('button', { class: 'cs-br-edit cs-br-undo', onclick: 'window._csUndoMatch(\'' + _e(m.id) + '\')' }, '↩ Отменить');
+    }
+
+    return h('div', { class: 'cs-br-match', 'data-mid': m.id },
+      liveBadge +
+      _slotHtml(t1, m.team1Source, m.score1, t1Win, done, 1, m.id) +
+      h('div', { class: 'cs-br-vs' }, 'vs') +
+      _slotHtml(t2, m.team2Source, m.score2, t2Win, done, 2, m.id) +
+      editBtn);
+  }
+
+  function _slotHtml(team, source, score, isWin, showScore, slotNum, matchId) {
+    var cls = 'cs-br-team' + (isWin ? ' win' : '') + (!team ? ' tbd' : '');
+    var logoHtml, nameHtml;
+    if (team) {
+      logoHtml = h('div', { class: 'cs-br-logo-wrap', onclick: 'window._csTeamPopup(\'' + _e(team.id) + '\')' },
+        _logoEl(team, 26));
+      nameHtml = h('span', {
+        class: 'cs-br-tname',
+        onclick: 'window._csTeamPopup(\'' + _e(team.id) + '\')'
+      }, _e(team.name));
+    } else {
+      var hint = source ? _sourceHint(source) : '';
+      logoHtml = h('div', { class: 'cs-br-logo-wrap' },
+        h('div', { class: 'cs-logo-ph', style: { width: '26px', height: '26px', 'font-size': '11px' } }, '?'));
+      nameHtml = h('span', { class: 'cs-br-tname tbd' }, hint || 'TBD');
+    }
+    var scoreHtml = showScore
+      ? h('span', { class: 'cs-br-score' + (isWin ? ' win' : '') }, String(score || 0))
+      : '';
+    return h('div', { class: cls, 'data-slot': slotNum, 'data-mid': matchId }, logoHtml + nameHtml + scoreHtml);
+  }
+
+  function _sourceHint(src) {
+    var role = src.takes === 'winner' ? 'Победитель' : 'Проигравший';
+    var label = (S.matches[src.matchId] && S.matches[src.matchId].label) || src.matchId;
+    return role + ' · ' + _e(label);
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     SVG CONNECTORS — рисуем линии после рендера
+  ══════════════════════════════════════════════════════════ */
+  function _drawConnectors() {
+    setTimeout(function () {
+      _qa('.cs-bracket-wrap').forEach(function (wrap) {
+        var bracket = wrap.querySelector('.cs-bracket');
+        var svg = wrap.querySelector('.cs-bracket-svg');
+        if (!bracket || !svg) return;
+
+        var cards = bracket.querySelectorAll('.cs-br-match');
+        var byMid = {};
+        cards.forEach(function (c) { byMid[c.dataset.mid] = c; });
+
+        var bRect = bracket.getBoundingClientRect();
+        svg.setAttribute('width', bracket.scrollWidth);
+        svg.setAttribute('height', bracket.scrollHeight);
+        svg.style.width  = bracket.scrollWidth + 'px';
+        svg.style.height = bracket.scrollHeight + 'px';
+        svg.innerHTML = '';
+
+        cards.forEach(function (card) {
+          var mid = card.dataset.mid;
+          var m = S.matches[mid];
+          if (!m) return;
+          var dRect = card.getBoundingClientRect();
+          var dx = dRect.left - bRect.left;
+          var dy = dRect.top  - bRect.top;
+          var dHeight = dRect.height;
+
+          [
+            { src: m.team1Source, slot: 1 },
+            { src: m.team2Source, slot: 2 }
+          ].forEach(function (pair) {
+            if (!pair.src) return;
+            var srcCard = byMid[pair.src.matchId];
+            if (!srcCard) return;  // источник в другой сетке (UB→LB) — не рисуем
+            var sRect = srcCard.getBoundingClientRect();
+            var sx = sRect.right - bRect.left;
+            var sy = sRect.top + sRect.height / 2 - bRect.top;
+            // Точка входа в карточку: правая или левая середина в зависимости от слота
+            var ex = dx;
+            var ey = dy + (pair.slot === 1 ? dHeight * 0.30 : dHeight * 0.70);
+            var midX = sx + (ex - sx) / 2;
+            var path = '<path d="M ' + sx + ' ' + sy +
+              ' C ' + midX + ' ' + sy + ', ' + midX + ' ' + ey + ', ' + ex + ' ' + ey +
+              '" class="cs-svg-link' + (pair.src.takes === 'loser' ? ' loser' : '') + '"/>';
+            svg.insertAdjacentHTML('beforeend', path);
+          });
+        });
       });
-      if (m.winnerId) {
-        if (stats[m.winnerId]) stats[m.winnerId].wins++;
-        var loserId = m.winnerId === m.team1Id ? m.team2Id : m.team1Id;
-        if (loserId && stats[loserId]) stats[loserId].losses++;
-      }
-    });
-    return Object.values(stats).sort(function (a, b) {
-      return b.wins - a.wins || a.losses - b.losses;
-    });
+    }, 30);
   }
 
-  /* ── Start tournament ── */
+  /* ══════════════════════════════════════════════════════════
+     START / GENERATE
+  ══════════════════════════════════════════════════════════ */
   window._csStart = function () {
-    var t = _currentT; if (!t) return;
+    var t = S.currentT; if (!t) return;
     var db = _db(); if (!db) return;
     var teamArr = _teamsSorted();
     if (teamArr.length < 2) { alert('Добавьте хотя бы 2 команды'); return; }
 
+    var batch = db.batch();
+    var mRef = db.collection('tournaments').doc(S.currentTId).collection('matches');
+    var matches, extra = {};
+
     if (t.format === 'single_elim') {
-      _generateSE(teamArr, db);
+      matches = Engine.genSE(teamArr, { bo: t.bo || 3, thirdPlace: !!t.thirdPlace });
     } else if (t.format === 'double_elim') {
-      _generateDE(teamArr, db);
+      matches = Engine.genDE(teamArr, { bo: t.bo || 3 });
     } else if (t.format === 'group_elim') {
-      _generateGroups(teamArr, db);
+      var res = Engine.genGroup(teamArr, { bo: t.bo || 3 });
+      matches = res.matches;
+      extra.groupConfig = JSON.stringify(res.groupConfig);
     } else {
-      alert('Формат "' + (FORMAT_LABELS[t.format] || t.format) + '" — генерация скоро. Пока используйте Single Elimination, Double Elimination или Группы + Плей-офф');
+      alert('Формат не поддерживается');
+      return;
     }
+
+    matches.forEach(function (m) { batch.set(mRef.doc(m.id), m); });
+    var tUpdate = Object.assign({ status: 'active' }, extra);
+    batch.update(db.collection('tournaments').doc(S.currentTId), tUpdate);
+
+    batch.commit().then(function () {
+      S.bracketTab = 'bracket';
+    }).catch(function (e) { alert('Ошибка старта: ' + e.message); });
   };
 
-  /* ── Generate Single Elimination ── */
-  function _seedPairs(n) {
-    var seeds = [1, 2];
-    var rounds = Math.log2(n);
-    for (var r = 1; r < rounds; r++) {
-      var ns = [];
-      for (var i = 0; i < seeds.length; i++) {
-        ns.push(seeds[i]); ns.push(n + 1 - seeds[i]);
-      }
-      seeds = ns;
-    }
-    var pairs = [];
-    for (var j = 0; j < seeds.length; j += 2) pairs.push([seeds[j], seeds[j + 1]]);
-    return pairs;
-  }
+  /* ─── Запуск плей-офф после групп ─── */
+  window._csStartPlayoff = function () {
+    var t = S.currentT; if (!t) return;
+    var db = _db(); if (!db) return;
 
-  function _pow2(n) { var p = 1; while (p < n) p *= 2; return p; }
+    var groupConfig;
+    try { groupConfig = JSON.parse(t.groupConfig || '{}'); } catch (e) { groupConfig = {}; }
+    if (!Object.keys(groupConfig).length) { alert('Нет данных о группах'); return; }
 
-  function _generateSE(teamArr, db) {
-    var n      = _pow2(teamArr.length);
-    var pairs  = _seedPairs(n);
-    var totRnd = Math.log2(n);
-    var batch  = db.batch();
-    var mRef   = db.collection('tournaments').doc(_currentTId).collection('matches');
-
-    var seedMap = {};
-    teamArr.forEach(function (t, i) { seedMap[i + 1] = t.id; });
-
-    // Pre-build all match IDs so we can resolve nextMatchId links
-    // Also compute round-1 bye info in the same batch
-    var pairIdx  = 0;
-    var r2Updates = {}; // nextMatchId → {field: winnerId} for byes
-
-    for (var round = 1; round <= totRnd; round++) {
-      var cnt   = n / Math.pow(2, round);
-      for (var mn = 1; mn <= cnt; mn++) {
-        var mId   = 'r' + round + 'm' + mn;
-        var nRnd  = round + 1;
-        var nMn   = Math.ceil(mn / 2);
-        var nId   = nRnd <= totRnd ? 'r' + nRnd + 'm' + nMn : null;
-        var nSlot = mn % 2 === 1 ? 1 : 2;
-
-        var t1Id = null, t2Id = null;
-        if (round === 1) {
-          var pair = pairs[pairIdx] || [];
-          t1Id = seedMap[pair[0]] || null;
-          t2Id = seedMap[pair[1]] || null;
-          pairIdx++;
-        }
-
-        // Detect bye: one team present, other missing — resolve immediately in batch
-        var byeWinnerId = null;
-        if (round === 1 && t1Id && !t2Id) byeWinnerId = t1Id;
-        if (round === 1 && !t1Id && t2Id) byeWinnerId = t2Id;
-
-        var matchData = {
-          round: round, matchNum: mn, phase: 'bracket',
-          team1Id: t1Id, team2Id: t2Id,
-          score1: byeWinnerId ? (t1Id ? 1 : 0) : 0,
-          score2: byeWinnerId ? (t2Id ? 1 : 0) : 0,
-          winnerId: byeWinnerId, status: byeWinnerId ? 'completed' : 'upcoming',
-          nextMatchId: nId, nextMatchSlot: nSlot, bo: _currentT.bo || 3
-        };
-        batch.set(mRef.doc(mId), matchData);
-
-        // If bye, prefill next round slot in same batch
-        if (byeWinnerId && nId) {
-          if (!r2Updates[nId]) r2Updates[nId] = {};
-          r2Updates[nId][nSlot === 1 ? 'team1Id' : 'team2Id'] = byeWinnerId;
-        }
-      }
-    }
-
-    // Apply prefill updates for round-2 slots from byes
-    Object.keys(r2Updates).forEach(function (matchId) {
-      batch.update(mRef.doc(matchId), r2Updates[matchId]);
-    });
-
-    batch.update(db.collection('tournaments').doc(_currentTId), { status: 'active' });
-    batch.commit().then(function () {
-      _currentT.status = 'active'; _bracketTab = 'bracket'; _render();
-    }).catch(function (e) { alert('Ошибка старта: ' + e.message); });
-  }
-
-  /* ── Generate Double Elimination ── */
-  function _generateDE(teamArr, db) {
-    var n    = _pow2(teamArr.length);
-    var k    = Math.log2(n);      // number of UB rounds (e.g. 8 teams → k=3)
-    var bo   = _currentT.bo || 3;
-    var pairs    = _seedPairs(n);
-    var seedMap  = {};
-    teamArr.forEach(function (t, i) { seedMap[i + 1] = t.id; });
+    var allMatches = Object.values(S.matches);
+    var poMatches = Engine.genGroupPlayoff(groupConfig, allMatches, { bo: t.bo || 3 });
+    if (!poMatches.length) { alert('Не удалось сгенерировать плей-офф'); return; }
 
     var batch = db.batch();
-    var mRef  = db.collection('tournaments').doc(_currentTId).collection('matches');
-    var r2Pre = {}; // {matchId: {field: teamId}} — prefill from byes/advance
+    var mRef = db.collection('tournaments').doc(S.currentTId).collection('matches');
+    poMatches.forEach(function (m) { batch.set(mRef.doc(m.id), m); });
+    batch.update(db.collection('tournaments').doc(S.currentTId), { playoffStarted: true });
 
-    function _set(matchId, data) {
-      batch.set(mRef.doc(matchId), Object.assign({
-        score1: 0, score2: 0, winnerId: null, status: 'upcoming',
-        nextMatchId: null, nextMatchSlot: 1,
-        loserNextMatchId: null, loserNextMatchSlot: 1,
-        bo: bo
-      }, data));
-    }
+    batch.commit().catch(function (e) { alert('Ошибка: ' + e.message); });
+  };
 
-    /* ═══ UPPER BRACKET ════════════════════════════════════ */
-    var pairIdx = 0;
-    for (var r = 1; r <= k; r++) {
-      var cnt = n / Math.pow(2, r);
-      for (var m = 1; m <= cnt; m++) {
-        var mId = 'ub_r' + r + '_m' + m;
-
-        // Winner destination
-        var wId    = r < k   ? 'ub_r' + (r + 1) + '_m' + Math.ceil(m / 2) : 'grand_final';
-        var wSlot  = r < k   ? (m % 2 === 1 ? 1 : 2) : 1;
-
-        // Loser destination
-        var lId, lSlot;
-        if (r === 1) {
-          // UB R1 → LB R1 (pairs: matches 1&2 → lb_r1_m1, matches 3&4 → lb_r1_m2, …)
-          lId   = 'lb_r1_m' + Math.ceil(m / 2);
-          lSlot = m % 2 === 1 ? 1 : 2;
-        } else if (r < k) {
-          // UB R{r} → LB R{2*(r-1)} slot 2
-          lId   = 'lb_r' + (2 * (r - 1)) + '_m' + m;
-          lSlot = 2;
-        } else {
-          // UB Final → LB Final slot 2
-          lId   = 'lb_r' + (2 * (k - 1)) + '_m1';
-          lSlot = 2;
-        }
-
-        var t1Id = null, t2Id = null;
-        if (r === 1) {
-          var pair = pairs[pairIdx] || [];
-          t1Id = seedMap[pair[0]] || null;
-          t2Id = seedMap[pair[1]] || null;
-          pairIdx++;
-        }
-
-        // Handle bye
-        var byeW = (t1Id && !t2Id) ? t1Id : (!t1Id && t2Id) ? t2Id : null;
-        _set(mId, {
-          phase: 'upper', round: r, matchNum: m,
-          team1Id: t1Id, team2Id: t2Id,
-          score1: byeW ? (t1Id ? 1 : 0) : 0,
-          score2: byeW ? (t2Id ? 1 : 0) : 0,
-          winnerId: byeW, status: byeW ? 'completed' : 'upcoming',
-          nextMatchId: wId, nextMatchSlot: wSlot,
-          loserNextMatchId: lId, loserNextMatchSlot: lSlot
-        });
-        if (byeW) {
-          if (!r2Pre[wId]) r2Pre[wId] = {};
-          r2Pre[wId][wSlot === 1 ? 'team1Id' : 'team2Id'] = byeW;
-        }
-      }
-    }
-
-    /* ═══ LOWER BRACKET ════════════════════════════════════ */
-    var totalLBR = 2 * (k - 1);
-    for (var lr = 1; lr <= totalLBR; lr++) {
-      // Count matches in this LB round
-      var jj   = Math.ceil(lr / 2);
-      var lCnt = Math.pow(2, k - 1 - jj);
-
-      for (var lm = 1; lm <= lCnt; lm++) {
-        var lmId = 'lb_r' + lr + '_m' + lm;
-
-        // Winner destination
-        var lwId, lwSlot;
-        if (lr === totalLBR) {
-          lwId   = 'grand_final';
-          lwSlot = 2;
-        } else if (lr % 2 === 0) {
-          // Even → next odd (pure): pair into one match
-          lwId   = 'lb_r' + (lr + 1) + '_m' + Math.ceil(lm / 2);
-          lwSlot = lm % 2 === 1 ? 1 : 2;
-        } else {
-          // Odd → next even (drop-in): same match number, slot 1
-          lwId   = 'lb_r' + (lr + 1) + '_m' + lm;
-          lwSlot = 1;
-        }
-
-        _set(lmId, {
-          phase: 'lower', round: lr, matchNum: lm,
-          team1Id: null, team2Id: null,
-          nextMatchId: lwId, nextMatchSlot: lwSlot
-        });
-      }
-    }
-
-    /* ═══ GRAND FINAL ══════════════════════════════════════ */
-    _set('grand_final', {
-      phase: 'final', round: 1, matchNum: 1,
-      team1Id: null, team2Id: null
-    });
-
-    // Apply bye prefills
-    Object.keys(r2Pre).forEach(function (mid) {
-      batch.update(mRef.doc(mid), r2Pre[mid]);
-    });
-
-    batch.update(db.collection('tournaments').doc(_currentTId), { status: 'active' });
-    batch.commit().then(function () {
-      _currentT.status = 'active'; _bracketTab = 'bracket'; _render();
-    }).catch(function (e) { alert('Ошибка старта DE: ' + e.message); });
-  }
-
-  /* ── Generate Group Stage (Round Robin) ── */
-  function _generateGroups(teamArr, db) {
-    var numGroups = teamArr.length <= 8 ? 2 : teamArr.length <= 16 ? 4 : 8;
-    var labels    = 'ABCDEFGH';
-    var groups    = {};
-    for (var i = 0; i < numGroups; i++) groups[labels[i]] = [];
-    teamArr.forEach(function (t, i) { groups[labels[i % numGroups]].push(t); });
-
-    var batch  = db.batch();
-    var mRef   = db.collection('tournaments').doc(_currentTId).collection('matches');
-    var mNum   = 1;
-
-    Object.keys(groups).forEach(function (g) {
-      var gt = groups[g];
-      for (var a = 0; a < gt.length; a++) {
-        for (var b = a + 1; b < gt.length; b++) {
-          batch.set(mRef.doc('g' + g + 'm' + mNum), {
-            phase: 'group', group: g, round: 1, matchNum: mNum,
-            team1Id: gt[a].id, team2Id: gt[b].id,
-            score1: 0, score2: 0, winnerId: null, status: 'upcoming', bo: _currentT.bo || 3
-          });
-          mNum++;
-        }
-      }
-    });
-
-    var gConfig = {};
-    Object.keys(groups).forEach(function (g) {
-      gConfig[g] = groups[g].map(function (t) { return t.id; });
-    });
-
-    batch.update(db.collection('tournaments').doc(_currentTId), {
-      status: 'active',
-      groupConfig: JSON.stringify(gConfig)
-    });
-
-    batch.commit().then(function () {
-      _currentT.status = 'active'; _bracketTab = 'bracket'; _render();
-    }).catch(function (e) { alert('Ошибка старта: ' + e.message); });
-  }
-
-  /* ── Match result recording ── */
+  /* ══════════════════════════════════════════════════════════
+     MATCH RESULT — ввод и отмена
+  ══════════════════════════════════════════════════════════ */
   window._csMatchEdit = function (matchId) {
-    var m  = _matches[matchId]; if (!m) return;
-    var t1 = m.team1Id ? (_teams[m.team1Id] || null) : null;
-    var t2 = m.team2Id ? (_teams[m.team2Id] || null) : null;
-    var bo = m.bo || (_currentT && _currentT.bo) || 3;
+    var m = S.matches[matchId]; if (!m) return;
+    var t1 = m.team1Id ? (S.teams[m.team1Id] || null) : null;
+    var t2 = m.team2Id ? (S.teams[m.team2Id] || null) : null;
+    var bo = m.bo || (S.currentT && S.currentT.bo) || 3;
     var max = Math.ceil(bo / 2);
 
     _removePopup('csMatchPopup');
     var overlay = document.createElement('div');
-    overlay.id  = 'csMatchPopup';
+    overlay.id = 'csMatchPopup';
     overlay.className = 'cs-popup-overlay';
-    overlay.innerHTML = '<div class="cs-popup">' +
-      '<div class="cs-popup-title">Счёт матча <span class="cs-popup-bo">BO' + bo + '</span></div>' +
-      '<div class="cs-me-row">' +
-      '<span class="cs-me-team">' + _e(t1 ? t1.name : 'TBD') + '</span>' +
-      '<input type="number" class="cs-me-inp" id="csMeS1" min="0" max="' + max + '" value="' + (m.score1 || 0) + '">' +
-      '<span class="cs-me-sep">:</span>' +
-      '<input type="number" class="cs-me-inp" id="csMeS2" min="0" max="' + max + '" value="' + (m.score2 || 0) + '">' +
-      '<span class="cs-me-team">' + _e(t2 ? t2.name : 'TBD') + '</span>' +
-      '</div>' +
-      '<div class="cs-popup-note">Максимум ' + max + ' побед в BO' + bo + '</div>' +
-      '<div class="cs-popup-acts">' +
-      '<button class="cs-btn cs-btn-sec" onclick="window._csRemovePopup(\'csMatchPopup\')">Отмена</button>' +
-      '<button class="cs-btn cs-btn-pri" onclick="window._csSaveResult(\'' + matchId + '\')">Сохранить</button>' +
-      '</div></div>';
+    overlay.innerHTML = h('div', { class: 'cs-popup' },
+      h('div', { class: 'cs-popup-title' },
+        'Счёт матча ' + h('span', { class: 'cs-popup-bo' }, 'BO' + bo)) +
+      h('div', { class: 'cs-me-row' },
+        h('span', { class: 'cs-me-team' }, _e(t1 ? t1.name : 'TBD')) +
+        '<input type="number" class="cs-me-inp" id="csMeS1" min="0" max="' + max + '" value="' + (m.score1 || 0) + '">' +
+        h('span', { class: 'cs-me-sep' }, ':') +
+        '<input type="number" class="cs-me-inp" id="csMeS2" min="0" max="' + max + '" value="' + (m.score2 || 0) + '">' +
+        h('span', { class: 'cs-me-team' }, _e(t2 ? t2.name : 'TBD'))) +
+      h('div', { class: 'cs-popup-note' }, 'Максимум ' + max + ' побед в BO' + bo) +
+      h('div', { class: 'cs-popup-acts' },
+        h('button', { class: 'cs-btn cs-btn-sec', onclick: 'window._csRemovePopup(\'csMatchPopup\')' }, 'Отмена') +
+        h('button', { class: 'cs-btn cs-btn-pri', onclick: 'window._csSaveResult(\'' + _e(matchId) + '\')' }, 'Сохранить')));
     overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
     var mask = document.getElementById('cybersportMask');
     if (mask) mask.appendChild(overlay);
@@ -1167,11 +1568,11 @@
 
   window._csSaveResult = function (matchId) {
     var db = _db(); if (!db) return;
-    var m  = _matches[matchId]; if (!m) return;
-    var bo  = m.bo || (_currentT && _currentT.bo) || 3;
+    var m = S.matches[matchId]; if (!m) return;
+    var bo = m.bo || (S.currentT && S.currentT.bo) || 3;
     var max = Math.ceil(bo / 2);
-    var s1  = parseInt((_q('#csMeS1') || {}).value || '0');
-    var s2  = parseInt((_q('#csMeS2') || {}).value || '0');
+    var s1 = parseInt((_q('#csMeS1') || {}).value || '0');
+    var s2 = parseInt((_q('#csMeS2') || {}).value || '0');
 
     if (isNaN(s1) || isNaN(s2) || s1 < 0 || s2 < 0 || s1 > max || s2 > max) {
       alert('Некорректный счёт для BO' + bo + ' (максимум ' + max + ')'); return;
@@ -1182,23 +1583,17 @@
     }
 
     var winnerId = s1 > s2 ? m.team1Id : m.team2Id;
-    var loserId  = s1 > s2 ? m.team2Id : m.team1Id;
-    var batch    = db.batch();
-    var mRef     = db.collection('tournaments').doc(_currentTId).collection('matches').doc(matchId);
+    var batch = db.batch();
+    var mRef  = db.collection('tournaments').doc(S.currentTId).collection('matches').doc(matchId);
     batch.update(mRef, { score1: s1, score2: s2, winnerId: winnerId, status: 'completed' });
 
-    // Winner path (SE + DE upper)
-    if (m.nextMatchId) {
-      var nRef  = db.collection('tournaments').doc(_currentTId).collection('matches').doc(m.nextMatchId);
-      var upd   = {}; upd[m.nextMatchSlot === 1 ? 'team1Id' : 'team2Id'] = winnerId;
-      batch.update(nRef, upd);
-    }
-    // Loser path (DE only — loser drops to lower bracket)
-    if (m.loserNextMatchId && loserId) {
-      var lRef  = db.collection('tournaments').doc(_currentTId).collection('matches').doc(m.loserNextMatchId);
-      var lupd  = {}; lupd[m.loserNextMatchSlot === 1 ? 'team1Id' : 'team2Id'] = loserId;
-      batch.update(lRef, lupd);
-    }
+    // Вычисляем downstream-обновления через Engine
+    var allMatches = Object.values(S.matches);
+    var completedSnapshot = Object.assign({}, m, { score1: s1, score2: s2, winnerId: winnerId });
+    var updates = Engine.propagateMatchResult(allMatches, completedSnapshot);
+    Object.keys(updates).forEach(function (mid) {
+      batch.update(db.collection('tournaments').doc(S.currentTId).collection('matches').doc(mid), updates[mid]);
+    });
 
     batch.commit().then(function () {
       _removePopup('csMatchPopup');
@@ -1209,61 +1604,66 @@
   window._csUndoMatch = function (matchId) {
     if (!confirm('Отменить результат этого матча?')) return;
     var db = _db(); if (!db) return;
-    var m  = _matches[matchId]; if (!m) return;
+    var m = S.matches[matchId]; if (!m) return;
+
     var batch = db.batch();
-    var mRef  = db.collection('tournaments').doc(_currentTId).collection('matches').doc(matchId);
+    var mRef  = db.collection('tournaments').doc(S.currentTId).collection('matches').doc(matchId);
     batch.update(mRef, { score1: 0, score2: 0, winnerId: null, status: 'upcoming' });
-    // Clear winner path
-    if (m.nextMatchId) {
-      var nRef = db.collection('tournaments').doc(_currentTId).collection('matches').doc(m.nextMatchId);
-      var upd  = {}; upd[m.nextMatchSlot === 1 ? 'team1Id' : 'team2Id'] = null;
-      batch.update(nRef, upd);
-    }
-    // Clear loser path (DE)
-    if (m.loserNextMatchId) {
-      var lRef = db.collection('tournaments').doc(_currentTId).collection('matches').doc(m.loserNextMatchId);
-      var lupd = {}; lupd[m.loserNextMatchSlot === 1 ? 'team1Id' : 'team2Id'] = null;
-      batch.update(lRef, lupd);
-    }
+
+    var allMatches = Object.values(S.matches);
+    var clears = Engine.clearDownstream(allMatches, matchId);
+    Object.keys(clears).forEach(function (mid) {
+      batch.update(db.collection('tournaments').doc(S.currentTId).collection('matches').doc(mid), clears[mid]);
+    });
+
     batch.commit().catch(function (e) { alert('Ошибка: ' + e.message); });
   };
 
   function _checkComplete() {
-    var all = Object.values(_matches).every(function (m) { return !!m.winnerId; });
-    if (!all) return;
+    var all = Object.values(S.matches);
+    if (!all.length) return;
+    var t = S.currentT;
+    // Для group_elim турнир завершён только когда есть плей-офф и его финал сыгран
+    if (t && t.format === 'group_elim') {
+      var poMatches = all.filter(function (m) { return m.phase === 'playoff'; });
+      if (!poMatches.length) return;
+      if (!poMatches.every(function (m) { return !!m.winnerId; })) return;
+    } else {
+      if (!all.every(function (m) { return !!m.winnerId; })) return;
+    }
     var db = _db(); if (!db) return;
-    db.collection('tournaments').doc(_currentTId).update({ status: 'completed' })
-      .then(function () { if (_currentT) _currentT.status = 'completed'; })
+    db.collection('tournaments').doc(S.currentTId).update({ status: 'completed' })
       .catch(function () {});
   }
 
-  /* ── Team popup ── */
+  /* ══════════════════════════════════════════════════════════
+     TEAM POPUP
+  ══════════════════════════════════════════════════════════ */
   window._csTeamPopup = function (teamId) {
-    var team = _teams[teamId]; if (!team) return;
+    var team = S.teams[teamId]; if (!team) return;
     _removePopup('csTeamPopup');
 
     var players = (team.players || []).filter(function (p) { return p.nick; }).map(function (p) {
       var lbl = ROLES[p.role] || p.role;
-      return '<div class="cs-tp-row">' +
-        '<span class="cs-rl-ico">' + lbl.split(' ')[0] + '</span>' +
-        '<span class="cs-tp-nick">' + _e(p.nick) + '</span>' +
-        '<span class="cs-tp-role">' + lbl.split(' ').slice(1).join(' ') + '</span>' +
-        '</div>';
+      return h('div', { class: 'cs-tp-row' },
+        h('span', { class: 'cs-rl-ico' }, lbl.split(' ')[0]) +
+        h('span', { class: 'cs-tp-nick' }, _e(p.nick)) +
+        h('span', { class: 'cs-tp-role' }, lbl.split(' ').slice(1).join(' ')));
     }).join('');
 
     var overlay = document.createElement('div');
-    overlay.id  = 'csTeamPopup';
+    overlay.id = 'csTeamPopup';
     overlay.className = 'cs-popup-overlay';
-    overlay.innerHTML = '<div class="cs-popup">' +
-      '<div class="cs-tp-hdr">' +
-      _logoEl(team, 42) +
-      '<div class="cs-tp-info"><div class="cs-tp-name">' + _e(team.name) + '</div>' +
-      '<div class="cs-tp-seed">Seed #' + (team.seed || '?') + '</div></div>' +
-      '<button class="cs-btn-ico" onclick="window._csRemovePopup(\'csTeamPopup\')">✕</button>' +
-      '</div>' +
-      (players ? '<div class="cs-tp-players">' + players + '</div>' :
-        '<div class="cs-tp-empty">Состав не указан</div>') +
-      '</div>';
+    overlay.innerHTML = h('div', { class: 'cs-popup' },
+      h('div', { class: 'cs-tp-hdr' },
+        _logoEl(team, 42) +
+        h('div', { class: 'cs-tp-info' },
+          h('div', { class: 'cs-tp-name' }, _e(team.name)) +
+          h('div', { class: 'cs-tp-seed' }, 'Seed #' + (team.seed || '?'))) +
+        h('button', { class: 'cs-btn-ico', onclick: 'window._csRemovePopup(\'csTeamPopup\')' }, '✕')) +
+      (players
+        ? h('div', { class: 'cs-tp-players' }, players)
+        : h('div', { class: 'cs-tp-empty' }, 'Состав не указан')));
     overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
     var mask = document.getElementById('cybersportMask');
     if (mask) mask.appendChild(overlay);
@@ -1271,51 +1671,66 @@
 
   window._csRemovePopup = function (id) { _removePopup(id); };
 
+  function _removePopup(id) {
+    var el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
   /* ══════════════════════════════════════════════════════════
      SCHEDULE TAB
   ══════════════════════════════════════════════════════════ */
   function _htmlSchedule() {
-    var matchArr = Object.values(_matches);
-    if (!matchArr.length) return '<div class="cs-empty">Расписание появится после запуска</div>';
+    var matchArr = Object.values(S.matches);
+    if (!matchArr.length) return h('div', { class: 'cs-empty' }, 'Расписание появится после запуска');
 
-    var isCreator = _uid() && _currentT && _currentT.createdBy === _uid();
-    var upcoming  = matchArr.filter(function (m) { return !m.winnerId; });
-    var done      = matchArr.filter(function (m) { return !!m.winnerId; });
+    var canEdit = _canEdit();
+    var upcoming = matchArr.filter(function (m) { return !m.winnerId; });
+    var done     = matchArr.filter(function (m) { return !!m.winnerId; });
 
     function _rowHtml(m) {
-      var t1  = m.team1Id ? (_teams[m.team1Id] || null) : null;
-      var t2  = m.team2Id ? (_teams[m.team2Id] || null) : null;
-      var lbl = m.phase === 'group' ? 'Группа ' + m.group : 'Раунд ' + m.round;
-      var w   = m.winnerId ? (m.winnerId === m.team1Id ? t1 : t2) : null;
-      return '<div class="cs-sched-row">' +
-        '<span class="cs-sched-lbl">' + lbl + '</span>' +
-        '<span class="cs-sched-teams">' + (t1 ? _e(t1.name) : 'TBD') + ' vs ' + (t2 ? _e(t2.name) : 'TBD') + '</span>' +
-        (w ? '<span class="cs-sched-win">▶ ' + _e(w.name) + '</span>' : '') +
-        (isCreator && t1 && t2 && !m.winnerId ? '<button class="cs-sched-btn" onclick="window._csMatchEdit(\'' + m.id + '\')">Счёт</button>' : '') +
-        '</div>';
+      var t1 = m.team1Id ? (S.teams[m.team1Id] || null) : null;
+      var t2 = m.team2Id ? (S.teams[m.team2Id] || null) : null;
+      var lbl = m.label || (m.phase === 'group' ? 'Группа ' + m.group : 'Раунд ' + m.round);
+      var w  = m.winnerId ? (m.winnerId === m.team1Id ? t1 : t2) : null;
+      return h('div', { class: 'cs-sched-row' },
+        h('span', { class: 'cs-sched-lbl' }, _e(lbl)) +
+        h('span', { class: 'cs-sched-teams' },
+          (t1 ? _e(t1.name) : 'TBD') + ' vs ' + (t2 ? _e(t2.name) : 'TBD')) +
+        (w ? h('span', { class: 'cs-sched-win' }, '▶ ' + _e(w.name)) : '') +
+        (canEdit && t1 && t2 && !m.winnerId
+          ? h('button', { class: 'cs-sched-btn', onclick: 'window._csMatchEdit(\'' + _e(m.id) + '\')' }, 'Счёт')
+          : ''));
     }
 
     var html = '';
-    if (upcoming.length) html += '<div class="cs-sched-section">Предстоящие</div>' + upcoming.map(_rowHtml).join('');
-    if (done.length)     html += '<div class="cs-sched-section">Завершённые</div>' + done.map(_rowHtml).join('');
-    return '<div class="cs-schedule">' + html + '</div>';
+    if (upcoming.length) html += h('div', { class: 'cs-sched-section' }, 'Предстоящие') + upcoming.map(_rowHtml).join('');
+    if (done.length)     html += h('div', { class: 'cs-sched-section' }, 'Завершённые') + done.map(_rowHtml).join('');
+    return h('div', { class: 'cs-schedule' }, html);
   }
 
-  /* ── Edit tournament settings ── */
+  /* ══════════════════════════════════════════════════════════
+     TOURNAMENT SETTINGS — редактирование
+  ══════════════════════════════════════════════════════════ */
   window._csTEditSettings = function () {
-    var t = _currentT; if (!t) return;
+    var t = S.currentT; if (!t) return;
     _removePopup('csTEditPopup');
+    var publicChecked = t.isPublic ? 'checked' : '';
     var overlay = document.createElement('div');
-    overlay.id  = 'csTEditPopup';
+    overlay.id = 'csTEditPopup';
     overlay.className = 'cs-popup-overlay';
-    overlay.innerHTML = '<div class="cs-popup">' +
-      '<div class="cs-popup-title">Настройки турнира</div>' +
-      _field('Название', '<input class="cs-input" id="csTeName" value="' + _e(t.name || '') + '">') +
-      _field('Призовой фонд', '<input class="cs-input" id="csTePrize" value="' + _e(t.prizePool || '') + '">') +
-      '<div class="cs-popup-acts">' +
-      '<button class="cs-btn cs-btn-sec" onclick="window._csRemovePopup(\'csTEditPopup\')">Отмена</button>' +
-      '<button class="cs-btn cs-btn-pri" onclick="window._csSaveTSettings()">Сохранить</button>' +
-      '</div></div>';
+    overlay.innerHTML = h('div', { class: 'cs-popup' },
+      h('div', { class: 'cs-popup-title' }, 'Настройки турнира') +
+      _field('Название',
+        h('input', { class: 'cs-input', id: 'csTeName', value: t.name || '' }, '')) +
+      _field('Призовой фонд',
+        h('input', { class: 'cs-input', id: 'csTePrize', value: t.prizePool || '' }, '')) +
+      h('label', { class: 'cs-checkrow' },
+        '<input type="checkbox" id="csTeIsPublic" ' + publicChecked + '>' +
+        '<span>Публичный — доступен по прямой ссылке</span>') +
+      h('div', { class: 'cs-popup-acts' },
+        h('button', { class: 'cs-btn cs-btn-danger', onclick: 'window._csTDeleteTournament()' }, 'Удалить турнир') +
+        h('button', { class: 'cs-btn cs-btn-sec', onclick: 'window._csRemovePopup(\'csTEditPopup\')' }, 'Отмена') +
+        h('button', { class: 'cs-btn cs-btn-pri', onclick: 'window._csSaveTSettings()' }, 'Сохранить')));
     overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
     var mask = document.getElementById('cybersportMask');
     if (mask) mask.appendChild(overlay);
@@ -1325,48 +1740,95 @@
     var db = _db(); if (!db) return;
     var name  = (_q('#csTeName') || {}).value || '';
     var prize = (_q('#csTePrize') || {}).value || '';
+    var isPublic = !!(_q('#csTeIsPublic') && _q('#csTeIsPublic').checked);
     if (!name.trim()) { alert('Введите название'); return; }
-    db.collection('tournaments').doc(_currentTId).update({ name: name.trim(), prizePool: prize.trim() })
-      .then(function () {
-        if (_currentT) { _currentT.name = name.trim(); _currentT.prizePool = prize.trim(); }
-        _removePopup('csTEditPopup'); _render();
-      }).catch(function (e) { alert('Ошибка: ' + e.message); });
+    db.collection('tournaments').doc(S.currentTId).update({
+      name: name.trim(), prizePool: prize.trim(), isPublic: isPublic
+    }).then(function () {
+      _removePopup('csTEditPopup');
+    }).catch(function (e) { alert('Ошибка: ' + e.message); });
   };
+
+  window._csTDeleteTournament = function () {
+    if (!confirm('Удалить турнир целиком? Это действие необратимо.')) return;
+    var db = _db(); if (!db) return;
+    var tId = S.currentTId;
+    var tRef = db.collection('tournaments').doc(tId);
+
+    // Удаляем подколлекции команд и матчей
+    Promise.all([
+      tRef.collection('teams').get(),
+      tRef.collection('matches').get()
+    ]).then(function (snaps) {
+      var batch = db.batch();
+      snaps.forEach(function (snap) {
+        snap.forEach(function (d) { batch.delete(d.ref); });
+      });
+      batch.delete(tRef);
+      return batch.commit();
+    }).then(function () {
+      _removePopup('csTEditPopup');
+      window._csBackToList();
+      _toast('Турнир удалён');
+    }).catch(function (e) { alert('Ошибка удаления: ' + e.message); });
+  };
+
+  /* ══════════════════════════════════════════════════════════
+     SHARING
+  ══════════════════════════════════════════════════════════ */
+  window._csShare = function () {
+    var t = S.currentT; if (!t) return;
+    var url = window.location.origin + window.location.pathname + '?cs=' + S.currentTId;
+
+    if (!t.isPublic && _isCreator()) {
+      if (confirm('Турнир сейчас приватный — зрители без авторизации не смогут открыть ссылку. Сделать его публичным?')) {
+        var db = _db();
+        if (db) db.collection('tournaments').doc(S.currentTId).update({ isPublic: true });
+      }
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function () {
+        _toast('Ссылка скопирована');
+      }).catch(function () {
+        _showShareLink(url);
+      });
+    } else {
+      _showShareLink(url);
+    }
+  };
+
+  function _showShareLink(url) {
+    _removePopup('csSharePopup');
+    var overlay = document.createElement('div');
+    overlay.id = 'csSharePopup';
+    overlay.className = 'cs-popup-overlay';
+    overlay.innerHTML = h('div', { class: 'cs-popup' },
+      h('div', { class: 'cs-popup-title' }, '🔗 Ссылка на турнир') +
+      h('input', { class: 'cs-input', id: 'csShareUrl', value: url, readonly: 'readonly' }, '') +
+      h('div', { class: 'cs-popup-note' }, 'Скопируйте и отправьте кому угодно — даже без аккаунта смогут смотреть сетку.') +
+      h('div', { class: 'cs-popup-acts' },
+        h('button', { class: 'cs-btn cs-btn-pri', onclick: 'window._csRemovePopup(\'csSharePopup\')' }, 'OK')));
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.remove(); });
+    var mask = document.getElementById('cybersportMask');
+    if (mask) mask.appendChild(overlay);
+    setTimeout(function () { var i = _q('#csShareUrl'); if (i) i.select(); }, 50);
+  }
 
   /* ══════════════════════════════════════════════════════════
      UTILS
   ══════════════════════════════════════════════════════════ */
-  function _e(s)  { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function _ea(s) { return _e(s); }
-  function _q(sel) { return document.querySelector(sel); }
-
-  function _field(label, inputHtml) {
-    return '<div class="cs-field"><label class="cs-label">' + label + '</label>' + inputHtml + '</div>';
-  }
-
   function _teamsSorted() {
-    return Object.values(_teams).sort(function (a, b) { return (a.seed || 0) - (b.seed || 0); });
-  }
-
-  function _logoEl(team, size) {
-    if (team.logoUrl) {
-      return '<img class="cs-logo-img" src="' + _ea(team.logoUrl) + '" style="width:' + size + 'px;height:' + size + 'px">';
-    }
-    return '<div class="cs-logo-ph" style="width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * 0.45) + 'px">' +
-      (team.name ? team.name[0].toUpperCase() : '?') + '</div>';
-  }
-
-  function _collectPlayers() {
-    var players = [];
-    document.querySelectorAll('[data-pi]').forEach(function (inp, i) {
-      players.push({ nick: inp.value.trim(), role: ROLE_KEYS[i] || 'top' });
+    return Object.keys(S.teams).map(function (k) { return S.teams[k]; }).sort(function (a, b) {
+      return (a.seed || 0) - (b.seed || 0);
     });
-    return players;
   }
 
-  function _removePopup(id) {
-    var el = document.getElementById(id);
-    if (el) el.remove();
-  }
+  /* Перерисовываем коннекторы при ресайзе окна */
+  window.addEventListener('resize', function () {
+    if (S.view === 'tournament' && S.bracketTab === 'bracket') {
+      _drawConnectors();
+    }
+  });
 
 })();

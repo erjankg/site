@@ -2891,26 +2891,45 @@
             ? 'linear-gradient(135deg,#e74c3c,#c0392b)'
             : 'linear-gradient(135deg,#f39c12,#e67e22)';
 
+        // Локальный escape — у app.js нет общего escapeHtml в этом скопе.
+        function _esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        }
+
         var overlay = document.createElement('div');
+        overlay.setAttribute('role','dialog');
+        overlay.setAttribute('aria-modal','true');
         overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);';
 
         var box = document.createElement('div');
         box.style.cssText = 'background:var(--bg-secondary,#1a1a2e);border:1px solid rgba(109,63,245,0.3);border-radius:16px;padding:28px 24px 20px;max-width:340px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.6);';
+        // icon — передаётся самой стороной кода (эмодзи/контролируемое значение); msg/title — из юзерского контекста, экранируем.
         box.innerHTML = ''
-            + '<div style="font-size:36px;margin-bottom:12px;">'+icon+'</div>'
-            + '<div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:8px;">'+title+'</div>'
-            + '<div style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5;">'+msg+'</div>'
+            + '<div style="font-size:36px;margin-bottom:12px;">'+_esc(icon)+'</div>'
+            + '<div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:8px;">'+_esc(title)+'</div>'
+            + '<div style="font-size:13px;color:rgba(255,255,255,0.55);margin-bottom:22px;line-height:1.5;">'+_esc(msg)+'</div>'
             + '<div style="display:flex;gap:10px;">'
             +   '<button class="_conf-cancel" style="flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:rgba(255,255,255,0.6);font-size:13px;font-weight:700;cursor:pointer;">Отмена</button>'
-            +   '<button class="_conf-ok" style="flex:1;padding:12px;border-radius:10px;border:none;background:'+btnBg+';color:#fff;font-size:13px;font-weight:800;cursor:pointer;">'+confirmText+'</button>'
+            +   '<button class="_conf-ok" style="flex:1;padding:12px;border-radius:10px;border:none;background:'+btnBg+';color:#fff;font-size:13px;font-weight:800;cursor:pointer;">'+_esc(confirmText)+'</button>'
             + '</div>';
 
-        box.querySelector('._conf-cancel').onclick = function() { overlay.remove(); };
-        box.querySelector('._conf-ok').onclick = function() { overlay.remove(); onConfirm(); };
-        overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+        var cancelBtn = box.querySelector('._conf-cancel');
+        var okBtn = box.querySelector('._conf-ok');
+        function close(){ overlay.remove(); document.removeEventListener('keydown', keyHandler, true); }
+        cancelBtn.onclick = close;
+        okBtn.onclick = function(){ close(); onConfirm(); };
+        overlay.onclick = function(e){ if (e.target === overlay) close(); };
+        function keyHandler(e){
+            if (e.key === 'Escape') { e.preventDefault(); close(); }
+            else if (e.key === 'Enter') { e.preventDefault(); close(); onConfirm(); }
+        }
+        document.addEventListener('keydown', keyHandler, true);
 
         overlay.appendChild(box);
         document.body.appendChild(overlay);
+        setTimeout(function(){ try { okBtn.focus(); } catch(e){} }, 30);
     };
 
     // ═══════════════════════════════════════
@@ -3582,6 +3601,9 @@
         document.documentElement.classList.remove('pre-guest');
         try { localStorage.setItem('_wrsAuthed', '1'); } catch(e){}
     }
+    // Экспортируем для cybersport.js: он зовёт когда юзер закрывает публичный режим
+    window.showSiteAuthGate = showSiteAuthGate;
+    window.hideSiteAuthGate = hideSiteAuthGate;
 
     // Захватываем pending-URL параметры до любых навигаций
     var _pendingDeepLink = (function(){
@@ -3590,6 +3612,8 @@
             var draft = p.get('draft');
             var token = p.get('t');
             if (draft) return { type: 'draft', id: draft, token: token || '' };
+            var cs = p.get('cs');
+            if (cs) return { type: 'cybersport', id: cs };
         } catch(e) {}
         return null;
     })();
@@ -3603,6 +3627,7 @@
             var url = new URL(window.location.href);
             url.searchParams.delete('draft');
             url.searchParams.delete('t');
+            url.searchParams.delete('cs');
             window.history.replaceState({}, '', url.pathname + (url.search || '') + url.hash);
         } catch(e) {}
         if (dl.type === 'draft') {
@@ -3611,6 +3636,11 @@
                 setTimeout(function(){
                     if (window.dcoopOpenLobby) window.dcoopOpenLobby(dl.id, dl.token);
                 }, 300);
+            }, 200);
+        } else if (dl.type === 'cybersport') {
+            setTimeout(function(){
+                if (window.openCybersportTournament) window.openCybersportTournament(dl.id);
+                else if (window.openCybersport) window.openCybersport();
             }, 200);
         }
     }
@@ -3698,7 +3728,21 @@
                 window._isAdmin = false;
                 document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = 'none'; });
                 document.body.classList.remove('profile-gated');
-                showSiteAuthGate();
+                // Публичный просмотр турнира по ?cs= — пропускаем auth-gate,
+                // открываем сразу модалку. Если cs-public-mode уже активирован в
+                // index.html, просто применяем deep-link. Если визитёр был с
+                // _wasAuthed=true но сейчас разлогинен и пришёл с ?cs= —
+                // активируем публичный режим динамически.
+                var hasCsDeepLink = _pendingDeepLink && _pendingDeepLink.type === 'cybersport';
+                if (hasCsDeepLink || document.documentElement.classList.contains('cs-public-mode')) {
+                    if (hasCsDeepLink && !document.documentElement.classList.contains('cs-public-mode')) {
+                        document.documentElement.classList.add('cs-public-mode');
+                        document.documentElement.classList.remove('pre-guest');
+                    }
+                    applyPendingDeepLink();
+                } else {
+                    showSiteAuthGate();
+                }
             }
         });
     } else {
