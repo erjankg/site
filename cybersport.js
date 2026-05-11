@@ -675,6 +675,8 @@
     _loadTournament(id);
   };
   window._csBackToList = function () {
+    // В публичном режиме списка нет — выходим в auth-gate
+    if (_isPublicMode()) { window.closeCybersport(); return; }
     _unsubAll();
     S.view = 'list'; S.currentTId = null; S.currentT = null;
     S.teams = {}; S.matches = {};
@@ -1013,9 +1015,21 @@
       body = h('div', { class: 'cs-loading' }, 'Загрузка...');
     }
 
+    // Баннер публичного режима: видим только незалогиненному зрителю
+    var publicBanner = _isPublicMode()
+      ? h('div', { class: 'cs-public-banner' },
+          '👁 ' + h('strong', null, 'Публичный просмотр') +
+          ' — войдите чтобы создавать свои турниры или открыть остальной сайт.' +
+          h('button', { class: 'cs-banner-cta', onclick: 'window._csPublicSignIn()' }, '🔑 Войти'))
+      : '';
+
+    // В публичном режиме кнопка ← ведёт на auth-gate (списка турниров нет)
+    var backLabel = _isPublicMode() ? '✕' : '←';
+
     return h('div', { class: 'cs-tourn-view' },
+      publicBanner +
       h('div', { class: 'cs-tourn-hdr' },
-        h('button', { class: 'cs-btn-ico cs-back', onclick: 'window._csBackToList()' }, '←') +
+        h('button', { class: 'cs-btn-ico cs-back', onclick: 'window._csBackToList()' }, backLabel) +
         h('span', { class: 'cs-tourn-name' }, _e(name) + statusBadge + publicBadge) +
         h('div', { class: 'cs-tourn-acts' }, startBtn + shareBtn + editBtn)) +
       (t ? h('div', { class: 'cs-tourn-meta' },

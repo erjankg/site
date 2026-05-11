@@ -3599,6 +3599,14 @@
         if (g) g.style.display = 'none';
         document.body.classList.remove('site-auth-locked');
         document.documentElement.classList.remove('pre-guest');
+        // Если юзер был в публичном просмотре турнира и залогинился — выходим из публичного режима
+        if (document.documentElement.classList.contains('cs-public-mode')) {
+            document.documentElement.classList.remove('cs-public-mode');
+            // Триггерим ре-рендер чтобы баннер пропал и edit-кнопки появились (если он создатель)
+            setTimeout(function () {
+                if (typeof window._csRender === 'function') window._csRender();
+            }, 300);
+        }
         try { localStorage.setItem('_wrsAuthed', '1'); } catch(e){}
     }
     // Экспортируем для cybersport.js: он зовёт когда юзер закрывает публичный режим
