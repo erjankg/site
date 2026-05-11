@@ -1507,7 +1507,10 @@
         if (!snap.exists) return;
         var g = snap.data(); g.id = snap.id;
         _currentGame = g;
-        renderDraftUi(lobby, g);
+        // Берём свежий lobby через _currentLobby (а не захваченный closure),
+        // иначе обновления seriesScore/completedGames/status не доезжают до UI
+        // при ранних return-ах listenToCurrentGame по тому же gameKey.
+        renderDraftUi(_currentLobby || lobby, g);
       }, function(err){ console.warn('[draft] game listener', err); });
   }
 
@@ -1583,6 +1586,12 @@
     if (roles.blue.cap && roles.blue.cap.uid === uid) mySide = 'blue';
     else if (roles.red.cap && roles.red.cap.uid === uid) mySide = 'red';
     var iAmCaptain = !!mySide;
+    // myTeam — идентификатор моей команды (blueCaptain/redCaptain), НЕ позиция.
+    // Нужен отдельно от mySide потому что game.readyBlue/readyRed пишутся по КОМАНДЕ,
+    // а mySide после свапа сторон даёт позицию. Без myTeam Ready-кнопка читала чужой флаг.
+    var myTeam = null;
+    if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) myTeam = 'blue';
+    else if (lobby.redCaptain && lobby.redCaptain.uid === uid) myTeam = 'red';
     var isCreator = lobby.createdBy === uid;
 
     var step = WR_DRAFT_SEQUENCE[game.turnIndex] || null;
@@ -1605,7 +1614,7 @@
       +   '<div class="dcoop-gallery-col">'
       +     gallerySearchHtml()
       +     '<div id="dcoopGallery" class="dcoop-gallery"></div>'
-      +     lockInBtnHtml(myTurn, game, step, mySide, iAmCaptain)
+      +     lockInBtnHtml(myTurn, game, step, mySide, iAmCaptain, myTeam)
       +   '</div>'
       +   sidePanelHtml('red', lobby, game, step)
       + '</div>'
@@ -2202,12 +2211,14 @@
       + '</div>';
   }
 
-  function lockInBtnHtml(myTurn, game, step, mySide, iAmCaptain) {
+  function lockInBtnHtml(myTurn, game, step, mySide, iAmCaptain, myTeam) {
     if (game.phase === 'done') return '';
     // Оба кэпа ещё не нажали "Готов" — показываем кнопку готовности вместо Lock In
     if (!game.readyBlue || !game.readyRed) {
       if (iAmCaptain) {
-        var myReady = mySide === 'blue' ? !!game.readyBlue : !!game.readyRed;
+        // game.readyBlue/readyRed пишутся по КОМАНДЕ (см. draftCapReady),
+        // поэтому читаем по myTeam, не по mySide (позиции).
+        var myReady = myTeam === 'blue' ? !!game.readyBlue : !!game.readyRed;
         if (myReady) {
           return '<button class="dcoop-lock-btn" disabled style="background:rgba(46,204,113,0.18);color:#2ecc71;border-color:#2ecc71;cursor:default;">✓ Готов — ждём соперника…</button>';
         }
