@@ -63,19 +63,19 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" integrity="sha384-qn4Jh88HhJA8dplNQyGjOh9OGI4izVhrfj/qIFgaKcdgOE06pXqIKGlsCILZcLAC" crossorigin="anonymous"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js" integrity="sha384-6I0gWsz4FIAr30c0TxIxJnPQuJiZ1FfILdZrgJdjxTH3R8dgPGTvexbyqTvReV6Z" crossorigin="anonymous"></script>
 
-    <!-- Pre-auth state check: если флаг "был залогинен" отсутствует — сразу блокируем сайт чтобы не просвечивал контент гостю. -->
-    <!-- Исключение: ?cs=<id> — публичный просмотр турнира без авторизации (CS public mode). -->
+    <!-- Pre-auth state check: контент главной публичен (для SEO/Googlebot и обычных гостей).
+         Гейт показывается только при попытке войти в auth-only фичу (см. requireAuth в app.js).
+         pre-profile-gate сохраняется — он применяется только к залогиненным с незаполненным
+         профилем, на SEO не влияет. cs-public-mode — отдельная ветка для шаринга турниров. -->
     <script>
       try {
         var _wasAuthed = localStorage.getItem('_wrsAuthed') === '1';
         var _wasProfileReady = localStorage.getItem('_wrsProfileReady') === '1';
         var _csParam = new URLSearchParams(window.location.search).get('cs');
         if (_csParam && !_wasAuthed) {
-          // Публичный просмотр турнира — не показываем стену, рендерим только модалку
           document.documentElement.classList.add('cs-public-mode');
-        } else {
-          if (!_wasAuthed) document.documentElement.classList.add('pre-guest');
-          if (_wasAuthed && !_wasProfileReady) document.documentElement.classList.add('pre-profile-gate');
+        } else if (_wasAuthed && !_wasProfileReady) {
+          document.documentElement.classList.add('pre-profile-gate');
         }
       } catch(e){}
     </script>
@@ -85,7 +85,7 @@
 <!-- ══ SITE AUTH GATE (shown ON-DEMAND для auth-only фич: профиль/чат/драфт/админка). -->
 <!-- НЕ показывается на старте незалогиненным посетителям, чтобы Googlebot и обычные -->
 <!-- юзеры могли видеть публичный контент (тир-листы, винрейты, патчноуты, киберспорт). -->
-<div id="siteAuthGate" class="site-auth-gate" style="display:none;">
+<div id="siteAuthGate" class="site-auth-gate" style="display:none;" onclick="if(event.target===this)hideSiteAuthGate()">
   <div class="site-auth-box">
     <button class="site-auth-close" type="button" onclick="hideSiteAuthGate()" aria-label="Закрыть">✕</button>
     <div class="site-auth-icon">⚔️</div>

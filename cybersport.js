@@ -84,8 +84,12 @@
   }
   function _exitPublicMode() {
     document.documentElement.classList.remove('cs-public-mode');
-    document.documentElement.classList.add('pre-guest');
-    if (window.showSiteAuthGate) window.showSiteAuthGate();
+    // SEO: больше не возвращаем pre-guest — контент остаётся публичным.
+    // Если юзеру нужно залогиниться (например для создания турнира) —
+    // вызовется requireAuth() из app.js, который покажет гейт on-demand.
+    if (window.requireAuth) {
+      window.requireAuth('Войди через Google чтобы продолжить.', null);
+    }
   }
   /* Вход в Google — для CTA «Войти» в публичном режиме */
   window._csPublicSignIn = function () {

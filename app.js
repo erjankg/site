@@ -5,202 +5,176 @@
 (() => {
 
     // =========================================
-    // MODAL SYSTEM - stacking (parent stays visible, child opens on top)
+    // MODAL SYSTEM — unified stack + history
+    // Инвариант: одна main-модалка в _modalStack = ОДНА запись в browser history.
+    // Overlay-модалки сверху каждая добавляет свою запись.
+    // Любое открытие/закрытие — ТОЛЬКО через openModal/closeModal.
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
         'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','draftCoopMask','champPickerModal','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask',
-        'socialPickerMask','socialLinkConfirmMask'];
+        'socialPickerMask','socialLinkConfirmMask','changesMask','cybersportMask'];
 
-    // Стек открытых модалок (порядок: первая = нижняя, последняя = верхняя)
-    var _modalStack = [];
-    var _baseZIndex = 6000;
-    var _closingFromPopstate = false; // предотвращает loop при popstate → closeModal → history.back()
-    var _popstateGuard = 0; // timestamp: popstate игнорируется если модалка только что открылась
-    var _consumeNextPopstate = false; // guard: программный history.back() из closeModal — игнорировать следующий popstate
-
-    // Модалки которые ВСЕГДА открываются поверх (не закрывая родителя)
+    // Модалки которые открываются ПОВЕРХ родителя (стек, родитель видим)
     var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask','profileSetupMask','userCardMask',
         'socialPickerMask','socialLinkConfirmMask'];
 
-    function closeAllModals(except) {
-        MODAL_IDS.forEach(function(id) {
-            if(id === except) return;
-            var el = document.getElementById(id);
-            if(!el) return;
-            // Если модалка не активна — мгновенный сброс (не было перехода)
-            if (!el.classList.contains('active')) {
-                el.style.display = '';
-                el.style.zIndex = '';
-                return;
-            }
-            // Активная модалка → плавное закрытие через .closing,
-            // чтобы при переходе A→B не было flash главного экрана между ними
-            if (el._closeTimer) { clearTimeout(el._closeTimer); el._closeTimer = null; }
-            el.classList.remove('closing');  // на случай если уже было
-            // Опускаем z-index чуть ниже новой модалки, чтобы новая была сверху
-            el.style.zIndex = String(_baseZIndex - 1);
-            el.classList.add('closing');
-            var oldEl = el;
-            var _t = setTimeout(function() {
-                if (!oldEl) return;
-                oldEl.classList.remove('active');
-                oldEl.classList.remove('closing');
-                oldEl.style.display = '';
-                oldEl.style.zIndex = '';
-                oldEl._closeTimer = null;
-                if (window._resetModalVV) window._resetModalVV(oldEl);
-            }, 180);
-            el._closeTimer = _t;
-        });
-        _modalStack = [];
-        if(!except) document.body.classList.remove('modal-open');
-    }
+    var _modalStack = [];          // верх = последний элемент
+    var _baseZIndex = 6000;
+    var _pendingBack = 0;          // счётчик programmatic history.back() — popstate их игнорит
 
-    function openModal(id) {
-        // Скрываем тултипы
+    function _hideTooltips() {
         ['itemTooltip','runeTooltip','uiTip'].forEach(function(tid){
             var t=document.getElementById(tid); if(t) t.style.display='none';
         });
+    }
 
-        // Если это overlay-модалка и уже есть активная — стекаем поверх
-        var isOverlay = OVERLAY_MODALS.includes(id);
-        var hasParent = _modalStack.length > 0;
+    function _smoothCloseEl(el) {
+        if(!el) return;
+        if (!el.classList.contains('active')) {
+            el.style.display = ''; el.style.zIndex = '';
+            return;
+        }
+        if (el._closeTimer) { clearTimeout(el._closeTimer); el._closeTimer = null; }
+        el.classList.remove('closing');
+        el.style.zIndex = String(_baseZIndex - 1);
+        el.classList.add('closing');
+        var oldEl = el;
+        el._closeTimer = setTimeout(function() {
+            oldEl.classList.remove('active');
+            oldEl.classList.remove('closing');
+            oldEl.style.display = '';
+            oldEl.style.zIndex = '';
+            oldEl._closeTimer = null;
+            if (window._resetModalVV) window._resetModalVV(oldEl);
+        }, 180);
+    }
 
-        if(isOverlay && hasParent) {
-            // Стекаем: родитель остаётся видимым, новая поверх
-            // Убираем id из стека если уже есть (перемещаем наверх)
+    function _applyStackVisuals() {
+        // Закрываем всё что НЕ в стеке
+        MODAL_IDS.forEach(function(id) {
+            if (_modalStack.indexOf(id) !== -1) return;
+            var el = document.getElementById(id);
+            if (el) _smoothCloseEl(el);
+        });
+        // Показываем то что в стеке (z-index по порядку)
+        _modalStack.forEach(function(id, idx) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            if (el._closeTimer) { clearTimeout(el._closeTimer); el._closeTimer = null; }
+            el.classList.remove('closing');
+            el.classList.add('active');
+            el.style.zIndex = String(_baseZIndex + (idx * 100));
+            el.style.visibility = '';
+        });
+        if (_modalStack.length > 0) document.body.classList.add('modal-open');
+        else document.body.classList.remove('modal-open');
+    }
+
+    function _handleSidebarOnClose(id) {
+        if (!(_sidebarModalId && id === _sidebarModalId)) return;
+        var elS = document.getElementById(id);
+        if (elS) elS.classList.remove('side-panel-modal');
+        document.body.classList.remove('pc-chat-mode');
+        document.body.classList.remove('pc-side-mode');
+        _sidebarModalId = null;
+        _sidebarClearActive();
+        if (_pcSideMode) {
+            _pcSideMode = false;
+        } else {
+            setTimeout(function() {
+                if (_modalStack.length > 0) return;
+                var stillActive = MODAL_IDS.some(function(mid) {
+                    var mel = document.getElementById(mid);
+                    return mel && mel.classList.contains('active');
+                });
+                if (!stillActive) toggleSidebar();
+            }, 150);
+        }
+    }
+
+    // Совместимость: closeAllModals(except) — закрывает всё кроме except (визуально).
+    function closeAllModals(except) {
+        _modalStack = except ? [except] : [];
+        _applyStackVisuals();
+    }
+
+    function openModal(id) {
+        _hideTooltips();
+        var el = document.getElementById(id);
+        if (!el) return;
+
+        var top = _modalStack.length > 0 ? _modalStack[_modalStack.length - 1] : null;
+        // Защита от двойных кликов
+        if (top === id) return;
+
+        var isOverlay = OVERLAY_MODALS.indexOf(id) !== -1;
+
+        if (isOverlay) {
+            // Стекаем поверх
             _modalStack = _modalStack.filter(function(m){ return m !== id; });
             _modalStack.push(id);
+            _applyStackVisuals();
+            if (history && history.pushState) history.pushState({ modal: id }, '');
         } else {
-            // Основная модалка — закрываем все предыдущие
-            closeAllModals(id);
+            // Main-модалка: заменяет ВЕСЬ стек
+            var hadAny = _modalStack.length > 0;
             _modalStack = [id];
-        }
-
-        // Расставляем z-index по стеку
-        _modalStack.forEach(function(mid, idx) {
-            var mel = document.getElementById(mid);
-            if(mel) {
-                // Отмена pending-close если модалка переоткрывается
-                if (mel._closeTimer) { clearTimeout(mel._closeTimer); mel._closeTimer = null; }
-                mel.classList.remove('closing');
-                mel.classList.add('active');
-                mel.style.zIndex = String(_baseZIndex + (idx * 100));
-                mel.style.visibility = '';
+            _applyStackVisuals();
+            if (history) {
+                // Уже была модалка → REPLACE текущую history-запись (без race).
+                // Иначе → PUSH (вход с main-экрана).
+                if (hadAny && history.replaceState) {
+                    history.replaceState({ modal: id }, '');
+                } else if (history.pushState) {
+                    history.pushState({ modal: id }, '');
+                }
             }
-        });
-
-        document.body.classList.add('modal-open');
-
-        // History API: каждое открытие модалки = новая запись истории.
-        // Android back-кнопка и браузерный back теперь будут закрывать модалку,
-        // а не уходить с сайта.
-        if (history && history.pushState) {
-            history.pushState({ modal: id }, '');
         }
-        // Guard: если сразу после открытия придёт async popstate (от предыдущего back()),
-        // игнорируем его — иначе новая модалка мгновенно закроется.
-        _popstateGuard = Date.now();
     }
     window.openModal = openModal;
 
-    // skipSidebar=true используется внутри самого sidebar-кода чтобы не вызвать петлю
+    // skipSidebar=true — для внутренних переключений sidebar-кода
     function closeModal(id, skipSidebar) {
-        var el = document.getElementById(id);
-        if(el) {
-            // Плавное закрытие: добавляем .closing, после анимации убираем .active
-            el.classList.add('closing');
-            var _closeTimer = setTimeout(function() {
-                if (el) {
-                    el.classList.remove('active');
-                    el.classList.remove('closing');
-                    el.style.display = '';
-                    el.style.zIndex = '';
-                    el.style.visibility = '';
-                    if (window._resetModalVV) window._resetModalVV(el);
-                }
-            }, 180);
-            el._closeTimer = _closeTimer;
+        var idx = _modalStack.indexOf(id);
+        if (idx === -1) {
+            // Не в стеке — визуальный сброс на всякий случай и выход
+            var el0 = document.getElementById(id);
+            if (el0) _smoothCloseEl(el0);
+            return;
         }
 
-        // Убираем из стека
-        _modalStack = _modalStack.filter(function(m){ return m !== id; });
+        // Сколько шагов back() надо сделать (если закрыли НЕ верхний — детей тоже)
+        var stepsBack = _modalStack.length - idx;
 
-        // Если стек не пуст — убеждаемся что верхняя модалка видна
-        if(_modalStack.length > 0) {
-            var topId = _modalStack[_modalStack.length - 1];
-            var topEl = document.getElementById(topId);
-            if(topEl) {
-                topEl.classList.add('active');
-                topEl.style.visibility = '';
-            }
-            document.body.classList.add('modal-open');
-        } else {
-            document.body.classList.remove('modal-open');
-        }
+        // Обрезаем стек до закрываемого (НЕвключительно)
+        _modalStack = _modalStack.slice(0, idx);
+        _applyStackVisuals();
 
-        // Sidebar: при закрытии основной модалки восстанавливаем sidebar-состояние
-        if(!skipSidebar && _sidebarModalId && id === _sidebarModalId) {
-            if (el) el.classList.remove('side-panel-modal');
-            document.body.classList.remove('pc-chat-mode');
-            document.body.classList.remove('pc-side-mode');
-            _sidebarModalId = null;
-            _sidebarClearActive();
-            if (_pcSideMode) {
-                _pcSideMode = false;
-            } else {
-                setTimeout(function() {
-                    var anyOpen = _modalStack && _modalStack.length > 0;
-                    if(!anyOpen) {
-                        var stillActive = MODAL_IDS.some(function(mid) {
-                            var mel = document.getElementById(mid);
-                            return mel && mel.classList.contains('active');
-                        });
-                        if(!stillActive) {
-                            toggleSidebar();
-                        }
-                    }
-                }, 150);
-            }
-        }
+        if (!skipSidebar) _handleSidebarOnClose(id);
 
-        // History API: при программном закрытии модалки «поглощаем» запись истории,
-        // чтобы следующий back уже не наткнулся на неё.
-        // skipSidebar = переключение sidebar-модалок: не дёргаем back(),
-        // иначе async popstate закроет следующую модалку.
-        if (!_closingFromPopstate && !skipSidebar && history && history.back) {
-            _consumeNextPopstate = true; // предотвращает каскадное закрытие родительской модалки
-            history.back();
+        // Программный back: помечаем popstate-handler чтобы он не закрывал ещё одну модалку.
+        // skipSidebar=true: переключение sidebar-модалок, history менять не нужно.
+        if (!skipSidebar && history && history.back && stepsBack > 0) {
+            _pendingBack += stepsBack;
+            for (var k = 0; k < stepsBack; k++) history.back();
         }
     }
     window.closeModal = closeModal;
 
-    // ── Back-button / Android back: перехватываем popstate ──
-    window.addEventListener('popstate', function(e) {
-        // Guard: программный history.back() из closeModal — не закрываем следующую модалку
-        if (_consumeNextPopstate) {
-            _consumeNextPopstate = false;
-            // Восстанавливаем history entry для оставшейся верхней модалки
-            if (_modalStack.length > 0 && history && history.pushState) {
-                history.pushState({ modal: _modalStack[_modalStack.length - 1] }, '');
-            }
+    // Back-button / Android back / системный свайп
+    window.addEventListener('popstate', function() {
+        if (_pendingBack > 0) {
+            // Свой собственный back() из closeModal — игнорим
+            _pendingBack--;
             return;
         }
-        // Защита от гонки: если модалка открылась < 300ms назад,
-        // этот popstate — «мусор» от предыдущего closeModal → history.back().
-        if (_popstateGuard && Date.now() - _popstateGuard < 300) {
-            _popstateGuard = 0;
-            // Восстанавливаем history entry, который back() только что съел
-            if (_modalStack.length > 0 && history && history.pushState) {
-                history.pushState({ modal: _modalStack[_modalStack.length - 1] }, '');
-            }
-            return;
-        }
+        // Юзер реально нажал «Назад»
         if (_modalStack.length > 0) {
-            _closingFromPopstate = true;
             var topId = _modalStack[_modalStack.length - 1];
-            closeModal(topId);
-            _closingFromPopstate = false;
+            // Закрываем визуально БЕЗ history.back() (его уже сделал юзер)
+            _modalStack.pop();
+            _applyStackVisuals();
+            _handleSidebarOnClose(topId);
         }
     });
 
@@ -3590,9 +3564,9 @@
     function showSiteAuthGate() {
         var g = document.getElementById('siteAuthGate');
         if (g) g.style.display = 'flex';
-        document.body.classList.add('site-auth-locked');
-        document.documentElement.classList.add('pre-guest');
-        try { localStorage.removeItem('_wrsAuthed'); localStorage.removeItem('_wrsProfileReady'); } catch(e){}
+        // SEO/UX: НЕ блокируем body classList и НЕ скрываем контент.
+        // Гейт теперь как modal — поверх контента, но контент остаётся в DOM
+        // (Googlebot видит публичный контент, обычный юзер может закрыть гейт).
     }
     function hideSiteAuthGate() {
         var g = document.getElementById('siteAuthGate');
@@ -3729,6 +3703,14 @@
                 setTimeout(function() { checkAdmin(); }, 1500);
                 checkFirstLogin();
                 checkProfileGate(user);
+                // Закрываем гейт если он был открыт (юзер залогинился изнутри requireAuth)
+                hideSiteAuthGate();
+                // И автоматически запускаем отложенное действие, если оно было
+                if (window._postLoginAction) {
+                    var _act = window._postLoginAction;
+                    window._postLoginAction = null;
+                    try { setTimeout(_act, 200); } catch (e) { console.warn('postLoginAction', e); }
+                }
             } else {
                 stopPresence();
                 updateChatUI(false);
