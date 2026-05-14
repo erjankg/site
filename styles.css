@@ -41,7 +41,27 @@
   border-radius: 22px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.6);
   backdrop-filter: blur(14px);
+  position: relative;
 }
+.site-auth-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 22px;
+  font-weight: 400;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.site-auth-close:hover { background: rgba(255,255,255,0.08); color: #fff; }
 .site-auth-icon {
   font-size: 56px;
   margin-bottom: 12px;

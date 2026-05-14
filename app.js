@@ -3736,27 +3736,49 @@
                 window._isAdmin = false;
                 document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = 'none'; });
                 document.body.classList.remove('profile-gated');
-                // Публичный просмотр турнира по ?cs= — пропускаем auth-gate,
-                // открываем сразу модалку. Если cs-public-mode уже активирован в
-                // index.html, просто применяем deep-link. Если визитёр был с
-                // _wasAuthed=true но сейчас разлогинен и пришёл с ?cs= —
-                // активируем публичный режим динамически.
+                // SEO + UX: НЕ показываем глобальный гейт незалогиненным посетителям.
+                // Главная (тир-листы, винрейты, патчноуты, инфлюенсеры, киберспорт)
+                // публична — Googlebot и обычные посетители видят контент сразу.
+                // Гейт показывается только при попытке войти в auth-only фичу
+                // (профиль / чат / драфт-серии / админка) — см. requireAuth().
+                document.documentElement.classList.remove('pre-guest');
+                document.body.classList.remove('site-auth-locked');
+                hideSiteAuthGate();
+                // Deep-link для турнира — продолжает работать как раньше
                 var hasCsDeepLink = _pendingDeepLink && _pendingDeepLink.type === 'cybersport';
                 if (hasCsDeepLink || document.documentElement.classList.contains('cs-public-mode')) {
                     if (hasCsDeepLink && !document.documentElement.classList.contains('cs-public-mode')) {
                         document.documentElement.classList.add('cs-public-mode');
-                        document.documentElement.classList.remove('pre-guest');
                     }
                     applyPendingDeepLink();
-                } else {
-                    showSiteAuthGate();
                 }
             }
         });
     } else {
-        // Firebase недоступен — всё равно показываем gate (там кнопка покажет алерт)
-        showSiteAuthGate();
+        // Firebase недоступен — НЕ блокируем сайт, контент остаётся доступным
+        document.documentElement.classList.remove('pre-guest');
+        document.body.classList.remove('site-auth-locked');
     }
+
+    // ─── requireAuth: открыть фичу только если юзер залогинен ───
+    // Используется для функций, которым реально нужен Firestore-state
+    // (профиль, чат, драфт-серии, админка). Если не залогинен — показываем
+    // siteAuthGate с пояснением, ЗАЧЕМ нужен вход; гейт закрывается через ✕.
+    window.requireAuth = function(featureLabel, onAuthed) {
+        if (_currentUser) {
+            try { onAuthed && onAuthed(); } catch (e) { console.warn('requireAuth callback', e); }
+            return true;
+        }
+        // Запоминаем что после логина открыть эту фичу
+        try { window._postLoginAction = onAuthed || null; } catch (e) {}
+        // Меняем текст гейта под конкретную фичу (если есть подзаголовок)
+        var gateSub = document.querySelector('#siteAuthGate [data-auth-sub]');
+        if (gateSub && featureLabel) {
+            gateSub.textContent = featureLabel;
+        }
+        showSiteAuthGate();
+        return false;
+    };
 
 
     // ═══════════════════════════════════════
@@ -3778,6 +3800,10 @@
 
     // ═══ OPEN / CLOSE ═══
     window.openChatSystem = function() {
+        // Чат требует логин (отправка/получение сообщений завязаны на uid).
+        if (!window.requireAuth || !window.requireAuth('Войди через Google чтобы писать в общий чат и видеть онлайн-юзеров.', window.openChatSystem)) {
+            if (!_currentUser) return;
+        }
         _chatOpen = true;
         openModal('chatSystemMask');
         updateChatUI(!!_currentUser);
@@ -4242,6 +4268,10 @@
     }
 
     window.openProfileSetup = function() {
+        // Профиль читает/пишет в Firestore users/{uid} — без логина бессмысленно.
+        if (!window.requireAuth || !window.requireAuth('Войди через Google чтобы настроить профиль (ник, ранг, любимые чемпы).', window.openProfileSetup)) {
+            if (!_currentUser) return;
+        }
         _profileRole = '';
         _profileRank = '';
         _profileSocialLinks = [];
