@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
 
+# Не индексировать персональные deep-link параметры
+Disallow: /*?draft=
+Disallow: /*?cs=
+Disallow: /*?t=
+
+# Закрытые админские страницы (если когда-то появятся как отдельные пути)
+Disallow: /admin/
+Disallow: /cms/
+
 Sitemap: https://pro-wildrift.com/sitemap.xml

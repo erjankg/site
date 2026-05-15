@@ -285,7 +285,7 @@
     el.innerHTML = _globalBansList.map(function(n){
       var img = window._champIcon ? window._champIcon(n) : '';
       return '<div onclick="dcoopRemoveGlobalBan(\''+encodeURIComponent(n)+'\')" title="'+escapeHtml(n)+' — убрать" style="position:relative;cursor:pointer;width:36px;height:36px;flex-shrink:0;">'
-        + '<img src="'+img+'" style="width:36px;height:36px;border-radius:6px;border:1.5px solid rgba(231,76,60,0.6);" onerror="this.style.display=\'none\'">'
+        + '<img loading="lazy" decoding="async" src="'+img+'" style="width:36px;height:36px;border-radius:6px;border:1.5px solid rgba(231,76,60,0.6);" onerror="this.style.display=\'none\'">'
         + '<div style="position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#e74c3c;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:900;pointer-events:none;">✕</div>'
         + '</div>';
     }).join('');
@@ -628,7 +628,7 @@
       var gbIcons = l.globalBans.map(function(n){
         var img = window._champIcon ? window._champIcon(n) : '';
         return '<div title="'+escapeHtml(n)+'" style="display:flex;flex-direction:column;align-items:center;gap:3px;">'
-          + '<img src="'+img+'" style="width:32px;height:32px;border-radius:6px;border:1.5px solid rgba(231,76,60,0.5);filter:grayscale(1) brightness(0.45);" onerror="this.style.display=\'none\'">'
+          + '<img loading="lazy" decoding="async" src="'+img+'" style="width:32px;height:32px;border-radius:6px;border:1.5px solid rgba(231,76,60,0.5);filter:grayscale(1) brightness(0.45);" onerror="this.style.display=\'none\'">'
           + '<div style="font-size:9px;color:rgba(231,76,60,0.7);max-width:36px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;">'+escapeHtml(n)+'</div>'
           + '</div>';
       }).join('');
@@ -999,7 +999,7 @@
     var sz = size || 40;
     if (u.photoURL || u.photo) {
       var src = escapeHtml(u.photoURL || u.photo);
-      return '<img src="'+src+'" style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-border-sub);flex-shrink:0;" onerror="this.outerHTML=&quot;<div style=\\&quot;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;\\&quot;>'+escapeHtml((u.displayName||u.nick||'?').charAt(0).toUpperCase())+'</div>&quot;;">';
+      return '<img loading="lazy" decoding="async" src="'+src+'" style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-border-sub);flex-shrink:0;" onerror="this.outerHTML=&quot;<div style=\\&quot;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;\\&quot;>'+escapeHtml((u.displayName||u.nick||'?').charAt(0).toUpperCase())+'</div>&quot;;">';
     }
     var ini = escapeHtml((u.displayName || u.nick || '?').charAt(0).toUpperCase());
     return '<div style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;">'+ini+'</div>';
@@ -1553,7 +1553,7 @@
     var icons = bans.map(function(n){
       var img = window._champIcon ? window._champIcon(n) : '';
       return '<div title="'+escapeHtml(n)+'" style="position:relative;width:26px;height:26px;flex-shrink:0;">'
-        + '<img src="'+img+'" style="width:26px;height:26px;border-radius:5px;filter:grayscale(1) brightness(0.3);" onerror="this.style.display=\'none\'">'
+        + '<img loading="lazy" decoding="async" src="'+img+'" style="width:26px;height:26px;border-radius:5px;filter:grayscale(1) brightness(0.3);" onerror="this.style.display=\'none\'">'
         + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;pointer-events:none;">⛔</div>'
         + '</div>';
     }).join('');
@@ -1811,10 +1811,10 @@
       var html = '<span class="dcoop-slot-x">✕</span>';
       if (n) {
         var img = window._champIcon ? window._champIcon(n) : '';
-        html = '<img src="'+img+'" alt="'+escapeHtml(n)+'" onerror="this.style.display=\'none\'">';
+        html = '<img loading="lazy" decoding="async" src="'+img+'" alt="'+escapeHtml(n)+'" onerror="this.style.display=\'none\'">';
       } else if (i === activeBanIdx && hover) {
         var imgh = window._champIcon ? window._champIcon(hover) : '';
-        html = '<img src="'+imgh+'" alt="'+escapeHtml(hover)+'" style="opacity:0.45;" onerror="this.style.display=\'none\'">';
+        html = '<img loading="lazy" decoding="async" src="'+imgh+'" alt="'+escapeHtml(hover)+'" style="opacity:0.45;" onerror="this.style.display=\'none\'">';
         cls += ' dcoop-active-slot';
       } else if (i === activeBanIdx) {
         cls += ' dcoop-active-slot';
@@ -1834,11 +1834,11 @@
       var html = '<span class="dcoop-slot-placeholder">'+(i+1)+'</span>';
       if (p && p.champ) {
         var img = window._champIcon ? window._champIcon(p.champ) : '';
-        html = '<img src="'+img+'" alt="'+escapeHtml(p.champ)+'" onerror="this.style.display=\'none\'">'
+        html = '<img loading="lazy" decoding="async" src="'+img+'" alt="'+escapeHtml(p.champ)+'" onerror="this.style.display=\'none\'">'
              + (showName ? '<div class="dcoop-pick-name">'+escapeHtml(p.champ)+'</div>' : '');
       } else if (i === activePickIdx && hover) {
         var imgh = window._champIcon ? window._champIcon(hover) : '';
-        html = '<img src="'+imgh+'" alt="'+escapeHtml(hover)+'" style="opacity:0.45;" onerror="this.style.display=\'none\'">'
+        html = '<img loading="lazy" decoding="async" src="'+imgh+'" alt="'+escapeHtml(hover)+'" style="opacity:0.45;" onerror="this.style.display=\'none\'">'
              + (showName ? '<div class="dcoop-pick-name" style="opacity:0.5;">'+escapeHtml(hover)+'</div>' : '');
         cls += ' dcoop-active-slot';
       } else if (i === activePickIdx) {
@@ -2019,7 +2019,7 @@
     function slot(n) {
       if (!n) return '<div class="dcoop-past-slot empty"></div>';
       var img = window._champIcon ? window._champIcon(n) : '';
-      return '<div class="dcoop-past-slot"><img src="'+img+'" alt="'+escapeHtml(n)+'" title="'+escapeHtml(n)+'" onerror="this.style.display=\'none\'"></div>';
+      return '<div class="dcoop-past-slot"><img loading="lazy" decoding="async" src="'+img+'" alt="'+escapeHtml(n)+'" title="'+escapeHtml(n)+'" onerror="this.style.display=\'none\'"></div>';
     }
     function padRow(arr) {
       var out = (arr || []).slice(0, 5);
@@ -2035,7 +2035,7 @@
     function banSlot(n) {
       if (!n) return '<div class="dcoop-past-ban empty" title="пусто">✕</div>';
       var img = window._champIcon ? window._champIcon(n) : '';
-      return '<div class="dcoop-past-ban" title="'+escapeHtml(n)+'"><img src="'+img+'" alt="'+escapeHtml(n)+'" onerror="this.style.display=\'none\'"></div>';
+      return '<div class="dcoop-past-ban" title="'+escapeHtml(n)+'"><img loading="lazy" decoding="async" src="'+img+'" alt="'+escapeHtml(n)+'" onerror="this.style.display=\'none\'"></div>';
     }
 
     var rowsHtml = completed.map(function(g){
@@ -2303,7 +2303,7 @@
       else if (st === 'fearless') cls += ' fearless-locked';
       else if (st === 'global') cls += ' global-banned';
       return '<div class="'+cls+'" data-champ="'+escapeHtml(c.name)+'" onclick="dcoopChampClick(\''+encodeURIComponent(c.name)+'\')" title="'+escapeHtml(c.name)+'">'
-        +   '<img src="'+c.img+'" alt="'+escapeHtml(c.name)+'" onerror="this.style.display=\'none\'">'
+        +   '<img loading="lazy" decoding="async" src="'+c.img+'" alt="'+escapeHtml(c.name)+'" onerror="this.style.display=\'none\'">'
         +   '<div class="dcoop-champ-name">'+escapeHtml(c.name)+'</div>'
         + '</div>';
     }).join('');
@@ -2842,7 +2842,7 @@
         ? '<div class="dcoop-assist-stars">'+stars.map(function(c){ return '<span style="color:'+c+';">★</span>'; }).join('')+'</div>'
         : '';
       return '<div class="dcoop-assist-item" onclick="dcoopChampClick(\''+encodeURIComponent(x.name)+'\')" title="'+escapeHtml(x.name)+'">'
-        +    '<img src="'+img+'" alt="'+escapeHtml(x.name)+'" onerror="this.style.display=\'none\'">'
+        +    '<img loading="lazy" decoding="async" src="'+img+'" alt="'+escapeHtml(x.name)+'" onerror="this.style.display=\'none\'">'
         +    starsHtml
         +    '<div class="dcoop-assist-item-name">'+escapeHtml(x.name)+'</div>'
         +  '</div>';
@@ -3395,7 +3395,7 @@
         try {
           var url2 = c.toDataURL('image/png');
           var w = window.open();
-          if (w) w.document.write('<img src="'+url2+'" style="max-width:100%;">');
+          if (w) w.document.write('<img loading="lazy" decoding="async" src="'+url2+'" style="max-width:100%;">');
           else toast('PNG не удалось сохранить (CORS). Скопируйте текст.');
         } catch(_) { toast('PNG не удалось сохранить (CORS). Скопируйте текст.'); }
       }

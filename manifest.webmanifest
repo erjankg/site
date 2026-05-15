@@ -1,0 +1,42 @@
+{
+  "name": "Wild Rift Stats",
+  "short_name": "WR Stats",
+  "description": "Справочник Wild Rift: статы чемпионов, винрейты, патч-ноты, тир-листы, драфтер.",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0318",
+  "theme_color": "#6d3ff5",
+  "categories": ["games", "entertainment", "utilities"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Тир-листы",
+      "short_name": "Tier",
+      "description": "Лучшие чемпы по ролям",
+      "url": "/?view=tier"
+    },
+    {
+      "name": "Драфтер серий",
+      "short_name": "Draft",
+      "description": "Кооперативный драфт",
+      "url": "/?view=draft"
+    },
+    {
+      "name": "Винрейты",
+      "short_name": "WinRate",
+      "description": "Таблица винрейтов",
+      "url": "/?view=wrpr"
+    }
+  ]
+}

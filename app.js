@@ -4,6 +4,40 @@
 
 (() => {
 
+    // Performance: lazy-load всех картинок (чемпы, предметы, руны, ранги).
+    // Сначала пробегаемся по существующим <img> без атрибута loading и ставим lazy.
+    // Затем — MutationObserver на новые <img>, которые добавляются динамически
+    // через innerHTML в draft.js / app.js / cms.js / cybersport.js — им тоже
+    // проставится lazy+async, что снимает нагрузку при первом рендере галерей.
+    function _applyLazyImg(img) {
+        if (!img || img.tagName !== 'IMG') return;
+        if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+        if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+    }
+    function _lazyifyAllImages(root) {
+        (root || document).querySelectorAll('img:not([loading])').forEach(_applyLazyImg);
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function(){ _lazyifyAllImages(); });
+    } else {
+        _lazyifyAllImages();
+    }
+    try {
+        var _imgObserver = new MutationObserver(function(muts){
+            for (var i = 0; i < muts.length; i++) {
+                var added = muts[i].addedNodes;
+                for (var j = 0; j < added.length; j++) {
+                    var n = added[j];
+                    if (!n || n.nodeType !== 1) continue;
+                    if (n.tagName === 'IMG') _applyLazyImg(n);
+                    else if (n.querySelectorAll) _lazyifyAllImages(n);
+                }
+            }
+        });
+        _imgObserver.observe(document.documentElement, { childList: true, subtree: true });
+    } catch (e) { /* observer недоступен — non-fatal */ }
+
+
     // =========================================
     // MODAL SYSTEM — unified stack + history
     // Инвариант: одна main-модалка в _modalStack = ОДНА запись в browser history.
@@ -708,7 +742,7 @@
             const isAll = allChampsInRole.length > 0 && allChampsInRole.every(x => selected.has(x.name));
             const roleDiv = document.createElement('div');
             roleDiv.className = 'm-role ' + (isAll ? 'on' : '');
-            roleDiv.innerHTML = '<img src="' + roleIcons[role] + '" alt="' + role + '">';
+            roleDiv.innerHTML = '<img loading="lazy" decoding="async" src="' + roleIcons[role] + '" alt="' + role + '">';
             roleDiv.onclick = () => roleT(role, isAll);
             container.appendChild(roleDiv);
 
@@ -2210,7 +2244,7 @@
                     data.forEach(function(cn) {
                         var chip = document.createElement('div');
                         chip.style.cssText = 'display:flex;align-items:center;gap:2px;background:rgba('+sec.bgRgb+',0.12);border:1px solid rgba('+sec.bgRgb+',0.25);border-radius:6px;padding:2px;cursor:default;';
-                        chip.innerHTML = '<img src="'+champIcon(cn)+'" title="'+cn+'" style="width:29px;height:29px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'">';
+                        chip.innerHTML = '<img loading="lazy" decoding="async" src="'+champIcon(cn)+'" title="'+cn+'" style="width:29px;height:29px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'">';
                         var xBtn = document.createElement('span');
                         xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;line-height:1;';
                         xBtn.textContent = '\u00d7';
@@ -2579,7 +2613,7 @@
                       + '</div>'
                     : '<div style="height:12px;"></div>';
                 return '<div style="display:inline-flex;flex-direction:column;align-items:center;">'
-                    + '<img src="'+champIcon(x.name)+'" style="width:44px;height:44px;border-radius:7px;object-fit:cover;display:block;" onerror="this.style.background=\'var(--sel-placeholder)\'">'
+                    + '<img loading="lazy" decoding="async" src="'+champIcon(x.name)+'" style="width:44px;height:44px;border-radius:7px;object-fit:cover;display:block;" onerror="this.style.background=\'var(--sel-placeholder)\'">'
                     + starsHtml
                     + '</div>';
             }).join('');
@@ -3450,11 +3484,11 @@
             Object.keys(inf.counters).forEach(function(champ){
                 var row=document.createElement('div');
                 row.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(231,76,60,0.06);border-radius:8px;';
-                row.innerHTML='<img src="'+_champImg(champ)+'" style="width:28px;height:28px;border-radius:6px;" onerror="this.style.display=\'none\'">'
+                row.innerHTML='<img loading="lazy" decoding="async" src="'+_champImg(champ)+'" style="width:28px;height:28px;border-radius:6px;" onerror="this.style.display=\'none\'">'
                     +'<span style="font-size:12px;font-weight:700;color:#fff;min-width:70px;">'+champ+'</span>'
                     +'<span style="font-size:11px;color:rgba(255,255,255,0.3);">→</span>'
                     +'<div style="display:flex;gap:4px;flex-wrap:wrap;">'
-                    +(inf.counters[champ]||[]).map(function(c){return '<img src="'+_champImg(c)+'" title="'+c+'" style="width:26px;height:26px;border-radius:6px;border:1px solid rgba(231,76,60,0.3);" onerror="this.style.display=\'none\'">';}).join('')
+                    +(inf.counters[champ]||[]).map(function(c){return '<img loading="lazy" decoding="async" src="'+_champImg(c)+'" title="'+c+'" style="width:26px;height:26px;border-radius:6px;border:1px solid rgba(231,76,60,0.3);" onerror="this.style.display=\'none\'">';}).join('')
                     +'</div>';
                 ctrEl.appendChild(row);
             });
@@ -3469,11 +3503,11 @@
             Object.keys(inf.combos).forEach(function(champ){
                 var row=document.createElement('div');
                 row.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(46,204,113,0.06);border-radius:8px;';
-                row.innerHTML='<img src="'+_champImg(champ)+'" style="width:28px;height:28px;border-radius:6px;" onerror="this.style.display=\'none\'">'
+                row.innerHTML='<img loading="lazy" decoding="async" src="'+_champImg(champ)+'" style="width:28px;height:28px;border-radius:6px;" onerror="this.style.display=\'none\'">'
                     +'<span style="font-size:12px;font-weight:700;color:#fff;min-width:70px;">'+champ+'</span>'
                     +'<span style="font-size:11px;color:rgba(255,255,255,0.3);">+</span>'
                     +'<div style="display:flex;gap:4px;flex-wrap:wrap;">'
-                    +(inf.combos[champ]||[]).map(function(c){return '<img src="'+_champImg(c)+'" title="'+c+'" style="width:26px;height:26px;border-radius:6px;border:1px solid rgba(46,204,113,0.3);" onerror="this.style.display=\'none\'">';}).join('')
+                    +(inf.combos[champ]||[]).map(function(c){return '<img loading="lazy" decoding="async" src="'+_champImg(c)+'" title="'+c+'" style="width:26px;height:26px;border-radius:6px;border:1px solid rgba(46,204,113,0.3);" onerror="this.style.display=\'none\'">';}).join('')
                     +'</div>';
                 coEl.appendChild(row);
             });
@@ -4618,7 +4652,7 @@
             var bg = sel ? 'var(--sel-placeholder)' : 'var(--sel-bg-faint)';
             var roleImg = (window._roleIcons && window._roleIcons[r]) || '';
             html += '<button id="prole-' + r + '" onclick="window._profileSelectRole(\'' + r + '\')" style="flex:1;padding:8px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';cursor:pointer;color:#fff;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:4px;">'
-                  + (roleImg ? '<img src="' + roleImg + '" alt="' + r + '" style="width:26px;height:26px;object-fit:contain;" onerror="this.style.display=\'none\'">' : '')
+                  + (roleImg ? '<img loading="lazy" decoding="async" src="' + roleImg + '" alt="' + r + '" style="width:26px;height:26px;object-fit:contain;" onerror="this.style.display=\'none\'">' : '')
                   + '<span style="font-size:9px;color:#fff;font-weight:700;">' + r + '</span>'
                   + '</button>';
         });
@@ -4635,7 +4669,7 @@
             var border = sel ? rk.color : 'var(--sel-border-35)';
             var bg = sel ? 'var(--sel-dim)' : 'var(--sel-bg-faint)';
             var shadow = sel ? 'box-shadow:0 0 8px ' + rk.color + '55;' : '';
-            var icon = '<img src="' + rk.img + '" style="width:32px;height:32px;object-fit:contain;">';
+            var icon = '<img loading="lazy" decoding="async" src="' + rk.img + '" style="width:32px;height:32px;object-fit:contain;">';
             html += '<button id="prank-' + rk.id + '" onclick="window._profileSelectRank(\'' + rk.id + '\')" style="padding:6px 4px;border-radius:10px;border:2px solid ' + border + ';background:' + bg + ';color:' + rk.color + ';font-size:10px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;' + shadow + '">'
                   + icon
                   + '<span>' + rk.name + '</span>'
@@ -5825,7 +5859,7 @@
             var engName = _wrprDisplayName[d.name] || d.name;
             var pWR = (window.patchMap || {})[d.name];
             tdC.innerHTML = '<div style="display:flex;align-items:center;gap:8px;position:relative;">'
-                + '<img src="' + iconUrl + '" alt="' + engName + '" '
+                + '<img loading="lazy" decoding="async" src="' + iconUrl + '" alt="' + engName + '" '
                 + 'onerror="this.onerror=null;this.style.cssText=\'width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,var(--sel-fill),var(--sel-glow-sub));flex-shrink:0;display:block;\'" '
                 + 'style="width:34px;height:34px;border-radius:7px;object-fit:cover;flex-shrink:0;">'
                 + '<span class="wrpr-champ-name" style="font-size:14px;font-weight:700;color:#fff;">' + engName + '</span>'

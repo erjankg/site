@@ -27,32 +27,72 @@
     <meta name="twitter:description" content="Полный справочник Wild Rift: статы по уровням 1-15, калькулятор урона, руны, предметы, тир-листы, драфтер и таблица винрейтов.">
     <meta name="twitter:image" content="https://pro-wildrift.com/preview.jpg">
     <link rel="canonical" href="https://pro-wildrift.com/">
-    <meta name="theme-color" content="var(--accent)">
+    <meta name="theme-color" content="#6d3ff5">
+    <!-- PWA manifest — позволяет «установить» сайт на главный экран телефона. -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <!-- iOS standalone-режим (когда добавлен на экран). -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WR Stats">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "Wild Rift Stats",
-      "alternateName": "ERjanKG Stats",
-      "url": "https://pro-wildrift.com/",
-      "description": "Полный справочник Wild Rift: базовые статы всех чемпионов по уровням 1-15, калькулятор урона, руны, предметы, патч-ноты и тир-листы.",
-      "applicationCategory": "GameApplication",
-      "operatingSystem": "Web",
-      "inLanguage": "ru",
-      "image": "https://pro-wildrift.com/preview.jpg",
-      "author": {
-        "@type": "Person",
-        "name": "ERjanKG",
-        "url": "https://www.twitch.tv/ERjanKG"
-      },
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://pro-wildrift.com/?q={search_term_string}"
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://pro-wildrift.com/#website",
+          "url": "https://pro-wildrift.com/",
+          "name": "Wild Rift Stats",
+          "description": "Справочник по Wild Rift: статы чемпионов, винрейты, патч-ноты, тир-листы, драфтер.",
+          "inLanguage": "ru",
+          "publisher": { "@id": "https://pro-wildrift.com/#publisher" },
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://pro-wildrift.com/?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
         },
-        "query-input": "required name=search_term_string"
-      }
+        {
+          "@type": "Organization",
+          "@id": "https://pro-wildrift.com/#publisher",
+          "name": "ERjanKG",
+          "url": "https://pro-wildrift.com/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://pro-wildrift.com/preview.jpg",
+            "width": 1200,
+            "height": 630
+          },
+          "sameAs": [
+            "https://www.twitch.tv/ERjanKG"
+          ]
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://pro-wildrift.com/#webapp",
+          "name": "Wild Rift Stats",
+          "alternateName": "ERjanKG Stats",
+          "url": "https://pro-wildrift.com/",
+          "description": "Полный справочник Wild Rift: базовые статы всех чемпионов по уровням 1-15, калькулятор урона, руны, предметы, патч-ноты и тир-листы.",
+          "applicationCategory": "GameApplication",
+          "operatingSystem": "Web",
+          "inLanguage": "ru",
+          "image": "https://pro-wildrift.com/preview.jpg",
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "author": { "@id": "https://pro-wildrift.com/#publisher" },
+          "isPartOf": { "@id": "https://pro-wildrift.com/#website" }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://pro-wildrift.com/" }
+          ]
+        }
+      ]
     }
     </script>
     <link rel="stylesheet" href="styles.css">
@@ -509,7 +549,16 @@ Stormarrow: При максимальных зарядах следующая б
   <button class="side-btn side-btn-cs" onclick="sidebarOpen('cybersport')"><span class="side-icon">🏆</span>Киберспорт</button>
 
   <div style="flex:1;"></div>
-  <div style="padding:0 8px;">
+  <div style="padding:0 8px;display:flex;flex-direction:column;gap:6px;">
+    <!-- PWA install button — скрыта по умолчанию, показывается через JS если -->
+    <!-- браузер поддерживает install OR это iOS Safari (там показываем инструкцию). -->
+    <button id="sideInstallPwa"
+            class="side-btn side-install"
+            type="button"
+            style="display:none;"
+            onclick="window._showInstallPwa && window._showInstallPwa()">
+      <span class="side-icon">📲</span>Установить приложение
+    </button>
     <a href="#"
        id="sideSupport"
        class="side-btn side-support"
@@ -1215,6 +1264,114 @@ Stormarrow: При максимальных зарядах следующая б
 <script src="app.js"></script>
 <script src="draft.js"></script>
 <script src="cybersport.js"></script>
+
+<!-- ══ PWA: SERVICE WORKER + INSTALL BUTTON ══ -->
+<script>
+  // ─── 1. Service Worker registration ───
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js', { scope: './' })
+        .then(function(reg) {
+          if (!reg) return;
+          if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
+          reg.addEventListener('updatefound', function() {
+            var nw = reg.installing;
+            if (!nw) return;
+            nw.addEventListener('statechange', function() {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                nw.postMessage('SKIP_WAITING');
+              }
+            });
+          });
+        })
+        .catch(function(err) { console.warn('[sw] register failed', err); });
+    });
+  }
+
+  // ─── 2. Install button logic ───
+  // Если приложение уже установлено (standalone) — кнопка не нужна.
+  // На Chrome/Edge/Android: ловим beforeinstallprompt, сохраняем, показываем кнопку.
+  // На iOS Safari: beforeinstallprompt не существует, но мы всё равно показываем
+  // кнопку с короткой инструкцией «Поделиться → На экран Домой».
+  (function() {
+    function _isStandalone() {
+      return window.matchMedia && window.matchMedia('(display-mode: standalone)').matches
+        || window.navigator.standalone === true;
+    }
+    function _isIOS() {
+      var ua = navigator.userAgent || '';
+      // iPad на iOS 13+ маскируется под Mac — поэтому проверяем touch.
+      return /iPhone|iPad|iPod/.test(ua)
+        || (/Mac/.test(ua) && typeof document.ontouchend !== 'undefined');
+    }
+    var btn = document.getElementById('sideInstallPwa');
+    if (!btn) return;
+    if (_isStandalone()) return; // уже установлено
+    var deferredPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      btn.style.display = '';
+    });
+    // appinstalled — пользователь установил приложение. Скрываем кнопку.
+    window.addEventListener('appinstalled', function() {
+      btn.style.display = 'none';
+      deferredPrompt = null;
+      try {
+        if (window.showToast) window.showToast('Приложение установлено!');
+      } catch (e) {}
+    });
+    // На iOS показываем кнопку сразу — там нет API установки, только инструкция.
+    if (_isIOS()) btn.style.display = '';
+
+    window._showInstallPwa = function() {
+      // Chrome/Edge/Android: вызываем сохранённый prompt.
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(choice) {
+          deferredPrompt = null;
+          if (choice && choice.outcome === 'accepted') {
+            btn.style.display = 'none';
+          }
+        }).catch(function(){});
+        return;
+      }
+      // iOS Safari или другой браузер без поддержки — модалка с инструкцией.
+      _showInstallHelpModal();
+    };
+
+    function _showInstallHelpModal() {
+      // Снимаем существующую если открыта повторно
+      var prev = document.getElementById('pwaInstallHelp');
+      if (prev) prev.remove();
+      var ios = _isIOS();
+      var steps = ios
+        ? ['Нажми кнопку «Поделиться» внизу Safari (квадрат со стрелкой вверх).',
+           'Прокрути и выбери «На экран «Домой»» (или «Добавить на главный экран»).',
+           'Подтверди — иконка появится на главном экране телефона.']
+        : ['Открой меню браузера (три точки в правом верхнем углу).',
+           'Выбери пункт «Установить приложение» / «Установить Wild Rift Stats».',
+           'Подтверди — иконка появится на рабочем столе / в меню приложений.'];
+      var overlay = document.createElement('div');
+      overlay.id = 'pwaInstallHelp';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.78);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;';
+      overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.remove(); });
+      var box = document.createElement('div');
+      box.style.cssText = 'background:linear-gradient(135deg,#1a0d2e,#0f0520);border:1px solid rgba(109,63,245,0.4);border-radius:18px;padding:26px 24px 20px;max-width:380px;width:100%;color:#fff;box-shadow:0 24px 60px rgba(0,0,0,0.7);position:relative;';
+      box.innerHTML = '<button aria-label="Закрыть" style="position:absolute;top:8px;right:12px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;">&times;</button>'
+        + '<div style="font-size:34px;text-align:center;margin-bottom:8px;">📲</div>'
+        + '<div style="font-size:16px;font-weight:900;text-align:center;margin-bottom:14px;">Установить Wild Rift Stats</div>'
+        + '<ol style="margin:0;padding-left:22px;line-height:1.7;font-size:13px;color:rgba(255,255,255,0.85);">'
+        +   steps.map(function(s){ return '<li style="margin-bottom:8px;">' + s + '</li>'; }).join('')
+        + '</ol>'
+        + '<div style="margin-top:14px;font-size:11px;color:rgba(255,255,255,0.4);text-align:center;">После установки сайт работает быстрее и доступен оффлайн.</div>';
+      box.querySelector('button').addEventListener('click', function(){ overlay.remove(); });
+      overlay.appendChild(box);
+      document.body.appendChild(overlay);
+    }
+  })();
+</script>
 
 <!-- ══ SEO CONTENT (off-screen для людей, видимо для Googlebot — отражает реальное содержимое сайта) ══ -->
 <section class="seo-content" aria-hidden="true">

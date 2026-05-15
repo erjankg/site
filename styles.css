@@ -822,7 +822,7 @@ transition: var(--tx-base);
 
 @media (hover: hover) and (pointer: fine) {
 #statTable tbody tr:hover td {
-    background: rgba(11, 196, 227, 0.07);
+    background: var(--accent-border-sub);
     border-bottom-color: var(--accent-border);
 }
 #statTable tbody tr:hover td:first-child {
@@ -1628,6 +1628,21 @@ background: linear-gradient(90deg,var(--accent-glow),var(--accent-dim));
 border: 1px solid var(--accent-border); color: var(--text-secondary); margin-top: 6px;
 }
 .side-btn.side-support:hover { background: linear-gradient(90deg,var(--accent-border-str),var(--accent-border)); }
+
+/* PWA install button — стиль рядом с «Поддержать», но с зелёным акцентом
+   чтобы выделялась как полезное действие, а не «донат». */
+.side-btn.side-install {
+  background: linear-gradient(90deg, rgba(46,204,113,0.15), rgba(46,204,113,0.04));
+  border: 1px solid rgba(46,204,113,0.4);
+  color: #2ecc71;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+.side-btn.side-install:hover {
+  background: linear-gradient(90deg, rgba(46,204,113,0.28), rgba(46,204,113,0.1));
+  border-color: rgba(46,204,113,0.6);
+  color: #fff;
+}
 
 /* ── PC: сайдбар всегда открыт, кнопка закрытия и гамбургер скрыты ── */
 @media (min-width: 769px) {

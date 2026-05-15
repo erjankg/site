@@ -1889,7 +1889,7 @@
     safe = safe.replace(/\[icon:([^\]]+)\]/g, function(_, name) {
       name = name.trim();
       var url = window._siteIcons[name] || name;
-      return '<img src="' + url.replace(/"/g, '&quot;') + '" '
+      return '<img loading="lazy" decoding="async" src="' + url.replace(/"/g, '&quot;') + '" '
         + 'style="height:1.1em;vertical-align:middle;display:inline-block;margin:0 1px;" '
         + 'alt="" onerror="this.style.display=\'none\'">';
     });
@@ -2262,7 +2262,7 @@
     // Preview URL при вводе
     urlInput.addEventListener('input', function() {
       var url = urlInput.value.trim();
-      if (url) previewDiv.innerHTML = '<img src="' + url + '" style="height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display=\'none\'">';
+      if (url) previewDiv.innerHTML = '<img loading="lazy" decoding="async" src="' + url + '" style="height:24px;vertical-align:middle;margin-right:6px;" onerror="this.style.display=\'none\'">';
       else previewDiv.innerHTML = '';
     });
 
@@ -2301,7 +2301,7 @@
           var d = doc.data();
           var row = document.createElement('div');
           row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.08);';
-          row.innerHTML = '<img src="' + (d.url||'') + '" style="height:22px;flex-shrink:0;" onerror="this.style.display=\'none\'">'
+          row.innerHTML = '<img loading="lazy" decoding="async" src="' + (d.url||'') + '" style="height:22px;flex-shrink:0;" onerror="this.style.display=\'none\'">'
             + '<code style="color:var(--accent-light);font-size:12px;flex:1;">[icon:' + (d.name||doc.id) + ']</code>'
             + '<div style="font-size:11px;color:rgba(255,255,255,0.3);flex:2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (d.url||'') + '</div>'
             + '<button style="background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;font-size:11px;padding:3px 8px;border-radius:6px;cursor:pointer;" '
@@ -3726,7 +3726,7 @@
     // [icon:name]
     escaped = escaped.replace(/\[icon:([^\]]+)\]/g, function(_, name) {
       var url = (window._siteIcons || {})[name];
-      return url ? '<img src="' + url + '" style="height:16px;vertical-align:middle;margin:0 2px;">' : '[' + name + ']';
+      return url ? '<img loading="lazy" decoding="async" src="' + url + '" style="height:16px;vertical-align:middle;margin:0 2px;">' : '[' + name + ']';
     });
     return escaped;
   }

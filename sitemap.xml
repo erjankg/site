@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Когда появятся отдельные URL для разделов (тир-листы / винрейты / патч-ноты / -->
+<!-- киберспорт) — добавь их сюда. Пока всё на главной через JS-modals, поэтому -->
+<!-- одна каноническая запись. lastmod обновляй при правке шапки/контента. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://pro-wildrift.com/</loc>
-    <lastmod>2026-03-24</lastmod>
+    <lastmod>2026-05-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
