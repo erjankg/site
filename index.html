@@ -1077,7 +1077,11 @@ Stormarrow: При максимальных зарядах следующая б
         <button class="tg-sidebar-close-btn" onclick="tgMobileCloseSidebar()">✕</button>
       </div>
       <div class="tg-sidebar-content" id="tgSidebarContent">
-        <div class="chat-login-msg" data-i18n="Загрузка...">Загрузка...</div>
+        <!-- Skeleton-плейсхолдер пока loadAllUsers не пришёл. JS подменит реальными карточками. -->
+        <div class="sk-row"><span class="sk sk-circle"></span><div class="sk-stack"><span class="sk sk-line sk-w-65 sk-h-sm"></span><span class="sk sk-line sk-w-40 sk-h-sm"></span></div></div>
+        <div class="sk-row"><span class="sk sk-circle"></span><div class="sk-stack"><span class="sk sk-line sk-w-50 sk-h-sm"></span><span class="sk sk-line sk-w-25 sk-h-sm"></span></div></div>
+        <div class="sk-row"><span class="sk sk-circle"></span><div class="sk-stack"><span class="sk sk-line sk-w-80 sk-h-sm"></span><span class="sk sk-line sk-w-40 sk-h-sm"></span></div></div>
+        <div class="sk-row"><span class="sk sk-circle"></span><div class="sk-stack"><span class="sk sk-line sk-w-65 sk-h-sm"></span><span class="sk sk-line sk-w-40 sk-h-sm"></span></div></div>
       </div>
     </div>
     <!-- RIGHT: Chat -->
@@ -1089,7 +1093,19 @@ Stormarrow: При максимальных зарядах следующая б
         <button class="tg-mobile-users-btn" id="tgMobileUsersBtn" onclick="tgMobileShowSidebar()">👥<span class="tg-mob-badge" id="tgMobBadge"></span></button>
       </div>
       <div class="chat-messages" id="chatMessages">
-        <div class="chat-login-msg" data-i18n="Загрузка...">Загрузка...</div>
+        <!-- Skeleton-каркас сообщений (alternating widths, имитирует реальный диалог). -->
+        <div class="sk-row" style="border:none;background:none;padding:6px 10px;">
+          <span class="sk sk-circle" style="width:32px;height:32px;"></span>
+          <div class="sk-stack"><span class="sk sk-line sk-w-25 sk-h-sm"></span><span class="sk sk-line sk-w-80"></span></div>
+        </div>
+        <div class="sk-row" style="border:none;background:none;padding:6px 10px;">
+          <span class="sk sk-circle" style="width:32px;height:32px;"></span>
+          <div class="sk-stack"><span class="sk sk-line sk-w-40 sk-h-sm"></span><span class="sk sk-line sk-w-65"></span></div>
+        </div>
+        <div class="sk-row" style="border:none;background:none;padding:6px 10px;">
+          <span class="sk sk-circle" style="width:32px;height:32px;"></span>
+          <div class="sk-stack"><span class="sk sk-line sk-w-25 sk-h-sm"></span><span class="sk sk-line sk-w-50"></span></div>
+        </div>
       </div>
       <div id="chatInputArea" class="chat-input-row" style="display:none;">
         <input class="chat-input" id="chatInput" type="text" placeholder="Написать сообщение..." data-i18n="Написать сообщение..." data-i18n-attr="placeholder" maxlength="300" onkeydown="if(event.key==='Enter')tgSendMsg()">

@@ -170,11 +170,33 @@
     if (_unsubMyLobbies) { try { _unsubMyLobbies(); } catch(e){} _unsubMyLobbies = null; }
   }
 
+  // Skeleton-плейсхолдер пока Firestore-snapshot ещё не пришёл.
+  // Заменяется реальными карточками или «Нет активных лобби» в renderMyLobbies.
+  function _lobbiesSkeletonHtml(count) {
+    var rows = '';
+    for (var i = 0; i < (count || 3); i++) {
+      rows += '<div class="sk-row">'
+        +   '<div class="sk-stack">'
+        +     '<span class="sk sk-line sk-w-65 sk-h-md"></span>'
+        +     '<span class="sk sk-line sk-w-40 sk-h-sm"></span>'
+        +   '</div>'
+        +   '<span class="sk sk-line sk-h-sm" style="width:54px;"></span>'
+        + '</div>';
+    }
+    return rows;
+  }
+
   function startMyLobbiesListener() {
     stopMyLobbiesListener();
     var uid = _uid();
     var dbInst = _db();
     if (!uid || !dbInst) return;
+
+    // Показываем skeletons сразу — до прихода первого snapshot.
+    var _activeList = document.getElementById('dcoopMyActiveList');
+    var _histList = document.getElementById('dcoopMyHistoryList');
+    if (_activeList) _activeList.innerHTML = _lobbiesSkeletonHtml(2);
+    if (_histList) _histList.innerHTML = _lobbiesSkeletonHtml(3);
 
     var buckets = { created: [], blue: [], red: [], spec: [] };
     var unsubs = [];
@@ -396,7 +418,7 @@
     // скоростью у двух игроков (расхождение часов устройств ≈ секунды).
     _measureServerOffset();
     var pane = document.getElementById('dcoopPaneLobby');
-    if (pane) pane.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-faint);">Загрузка лобби…</div>';
+    if (pane) pane.innerHTML = _lobbyLoadingSkeletonHtml();
 
     _unsubLobby = dbInst.collection('draftLobbies').doc(id).onSnapshot(function(snap){
       if (!snap.exists) {
@@ -3051,10 +3073,11 @@
       if (found) { renderReplay(cached.lobby, found, cached.allGames); return; }
     }
 
-    // Первая загрузка — тянем из Firestore
+    // Первая загрузка — тянем из Firestore. Сразу показываем skeleton-каркас,
+    // повторяющий раскладку реального replay: топбар + 2 боковых панели слотов.
     var dbInst = _db();
     if (!dbInst) return;
-    pane.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-faint);">Загрузка…</div>';
+    pane.innerHTML = _replaySkeletonHtml();
 
     Promise.all([
       dbInst.collection('draftLobbies').doc(lobbyId).get(),
@@ -3081,6 +3104,62 @@
     }).catch(function(e){
       pane.innerHTML = '<div style="padding:30px;color:#e74c3c;text-align:center;">Ошибка: '+escapeHtml(e.message||'')+'</div>';
     });
+  }
+
+  // Скелетон waiting-room: 2 командных панели + хедер. Сменится renderWaitingRoomHtml.
+  function _lobbyLoadingSkeletonHtml() {
+    function _teamPanelSk(col) {
+      return '<div style="border:1px solid '+col+';background:rgba(255,255,255,0.02);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;">'
+        +   '<div style="display:flex;align-items:center;gap:8px;">'
+        +     '<span class="sk sk-circle" style="width:22px;height:22px;"></span>'
+        +     '<span class="sk sk-line sk-w-50 sk-h-md"></span>'
+        +     '<span class="sk sk-line sk-h-sm" style="width:64px;margin-left:auto;"></span>'
+        +   '</div>'
+        +   '<span class="sk sk-line sk-h-sm sk-w-25"></span>'
+        +   '<span class="sk sk-line sk-w-65"></span>'
+        +   '<span class="sk sk-line sk-h-sm sk-w-25" style="margin-top:6px;"></span>'
+        +   '<span class="sk sk-line sk-w-80 sk-h-sm"></span>'
+        +   '<span class="sk sk-line sk-w-65 sk-h-sm"></span>'
+        +   '<span class="sk sk-line sk-w-50 sk-h-sm"></span>'
+        + '</div>';
+    }
+    return '<div style="padding:14px;display:flex;flex-direction:column;gap:14px;">'
+      +     '<div style="display:flex;align-items:center;gap:10px;">'
+      +       '<span class="sk sk-line" style="width:90px;height:28px;border-radius:8px;"></span>'
+      +       '<span class="sk sk-line sk-w-65 sk-h-md"></span>'
+      +     '</div>'
+      +     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+      +       _teamPanelSk('rgba(93,173,226,0.3)')
+      +       _teamPanelSk('rgba(231,76,60,0.3)')
+      +     '</div>'
+      +     '<span class="sk sk-rect sk-h-sm sk-w-100" style="border-radius:10px;"></span>'
+      +   '</div>';
+  }
+
+  function _replaySkeletonHtml() {
+    function _slotSk(){ return '<span class="sk" style="width:36px;height:36px;border-radius:6px;display:inline-block;margin:3px;"></span>'; }
+    var slots5 = '';
+    for (var i = 0; i < 5; i++) slots5 += _slotSk();
+    function _sidePanelSk() {
+      return '<div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--accent-border-sub);border-radius:10px;background:rgba(255,255,255,0.02);">'
+        +   '<span class="sk sk-line sk-h-sm sk-w-40"></span>'
+        +   '<div style="display:flex;flex-wrap:wrap;">'+slots5+'</div>'
+        +   '<span class="sk sk-line sk-h-sm sk-w-40" style="margin-top:6px;"></span>'
+        +   '<div style="display:flex;flex-direction:column;gap:4px;">'+slots5+'</div>'
+        + '</div>';
+    }
+    return '<div class="dcoop-replay-topbar">'
+      +     '<span class="sk sk-line" style="width:90px;height:24px;border-radius:8px;"></span>'
+      +     '<div class="dcoop-replay-info" style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;">'
+      +       '<span class="sk sk-line sk-w-50"></span>'
+      +       '<span class="sk sk-line sk-h-sm sk-w-65"></span>'
+      +     '</div>'
+      +     '<span class="sk sk-line" style="width:120px;"></span>'
+      +   '</div>'
+      +   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px;">'
+      +     _sidePanelSk()
+      +     _sidePanelSk()
+      +   '</div>';
   }
 
   // Реплей — точная копия раскладки реалтайм-драфта, но статичная (read-only).

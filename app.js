@@ -3981,7 +3981,19 @@
     function loadUsersToSidebar() {
         var container = document.getElementById('tgSidebarContent');
         if (!container) return;
-        container.innerHTML = '<div class="chat-login-msg">'+t('Загрузка...')+'</div>';
+        // Skeleton: 6 строк-плейсхолдеров вместо текста «Загрузка...» —
+        // юзер сразу видит «форму» списка, перцептивно быстрее.
+        var skRows = '';
+        for (var i = 0; i < 6; i++) {
+          skRows += '<div class="sk-row">'
+            +   '<span class="sk sk-circle"></span>'
+            +   '<div class="sk-stack">'
+            +     '<span class="sk sk-line sk-w-65 sk-h-sm"></span>'
+            +     '<span class="sk sk-line sk-w-40 sk-h-sm"></span>'
+            +   '</div>'
+            + '</div>';
+        }
+        container.innerHTML = skRows;
         loadAllUsers(function() {
                 renderUsersSidebar();
         });

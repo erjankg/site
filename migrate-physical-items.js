@@ -1,73 +1,26 @@
 /**
  * МИГРАЦИЯ: Обновление всех физических предметов в Firestore с rich-text разметкой
  *
- * ЗАПУСК:
- *   1. Открой сайт https://pro-wildrift.com/ и зайди под админом
- *   2. Открой DevTools (F12) → Console
- *   3. Вставь весь этот файл целиком (Ctrl+A в редакторе, Ctrl+C, потом в консоли Ctrl+V)
- *   4. Нажми Enter
- *   5. Вызови: migratePhysicalItems()
- *   6. Дождись "=== ГОТОВО ===" — в логе будет видно сколько обновлено
+ * ЗАПУСК — автоматический:
+ *   1. Открой сайт https://pro-wildrift.com/ и войди под админом
+ *   2. F12 → Console
+ *   3. Вставь весь файл целиком (Ctrl+A в редакторе → Ctrl+C → в консоли Ctrl+V → Enter)
+ *   4. Скрипт сам запустит миграцию (не нужно вызывать функцию вручную)
+ *   5. Дождись "=== ГОТОВО ===" — в логе будет видно сколько обновлено
  *
  * БЕЗОПАСНОСТЬ:
- *   - Скрипт делает .update() с merge — не трогает поля category, order, image
  *   - Обновляет только: name_ru, name_en, cost, stats, description_ru, description_en
+ *   - Не трогает поля category, order, image
  *   - Если предмет не найден в Firestore — пропустит и сообщит в логе
- *   - Перед запуском проверь что _isAdmin === true (иначе Firestore правила отклонят запись)
+ *   - Требует _isAdmin === true (иначе Firestore правила отклонят запись)
  */
 
-window.migratePhysicalItems = async function() {
-  if (!window.firebase || !firebase.firestore) {
-    console.error('❌ Firebase не загружен. Открой главную страницу сайта сначала.');
-    return;
-  }
-  if (!window._isAdmin) {
-    console.warn('⚠ Ты не залогинен как админ. Firestore правила могут отклонить запись.');
-  }
+(async function migratePhysicalItemsIIFE() {
+  // ═══════════════════════════════════════════════════════════════
+  // ДАННЫЕ — физические предметы
+  // ═══════════════════════════════════════════════════════════════
 
-  var db = firebase.firestore();
-  var batch = db.batch();
-  var updated = 0;
-  var skipped = 0;
-
-  console.log('=== НАЧАЛО МИГРАЦИИ ФИЗИЧЕСКИХ ПРЕДМЕТОВ ===');
-  console.log('Всего предметов в очереди: ' + PHYSICAL_ITEMS.length);
-
-  for (var i = 0; i < PHYSICAL_ITEMS.length; i++) {
-    var item = PHYSICAL_ITEMS[i];
-    try {
-      var docRef = db.collection('items').doc(item.id);
-      var snap = await docRef.get();
-      if (!snap.exists) {
-        console.warn('  ⊘ ' + item.id + ' — не найден в Firestore, пропускаю');
-        skipped++;
-        continue;
-      }
-      await docRef.update({
-        name_ru: item.name_ru,
-        name_en: item.name_en,
-        cost: item.cost,
-        stats: item.stats,
-        description_ru: item.description_ru,
-        description_en: item.description_en
-      });
-      console.log('  ✓ ' + item.id + ' — ' + item.name_ru);
-      updated++;
-    } catch (err) {
-      console.error('  ✗ ' + item.id + ' — ошибка: ' + err.message);
-    }
-  }
-
-  console.log('=== ГОТОВО ===');
-  console.log('Обновлено: ' + updated + ' / Пропущено: ' + skipped + ' / Всего: ' + PHYSICAL_ITEMS.length);
-  console.log('Обнови страницу (Ctrl+R) чтобы увидеть изменения.');
-};
-
-// ═══════════════════════════════════════════════════════════════
-// ДАННЫЕ — 38 физических предметов
-// ═══════════════════════════════════════════════════════════════
-
-var PHYSICAL_ITEMS = [
+  var PHYSICAL_ITEMS = [
   {
     id: 'black-cleaver',
     name_ru: 'Чёрная Секира',
@@ -401,7 +354,64 @@ var PHYSICAL_ITEMS = [
     description_ru: 'Рассечение : Следующая атака наносит [25|ad] [(+ 3% бонусного HP)|hp] [физ. урона|ad] цели + [80|ad] [(+ 10% бонусного HP)|hp] [физ. урона|ad] в конусе [550|ms]. Дальние: [75%|ms]. [(Перезарядка 1,75с)|ms].',
     description_en: 'Cleave : Your next attack deals [25|ad] [(+ 3% bonus HP)|hp] [physical damage|ad] to the target + [80|ad] [(+ 10% bonus HP)|hp] [physical damage|ad] in a [550|ms] cone. Ranged: [75%|ms]. [(1.75s cooldown)|ms].'
   }
-];
+  ];
 
-console.log('[migrate-physical-items] Скрипт загружен. Запусти: migratePhysicalItems()');
-console.log('[migrate-physical-items] В очереди: ' + PHYSICAL_ITEMS.length + ' предметов');
+  // ═══════════════════════════════════════════════════════════════
+  // АВТО-ЗАПУСК
+  // ═══════════════════════════════════════════════════════════════
+
+  if (!window.firebase || !firebase.firestore) {
+    console.error('❌ Firebase не загружен. Открой главную страницу сайта сначала.');
+    return;
+  }
+  if (!window._isAdmin) {
+    console.error('❌ Ты не админ (_isAdmin = ' + window._isAdmin + '). Firestore правила отклонят запись.');
+    console.error('   Восстанови isAdmin: true в users/<твой uid> через Firebase Console.');
+    return;
+  }
+
+  var db = firebase.firestore();
+  var updated = 0;
+  var skipped = 0;
+  var errors = 0;
+
+  console.log('═══════════════════════════════════════');
+  console.log('🚀 МИГРАЦИЯ ФИЗИЧЕСКИХ ПРЕДМЕТОВ');
+  console.log('═══════════════════════════════════════');
+  console.log('В очереди: ' + PHYSICAL_ITEMS.length + ' предметов');
+
+  for (var i = 0; i < PHYSICAL_ITEMS.length; i++) {
+    var item = PHYSICAL_ITEMS[i];
+    try {
+      var docRef = db.collection('items').doc(item.id);
+      var snap = await docRef.get();
+      if (!snap.exists) {
+        console.warn('  ⊘ ' + item.id + ' — не найден в Firestore, пропускаю');
+        skipped++;
+        continue;
+      }
+      await docRef.update({
+        name_ru: item.name_ru,
+        name_en: item.name_en,
+        cost: item.cost,
+        stats: item.stats,
+        description_ru: item.description_ru,
+        description_en: item.description_en
+      });
+      console.log('  ✓ [' + (i + 1) + '/' + PHYSICAL_ITEMS.length + '] ' + item.id + ' — ' + item.name_ru);
+      updated++;
+    } catch (err) {
+      console.error('  ✗ ' + item.id + ' — ошибка: ' + err.message);
+      errors++;
+    }
+  }
+
+  console.log('═══════════════════════════════════════');
+  console.log('✅ === ГОТОВО ===');
+  console.log('   Обновлено: ' + updated);
+  console.log('   Пропущено: ' + skipped);
+  console.log('   Ошибок:    ' + errors);
+  console.log('   Всего:     ' + PHYSICAL_ITEMS.length);
+  console.log('═══════════════════════════════════════');
+  console.log('🔄 Обнови страницу (Ctrl+R) чтобы увидеть изменения.');
+})();
