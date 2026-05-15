@@ -5754,6 +5754,33 @@
             ro.appendChild(b);
         });
         wrprUpdateButtons();
+
+        // Admin: кнопка bulk-импорта винрейтов с lolm.qq.com
+        // Рисуется отдельным блоком сразу после ряда ролей, видна только админу.
+        try {
+            var adminBar = document.getElementById('wrprAdminBar');
+            if (window._isAdmin && window.cmsOpenWinrateBulkImport) {
+                if (!adminBar) {
+                    adminBar = document.createElement('div');
+                    adminBar.id = 'wrprAdminBar';
+                    adminBar.style.cssText = 'display:flex;justify-content:center;padding:0 12px 10px;';
+                    var btn = document.createElement('button');
+                    btn.id = 'wrprImportBtn';
+                    btn.type = 'button';
+                    btn.textContent = '📥 Импорт винрейтов с lolm.qq.com';
+                    btn.title = 'Массово обновить таблицу из буфера обмена';
+                    btn.style.cssText = 'background:rgba(11,196,227,0.12);border:1.5px dashed rgba(11,196,227,0.45);color:#0bc4e3;padding:7px 16px;border-radius:18px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;';
+                    btn.onclick = function() {
+                        if (window.cmsOpenWinrateBulkImport) window.cmsOpenWinrateBulkImport();
+                    };
+                    adminBar.appendChild(btn);
+                    // Вставляем после ряда ролей
+                    if (ro && ro.parentNode) ro.parentNode.insertBefore(adminBar, ro.nextSibling);
+                }
+            } else if (adminBar) {
+                adminBar.remove();
+            }
+        } catch(e) {}
     }
 
     function wrprUpdateButtons() {

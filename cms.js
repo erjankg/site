@@ -1168,6 +1168,570 @@
   }
 
   // ═══════════════════════════════════════════════════════════════
+  // 📥 BULK-ИМПОРТ ВИНРЕЙТОВ С lolm.qq.com
+  // Вставка таблицы → автопарс → diff-превью → batch-сохранение
+  // ═══════════════════════════════════════════════════════════════
+
+  // Словарь: китайское имя → DDragon-ключ (как в Firestore winrates).
+  // Используются официальные имена с lolm.qq.com + популярные прозвища.
+  var LOLM_CN_TO_DDRAGON = {
+    '剑魔':'Aatrox','暗裔剑魔':'Aatrox',
+    '阿狸':'Ahri','狐狸':'Ahri',
+    '阿卡丽':'Akali',
+    '阿克尚':'Akshan',
+    '牛头':'Alistar','牛头酋长':'Alistar',
+    '安蓓萨':'Ambessa',
+    '木乃伊':'Amumu','阿木木':'Amumu',
+    '安妮':'Annie',
+    '厄斐琉斯':'Aphelios',
+    '寒冰':'Ashe','寒冰射手':'Ashe',
+    '翱锐龙兽':'AurelionSol','龙王':'AurelionSol',
+    '奥罗拉':'Aurora',
+    '巴德':'Bard',
+    '机器人':'Blitzcrank','蒸汽机器人':'Blitzcrank',
+    '火男':'Brand','复仇焰魂':'Brand',
+    '布隆':'Braum',
+    '女警':'Caitlyn','凯特琳':'Caitlyn',
+    '卡蜜尔':'Camille','卡密尔':'Camille',
+    '卡西奥佩娅':'Cassiopeia','蛇女':'Cassiopeia',
+    '大虫子':'Chogath','虚空恐惧':'Chogath','科加斯':'Chogath',
+    '飞机':'Corki','英勇投弹手':'Corki',
+    '诺手':'Darius','德莱厄斯':'Darius',
+    '皎月':'Diana',
+    '德莱文':'Draven',
+    '蒙多':'DrMundo','蒙多医生':'DrMundo',
+    '艾克':'Ekko',
+    '蜘蛛女皇':'Elise','伊莉丝':'Elise',
+    '寡妇':'Evelynn','伊芙琳':'Evelynn',
+    '伊泽瑞尔':'Ezreal','EZ':'Ezreal','探险家':'Ezreal',
+    '稻草人':'Fiddlesticks','费德提克':'Fiddlesticks',
+    '剑姬':'Fiora','菲奥娜':'Fiora',
+    '小鱼人':'Fizz','菲兹':'Fizz',
+    '加里奥':'Galio',
+    '船长':'Gangplank','普朗克':'Gangplank',
+    '盖伦':'Garen','德玛西亚之力':'Garen',
+    '纳尔':'Gnar',
+    '酒桶':'Gragas','古拉加斯':'Gragas',
+    '男枪':'Graves','格雷福斯':'Graves',
+    '格温':'Gwen',
+    '半人马':'Hecarim','赫卡里姆':'Hecarim',
+    '大头':'Heimerdinger','黑默丁格':'Heimerdinger',
+    '俄洛伊':'Illaoi','章鱼姐':'Illaoi',
+    '刀妹':'Irelia','伊瑞莉娅':'Irelia',
+    '艾翁':'Ivern',
+    '风女':'Janna','迦娜':'Janna',
+    '皇子':'JarvanIV','嘉文':'JarvanIV','嘉文四世':'JarvanIV',
+    '武器':'Jax','贾克斯':'Jax','武器大师':'Jax',
+    '杰斯':'Jayce',
+    '烬':'Jhin',
+    '金克丝':'Jinx',
+    '卡莎':'Kaisa',
+    '复仇之矛':'Kalista','卡莉丝塔':'Kalista',
+    '卡尔玛':'Karma',
+    '死歌':'Karthus','卡尔萨斯':'Karthus',
+    '卡萨丁':'Kassadin',
+    '卡特':'Katarina','卡特琳娜':'Katarina',
+    '凯尔':'Kayle',
+    '凯隐':'Kayn',
+    '凯南':'Kennen',
+    '螳螂':'Khazix','卡兹克':'Khazix',
+    '千珏':'Kindred',
+    '大嘴':'KogMaw','克格莫':'KogMaw',
+    '妖姬':'LeBlanc','乐芙兰':'LeBlanc',
+    '瞎子':'LeeSin','李青':'LeeSin',
+    '日女':'Leona','蕾欧娜':'Leona',
+    '莉莉娅':'Lillia',
+    '冰女':'Lissandra','丽桑卓':'Lissandra',
+    '卢锡安':'Lucian',
+    '璐璐':'Lulu',
+    '拉克丝':'Lux',
+    '石头人':'Malphite','墨菲特':'Malphite',
+    '树人':'Maokai','茂凯':'Maokai',
+    '易大师':'MasterYi','大师':'MasterYi',
+    '梅尔':'Mel','米尔':'Mel',
+    '米利欧':'Milio',
+    '厄运小姐':'MissFortune','MF':'MissFortune','赏金':'MissFortune',
+    '莫德凯撒':'Mordekaiser','MK':'Mordekaiser',
+    '莫甘娜':'Morgana',
+    '娜美':'Nami',
+    '狗头':'Nasus','内瑟斯':'Nasus',
+    '泰坦':'Nautilus','诺提勒斯':'Nautilus',
+    '妮蔻':'Neeko',
+    '豹女':'Nidalee','奈德丽':'Nidalee',
+    '尼菈':'Nilah',
+    '梦魇':'Nocturne','魔腾':'Nocturne',
+    '诺拉':'Norra',
+    '努努':'Nunu','雪人骑士':'Nunu',
+    '奥拉夫':'Olaf',
+    '发条':'Orianna','奥莉安娜':'Orianna',
+    '奥恩':'Ornn',
+    '潘森':'Pantheon',
+    '波比':'Poppy',
+    '派克':'Pyke',
+    '奇亚娜':'Qiyana',
+    '奎因':'Quinn',
+    '洛':'Rakan',
+    '龟':'Rammus','拉莫斯':'Rammus','披甲龙龟':'Rammus',
+    '雷尔':'Rell',
+    '鳄鱼':'Renekton','雷克顿':'Renekton',
+    '狮子狗':'Rengar','雷恩加尔':'Rengar',
+    '锐雯':'Riven',
+    '蹦蹦':'Rumble','兰博':'Rumble',
+    '瑞兹':'Ryze',
+    '莎弥拉':'Samira','萨米拉':'Samira',
+    '赛娜':'Senna',
+    '萨勒芬妮':'Seraphine','萨弗温妮':'Seraphine',
+    '瑟特':'Sett',
+    '小丑':'Shaco','萨科':'Shaco',
+    '慎':'Shen',
+    '龙女':'Shyvana','希瓦娜':'Shyvana',
+    '炼金':'Singed','辛吉德':'Singed',
+    '塞恩':'Sion',
+    '战争女神':'Sivir','希维尔':'Sivir',
+    '思蒙德':'Smolder','斯莫德':'Smolder',
+    '琴女':'Sona','娑娜':'Sona',
+    '索拉卡':'Soraka',
+    '斯维因':'Swain','斯韦因':'Swain',
+    '辛德拉':'Syndra',
+    '男刀':'Talon','泰隆':'Talon',
+    '提莫':'Teemo',
+    '锤石':'Thresh',
+    '小炮':'Tristana','崔丝塔娜':'Tristana',
+    '蛮王':'Tryndamere','泰达米尔':'Tryndamere',
+    '卡牌':'TwistedFate','崔斯特':'TwistedFate','TF':'TwistedFate',
+    '老鼠':'Twitch','图奇':'Twitch',
+    '武当':'Udyr','乌迪尔':'Udyr',
+    '厄加特':'Urgot',
+    '韦鲁斯':'Varus',
+    '薇恩':'Vayne','VN':'Vayne',
+    '维迦':'Veigar',
+    '大眼':'Velkoz','维克兹':'Velkoz',
+    '蔚':'Vi',
+    '佛耶戈':'Viego','破败王':'Viego',
+    '维克托':'Viktor',
+    '弗拉基米尔':'Vladimir','吸血鬼':'Vladimir',
+    '狗熊':'Volibear','沃利贝尔':'Volibear',
+    '狼人':'Warwick','沃里克':'Warwick','WW':'Warwick',
+    '猴子':'Wukong','孙悟空':'Wukong',
+    '霞':'Xayah',
+    '赵信':'XinZhao',
+    '亚索':'Yasuo',
+    '永恩':'Yone',
+    '约里克':'Yorick',
+    '悠米':'Yuumi',
+    '劫':'Zed',
+    '泽丽':'Zeri',
+    '吉格斯':'Ziggs',
+    '基兰':'Zilean','时光老人':'Zilean',
+    '婕拉':'Zyra'
+  };
+
+  // Английские/латинские ключи — для случая если в строке вместо китайского имени английское.
+  // Берём из объединения уже знакомых ключей словаря.
+  var LOLM_KNOWN_DDRAGON = null;
+  function _lolmEnSet() {
+    if (LOLM_KNOWN_DDRAGON) return LOLM_KNOWN_DDRAGON;
+    var s = {};
+    Object.keys(LOLM_CN_TO_DDRAGON).forEach(function(k) { s[LOLM_CN_TO_DDRAGON[k].toLowerCase()] = LOLM_CN_TO_DDRAGON[k]; });
+    LOLM_KNOWN_DDRAGON = s;
+    return s;
+  }
+
+  // Распознать имя героя из ячейки таблицы. Возвращает DDragon-ключ или null.
+  function _matchChampionName(raw) {
+    if (!raw) return null;
+    var s = String(raw).trim();
+    if (!s) return null;
+    // Прямое совпадение по китайскому
+    if (LOLM_CN_TO_DDRAGON[s]) return LOLM_CN_TO_DDRAGON[s];
+    // Английское/латинское (нечувствительно к регистру и пробелам, как "Lee Sin" → "LeeSin")
+    var noSpace = s.replace(/\s+/g,'').toLowerCase();
+    var en = _lolmEnSet();
+    if (en[noSpace]) return en[noSpace];
+    // Точка для имён вроде "Dr. Mundo", "Jarvan IV"
+    var noDots = noSpace.replace(/[\.\-']/g,'');
+    if (en[noDots]) return en[noDots];
+    return null;
+  }
+
+  // Парсер таблицы из буфера обмена.
+  // Принимает строку (TSV / много пробелов / смешанные разделители).
+  // Возвращает {rows: [{name, wr, pr, br, _rawName, _matched}], errors: [...]}
+  function _parseLolmTable(text, columnOrder) {
+    // columnOrder: 'wr-br-pr' (default lolm) | 'wr-pr-br' | 'wr-only'
+    var result = { rows: [], errors: [] };
+    if (!text) return result;
+
+    var lines = text.split(/\r?\n/);
+    lines.forEach(function(line, idx) {
+      var trimmed = line.trim();
+      if (!trimmed) return;
+
+      // Разбить на ячейки: tab или 2+ пробелов
+      var cells = trimmed.split(/\t+|\s{2,}/).map(function(c){ return c.trim(); }).filter(function(c){ return c.length > 0; });
+      if (cells.length < 2) return;
+
+      // Найти ячейку-имя: первая, в которой есть китайские иероглифы ИЛИ это распознаваемое латинское имя
+      var nameCell = null;
+      var nameIdx = -1;
+      for (var i = 0; i < cells.length; i++) {
+        var c = cells[i];
+        // Игнор шапки таблицы (排名/英雄/胜率/Ban率/出场率/Pick/Win/Ban)
+        if (/^(排名|英雄|胜率|败率|ban率|出场率|登场率|pick|win|ban|rank|name|hero|champion|wr|pr|br|tier|kda)$/i.test(c)) {
+          continue;
+        }
+        // Игнор чистых чисел (с %)
+        if (/^-?\d+([\.,]\d+)?%?$/.test(c)) continue;
+        // Игнор тиров S/A/B/C/T1
+        if (/^(s\+|s|a\+|a|b\+|b|c\+|c|d|t\d)$/i.test(c)) continue;
+        // Имя
+        if (/[一-鿿]/.test(c) || _matchChampionName(c)) {
+          nameCell = c;
+          nameIdx = i;
+          break;
+        }
+      }
+      if (!nameCell) return; // Не нашли имя — пропускаем (это шапка/мусор)
+
+      var matched = _matchChampionName(nameCell);
+
+      // Собрать все проценты из остальных ячеек (по порядку появления)
+      var nums = [];
+      cells.forEach(function(c, i) {
+        if (i === nameIdx) return;
+        var m = c.match(/^-?(\d+([\.,]\d+)?)%?$/);
+        if (m) {
+          var v = parseFloat(m[1].replace(',', '.'));
+          if (!isNaN(v)) nums.push(v);
+        }
+      });
+
+      // Не нашли ни одного числа — пропускаем (мусор)
+      if (nums.length === 0) return;
+
+      var wr = null, pr = null, br = null;
+      if (columnOrder === 'wr-pr-br') {
+        wr = nums[0]; pr = nums[1] != null ? nums[1] : 0; br = nums[2] != null ? nums[2] : 0;
+      } else if (columnOrder === 'wr-only') {
+        wr = nums[0]; pr = 0; br = 0;
+      } else {
+        // default lolm.qq.com: WR, BR, PR
+        wr = nums[0]; br = nums[1] != null ? nums[1] : 0; pr = nums[2] != null ? nums[2] : 0;
+      }
+
+      // Валидация WR (должен быть в диапазоне 30-70%)
+      if (wr == null || wr < 20 || wr > 80) {
+        result.errors.push('Строка ' + (idx+1) + ': WR=' + wr + '% (вне 20-80%), пропущена');
+        return;
+      }
+
+      result.rows.push({
+        name: matched || nameCell,
+        wr: Math.round(wr * 100) / 100,
+        ch: null,
+        pr: Math.round((pr || 0) * 100) / 100,
+        br: Math.round((br || 0) * 100) / 100,
+        _rawName: nameCell,
+        _matched: !!matched
+      });
+    });
+
+    return result;
+  }
+
+  // Вычислить diff: что добавится / изменится / удалится по сравнению с текущим состоянием
+  function _computeWinrateDiff(currentList, newList) {
+    var curByName = {};
+    (currentList || []).forEach(function(e) { curByName[e.name] = e; });
+    var newByName = {};
+    newList.forEach(function(e) { newByName[e.name] = e; });
+
+    var added = [], changed = [], removed = [];
+    newList.forEach(function(n) {
+      var old = curByName[n.name];
+      if (!old) added.push(n);
+      else if (old.wr !== n.wr || old.pr !== n.pr || old.br !== n.br) changed.push({ old: old, new: n });
+    });
+    (currentList || []).forEach(function(o) {
+      if (!newByName[o.name]) removed.push(o);
+    });
+    return { added: added, changed: changed, removed: removed };
+  }
+
+  window.cmsOpenWinrateBulkImport = function() {
+    if (!window._isAdmin) return;
+    if (!firebase || !firebase.firestore) {
+      _showToast('Firebase не загружен', 'error');
+      return;
+    }
+
+    // Запомненный порядок колонок
+    var savedOrder = null;
+    try { savedOrder = localStorage.getItem('cms_wr_import_order'); } catch(e) {}
+    var columnOrder = savedOrder || 'wr-br-pr';
+
+    var overlay = document.createElement('div');
+    overlay.className = 'cms-modal-overlay';
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+
+    var win = document.createElement('div');
+    win.className = 'cms-modal-win';
+    win.style.maxWidth = '720px';
+    win.style.width = '92vw';
+    win.style.maxHeight = '88vh';
+    win.style.overflowY = 'auto';
+
+    // Заголовок
+    var hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;';
+    hdr.innerHTML = '<h3 style="margin:0;color:#fff;font-size:18px;">📥 Импорт винрейтов с lolm.qq.com</h3>' +
+      '<button class="cms-bulk-close" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>';
+    hdr.querySelector('.cms-bulk-close').onclick = function() { overlay.remove(); };
+    win.appendChild(hdr);
+
+    // Инструкция
+    var help = document.createElement('div');
+    help.style.cssText = 'background:rgba(11,196,227,0.08);border:1px solid rgba(11,196,227,0.25);border-radius:10px;padding:10px 12px;margin-bottom:14px;color:rgba(255,255,255,0.75);font-size:12px;line-height:1.5;';
+    help.innerHTML = '1. Открой <a href="https://lolm.qq.com/act/a20220818raider/index.html" target="_blank" style="color:#0bc4e3;">lolm.qq.com</a> → выбери ранг и роль<br>' +
+      '2. Выдели таблицу на странице (имя + WR + BR + PR) и нажми Ctrl+C<br>' +
+      '3. Выбери ниже тот же ранг и роль и вставь в поле<br>' +
+      '4. Нажми «Распарсить» → проверь diff → «Сохранить»';
+    win.appendChild(help);
+
+    // Селекторы ранга и роли
+    var sel = document.createElement('div');
+    sel.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;';
+    var rankOpts = WR_RANKS.map(function(r){ return '<option value="'+r+'">'+r+'</option>'; }).join('');
+    var roleOpts = WR_ROLES.map(function(r){ return '<option value="'+r+'">'+r+'</option>'; }).join('');
+    sel.innerHTML =
+      '<div><label style="display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Ранг</label>' +
+        '<select class="cms-input cms-bulk-rank">'+rankOpts+'</select></div>' +
+      '<div><label style="display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Роль</label>' +
+        '<select class="cms-input cms-bulk-role">'+roleOpts+'</select></div>';
+    win.appendChild(sel);
+
+    // Дефолтные значения из текущего состояния UI
+    var rankSelect = sel.querySelector('.cms-bulk-rank');
+    var roleSelect = sel.querySelector('.cms-bulk-role');
+    try {
+      // app.js хранит _wrprRank/_wrprRole в замыкании, но через wrprRender знаем активный.
+      // Пытаемся вытащить из активных кнопок-фильтров.
+      var rr = document.querySelector('#wrprRankRow button[style*="rgba(46, 204, 113"]');
+      var ro = document.querySelector('#wrprRoleRow button[style*="border-color: rgb"]');
+      if (rr && rr.dataset.rank) rankSelect.value = rr.dataset.rank;
+      if (ro && ro.dataset.role) roleSelect.value = ro.dataset.role;
+    } catch(e) {}
+
+    // Порядок колонок
+    var order = document.createElement('div');
+    order.style.cssText = 'margin-bottom:10px;';
+    order.innerHTML =
+      '<label style="display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Порядок чисел в строке</label>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+        '<label class="cms-bulk-order-lbl"><input type="radio" name="cmsOrd" value="wr-br-pr"'+(columnOrder==='wr-br-pr'?' checked':'')+'> WR → BR → PR <span style="color:rgba(255,255,255,0.4);">(lolm.qq.com)</span></label>' +
+        '<label class="cms-bulk-order-lbl"><input type="radio" name="cmsOrd" value="wr-pr-br"'+(columnOrder==='wr-pr-br'?' checked':'')+'> WR → PR → BR</label>' +
+        '<label class="cms-bulk-order-lbl"><input type="radio" name="cmsOrd" value="wr-only"'+(columnOrder==='wr-only'?' checked':'')+'> Только WR</label>' +
+      '</div>';
+    // Стили radio-лейблов
+    Array.prototype.forEach.call(order.querySelectorAll('.cms-bulk-order-lbl'), function(l){
+      l.style.cssText = 'color:rgba(255,255,255,0.85);font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;';
+    });
+    win.appendChild(order);
+
+    // Textarea
+    var ta = document.createElement('textarea');
+    ta.className = 'cms-input';
+    ta.placeholder = 'Вставь сюда таблицу с lolm.qq.com (Ctrl+V)…\n\nПример:\n剑魔\t49.5%\t5.34%\t5.91%\n亚索\t48.4%\t23.5%\t3.19%';
+    ta.style.cssText = 'width:100%;min-height:180px;font-family:Consolas,Monaco,monospace;font-size:12px;line-height:1.4;margin-bottom:10px;';
+    win.appendChild(ta);
+
+    // Превью diff
+    var preview = document.createElement('div');
+    preview.style.cssText = 'min-height:60px;max-height:260px;overflow-y:auto;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:12px;';
+    preview.textContent = 'Превью diff появится после парсинга…';
+    win.appendChild(preview);
+
+    // Кнопки
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap;';
+
+    var parseBtn = document.createElement('button');
+    parseBtn.className = 'cms-btn-save';
+    parseBtn.textContent = '🔍 Распарсить';
+    parseBtn.style.background = 'rgba(241,196,15,0.18)';
+    parseBtn.style.color = '#f1c40f';
+    parseBtn.style.borderColor = 'rgba(241,196,15,0.35)';
+
+    var saveBtn = document.createElement('button');
+    saveBtn.className = 'cms-btn-save';
+    saveBtn.textContent = '💾 Сохранить';
+    saveBtn.disabled = true;
+    saveBtn.style.opacity = '0.5';
+    saveBtn.style.cursor = 'not-allowed';
+
+    var cancelBtn = document.createElement('button');
+    cancelBtn.className = 'cms-btn-cancel';
+    cancelBtn.textContent = 'Отмена';
+    cancelBtn.onclick = function() { overlay.remove(); };
+
+    btnRow.appendChild(parseBtn);
+    btnRow.appendChild(saveBtn);
+    btnRow.appendChild(cancelBtn);
+    win.appendChild(btnRow);
+
+    overlay.appendChild(win);
+    document.body.appendChild(overlay);
+
+    // Состояние парсинга
+    var parsedRows = null;
+    var parsedRank = null;
+    var parsedRole = null;
+
+    function getColumnOrder() {
+      var checked = order.querySelector('input[name="cmsOrd"]:checked');
+      return checked ? checked.value : 'wr-br-pr';
+    }
+
+    parseBtn.onclick = function() {
+      var rank = rankSelect.value;
+      var role = roleSelect.value;
+      var ord = getColumnOrder();
+      try { localStorage.setItem('cms_wr_import_order', ord); } catch(e) {}
+
+      var text = ta.value || '';
+      if (!text.trim()) {
+        _showToast('Поле пустое — вставь таблицу', 'error');
+        return;
+      }
+
+      var parsed = _parseLolmTable(text, ord);
+      if (parsed.rows.length === 0) {
+        preview.innerHTML = '<div style="color:#e74c3c;font-weight:700;">❌ Не удалось распознать ни одной строки.</div>' +
+          '<div style="margin-top:6px;color:rgba(255,255,255,0.5);">Проверь что выделил именно таблицу с именами и числами WR/BR/PR.</div>';
+        saveBtn.disabled = true;
+        saveBtn.style.opacity = '0.5';
+        saveBtn.style.cursor = 'not-allowed';
+        return;
+      }
+
+      // Отделяем распознанные от нераспознанных
+      var unknown = parsed.rows.filter(function(r){ return !r._matched; });
+      var known = parsed.rows.filter(function(r){ return r._matched; });
+
+      // Текущее состояние
+      var curList = (window._cmsWinrates && window._cmsWinrates[rank] && window._cmsWinrates[rank][role]) || [];
+      var diff = _computeWinrateDiff(curList, known);
+
+      // Рисуем превью
+      var html = '';
+      html += '<div style="color:#0bc4e3;font-weight:700;margin-bottom:6px;">📊 Распознано строк: ' + parsed.rows.length + ' (' + known.length + ' с известными именами)</div>';
+
+      if (unknown.length) {
+        html += '<div style="color:#e74c3c;font-weight:700;margin-top:8px;">⚠ Не распознано (' + unknown.length + ') — будут пропущены:</div>';
+        html += '<div style="color:rgba(231,76,60,0.85);font-size:11px;margin-left:10px;">' +
+          unknown.map(function(r){ return '• ' + _esc(r._rawName) + ' (WR ' + r.wr + '%)'; }).join('<br>') + '</div>';
+      }
+
+      if (diff.added.length) {
+        html += '<div style="color:#2ecc71;font-weight:700;margin-top:8px;">➕ Добавится (' + diff.added.length + '):</div>';
+        html += '<div style="color:rgba(46,204,113,0.85);font-size:11px;margin-left:10px;">' +
+          diff.added.map(function(r){ return '• ' + _esc(r.name) + ' — WR ' + r.wr + '%, PR ' + r.pr + '%, BR ' + r.br + '%'; }).join('<br>') + '</div>';
+      }
+
+      if (diff.changed.length) {
+        html += '<div style="color:#f1c40f;font-weight:700;margin-top:8px;">📝 Изменится (' + diff.changed.length + '):</div>';
+        html += '<div style="color:rgba(241,196,15,0.85);font-size:11px;margin-left:10px;">' +
+          diff.changed.map(function(c){
+            var parts = [];
+            if (c.old.wr !== c.new.wr) parts.push('WR ' + c.old.wr + '→' + c.new.wr + '%');
+            if (c.old.pr !== c.new.pr) parts.push('PR ' + c.old.pr + '→' + c.new.pr + '%');
+            if (c.old.br !== c.new.br) parts.push('BR ' + c.old.br + '→' + c.new.br + '%');
+            return '• ' + _esc(c.new.name) + ' — ' + parts.join(', ');
+          }).join('<br>') + '</div>';
+      }
+
+      if (diff.removed.length) {
+        html += '<div style="color:#e67e22;font-weight:700;margin-top:8px;">❌ Удалится из таблицы (' + diff.removed.length + ') — нет в новых данных:</div>';
+        html += '<div style="color:rgba(230,126,34,0.85);font-size:11px;margin-left:10px;">' +
+          diff.removed.map(function(r){ return '• ' + _esc(r.name) + ' (был WR ' + r.wr + '%)'; }).join('<br>') + '</div>';
+      }
+
+      if (!diff.added.length && !diff.changed.length && !diff.removed.length) {
+        html += '<div style="color:rgba(255,255,255,0.5);margin-top:8px;">Данные совпадают с текущими — сохранять нечего.</div>';
+      }
+
+      if (parsed.errors.length) {
+        html += '<div style="color:rgba(255,255,255,0.4);margin-top:8px;font-size:11px;">Пропущены: ' +
+          parsed.errors.map(_esc).join('; ') + '</div>';
+      }
+
+      preview.innerHTML = html;
+
+      parsedRows = known;
+      parsedRank = rank;
+      parsedRole = role;
+
+      var canSave = known.length > 0 && (diff.added.length || diff.changed.length || diff.removed.length);
+      saveBtn.disabled = !canSave;
+      saveBtn.style.opacity = canSave ? '1' : '0.5';
+      saveBtn.style.cursor = canSave ? 'pointer' : 'not-allowed';
+    };
+
+    saveBtn.onclick = function() {
+      if (saveBtn.disabled || !parsedRows) return;
+      var rank = parsedRank, role = parsedRole, rows = parsedRows;
+      // Очищаем служебные поля
+      var clean = rows.map(function(r) { return { name: r.name, wr: r.wr, ch: null, pr: r.pr, br: r.br }; });
+
+      var db = firebase.firestore();
+      if (!window._cmsWinrates) window._cmsWinrates = {};
+      if (!window._cmsWinrates[rank]) window._cmsWinrates[rank] = {};
+      // Сохраняем предыдущее состояние роли для changelog
+      var oldRoleList = (window._cmsWinrates[rank][role] || []).slice();
+      window._cmsWinrates[rank][role] = clean;
+
+      var docData = {};
+      WR_ROLES.forEach(function(r) {
+        docData[r] = (window._cmsWinrates[rank] && window._cmsWinrates[rank][r]) || [];
+      });
+
+      saveBtn.disabled = true;
+      saveBtn.style.opacity = '0.5';
+      saveBtn.textContent = '⏳ Сохраняю…';
+
+      db.collection('winrates').doc(rank).set(docData)
+        .then(function() {
+          db.collection('changelog').add({
+            type: 'bulk-import',
+            entity: 'winrate',
+            name: 'Импорт ' + rank + '/' + role + ' (' + clean.length + ' чемпионов)',
+            newData: JSON.stringify(clean),
+            oldData: JSON.stringify(oldRoleList),
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            adminUid: window._currentUser ? window._currentUser.uid : 'unknown'
+          });
+          if (window.wrprRenderFromCMS) window.wrprRenderFromCMS();
+          _showToast('Сохранено: ' + clean.length + ' чемпионов в ' + rank + '/' + role, 'success');
+          overlay.remove();
+        })
+        .catch(function(err) {
+          // Откат локального состояния при ошибке
+          window._cmsWinrates[rank][role] = oldRoleList;
+          _showToast('Ошибка: ' + err.message, 'error');
+          saveBtn.disabled = false;
+          saveBtn.style.opacity = '1';
+          saveBtn.textContent = '💾 Сохранить';
+        });
+    };
+  };
+
+  function _esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // ═══════════════════════════════════════════════════════════════
   // 📝 ЭТАП 3: ПАТЧ-НОТЫ ИЗ FIRESTORE
   // ═══════════════════════════════════════════════════════════════
 
