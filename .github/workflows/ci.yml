@@ -1,0 +1,49 @@
+name: CI
+
+# Прогоняется на каждый push и pull request.
+# Ловит синтаксические ошибки в JS, битый JSON и регрессии в логике драфта
+# до того как они попадут в прод. Деплой остаётся ручным (Firebase Console).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check (все JS-файлы)
+        run: |
+          set -e
+          for f in app.js draft.js draft-logic.js share.js cms.js cybersport.js i18n.js sw.js migrate.js migrate-winrates.js; do
+            if [ -f "$f" ]; then
+              node --check "$f" && echo "  ok: $f"
+            fi
+          done
+
+      - name: Validate JSON / manifest
+        run: |
+          set -e
+          node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))" && echo "  ok: package.json"
+          node -e "JSON.parse(require('fs').readFileSync('manifest.webmanifest','utf8'))" && echo "  ok: manifest.webmanifest"
+
+      - name: Validate sitemap.xml
+        run: |
+          node -e "var s=require('fs').readFileSync('sitemap.xml','utf8'); if(!/<urlset[\s\S]*<\/urlset>/.test(s)){process.exit(1)}" \
+            && echo "  ok: sitemap.xml"
+
+      - name: Unit tests (Vitest)
+        run: npm test
