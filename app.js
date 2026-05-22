@@ -1707,6 +1707,55 @@
     };
     window.closeTierlist = function() { closeModal('tierlistMask'); };
 
+    // Поделиться текущим тир-листом как PNG-карточкой (share.js).
+    window.shareTierlist = function() {
+        if (!window.exportShareCard) { showToast(t('Модуль шеринга не загружен')); return; }
+        var tData, imgFn, title, subtitle;
+        if (_tierType === 'items') {
+            tData = ITEM_TIER_DATA[_tierItemCat] || ITEM_TIER_DATA.all;
+            var allItems = getItemsByCat().all;
+            imgFn = function(n) { var f = allItems.find(function(x){ return x.name === n; }); return f ? f.img : ''; };
+            title = t('Тир-лист предметов');
+            var ic = _ITEM_CATS.find(function(c){ return c.k === _tierItemCat; });
+            subtitle = ic ? t(ic.l) : '';
+        } else if (_tierType === 'runes') {
+            tData = RUNE_TIER_DATA[_tierRuneCat] || RUNE_TIER_DATA.keystone;
+            var runesD = getRunesData();
+            imgFn = function(n) { var f = runesD.find(function(x){ return x.name === n; }); return f ? f.img : ''; };
+            title = t('Тир-лист рун');
+            var rc = _RUNE_CATS.find(function(c){ return c.k === _tierRuneCat; });
+            subtitle = rc ? t(rc.l) : '';
+        } else {
+            tData = TIER_DATA[_tierRole] || TIER_DATA.all;
+            imgFn = function(n) { return champIcon(n); };
+            title = t('Тир-лист чемпионов');
+            var rl = ROLES.find(function(r){ return r.key === _tierRole; });
+            subtitle = (rl && rl.key !== 'all') ? rl.label : t('Все роли');
+        }
+        // Проверяем что хоть что-то есть
+        var total = 0;
+        _TIER_KEYS.forEach(function(tk){ total += (tData[tk] || []).length; });
+        if (!total) { showToast(t('Тир-лист пуст — нечего шарить')); return; }
+
+        var tiers = _TIER_KEYS.map(function(tk) {
+            return {
+                label: tk,
+                color: _TIER_COLORS[tk],
+                items: (tData[tk] || []).map(function(n) {
+                    return { img: imgFn(n), name: n };
+                })
+            };
+        });
+        window.exportShareCard({
+            title: title,
+            subtitle: subtitle,
+            mode: 'tier',
+            tiers: tiers,
+            fileName: 'wr-tierlist-' + (_tierType === 'champs' ? _tierRole
+                       : _tierType === 'items' ? _tierItemCat : _tierRuneCat)
+        });
+    };
+
     window.openTierlistMenu = function() { openModal('tierlistMenuMask'); };
     window.closeTierlistMenu = function() { closeModal('tierlistMenuMask'); };
     window.openTierlistFromMenu = function(type) {
@@ -5718,6 +5767,33 @@
             _wrprSortDir = -1;
         }
         wrprRender();
+    };
+
+    // Поделиться текущей таблицей винрейтов как PNG-карточкой (топ-10 по WR).
+    window.shareWinrates = function() {
+        if (!window.exportShareCard) { showToast(t('Модуль шеринга не загружен')); return; }
+        var rankData = WR_DATA[_wrprRank];
+        var list = rankData ? (rankData[_wrprRole] || []) : [];
+        if (!list.length) { showToast(t('Нет данных для шеринга')); return; }
+        var sorted = list.slice().sort(function(a, b) { return b.wr - a.wr; }).slice(0, 10);
+        var rows = sorted.map(function(d) {
+            var col = d.wr >= 52 ? '#2ecc71' : d.wr >= 50 ? '#f1c40f' : '#e74c3c';
+            return {
+                img: wrprIcon(d.name),
+                name: _wrprDisplayName[d.name] || d.name,
+                value: d.wr.toFixed(2) + '%',
+                valueColor: col
+            };
+        });
+        var rk = _WRPR_RANKS.find(function(r){ return r.id === _wrprRank; });
+        var rl = _WRPR_ROLES.find(function(r){ return r.id === _wrprRole; });
+        window.exportShareCard({
+            title: t('Винрейты Wild Rift'),
+            subtitle: (rk ? rk.label : _wrprRank) + ' · ' + (rl ? rl.label : _wrprRole) + ' · Top 10',
+            mode: 'table',
+            rows: rows,
+            fileName: 'wr-winrate-' + _wrprRank + '-' + _wrprRole
+        });
     };
 
     function wrprBuildFilters() {

@@ -140,6 +140,27 @@ body.profile-gated #profileSetupMask [onclick*="closeProfileSetup"] { display: n
 }
 .col-cfg-btn:hover { background: rgba(11, 196, 227, 0.2); transform: rotate(30deg); }
 
+/* Share-кнопка винрейтов — рядом с ⚙, зелёный акцент */
+.wrpr-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-left: 6px;
+  padding: 0;
+  background: rgba(46, 204, 113, 0.1);
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  color: #2ecc71;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: var(--tx-base);
+}
+.wrpr-share-btn:hover { background: rgba(46, 204, 113, 0.22); transform: scale(1.08); }
+
 /* Column-config button в блоке Level (справа от "Patch") */
 .lvl-col-cfg-btn {
   display: inline-flex;
@@ -162,6 +183,95 @@ body.profile-gated #profileSetupMask [onclick*="closeProfileSetup"] { display: n
 .lvl-col-cfg-btn:hover { background: rgba(11, 196, 227, 0.22); transform: rotate(30deg); }
 @media (max-width: 600px) {
   .lvl-col-cfg-btn { width: 26px; height: 26px; font-size: 13px; margin-left: 4px; }
+}
+
+/* ═══════════════════════════════════════════════
+   SHARE CARD OVERLAY — превью PNG-карточки + кнопки шеринга.
+   ─────────────────────────────────────────────── */
+.share-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100002;
+  background: rgba(0,0,0,0.82);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: shareFadeIn 0.2s ease;
+}
+@keyframes shareFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.share-box {
+  background: linear-gradient(135deg, #1a0d2e, #0f0520);
+  border: 1px solid rgba(109,63,245,0.4);
+  border-radius: 18px;
+  padding: 20px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+}
+.share-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 20px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: background 0.15s, color 0.15s;
+}
+.share-close:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.share-preview-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 8px 0 14px;
+  background: rgba(0,0,0,0.3);
+}
+.share-preview { display: block; width: 100%; height: auto; }
+.share-preview-fail {
+  padding: 30px 20px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.5;
+}
+.share-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.share-act {
+  flex: 1;
+  min-width: 110px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--accent-border);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.15s, filter 0.15s;
+}
+.share-act:hover { background: rgba(255,255,255,0.1); transform: translateY(-1px); }
+.share-act:active { transform: scale(0.97); }
+.share-act-primary {
+  background: linear-gradient(135deg, var(--accent), var(--bg-secondary));
+  border-color: var(--accent);
+}
+.share-act-primary:hover { filter: brightness(1.12); }
+.share-hint {
+  margin-top: 12px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  text-align: center;
 }
 
 /* ═══════════════════════════════════════════════
@@ -1638,13 +1748,19 @@ z-index: 8001; transform: translateX(-100%);
 transition: transform 0.28s cubic-bezier(.4,0,.2,1);
 display: flex; flex-direction: column; padding: 0 0 20px;
 box-shadow: 4px 0 32px rgba(0,0,0,0.5);
+overflow-y: auto; overscroll-behavior: contain;
 }
+#sidePanel::-webkit-scrollbar { width: 6px; }
+#sidePanel::-webkit-scrollbar-thumb { background: var(--accent-border); border-radius: 3px; }
+#sidePanel::-webkit-scrollbar-track { background: transparent; }
 #sidePanel.open { transform: translateX(0); }
 #sidePanel.open ~ body.sidebar-open #menuBtn { visibility: hidden; pointer-events: none; }
 #sideHeader {
 padding: 18px 16px 14px;
 border-bottom: 1px solid var(--accent-border);
 display: flex; align-items: center; gap: 10px;
+flex-shrink: 0; position: sticky; top: 0; z-index: 1;
+background: var(--bg-secondary);
 }
 .side-logo { font-size: 22px; }
 .side-title { font-size: 14px; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
@@ -1658,6 +1774,7 @@ color: var(--text-muted); font-size: 18px; cursor: pointer; padding: 2px 6px;
 padding: 10px 10px 4px;
 font-size: 9px; color: var(--text-faint);
 font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+flex-shrink: 0;
 }
 .side-btn {
 display: flex; align-items: center; gap: 10px;
@@ -1665,6 +1782,7 @@ padding: 11px 16px; margin: 0 8px; border-radius: 10px;
 background: none; border: none; color: rgba(255,255,255,0.75);
 font-size: 13px; font-weight: 600; cursor: pointer;
 transition: var(--tx-base); width: calc(100% - 16px); text-align: left;
+flex-shrink: 0;
 }
 .side-btn:hover { background: var(--accent-border); color: #fff; }
 .side-btn:active { transform: scale(0.97); }

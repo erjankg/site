@@ -211,7 +211,8 @@
     <span style="font-size:18px;margin-right:8px;">📊</span>
     <span class="wrpr-title">WinRate &amp; PickRate</span>
     <span class="wrpr-update" data-i18n="обновлено 04.04.2026">обновлено 04.04.2026</span>
-    <button class="col-cfg-btn" style="margin-left:auto;" onclick="openWrprColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button>
+    <button class="wrpr-share-btn" style="margin-left:auto;" onclick="shareWinrates()" title="Поделиться картинкой" aria-label="Поделиться">📷</button>
+    <button class="col-cfg-btn" onclick="openWrprColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button>
   </div>
   <!-- Rank filters -->
   <div style="display:flex;gap:6px;padding:10px 12px 8px;overflow-x:auto;justify-content:center;" id="wrprRankRow"></div>
@@ -656,6 +657,7 @@ Stormarrow: При максимальных зарядах следующая б
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeTierlist()">←</button>
       <div id="tierlistTitle" class="mhdr-t"></div>
+      <button id="tierlistShareBtn" onclick="shareTierlist()" title="Поделиться картинкой" style="padding:5px 12px;border-radius:10px;border:1.5px solid rgba(46,204,113,0.4);background:rgba(46,204,113,0.08);color:#2ecc71;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">📷 Поделиться</button>
       <button id="tierlistEditBtn" onclick="toggleTierlistEdit()" data-i18n="✏ Изменить" style="display:none;padding:5px 12px;border-radius:10px;border:1.5px solid rgba(255,215,0,0.4);background:rgba(255,215,0,0.08);color:#FFD700;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">✏ Изменить</button>
       <button id="tierlistPCBtn" onclick="toggleTierlistPCMode()" style="display:none;padding:5px 12px;border-radius:10px;border:1.5px solid rgba(100,180,255,0.4);background:rgba(100,180,255,0.08);color:#64b4ff;font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap;">⊞ Колонки</button>
     </div>
@@ -1276,6 +1278,7 @@ Stormarrow: При максимальных зарядах следующая б
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
+<script src="share.js"></script>
 <script src="cms.js"></script>
 <script src="app.js"></script>
 <script src="draft.js"></script>
