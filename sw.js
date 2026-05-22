@@ -26,6 +26,8 @@ const PRECACHE_URLS = [
   './styles.css',
   './app.js',
   './draft.js',
+  './draft-logic.js',
+  './share.js',
   './cms.js',
   './cybersport.js',
   './migrate.js',

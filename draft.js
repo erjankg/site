@@ -1481,33 +1481,12 @@
   // ═══════════════════════════════════════════
   // DRAFT CORE — последовательность, Lock In, таймер, hover
   // ═══════════════════════════════════════════
-  var WR_DRAFT_SEQUENCE = [
-    // Ban phase 1 (B-R-B-R-B-R)
-    {phase:'ban1',  side:'blue', action:'ban',  banIdx:0, pickIdx:null},
-    {phase:'ban1',  side:'red',  action:'ban',  banIdx:0, pickIdx:null},
-    {phase:'ban1',  side:'blue', action:'ban',  banIdx:1, pickIdx:null},
-    {phase:'ban1',  side:'red',  action:'ban',  banIdx:1, pickIdx:null},
-    {phase:'ban1',  side:'blue', action:'ban',  banIdx:2, pickIdx:null},
-    {phase:'ban1',  side:'red',  action:'ban',  banIdx:2, pickIdx:null},
-    // Pick phase 1 (B1 R2 B2 R1)
-    {phase:'pick1', side:'blue', action:'pick', banIdx:null, pickIdx:0},
-    {phase:'pick1', side:'red',  action:'pick', banIdx:null, pickIdx:0},
-    {phase:'pick1', side:'red',  action:'pick', banIdx:null, pickIdx:1},
-    {phase:'pick1', side:'blue', action:'pick', banIdx:null, pickIdx:1},
-    {phase:'pick1', side:'blue', action:'pick', banIdx:null, pickIdx:2},
-    {phase:'pick1', side:'red',  action:'pick', banIdx:null, pickIdx:2},
-    // Ban phase 2 (R-B-R-B)
-    {phase:'ban2',  side:'red',  action:'ban',  banIdx:3, pickIdx:null},
-    {phase:'ban2',  side:'blue', action:'ban',  banIdx:3, pickIdx:null},
-    {phase:'ban2',  side:'red',  action:'ban',  banIdx:4, pickIdx:null},
-    {phase:'ban2',  side:'blue', action:'ban',  banIdx:4, pickIdx:null},
-    // Pick phase 2 (R1 B2 R1)
-    {phase:'pick2', side:'red',  action:'pick', banIdx:null, pickIdx:3},
-    {phase:'pick2', side:'blue', action:'pick', banIdx:null, pickIdx:3},
-    {phase:'pick2', side:'blue', action:'pick', banIdx:null, pickIdx:4},
-    {phase:'pick2', side:'red',  action:'pick', banIdx:null, pickIdx:4}
-  ];
-  var SEQ_LEN = WR_DRAFT_SEQUENCE.length;
+  // Pure-логика драфта вынесена в draft-logic.js (window.DraftLogic) —
+  // тестируется отдельно через Vitest. Здесь только ссылки.
+  // Fallback-объект на случай если draft-logic.js не загрузился.
+  var _DL = window.DraftLogic || {};
+  var WR_DRAFT_SEQUENCE = _DL.WR_DRAFT_SEQUENCE || [];
+  var SEQ_LEN = _DL.SEQ_LEN || WR_DRAFT_SEQUENCE.length;
 
   // ─── Champion gallery data ───
   function getAllChamps() {
@@ -1516,17 +1495,17 @@
     });
   }
 
-  // Чемпионы, недоступные в текущем состоянии (забанены/запикнуты/fearless-lock/global-ban)
-  function getUnavailable(game, fearlessLock, globalBans) {
+  // Чемпионы, недоступные в текущем состоянии — реализация в draft-logic.js.
+  var getUnavailable = _DL.getUnavailable || function(game, fearlessLock, globalBans) {
     var set = {};
-    (game.bans.blue || []).forEach(function(n){ if (n) set[n] = 'banned'; });
-    (game.bans.red  || []).forEach(function(n){ if (n) set[n] = 'banned'; });
-    (game.picks.blue || []).forEach(function(p){ if (p && p.champ) set[p.champ] = 'picked'; });
-    (game.picks.red  || []).forEach(function(p){ if (p && p.champ) set[p.champ] = 'picked'; });
+    ((game.bans && game.bans.blue) || []).forEach(function(n){ if (n) set[n] = 'banned'; });
+    ((game.bans && game.bans.red)  || []).forEach(function(n){ if (n) set[n] = 'banned'; });
+    ((game.picks && game.picks.blue) || []).forEach(function(p){ if (p && p.champ) set[p.champ] = 'picked'; });
+    ((game.picks && game.picks.red)  || []).forEach(function(p){ if (p && p.champ) set[p.champ] = 'picked'; });
     (fearlessLock || []).forEach(function(n){ if (!set[n]) set[n] = 'fearless'; });
     (globalBans || []).forEach(function(n){ if (!set[n]) set[n] = 'global'; });
     return set;
-  }
+  };
 
   // ─── Game state listener ───
   var _unsubGame = null;
@@ -1870,10 +1849,9 @@
     }).join('');
   }
 
-  // Map позиция (blue/red) → team (blue/red) + капитан + teamName.
-  // Используется для корректного свапа сторон между играми серии.
-  // currentGameBlueSide = какая "команда" сейчас играет на синей позиции.
-  function sideRoles(lobby, game) {
+  // Map позиция (blue/red) → team + капитан + teamName — реализация в draft-logic.js.
+  var sideRoles = _DL.sideRoles || function(lobby, game) {
+    lobby = lobby || {};
     var bs = (game && game.blueSide) || (lobby && lobby.currentGameBlueSide) || 'blue';
     if (bs === 'red') {
       return {
@@ -1885,7 +1863,7 @@
       blue: { team:'blue', cap: lobby.blueCaptain, teamName: (lobby.blueTeamName || 'Blue') },
       red:  { team:'red',  cap: lobby.redCaptain,  teamName: (lobby.redTeamName  || 'Red' ) }
     };
-  }
+  };
 
   // ─── Captain block (user-card style) ───
   function captainBlockHtml(side, cap, lobby, step, teamNameOverride, scoreOverride) {
@@ -2593,15 +2571,17 @@
   }
 
   var _autoActionFired = {};
-  // Детерминированный random: одинаковый chamber на всех клиентах
-  function deterministicPick(seed, pool) {
+  // Детерминированный random — реализация в draft-logic.js.
+  var deterministicPick = _DL.deterministicPick || function(seed, pool) {
+    if (!pool || !pool.length) return undefined;
+    seed = String(seed == null ? '' : seed);
     var h = 2166136261 >>> 0;
     for (var i = 0; i < seed.length; i++) {
       h ^= seed.charCodeAt(i);
       h = Math.imul(h, 16777619) >>> 0;
     }
     return pool[h % pool.length];
-  }
+  };
 
   // Показать поверх таймера и активного слота индикатор «применяется…» —
   // сообщает юзерам, что таймер истёк и сейчас применится auto-pick.

@@ -1,0 +1,13 @@
+{
+  "name": "wild-rift-stats",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wild Rift Stats — справочник чемпионов, драфтер, винрейты",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}
