@@ -3818,12 +3818,18 @@
             _currentUser = user || null;
             updateAuthUI(user);
             if (user) {
-                loadUserDataFromFirestore();
-                startPresence();
-                updateChatUI(true);
-                checkAdmin();
-                checkFirstLogin();
-                checkProfileGate(user);
+                // Token refresh от Firebase повторно дёргает onAuthStateChanged для
+                // того же uid — тяжёлые операции (checkAdmin перерисовывает CMS-секции)
+                // делаем только при РЕАЛЬНОЙ смене юзера. Иначе ловим фризы при кликах,
+                // которые задевают auth (например открытие профиля).
+                if (userChanged) {
+                    loadUserDataFromFirestore();
+                    startPresence();
+                    updateChatUI(true);
+                    checkAdmin();
+                    checkFirstLogin();
+                    checkProfileGate(user);
+                }
                 // Закрываем гейт если он был открыт (юзер залогинился изнутри requireAuth)
                 hideSiteAuthGate();
                 // И автоматически запускаем отложенное действие, если оно было
