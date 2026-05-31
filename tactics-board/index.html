@@ -12,34 +12,33 @@
   <div class="tb-header-inner">
     <a href="../index.html" class="tb-back" title="На основной сайт">←</a>
     <h1 class="tb-title">Тактическая доска <span class="tb-beta">BETA</span></h1>
-    <div class="tb-header-hint">Песочница — фича в разработке</div>
+    <div class="tb-header-hint" id="tbStatus">Песочница — фича в разработке</div>
   </div>
 </header>
 
 <div class="tb-toolbar">
   <div class="tb-toolbar-group">
-    <button class="tb-tool tb-tool-active" data-tool="move" title="Двигать чемпов и варды">
-      <span class="tb-tool-icon">✋</span> Двигать
-    </button>
-    <button class="tb-tool" data-tool="arrow" title="Рисовать стрелки (ротации)">
+    <button class="tb-tool" data-tool="arrow" title="Рисовать стрелки (ротации). Можно двигать любой объект зажатием.">
       <span class="tb-tool-icon">↗</span> Стрелка
     </button>
   </div>
   <div class="tb-toolbar-group">
-    <button class="tb-tool tb-tool-ward" data-tool="ward-yellow" title="Жёлтый вард (обычный)">
-      <span class="tb-ward-dot tb-ward-yellow"></span> Жёлтый
+    <button class="tb-tool tb-tool-ward" data-tool="ward-ally" title="Свой вард (синий)">
+      <span class="tb-ward-chip tb-ward-chip-ally"></span> Свой
     </button>
-    <button class="tb-tool tb-tool-ward" data-tool="ward-pink" title="Розовый вард (контроль)">
-      <span class="tb-ward-dot tb-ward-pink"></span> Розовый
+    <button class="tb-tool tb-tool-ward" data-tool="ward-enemy" title="Вражеский вард (красный)">
+      <span class="tb-ward-chip tb-ward-chip-enemy"></span> Враг
     </button>
-    <button class="tb-tool tb-tool-ward" data-tool="ward-blue" title="Синий вард (обзор)">
-      <span class="tb-ward-dot tb-ward-blue"></span> Синий
+  </div>
+  <div class="tb-toolbar-group">
+    <button class="tb-mirror-btn" id="tbMirrorBtn" title="Поменять стороны (Baron / Dragon side swap)">
+      <span class="tb-tool-icon">⇄</span> Стороны
     </button>
   </div>
   <div class="tb-toolbar-group tb-toolbar-right">
-    <button class="tb-clear-btn" data-clear="arrows" title="Очистить только стрелки">Очистить стрелки</button>
-    <button class="tb-clear-btn" data-clear="wards" title="Очистить только варды">Очистить варды</button>
-    <button class="tb-clear-btn tb-clear-all" data-clear="all" title="Очистить всё">Очистить всё</button>
+    <button class="tb-clear-btn" data-clear="arrows" title="Очистить только стрелки">Стрелки</button>
+    <button class="tb-clear-btn" data-clear="wards" title="Очистить только варды">Варды</button>
+    <button class="tb-clear-btn tb-clear-all" data-clear="all" title="Очистить всё">Всё</button>
   </div>
 </div>
 
@@ -48,7 +47,7 @@
   <aside class="tb-sidebar tb-blue-side">
     <div class="tb-side-header">
       <span class="tb-side-dot tb-side-dot-blue"></span>
-      <span class="tb-side-title">Синяя сторона</span>
+      <span class="tb-side-title">Синяя</span>
     </div>
     <div class="tb-team-slots" data-team="blue">
       <button class="tb-slot" data-team="blue" data-idx="0">
@@ -76,9 +75,7 @@
 
   <section class="tb-board-wrap">
     <div class="tb-board" id="tbBoard">
-      <!-- Заглушка карты (SVG) — заменится на реальную картинку Wild Rift -->
-      <svg class="tb-map-bg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <!-- Фон ущелья -->
+      <svg class="tb-map-bg" id="tbMapBg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <radialGradient id="tbBg" cx="50%" cy="50%" r="70%">
             <stop offset="0%" stop-color="#0a2030"/>
@@ -95,31 +92,24 @@
         </defs>
         <rect width="1000" height="1000" fill="url(#tbBg)"/>
 
-        <!-- Реки (диагонали) -->
         <polygon points="0,640 360,1000 640,1000 0,360" fill="rgba(11,196,227,0.06)"/>
 
-        <!-- Линия (lane top) -->
         <path d="M 120 80 L 120 700 Q 120 880 300 880 L 900 880" stroke="rgba(255,255,255,0.18)" stroke-width="60" fill="none"/>
-        <!-- Линия (lane mid) — диагональ -->
         <path d="M 150 150 L 850 850" stroke="rgba(255,255,255,0.18)" stroke-width="60" fill="none"/>
-        <!-- Линия (lane bot) -->
         <path d="M 100 100 L 700 100 Q 880 100 880 280 L 880 900" stroke="rgba(255,255,255,0.18)" stroke-width="60" fill="none"/>
 
-        <!-- Спавны -->
         <circle cx="120" cy="880" r="70" fill="url(#tbBlueLane)" stroke="#0BC4E3" stroke-width="2"/>
         <text x="120" y="888" text-anchor="middle" fill="#0BC4E3" font-size="22" font-weight="bold">SYN</text>
 
         <circle cx="880" cy="120" r="70" fill="url(#tbRedLane)" stroke="#D64545" stroke-width="2"/>
         <text x="880" y="128" text-anchor="middle" fill="#D64545" font-size="22" font-weight="bold">RED</text>
 
-        <!-- Дракон / Барон (заглушки кружочки) -->
         <circle cx="700" cy="700" r="34" fill="rgba(214,69,69,0.15)" stroke="rgba(214,69,69,0.5)" stroke-width="2"/>
         <text x="700" y="708" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="14">DRAGON</text>
 
         <circle cx="300" cy="300" r="34" fill="rgba(200,155,60,0.15)" stroke="rgba(200,155,60,0.5)" stroke-width="2"/>
         <text x="300" y="308" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="14">BARON</text>
 
-        <!-- Башни (точки) -->
         <g fill="rgba(255,255,255,0.3)">
           <circle cx="220" cy="780" r="8"/>
           <circle cx="320" cy="680" r="8"/>
@@ -128,32 +118,26 @@
           <circle cx="500" cy="500" r="10" fill="rgba(11,196,227,0.5)"/>
         </g>
 
-        <!-- Лейбл заглушки -->
-        <text x="500" y="50" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="20" font-weight="bold">SCHEMATIC MAP (TEST)</text>
-        <text x="500" y="980" text-anchor="middle" fill="rgba(255,255,255,0.2)" font-size="14">Замени на реальную карту Wild Rift</text>
+        <text x="500" y="50" text-anchor="middle" fill="rgba(255,255,255,0.25)" font-size="20" font-weight="bold">SCHEMATIC MAP (TEST)</text>
+        <text x="500" y="980" text-anchor="middle" fill="rgba(255,255,255,0.15)" font-size="14">Замени на реальную карту Wild Rift</text>
       </svg>
 
-      <!-- SVG-слой для стрелок (рисуем поверх карты) -->
       <svg class="tb-arrows-layer" id="tbArrowsLayer" viewBox="0 0 1000 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <marker id="tbArrowHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="strokeWidth">
             <path d="M 0 0 L 8 4 L 0 8 z" fill="currentColor"/>
           </marker>
         </defs>
-        <!-- Сюда будут добавляться нарисованные стрелки -->
       </svg>
 
-      <!-- Слой токенов (чемпы, варды) — обычные DOM-элементы, абсолютное позиционирование -->
-      <div class="tb-tokens-layer" id="tbTokensLayer">
-        <!-- Сюда динамически вставляются чемпы и варды -->
-      </div>
+      <div class="tb-tokens-layer" id="tbTokensLayer"></div>
     </div>
   </section>
 
   <aside class="tb-sidebar tb-red-side">
     <div class="tb-side-header">
       <span class="tb-side-dot tb-side-dot-red"></span>
-      <span class="tb-side-title">Красная сторона</span>
+      <span class="tb-side-title">Красная</span>
     </div>
     <div class="tb-team-slots" data-team="red">
       <button class="tb-slot" data-team="red" data-idx="0">
@@ -181,7 +165,6 @@
 
 </main>
 
-<!-- Модалка выбора чемпиона -->
 <div class="tb-picker" id="tbPicker" hidden>
   <div class="tb-picker-backdrop" data-picker-close></div>
   <div class="tb-picker-box">
@@ -190,7 +173,9 @@
       <input type="text" class="tb-picker-search" id="tbPickerSearch" placeholder="Поиск по имени…" autocomplete="off">
       <button class="tb-picker-close" data-picker-close>×</button>
     </div>
-    <div class="tb-picker-grid" id="tbPickerGrid"></div>
+    <div class="tb-picker-grid" id="tbPickerGrid">
+      <div class="tb-picker-loading">Загружаю чемпов…</div>
+    </div>
   </div>
 </div>
 

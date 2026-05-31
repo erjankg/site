@@ -1,41 +1,28 @@
 /* ═══════════════════════════════════════════════════════════
-   ТАКТИЧЕСКАЯ ДОСКА — board.js
-   Песочница для тренеров: 5v5 чемпы на карте, стрелки, варды.
+   ТАКТИЧЕСКАЯ ДОСКА — board.js (Phase 1)
    ───────────────────────────────────────────────────────────
-   Структура файла:
-     1. Конфиг и константы (чемпы, маппинг имён в Data Dragon)
-     2. Состояние (выбранные чемпы, текущий инструмент)
-     3. Picker — модалка выбора чемпиона
-     4. Слоты — клик по слоту → открыть picker
-     5. Токены чемпов на карте — drag&drop
-     6. Стрелки — рисование на SVG-оверлее
-     7. Варды — постановка одним кликом
-     8. Кнопки очистки + переключение инструментов
+   Структура:
+     1. Конфиг (G_URL, маппинг имён, спец-картинки)
+     2. Загрузка чемпов из Google Sheets (с кэшем)
+     3. Состояние
+     4. Picker — модалка выбора чемпиона
+     5. Слоты команд
+     6. Токены чемпов
+     7. Универсальный drag (токены, варды, стрелки) во всех режимах
+     8. Рисование стрелок
+     9. Постановка вардов с проверкой расстояния
+    10. Инструменты + Очистка + Зеркало
    ═══════════════════════════════════════════════════════════ */
 
 (function() {
   'use strict';
 
   // ───────────────────────────────────────────────────────────
-  // 1. КОНФИГ — список чемпионов Wild Rift + маппинг в Data Dragon
-  //    Имена и логика картинок взяты из основного app.js (champKey/champIcon)
+  // 1. КОНФИГ
   // ───────────────────────────────────────────────────────────
-  const CHAMPIONS = [
-    'Aatrox','Ahri','Akali','Akshan','Alistar','Amumu','Annie','Ashe','Aurelion Sol',
-    'Blitzcrank','Brand','Braum','Caitlyn','Camille','Cho\'Gath','Corki','Darius','Diana',
-    'Dr. Mundo','Draven','Ekko','Evelynn','Ezreal','Fiddlesticks','Fiora','Fizz','Galio','Garen',
-    'Gnar','Gragas','Graves','Gwen','Hecarim','Heimerdinger','Irelia','Janna','Jarvan IV','Jax',
-    'Jayce','Jhin','Jinx','Kai\'Sa','Karma','Kassadin','Katarina','Kayle','Kayn','Kennen',
-    'Kha\'Zix','Kindred','Kog\'Maw','LeBlanc','Lee Sin','Leona','Lillia','Lucian','Lulu','Lux',
-    'Malphite','Master Yi','Mel','Miss Fortune','Mordekaiser','Morgana','Nami','Nasus','Nautilus',
-    'Norra','Nunu & Willump','Olaf','Orianna','Pantheon','Poppy','Pyke','Rakan','Rammus','Renekton',
-    'Rengar','Riven','Samira','Senna','Seraphine','Sett','Shen','Shyvana','Singed','Sion','Sivir',
-    'Skarner','Sona','Soraka','Swain','Syndra','Talon','Teemo','Thresh','Tristana','Tryndamere',
-    'Twisted Fate','Twitch','Varus','Vayne','Veigar','Vex','Vi','Viego','Viktor','Vladimir',
-    'Volibear','Warwick','Wukong','Xayah','Xin Zhao','Yasuo','Yone','Yuumi','Zed','Zeri','Ziggs','Zoe','Zyra'
-  ].sort();
+  const G_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
 
-  // Маппинг имени чемпа в ключ Data Dragon (взят 1-в-1 из app.js)
+  // Маппинг имени чемпа в ключ Data Dragon — 1-в-1 как в app.js
   function champKey(n) {
     const m = {
       'Aurelion Sol':'AurelionSol','Dr. Mundo':'DrMundo','Jarvan IV':'JarvanIV',
@@ -43,16 +30,20 @@
       'Twisted Fate':'TwistedFate','Xin Zhao':'XinZhao','Nunu & Willump':'Nunu',
       "Cho'Gath":'Chogath',"Vel'Koz":'Velkoz',"Kai'Sa":'Kaisa',"Kha'Zix":'Khazix',"Kog'Maw":'KogMaw',
       "K'Sante":'KSante',"Rek'Sai":'RekSai','Tahm Kench':'TahmKench','Wukong':'MonkeyKing',
+      'M.Fortune':'MissFortune','Tw. Fate':'TwistedFate','Au. Sol':'AurelionSol',
+      'Jarvan':'JarvanIV','XinZhao':'XinZhao','KhaZix':'Khazix','KogMaw':'KogMaw','Ksante':'KSante',
+      'KaiSa':'Kaisa','Morde':'Mordekaiser','Seraph':'Seraphine',
+      'Fiddle':'Fiddlesticks','Fiddles':'Fiddlesticks','FiddleSticks':'Fiddlesticks','Fiddlesticks':'Fiddlesticks',
+      'Trynda':'Tryndamere','Trynd':'Tryndamere','Trinda':'Tryndamere','Heimer':'Heimerdinger',
+      'Mundo':'DrMundo','Nunu':'Nunu',
     };
     return m[n] || n.replace(/[\s\'\.\#&]/g, '');
   }
   const DD_URL = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
-  // Спец-картинки для чемпов, которых нет в DD (Wild Rift exclusives)
   const SPECIAL = {
     'Norra': '../image/norra.png',
     'Mel':   'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/Mel_0.jpg'
   };
-  // Запасные ссылки если основная не отдаёт картинку (для error-фолбека)
   const FALLBACK = {
     'Norra': ['https://www.wildriftfire.com/images/champions/norra.png','https://cdn.communitydragon.org/latest/champion/norra/square'],
     'Mel':   ['https://www.wildriftfire.com/images/champions/mel.png']
@@ -66,67 +57,149 @@
     if (fb && img._fb < fb.length) {
       img.src = fb[img._fb++];
     } else {
-      // Совсем не нашли — серая заглушка с инициалом
       img.style.cssText = 'width:100%;height:100%;background:#1a2a3a;display:flex;align-items:center;justify-content:center;color:#0BC4E3;font-weight:bold;font-size:18px;';
-      img.outerHTML = '<div style="' + img.style.cssText + '">' + (name[0] || '?') + '</div>';
+    }
+  }
+
+  // Минимальное расстояние между вардами (в % размера карты)
+  const WARD_MIN_DIST_PCT = 6;
+
+  // ───────────────────────────────────────────────────────────
+  // 2. ЗАГРУЗКА ЧЕМПОВ ИЗ GOOGLE SHEETS
+  //    Кэш в localStorage на 1 час (чтобы не дергать шит постоянно)
+  // ───────────────────────────────────────────────────────────
+  const CACHE_KEY = 'tb_champs_v1';
+  const CACHE_TTL_MS = 60 * 60 * 1000; // 1 час
+
+  async function loadChampions() {
+    // 1) Если в окне уже есть _champsRaw от основного app.js — используем напрямую
+    if (window._champsRaw && Array.isArray(window._champsRaw) && window._champsRaw.length) {
+      return window._champsRaw.map(c => ({ name: c.name, is: c.is || {} }));
+    }
+    // 2) Кэш
+    try {
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+      if (cached && cached.ts && (Date.now() - cached.ts) < CACHE_TTL_MS && cached.list && cached.list.length) {
+        // фон: обновим в фоне, но сразу вернём что есть
+        fetchFromSheets().then(list => list && cacheChamps(list));
+        return cached.list;
+      }
+    } catch(e) {}
+    // 3) Сетевой запрос
+    const list = await fetchFromSheets();
+    if (list) cacheChamps(list);
+    return list || [];
+  }
+
+  function cacheChamps(list) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), list })); } catch(e) {}
+  }
+
+  async function fetchFromSheets() {
+    try {
+      const r = await fetch(G_URL);
+      const tsv = await r.text();
+      if (tsv.trim().startsWith('<')) throw new Error('Sheet returned HTML — not published');
+      const lines = tsv.trim().split('\n');
+      const heads = lines[0].split('\t').map(h => h.trim());
+      const ci = name => heads.indexOf(name);
+      const cName = ci('Champion');
+      const list = lines.slice(1)
+        .map(l => {
+          const c = l.split('\t');
+          const name = (c[cName] || '').trim();
+          if (!name) return null;
+          return {
+            name,
+            is: {
+              Top:     +c[ci('Is_Top')]     === 1,
+              Jungle:  +c[ci('Is_Jungle')]  === 1,
+              Mid:     +c[ci('Is_Mid')]     === 1,
+              ADC:     +c[ci('Is_Adc')]     === 1,
+              Support: +c[ci('Is_Support')] === 1,
+            }
+          };
+        })
+        .filter(Boolean);
+      return list;
+    } catch (e) {
+      console.warn('[tactics-board] Не удалось загрузить чемпов из Google Sheets:', e);
+      return null;
     }
   }
 
   // ───────────────────────────────────────────────────────────
-  // 2. СОСТОЯНИЕ
+  // 3. СОСТОЯНИЕ
   // ───────────────────────────────────────────────────────────
   const state = {
     teams: { blue: [null, null, null, null, null], red: [null, null, null, null, null] },
-    tokens: {},      // tokenId → { team, idx, name, x, y, el }
-    tool: 'move',    // 'move' | 'arrow' | 'ward-yellow' | 'ward-pink' | 'ward-blue'
-    pickerTarget: null,  // { team, idx } — какой слот сейчас открыт в picker'е
-    arrowDraw: null,     // { startX, startY, pathEl } — текущая рисуемая стрелка
-    tokenCounter: 0
+    tokens: {},        // tokenId → { team, idx, name, x, y, el }
+    tool: null,        // null | 'arrow' | 'ward-ally' | 'ward-enemy'
+    pickerTarget: null,
+    tokenCounter: 0,
+    mirrored: false,
+    champions: [],     // [{ name, is }]
+    champLoadDone: false
   };
 
-  // ───────────────────────────────────────────────────────────
-  // 3. PICKER — модалка выбора чемпа
-  // ───────────────────────────────────────────────────────────
-  const pickerEl = document.getElementById('tbPicker');
-  const pickerGridEl = document.getElementById('tbPickerGrid');
-  const pickerSearchEl = document.getElementById('tbPickerSearch');
+  const boardEl     = document.getElementById('tbBoard');
+  const mapBgEl     = document.getElementById('tbMapBg');
+  const arrowsLayer = document.getElementById('tbArrowsLayer');
+  const tokensLayer = document.getElementById('tbTokensLayer');
+  const pickerEl    = document.getElementById('tbPicker');
+  const pickerGrid  = document.getElementById('tbPickerGrid');
+  const pickerSearch= document.getElementById('tbPickerSearch');
+  const statusEl    = document.getElementById('tbStatus');
 
+  // ───────────────────────────────────────────────────────────
+  // 4. PICKER — модалка выбора чемпа
+  // ───────────────────────────────────────────────────────────
   function renderPickerGrid(filter) {
+    if (!state.champions.length) {
+      pickerGrid.innerHTML = '<div class="tb-picker-loading">' +
+        (state.champLoadDone
+          ? 'Не удалось загрузить чемпов. Проверь интернет и обнови страницу.'
+          : 'Загружаю чемпов…') +
+        '</div>';
+      return;
+    }
     const q = (filter || '').trim().toLowerCase();
     const taken = new Set();
     state.teams.blue.forEach(n => n && taken.add(n));
     state.teams.red.forEach(n => n && taken.add(n));
 
-    pickerGridEl.innerHTML = '';
-    CHAMPIONS
-      .filter(n => !q || n.toLowerCase().includes(q))
-      .forEach(name => {
-        const btn = document.createElement('button');
-        btn.className = 'tb-pick' + (taken.has(name) ? ' tb-pick-taken' : '');
-        btn.dataset.name = name;
-        btn.innerHTML =
-          '<img src="' + champIcon(name) + '" alt="' + name + '">' +
-          '<span class="tb-pick-name">' + name + '</span>';
-        btn.querySelector('img').onerror = function() { onImgError(this, name); };
-        pickerGridEl.appendChild(btn);
-      });
+    const html = state.champions
+      .filter(c => !q || c.name.toLowerCase().includes(q))
+      .map(c => {
+        const isTaken = taken.has(c.name) ? ' tb-pick-taken' : '';
+        return '<button class="tb-pick' + isTaken + '" data-name="' + c.name + '">' +
+          '<img src="' + champIcon(c.name) + '" alt="' + c.name + '" data-name="' + c.name + '">' +
+          '<span class="tb-pick-name">' + c.name + '</span>' +
+        '</button>';
+      })
+      .join('');
+    pickerGrid.innerHTML = html || '<div class="tb-picker-loading">Ничего не нашёл</div>';
+    // Подцепить фолбеки картинок
+    pickerGrid.querySelectorAll('img[data-name]').forEach(img => {
+      img.onerror = function() { onImgError(this, this.dataset.name); };
+    });
   }
 
   function openPicker(team, idx) {
     state.pickerTarget = { team, idx };
-    pickerSearchEl.value = '';
+    pickerSearch.value = '';
     renderPickerGrid('');
     pickerEl.hidden = false;
-    setTimeout(() => pickerSearchEl.focus(), 50);
+    setTimeout(() => pickerSearch.focus(), 50);
   }
   function closePicker() {
     pickerEl.hidden = true;
     state.pickerTarget = null;
   }
 
-  pickerSearchEl.addEventListener('input', e => renderPickerGrid(e.target.value));
+  pickerSearch.addEventListener('input', e => renderPickerGrid(e.target.value));
   pickerEl.addEventListener('click', e => {
-    if (e.target.matches('[data-picker-close]')) closePicker();
+    if (e.target.matches('[data-picker-close]')) { closePicker(); return; }
     const pick = e.target.closest('.tb-pick');
     if (pick && state.pickerTarget) {
       const name = pick.dataset.name;
@@ -135,13 +208,15 @@
       closePicker();
     }
   });
-  // Esc — закрыть picker
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !pickerEl.hidden) closePicker();
+    if (e.key === 'Escape') {
+      if (!pickerEl.hidden) closePicker();
+      else if (state.tool) deactivateTool();
+    }
   });
 
   // ───────────────────────────────────────────────────────────
-  // 4. СЛОТЫ — клик открывает picker
+  // 5. СЛОТЫ КОМАНД
   // ───────────────────────────────────────────────────────────
   document.querySelectorAll('.tb-slot').forEach(slot => {
     slot.addEventListener('click', () => {
@@ -152,18 +227,17 @@
   });
 
   function pickChampion(team, idx, name) {
-    // Если у этого слота уже был чемп — удалить старый токен
-    const prevName = state.teams[team][idx];
-    if (prevName) removeTokenByTeamIdx(team, idx);
+    const prev = state.teams[team][idx];
+    if (prev) removeTokenByTeamIdx(team, idx);
 
     state.teams[team][idx] = name;
     updateSlotUI(team, idx);
 
-    // Стартовая позиция: синие — нижний левый, красные — верхний правый
-    // Раскидываем по 5 слотам с небольшим смещением
-    const spawnX = team === 'blue' ? 12 : 88;
-    const spawnY = team === 'blue' ? 88 : 12;
-    const offset = idx * 4 - 8; // -8, -4, 0, 4, 8
+    // Спавн: с учётом текущей ориентации (если карта зеркалирована, спавны меняются местами)
+    const blueIsBottom = !state.mirrored;
+    const spawnX = (team === 'blue') === blueIsBottom ? 12 : 88;
+    const spawnY = (team === 'blue') === blueIsBottom ? 88 : 12;
+    const offset = idx * 4 - 8;
     createToken(team, idx, name, spawnX + offset, spawnY - offset);
   }
 
@@ -175,24 +249,24 @@
     const label = slot.querySelector('.tb-slot-label');
     if (name) {
       slot.classList.add('tb-slot-filled');
-      plus.innerHTML = '<img src="' + champIcon(name) + '" alt="' + name + '">';
-      plus.querySelector('img').onerror = function() { onImgError(this, name); };
+      const img = document.createElement('img');
+      img.src = champIcon(name);
+      img.alt = name;
+      img.onerror = function() { onImgError(this, name); };
+      plus.innerHTML = '';
+      plus.appendChild(img);
       label.textContent = name;
     } else {
       slot.classList.remove('tb-slot-filled');
       plus.textContent = '+';
-      // Восстановить дефолтную роль-метку
       const roles = ['Топ','Лес','Мид','АДК','Саппорт'];
       label.textContent = roles[idx];
     }
   }
 
   // ───────────────────────────────────────────────────────────
-  // 5. ТОКЕНЫ — чемпы на карте (drag&drop)
+  // 6. ТОКЕНЫ
   // ───────────────────────────────────────────────────────────
-  const boardEl = document.getElementById('tbBoard');
-  const tokensLayer = document.getElementById('tbTokensLayer');
-
   function createToken(team, idx, name, xPct, yPct) {
     state.tokenCounter++;
     const tokenId = 't' + state.tokenCounter;
@@ -201,9 +275,12 @@
     el.dataset.tokenId = tokenId;
     el.style.left = xPct + '%';
     el.style.top = yPct + '%';
-    el.innerHTML = '<img src="' + champIcon(name) + '" alt="' + name + '">';
-    el.querySelector('img').onerror = function() { onImgError(this, name); };
-    el.title = name + ' (двойной клик — удалить)';
+    const img = document.createElement('img');
+    img.src = champIcon(name);
+    img.alt = name;
+    img.onerror = function() { onImgError(this, name); };
+    el.appendChild(img);
+    el.title = name + ' — перетаскивай, двойной клик — удалить';
     tokensLayer.appendChild(el);
     state.tokens[tokenId] = { team, idx, name, x: xPct, y: yPct, el };
   }
@@ -219,49 +296,7 @@
     }
   }
 
-  // Drag & drop токенов и вардов (одной функцией — оба перетаскиваются)
-  let dragState = null;
-  function getBoardCoords(clientX, clientY) {
-    const rect = boardEl.getBoundingClientRect();
-    return {
-      x: Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)),
-      y: Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100))
-    };
-  }
-
-  boardEl.addEventListener('pointerdown', e => {
-    // Только в режиме "Двигать" таскаем токены/варды
-    if (state.tool !== 'move') return;
-    const draggable = e.target.closest('.tb-token, .tb-ward-on-map');
-    if (!draggable) return;
-    e.preventDefault();
-    draggable.setPointerCapture(e.pointerId);
-    draggable.classList.add('tb-token-dragging');
-    dragState = { el: draggable, pointerId: e.pointerId };
-  });
-
-  boardEl.addEventListener('pointermove', e => {
-    if (!dragState || e.pointerId !== dragState.pointerId) return;
-    const { x, y } = getBoardCoords(e.clientX, e.clientY);
-    dragState.el.style.left = x + '%';
-    dragState.el.style.top = y + '%';
-  });
-
-  function endDrag(e) {
-    if (!dragState || e.pointerId !== dragState.pointerId) return;
-    dragState.el.classList.remove('tb-token-dragging');
-    // Сохранить координаты в state, если это токен
-    const id = dragState.el.dataset.tokenId;
-    if (id && state.tokens[id]) {
-      state.tokens[id].x = parseFloat(dragState.el.style.left);
-      state.tokens[id].y = parseFloat(dragState.el.style.top);
-    }
-    dragState = null;
-  }
-  boardEl.addEventListener('pointerup', endDrag);
-  boardEl.addEventListener('pointercancel', endDrag);
-
-  // Двойной клик по токену → удалить (и освободить слот)
+  // Двойной клик — удалить чемпа/вард/стрелку
   tokensLayer.addEventListener('dblclick', e => {
     const tok = e.target.closest('.tb-token');
     if (tok) {
@@ -278,83 +313,181 @@
     const ward = e.target.closest('.tb-ward-on-map');
     if (ward) ward.remove();
   });
+  arrowsLayer.addEventListener('dblclick', e => {
+    if (e.target.classList.contains('tb-arrow')) e.target.remove();
+  });
 
   // ───────────────────────────────────────────────────────────
-  // 6. СТРЕЛКИ — рисование на SVG-оверлее
+  // 7. УНИВЕРСАЛЬНЫЙ DRAG
+  //    Любой объект (токен/вард/стрелка) тащится при pointerdown
+  //    в ЛЮБОМ режиме (включая режим стрелки/варда).
+  //    Тулы срабатывают только на пустой области карты.
   // ───────────────────────────────────────────────────────────
-  const arrowsLayer = document.getElementById('tbArrowsLayer');
+  let dragState = null;
 
-  // Используем pointerdown/move/up на самой карте — но только когда tool === 'arrow'
-  // и pointerdown НЕ на токене (чтобы можно было таскать поверх)
-  let arrowDraw = null;
+  function getBoardCoords(clientX, clientY) {
+    const rect = boardEl.getBoundingClientRect();
+    return {
+      x: Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)),
+      y: Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100))
+    };
+  }
 
+  function startDragToken(el, e) {
+    el.setPointerCapture(e.pointerId);
+    el.classList.add('tb-token-dragging');
+    dragState = { kind: 'token', el, pointerId: e.pointerId };
+  }
+  function startDragWard(el, e) {
+    el.setPointerCapture(e.pointerId);
+    el.classList.add('tb-token-dragging');
+    dragState = { kind: 'ward', el, pointerId: e.pointerId };
+  }
+  function startDragArrow(pathEl, e) {
+    // Перемещаем стрелку целиком — храним исходные точки и стартовый клиент
+    const d = pathEl.getAttribute('d');
+    const m = d.match(/M\s+([-\d.]+)\s+([-\d.]+)\s+L\s+([-\d.]+)\s+([-\d.]+)/);
+    if (!m) return;
+    boardEl.setPointerCapture(e.pointerId);
+    dragState = {
+      kind: 'arrow',
+      pathEl,
+      x1: parseFloat(m[1]), y1: parseFloat(m[2]),
+      x2: parseFloat(m[3]), y2: parseFloat(m[4]),
+      startClientX: e.clientX, startClientY: e.clientY,
+      pointerId: e.pointerId
+    };
+  }
+
+  // Главный pointerdown обработчик
   boardEl.addEventListener('pointerdown', e => {
-    if (state.tool !== 'arrow') return;
-    if (e.target.closest('.tb-token, .tb-ward-on-map')) return;
+    // 1) Если ткнули по токену/варду/стрелке — всегда драгаем (в любом режиме)
+    const token = e.target.closest('.tb-token');
+    if (token) { e.preventDefault(); startDragToken(token, e); return; }
+    const ward = e.target.closest('.tb-ward-on-map');
+    if (ward)  { e.preventDefault(); startDragWard(ward, e); return; }
+    const arrow = e.target.closest('.tb-arrow');
+    if (arrow) { e.preventDefault(); startDragArrow(arrow, e); return; }
+
+    // 2) Пустая область — действие активного инструмента
+    if (state.tool === 'arrow') {
+      startArrowDraw(e);
+    } else if (state.tool === 'ward-ally' || state.tool === 'ward-enemy') {
+      placeWard(e);
+    }
+    // если tool === null — ничего не делаем
+  });
+
+  boardEl.addEventListener('pointermove', e => {
+    if (!dragState || e.pointerId !== dragState.pointerId) return;
+    if (dragState.kind === 'token' || dragState.kind === 'ward') {
+      const { x, y } = getBoardCoords(e.clientX, e.clientY);
+      dragState.el.style.left = x + '%';
+      dragState.el.style.top = y + '%';
+    } else if (dragState.kind === 'arrow') {
+      const rect = boardEl.getBoundingClientRect();
+      const dxPct = ((e.clientX - dragState.startClientX) / rect.width) * 100;
+      const dyPct = ((e.clientY - dragState.startClientY) / rect.height) * 100;
+      // viewBox 0..1000 → coord% × 10
+      const dx = dxPct * 10, dy = dyPct * 10;
+      const x1 = dragState.x1 + dx, y1 = dragState.y1 + dy;
+      const x2 = dragState.x2 + dx, y2 = dragState.y2 + dy;
+      dragState.pathEl.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2);
+    } else if (dragState.kind === 'arrow-draw') {
+      const { x, y } = getBoardCoords(e.clientX, e.clientY);
+      dragState.pathEl.setAttribute('d', 'M ' + (dragState.startX * 10) + ' ' + (dragState.startY * 10) +
+                                           ' L ' + (x * 10) + ' ' + (y * 10));
+    }
+  });
+
+  function endDrag(e) {
+    if (!dragState || e.pointerId !== dragState.pointerId) return;
+    if (dragState.kind === 'token') {
+      dragState.el.classList.remove('tb-token-dragging');
+      const id = dragState.el.dataset.tokenId;
+      if (id && state.tokens[id]) {
+        state.tokens[id].x = parseFloat(dragState.el.style.left);
+        state.tokens[id].y = parseFloat(dragState.el.style.top);
+      }
+    } else if (dragState.kind === 'ward') {
+      dragState.el.classList.remove('tb-token-dragging');
+    } else if (dragState.kind === 'arrow-draw') {
+      // Если стрелка слишком короткая — удалить (случайный клик)
+      const d = dragState.pathEl.getAttribute('d') || '';
+      const parts = d.match(/[-\d.]+/g);
+      if (parts && parts.length >= 4) {
+        const dx = parseFloat(parts[2]) - parseFloat(parts[0]);
+        const dy = parseFloat(parts[3]) - parseFloat(parts[1]);
+        if (Math.sqrt(dx*dx + dy*dy) < 30) dragState.pathEl.remove();
+      } else {
+        dragState.pathEl.remove();
+      }
+    }
+    dragState = null;
+  }
+  boardEl.addEventListener('pointerup', endDrag);
+  boardEl.addEventListener('pointercancel', endDrag);
+
+  // ───────────────────────────────────────────────────────────
+  // 8. РИСОВАНИЕ СТРЕЛОК
+  // ───────────────────────────────────────────────────────────
+  function startArrowDraw(e) {
     e.preventDefault();
     const { x, y } = getBoardCoords(e.clientX, e.clientY);
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     path.setAttribute('class', 'tb-arrow');
     path.setAttribute('stroke', '#FFD700');
-    path.setAttribute('marker-end', 'url(#tbArrowHead)');
     path.style.color = '#FFD700';
-    // viewBox карты 0..1000, координаты в % → умножаем на 10
+    path.setAttribute('marker-end', 'url(#tbArrowHead)');
     path.setAttribute('d', 'M ' + (x * 10) + ' ' + (y * 10));
     arrowsLayer.appendChild(path);
-    arrowDraw = { path, startX: x, startY: y, points: [{ x, y }], pointerId: e.pointerId };
     boardEl.setPointerCapture(e.pointerId);
-  });
-
-  boardEl.addEventListener('pointermove', e => {
-    if (!arrowDraw || e.pointerId !== arrowDraw.pointerId) return;
-    const { x, y } = getBoardCoords(e.clientX, e.clientY);
-    arrowDraw.points.push({ x, y });
-    // Простая линия от старта до текущей точки (можно потом сделать ломаную, но прямая стрелка читабельнее)
-    const d = 'M ' + (arrowDraw.startX * 10) + ' ' + (arrowDraw.startY * 10) +
-              ' L ' + (x * 10) + ' ' + (y * 10);
-    arrowDraw.path.setAttribute('d', d);
-  });
-
-  function endArrow(e) {
-    if (!arrowDraw || e.pointerId !== arrowDraw.pointerId) return;
-    // Если стрелка слишком короткая — удалить (случайный клик)
-    const last = arrowDraw.points[arrowDraw.points.length - 1];
-    const dx = last.x - arrowDraw.startX;
-    const dy = last.y - arrowDraw.startY;
-    if (Math.sqrt(dx * dx + dy * dy) < 2) {
-      arrowDraw.path.remove();
-    }
-    arrowDraw = null;
+    dragState = { kind: 'arrow-draw', pathEl: path, startX: x, startY: y, pointerId: e.pointerId };
   }
-  boardEl.addEventListener('pointerup', endArrow);
-  boardEl.addEventListener('pointercancel', endArrow);
-
-  // Двойной клик по стрелке → удалить
-  arrowsLayer.addEventListener('dblclick', e => {
-    if (e.target.matches('.tb-arrow')) e.target.remove();
-  });
 
   // ───────────────────────────────────────────────────────────
-  // 7. ВАРДЫ — клик ставит вард в режиме ward-*
+  // 9. ПОСТАНОВКА ВАРДОВ С ПРОВЕРКОЙ РАССТОЯНИЯ
   // ───────────────────────────────────────────────────────────
-  boardEl.addEventListener('click', e => {
-    if (!state.tool.startsWith('ward-')) return;
-    if (e.target.closest('.tb-token, .tb-ward-on-map')) return;
-    const color = state.tool.replace('ward-', ''); // yellow | pink | blue
+  function placeWard(e) {
+    const side = state.tool === 'ward-ally' ? 'ally' : 'enemy';
     const { x, y } = getBoardCoords(e.clientX, e.clientY);
+
+    // Проверка минимального расстояния до других вардов
+    const wards = tokensLayer.querySelectorAll('.tb-ward-on-map');
+    for (const w of wards) {
+      const wx = parseFloat(w.style.left);
+      const wy = parseFloat(w.style.top);
+      const dx = x - wx, dy = y - wy;
+      if (Math.sqrt(dx*dx + dy*dy) < WARD_MIN_DIST_PCT) {
+        // Слишком близко к существующему — мигаем тем вардом, не ставим новый
+        w.classList.add('tb-ward-too-close');
+        setTimeout(() => w.classList.remove('tb-ward-too-close'), 350);
+        return;
+      }
+    }
+
     const ward = document.createElement('div');
-    ward.className = 'tb-ward tb-ward-on-map tb-w-' + color;
+    ward.className = 'tb-ward-on-map tb-w-' + side;
     ward.style.left = x + '%';
     ward.style.top = y + '%';
-    ward.title = 'Вард (двойной клик — удалить)';
+    ward.innerHTML = '<div class="tb-ward-radius"></div><div class="tb-ward-dot"></div>';
+    ward.title = (side === 'ally' ? 'Свой вард' : 'Вражеский вард') + ' — перетаскивай, двойной клик — удалить';
     tokensLayer.appendChild(ward);
-  });
+  }
 
   // ───────────────────────────────────────────────────────────
-  // 8. ИНСТРУМЕНТЫ + ОЧИСТКА
+  // 10. ИНСТРУМЕНТЫ + ОЧИСТКА + ЗЕРКАЛО
   // ───────────────────────────────────────────────────────────
+  function deactivateTool() {
+    document.querySelectorAll('.tb-tool').forEach(b => b.classList.remove('tb-tool-active'));
+    state.tool = null;
+    boardEl.dataset.tool = '';
+  }
+
   document.querySelectorAll('.tb-tool').forEach(btn => {
     btn.addEventListener('click', () => {
+      // Если кликнули по уже активному инструменту — отключаем
+      if (state.tool === btn.dataset.tool) { deactivateTool(); return; }
       document.querySelectorAll('.tb-tool').forEach(b => b.classList.remove('tb-tool-active'));
       btn.classList.add('tb-tool-active');
       state.tool = btn.dataset.tool;
@@ -372,7 +505,6 @@
         tokensLayer.querySelectorAll('.tb-ward-on-map').forEach(w => w.remove());
       }
       if (what === 'all') {
-        // Удалить всех чемпов и сбросить слоты
         tokensLayer.querySelectorAll('.tb-token').forEach(t => t.remove());
         state.tokens = {};
         ['blue','red'].forEach(team => {
@@ -383,8 +515,50 @@
     });
   });
 
-  // Старт — установить дефолтный инструмент
-  boardEl.dataset.tool = state.tool;
+  // ЗЕРКАЛО — поменять стороны Baron/Dragon
+  document.getElementById('tbMirrorBtn').addEventListener('click', () => {
+    state.mirrored = !state.mirrored;
+    mapBgEl.classList.toggle('tb-mirrored', state.mirrored);
 
-  console.log('[tactics-board] готов. Чемпов в базе:', CHAMPIONS.length);
+    // Зеркалируем все токены (x → 100-x, y → 100-y)
+    for (const id in state.tokens) {
+      const t = state.tokens[id];
+      t.x = 100 - t.x;
+      t.y = 100 - t.y;
+      t.el.style.left = t.x + '%';
+      t.el.style.top = t.y + '%';
+    }
+    // Зеркалируем варды
+    tokensLayer.querySelectorAll('.tb-ward-on-map').forEach(w => {
+      const x = parseFloat(w.style.left);
+      const y = parseFloat(w.style.top);
+      w.style.left = (100 - x) + '%';
+      w.style.top = (100 - y) + '%';
+    });
+    // Зеркалируем стрелки (viewBox 0..1000 → 1000-coord)
+    arrowsLayer.querySelectorAll('.tb-arrow').forEach(path => {
+      const d = path.getAttribute('d');
+      const newD = d.replace(/([ML])\s+([-\d.]+)\s+([-\d.]+)/g, (_, cmd, x, y) => {
+        return cmd + ' ' + (1000 - parseFloat(x)) + ' ' + (1000 - parseFloat(y));
+      });
+      path.setAttribute('d', newD);
+    });
+  });
+
+  // ───────────────────────────────────────────────────────────
+  // СТАРТ
+  // ───────────────────────────────────────────────────────────
+  (async function init() {
+    boardEl.dataset.tool = '';
+    statusEl.textContent = 'Загружаю чемпов…';
+    const list = await loadChampions();
+    state.champions = (list || []).sort((a, b) => a.name.localeCompare(b.name));
+    state.champLoadDone = true;
+    statusEl.textContent = state.champions.length
+      ? 'Чемпов в базе: ' + state.champions.length
+      : 'Не удалось загрузить чемпов (проверь интернет)';
+    if (!pickerEl.hidden) renderPickerGrid(pickerSearch.value);
+    console.log('[tactics-board] готов. Чемпов:', state.champions.length);
+  })();
+
 })();

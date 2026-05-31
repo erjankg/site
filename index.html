@@ -551,13 +551,14 @@ Stormarrow: При максимальных зарядах следующая б
 
   <div style="flex:1;"></div>
   <div style="padding:0 8px;display:flex;flex-direction:column;gap:6px;">
-    <!-- Кнопка версии: показывает текущую vXXX серым; когда SW нашёл обновление —  -->
-    <!-- становится зелёной «🟢 Обновить до vXXX». Клик в обычном режиме — -->
-    <!-- форсированный чек обновления (reg.update()). -->
+    <!-- Кнопка версии видна ТОЛЬКО в установленном PWA (standalone), -->
+    <!-- т.к. в браузере F5 и так подтягивает свежий код. -->
+    <!-- Показывает текущую vXXX серым; когда SW нашёл обновление — -->
+    <!-- становится зелёной «🟢 Обновить до vXXX». -->
     <button id="sideVersion"
             class="side-btn side-version"
             type="button"
-            style="opacity:0.55;cursor:pointer;"
+            style="display:none;opacity:0.55;cursor:pointer;"
             onclick="window._handleVersionClick && window._handleVersionClick()"
             title="Текущая версия приложения. Клик — проверить обновления.">
       <span class="side-icon" id="sideVersionIcon">📦</span><span id="sideVersionLabel">v…</span>
@@ -1298,8 +1299,17 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ PWA: SERVICE WORKER + INSTALL BUTTON ══ -->
 <script>
-  // ─── 1. Service Worker registration + кнопка версии ───
+  // ─── 1. Service Worker registration + кнопка версии (только в PWA) ───
   (function() {
+    // Кнопка обновления имеет смысл только в установленном приложении (standalone),
+    // т.к. в браузере F5 и так подтягивает свежий код. В браузере просто молча
+    // регистрируем SW без UI-кнопки.
+    function _isStandalone() {
+      return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+        || window.navigator.standalone === true;
+    }
+    var IS_PWA = _isStandalone();
+
     var versionLabel = function() { return document.getElementById('sideVersionLabel'); };
     var versionIcon  = function() { return document.getElementById('sideVersionIcon'); };
     var versionBtn   = function() { return document.getElementById('sideVersion'); };
@@ -1318,8 +1328,10 @@ Stormarrow: При максимальных зарядах следующая б
 
     // Состояния кнопки: 'current' (серая, актуальная) | 'update' (зелёная, доступна обнова) | 'reloading'.
     function setVersionUI(state, label) {
+      if (!IS_PWA) return; // В браузере кнопку не показываем вообще.
       var btn = versionBtn(), lab = versionLabel(), ico = versionIcon();
       if (!btn || !lab) return;
+      btn.style.display = ''; // Стало видимо в PWA-режиме.
       if (state === 'update') {
         btn.style.opacity = '1';
         btn.style.background = 'rgba(46,204,113,0.18)';
