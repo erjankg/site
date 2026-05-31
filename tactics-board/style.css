@@ -370,6 +370,11 @@ body {
   display: block;
 }
 .tb-map-bg {
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
   transition: transform 0.4s ease;
 }
 .tb-map-bg.tb-mirrored {

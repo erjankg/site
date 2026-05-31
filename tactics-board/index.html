@@ -75,49 +75,7 @@
 
   <section class="tb-board-wrap">
     <div class="tb-board" id="tbBoard">
-      <svg class="tb-map-bg" id="tbMapBg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="tbBg" cx="50%" cy="50%" r="70%">
-            <stop offset="0%" stop-color="#0a2030"/>
-            <stop offset="100%" stop-color="#010A13"/>
-          </radialGradient>
-          <linearGradient id="tbBlueLane" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#0BC4E3" stop-opacity="0.25"/>
-            <stop offset="100%" stop-color="#0BC4E3" stop-opacity="0.05"/>
-          </linearGradient>
-          <linearGradient id="tbRedLane" x1="100%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stop-color="#D64545" stop-opacity="0.25"/>
-            <stop offset="100%" stop-color="#D64545" stop-opacity="0.05"/>
-          </linearGradient>
-        </defs>
-        <rect width="1000" height="1000" fill="url(#tbBg)"/>
-
-        <polygon points="0,640 360,1000 640,1000 0,360" fill="rgba(11,196,227,0.06)"/>
-
-        <path d="M 120 80 L 120 700 Q 120 880 300 880 L 900 880" stroke="rgba(255,255,255,0.18)" stroke-width="60" fill="none"/>
-        <path d="M 150 150 L 850 850" stroke="rgba(255,255,255,0.18)" stroke-width="60" fill="none"/>
-        <path d="M 100 100 L 700 100 Q 880 100 880 280 L 880 900" stroke="rgba(255,255,255,0.18)" stroke-width="60" fill="none"/>
-
-        <circle cx="120" cy="880" r="70" fill="url(#tbBlueLane)" stroke="#0BC4E3" stroke-width="3"/>
-        <circle cx="880" cy="120" r="70" fill="url(#tbRedLane)" stroke="#D64545" stroke-width="3"/>
-
-        <!-- Dragon: красный кружок (юг-восток у синей стороны по умолчанию) -->
-        <circle cx="700" cy="700" r="40" fill="rgba(214,69,69,0.2)" stroke="rgba(214,69,69,0.6)" stroke-width="2"/>
-        <circle cx="700" cy="700" r="14" fill="rgba(214,69,69,0.7)"/>
-
-        <!-- Baron: золотой кружок (северо-запад у синей стороны по умолчанию) -->
-        <circle cx="300" cy="300" r="40" fill="rgba(200,155,60,0.2)" stroke="rgba(200,155,60,0.6)" stroke-width="2"/>
-        <circle cx="300" cy="300" r="14" fill="rgba(200,155,60,0.7)"/>
-
-        <!-- Башни -->
-        <g fill="rgba(255,255,255,0.35)">
-          <circle cx="220" cy="780" r="9"/>
-          <circle cx="320" cy="680" r="9"/>
-          <circle cx="780" cy="220" r="9"/>
-          <circle cx="680" cy="320" r="9"/>
-          <circle cx="500" cy="500" r="11" fill="rgba(11,196,227,0.6)"/>
-        </g>
-      </svg>
+      <img class="tb-map-bg" id="tbMapBg" src="assets/map-square.jpg" alt="Карта Wild Rift" draggable="false">
 
       <svg class="tb-arrows-layer" id="tbArrowsLayer" viewBox="0 0 1000 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>

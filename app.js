@@ -3842,7 +3842,9 @@
     // siteAuthGate с пояснением, ЗАЧЕМ нужен вход; гейт закрывается через ✕.
     window.requireAuth = function(featureLabel, onAuthed) {
         if (_currentUser) {
-            try { onAuthed && onAuthed(); } catch (e) { console.warn('requireAuth callback', e); }
+            // onAuthed тут НЕ вызываем: вызывающая фича передаёт саму себя
+            // (openProfileSetup/openChatSystem) и продолжит работу сама.
+            // Повторный вызов = бесконечная рекурсия до переполнения стека.
             return true;
         }
         // Запоминаем что после логина открыть эту фичу
@@ -4329,6 +4331,33 @@
     var _profileRank = '';
     var _profileSocialLinks = [];
 
+    // Локальный кэш профиля (localStorage) — чтобы окно профиля открывалось
+    // мгновенно, не дожидаясь ответа Firestore (~5с на медленном соединении).
+    function _profileCacheKey(uid) { return '_wrsProfileCache_' + uid; }
+    function _readProfileCache(uid) {
+        if (!uid) return null;
+        try {
+            var raw = localStorage.getItem(_profileCacheKey(uid));
+            if (!raw) return null;
+            var d = JSON.parse(raw);
+            return {
+                role: d.role || '',
+                rank: d.rank || '',
+                socialLinks: Array.isArray(d.socialLinks) ? d.socialLinks : []
+            };
+        } catch (e) { return null; }
+    }
+    function _writeProfileCache(uid, d) {
+        if (!uid) return;
+        try {
+            localStorage.setItem(_profileCacheKey(uid), JSON.stringify({
+                role: d.role || '',
+                rank: d.rank || '',
+                socialLinks: Array.isArray(d.socialLinks) ? d.socialLinks : []
+            }));
+        } catch (e) {}
+    }
+
     var RANKS = [
         { id:'diamond',     name:'Diamond',   color:'#B9F2FF', img:'web.p/Diamond.webp' },
         { id:'master',      name:'Master',    color:'#9B59B6', img:'web.p/Master.webp' },
@@ -4363,6 +4392,14 @@
         _profileRole = '';
         _profileRank = '';
         _profileSocialLinks = [];
+        // Мгновенно подставляем последнюю известную копию профиля из кэша,
+        // чтобы окно сразу открылось с заполненными ник/ранг/роль.
+        var cached = _currentUser ? _readProfileCache(_currentUser.uid) : null;
+        if (cached) {
+            _profileRole = cached.role;
+            _profileRank = cached.rank;
+            _profileSocialLinks = cached.socialLinks;
+        }
         _resetSaveBtn();
         openModal('profileSetupMask');
         var panelProfile = document.getElementById('profPanelProfile');
@@ -4374,15 +4411,26 @@
         drawRanks();
         renderProfileSocialLinks();
         if (db && _currentUser) {
-            db.collection('users').doc(_currentUser.uid).get().then(function(doc) {
-                if (doc.exists) {
-                    var d = doc.data();
-                    if (d.role) { _profileRole = d.role; window._profileSelectRole(d.role); }
-                    if (d.rank) { _profileRank = d.rank; window._profileSelectRank(d.rank); }
-                    if (d.socialLinks && Array.isArray(d.socialLinks)) {
-                        _profileSocialLinks = d.socialLinks;
-                        renderProfileSocialLinks();
-                    }
+            var _uid = _currentUser.uid;
+            db.collection('users').doc(_uid).get().then(function(doc) {
+                if (!doc.exists) return;
+                var d = doc.data();
+                var fresh = {
+                    role: d.role || '',
+                    rank: d.rank || '',
+                    socialLinks: Array.isArray(d.socialLinks) ? d.socialLinks : []
+                };
+                _writeProfileCache(_uid, fresh);
+                // Перерисовываем только если сервер вернул что-то отличное от
+                // показанного — иначе ничего не мигает.
+                var shown = { role: _profileRole, rank: _profileRank, socialLinks: _profileSocialLinks };
+                if (JSON.stringify(fresh) !== JSON.stringify(shown)) {
+                    _profileRole = fresh.role;
+                    _profileRank = fresh.rank;
+                    _profileSocialLinks = fresh.socialLinks;
+                    drawRoles();
+                    drawRanks();
+                    renderProfileSocialLinks();
                 }
             }).catch(function(e) { console.warn('Profile load:', e); });
         }
@@ -5081,6 +5129,11 @@
             rank: _profileRank,
             socialLinks: _profileSocialLinks
         }, { merge: true }).then(function() {
+            _writeProfileCache(_currentUser.uid, {
+                role: _profileRole,
+                rank: _profileRank,
+                socialLinks: _profileSocialLinks
+            });
             if (btn) {
                 btn.textContent = t('✓ Сохранено!');
                 btn.style.background = 'linear-gradient(135deg,#27ae60,#2ecc71)';
