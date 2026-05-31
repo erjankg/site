@@ -64,6 +64,23 @@
   // Минимальное расстояние между вардами (в % размера карты)
   const WARD_MIN_DIST_PCT = 6;
 
+  // Локальный fallback на случай если Google Sheets недоступен (file://, нет интернета и т.д.)
+  // Это список всех Wild Rift чемпов на момент 2026-05. Будет заменён данными из шита при загрузке.
+  const FALLBACK_CHAMPS = [
+    'Aatrox','Ahri','Akali','Akshan','Alistar','Amumu','Annie','Ashe','Aurelion Sol',
+    'Blitzcrank','Brand','Braum','Caitlyn','Camille',"Cho'Gath",'Corki','Darius','Diana',
+    'Dr. Mundo','Draven','Ekko','Evelynn','Ezreal','Fiddlesticks','Fiora','Fizz','Galio','Garen',
+    'Gnar','Gragas','Graves','Gwen','Hecarim','Heimerdinger','Irelia','Janna','Jarvan IV','Jax',
+    'Jayce','Jhin','Jinx',"Kai'Sa",'Karma','Kassadin','Katarina','Kayle','Kayn','Kennen',
+    "Kha'Zix",'Kindred',"Kog'Maw",'LeBlanc','Lee Sin','Leona','Lillia','Lucian','Lulu','Lux',
+    'Malphite','Master Yi','Mel','Miss Fortune','Mordekaiser','Morgana','Nami','Nasus','Nautilus',
+    'Norra','Nunu & Willump','Olaf','Orianna','Pantheon','Poppy','Pyke','Rakan','Rammus','Renekton',
+    'Rengar','Riven','Samira','Senna','Seraphine','Sett','Shen','Shyvana','Singed','Sion','Sivir',
+    'Skarner','Sona','Soraka','Swain','Syndra','Talon','Teemo','Thresh','Tristana','Tryndamere',
+    'Twisted Fate','Twitch','Varus','Vayne','Veigar','Vex','Vi','Viego','Viktor','Vladimir',
+    'Volibear','Warwick','Wukong','Xayah','Xin Zhao','Yasuo','Yone','Yuumi','Zed','Zeri','Ziggs','Zoe','Zyra'
+  ].map(name => ({ name, is: {} }));
+
   // ───────────────────────────────────────────────────────────
   // 2. ЗАГРУЗКА ЧЕМПОВ ИЗ GOOGLE SHEETS
   //    Кэш в localStorage на 1 час (чтобы не дергать шит постоянно)
@@ -550,15 +567,19 @@
   // ───────────────────────────────────────────────────────────
   (async function init() {
     boardEl.dataset.tool = '';
-    statusEl.textContent = 'Загружаю чемпов…';
-    const list = await loadChampions();
-    state.champions = (list || []).sort((a, b) => a.name.localeCompare(b.name));
+    // Сразу подсовываем локальный список, чтобы picker работал даже без сети
+    state.champions = FALLBACK_CHAMPS.slice().sort((a, b) => a.name.localeCompare(b.name));
     state.champLoadDone = true;
-    statusEl.textContent = state.champions.length
-      ? 'Чемпов в базе: ' + state.champions.length
-      : 'Не удалось загрузить чемпов (проверь интернет)';
-    if (!pickerEl.hidden) renderPickerGrid(pickerSearch.value);
-    console.log('[tactics-board] готов. Чемпов:', state.champions.length);
+    statusEl.textContent = 'Чемпов: ' + state.champions.length + ' (локальный)';
+    // Параллельно пытаемся подтянуть свежий список из шита — апгрейд если получилось
+    loadChampions().then(list => {
+      if (list && list.length) {
+        state.champions = list.sort((a, b) => a.name.localeCompare(b.name));
+        statusEl.textContent = 'Чемпов: ' + state.champions.length + ' (из Sheets)';
+        if (!pickerEl.hidden) renderPickerGrid(pickerSearch.value);
+      }
+    });
+    console.log('[tactics-board] стартовал с', state.champions.length, 'чемпами (локальный fallback)');
   })();
 
 })();
