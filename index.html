@@ -551,6 +551,17 @@ Stormarrow: При максимальных зарядах следующая б
 
   <div style="flex:1;"></div>
   <div style="padding:0 8px;display:flex;flex-direction:column;gap:6px;">
+    <!-- Кнопка версии: показывает текущую vXXX серым; когда SW нашёл обновление —  -->
+    <!-- становится зелёной «🟢 Обновить до vXXX». Клик в обычном режиме — -->
+    <!-- форсированный чек обновления (reg.update()). -->
+    <button id="sideVersion"
+            class="side-btn side-version"
+            type="button"
+            style="opacity:0.55;cursor:pointer;"
+            onclick="window._handleVersionClick && window._handleVersionClick()"
+            title="Текущая версия приложения. Клик — проверить обновления.">
+      <span class="side-icon" id="sideVersionIcon">📦</span><span id="sideVersionLabel">v…</span>
+    </button>
     <!-- PWA install button — скрыта по умолчанию, показывается через JS если -->
     <!-- браузер поддерживает install OR это iOS Safari (там показываем инструкцию). -->
     <button id="sideInstallPwa"
@@ -1287,26 +1298,143 @@ Stormarrow: При максимальных зарядах следующая б
 
 <!-- ══ PWA: SERVICE WORKER + INSTALL BUTTON ══ -->
 <script>
-  // ─── 1. Service Worker registration ───
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('sw.js', { scope: './' })
-        .then(function(reg) {
-          if (!reg) return;
-          if (reg.waiting) reg.waiting.postMessage('SKIP_WAITING');
-          reg.addEventListener('updatefound', function() {
-            var nw = reg.installing;
-            if (!nw) return;
-            nw.addEventListener('statechange', function() {
-              if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-                nw.postMessage('SKIP_WAITING');
+  // ─── 1. Service Worker registration + кнопка версии ───
+  (function() {
+    var versionLabel = function() { return document.getElementById('sideVersionLabel'); };
+    var versionIcon  = function() { return document.getElementById('sideVersionIcon'); };
+    var versionBtn   = function() { return document.getElementById('sideVersion'); };
+
+    // Получить версию текущего активного SW (через MessageChannel-порт).
+    function askVersion(target) {
+      if (!target) return Promise.resolve(null);
+      return new Promise(function(resolve) {
+        var ch = new MessageChannel();
+        var done = false;
+        ch.port1.onmessage = function(e) { done = true; resolve(e.data); };
+        try { target.postMessage('GET_VERSION', [ch.port2]); } catch (e) { resolve(null); return; }
+        setTimeout(function() { if (!done) resolve(null); }, 1500);
+      });
+    }
+
+    // Состояния кнопки: 'current' (серая, актуальная) | 'update' (зелёная, доступна обнова) | 'reloading'.
+    function setVersionUI(state, label) {
+      var btn = versionBtn(), lab = versionLabel(), ico = versionIcon();
+      if (!btn || !lab) return;
+      if (state === 'update') {
+        btn.style.opacity = '1';
+        btn.style.background = 'rgba(46,204,113,0.18)';
+        btn.style.borderColor = 'rgba(46,204,113,0.55)';
+        btn.style.color = '#2ecc71';
+        btn.style.cursor = 'pointer';
+        if (ico) ico.textContent = '🟢';
+        lab.textContent = label || 'Обновить';
+        btn.title = 'Доступна новая версия — нажми, чтобы обновить и перезапустить.';
+      } else if (state === 'reloading') {
+        btn.style.opacity = '0.7';
+        btn.style.cursor = 'wait';
+        if (ico) ico.textContent = '⏳';
+        lab.textContent = 'Обновляю…';
+      } else { // 'current'
+        btn.style.opacity = '0.55';
+        btn.style.background = '';
+        btn.style.borderColor = '';
+        btn.style.color = '';
+        btn.style.cursor = 'pointer';
+        if (ico) ico.textContent = '📦';
+        lab.textContent = label || 'v…';
+        btn.title = 'Текущая версия приложения. Клик — проверить обновления.';
+      }
+    }
+
+    // Версия, отображаемая на кнопке когда обновлений нет.
+    var _currentVersion = null;
+    // Worker, ждущий активации (если есть обновление).
+    var _waitingWorker = null;
+    // Registration — нужен для reg.update() по клику.
+    var _reg = null;
+
+    // Клик по кнопке: либо применить обновление, либо форсированно проверить.
+    window._handleVersionClick = function() {
+      if (_waitingWorker) {
+        // Есть установленная новая версия — активируем и перезагружаемся.
+        setVersionUI('reloading');
+        try { _waitingWorker.postMessage('SKIP_WAITING'); } catch (e) {}
+        // controllerchange ниже сделает reload, но подстрахуемся таймером.
+        setTimeout(function() { try { location.reload(); } catch (e) {} }, 2500);
+        return;
+      }
+      if (_reg && _reg.update) {
+        // Форсированный чек: спрашиваем сервер «нет ли свежего sw.js?».
+        var lab = versionLabel(); if (lab) lab.textContent = 'Проверяю…';
+        _reg.update().then(function() {
+          // Если обновление найдено — updatefound сработает и поменяет UI.
+          // Иначе через 1.5с вернём актуальный лейбл.
+          setTimeout(function() {
+            if (!_waitingWorker) setVersionUI('current', _currentVersion);
+          }, 1500);
+        }).catch(function() { setVersionUI('current', _currentVersion); });
+      }
+    };
+
+    // Отлавливаем активацию нового SW — это сигнал, что наш SKIP_WAITING сработал.
+    if ('serviceWorker' in navigator) {
+      var _reloading = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function() {
+        if (_reloading) return;
+        _reloading = true;
+        try { location.reload(); } catch (e) {}
+      });
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js', { scope: './' })
+          .then(function(reg) {
+            if (!reg) return;
+            _reg = reg;
+
+            // Узнать версию активного SW.
+            var active = navigator.serviceWorker.controller || reg.active;
+            askVersion(active).then(function(v) {
+              _currentVersion = v || '';
+              // Если обновление уже ждёт активации (например было установлено в прошлой сессии) — сразу показать.
+              if (reg.waiting && navigator.serviceWorker.controller) {
+                _waitingWorker = reg.waiting;
+                askVersion(reg.waiting).then(function(nv) {
+                  setVersionUI('update', nv ? ('Обновить до ' + _shortVer(nv)) : 'Обновить');
+                });
+              } else {
+                setVersionUI('current', _currentVersion ? _shortVer(_currentVersion) : 'v?');
               }
             });
-          });
-        })
-        .catch(function(err) { console.warn('[sw] register failed', err); });
-    });
-  }
+
+            // Подписка на новые версии.
+            reg.addEventListener('updatefound', function() {
+              var nw = reg.installing;
+              if (!nw) return;
+              nw.addEventListener('statechange', function() {
+                if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                  // Новая версия установлена — НЕ активируем автоматически, ждём клика юзера.
+                  _waitingWorker = nw;
+                  askVersion(nw).then(function(nv) {
+                    setVersionUI('update', nv ? ('Обновить до ' + _shortVer(nv)) : 'Обновить');
+                  });
+                }
+              });
+            });
+          })
+          .catch(function(err) { console.warn('[sw] register failed', err); });
+      });
+    }
+
+    // 'wrs-v2.2026-05-31' → 'v05-31'  (короткая версия для тесной кнопки).
+    function _shortVer(v) {
+      if (!v) return 'v?';
+      var m = String(v).match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (m) return 'v' + m[2] + '-' + m[3];
+      return String(v).replace(/^wrs-/, '');
+    }
+  })();
 
   // ─── 2. Install button logic ───
   // Если приложение уже установлено (standalone) — кнопка не нужна.

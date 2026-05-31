@@ -13,7 +13,7 @@
  *
  * Старые caches удаляются в activate.
  */
-const VERSION = 'wrs-v2.2026-05-22';
+const VERSION = 'wrs-v2.2026-05-31';
 
 // Сколько ждём сеть, прежде чем отдать офлайн-резерв из кэша (мс).
 const NET_TIMEOUT = 3000;
@@ -144,7 +144,11 @@ async function staleWhileRevalidate(req) {
   return cached || (await network) || new Response('', { status: 504, statusText: 'Offline' });
 }
 
-// Позволяет странице форсировать активацию новой версии (postMessage SKIP_WAITING).
+// Позволяет странице форсировать активацию новой версии (postMessage SKIP_WAITING)
+// и узнать текущую версию (GET_VERSION → отвечаем через MessageChannel-порт).
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
+  else if (event.data === 'GET_VERSION') {
+    if (event.ports && event.ports[0]) event.ports[0].postMessage(VERSION);
+  }
 });
