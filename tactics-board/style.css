@@ -1,0 +1,567 @@
+/* ═══════════════════════════════════════════
+   ТАКТИЧЕСКАЯ ДОСКА — Wild Rift Stats
+   Песочница / MVP. Стиль наследует основной сайт (тёмная навигация + бирюза)
+   ═══════════════════════════════════════════ */
+
+:root {
+  --tb-bg-base:       #010A13;
+  --tb-bg-primary:    #010d18;
+  --tb-bg-secondary:  #011520;
+  --tb-bg-card:       rgba(1, 21, 32, 0.85);
+  --tb-bg-input:      rgba(1, 15, 32, 0.6);
+
+  --tb-accent:        #0BC4E3;
+  --tb-accent-glow:   rgba(11, 196, 227, 0.4);
+  --tb-accent-dim:    rgba(11, 196, 227, 0.15);
+  --tb-accent-border: rgba(11, 196, 227, 0.25);
+  --tb-gold:          #C89B3C;
+
+  --tb-blue:          #3a9ad9;
+  --tb-blue-glow:     rgba(58, 154, 217, 0.5);
+  --tb-blue-soft:     rgba(58, 154, 217, 0.15);
+
+  --tb-red:           #D64545;
+  --tb-red-glow:      rgba(214, 69, 69, 0.5);
+  --tb-red-soft:      rgba(214, 69, 69, 0.15);
+
+  --tb-text:          #ffffff;
+  --tb-text-mute:     rgba(255, 255, 255, 0.6);
+  --tb-text-faint:    rgba(255, 255, 255, 0.3);
+
+  --tb-ward-yellow:   #f1c40f;
+  --tb-ward-pink:     #e91e63;
+  --tb-ward-blue:     #3498db;
+
+  --tb-shadow-glow:   0 0 18px rgba(11, 196, 227, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--tb-bg-base);
+  color: var(--tb-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(11, 196, 227, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(30, 10, 80, 0.3) 0%, transparent 60%),
+    var(--tb-bg-base);
+}
+
+/* ── HEADER ─────────────────────────────────────────── */
+.tb-header {
+  background: linear-gradient(180deg, rgba(1, 21, 32, 0.95), rgba(1, 13, 24, 0.7));
+  border-bottom: 1px solid var(--tb-accent-border);
+  padding: 14px 24px;
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.tb-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+.tb-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--tb-accent-dim);
+  color: var(--tb-accent);
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: bold;
+  border: 1px solid var(--tb-accent-border);
+  transition: all 0.15s;
+}
+.tb-back:hover {
+  background: var(--tb-accent);
+  color: var(--tb-bg-base);
+  transform: translateX(-2px);
+}
+.tb-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, var(--tb-accent), var(--tb-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.tb-beta {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 11px;
+  background: var(--tb-gold);
+  -webkit-text-fill-color: var(--tb-bg-base);
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 2px;
+  vertical-align: middle;
+  font-weight: 900;
+}
+.tb-header-hint {
+  margin-left: auto;
+  color: var(--tb-text-mute);
+  font-size: 13px;
+}
+
+/* ── TOOLBAR ────────────────────────────────────────── */
+.tb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px 24px;
+  background: rgba(1, 13, 24, 0.4);
+  border-bottom: 1px solid rgba(11, 196, 227, 0.1);
+  align-items: center;
+}
+.tb-toolbar-group {
+  display: flex;
+  gap: 6px;
+  padding: 0 10px;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+.tb-toolbar-group:last-child { border-right: none; }
+.tb-toolbar-right { margin-left: auto; }
+
+.tb-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--tb-bg-input);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: var(--tb-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.tb-tool:hover {
+  border-color: var(--tb-accent-border);
+  background: var(--tb-accent-dim);
+}
+.tb-tool-active {
+  background: var(--tb-accent);
+  border-color: var(--tb-accent);
+  color: var(--tb-bg-base);
+  box-shadow: var(--tb-shadow-glow);
+}
+.tb-tool-icon { font-size: 16px; }
+
+.tb-ward-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.4);
+}
+.tb-ward-yellow { background: var(--tb-ward-yellow); box-shadow: 0 0 8px var(--tb-ward-yellow); }
+.tb-ward-pink   { background: var(--tb-ward-pink);   box-shadow: 0 0 8px var(--tb-ward-pink); }
+.tb-ward-blue   { background: var(--tb-ward-blue);   box-shadow: 0 0 8px var(--tb-ward-blue); }
+
+.tb-clear-btn {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid rgba(214, 69, 69, 0.3);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.tb-clear-btn:hover {
+  background: rgba(214, 69, 69, 0.1);
+  color: var(--tb-red);
+  border-color: var(--tb-red);
+}
+.tb-clear-all {
+  border-color: var(--tb-red);
+  color: var(--tb-red);
+}
+.tb-clear-all:hover {
+  background: var(--tb-red);
+  color: var(--tb-text);
+}
+
+/* ── LAYOUT ─────────────────────────────────────────── */
+.tb-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 240px;
+  gap: 18px;
+  padding: 18px 24px 24px;
+  max-width: 1800px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+/* ── SIDEBAR (команды) ──────────────────────────────── */
+.tb-sidebar {
+  background: var(--tb-bg-card);
+  border: 1px solid var(--tb-accent-border);
+  border-radius: 16px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+}
+.tb-blue-side { border-color: rgba(58, 154, 217, 0.3); }
+.tb-red-side  { border-color: rgba(214, 69, 69, 0.3); }
+
+.tb-side-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.tb-side-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.tb-side-dot-blue { background: var(--tb-blue); box-shadow: 0 0 10px var(--tb-blue-glow); }
+.tb-side-dot-red  { background: var(--tb-red);  box-shadow: 0 0 10px var(--tb-red-glow); }
+.tb-side-title {
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.tb-team-slots {
+  display: grid;
+  gap: 10px;
+}
+.tb-slot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--tb-bg-input);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  color: var(--tb-text);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  min-height: 56px;
+}
+.tb-slot:hover {
+  border-color: var(--tb-accent-border);
+  background: var(--tb-accent-dim);
+  transform: translateY(-1px);
+}
+.tb-blue-side .tb-slot:hover { border-color: var(--tb-blue); background: var(--tb-blue-soft); }
+.tb-red-side  .tb-slot:hover { border-color: var(--tb-red);  background: var(--tb-red-soft); }
+
+.tb-slot-plus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(11, 196, 227, 0.1);
+  color: var(--tb-accent);
+  font-size: 22px;
+  font-weight: 300;
+  flex-shrink: 0;
+}
+.tb-slot-label {
+  color: var(--tb-text-mute);
+  font-size: 13px;
+  font-weight: 600;
+}
+.tb-slot.tb-slot-filled .tb-slot-plus {
+  background: none;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  overflow: hidden;
+}
+.tb-slot.tb-slot-filled .tb-slot-plus img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.tb-slot.tb-slot-filled .tb-slot-label {
+  color: var(--tb-text);
+  font-weight: 700;
+}
+
+/* ── BOARD (карта) ──────────────────────────────────── */
+.tb-board-wrap {
+  display: flex;
+  justify-content: center;
+}
+.tb-board {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--tb-bg-base);
+  border: 2px solid var(--tb-accent-border);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(11, 196, 227, 0.1);
+  user-select: none;
+  touch-action: none;
+}
+.tb-map-bg,
+.tb-arrows-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.tb-arrows-layer {
+  pointer-events: none;
+  z-index: 2;
+}
+.tb-arrows-layer .tb-arrow {
+  fill: none;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tb-tokens-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+/* ── TOKENS (чемпы на карте) ────────────────────────── */
+.tb-token {
+  position: absolute;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--tb-blue);
+  box-shadow: 0 0 12px var(--tb-blue-glow), 0 4px 12px rgba(0,0,0,0.5);
+  cursor: grab;
+  transform: translate(-50%, -50%);
+  transition: box-shadow 0.15s, transform 0.05s;
+  background: var(--tb-bg-base);
+}
+.tb-token.tb-token-red {
+  border-color: var(--tb-red);
+  box-shadow: 0 0 12px var(--tb-red-glow), 0 4px 12px rgba(0,0,0,0.5);
+}
+.tb-token img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.tb-token:hover {
+  box-shadow: 0 0 22px var(--tb-blue-glow), 0 6px 18px rgba(0,0,0,0.6);
+}
+.tb-token.tb-token-red:hover {
+  box-shadow: 0 0 22px var(--tb-red-glow), 0 6px 18px rgba(0,0,0,0.6);
+}
+.tb-token.tb-token-dragging {
+  cursor: grabbing;
+  z-index: 999;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* ── WARDS на карте ─────────────────────────────────── */
+.tb-ward {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 0, 0, 0.6);
+  cursor: grab;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+.tb-ward-on-map.tb-w-yellow { background: var(--tb-ward-yellow); box-shadow: 0 0 14px var(--tb-ward-yellow); }
+.tb-ward-on-map.tb-w-pink   { background: var(--tb-ward-pink);   box-shadow: 0 0 14px var(--tb-ward-pink); }
+.tb-ward-on-map.tb-w-blue   { background: var(--tb-ward-blue);   box-shadow: 0 0 14px var(--tb-ward-blue); }
+
+/* ── CURSOR MODES ───────────────────────────────────── */
+.tb-board[data-tool="arrow"] { cursor: crosshair; }
+.tb-board[data-tool="ward-yellow"],
+.tb-board[data-tool="ward-pink"],
+.tb-board[data-tool="ward-blue"] { cursor: copy; }
+
+/* ── PICKER (модалка чемпионов) ─────────────────────── */
+.tb-picker {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.tb-picker[hidden] { display: none; }
+.tb-picker-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+.tb-picker-box {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  max-height: 85vh;
+  background: linear-gradient(180deg, var(--tb-bg-secondary), var(--tb-bg-primary));
+  border: 1px solid var(--tb-accent-border);
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+.tb-picker-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(11, 196, 227, 0.1);
+}
+.tb-picker-title {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--tb-accent);
+}
+.tb-picker-search {
+  flex: 1;
+  background: var(--tb-bg-input);
+  border: 1px solid var(--tb-accent-border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: var(--tb-text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+.tb-picker-search:focus { border-color: var(--tb-accent); box-shadow: 0 0 0 3px var(--tb-accent-dim); }
+.tb-picker-close {
+  background: transparent;
+  border: none;
+  color: var(--tb-text-mute);
+  font-size: 28px;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.tb-picker-close:hover { background: rgba(255,255,255,0.08); color: var(--tb-text); }
+
+.tb-picker-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 10px;
+  align-content: start;
+}
+.tb-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  background: var(--tb-bg-input);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.12s;
+  font-family: inherit;
+  color: var(--tb-text);
+}
+.tb-pick:hover {
+  background: var(--tb-accent-dim);
+  border-color: var(--tb-accent);
+  transform: translateY(-2px);
+}
+.tb-pick img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.tb-pick-name {
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--tb-text-mute);
+  white-space: nowrap;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tb-pick:hover .tb-pick-name { color: var(--tb-text); }
+.tb-pick.tb-pick-taken {
+  opacity: 0.35;
+  filter: grayscale(0.7);
+  pointer-events: none;
+}
+
+/* ── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .tb-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .tb-sidebar { order: 2; }
+  .tb-board-wrap { order: 1; }
+  .tb-team-slots {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .tb-slot { flex-direction: column; min-height: auto; padding: 8px 6px; }
+  .tb-slot-plus { width: 40px; height: 40px; }
+  .tb-slot-label { font-size: 11px; }
+}
+@media (max-width: 640px) {
+  .tb-header { padding: 10px 14px; }
+  .tb-title { font-size: 17px; }
+  .tb-header-hint { display: none; }
+  .tb-toolbar { padding: 10px 14px; gap: 6px; }
+  .tb-toolbar-group { padding: 0 4px; gap: 4px; }
+  .tb-tool { padding: 6px 10px; font-size: 12px; }
+  .tb-clear-btn { padding: 6px 8px; font-size: 11px; }
+  .tb-layout { padding: 12px 10px; }
+  .tb-sidebar { padding: 10px; }
+  .tb-token { width: 40px; height: 40px; border-width: 2px; }
+  .tb-ward { width: 20px; height: 20px; border-width: 2px; }
+  .tb-picker-grid { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 8px; padding: 12px; }
+  .tb-pick img { width: 48px; height: 48px; }
+  .tb-pick-name { font-size: 10px; max-width: 60px; }
+}
