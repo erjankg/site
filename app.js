@@ -3061,19 +3061,50 @@
     }
     var _isAdmin = false;
 
-    function checkAdmin() {
+    // Синхронный сброс ВСЕХ админ-зависимых элементов до того, как асинхронный
+    // checkAdmin вернёт реальный флаг. Вызывается при logout / смене аккаунта,
+    // чтобы не-админ ни на миллисекунду не видел админ-фичи бывшего юзера.
+    function purgeAdminUI() {
         _isAdmin = false;
         window._isAdmin = false;
+        // 1. Скрыть статичные .admin-only
+        document.querySelectorAll('.admin-only').forEach(function(el) {
+            el.style.display = 'none';
+        });
+        // 2. Снести админ-бар импорта винрейтов
+        var bar = document.getElementById('wrprAdminBar');
+        if (bar) bar.remove();
+        // 3. Закрыть inline-edit-попап если открыт
+        document.querySelectorAll('.cms-inline-edit-popup').forEach(function(el) { el.remove(); });
+        // 4. Удалить все динамические кнопки редактирования/добавления, которые
+        //    рисуются только админу прямо в DOM
+        document.querySelectorAll('.cms-edit-btn, .cms-add-btn').forEach(function(el) { el.remove(); });
+        // 5. Перерисовать секции, у которых есть admin-only элементы в шаблоне
+        try { if (window.wrprRender) window.wrprRender(); } catch (e) {}
+        try { if (window.cmsRenderItems && window._cmsLoaded) window.cmsRenderItems(); } catch (e) {}
+        try { if (window.cmsRenderRunes && window._cmsLoaded) window.cmsRenderRunes(); } catch (e) {}
+        try { if (window.cmsRenderPatchnotes) window.cmsRenderPatchnotes(); } catch (e) {}
+    }
+    window._purgeAdminUI = purgeAdminUI;
+
+    function checkAdmin() {
+        // Перед запросом — гарантируем, что UI в не-админском состоянии.
+        // Если юзер реально админ, ниже перерисуем обратно.
+        purgeAdminUI();
         if (!db || !_currentUser) { console.warn('[checkAdmin] db or user missing', !!db, !!_currentUser); return; }
-        console.log('[checkAdmin] checking uid:', _currentUser.uid);
-        db.collection('users').doc(_currentUser.uid).get({ source: 'server' }).then(function(doc) {
+        var checkUid = _currentUser.uid;
+        console.log('[checkAdmin] checking uid:', checkUid);
+        db.collection('users').doc(checkUid).get({ source: 'server' }).then(function(doc) {
+            // Защита: пока летел запрос, юзер мог разлогиниться или сменить аккаунт.
+            // В этом случае результат уже не релевантен — игнорируем.
+            if (!_currentUser || _currentUser.uid !== checkUid) {
+                console.log('[checkAdmin] user changed during fetch, ignoring result');
+                return;
+            }
             console.log('[checkAdmin] doc exists:', doc.exists, 'isAdmin:', doc.exists ? doc.data().isAdmin : 'N/A');
             if (doc.exists && doc.data().isAdmin === true) { _isAdmin = true; }
             window._isAdmin = _isAdmin;
             console.log('[checkAdmin] final _isAdmin:', _isAdmin);
-            if (_isAdmin) {
-                // Текстовый редактор включается только кнопкой ✏ (cmsInitInlineEdit)
-            }
             renderGlobalChat();
             // CMS: перерисовать с кнопками редактирования для админа
             if (_isAdmin && window._cmsLoaded) {
@@ -3776,14 +3807,21 @@
 
     // Hook into auth state
     if (auth) {
+        var _prevUid = null;
         auth.onAuthStateChanged(function(user) {
+            var newUid = user ? user.uid : null;
+            var userChanged = _prevUid !== newUid;
+            // Если юзер сменился (logout ИЛИ другой аккаунт) — мгновенно сносим
+            // весь админ-UI до того, как асинхронные проверки вернут реальный флаг.
+            if (userChanged) purgeAdminUI();
+            _prevUid = newUid;
             _currentUser = user || null;
             updateAuthUI(user);
             if (user) {
                 loadUserDataFromFirestore();
                 startPresence();
                 updateChatUI(true);
-                setTimeout(function() { checkAdmin(); }, 1500);
+                checkAdmin();
                 checkFirstLogin();
                 checkProfileGate(user);
                 // Закрываем гейт если он был открыт (юзер залогинился изнутри requireAuth)
@@ -3797,9 +3835,8 @@
             } else {
                 stopPresence();
                 updateChatUI(false);
-                _isAdmin = false;
-                window._isAdmin = false;
-                document.querySelectorAll('.admin-only').forEach(function(el) { el.style.display = 'none'; });
+                // purgeAdminUI выше уже сбросил _isAdmin и почистил UI, но на logout
+                // дополнительно убираем profile-gated стейт.
                 document.body.classList.remove('profile-gated');
                 // SEO + UX: НЕ показываем глобальный гейт незалогиненным посетителям.
                 // Главная (тир-листы, винрейты, патчноуты, инфлюенсеры, киберспорт)
