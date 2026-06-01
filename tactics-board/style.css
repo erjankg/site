@@ -384,9 +384,18 @@ body {
   pointer-events: auto;
   z-index: 2;
 }
-.tb-arrows-layer .tb-arrow {
+/* Стрелка = группа из двух path: видимая тонкая + невидимая широкая для клика */
+.tb-arrows-layer .tb-arrow-vis {
   fill: none;
   stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.tb-arrows-layer .tb-arrow-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 22;
   stroke-linecap: round;
   stroke-linejoin: round;
   pointer-events: stroke;
@@ -411,6 +420,7 @@ body {
   transform: translate(-50%, -50%);
   transition: box-shadow 0.15s;
   background: var(--tb-bg-base);
+  z-index: 5;
 }
 .tb-token.tb-token-red {
   border-color: var(--tb-red);
@@ -440,9 +450,8 @@ body {
   width: 0;
   height: 0;
   transform: translate(-50%, -50%);
-  z-index: 2;
-  cursor: grab;
-  pointer-events: auto;
+  z-index: 3;
+  pointer-events: none;  /* контейнер сам не ловит клики, только точка-dot */
 }
 .tb-ward-on-map .tb-ward-radius {
   position: absolute;
@@ -453,25 +462,26 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  pointer-events: none;
+  pointer-events: none;  /* большой полупрозрачный круг — не блокирует клики */
 }
 .tb-ward-on-map .tb-ward-dot {
   position: absolute;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   border: 2.5px solid rgba(0, 0, 0, 0.7);
-  pointer-events: none;
+  pointer-events: auto;  /* точка — единственная зона клика для варда */
+  cursor: grab;
 }
 .tb-ward-on-map.tb-w-ally  .tb-ward-radius { background: radial-gradient(circle, rgba(var(--tb-ward-ally-rgb), 0.32) 0%, rgba(var(--tb-ward-ally-rgb), 0.18) 55%, rgba(var(--tb-ward-ally-rgb), 0.04) 100%); border: 1.5px solid rgba(var(--tb-ward-ally-rgb), 0.55); }
 .tb-ward-on-map.tb-w-ally  .tb-ward-dot    { background: rgb(var(--tb-ward-ally-rgb));  box-shadow: 0 0 12px rgba(var(--tb-ward-ally-rgb), 0.9); }
 .tb-ward-on-map.tb-w-enemy .tb-ward-radius { background: radial-gradient(circle, rgba(var(--tb-ward-enemy-rgb), 0.32) 0%, rgba(var(--tb-ward-enemy-rgb), 0.18) 55%, rgba(var(--tb-ward-enemy-rgb), 0.04) 100%); border: 1.5px solid rgba(var(--tb-ward-enemy-rgb), 0.55); }
 .tb-ward-on-map.tb-w-enemy .tb-ward-dot    { background: rgb(var(--tb-ward-enemy-rgb)); box-shadow: 0 0 12px rgba(var(--tb-ward-enemy-rgb), 0.9); }
-.tb-ward-on-map.tb-token-dragging { cursor: grabbing !important; z-index: 999; }
-.tb-ward-on-map.tb-token-dragging .tb-ward-dot { transform: translate(-50%, -50%) scale(1.15); }
+.tb-ward-on-map.tb-token-dragging { z-index: 999; }
+.tb-ward-on-map.tb-token-dragging .tb-ward-dot { cursor: grabbing !important; transform: translate(-50%, -50%) scale(1.15); }
 
 /* container-query unit cqw fallback для старых браузеров */
 .tb-board { container-type: inline-size; }

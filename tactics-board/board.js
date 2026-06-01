@@ -331,7 +331,8 @@
     if (ward) ward.remove();
   });
   arrowsLayer.addEventListener('dblclick', e => {
-    if (e.target.classList.contains('tb-arrow')) e.target.remove();
+    const arrow = e.target.closest('.tb-arrow');
+    if (arrow) arrow.remove();
   });
 
   // ───────────────────────────────────────────────────────────
@@ -360,20 +361,26 @@
     el.classList.add('tb-token-dragging');
     dragState = { kind: 'ward', el, pointerId: e.pointerId };
   }
-  function startDragArrow(pathEl, e) {
+  function startDragArrow(groupEl, e) {
     // Перемещаем стрелку целиком — храним исходные точки и стартовый клиент
-    const d = pathEl.getAttribute('d');
-    const m = d.match(/M\s+([-\d.]+)\s+([-\d.]+)\s+L\s+([-\d.]+)\s+([-\d.]+)/);
+    const visPath = groupEl.querySelector('.tb-arrow-vis');
+    if (!visPath) return;
+    const d = visPath.getAttribute('d');
+    const m = d && d.match(/M\s+([-\d.]+)\s+([-\d.]+)\s+L\s+([-\d.]+)\s+([-\d.]+)/);
     if (!m) return;
     boardEl.setPointerCapture(e.pointerId);
     dragState = {
       kind: 'arrow',
-      pathEl,
+      groupEl,
       x1: parseFloat(m[1]), y1: parseFloat(m[2]),
       x2: parseFloat(m[3]), y2: parseFloat(m[4]),
       startClientX: e.clientX, startClientY: e.clientY,
       pointerId: e.pointerId
     };
+  }
+  // Установить одинаковый d на все path внутри группы (видимая + hit-зона)
+  function setArrowD(groupEl, d) {
+    groupEl.querySelectorAll('path').forEach(p => p.setAttribute('d', d));
   }
 
   // Главный pointerdown обработчик
@@ -409,11 +416,11 @@
       const dx = dxPct * 10, dy = dyPct * 10;
       const x1 = dragState.x1 + dx, y1 = dragState.y1 + dy;
       const x2 = dragState.x2 + dx, y2 = dragState.y2 + dy;
-      dragState.pathEl.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2);
+      setArrowD(dragState.groupEl, 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2);
     } else if (dragState.kind === 'arrow-draw') {
       const { x, y } = getBoardCoords(e.clientX, e.clientY);
-      dragState.pathEl.setAttribute('d', 'M ' + (dragState.startX * 10) + ' ' + (dragState.startY * 10) +
-                                           ' L ' + (x * 10) + ' ' + (y * 10));
+      setArrowD(dragState.groupEl, 'M ' + (dragState.startX * 10) + ' ' + (dragState.startY * 10) +
+                                     ' L ' + (x * 10) + ' ' + (y * 10));
     }
   });
 
@@ -430,14 +437,15 @@
       dragState.el.classList.remove('tb-token-dragging');
     } else if (dragState.kind === 'arrow-draw') {
       // Если стрелка слишком короткая — удалить (случайный клик)
-      const d = dragState.pathEl.getAttribute('d') || '';
+      const visPath = dragState.groupEl.querySelector('.tb-arrow-vis');
+      const d = (visPath && visPath.getAttribute('d')) || '';
       const parts = d.match(/[-\d.]+/g);
       if (parts && parts.length >= 4) {
         const dx = parseFloat(parts[2]) - parseFloat(parts[0]);
         const dy = parseFloat(parts[3]) - parseFloat(parts[1]);
-        if (Math.sqrt(dx*dx + dy*dy) < 30) dragState.pathEl.remove();
+        if (Math.sqrt(dx*dx + dy*dy) < 30) dragState.groupEl.remove();
       } else {
-        dragState.pathEl.remove();
+        dragState.groupEl.remove();
       }
     }
     dragState = null;
@@ -451,15 +459,29 @@
   function startArrowDraw(e) {
     e.preventDefault();
     const { x, y } = getBoardCoords(e.clientX, e.clientY);
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('class', 'tb-arrow');
-    path.setAttribute('stroke', '#FFD700');
-    path.style.color = '#FFD700';
-    path.setAttribute('marker-end', 'url(#tbArrowHead)');
-    path.setAttribute('d', 'M ' + (x * 10) + ' ' + (y * 10));
-    arrowsLayer.appendChild(path);
+    const initialD = 'M ' + (x * 10) + ' ' + (y * 10);
+
+    // Создаём <g> с двумя path: hit (широкая невидимая для клика) и vis (видимая золотая)
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'tb-arrow');
+
+    const hitPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    hitPath.setAttribute('class', 'tb-arrow-hit');
+    hitPath.setAttribute('d', initialD);
+
+    const visPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    visPath.setAttribute('class', 'tb-arrow-vis');
+    visPath.setAttribute('stroke', '#FFD700');
+    visPath.style.color = '#FFD700';
+    visPath.setAttribute('marker-end', 'url(#tbArrowHead)');
+    visPath.setAttribute('d', initialD);
+
+    g.appendChild(hitPath);
+    g.appendChild(visPath);
+    arrowsLayer.appendChild(g);
+
     boardEl.setPointerCapture(e.pointerId);
-    dragState = { kind: 'arrow-draw', pathEl: path, startX: x, startY: y, pointerId: e.pointerId };
+    dragState = { kind: 'arrow-draw', groupEl: g, startX: x, startY: y, pointerId: e.pointerId };
   }
 
   // ───────────────────────────────────────────────────────────
@@ -552,13 +574,16 @@
       w.style.left = (100 - x) + '%';
       w.style.top = (100 - y) + '%';
     });
-    // Зеркалируем стрелки (viewBox 0..1000 → 1000-coord)
-    arrowsLayer.querySelectorAll('.tb-arrow').forEach(path => {
-      const d = path.getAttribute('d');
-      const newD = d.replace(/([ML])\s+([-\d.]+)\s+([-\d.]+)/g, (_, cmd, x, y) => {
-        return cmd + ' ' + (1000 - parseFloat(x)) + ' ' + (1000 - parseFloat(y));
+    // Зеркалируем стрелки (viewBox 0..1000 → 1000-coord), на обоих path в группе
+    arrowsLayer.querySelectorAll('.tb-arrow').forEach(g => {
+      g.querySelectorAll('path').forEach(path => {
+        const d = path.getAttribute('d');
+        if (!d) return;
+        const newD = d.replace(/([ML])\s+([-\d.]+)\s+([-\d.]+)/g, (_, cmd, x, y) => {
+          return cmd + ' ' + (1000 - parseFloat(x)) + ' ' + (1000 - parseFloat(y));
+        });
+        path.setAttribute('d', newD);
       });
-      path.setAttribute('d', newD);
     });
   });
 
