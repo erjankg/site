@@ -132,6 +132,64 @@
         _applyStackVisuals();
     }
 
+    // =========================================
+    // LAZY-LOAD тяжёлых фич (cybersport, кооп-драфт)
+    // Снимаем их парсинг/выполнение с критического старта (domReady).
+    // Грузим по требованию (открытие) + draft фоном для залогиненных.
+    // =========================================
+    var _lazyScripts = {};
+    function _lazyScript(src) {
+        if (_lazyScripts[src]) return _lazyScripts[src];
+        _lazyScripts[src] = new Promise(function(resolve, reject) {
+            var s = document.createElement('script');
+            s.src = src; s.async = true;
+            s.onload = resolve;
+            s.onerror = function() { _lazyScripts[src] = null; reject(new Error('lazy load fail: ' + src)); };
+            document.head.appendChild(s);
+        });
+        return _lazyScripts[src];
+    }
+    window._lazyScript = _lazyScript;
+
+    // Заглушка: пока реальный скрипт не загружен — подгружаем его и вызываем
+    // настоящую функцию (которая перезапишет заглушку). Аргументы пробрасываются.
+    function _lazyStub(src, name) {
+        var stub = function() {
+            var args = arguments;
+            _lazyScript(src).then(function() {
+                var fn = window[name];
+                if (typeof fn === 'function' && !fn.__lazyStub) fn.apply(null, args);
+            }).catch(function(e) { console.warn('[lazy]', e); });
+        };
+        stub.__lazyStub = true;
+        window[name] = stub;
+    }
+    _lazyStub('cybersport.js', 'openCybersport');
+    _lazyStub('cybersport.js', 'openCybersportTournament');
+    _lazyStub('draft.js', 'openDraftCoop');
+
+    // Редактор позиций (админ): грузим лениво по клику в меню.
+    window._openLayoutEditor = function() {
+        _lazyScript('layout-editor.js').then(function() {
+            if (window.LayoutEditor) window.LayoutEditor.activate();
+        }).catch(function(e) { console.warn('[lazy] layout-editor', e); });
+    };
+
+    // Фоновая догрузка кооп-драфта для залогиненных (чтобы авто-редирект
+    // капитанов работал), но ПОСЛЕ интерактива — вне критического старта.
+    function _bgLoadDraft() {
+        try {
+            if (firebase && firebase.auth && firebase.auth().currentUser) _lazyScript('draft.js');
+        } catch (e) {}
+    }
+    function _scheduleBgDraft() {
+        if ('requestIdleCallback' in window) requestIdleCallback(_bgLoadDraft, { timeout: 4000 });
+        else setTimeout(_bgLoadDraft, 2500);
+        try { firebase.auth().onAuthStateChanged(function(u) { if (u) _bgLoadDraft(); }); } catch (e) {}
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _scheduleBgDraft);
+    else _scheduleBgDraft();
+
     function openModal(id) {
         _hideTooltips();
         var el = document.getElementById(id);
@@ -3078,25 +3136,55 @@
     }
     window._purgeAdminUI = purgeAdminUI;
 
+    // Применяет видимость админ-UI по текущему _isAdmin. Вызывается из checkAdmin.
+    function applyAdminUI() {
+        window._isAdmin = _isAdmin;
+        renderGlobalChat();
+        if (_isAdmin && window._cmsLoaded) {
+            window.cmsRenderItems && window.cmsRenderItems();
+            window.cmsRenderRunes && window.cmsRenderRunes();
+        }
+        if (_isAdmin) wrprRender();
+        document.querySelectorAll('.admin-only').forEach(function(el) {
+            el.style.display = _isAdmin ? '' : 'none';
+        });
+        if (_isAdmin && window.cmsInitInlineEdit) window.cmsInitInlineEdit();
+        // Если у админа есть черновик правок позиций — подгружаем редактор,
+        // он сам применит черновик (показывает твою раскладку до вшивания в CSS).
+        if (_isAdmin) {
+            try {
+                var ld = localStorage.getItem('le_layout_pc');
+                if (ld && ld !== '{}') _lazyScript('layout-editor.js');
+            } catch (e) {}
+        }
+    }
+
     function checkAdmin() {
         if (!db || !_currentUser) { console.warn('[checkAdmin] db or user missing', !!db, !!_currentUser); return; }
         var checkUid = _currentUser.uid;
-        console.log('[checkAdmin] checking uid:', checkUid);
-        db.collection('users').doc(checkUid).get({ source: 'server' }).then(function(doc) {
+
+        // Быстрый НАДЁЖНЫЙ путь для владельца сайта: его UID захардкожен (ADMIN_UID).
+        // Показываем админку сразу, не завися от сети/доступности Firestore.
+        // Реальную безопасность правок держат серверные firestore.rules — поэтому
+        // клиентский флаг ничего не «открывает», только показывает UI владельцу.
+        if (checkUid === ADMIN_UID) {
+            _isAdmin = true;
+            applyAdminUI();
+            return;
+        }
+
+        // Прочие пользователи: читаем поле isAdmin из базы.
+        // Обычный .get() (с откатом на кэш), НЕ { source: 'server' } — иначе при
+        // недоступности бэкенда запрос падает и админка пропадала бы.
+        db.collection('users').doc(checkUid).get().then(function(doc) {
             if (!_currentUser || _currentUser.uid !== checkUid) return;
             _isAdmin = !!(doc.exists && doc.data().isAdmin === true);
-            window._isAdmin = _isAdmin;
-            renderGlobalChat();
-            if (_isAdmin && window._cmsLoaded) {
-                window.cmsRenderItems && window.cmsRenderItems();
-                window.cmsRenderRunes && window.cmsRenderRunes();
-            }
-            if (_isAdmin) wrprRender();
-            document.querySelectorAll('.admin-only').forEach(function(el) {
-                el.style.display = _isAdmin ? '' : 'none';
-            });
-            if (_isAdmin && window.cmsInitInlineEdit) window.cmsInitInlineEdit();
-        }).catch(function(err) { console.error('[checkAdmin] ERROR:', err); _isAdmin = false; window._isAdmin = false; });
+            applyAdminUI();
+        }).catch(function(err) {
+            // Разовый сбой сети не должен скрывать админку: оставляем статус как есть
+            // (при смене аккаунта purgeAdminUI уже отработал и скрыл лишнее).
+            console.error('[checkAdmin] ERROR (статус не меняю):', err);
+        });
     }
 
     // ═══════════════════════════════════════
@@ -3256,7 +3344,6 @@
             itemTierData: JSON.stringify(itemTierData),
             runeTierData: JSON.stringify(runeTierData),
             selectedChamps: JSON.stringify(selectedChamps),
-            email: _currentUser.email || '',
             displayName: _currentUser.displayName || '',
             photoURL: _currentUser.photoURL || '',
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -3609,7 +3696,7 @@
                 lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
                 displayName: _currentUser.displayName || '',
                 nickLower: (_currentUser.displayName || '').toLowerCase(),
-                email: _currentUser.email || '',
+                email: firebase.firestore.FieldValue.delete(),
                 photoURL: _currentUser.photoURL || ''
             }, { merge: true });
         }
@@ -3704,11 +3791,14 @@
             window.history.replaceState({}, '', url.pathname + (url.search || '') + url.hash);
         } catch(e) {}
         if (dl.type === 'draft') {
+            // draft.js грузится лениво — дожидаемся загрузки, потом открываем лобби
             setTimeout(function(){
-                if (window.openDraftCoop) window.openDraftCoop();
-                setTimeout(function(){
-                    if (window.dcoopOpenLobby) window.dcoopOpenLobby(dl.id, dl.token);
-                }, 300);
+                _lazyScript('draft.js').then(function(){
+                    if (window.openDraftCoop) window.openDraftCoop();
+                    setTimeout(function(){
+                        if (window.dcoopOpenLobby) window.dcoopOpenLobby(dl.id, dl.token);
+                    }, 300);
+                }).catch(function(e){ console.warn('[lazy] draft deeplink', e); });
             }, 200);
         } else if (dl.type === 'cybersport') {
             setTimeout(function(){
@@ -4088,6 +4178,18 @@
         }).catch(function(e) { console.warn('Users load err:', e); if (cb) cb(); });
     }
 
+    function _safeAvatarUrl(raw) {
+        if (typeof raw !== 'string' || !raw) return '';
+        try {
+            var u = new URL(raw, window.location.href);
+            if (u.protocol !== 'https:') return '';
+            var h = u.hostname;
+            if (h === 'googleusercontent.com' || h.endsWith('.googleusercontent.com')
+                || h === 'firebasestorage.googleapis.com' || h.endsWith('.firebasestorage.app')) return u.href;
+            return '';
+        } catch (e) { return ''; }
+    }
+
     function renderUsersSidebar() {
         var container = document.getElementById('tgSidebarContent');
         if (!container) return;
@@ -4109,9 +4211,10 @@
             avWrap.className = 'user-av-wrap';
             var av = document.createElement('div');
             av.className = 'user-av';
-            if (u.photoURL) {
+            var uPhoto = _safeAvatarUrl(u.photoURL);
+            if (uPhoto) {
                 var avImg = document.createElement('img');
-                avImg.src = u.photoURL;
+                avImg.src = uPhoto;
                 avImg.onerror = function(){ this.style.display='none'; };
                 av.appendChild(avImg);
             } else av.textContent = (u.displayName||'?').charAt(0).toUpperCase();
@@ -4209,9 +4312,10 @@
 
         var av = document.createElement('div');
         av.className = 'chat-bubble-av';
-        if (msg.photoURL) {
+        var msgPhoto = _safeAvatarUrl(msg.photoURL);
+        if (msgPhoto) {
             var avImg = document.createElement('img');
-            avImg.src = msg.photoURL;
+            avImg.src = msgPhoto;
             avImg.onerror = function(){ this.style.display='none'; };
             av.appendChild(avImg);
         } else av.textContent = (msg.name || '?').charAt(0).toUpperCase();

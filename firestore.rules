@@ -307,9 +307,12 @@ service cloud.firestore {
         resource.data.toUid == request.auth.uid ||
         resource.data.fromUid == request.auth.uid
       );
-      // Создавать может только отправитель (и только на своё имя)
+      // Создавать может только отправитель (и только на своё имя),
+      // и нельзя выписывать инвайт самому себе (иначе можно подделать accepted-инвайт
+      // и самовольно войти в любое лобби).
       allow create: if request.auth != null
-        && request.resource.data.fromUid == request.auth.uid;
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.toUid != request.auth.uid;
       // Обновлять — отправитель или получатель
       allow update: if request.auth != null && (
         resource.data.toUid == request.auth.uid ||

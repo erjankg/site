@@ -13,7 +13,7 @@
  *
  * Старые caches удаляются в activate.
  */
-const VERSION = 'wrs-v2.2026-06-01a';
+const VERSION = 'wrs-v2.2026-06-02c';
 
 // Сколько ждём сеть, прежде чем отдать офлайн-резерв из кэша (мс).
 const NET_TIMEOUT = 3000;
@@ -30,8 +30,7 @@ const PRECACHE_URLS = [
   './share.js',
   './cms.js',
   './cybersport.js',
-  './migrate.js',
-  './migrate-winrates.js',
+  './anim-perf.js',
   './i18n.js',
   './icon.svg',
   './manifest.webmanifest'

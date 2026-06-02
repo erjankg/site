@@ -1,0 +1,96 @@
+/* ════════════════════════════════════════════════════════════════
+   LAYOUT EDITOR — chrome редактора позиций (только для админа).
+   Грузится лениво при открытии. На обычных юзеров не влияет.
+   Префикс .le- чтобы ничего не конфликтовало со стилями сайта.
+   ════════════════════════════════════════════════════════════════ */
+
+/* Курсор-перекрестие в режиме редактирования */
+body.le-on, body.le-on * { cursor: default; }
+body.le-on { user-select: none; -webkit-user-select: none; }
+
+/* Верхняя панель */
+.le-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 46px; z-index: 2147483600;
+  display: flex; align-items: center; gap: 10px; padding: 0 14px;
+  background: linear-gradient(180deg, #0d1424, #0a0f1c);
+  border-bottom: 1px solid #233354;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  font-family: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+  color: #e7ecf5;
+}
+.le-bar-title {
+  font-size: 13px; font-weight: 800; letter-spacing: -0.01em;
+  background: linear-gradient(90deg, #38bdf8, #a78bfa);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.le-bar-mode {
+  font-size: 11px; color: #8a97b2; padding: 3px 9px; border: 1px solid #233354; border-radius: 99px;
+}
+.le-spacer { flex: 1; }
+.le-btn {
+  font-size: 12px; font-weight: 700; padding: 7px 13px; border-radius: 9px; cursor: pointer;
+  background: #131c30; border: 1px solid #233354; color: #e7ecf5;
+}
+.le-btn:hover { background: #1a2540; }
+.le-btn.accent { background: linear-gradient(90deg, #38bdf8, #a78bfa); border: none; color: #04101e; }
+.le-btn.danger { color: #fca5a5; border-color: #6b2230; }
+.le-btn.ok { color: #34d399; border-color: #1f6b4f; }
+
+/* Сдвигаем сайт вниз, чтобы панель не перекрывала */
+body.le-on { padding-top: 46px !important; }
+
+/* Подсветка элемента под курсором (hover) */
+.le-hover-outline {
+  position: fixed; z-index: 2147483500; pointer-events: none;
+  border: 1px dashed rgba(56,189,248,0.7); background: rgba(56,189,248,0.06);
+  border-radius: 3px;
+}
+
+/* Рамка выбранного элемента */
+.le-sel {
+  position: fixed; z-index: 2147483550; pointer-events: none;
+  border: 1.5px solid #38bdf8; box-sizing: border-box;
+}
+/* Тело рамки ловит перетаскивание (move) */
+.le-sel-body {
+  position: absolute; inset: 0; pointer-events: auto; cursor: move;
+}
+/* Ручки */
+.le-h {
+  position: absolute; width: 12px; height: 12px; background: #fff;
+  border: 2px solid #38bdf8; border-radius: 3px; pointer-events: auto;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.le-h-nw { left: -6px;  top: -6px;  cursor: nwse-resize; }
+.le-h-n  { left: 50%;   top: -6px;  margin-left: -6px; cursor: ns-resize; }
+.le-h-ne { right: -6px; top: -6px;  cursor: nesw-resize; }
+.le-h-e  { right: -6px; top: 50%;   margin-top: -6px; cursor: ew-resize; }
+.le-h-se { right: -6px; bottom: -6px; cursor: nwse-resize; }
+.le-h-s  { left: 50%;   bottom: -6px; margin-left: -6px; cursor: ns-resize; }
+.le-h-sw { left: -6px;  bottom: -6px; cursor: nesw-resize; }
+.le-h-w  { left: -6px;  top: 50%;   margin-top: -6px; cursor: ew-resize; }
+
+/* Бейдж с инфо над рамкой */
+.le-tag {
+  position: absolute; left: 0; top: -22px; height: 18px; line-height: 18px;
+  padding: 0 7px; font-size: 10.5px; font-weight: 700; white-space: nowrap;
+  background: #38bdf8; color: #04101e; border-radius: 4px; pointer-events: none;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+/* Направляющие линии привязки */
+.le-guide {
+  position: fixed; z-index: 2147483540; pointer-events: none; background: #f0abfc;
+}
+.le-guide-v { width: 1px; top: 0; bottom: 0; }
+.le-guide-h { height: 1px; left: 0; right: 0; }
+
+/* Тост */
+.le-toast {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  z-index: 2147483600; background: #0d1424; border: 1px solid #233354; color: #e7ecf5;
+  padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.2s;
+  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+}
+.le-toast.show { opacity: 1; }

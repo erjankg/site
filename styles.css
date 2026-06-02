@@ -1104,45 +1104,17 @@ touch-action: pan-y;
   backdrop-filter: blur(3px);
 }
 
+/* Раскладка маски (анимации задаются ниже, в блоке 2026) */
 .m-mask.active {
 display: flex;
 align-items: center;
 justify-content: center;
-animation: maskFadeIn 0.22s ease;
 }
-
-@keyframes maskFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* Контент модалки плавно въезжает снизу */
-.m-mask.active > .m-win {
-  animation: modalContentIn 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-}
-@keyframes modalContentIn {
-  from { opacity: 0; transform: scale(0.96) translateY(12px); }
-  to   { opacity: 1; transform: scale(1)    translateY(0); }
-}
-
-/* Закрытие: плавное затухание через .closing */
 .m-mask.closing {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: maskFadeOut 0.18s ease forwards;
   pointer-events: none;
-}
-.m-mask.closing > .m-win {
-  animation: modalContentOut 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
-}
-@keyframes maskFadeOut {
-  from { opacity: 1; }
-  to   { opacity: 0; }
-}
-@keyframes modalContentOut {
-  from { opacity: 1; transform: scale(1) translateY(0); }
-  to   { opacity: 0; transform: scale(0.96) translateY(8px); }
 }
 /* WR/PR inline section */
 #wrprSection {
@@ -2553,10 +2525,7 @@ font-size: 12px;
     animation: shimmer 1.2s infinite;
     border-radius: 10px;
 }
-@keyframes shimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
+/* @keyframes shimmer определён выше (skeleton-cell) — дубль удалён */
 
 
 /* ── PC CHAT MODE (sidebar stays left, users panel moves right) ── */
@@ -6700,25 +6669,65 @@ body.cms-edit-mode :not(input):not(textarea):not(select):not(#cmsEditModeToggle)
   animation: none;
   opacity: 1;
 }
+/* Глобальная анимация ВСЕХ модалок — Rise-Blur: всплывает снизу с фокусом */
 .m-mask.active > .m-win {
-  animation: modalContentIn2026 0.28s var(--ease-apple-out) both;
-  will-change: transform, opacity;
+  animation: modalRiseBlurIn 0.42s var(--ease-apple-out) both;
+  will-change: transform, opacity, filter;
 }
-@keyframes modalContentIn2026 {
-  from { opacity: 0; transform: translateY(12px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes modalRiseBlurIn {
+  from { opacity: 0; filter: blur(12px); transform: translateY(40px) scale(0.98); }
+  to   { opacity: 1; filter: blur(0);    transform: none; }
 }
 .m-mask.closing {
   animation: none;
   opacity: 1;
   pointer-events: none;
 }
+/* Закрытие 0.18s — укладывается в 180мс, которые JS отводит на закрытие */
 .m-mask.closing > .m-win {
-  animation: modalContentOut2026 0.18s ease forwards;
+  animation: modalRiseBlurOut 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
-@keyframes modalContentOut2026 {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to   { opacity: 0; transform: translateY(8px) scale(0.97); }
+@keyframes modalRiseBlurOut {
+  from { opacity: 1; filter: blur(0);    transform: none; }
+  to   { opacity: 0; filter: blur(10px); transform: translateY(16px) scale(0.98); }
+}
+
+/* ── «Старый ТВ» (CRT power-on) — ТОЛЬКО модалка «Мой профиль» ──
+   Окно схлопывается в яркую горизонтальную линию и разворачивается,
+   как при включении лампового телевизора. id-селектор перебивает
+   общий modalRiseBlurIn по специфичности. */
+#profileSetupMask.active > .m-win {
+  animation: profileCrtOn 0.55s var(--ease-apple-out) both;
+  transform-origin: center center;
+}
+@keyframes profileCrtOn {
+  0%   { opacity: 0; transform: scaleX(0.02) scaleY(0.0015); filter: brightness(4); }
+  30%  { opacity: 1; transform: scaleX(1)    scaleY(0.006);  filter: brightness(3); }
+  60%  {             transform: scaleX(1)    scaleY(1);      filter: brightness(1.6); }
+  100% {             transform: scale(1);                    filter: brightness(1); }
+}
+/* Закрытие: быстрый «выключ» — укладывается в 180мс, которые отводит JS */
+#profileSetupMask.closing > .m-win {
+  animation: profileCrtOff 0.16s ease forwards;
+  transform-origin: center center;
+}
+@keyframes profileCrtOff {
+  0%   { opacity: 1; transform: scale(1);                    filter: brightness(1); }
+  45%  {             transform: scaleX(1)    scaleY(0.006);  filter: brightness(3); }
+  100% { opacity: 0; transform: scaleX(0.02) scaleY(0.0015); filter: brightness(4); }
+}
+
+/* ── Пауза бесконечных анимаций когда их не видно (управляет anim-perf.js) ──
+   Экономит CPU/GPU и убирает фоновое подлагивание. */
+body.anims-frozen *,
+body.anims-frozen *::before,
+body.anims-frozen *::after {
+  animation-play-state: paused !important;   /* вкладка скрыта → стоп всё */
+}
+.anim-offscreen,
+.anim-offscreen::before,
+.anim-offscreen::after {
+  animation-play-state: paused !important;   /* элемент уехал за экран */
 }
 
 /* ── content-visibility: ускоряем скролл для длинных статичных списков ── */

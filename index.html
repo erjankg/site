@@ -5,6 +5,7 @@
     <meta name="google-site-verification" content="TIUrZqRHsoStR6ASx-k6uKFFQsrSIJu7qYFuuSZ1z-g" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <!-- CSP: ограничиваем источники скриптов/стилей/коннектов. unsafe-inline нужен из-за inline onclick= в HTML и inline стилей. -->
+    <!-- TODO security: убрать 'unsafe-inline' из script-src — перевести inline onclick= на addEventListener (крупный рефактор), тогда CSP станет полноценной защитой от XSS. -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src * data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://www.gstatic.com wss://*.firebaseio.com; frame-src https://*.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -172,6 +173,7 @@
             <button class="user-menu-item" onclick="syncNow()" data-i18n="🔄 Синхронизировать">🔄 Синхронизировать</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenChangelog)cmsOpenChangelog()" style="display:none" data-i18n="📋 История изменений">📋 История изменений</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenLayoutEditor)cmsOpenLayoutEditor()" style="display:none" data-i18n="⚙ Настройки лейаута">⚙ Настройки лейаута</button>
+            <button class="user-menu-item admin-only" onclick="if(window._openLayoutEditor)_openLayoutEditor()" style="display:none">🎚 Редактор позиций</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsClearAllPatchnotes)cmsClearAllPatchnotes()" style="display:none" data-i18n="🧹 Очистить все патч-ноты">🧹 Очистить все патч-ноты</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenIconsEditor)cmsOpenIconsEditor()" style="display:none" data-i18n="🖼 Иконки">🖼 Иконки</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenSidebarEditor)cmsOpenSidebarEditor()" style="display:none" data-i18n="🔤 Сайдбар">🔤 Сайдбар</button>
@@ -1295,8 +1297,9 @@ Stormarrow: При максимальных зарядах следующая б
 <script src="cms.js"></script>
 <script src="app.js"></script>
 <script src="draft-logic.js"></script>
-<script src="draft.js"></script>
-<script src="cybersport.js"></script>
+<!-- draft.js (Кооп-драфт) и cybersport.js грузятся ЛЕНИВО из app.js (_lazyScript)
+     по требованию — сняты с критического старта. Остаются в SW-precache. -->
+<script src="anim-perf.js" defer></script>
 
 <!-- ══ PWA: SERVICE WORKER + INSTALL BUTTON ══ -->
 <script>

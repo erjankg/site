@@ -1,0 +1,201 @@
+/* ════════════════════════════════════════════════════════════════
+   ANIM-LAB — оформление самой лаборатории (chrome).
+   Тёмная геймерская тема под Wild Rift сайт.
+   ════════════════════════════════════════════════════════════════ */
+:root {
+  --bg-base:     #060912;
+  --bg-panel:    #0d1220;
+  --bg-card:     #121a2c;
+  --bg-card-h:   #1a2540;
+  --line:        #1e2a44;
+  --txt:         #e7ecf5;
+  --txt-dim:     #8a97b2;
+  --accent:      #38bdf8;
+  --accent-2:    #a78bfa;
+  --ok:          #34d399;
+  --radius:      14px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(56,189,248,0.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(167,139,250,0.10), transparent 60%),
+    var(--bg-base);
+  color: var(--txt);
+  font-family: -apple-system, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+.lab-app {
+  display: grid;
+  grid-template-columns: minmax(360px, 30vw) 1fr;
+  height: 100vh;
+}
+
+/* ── ЛЕВАЯ ПАНЕЛЬ: список анимаций ─────────────────────────────── */
+.lab-side {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.lab-side-head {
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.lab-logo {
+  font-size: 19px; font-weight: 800; letter-spacing: -0.02em;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.lab-logo small { display:block; font-size: 11px; font-weight: 500; color: var(--txt-dim);
+  -webkit-text-fill-color: var(--txt-dim); margin-top: 2px; letter-spacing: 0; }
+
+.lab-search {
+  width: 100%; margin-top: 12px; padding: 9px 12px;
+  background: var(--bg-card); border: 1px solid var(--line); border-radius: 10px;
+  color: var(--txt); font-size: 13px; outline: none;
+}
+.lab-search:focus { border-color: var(--accent); }
+
+.lab-cats { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 20px; border-bottom: 1px solid var(--line); }
+.lab-cat {
+  font-size: 11px; padding: 5px 11px; border-radius: 99px; cursor: pointer;
+  background: var(--bg-card); border: 1px solid var(--line); color: var(--txt-dim);
+  user-select: none; transition: all 0.15s;
+}
+.lab-cat:hover { color: var(--txt); }
+.lab-cat.on { background: rgba(56,189,248,0.15); border-color: var(--accent); color: var(--accent); }
+
+.lab-list { flex: 1; overflow-y: auto; padding: 10px; min-height: 0; }
+.lab-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  border: 1px solid transparent; margin-bottom: 4px; transition: background 0.12s;
+}
+.lab-item:hover { background: var(--bg-card); }
+.lab-item.on { background: var(--bg-card-h); border-color: var(--accent); }
+.lab-item-num { font-size: 11px; color: var(--txt-dim); width: 22px; text-align: right; font-variant-numeric: tabular-nums; }
+.lab-item-body { flex: 1; min-width: 0; }
+.lab-item-name { font-size: 13.5px; font-weight: 600; }
+.lab-item-desc { font-size: 11px; color: var(--txt-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lab-item-tag { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent-2); }
+
+/* ── ПРАВАЯ ЧАСТЬ: сцена + пульт ───────────────────────────────── */
+.lab-main { display: flex; flex-direction: column; min-width: 0; }
+
+.lab-stage {
+  flex: 1; position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Затемнённый фон (backdrop) */
+.lab-mask {
+  position: absolute; inset: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(2,6,18,0.66);
+  opacity: 0; pointer-events: none;
+}
+.lab-mask.show { opacity: 1; }
+
+/* Само окно модалки-образца */
+.lab-win {
+  width: min(460px, 80%);
+  background: linear-gradient(135deg, #141d31, #0e1424);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+  padding: 26px 26px 22px;
+  will-change: transform, opacity, filter, clip-path;
+}
+.lab-win-title { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+.lab-win-sub   { font-size: 13px; color: var(--txt-dim); margin: 0 0 18px; }
+.lab-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 13px; border-radius: 10px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+.lab-row .dot { width: 30px; height: 30px; border-radius: 8px; flex: none;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.lab-row .ln { flex: 1; }
+.lab-row .ln b { display: block; font-size: 13px; }
+.lab-row .ln span { font-size: 11px; color: var(--txt-dim); }
+.lab-win-actions { display: flex; gap: 10px; margin-top: 16px; }
+.lab-win-actions button {
+  flex: 1; padding: 11px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--bg-card); color: var(--txt); font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.lab-win-actions .primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; color: #04101e; }
+
+/* Пустое состояние сцены */
+.lab-hint {
+  position: absolute; z-index: 0; color: var(--txt-dim); font-size: 14px;
+  text-align: center; pointer-events: none;
+}
+.lab-hint kbd { background: var(--bg-card); border: 1px solid var(--line); border-radius: 6px; padding: 2px 7px; font-size: 12px; }
+
+/* ── ПУЛЬТ снизу ───────────────────────────────────────────────── */
+.lab-dock {
+  border-top: 1px solid var(--line); background: var(--bg-panel);
+  padding: 14px 18px; display: flex; flex-direction: column; gap: 12px;
+}
+.lab-dock-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.lab-current { font-size: 14px; font-weight: 700; min-width: 140px; }
+.lab-current span { color: var(--txt-dim); font-weight: 500; }
+
+.lab-btn {
+  padding: 9px 15px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--bg-card); color: var(--txt); font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.lab-btn:hover { background: var(--bg-card-h); }
+.lab-btn.accent { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border: none; color: #04101e; }
+.lab-btn.ghost { background: transparent; }
+
+.lab-sliders { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+.lab-slider { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--txt-dim); }
+.lab-slider input[type=range] { width: 120px; accent-color: var(--accent); }
+.lab-slider b { color: var(--txt); font-variant-numeric: tabular-nums; min-width: 46px; }
+
+.lab-select {
+  padding: 8px 10px; border-radius: 9px; background: var(--bg-card);
+  border: 1px solid var(--line); color: var(--txt); font-size: 12px;
+}
+
+/* Панель кода */
+.lab-code-wrap { position: relative; }
+.lab-code {
+  background: #080d18; border: 1px solid var(--line); border-radius: 10px;
+  padding: 12px 14px; margin: 0; font-family: "SF Mono", ui-monospace, Consolas, monospace;
+  font-size: 12px; line-height: 1.55; color: #b9c5dc; white-space: pre; overflow-x: auto;
+}
+.lab-code .k { color: var(--accent); }
+.lab-code .v { color: #f0b86e; }
+.lab-copy {
+  position: absolute; top: 8px; right: 8px; font-size: 11px; padding: 4px 9px;
+  border-radius: 7px; border: 1px solid var(--line); background: var(--bg-card);
+  color: var(--txt-dim); cursor: pointer;
+}
+.lab-copy:hover { color: var(--txt); }
+.lab-copy.ok { color: var(--ok); border-color: var(--ok); }
+
+/* Бейдж очереди */
+.lab-queue-badge {
+  font-size: 12px; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums;
+  display: none;
+}
+.lab-queue-badge.on { display: inline; }
+
+@media (max-width: 860px) {
+  .lab-app { grid-template-columns: 1fr; grid-template-rows: 38vh 62vh; }
+  .lab-side { border-right: none; border-bottom: 1px solid var(--line); }
+}

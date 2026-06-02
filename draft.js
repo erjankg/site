@@ -117,6 +117,18 @@
       .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
+  function safeAvatarUrl(raw) {
+    if (typeof raw !== 'string' || !raw) return '';
+    try {
+      var u = new URL(raw, window.location.href);
+      if (u.protocol !== 'https:') return '';
+      var h = u.hostname;
+      if (h === 'googleusercontent.com' || h.endsWith('.googleusercontent.com')
+          || h === 'firebasestorage.googleapis.com' || h.endsWith('.firebasestorage.app')) return u.href;
+      return '';
+    } catch (e) { return ''; }
+  }
+
   function toast(msg) {
     if (window.showToast) window.showToast(msg);
     else alert(msg);
@@ -1019,8 +1031,9 @@
 
   function avatarHtml(u, size) {
     var sz = size || 40;
-    if (u.photoURL || u.photo) {
-      var src = escapeHtml(u.photoURL || u.photo);
+    var safePhoto = safeAvatarUrl(u.photoURL || u.photo);
+    if (safePhoto) {
+      var src = escapeHtml(safePhoto);
       return '<img loading="lazy" decoding="async" src="'+src+'" style="width:'+sz+'px;height:'+sz+'px;border-radius:50%;object-fit:cover;border:1px solid var(--accent-border-sub);flex-shrink:0;" onerror="this.outerHTML=&quot;<div style=\\&quot;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0;\\&quot;>'+escapeHtml((u.displayName||u.nick||'?').charAt(0).toUpperCase())+'</div>&quot;;">';
     }
     var ini = escapeHtml((u.displayName || u.nick || '?').charAt(0).toUpperCase());
@@ -3920,7 +3933,7 @@
   // Переоткрыть при логине, если модалка сейчас открыта
   // + Автоматический переход на активное капитанское лобби
   var _autoRedirectChecked = false;
-  document.addEventListener('DOMContentLoaded', function(){
+  function _draftCoopInit(){
     try {
       firebase.auth().onAuthStateChanged(function(user){
         var mask = document.getElementById('draftCoopMask');
@@ -3938,7 +3951,10 @@
         else stopInvitesListeners();
       });
     } catch(e) {}
-  });
+  }
+  // Работает и при обычной загрузке, и при ленивой подгрузке после DOMContentLoaded
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _draftCoopInit);
+  else _draftCoopInit();
 
   // ?draft=ID deeplink обрабатывается в app.js после прохождения auth-gate и profile-setup
 })();

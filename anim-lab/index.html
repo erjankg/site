@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Anim-Lab · песочница анимаций</title>
+  <link rel="stylesheet" href="lab-animations.css">
+  <link rel="stylesheet" href="lab.css">
+</head>
+<body>
+  <div class="lab-app">
+
+    <!-- ЛЕВО: список анимаций -->
+    <aside class="lab-side">
+      <div class="lab-side-head">
+        <div class="lab-logo">⚡ Anim-Lab<small>песочница движений UI · не индексируется, не на сайте</small></div>
+        <input id="labSearch" class="lab-search" type="text" placeholder="Поиск анимации…" autocomplete="off">
+      </div>
+      <div id="labCats" class="lab-cats"></div>
+      <div id="labList" class="lab-list"></div>
+    </aside>
+
+    <!-- ПРАВО: сцена + пульт -->
+    <main class="lab-main">
+      <div class="lab-stage">
+        <div id="labHint" class="lab-hint">
+          Нажми <kbd>Space</kbd> — проиграть · <kbd>↑/↓</kbd> — листать · <kbd>Esc</kbd> — закрыть<br>
+          или жми кнопки очереди снизу: <b>10 / 20 / Все</b>
+        </div>
+
+        <!-- образец модалки -->
+        <div id="labMask" class="lab-mask">
+          <div id="labWin" class="lab-win lab-stagger">
+            <h3 class="lab-win-title">Окно модалки</h3>
+            <p class="lab-win-sub">Так появится / закроется на сайте</p>
+            <div class="lab-row"><div class="dot"></div><div class="ln"><b>Строка контента</b><span>пример элемента внутри</span></div></div>
+            <div class="lab-row"><div class="dot"></div><div class="ln"><b>Ещё строка</b><span>для проверки stagger</span></div></div>
+            <div class="lab-row"><div class="dot"></div><div class="ln"><b>И третья</b><span>появляются по очереди</span></div></div>
+            <div class="lab-win-actions">
+              <button class="primary">Подтвердить</button>
+              <button id="winClose">Закрыть</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ПУЛЬТ -->
+      <div class="lab-dock">
+        <div class="lab-dock-row">
+          <div id="labCurrent" class="lab-current">—</div>
+          <button id="btnPlay"  class="lab-btn accent">▶ Проиграть</button>
+          <button id="btnClose" class="lab-btn">Закрыть</button>
+          <button id="btnLoop"  class="lab-btn ghost">↻ Зациклить</button>
+          <span style="width:1px;height:22px;background:var(--line)"></span>
+          <button id="btnQ10"  class="lab-btn">Очередь 10</button>
+          <button id="btnQ20"  class="lab-btn">Очередь 20</button>
+          <button id="btnQAll" class="lab-btn">Очередь Все</button>
+          <button id="btnStop" class="lab-btn ghost">■ Стоп</button>
+          <span id="labQueueBadge" class="lab-queue-badge"></span>
+        </div>
+
+        <div class="lab-dock-row lab-sliders">
+          <label class="lab-slider">Скорость
+            <input id="labSpeed" type="range" min="0.15" max="1.5" step="0.05" value="1">
+            <b id="labSpeedVal">1.00×</b>
+          </label>
+          <label class="lab-slider">Фон
+            <select id="labBackdrop" class="lab-select"></select>
+          </label>
+        </div>
+
+        <div class="lab-code-wrap">
+          <button id="labCopy" class="lab-copy">copy</button>
+          <pre id="labCode" class="lab-code"></pre>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="lab.js"></script>
+</body>
+</html>
