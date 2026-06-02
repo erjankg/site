@@ -3138,8 +3138,8 @@
         // он сам применит черновик (показывает твою раскладку до вшивания в CSS).
         if (_isAdmin) {
             try {
-                var ld = localStorage.getItem('le_layout_pc');
-                if (ld && ld !== '{}') _lazyScript('layout-editor.js');
+                var lp = localStorage.getItem('le_layout_pc'), lm = localStorage.getItem('le_layout_mobile');
+                if ((lp && lp !== '{}') || (lm && lm !== '{}')) _lazyScript('layout-editor.js');
             } catch (e) {}
         }
     }

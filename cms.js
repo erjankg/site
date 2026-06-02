@@ -1354,85 +1354,138 @@
     return null;
   }
 
+  // Слова-числительные: Google переводит ранг «二十一» как «twenty one» — это номер строки, не имя.
+  var _NUMBER_WORDS = {zero:1,one:1,two:1,three:1,four:1,five:1,six:1,seven:1,eight:1,nine:1,ten:1,eleven:1,twelve:1,thirteen:1,fourteen:1,fifteen:1,sixteen:1,seventeen:1,eighteen:1,nineteen:1,twenty:1,thirty:1,forty:1,fifty:1,sixty:1,seventy:1,eighty:1,ninety:1,hundred:1};
+  function _isRankWord(s) {
+    var parts = String(s).toLowerCase().split(/[\s\-]+/).filter(Boolean);
+    if (!parts.length) return false;
+    for (var i = 0; i < parts.length; i++) { if (!_NUMBER_WORDS[parts[i]]) return false; }
+    return true;
+  }
+  function _isHeaderCell(c) {
+    if (/率/.test(c)) return true;                 // 胜率 / 出场率 / ban率
+    if (/rate/i.test(c)) return true;              // win rate / appearance rate / ban rate
+    return /^(排名|英雄|胜率|败率|登场率|出场率|ban率|ranking|rank|location|name|hero|champion|wr|pr|br|tier|kda|win|ban|pick|appearance)$/i.test(String(c).trim());
+  }
+  function _isTierCell(c) { return /^(s\+|s|a\+|a|b\+|b|c\+|c|d|t\d)$/i.test(String(c).trim()); }
+
+  // Полный список чемпионов (значения словаря) — для выпадашек ручного выбора.
+  var ALL_CHAMPIONS = (function() {
+    var seen = {}, list = [];
+    Object.keys(LOLM_CN_TO_DDRAGON).forEach(function(k) {
+      var v = LOLM_CN_TO_DDRAGON[k];
+      if (!seen[v]) { seen[v] = 1; list.push(v); }
+    });
+    list.sort();
+    return list;
+  })();
+
+  // HTML <option>-ов для выпадашки выбора чемпиона.
+  // current — текущий выбор строки; usedSet — чемпы, занятые ДРУГИМИ строками (уходят вниз списка).
+  function _champOptionsHtml(current, usedSet) {
+    var avail = [], used = [];
+    ALL_CHAMPIONS.forEach(function(n) {
+      if (n === current) return;
+      if (usedSet && usedSet[n]) used.push(n); else avail.push(n);
+    });
+    var html = '<option value=""' + (current ? '' : ' selected') + '>— выбери чемпиона —</option>';
+    if (current) html += '<option value="' + _esc(current) + '" selected>' + _esc(current) + '</option>';
+    avail.forEach(function(n) { html += '<option value="' + _esc(n) + '">' + _esc(n) + '</option>'; });
+    if (used.length) {
+      html += '<option value="" disabled>──── уже выбраны ────</option>';
+      used.forEach(function(n) { html += '<option value="' + _esc(n) + '">' + _esc(n) + ' • занят</option>'; });
+    }
+    return html;
+  }
+
   // Парсер таблицы из буфера обмена.
-  // Принимает строку (TSV / много пробелов / смешанные разделители).
-  // Возвращает {rows: [{name, wr, pr, br, _rawName, _matched}], errors: [...]}
+  // Понимает И «строку» (имя+числа в одной строке, TSV), И «столбик»
+  // (каждое значение на отдельной строке — так копируется таблица с lolm.qq.com).
+  // Возвращает {rows: [{name, wr, pr, br, _rawName, _matched, _assigned}], errors: [...]}
   function _parseLolmTable(text, columnOrder) {
-    // columnOrder: 'wr-br-pr' (default lolm) | 'wr-pr-br' | 'wr-only'
+    // columnOrder: 'wr-br-pr' (lolm по умолч.) | 'wr-pr-br' | 'wr-only'
     var result = { rows: [], errors: [] };
     if (!text) return result;
+    var expected = (columnOrder === 'wr-only') ? 1 : 3;
 
-    var lines = text.split(/\r?\n/);
-    lines.forEach(function(line, idx) {
-      var trimmed = line.trim();
-      if (!trimmed) return;
-
-      // Разбить на ячейки: tab или 2+ пробелов
-      var cells = trimmed.split(/\t+|\s{2,}/).map(function(c){ return c.trim(); }).filter(function(c){ return c.length > 0; });
-      if (cells.length < 2) return;
-
-      // Найти ячейку-имя: первая, в которой есть китайские иероглифы ИЛИ это распознаваемое латинское имя
-      var nameCell = null;
-      var nameIdx = -1;
-      for (var i = 0; i < cells.length; i++) {
-        var c = cells[i];
-        // Игнор шапки таблицы (排名/英雄/胜率/Ban率/出场率/Pick/Win/Ban)
-        if (/^(排名|英雄|胜率|败率|ban率|出场率|登场率|pick|win|ban|rank|name|hero|champion|wr|pr|br|tier|kda)$/i.test(c)) {
-          continue;
-        }
-        // Игнор чистых чисел (с %)
-        if (/^-?\d+([\.,]\d+)?%?$/.test(c)) continue;
-        // Игнор тиров S/A/B/C/T1
-        if (/^(s\+|s|a\+|a|b\+|b|c\+|c|d|t\d)$/i.test(c)) continue;
-        // Имя
-        if (/[一-鿿]/.test(c) || _matchChampionName(c)) {
-          nameCell = c;
-          nameIdx = i;
-          break;
-        }
-      }
-      if (!nameCell) return; // Не нашли имя — пропускаем (это шапка/мусор)
-
-      var matched = _matchChampionName(nameCell);
-
-      // Собрать все проценты из остальных ячеек (по порядку появления)
-      var nums = [];
-      cells.forEach(function(c, i) {
-        if (i === nameIdx) return;
-        var m = c.match(/^-?(\d+([\.,]\d+)?)%?$/);
-        if (m) {
-          var v = parseFloat(m[1].replace(',', '.'));
-          if (!isNaN(v)) nums.push(v);
+    // 1. Расплющиваем текст в плоский поток ячеек. «Столбик» (1 ячейка на строку)
+    //    и «строка» (несколько ячеек через таб/2+ пробела) дают одну и ту же
+    //    последовательность токенов, поэтому дальше логика общая.
+    var tokens = [];
+    function _isNumCell(x) { return /^-?\d+(?:[\.,]\d+)?%?$/.test(x); }
+    text.split(/\r?\n/).forEach(function(line) {
+      var t = line.trim();
+      if (!t) return;
+      t.split(/\t+|\s{2,}/).forEach(function(cell) {
+        var c = cell.trim();
+        if (!c) return;
+        // Ячейка из нескольких чисел через одиночный пробел («49.14% 2.30% 0.08%») → разбить на числа.
+        // Имена с пробелами («Night Hunter») не трогаем — у них не все части числовые.
+        var parts = c.split(/\s+/);
+        if (parts.length > 1 && parts.every(_isNumCell)) {
+          parts.forEach(function(p) { tokens.push(p); });
+        } else {
+          tokens.push(c);
         }
       });
+    });
 
-      // Не нашли ни одного числа — пропускаем (мусор)
-      if (nums.length === 0) return;
+    // 2. Группируем токены в записи {name, nums[]}.
+    var records = [];
+    var cur = null;
+    function flush() { if (cur && (cur.nums.length || cur.name)) records.push(cur); cur = null; }
 
-      var wr = null, pr = null, br = null;
-      if (columnOrder === 'wr-pr-br') {
-        wr = nums[0]; pr = nums[1] != null ? nums[1] : 0; br = nums[2] != null ? nums[2] : 0;
-      } else if (columnOrder === 'wr-only') {
-        wr = nums[0]; pr = 0; br = 0;
-      } else {
-        // default lolm.qq.com: WR, BR, PR
-        wr = nums[0]; br = nums[1] != null ? nums[1] : 0; pr = nums[2] != null ? nums[2] : 0;
-      }
+    tokens.forEach(function(tok) {
+      if (_isHeaderCell(tok) || _isTierCell(tok)) return;
 
-      // Валидация WR (должен быть в диапазоне 30-70%)
-      if (wr == null || wr < 20 || wr > 80) {
-        result.errors.push('Строка ' + (idx+1) + ': WR=' + wr + '% (вне 20-80%), пропущена');
+      // Номер строки (голое целое «21» или слова «twenty one») → граница новой записи.
+      if (/^\d+$/.test(tok) || _isRankWord(tok)) {
+        flush();
+        cur = { name: null, nums: [] };
         return;
       }
 
+      // Статистика: число с дробной частью или со знаком %.
+      var m = tok.match(/^-?(\d+(?:[\.,]\d+)?)\s*%$/) || tok.match(/^-?(\d+[\.,]\d+)$/);
+      if (m) {
+        if (!cur) cur = { name: null, nums: [] };
+        if (cur.nums.length >= expected) { flush(); cur = { name: null, nums: [] }; }
+        var v = parseFloat(m[1].replace(',', '.'));
+        if (!isNaN(v)) cur.nums.push(v);
+        return;
+      }
+
+      // Иначе — имя чемпиона.
+      if (cur && cur.name) { flush(); cur = { name: null, nums: [] }; }
+      if (!cur) cur = { name: null, nums: [] };
+      cur.name = tok;
+    });
+    flush();
+
+    // 3. Записи → строки таблицы.
+    records.forEach(function(rec) {
+      if (!rec.nums.length && !rec.name) return;
+      var nums = rec.nums;
+      var wr = null, pr = 0, br = 0;
+      if (columnOrder === 'wr-pr-br') { wr = nums[0]; pr = nums[1] != null ? nums[1] : 0; br = nums[2] != null ? nums[2] : 0; }
+      else if (columnOrder === 'wr-only') { wr = nums[0]; }
+      else { wr = nums[0]; br = nums[1] != null ? nums[1] : 0; pr = nums[2] != null ? nums[2] : 0; }
+
+      if (wr == null || wr < 20 || wr > 80) {
+        result.errors.push('«' + (rec.name || 'без имени') + '»: WR=' + (wr == null ? '—' : wr) + ' (вне 20–80%), пропущено');
+        return;
+      }
+
+      var matched = rec.name ? _matchChampionName(rec.name) : null;
       result.rows.push({
-        name: matched || nameCell,
+        name: matched || rec.name || '',
         wr: Math.round(wr * 100) / 100,
         ch: null,
         pr: Math.round((pr || 0) * 100) / 100,
         br: Math.round((br || 0) * 100) / 100,
-        _rawName: nameCell,
-        _matched: !!matched
+        _rawName: rec.name || '',
+        _matched: !!matched,
+        _assigned: matched || ''
       });
     });
 
@@ -1493,9 +1546,10 @@
     var help = document.createElement('div');
     help.style.cssText = 'background:rgba(11,196,227,0.08);border:1px solid rgba(11,196,227,0.25);border-radius:10px;padding:10px 12px;margin-bottom:14px;color:rgba(255,255,255,0.75);font-size:12px;line-height:1.5;';
     help.innerHTML = '1. Открой <a href="https://lolm.qq.com/act/a20220818raider/index.html" target="_blank" style="color:#0bc4e3;">lolm.qq.com</a> → выбери ранг и роль<br>' +
-      '2. Выдели таблицу на странице (имя + WR + BR + PR) и нажми Ctrl+C<br>' +
-      '3. Выбери ниже тот же ранг и роль и вставь в поле<br>' +
-      '4. Нажми «Распарсить» → проверь diff → «Сохранить»';
+      '2. Выдели таблицу и нажми Ctrl+C — лучше <b>с иероглифами</b> (так имена опознаются точнее). Копировать «столбиком» теперь можно.<br>' +
+      '3. Выбери ниже тот же ранг и роль, проверь <b>порядок чисел</b> и вставь в поле<br>' +
+      '4. «Распарсить» → кого не узнал, выбери из списка вручную → «Сохранить»<br>' +
+      '<span style="color:rgba(255,255,255,0.5);">Можно вставить и просто числа без имён (по 3 на чемпиона) — тогда выберешь чемпиона руками.</span>';
     win.appendChild(help);
 
     // Селекторы ранга и роли
@@ -1582,111 +1636,148 @@
     overlay.appendChild(win);
     document.body.appendChild(overlay);
 
-    // Состояние парсинга
+    // ── Состояние: распарсенные строки. У каждой строки _assigned — выбранный чемпион
+    //    (правится вручную через выпадашку). Источник истины для diff и сохранения. ──
     var parsedRows = null;
-    var parsedRank = null;
-    var parsedRole = null;
 
     function getColumnOrder() {
       var checked = order.querySelector('input[name="cmsOrd"]:checked');
       return checked ? checked.value : 'wr-br-pr';
     }
 
+    function setSaveEnabled(on) {
+      saveBtn.disabled = !on;
+      saveBtn.style.opacity = on ? '1' : '0.5';
+      saveBtn.style.cursor = on ? 'pointer' : 'not-allowed';
+    }
+
+    // Текущее состояние назначений: распознанные/нет, дубли, diff против Firestore.
+    function computeState() {
+      var rank = rankSelect.value, role = roleSelect.value;
+      var assigned = [], unassigned = [];
+      parsedRows.forEach(function(r) { (r._assigned ? assigned : unassigned).push(r); });
+
+      var counts = {};
+      assigned.forEach(function(r) { counts[r._assigned] = (counts[r._assigned] || 0) + 1; });
+      var dups = Object.keys(counts).filter(function(k) { return counts[k] > 1; });
+
+      var known = assigned.map(function(r) { return { name: r._assigned, wr: r.wr, ch: null, pr: r.pr, br: r.br }; });
+      var curList = (window._cmsWinrates && window._cmsWinrates[rank] && window._cmsWinrates[rank][role]) || [];
+      var diff = _computeWinrateDiff(curList, known);
+      return { rank: rank, role: role, assigned: assigned, unassigned: unassigned, dups: dups, known: known, diff: diff };
+    }
+
+    // Перерисовать таблицу назначений + сводку. Вызывается после парсинга и при любом выборе.
+    function renderAssign() {
+      if (!parsedRows) return;
+      var st = computeState();
+
+      // Сколько раз каждый чемпион уже выбран — чтобы занятые уходили вниз выпадашки.
+      var usedAll = {};
+      parsedRows.forEach(function(r) { if (r._assigned) usedAll[r._assigned] = (usedAll[r._assigned] || 0) + 1; });
+
+      var th = 'color:rgba(255,255,255,0.45);font-weight:700;text-align:left;padding:4px 6px;font-size:10px;text-transform:uppercase;letter-spacing:0.4px;';
+      var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;">' +
+        '<thead><tr>' +
+        '<th style="' + th + '">с lolm</th>' +
+        '<th style="' + th + 'text-align:center;">WR</th>' +
+        '<th style="' + th + 'text-align:center;">PR</th>' +
+        '<th style="' + th + 'text-align:center;">BR</th>' +
+        '<th style="' + th + '">чемпион</th>' +
+        '</tr></thead><tbody>';
+
+      parsedRows.forEach(function(r, i) {
+        // Занятые ДРУГИМИ строками (свой текущий выбор не считаем занятым).
+        var usedSet = {};
+        Object.keys(usedAll).forEach(function(n) {
+          var others = usedAll[n] - (r._assigned === n ? 1 : 0);
+          if (others > 0) usedSet[n] = 1;
+        });
+        var rawLbl = r._rawName ? _esc(r._rawName) : '<span style="color:rgba(255,255,255,0.35);">(без имени)</span>';
+        var rowBg = r._assigned ? '' : 'background:rgba(231,76,60,0.07);';
+        var selBorder = r._assigned ? 'rgba(46,204,113,0.5)' : 'rgba(231,76,60,0.6)';
+        html += '<tr style="border-top:1px solid rgba(255,255,255,0.06);' + rowBg + '">' +
+          '<td style="padding:4px 6px;color:rgba(255,255,255,0.85);">' + rawLbl + '</td>' +
+          '<td style="padding:4px 6px;text-align:center;color:#0bc4e3;font-weight:700;">' + r.wr + '%</td>' +
+          '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.pr + '%</td>' +
+          '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.br + '%</td>' +
+          '<td style="padding:4px 6px;"><select data-i="' + i + '" class="cms-input" style="width:100%;padding:4px 6px;font-size:12px;border-color:' + selBorder + ';">' +
+            _champOptionsHtml(r._assigned, usedSet) + '</select></td>' +
+          '</tr>';
+      });
+      html += '</tbody></table>';
+
+      var sum = '<div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px;">';
+      sum += '<div style="color:#0bc4e3;font-weight:700;">Назначено: ' + st.assigned.length + ' / ' + parsedRows.length + '</div>';
+      if (st.unassigned.length) {
+        sum += '<div style="color:#e74c3c;font-size:11px;margin-top:3px;">⚠ Без чемпиона: ' + st.unassigned.length + ' — выбери из списка, иначе не сохранятся.</div>';
+      }
+      if (st.dups.length) {
+        sum += '<div style="color:#e67e22;font-weight:700;font-size:11px;margin-top:3px;">⚠ Дважды выбран: ' + st.dups.map(_esc).join(', ') + ' — исправь, чтобы сохранить.</div>';
+      }
+      var d = st.diff;
+      if (d.added.length || d.changed.length || d.removed.length) {
+        var bits = [];
+        if (d.added.length) bits.push('<span style="color:#2ecc71;">➕ ' + d.added.length + '</span>');
+        if (d.changed.length) bits.push('<span style="color:#f1c40f;">📝 ' + d.changed.length + '</span>');
+        if (d.removed.length) bits.push('<span style="color:#e67e22;">❌ ' + d.removed.length + '</span>');
+        sum += '<div style="font-size:11px;margin-top:4px;">Изменения в «' + _esc(st.rank) + ' / ' + _esc(st.role) + '»: ' + bits.join('&nbsp;&nbsp;') + '</div>';
+      } else if (st.known.length) {
+        sum += '<div style="color:rgba(255,255,255,0.45);font-size:11px;margin-top:4px;">Совпадает с текущими данными — сохранять нечего.</div>';
+      }
+      sum += '</div>';
+
+      preview.innerHTML = html + sum;
+
+      Array.prototype.forEach.call(preview.querySelectorAll('select[data-i]'), function(selEl) {
+        selEl.onchange = function() {
+          var idx = parseInt(this.getAttribute('data-i'), 10);
+          parsedRows[idx]._assigned = this.value || '';
+          renderAssign();
+        };
+      });
+
+      var canSave = st.known.length > 0 && st.dups.length === 0 &&
+        (d.added.length || d.changed.length || d.removed.length);
+      setSaveEnabled(canSave);
+    }
+
     parseBtn.onclick = function() {
-      var rank = rankSelect.value;
-      var role = roleSelect.value;
       var ord = getColumnOrder();
       try { localStorage.setItem('cms_wr_import_order', ord); } catch(e) {}
 
       var text = ta.value || '';
-      if (!text.trim()) {
-        _showToast('Поле пустое — вставь таблицу', 'error');
-        return;
-      }
+      if (!text.trim()) { _showToast('Поле пустое — вставь таблицу', 'error'); return; }
 
       var parsed = _parseLolmTable(text, ord);
       if (parsed.rows.length === 0) {
+        parsedRows = null;
         preview.innerHTML = '<div style="color:#e74c3c;font-weight:700;">❌ Не удалось распознать ни одной строки.</div>' +
-          '<div style="margin-top:6px;color:rgba(255,255,255,0.5);">Проверь что выделил именно таблицу с именами и числами WR/BR/PR.</div>';
-        saveBtn.disabled = true;
-        saveBtn.style.opacity = '0.5';
-        saveBtn.style.cursor = 'not-allowed';
+          '<div style="margin-top:6px;color:rgba(255,255,255,0.5);font-size:12px;">Скопируй таблицу с lolm.qq.com (имя + проценты). Подходит и «столбиком», и в одну строку.</div>';
+        setSaveEnabled(false);
         return;
       }
 
-      // Отделяем распознанные от нераспознанных
-      var unknown = parsed.rows.filter(function(r){ return !r._matched; });
-      var known = parsed.rows.filter(function(r){ return r._matched; });
-
-      // Текущее состояние
-      var curList = (window._cmsWinrates && window._cmsWinrates[rank] && window._cmsWinrates[rank][role]) || [];
-      var diff = _computeWinrateDiff(curList, known);
-
-      // Рисуем превью
-      var html = '';
-      html += '<div style="color:#0bc4e3;font-weight:700;margin-bottom:6px;">📊 Распознано строк: ' + parsed.rows.length + ' (' + known.length + ' с известными именами)</div>';
-
-      if (unknown.length) {
-        html += '<div style="color:#e74c3c;font-weight:700;margin-top:8px;">⚠ Не распознано (' + unknown.length + ') — будут пропущены:</div>';
-        html += '<div style="color:rgba(231,76,60,0.85);font-size:11px;margin-left:10px;">' +
-          unknown.map(function(r){ return '• ' + _esc(r._rawName) + ' (WR ' + r.wr + '%)'; }).join('<br>') + '</div>';
-      }
-
-      if (diff.added.length) {
-        html += '<div style="color:#2ecc71;font-weight:700;margin-top:8px;">➕ Добавится (' + diff.added.length + '):</div>';
-        html += '<div style="color:rgba(46,204,113,0.85);font-size:11px;margin-left:10px;">' +
-          diff.added.map(function(r){ return '• ' + _esc(r.name) + ' — WR ' + r.wr + '%, PR ' + r.pr + '%, BR ' + r.br + '%'; }).join('<br>') + '</div>';
-      }
-
-      if (diff.changed.length) {
-        html += '<div style="color:#f1c40f;font-weight:700;margin-top:8px;">📝 Изменится (' + diff.changed.length + '):</div>';
-        html += '<div style="color:rgba(241,196,15,0.85);font-size:11px;margin-left:10px;">' +
-          diff.changed.map(function(c){
-            var parts = [];
-            if (c.old.wr !== c.new.wr) parts.push('WR ' + c.old.wr + '→' + c.new.wr + '%');
-            if (c.old.pr !== c.new.pr) parts.push('PR ' + c.old.pr + '→' + c.new.pr + '%');
-            if (c.old.br !== c.new.br) parts.push('BR ' + c.old.br + '→' + c.new.br + '%');
-            return '• ' + _esc(c.new.name) + ' — ' + parts.join(', ');
-          }).join('<br>') + '</div>';
-      }
-
-      if (diff.removed.length) {
-        html += '<div style="color:#e67e22;font-weight:700;margin-top:8px;">❌ Удалится из таблицы (' + diff.removed.length + ') — нет в новых данных:</div>';
-        html += '<div style="color:rgba(230,126,34,0.85);font-size:11px;margin-left:10px;">' +
-          diff.removed.map(function(r){ return '• ' + _esc(r.name) + ' (был WR ' + r.wr + '%)'; }).join('<br>') + '</div>';
-      }
-
-      if (!diff.added.length && !diff.changed.length && !diff.removed.length) {
-        html += '<div style="color:rgba(255,255,255,0.5);margin-top:8px;">Данные совпадают с текущими — сохранять нечего.</div>';
-      }
-
-      if (parsed.errors.length) {
-        html += '<div style="color:rgba(255,255,255,0.4);margin-top:8px;font-size:11px;">Пропущены: ' +
-          parsed.errors.map(_esc).join('; ') + '</div>';
-      }
-
-      preview.innerHTML = html;
-
-      parsedRows = known;
-      parsedRank = rank;
-      parsedRole = role;
-
-      var canSave = known.length > 0 && (diff.added.length || diff.changed.length || diff.removed.length);
-      saveBtn.disabled = !canSave;
-      saveBtn.style.opacity = canSave ? '1' : '0.5';
-      saveBtn.style.cursor = canSave ? 'pointer' : 'not-allowed';
+      parsedRows = parsed.rows;
+      renderAssign();
+      if (parsed.errors.length) _showToast('Пропущено строк: ' + parsed.errors.length);
     };
+
+    // Смена ранга/роли после парсинга — пересчитать diff против новой ячейки.
+    rankSelect.onchange = function() { if (parsedRows) renderAssign(); };
+    roleSelect.onchange = function() { if (parsedRows) renderAssign(); };
 
     saveBtn.onclick = function() {
       if (saveBtn.disabled || !parsedRows) return;
-      var rank = parsedRank, role = parsedRole, rows = parsedRows;
-      // Очищаем служебные поля
-      var clean = rows.map(function(r) { return { name: r.name, wr: r.wr, ch: null, pr: r.pr, br: r.br }; });
+      var st = computeState();
+      if (!st.known.length || st.dups.length) return;
+
+      var rank = st.rank, role = st.role;
+      var clean = st.known.map(function(r) { return { name: r.name, wr: r.wr, ch: null, pr: r.pr, br: r.br }; });
 
       var db = firebase.firestore();
       if (!window._cmsWinrates) window._cmsWinrates = {};
       if (!window._cmsWinrates[rank]) window._cmsWinrates[rank] = {};
-      // Сохраняем предыдущее состояние роли для changelog
       var oldRoleList = (window._cmsWinrates[rank][role] || []).slice();
       window._cmsWinrates[rank][role] = clean;
 
@@ -1695,8 +1786,7 @@
         docData[r] = (window._cmsWinrates[rank] && window._cmsWinrates[rank][r]) || [];
       });
 
-      saveBtn.disabled = true;
-      saveBtn.style.opacity = '0.5';
+      setSaveEnabled(false);
       saveBtn.textContent = '⏳ Сохраняю…';
 
       db.collection('winrates').doc(rank).set(docData)
@@ -1715,12 +1805,10 @@
           overlay.remove();
         })
         .catch(function(err) {
-          // Откат локального состояния при ошибке
           window._cmsWinrates[rank][role] = oldRoleList;
           _showToast('Ошибка: ' + err.message, 'error');
-          saveBtn.disabled = false;
-          saveBtn.style.opacity = '1';
           saveBtn.textContent = '💾 Сохранить';
+          renderAssign();
         });
     };
   };

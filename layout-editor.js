@@ -11,13 +11,18 @@
 (function () {
   'use strict';
 
-  var LS_KEY = 'le_layout_pc';
+  var KEY_PC = 'le_layout_pc';
+  var KEY_MOB = 'le_layout_mobile';
   var STYLE_ID = 'le-applied-style';
   var SNAP = 6; // порог привязки, px
+  var MOB_MAX = 768; // ширина окна <= этого = режим «телефон»
 
-  // drafts: { "<selector>": { dx, dy, w, h } }
-  function loadDrafts() { try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch (e) { return {}; } }
-  var drafts = loadDrafts();
+  // Два набора правок: { "<selector>": { dx, dy, w, h } } для ПК и для телефона.
+  function loadSet(k) { try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch (e) { return {}; } }
+  var setPC = loadSet(KEY_PC), setMob = loadSet(KEY_MOB);
+  // Активный набор зависит от ТЕКУЩЕЙ ширины окна (WYSIWYG: сузил окно → правишь мобайл).
+  function isMobile() { return window.innerWidth <= MOB_MAX; }
+  function drafts() { return isMobile() ? setMob : setPC; }
 
   // ── Адрес-селектор элемента ───────────────────────────────────
   function cssPath(el) {
@@ -34,30 +39,38 @@
     return parts.join('>');
   }
 
-  // ── Сборка CSS из черновика ───────────────────────────────────
-  function buildCSS(wrap) {
+  // ── Сборка CSS из набора ──────────────────────────────────────
+  function rulesFor(set) {
     var rules = [];
-    for (var sel in drafts) {
-      var d = drafts[sel], decl = [];
+    for (var sel in set) {
+      var d = set[sel], decl = [];
       if (d.dx || d.dy) decl.push('transform: translate(' + (d.dx || 0) + 'px, ' + (d.dy || 0) + 'px) !important');
       if (d.w != null) decl.push('width: ' + d.w + 'px !important', 'max-width: none !important');
       if (d.h != null) decl.push('height: ' + d.h + 'px !important');
       if (decl.length) rules.push(sel + ' { ' + decl.join('; ') + '; }');
     }
-    var body = rules.join('\n');
-    if (wrap) return '/* layout-editor — правки позиций (ПК) */\n@media (min-width: 769px) {\n' + body.replace(/^/gm, '  ') + '\n}';
-    return body;
+    return rules.join('\n');
+  }
+  function buildCSS() {
+    var out = [], pc = rulesFor(setPC), mob = rulesFor(setMob);
+    if (pc) out.push('/* layout-editor — ПК */\n@media (min-width: ' + (MOB_MAX + 1) + 'px) {\n' + pc.replace(/^/gm, '  ') + '\n}');
+    if (mob) out.push('/* layout-editor — телефон */\n@media (max-width: ' + MOB_MAX + 'px) {\n' + mob.replace(/^/gm, '  ') + '\n}');
+    return out.join('\n\n');
   }
 
   function rebuildStyle() {
     var st = document.getElementById(STYLE_ID);
     if (!st) { st = document.createElement('style'); st.id = STYLE_ID; document.head.appendChild(st); }
-    st.textContent = buildCSS(true);
+    st.textContent = buildCSS();
   }
-  function saveDrafts() { localStorage.setItem(LS_KEY, JSON.stringify(drafts)); rebuildStyle(); }
+  function saveDrafts() {
+    localStorage.setItem(KEY_PC, JSON.stringify(setPC));
+    localStorage.setItem(KEY_MOB, JSON.stringify(setMob));
+    rebuildStyle();
+  }
 
   // Применить черновик без открытия редактора (зовётся из app.js на старте).
-  function applyOnly() { if (Object.keys(drafts).length) rebuildStyle(); }
+  function applyOnly() { if (Object.keys(setPC).length || Object.keys(setMob).length) rebuildStyle(); }
 
   // ════════════════════════════════════════════════════════════
   //  Ниже — интерактив, создаётся только при activate()
@@ -79,6 +92,7 @@
     }
     document.body.classList.add('le-on');
     buildBar();
+    _lastMobile = isMobile(); updateMode();
     hoverEl = el('div', 'le-hover-outline', document.body); hoverEl.style.display = 'none';
     guideV = el('div', 'le-guide le-guide-v', document.body); guideV.style.display = 'none';
     guideH = el('div', 'le-guide le-guide-h', document.body); guideH.style.display = 'none';
@@ -87,9 +101,23 @@
     document.addEventListener('mousedown', onDown, true);
     document.addEventListener('click', blockClick, true);
     window.addEventListener('scroll', reposition, true);
-    window.addEventListener('resize', reposition, true);
-    toast('Редактор включён. Кликни элемент → тяни тело/углы. Esc — снять выбор.');
+    window.addEventListener('resize', onResize, true);
+    toast('Редактор включён. Кликни элемент → тяни тело/углы. Сузь окно до телефона — правишь мобайл.');
     document.addEventListener('keydown', onKey, true);
+  }
+
+  var _lastMobile = null;
+  function onResize() {
+    reposition();
+    var m = isMobile();
+    if (_lastMobile !== null && m !== _lastMobile) { deselect(); rebuildStyle(); }
+    _lastMobile = m;
+    updateMode();
+  }
+  function updateMode() {
+    if (!bar) return;
+    var el = bar.querySelector('.le-bar-mode');
+    if (el) el.textContent = isMobile() ? '📱 Телефон' : '🖥 ПК';
   }
 
   function deactivate() {
@@ -100,7 +128,7 @@
     document.removeEventListener('mousedown', onDown, true);
     document.removeEventListener('click', blockClick, true);
     window.removeEventListener('scroll', reposition, true);
-    window.removeEventListener('resize', reposition, true);
+    window.removeEventListener('resize', onResize, true);
     document.removeEventListener('keydown', onKey, true);
     document.body.classList.remove('le-on');
     if (bar) { bar.remove(); bar = null; }
@@ -148,7 +176,8 @@
   function select(target) {
     selEl = target;
     var sel = cssPath(target);
-    selData = drafts[sel] || (drafts[sel] = {});
+    var set = drafts();
+    selData = set[sel] || (set[sel] = {});
     selData._sel = sel;
     if (!selBox) {
       selBox = el('div', 'le-sel', document.body);
@@ -239,7 +268,7 @@
     // снять inline (его заменит <style> из черновика) и сохранить
     if (selEl) { selEl.style.removeProperty('transform'); selEl.style.removeProperty('width'); selEl.style.removeProperty('max-width'); selEl.style.removeProperty('height'); }
     // если правок по элементу нет — убрать пустую запись
-    if (selData && !selData.dx && !selData.dy && selData.w == null && selData.h == null) { delete drafts[selData._sel]; }
+    if (selData && !selData.dx && !selData.dy && selData.w == null && selData.h == null) { delete drafts()[selData._sel]; }
     saveDrafts();
     reposition();
     drag = null;
@@ -288,18 +317,17 @@
 
   // ── Экспорт / Сброс ───────────────────────────────────────────
   function exportCSS() {
-    var css = buildCSS(true);
-    if (!Object.keys(drafts).length) { toast('Пока нечего экспортировать — ничего не менял.'); return; }
+    if (!Object.keys(setPC).length && !Object.keys(setMob).length) { toast('Пока нечего экспортировать — ничего не менял.'); return; }
+    var css = buildCSS();
     navigator.clipboard.writeText(css).then(function () {
-      toast('✓ CSS скопирован. Вставь его Claude в чат — он вошьёт в styles.css.');
+      toast('✓ CSS скопирован (ПК + телефон). Вставь его Claude в чат — он вошьёт в styles.css.');
     }, function () {
-      // fallback: показать в prompt
       window.prompt('Скопируй CSS вручную:', css);
     });
   }
   function resetAll() {
-    if (!confirm('Сбросить ВСЕ изменения позиций? (вернётся как было)')) return;
-    drafts = {}; saveDrafts(); deselect();
+    if (!confirm('Сбросить ВСЕ изменения позиций (и ПК, и телефон)? Вернётся как было.')) return;
+    setPC = {}; setMob = {}; saveDrafts(); deselect();
     toast('Сброшено.');
   }
 
