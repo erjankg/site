@@ -5,7 +5,8 @@
   "description": "Wild Rift Stats — справочник чемпионов, драфтер, винрейты",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "seo": "node seo/generate.mjs"
   },
   "devDependencies": {
     "vitest": "^2.1.8"

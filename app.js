@@ -53,7 +53,7 @@
         'socialPickerMask','socialLinkConfirmMask'];
 
     var _modalStack = [];          // верх = последний элемент
-    var _baseZIndex = 6000;
+    var _baseZIndex = 8100;  // выше сайдбара (#sidePanel z-index:8001) → модалка не уходит за сайдбар
     var _pendingBack = 0;          // счётчик programmatic history.back() — popstate их игнорит
 
     function _hideTooltips() {
@@ -106,10 +106,7 @@
 
     function _handleSidebarOnClose(id) {
         if (!(_sidebarModalId && id === _sidebarModalId)) return;
-        var elS = document.getElementById(id);
-        if (elS) elS.classList.remove('side-panel-modal');
         document.body.classList.remove('pc-chat-mode');
-        document.body.classList.remove('pc-side-mode');
         _sidebarModalId = null;
         _sidebarClearActive();
         if (_pcSideMode) {
@@ -1049,14 +1046,11 @@
         var panel = document.getElementById('sidePanel');
         var overlay = document.getElementById('sideOverlay');
         document.body.classList.remove('pc-chat-mode');
-        document.body.classList.remove('pc-side-mode');
         _sidebarClearActive();
 
         if (isPc) {
             // PC: не закрываем сайдбар, только чистим состояние модалок
             if (_sidebarModalId && _pcSideMode) {
-                var _el = document.getElementById(_sidebarModalId);
-                if (_el) _el.classList.remove('side-panel-modal');
                 _sidebarModalId = null;
                 _pcSideMode = false;
             }
@@ -1076,8 +1070,6 @@
         // Close any modal that was opened in PC side-panel mode
         if (_sidebarModalId && _pcSideMode) {
             var _id = _sidebarModalId;
-            var _el2 = document.getElementById(_id);
-            if (_el2) _el2.classList.remove('side-panel-modal');
             _sidebarModalId = null;
             _pcSideMode = false;
             closeModal(_id);
@@ -2494,22 +2486,15 @@
         if (isPc && sidebarIsOpen) {
             // PC mode: keep sidebar open, open modal to the RIGHT of sidebar
             if (_sidebarModalId && _pcSideMode) {
-                var prevEl = document.getElementById(_sidebarModalId);
-                if (prevEl) prevEl.classList.remove('side-panel-modal');
                 document.body.classList.remove('pc-chat-mode');
                 closeModal(_sidebarModalId, true); // skipSidebar: переключаем модалку, не реопеним sidebar
             }
             _pcSideMode = true;
-            document.body.classList.add('pc-side-mode');
             _sidebarModalId = _sidebarModalMap[what] || null;
             if (what === 'globalChat' || what === 'users') {
                 document.body.classList.add('pc-chat-mode');
             }
             _sidebarDoOpen(what);
-            if (_sidebarModalId) {
-                var el = document.getElementById(_sidebarModalId);
-                if (el) el.classList.add('side-panel-modal');
-            }
             // Подсвечиваем активную кнопку сайдбара
             _sidebarSetActive(what);
             return;

@@ -1615,9 +1615,9 @@
     var _uiState = _captureUiState(pane);
 
     // Активируем fullscreen режим для лобби.
-    // closeSidebar() сбрасывает JS-состояние (_pcSideMode, _sidebarModalId)
-    // и убирает pc-side-mode / side-panel-modal — иначе после выхода из драфта
-    // sidebarOpen() думает что предыдущий sidebar-modal всё ещё открыт.
+    // closeSidebar() сбрасывает JS-состояние (_pcSideMode, _sidebarModalId) —
+    // иначе после выхода из драфта sidebarOpen() думает что предыдущая
+    // модалка сайдбара всё ещё открыта.
     if (window.closeSidebar) window.closeSidebar();
     var _panel = document.getElementById('sidePanel');
     if (_panel) _panel.classList.remove('open'); // физически скрываем сайдбар для fullscreen

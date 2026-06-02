@@ -2534,8 +2534,7 @@ font-size: 12px;
         left: 240px !important;
         width: calc(100vw - 240px) !important;
     }
-    body.pc-chat-mode #sideOverlay,
-    body.pc-side-mode #sideOverlay {
+    body.pc-chat-mode #sideOverlay {
         display: none !important;
     }
     body.pc-chat-mode.sidebar-open {
@@ -2607,43 +2606,57 @@ font-size: 12px;
 #wrprTbody td:nth-child(2) { padding: 5px 6px !important; text-align: center; }
 }
 
-/* PC sidebar panel mode: modals open to the RIGHT of the sidebar — fullscreen right panel */
+/* ПК: сайдбар (240px) всегда на месте слева → каждая модалка живёт в правой
+   области экрана. Это свойство раскладки (media query по ширине), а НЕ рантайм-
+   решение JS: классы sidebar-modal / m-fullscreen статичны в HTML, их не нужно
+   навешивать и снимать при каждом открытии. Поэтому положение модалки всегда
+   верное с первого кадра — гонок состояний больше нет. */
 @media (min-width: 769px) {
-  /* All active modals in pc-side-mode go above the overlay (8000) and sidebar (8001).
-     All modals (primary + sub) are constrained to the right panel area. */
-  body.pc-side-mode .m-mask.active {
-    z-index: 8010 !important;
-    left: 240px !important;
-    width: calc(100% - 240px) !important;
+  /* Любая модалка сдвинута в правую область, за сайдбар. z-index модалок
+     (8100+, задаётся в app.js) выше сайдбара (8001) → «позади сайдбара» невозможно. */
+  .m-mask {
+    left: 240px;
+    width: calc(100vw - 240px);
   }
-  /* Драфт серии — всегда на весь экран */
-  body.pc-side-mode #draftCoopMask.active {
-    left: 0 !important;
-    width: 100% !important;
+  /* Фуллскрин-исключения (драфтер, кооп-драфт) занимают весь экран. */
+  .m-mask.m-fullscreen {
+    left: 0;
+    width: 100vw;
   }
-  .m-mask.side-panel-modal {
-    left: 240px !important;
-    width: calc(100% - 240px) !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    top: 0 !important;
+  /* Внутренняя панель фуллскрин-модалки тоже на весь экран (не центр-карточка) */
+  .m-mask.m-fullscreen > * {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
   }
-  .m-mask.side-panel-modal.active {
-    align-items: stretch !important;
-    justify-content: flex-start !important;
-    padding: 0 !important;
-    animation: none !important;
+  /* Главные модалки сайдбара — панель во всю правую область, не центрированная
+     карточка: прозрачная подложка, edge-to-edge, квадратные углы. */
+  .m-mask.sidebar-modal {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    top: 0;
   }
-  /* Use > * to catch draft's inner div which has no .m-win class */
-  .m-mask.side-panel-modal > * {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: 100vh !important;
-    max-height: 100vh !important;
-    border-radius: 0 !important;
-    border: none !important;
-    border-left: 1px solid var(--accent-border) !important;
-    box-shadow: none !important;
+  .m-mask.sidebar-modal.active {
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
+    animation: none;
+  }
+  /* > * ловит внутреннюю панель даже если у неё нет класса .m-win */
+  .m-mask.sidebar-modal > * {
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+    border-left: 1px solid var(--accent-border);
+    box-shadow: none;
   }
 }
 
@@ -3961,9 +3974,9 @@ body.dcoop-fullscreen #sidebar,
 body.dcoop-fullscreen .sidebar,
 body.dcoop-fullscreen #sidebarMask,
 body.dcoop-fullscreen #menuBtn { display: none !important; }
-body.dcoop-fullscreen .m-mask.side-panel-modal {
+body.dcoop-fullscreen .m-mask {
   left: 0 !important;
-  width: 100% !important;
+  width: 100vw !important;
 }
 body.dcoop-fullscreen .dcoop-win {
   width: 100vw !important;
@@ -5287,9 +5300,9 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
 
 /* PC: changes panel — та же ширина что и другие side panels */
 @media (min-width: 769px) {
-  body.pc-side-mode #changesMask.active {
+  #changesMask.sidebar-modal.active {
     left: 240px !important;
-    width: calc(100% - 240px) !important;
+    width: calc(100vw - 240px) !important;
   }
   .changes-win {
     max-width: none;
@@ -6505,7 +6518,7 @@ html.cs-public-mode #cybersportMask .cs-win {
 
 /* PC side-panel mode */
 @media (min-width: 900px) {
-  #cybersportMask.side-panel-modal .cs-win {
+  #cybersportMask.sidebar-modal .cs-win {
     max-width: 100% !important;
     width: 100% !important;
     height: 100%;
