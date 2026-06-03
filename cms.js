@@ -1521,7 +1521,7 @@
     // Запомненный порядок колонок
     var savedOrder = null;
     try { savedOrder = localStorage.getItem('cms_wr_import_order'); } catch(e) {}
-    var columnOrder = savedOrder || 'wr-br-pr';
+    var columnOrder = savedOrder || 'wr-pr-br';
 
     var overlay = document.createElement('div');
     overlay.className = 'cms-modal-overlay';
@@ -1545,11 +1545,11 @@
     // Инструкция
     var help = document.createElement('div');
     help.style.cssText = 'background:rgba(11,196,227,0.08);border:1px solid rgba(11,196,227,0.25);border-radius:10px;padding:10px 12px;margin-bottom:14px;color:rgba(255,255,255,0.75);font-size:12px;line-height:1.5;';
-    help.innerHTML = '1. Открой <a href="https://lolm.qq.com/act/a20220818raider/index.html" target="_blank" style="color:#0bc4e3;">lolm.qq.com</a> → выбери ранг и роль<br>' +
-      '2. Выдели таблицу и нажми Ctrl+C — лучше <b>с иероглифами</b> (так имена опознаются точнее). Копировать «столбиком» теперь можно.<br>' +
-      '3. Выбери ниже тот же ранг и роль, проверь <b>порядок чисел</b> и вставь в поле<br>' +
-      '4. «Распарсить» → кого не узнал, выбери из списка вручную → «Сохранить»<br>' +
-      '<span style="color:rgba(255,255,255,0.5);">Можно вставить и просто числа без имён (по 3 на чемпиона) — тогда выберешь чемпиона руками.</span>';
+    help.innerHTML = '1. На <a href="https://lolm.qq.com/act/a20220818raider/index.html" target="_blank" style="color:#0bc4e3;">lolm.qq.com</a> выбери ранг и роль, выдели таблицу, Ctrl+C (имена не важны — код берёт только числа).<br>' +
+      '2. Выбери ниже тот же <b>ранг</b> и <b>роль</b> и вставь в поле.<br>' +
+      '3. «Распарсить» → получишь нумерованный список с числами. Напротив каждой строки <b>выбери чемпиона</b> из выпадашки (по порядку, как на lolm).<br>' +
+      '4. «Сохранить».<br>' +
+      '<span style="color:rgba(255,255,255,0.5);">Порядок чисел уже стоит «WR → PR → BR» (как на сайте: Win / Appearance / Ban). Уже выбранные чемпы уходят вниз списка.</span>';
     win.appendChild(help);
 
     // Селекторы ранга и роли
@@ -1582,8 +1582,8 @@
     order.innerHTML =
       '<label style="display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">Порядок чисел в строке</label>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
-        '<label class="cms-bulk-order-lbl"><input type="radio" name="cmsOrd" value="wr-br-pr"'+(columnOrder==='wr-br-pr'?' checked':'')+'> WR → BR → PR <span style="color:rgba(255,255,255,0.4);">(lolm.qq.com)</span></label>' +
-        '<label class="cms-bulk-order-lbl"><input type="radio" name="cmsOrd" value="wr-pr-br"'+(columnOrder==='wr-pr-br'?' checked':'')+'> WR → PR → BR</label>' +
+        '<label class="cms-bulk-order-lbl"><input type="radio" name="cmsOrd" value="wr-pr-br"'+(columnOrder==='wr-pr-br'?' checked':'')+'> WR → PR → BR <span style="color:rgba(255,255,255,0.4);">(Win / Appearance / Ban — как на сайте)</span></label>' +
+        '<label class="cms-bulk-order-lbl"><input type="radio" name="cmsOrd" value="wr-br-pr"'+(columnOrder==='wr-br-pr'?' checked':'')+'> WR → BR → PR</label>' +
         '<label class="cms-bulk-order-lbl"><input type="radio" name="cmsOrd" value="wr-only"'+(columnOrder==='wr-only'?' checked':'')+'> Только WR</label>' +
       '</div>';
     // Стили radio-лейблов
@@ -1679,11 +1679,11 @@
       var th = 'color:rgba(255,255,255,0.45);font-weight:700;text-align:left;padding:4px 6px;font-size:10px;text-transform:uppercase;letter-spacing:0.4px;';
       var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;">' +
         '<thead><tr>' +
-        '<th style="' + th + '">с lolm</th>' +
+        '<th style="' + th + 'text-align:center;width:26px;">#</th>' +
         '<th style="' + th + 'text-align:center;">WR</th>' +
         '<th style="' + th + 'text-align:center;">PR</th>' +
         '<th style="' + th + 'text-align:center;">BR</th>' +
-        '<th style="' + th + '">чемпион</th>' +
+        '<th style="' + th + '">чемпион (выбери)</th>' +
         '</tr></thead><tbody>';
 
       parsedRows.forEach(function(r, i) {
@@ -1693,16 +1693,17 @@
           var others = usedAll[n] - (r._assigned === n ? 1 : 0);
           if (others > 0) usedSet[n] = 1;
         });
-        var rawLbl = r._rawName ? _esc(r._rawName) : '<span style="color:rgba(255,255,255,0.35);">(без имени)</span>';
         var rowBg = r._assigned ? '' : 'background:rgba(231,76,60,0.07);';
         var selBorder = r._assigned ? 'rgba(46,204,113,0.5)' : 'rgba(231,76,60,0.6)';
+        // Имя с lolm — только мелкая серая подсказка (для парсинга оно не используется).
+        var hint = r._rawName ? '<div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;">lolm: ' + _esc(r._rawName) + '</div>' : '';
         html += '<tr style="border-top:1px solid rgba(255,255,255,0.06);' + rowBg + '">' +
-          '<td style="padding:4px 6px;color:rgba(255,255,255,0.85);">' + rawLbl + '</td>' +
+          '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.4);font-size:11px;">' + (i + 1) + '</td>' +
           '<td style="padding:4px 6px;text-align:center;color:#0bc4e3;font-weight:700;">' + r.wr + '%</td>' +
           '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.pr + '%</td>' +
           '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.br + '%</td>' +
           '<td style="padding:4px 6px;"><select data-i="' + i + '" class="cms-input" style="width:100%;padding:4px 6px;font-size:12px;border-color:' + selBorder + ';">' +
-            _champOptionsHtml(r._assigned, usedSet) + '</select></td>' +
+            _champOptionsHtml(r._assigned, usedSet) + '</select>' + hint + '</td>' +
           '</tr>';
       });
       html += '</tbody></table>';

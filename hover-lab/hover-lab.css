@@ -90,7 +90,7 @@ html, body {
   color: var(--text-secondary);
 }
 .hl-ctrl input[type="range"] { width: 120px; accent-color: var(--accent); }
-.hl-swatches { display: flex; gap: 6px; }
+.hl-swatches { display: flex; gap: 6px; flex-wrap: wrap; max-width: 230px; }
 .hl-sw {
   width: 22px;
   height: 22px;
@@ -101,6 +101,27 @@ html, body {
 }
 .hl-sw:hover { transform: scale(1.12); }
 .hl-sw.active { border-color: #fff; }
+.hl-custom {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px dashed var(--accent-border-str);
+  cursor: pointer;
+  flex: 0 0 auto;
+  display: inline-block;
+}
+.hl-custom input[type="color"] {
+  position: absolute;
+  inset: -6px;
+  width: calc(100% + 12px);
+  height: calc(100% + 12px);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
 
 /* ── Сетка вариантов ── */
 .hl-wrap {
@@ -122,6 +143,16 @@ html, body {
   flex-direction: column;
   gap: 14px;
 }
+.hl-variant--feature {
+  grid-column: 1 / -1;
+  background:
+    radial-gradient(ellipse at 50% -20%, var(--accent-dim) 0%, transparent 60%),
+    rgba(255, 255, 255, 0.02);
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 1px var(--accent-border-sub), 0 12px 40px rgba(0,0,0,0.35);
+}
+.hl-variant--feature .hl-variant-num { font-size: 11px; line-height: 1.1; }
+.hl-variant--feature .hl-grid { grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 10px; }
 .hl-variant-head {
   display: flex;
   align-items: flex-start;
@@ -260,7 +291,7 @@ html, body {
   position: absolute;
   inset: 0;
   background: radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%),
-              rgba(11,196,227,0.35), transparent 60%);
+              var(--accent-glow), transparent 60%);
   opacity: 0;
   pointer-events: none;
   border-radius: inherit;
@@ -398,13 +429,13 @@ html, body {
   left: 0; right: 0;
   height: 45%;
   top: 100%;
-  background: linear-gradient(to top, transparent, rgba(11,196,227,0.28), transparent);
+  background: linear-gradient(to top, transparent, var(--accent-glow), transparent);
   pointer-events: none;
   opacity: 0;
 }
 .v-holo .h-card:hover {
   border-color: var(--accent-border-str);
-  box-shadow: inset 0 0 18px rgba(11,196,227,0.18);
+  box-shadow: inset 0 0 18px var(--accent-dim);
   z-index: 2;
 }
 .v-holo .h-card:hover::after { animation: hl-scan calc(0.9s * var(--sp)) var(--ease-soft) infinite; }
@@ -457,6 +488,71 @@ html, body {
 }
 .v-label .h-card:hover { transform: translateY(-2px); border-color: var(--accent); z-index: 2; }
 .v-label .h-card:hover .h-name { transform: translateY(0); opacity: 1; }
+
+/* ★ · Combo — слияние выбранного: Lift & Glow + Shine Sweep + Cursor Spotlight + Label Reveal */
+.v-combo .h-card {
+  overflow: hidden;
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-spring),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              box-shadow calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+/* spotlight — пятно за курсором */
+.v-combo .h-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%),
+              var(--accent-glow), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+/* shine — диагональный блик */
+.v-combo .h-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.16) 50%, transparent 70%);
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity calc(var(--dur-fast) * var(--sp)) var(--ease-snap),
+              transform calc(0.65s * var(--sp)) var(--ease-soft);
+}
+/* label — название снизу */
+.v-combo .h-card .h-name {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 2;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 2px;
+  background: linear-gradient(to top, rgba(1,10,19,0.96), transparent);
+  color: var(--accent);
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-soft),
+              opacity calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-combo .h-card img {
+  transition: filter calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-combo .h-card:hover {
+  transform: translateY(-4px) scale(1.06);
+  border-color: var(--accent);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.45), 0 0 0 1px var(--accent-border), 0 0 22px var(--accent-glow);
+  z-index: 3;
+}
+.v-combo .h-card:hover::before { opacity: 1; }
+.v-combo .h-card:hover::after  { opacity: 1; transform: translateX(110%); }
+.v-combo .h-card:hover .h-name { transform: translateY(0); opacity: 1; }
+.v-combo .h-card:hover img     { filter: drop-shadow(0 0 6px var(--accent-glow)); }
 
 /* ── Доступность ── */
 @media (prefers-reduced-motion: reduce) {

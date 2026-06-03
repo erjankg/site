@@ -15,6 +15,14 @@ var RUNES = [
   ['lethal-tempo', 'Смертельный темп']
 ];
 
+/* ── Комбо: слияние выбранных 1+2+3+12 (показывается сверху, на всю ширину) ── */
+var COMBO = {
+  id: 'combo', featured: true, js: true,
+  name: 'Комбо ✦ выбранное',
+  tag: '1+2+3+12',
+  desc: 'Слил твой выбор в один эффект: подъём со свечением (2) + диагональный блик (1) + пятно света за курсором (3) + выезжающее название снизу (12). Это кандидат на боевой.'
+};
+
 /* ── Варианты hover-анимаций ── */
 var VARIANTS = [
   { id: 'shine', name: 'Shine Sweep', tag: 'текущая', desc: 'Диагональный блик пробегает по карточке + лёгкий подъём и свечение. То, что сейчас на сайте.' },
@@ -33,6 +41,19 @@ var VARIANTS = [
 
 /* ── CSS-сниппеты для кнопки «Скопировать CSS» (готовы к вставке в styles.css) ── */
 var SNIPPETS = {
+  combo:
+'/* CSS — комбо: lift + shine + spotlight + label. Требует <div class="rune-card-name"> внутри карточки */\n' +
+'.rune-card { overflow:hidden; transition:transform var(--dur-base) var(--ease-spring), border-color var(--dur-base) var(--ease-snap), box-shadow var(--dur-base) var(--ease-snap); }\n' +
+'.rune-card::before { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:radial-gradient(120px circle at var(--mx,50%) var(--my,50%),var(--accent-glow),transparent 60%); opacity:0; transition:opacity var(--dur-base) var(--ease-snap); }\n' +
+'.rune-card::after { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.16) 50%,transparent 70%); transform:translateX(-110%); opacity:0; transition:opacity var(--dur-fast) var(--ease-snap), transform .65s var(--ease-soft); }\n' +
+'.rune-card-name { position:absolute; left:0; right:0; bottom:0; z-index:2; display:block; font-size:9px; font-weight:700; padding:3px 2px; background:linear-gradient(to top,rgba(1,10,19,.96),transparent); color:var(--accent); transform:translateY(100%); opacity:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:transform var(--dur-base) var(--ease-soft), opacity var(--dur-base); }\n' +
+'.rune-card:hover { transform:translateY(-4px) scale(1.06); border-color:var(--accent); box-shadow:0 10px 22px rgba(0,0,0,.45),0 0 0 1px var(--accent-border),0 0 22px var(--accent-glow); z-index:3; }\n' +
+'.rune-card:hover::before { opacity:1; }\n' +
+'.rune-card:hover::after { opacity:1; transform:translateX(110%); }\n' +
+'.rune-card:hover .rune-card-name { transform:translateY(0); opacity:1; }\n' +
+'.rune-card:hover img { filter:drop-shadow(0 0 6px var(--accent-glow)); }\n' +
+'/* JS — пятно света за курсором */\n' +
+'document.querySelectorAll(".rune-card").forEach(function(c){ c.addEventListener("mousemove",function(e){ var r=c.getBoundingClientRect(); c.style.setProperty("--mx",((e.clientX-r.left)/r.width*100)+"%"); c.style.setProperty("--my",((e.clientY-r.top)/r.height*100)+"%"); }); });',
   shine:
 '.rune-card { overflow:hidden; transition:transform var(--dur-base) var(--ease-spring), border-color var(--dur-base) var(--ease-snap), box-shadow var(--dur-base) var(--ease-snap); }\n' +
 '.rune-card::after { content:""; position:absolute; inset:0; background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.14) 50%,transparent 70%); transform:translateX(-110%); opacity:0; pointer-events:none; border-radius:inherit; transition:opacity var(--dur-fast) var(--ease-snap), transform .65s var(--ease-soft); }\n' +
@@ -112,9 +133,11 @@ function buildVariant(v, idx) {
   var tag = '';
   if (v.tag) tag += '<span class="hl-tag">' + v.tag + '</span>';
   if (v.js)  tag += '<span class="hl-tag js">JS</span>';
-  return '<section class="hl-variant">' +
+  var num = v.featured ? '★' : (idx + 1);
+  var sectionClass = 'hl-variant' + (v.featured ? ' hl-variant--feature' : '');
+  return '<section class="' + sectionClass + '">' +
     '<div class="hl-variant-head">' +
-      '<div class="hl-variant-num">' + (idx + 1) + '</div>' +
+      '<div class="hl-variant-num">' + num + '</div>' +
       '<div class="hl-variant-meta">' +
         '<div class="hl-variant-name">' + v.name + tag + '</div>' +
         '<p class="hl-variant-desc">' + v.desc + '</p>' +
@@ -126,7 +149,7 @@ function buildVariant(v, idx) {
 }
 
 var wrap = document.getElementById('hlWrap');
-wrap.innerHTML = VARIANTS.map(buildVariant).join('');
+wrap.innerHTML = buildVariant(COMBO, -1) + VARIANTS.map(buildVariant).join('');
 
 /* ── Кнопка копирования CSS ── */
 wrap.addEventListener('click', function (e) {
@@ -162,7 +185,7 @@ document.addEventListener('mousemove', function (e) {
   var variant = grid.getAttribute('data-variant');
   var p = cardLocal(card, e);
 
-  if (variant === 'spotlight') {
+  if (variant === 'spotlight' || variant === 'combo') {
     card.style.setProperty('--mx', (p.x / p.w * 100) + '%');
     card.style.setProperty('--my', (p.y / p.h * 100) + '%');
   } else if (variant === 'tilt') {
@@ -211,12 +234,9 @@ speed.addEventListener('input', function () {
 
 /* ── Смена акцентного цвета ── */
 var swatches = document.getElementById('hlSwatches');
-swatches.addEventListener('click', function (e) {
-  var sw = e.target.closest('.hl-sw');
-  if (!sw) return;
-  swatches.querySelectorAll('.hl-sw').forEach(function (s) { s.classList.remove('active'); });
-  sw.classList.add('active');
-  var rgb = sw.getAttribute('data-accent');
+var custom = document.getElementById('hlCustom');
+
+function applyAccent(rgb) {
   var root = document.documentElement.style;
   root.setProperty('--accent', 'rgb(' + rgb + ')');
   root.setProperty('--accent-glow', 'rgba(' + rgb + ',0.4)');
@@ -224,4 +244,22 @@ swatches.addEventListener('click', function (e) {
   root.setProperty('--accent-border', 'rgba(' + rgb + ',0.2)');
   root.setProperty('--accent-border-sub', 'rgba(' + rgb + ',0.08)');
   root.setProperty('--accent-border-str', 'rgba(' + rgb + ',0.5)');
+}
+function hexToRgb(hex) {
+  var h = hex.replace('#', '');
+  if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+  return parseInt(h.slice(0, 2), 16) + ',' + parseInt(h.slice(2, 4), 16) + ',' + parseInt(h.slice(4, 6), 16);
+}
+
+swatches.addEventListener('click', function (e) {
+  var sw = e.target.closest('.hl-sw');
+  if (!sw) return;
+  swatches.querySelectorAll('.hl-sw').forEach(function (s) { s.classList.remove('active'); });
+  sw.classList.add('active');
+  applyAccent(sw.getAttribute('data-accent'));
+});
+
+custom.addEventListener('input', function () {
+  swatches.querySelectorAll('.hl-sw').forEach(function (s) { s.classList.remove('active'); });
+  applyAccent(hexToRgb(custom.value));
 });
