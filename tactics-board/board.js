@@ -307,9 +307,17 @@
     img.alt = name;
     img.onerror = function() { onImgError(this, name); };
     el.appendChild(img);
-    el.title = name + ' — перетаскивай, двойной клик — удалить';
+    el.title = name + ' — перетаскивай, двойной/правый клик — удалить';
     tokensLayer.appendChild(el);
     state.tokens[tokenId] = { team, idx, name, x: xPct, y: yPct, el };
+    pushUndo(() => {
+      if (state.tokens[tokenId]) {
+        state.teams[team][idx] = null;
+        updateSlotUI(team, idx);
+        el.remove();
+        delete state.tokens[tokenId];
+      }
+    });
   }
 
   function removeTokenByTeamIdx(team, idx) {
@@ -550,8 +558,9 @@
     ward.style.left = x + '%';
     ward.style.top = y + '%';
     ward.innerHTML = '<div class="tb-ward-radius"></div><div class="tb-ward-dot"></div>';
-    ward.title = (side === 'ally' ? 'Свой вард' : 'Вражеский вард') + ' — перетаскивай, двойной клик — удалить';
+    ward.title = (side === 'ally' ? 'Свой вард' : 'Вражеский вард') + ' — перетаскивай, двойной/правый клик — удалить';
     tokensLayer.appendChild(ward);
+    pushUndo(() => ward.remove());
   }
 
   // ───────────────────────────────────────────────────────────
@@ -578,10 +587,13 @@
     btn.addEventListener('click', () => {
       const what = btn.dataset.clear;
       if (what === 'arrows' || what === 'all') {
-        arrowsLayer.querySelectorAll('.tb-arrow').forEach(a => a.remove());
+        arrowsLayer.querySelectorAll('.tb-arrow, .tb-pen').forEach(a => a.remove());
       }
       if (what === 'wards' || what === 'all') {
         tokensLayer.querySelectorAll('.tb-ward-on-map').forEach(w => w.remove());
+      }
+      if (what === 'notes' || what === 'all') {
+        tokensLayer.querySelectorAll('.tb-note').forEach(n => n.remove());
       }
       if (what === 'all') {
         tokensLayer.querySelectorAll('.tb-token').forEach(t => t.remove());
@@ -614,16 +626,19 @@
       w.style.left = (100 - x) + '%';
       w.style.top = (100 - y) + '%';
     });
-    // Зеркалируем стрелки (viewBox 0..1000 → 1000-coord), на обоих path в группе
-    arrowsLayer.querySelectorAll('.tb-arrow').forEach(g => {
-      g.querySelectorAll('path').forEach(path => {
-        const d = path.getAttribute('d');
-        if (!d) return;
-        const newD = d.replace(/([ML])\s+([-\d.]+)\s+([-\d.]+)/g, (_, cmd, x, y) => {
-          return cmd + ' ' + (1000 - parseFloat(x)) + ' ' + (1000 - parseFloat(y));
-        });
-        path.setAttribute('d', newD);
+    // Зеркалируем стрелки И карандаш (viewBox 0..1000 → 1000-coord)
+    arrowsLayer.querySelectorAll('.tb-arrow path, .tb-pen').forEach(path => {
+      const d = path.getAttribute('d');
+      if (!d) return;
+      const newD = d.replace(/([ML])\s+([-\d.]+)\s+([-\d.]+)/g, (_, cmd, x, y) => {
+        return cmd + ' ' + (1000 - parseFloat(x)) + ' ' + (1000 - parseFloat(y));
       });
+      path.setAttribute('d', newD);
+    });
+    // Зеркалируем заметки
+    tokensLayer.querySelectorAll('.tb-note').forEach(n => {
+      n.style.left = (100 - parseFloat(n.style.left)) + '%';
+      n.style.top = (100 - parseFloat(n.style.top)) + '%';
     });
   });
 
