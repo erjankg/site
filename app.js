@@ -2113,6 +2113,13 @@
     }
     window.scFilter=function(){scBuildGrid();};
     window.closeSideChamps=function(){closeModal('sideChampsMask');};
+    // Модалку чемпионов могли открыть до загрузки данных (raw пуст) — тогда грид
+    // выходил пустым и оживал только после клика по фильтру. Дорисовываем сразу,
+    // как только данные подъехали (событие champsLoaded), если модалка открыта.
+    document.addEventListener('champsLoaded', function(){
+        var m=document.getElementById('sideChampsMask');
+        if(m&&m.classList.contains('active')) scBuildGrid();
+    });
     window.openChampDetail=function(name){
         var champ=raw.find(function(x){return x.name===name;});
         var el=document.getElementById('champDetailContent');
