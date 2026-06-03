@@ -576,17 +576,81 @@
       description_en: 'After destroying an enemy ward, a Zombie Ward appears in its place, granting vision for 120s. Also +3 AD or +6 AP (up to 5 stacks). At 5 stacks, a +10 AD or +20 AP bonus.' },
   ];
 
+  // ── авто-разметка описаний: иконки + цвета ([текст|токен], [icon:name]) ──
+  function annotate(t) {
+    if (!t) return t;
+    var s = t;
+    var notInside = function (off, full) {
+      var before = full.slice(0, off);
+      return (before.match(/\[/g) || []).length <= (before.match(/\]/g) || []).length;
+    };
+    s = s.replace(/физическ[а-яё]*\s+урон[а-яё]*/giu, function (m) { return '[' + m + '|ad]'; });
+    s = s.replace(/магическ[а-яё]*\s+урон[а-яё]*/giu, function (m) { return '[' + m + '|magic]'; });
+    s = s.replace(/(?:истинн|чист)[а-яё]*\s+урон[а-яё]*/giu, function (m) { return '[' + m + '|true]'; });
+    var STAT = [
+      [/(?<![а-яёa-z\[])(?:сопротивлени[а-яё]*\s+магии|сопр\.\s*магии)/giu, 'mrez', 'magic'],
+      [/(?<![а-яёa-z\[])(?<!пробивани[а-яё]{1,5}\s)брон[яиюейё][а-яё]*/giu, 'arm', 'armor'],
+      [/(?<![а-яёa-z\[])здоровь[а-яё]+/giu, 'hp', 'hp'],
+      [/(?<![а-яёa-z\[])ман[ыуоеа](?![а-яё])/giu, 'mana', 'mana'],
+      [/(?<![а-яёa-z\[])золот[а-яё]+/giu, 'gold', ''],
+    ];
+    STAT.forEach(function (rule) {
+      s = s.replace(rule[0], function (m, off, full) {
+        return notInside(off, full)
+          ? '[icon:' + rule[1] + ']' + (rule[2] ? '[' + m + '|' + rule[2] + ']' : m) : m;
+      });
+    });
+    s = s.replace(/\d[\d.,]*(?:\s*[–-]\s*\d[\d.,]*)?\s*(?:%|сек|мин|минут[а-яё]*)/giu,
+      function (m, off, full) { return notInside(off, full) ? '[' + m.trim() + '|ms]' : m; });
+    return s;
+  }
+
+  // ── авто-разметка характеристик: «+60 Armor» → «[icon:arm]+60 брони» ──
+  function statsRu(s) {
+    if (!s || s === '—' || /\[icon:/.test(s)) return s; // пусто или уже размечено
+    var MAP = [
+      ['attack damage', 'ad', 'силы атаки'], ['ability power', 'ap', 'силы умений'],
+      ['magic resistance', 'mrez', 'сопр. магии'], ['magic resist', 'mrez', 'сопр. магии'],
+      ['ability haste', 'usk', 'ускорения умений'], ['attack speed', 'as', 'скорости атаки'],
+      ['magic penetration', 'mpen', 'пробивания магии'], ['magic pen', 'mpen', 'пробивания магии'],
+      ['crit chance', 'krit', 'шанса крита'], ['heal & shield power', 'sh', 'силы лечения и щитов'],
+      ['hp regen', 'hp', 'реген. здоровья'], ['omnivamp', '', 'всестороннего вампиризма'],
+      ['armor', 'arm', 'брони'], ['health', 'hp', 'здоровья'], ['mana', 'mana', 'маны'],
+      ['move speed', '', 'скорости передвижения'],
+      ['ad', 'ad', 'силы атаки'], ['ap', 'ap', 'силы умений'], ['mr', 'mrez', 'сопр. магии'],
+      ['hp', 'hp', 'здоровья'], ['ms', '', 'скорости передвижения'], ['as', 'as', 'скорости атаки'],
+    ];
+    return s.split('|').map(function (seg) {
+      seg = seg.trim(); if (!seg) return '';
+      var low = ' ' + seg.toLowerCase() + ' ';
+      for (var i = 0; i < MAP.length; i++) {
+        var en = MAP[i][0];
+        var hit = en.length <= 3 ? new RegExp('[^a-zа-я]' + en + '[^a-zа-я]', 'i').test(low) : low.indexOf(en) !== -1;
+        if (hit) {
+          var num = (seg.match(/^[^A-Za-zА-Яа-я]*/) || [''])[0].trim();
+          return (MAP[i][1] ? '[icon:' + MAP[i][1] + ']' : '') + (num ? num + ' ' : '') + MAP[i][2];
+        }
+      }
+      return seg;
+    }).filter(Boolean).join('  |  ');
+  }
+
   async function applyAll(col, arr) {
     var ok = 0, miss = 0, fail = 0;
     for (var i = 0; i < arr.length; i++) {
       var e = arr[i];
       var patch = { name_ru: e.name_ru, name_en: e.name_en };
-      if (e.description_ru) patch.description_ru = e.description_ru;
+      if (e.description_ru) patch.description_ru = annotate(e.description_ru);
       if (e.description_en) patch.description_en = e.description_en;
       try {
         var ref = db.collection(col).doc(e.id);
         var snap = await ref.get();
         if (!snap.exists) { console.warn('  нет в базе:', col, e.id); miss++; continue; }
+        if (col === 'items') {
+          var curStats = (snap.data() || {}).stats;
+          var newStats = statsRu(curStats);
+          if (newStats && newStats !== curStats) patch.stats = newStats;
+        }
         await ref.update(patch);
         ok++;
       } catch (err) { console.error('  ошибка', col, e.id, err && err.message); fail++; }
