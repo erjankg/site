@@ -6858,7 +6858,61 @@ body.anims-frozen *::after {
   transform: translateX(110%);
 }
 .rune-card:hover {
+  transform: translateY(-4px) scale(1.06);
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--accent-border), 0 0 18px var(--accent-glow);
+}
+.rune-card img { transition: filter var(--dur-base) var(--ease-snap); }
+.rune-card:hover img { filter: drop-shadow(0 0 6px var(--accent-glow)); }
+
+/* ── Item cards: тот же эффект 1+2, что у рун (блик + подъём + ореол) ── */
+.item-card {
+  overflow: hidden;
+  transition:
+    transform   var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-snap),
+    box-shadow  var(--dur-base) var(--ease-snap);
+}
+.item-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.16) 50%, transparent 70%);
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity   var(--dur-fast) var(--ease-snap),
+    transform 0.65s var(--ease-soft);
+}
+.item-card img { transition: filter var(--dur-base) var(--ease-snap); }
+.item-card:hover {
+  transform: translateY(-4px) scale(1.06);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--accent-border), 0 0 18px var(--accent-glow);
+  z-index: 2;
+}
+.item-card:hover::after { opacity: 1; transform: translateX(110%); }
+.item-card:hover img    { filter: drop-shadow(0 0 6px var(--accent-glow)); }
+
+/* ── Иконки чемпионов и тир-листа (голые <img>): подъём + свечение
+      (часть эффекта «2»; бегущую полосу на <img> наложить нельзя) ── */
+.champ-icon,
+.tierlist-champ-icon {
+  transition:
+    transform   var(--dur-base) var(--ease-spring),
+    border-color var(--dur-base) var(--ease-snap),
+    box-shadow  var(--dur-base) var(--ease-snap),
+    filter      var(--dur-base) var(--ease-snap);
+}
+.champ-icon:hover,
+.tierlist-champ-icon:hover {
+  transform: translateY(-3px) scale(1.08);
+  border-color: var(--accent);
   box-shadow: var(--shadow-md), 0 0 18px var(--accent-glow);
+  filter: drop-shadow(0 0 5px var(--accent-glow));
+  z-index: 2;
+  position: relative;
 }
 
 /* ── Tabs: sliding underline indicator ── */

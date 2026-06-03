@@ -36,5 +36,20 @@
       "Skill(browse:*)",
       "Bash(node --check cms.js)"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/bump-sw.mjs",
+            "timeout": 15,
+            "statusMessage": "Проверяю версию Service Worker…"
+          }
+        ]
+      }
+    ]
   }
 }

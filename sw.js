@@ -13,7 +13,7 @@
  *
  * Старые caches удаляются в activate.
  */
-const VERSION = 'wrs-v2.2026-06-02e';
+const VERSION = 'wrs-v2.20260603-154846';
 
 // Сколько ждём сеть, прежде чем отдать офлайн-резерв из кэша (мс).
 const NET_TIMEOUT = 3000;

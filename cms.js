@@ -1388,12 +1388,13 @@
       if (n === current) return;
       if (usedSet && usedSet[n]) used.push(n); else avail.push(n);
     });
-    var html = '<option value=""' + (current ? '' : ' selected') + '>— выбери чемпиона —</option>';
-    if (current) html += '<option value="' + _esc(current) + '" selected>' + _esc(current) + '</option>';
-    avail.forEach(function(n) { html += '<option value="' + _esc(n) + '">' + _esc(n) + '</option>'; });
+    var os = ' style="background:#1d1d2e;color:#fff;"';   // сплошной тёмный фон, иначе список опций белый на белом
+    var html = '<option value=""' + os + (current ? '' : ' selected') + '>— выбери чемпиона —</option>';
+    if (current) html += '<option value="' + _esc(current) + '"' + os + ' selected>' + _esc(current) + '</option>';
+    avail.forEach(function(n) { html += '<option value="' + _esc(n) + '"' + os + '>' + _esc(n) + '</option>'; });
     if (used.length) {
-      html += '<option value="" disabled>──── уже выбраны ────</option>';
-      used.forEach(function(n) { html += '<option value="' + _esc(n) + '">' + _esc(n) + ' • занят</option>'; });
+      html += '<option value=""' + os + ' disabled>──── уже выбраны ────</option>';
+      used.forEach(function(n) { html += '<option value="' + _esc(n) + '"' + os + '>' + _esc(n) + ' • занят</option>'; });
     }
     return html;
   }
@@ -1529,10 +1530,13 @@
 
     var win = document.createElement('div');
     win.className = 'cms-modal-win';
-    win.style.maxWidth = '720px';
-    win.style.width = '92vw';
-    win.style.maxHeight = '88vh';
-    win.style.overflowY = 'auto';
+    win.style.maxWidth = '1400px';
+    win.style.width = '96vw';
+    win.style.height = '94vh';
+    win.style.maxHeight = '94vh';
+    win.style.display = 'flex';
+    win.style.flexDirection = 'column';
+    win.style.overflow = 'hidden';
 
     // Заголовок
     var hdr = document.createElement('div');
@@ -1596,12 +1600,12 @@
     var ta = document.createElement('textarea');
     ta.className = 'cms-input';
     ta.placeholder = 'Вставь сюда таблицу с lolm.qq.com (Ctrl+V)…\n\nПример:\n剑魔\t49.5%\t5.34%\t5.91%\n亚索\t48.4%\t23.5%\t3.19%';
-    ta.style.cssText = 'width:100%;min-height:180px;font-family:Consolas,Monaco,monospace;font-size:12px;line-height:1.4;margin-bottom:10px;';
+    ta.style.cssText = 'width:100%;min-height:110px;flex:0 0 auto;font-family:Consolas,Monaco,monospace;font-size:12px;line-height:1.4;margin-bottom:10px;';
     win.appendChild(ta);
 
     // Превью diff
     var preview = document.createElement('div');
-    preview.style.cssText = 'min-height:60px;max-height:260px;overflow-y:auto;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:12px;';
+    preview.style.cssText = 'flex:1 1 auto;min-height:120px;overflow-y:auto;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:12px;';
     preview.textContent = 'Превью diff появится после парсинга…';
     win.appendChild(preview);
 
@@ -1702,7 +1706,7 @@
           '<td style="padding:4px 6px;text-align:center;color:#0bc4e3;font-weight:700;">' + r.wr + '%</td>' +
           '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.pr + '%</td>' +
           '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.br + '%</td>' +
-          '<td style="padding:4px 6px;"><select data-i="' + i + '" class="cms-input" style="width:100%;padding:4px 6px;font-size:12px;border-color:' + selBorder + ';">' +
+          '<td style="padding:4px 6px;"><select data-i="' + i + '" class="cms-input" style="width:100%;padding:4px 6px;font-size:12px;background:#1d1d2e;color:#fff;border-color:' + selBorder + ';">' +
             _champOptionsHtml(r._assigned, usedSet) + '</select>' + hint + '</td>' +
           '</tr>';
       });

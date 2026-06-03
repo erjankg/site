@@ -554,6 +554,37 @@ html, body {
 .v-combo .h-card:hover .h-name { transform: translateY(0); opacity: 1; }
 .v-combo .h-card:hover img     { filter: drop-shadow(0 0 6px var(--accent-glow)); }
 
+/* ★ · Combo 1+2 — Shine Sweep + Lift & Glow (чистый CSS, без JS) */
+.v-combo2 .h-card {
+  overflow: hidden;
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-spring),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              box-shadow calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-combo2 .h-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.16) 50%, transparent 70%);
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity calc(var(--dur-fast) * var(--sp)) var(--ease-snap),
+              transform calc(0.65s * var(--sp)) var(--ease-soft);
+}
+.v-combo2 .h-card img {
+  transition: filter calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-combo2 .h-card:hover {
+  transform: translateY(-4px) scale(1.06);
+  border-color: var(--accent);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.45), 0 0 0 1px var(--accent-border), 0 0 20px var(--accent-glow);
+  z-index: 3;
+}
+.v-combo2 .h-card:hover::after { opacity: 1; transform: translateX(110%); }
+.v-combo2 .h-card:hover img   { filter: drop-shadow(0 0 6px var(--accent-glow)); }
+
 /* ── Доступность ── */
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

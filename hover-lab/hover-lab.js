@@ -23,6 +23,14 @@ var COMBO = {
   desc: 'Слил твой выбор в один эффект: подъём со свечением (2) + диагональный блик (1) + пятно света за курсором (3) + выезжающее название снизу (12). Это кандидат на боевой.'
 };
 
+/* ── Комбо 1+2: Shine Sweep + Lift & Glow (чистый CSS, без JS) ── */
+var COMBO2 = {
+  id: 'combo2', featured: true,
+  name: 'Комбо ✦ 1+2',
+  tag: '1+2',
+  desc: 'Слил Shine Sweep (1) и Lift & Glow (2): карточка приподнимается со свечением, по ней пробегает диагональный блик, иконка чуть светится. Без курсорных эффектов и подписи — чистый CSS, минималистично.'
+};
+
 /* ── Варианты hover-анимаций ── */
 var VARIANTS = [
   { id: 'shine', name: 'Shine Sweep', tag: 'текущая', desc: 'Диагональный блик пробегает по карточке + лёгкий подъём и свечение. То, что сейчас на сайте.' },
@@ -41,6 +49,14 @@ var VARIANTS = [
 
 /* ── CSS-сниппеты для кнопки «Скопировать CSS» (готовы к вставке в styles.css) ── */
 var SNIPPETS = {
+  combo2:
+'/* CSS — комбо 1+2: Shine Sweep + Lift & Glow. Чистый CSS, без JS. */\n' +
+'.rune-card { overflow:hidden; transition:transform var(--dur-base) var(--ease-spring), border-color var(--dur-base) var(--ease-snap), box-shadow var(--dur-base) var(--ease-snap); }\n' +
+'.rune-card::after { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.16) 50%,transparent 70%); transform:translateX(-110%); opacity:0; transition:opacity var(--dur-fast) var(--ease-snap), transform .65s var(--ease-soft); }\n' +
+'.rune-card img { transition:filter var(--dur-base) var(--ease-snap); }\n' +
+'.rune-card:hover { transform:translateY(-4px) scale(1.06); border-color:var(--accent); box-shadow:0 10px 22px rgba(0,0,0,.45),0 0 0 1px var(--accent-border),0 0 20px var(--accent-glow); z-index:3; }\n' +
+'.rune-card:hover::after { opacity:1; transform:translateX(110%); }\n' +
+'.rune-card:hover img { filter:drop-shadow(0 0 6px var(--accent-glow)); }',
   combo:
 '/* CSS — комбо: lift + shine + spotlight + label. Требует <div class="rune-card-name"> внутри карточки */\n' +
 '.rune-card { overflow:hidden; transition:transform var(--dur-base) var(--ease-spring), border-color var(--dur-base) var(--ease-snap), box-shadow var(--dur-base) var(--ease-snap); }\n' +
@@ -149,7 +165,7 @@ function buildVariant(v, idx) {
 }
 
 var wrap = document.getElementById('hlWrap');
-wrap.innerHTML = buildVariant(COMBO, -1) + VARIANTS.map(buildVariant).join('');
+wrap.innerHTML = buildVariant(COMBO, -1) + buildVariant(COMBO2, -1) + VARIANTS.map(buildVariant).join('');
 
 /* ── Кнопка копирования CSS ── */
 wrap.addEventListener('click', function (e) {
