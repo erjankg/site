@@ -1380,23 +1380,112 @@
     return list;
   })();
 
-  // HTML <option>-ов для выпадашки выбора чемпиона.
-  // current — текущий выбор строки; usedSet — чемпы, занятые ДРУГИМИ строками (уходят вниз списка).
-  function _champOptionsHtml(current, usedSet) {
-    var avail = [], used = [];
-    ALL_CHAMPIONS.forEach(function(n) {
-      if (n === current) return;
-      if (usedSet && usedSet[n]) used.push(n); else avail.push(n);
+  function _champIconUrl(name) {
+    return (typeof window._champIcon === 'function') ? window._champIcon(name) : '';
+  }
+
+  // Визуальный выбор чемпиона: сетка портретов + поиск + фильтр по роли (как в драфте).
+  //   role    — текущая роль ('top'..'support') для префильтра сетки
+  //   usedSet — {имя: true} занятые другими строками (показываем приглушённо, уходят вниз)
+  //   onPick(name) — колбэк при выборе чемпиона
+  function _openChampPicker(role, usedSet, onPick) {
+    var roleMap = { top: 'Top', jungle: 'Jungle', mid: 'Mid', adc: 'ADC', support: 'Support' };
+    var source = (window._champsRaw && window._champsRaw.length)
+      ? window._champsRaw.map(function(c) { return { name: c.name, is: c.is || {} }; })
+      : ALL_CHAMPIONS.map(function(n) { return { name: n, is: {} }; });
+
+    var ov = document.createElement('div');
+    ov.className = 'cms-modal-overlay';
+    ov.style.zIndex = '10001';
+    ov.style.padding = '0';
+    ov.onclick = function(e) { if (e.target === ov) ov.remove(); };
+
+    var box = document.createElement('div');
+    box.className = 'cms-modal-win';
+    box.style.cssText = 'width:min(1080px,96vw);height:92vh;max-width:none;max-height:none;margin:0;display:flex;flex-direction:column;overflow:hidden;';
+
+    var activeRole = roleMap[role] ? role : '';
+    var query = '';
+
+    var hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;';
+    hdr.innerHTML = '<h3 style="margin:0;color:#fff;font-size:17px;">Выбери чемпиона</h3>' +
+      '<button class="cmswr-pk-close" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>';
+    hdr.querySelector('.cmswr-pk-close').onclick = function() { ov.remove(); };
+    box.appendChild(hdr);
+
+    var search = document.createElement('input');
+    search.className = 'cms-input';
+    search.placeholder = '🔍 Поиск по имени…';
+    search.style.cssText = 'margin-bottom:10px;flex:0 0 auto;';
+    box.appendChild(search);
+
+    var chipsRow = document.createElement('div');
+    chipsRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;flex:0 0 auto;';
+    var roleChips = [['', 'Все'], ['top', 'Top'], ['jungle', 'Jungle'], ['mid', 'Mid'], ['adc', 'ADC'], ['support', 'Support']];
+    roleChips.forEach(function(rc) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.dataset.role = rc[0];
+      b.textContent = rc[1];
+      b.style.cssText = 'padding:5px 12px;border-radius:14px;cursor:pointer;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.8);';
+      b.onclick = function() { activeRole = rc[0]; syncChips(); renderGrid(); };
+      chipsRow.appendChild(b);
     });
-    var os = ' style="background:#1d1d2e;color:#fff;"';   // сплошной тёмный фон, иначе список опций белый на белом
-    var html = '<option value=""' + os + (current ? '' : ' selected') + '>— выбери чемпиона —</option>';
-    if (current) html += '<option value="' + _esc(current) + '"' + os + ' selected>' + _esc(current) + '</option>';
-    avail.forEach(function(n) { html += '<option value="' + _esc(n) + '"' + os + '>' + _esc(n) + '</option>'; });
-    if (used.length) {
-      html += '<option value=""' + os + ' disabled>──── уже выбраны ────</option>';
-      used.forEach(function(n) { html += '<option value="' + _esc(n) + '"' + os + '>' + _esc(n) + ' • занят</option>'; });
+    box.appendChild(chipsRow);
+
+    function syncChips() {
+      Array.prototype.forEach.call(chipsRow.children, function(b) {
+        var on = b.dataset.role === activeRole;
+        b.style.background = on ? 'rgba(11,196,227,0.18)' : 'rgba(255,255,255,0.05)';
+        b.style.borderColor = on ? 'rgba(11,196,227,0.55)' : 'rgba(255,255,255,0.15)';
+        b.style.color = on ? '#0bc4e3' : 'rgba(255,255,255,0.8)';
+      });
     }
-    return html;
+
+    var grid = document.createElement('div');
+    grid.style.cssText = 'flex:1 1 auto;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;align-content:start;padding:4px 2px;';
+    box.appendChild(grid);
+
+    function renderGrid() {
+      var rk = roleMap[activeRole];
+      var list = source.filter(function(c) {
+        if (rk && !(c.is && c.is[rk])) return false;
+        if (query && c.name.toLowerCase().indexOf(query) === -1) return false;
+        return true;
+      });
+      list.sort(function(a, b) {
+        var ua = usedSet && usedSet[a.name] ? 1 : 0;
+        var ub = usedSet && usedSet[b.name] ? 1 : 0;
+        if (ua !== ub) return ua - ub;       // занятые — вниз
+        return a.name.localeCompare(b.name);
+      });
+      if (!list.length) { grid.innerHTML = '<div style="color:rgba(255,255,255,0.4);padding:20px;grid-column:1/-1;">Ничего не найдено</div>'; return; }
+      var html = '';
+      list.forEach(function(c) {
+        var used = usedSet && usedSet[c.name];
+        html += '<button type="button" class="cmswr-champ" data-name="' + _esc(c.name) + '" ' +
+          'style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 4px;border-radius:10px;cursor:pointer;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);' + (used ? 'opacity:0.4;' : '') + '">' +
+          '<img loading="lazy" decoding="async" src="' + _esc(_champIconUrl(c.name)) + '" alt="" style="width:56px;height:56px;border-radius:10px;object-fit:cover;background:rgba(0,0,0,0.3);" onerror="this.style.visibility=\'hidden\'">' +
+          '<span style="font-size:11px;color:rgba(255,255,255,0.85);text-align:center;line-height:1.1;word-break:break-word;">' + _esc(c.name) + (used ? ' ✓' : '') + '</span>' +
+          '</button>';
+      });
+      grid.innerHTML = html;
+    }
+
+    grid.onclick = function(e) {
+      var btn = e.target.closest ? e.target.closest('.cmswr-champ') : null;
+      if (!btn) return;
+      var nm = btn.getAttribute('data-name');
+      if (nm) { onPick(nm); ov.remove(); }
+    };
+    search.oninput = function() { query = this.value.trim().toLowerCase(); renderGrid(); };
+
+    ov.appendChild(box);
+    document.body.appendChild(ov);
+    syncChips();
+    renderGrid();
+    try { search.focus(); } catch (e) {}
   }
 
   // Парсер таблицы из буфера обмена.
@@ -1689,10 +1778,6 @@
       if (!parsedRows) return;
       var st = computeState();
 
-      // Сколько раз каждый чемпион уже выбран — чтобы занятые уходили вниз выпадашки.
-      var usedAll = {};
-      parsedRows.forEach(function(r) { if (r._assigned) usedAll[r._assigned] = (usedAll[r._assigned] || 0) + 1; });
-
       var th = 'color:rgba(255,255,255,0.45);font-weight:700;text-align:left;padding:4px 6px;font-size:10px;text-transform:uppercase;letter-spacing:0.4px;';
       var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;">' +
         '<thead><tr>' +
@@ -1704,23 +1789,19 @@
         '</tr></thead><tbody>';
 
       parsedRows.forEach(function(r, i) {
-        // Занятые ДРУГИМИ строками (свой текущий выбор не считаем занятым).
-        var usedSet = {};
-        Object.keys(usedAll).forEach(function(n) {
-          var others = usedAll[n] - (r._assigned === n ? 1 : 0);
-          if (others > 0) usedSet[n] = 1;
-        });
         var rowBg = r._assigned ? '' : 'background:rgba(231,76,60,0.07);';
         var selBorder = r._assigned ? 'rgba(46,204,113,0.5)' : 'rgba(231,76,60,0.6)';
         // Имя с lolm — только мелкая серая подсказка (для парсинга оно не используется).
         var hint = r._rawName ? '<div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;">lolm: ' + _esc(r._rawName) + '</div>' : '';
+        var pickInner = r._assigned
+          ? '<img src="' + _esc(_champIconUrl(r._assigned)) + '" alt="" style="width:26px;height:26px;border-radius:6px;object-fit:cover;flex:0 0 auto;" onerror="this.style.display=\'none\'"><span>' + _esc(r._assigned) + '</span>'
+          : '<span style="color:rgba(231,76,60,0.95);">▾ выбери чемпиона</span>';
         html += '<tr style="border-top:1px solid rgba(255,255,255,0.06);' + rowBg + '">' +
           '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.4);font-size:11px;">' + (i + 1) + '</td>' +
           '<td style="padding:4px 6px;text-align:center;color:#0bc4e3;font-weight:700;">' + r.wr + '%</td>' +
           '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.pr + '%</td>' +
           '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.br + '%</td>' +
-          '<td style="padding:4px 6px;"><select data-i="' + i + '" class="cms-input" style="width:100%;padding:4px 6px;font-size:12px;background:#1d1d2e;color:#fff;border-color:' + selBorder + ';">' +
-            _champOptionsHtml(r._assigned, usedSet) + '</select>' + hint + '</td>' +
+          '<td style="padding:4px 6px;"><button type="button" class="cmswr-pick" data-i="' + i + '" style="display:flex;align-items:center;gap:8px;width:100%;padding:5px 8px;font-size:13px;font-weight:700;cursor:pointer;border-radius:8px;border:1.5px solid ' + selBorder + ';background:rgba(255,255,255,0.04);color:#fff;text-align:left;">' + pickInner + '</button>' + hint + '</td>' +
           '</tr>';
       });
       html += '</tbody></table>';
@@ -1747,11 +1828,16 @@
 
       preview.innerHTML = html + sum;
 
-      Array.prototype.forEach.call(preview.querySelectorAll('select[data-i]'), function(selEl) {
-        selEl.onchange = function() {
+      Array.prototype.forEach.call(preview.querySelectorAll('.cmswr-pick'), function(btnEl) {
+        btnEl.onclick = function() {
           var idx = parseInt(this.getAttribute('data-i'), 10);
-          parsedRows[idx]._assigned = this.value || '';
-          renderAssign();
+          // Занятые ДРУГИМИ строками — показываем в пикере приглушённо, чтобы не выбрать дважды.
+          var taken = {};
+          parsedRows.forEach(function(rr, j) { if (j !== idx && rr._assigned) taken[rr._assigned] = 1; });
+          _openChampPicker(roleSelect.value, taken, function(name) {
+            parsedRows[idx]._assigned = name;
+            renderAssign();
+          });
         };
       });
 
@@ -4718,6 +4804,9 @@
   (function() {
     var _inlineTexts = {};
     var _activeEdit  = null;
+    var _editOn      = false;
+    var _editListener = null;
+    var _editBtn     = null;
 
     // Tags that should never be treated as text targets (form elements, media, scripts)
     // BUTTON and A are NOT here — in edit mode their text IS editable
@@ -4908,30 +4997,19 @@
     /* ── ОДИН глобальный floating toggle ──
        Поверх всего (z-index: 999999). ВКЛ → весь текст на экране редактируется
        (главная, модалки, всё). ВЫКЛ → ничего не перехватывается. */
-    window.cmsInitInlineEdit = function() {
-      if (document.getElementById('cmsEditModeToggle')) return;
-      window.cmsLoadInlineTexts();
-
-      var editOn = false;
-      var listener = null;
-
-      var btn = document.createElement('button');
-      btn.id = 'cmsEditModeToggle';
-      btn.className = 'cms-edit-mode-toggle';
-      btn.setAttribute('data-cms-inline-skip', '1');
-      btn.innerHTML = '<span class="cms-edit-toggle-icon">✏</span>'
-        + '<span class="cms-edit-toggle-label">Редактировать тексты</span>';
-
-      btn.onclick = function(e) {
-        e.stopPropagation();
-        editOn = !editOn;
-        btn.classList.toggle('active', editOn);
-        btn.querySelector('.cms-edit-toggle-label').textContent =
-          editOn ? 'Редактирование ВКЛ' : 'Редактировать тексты';
-        document.body.classList.toggle('cms-edit-mode', editOn);
-
-        if (editOn) {
-          listener = function(e) {
+    // Единая точка вкл/выкл режима: метка на body, перехватчик кликов,
+    // подпись кнопки и попап меняются ВСЕГДА вместе — рассинхрон невозможен.
+    function _setEdit(on) {
+      _editOn = on;
+      document.body.classList.toggle('cms-edit-mode', on);
+      if (_editBtn) {
+        _editBtn.classList.toggle('active', on);
+        var lbl = _editBtn.querySelector('.cms-edit-toggle-label');
+        if (lbl) lbl.textContent = on ? 'Редактирование ВКЛ' : 'Редактировать тексты';
+      }
+      if (on) {
+        if (!_editListener) {
+          _editListener = function(e) {
             // Пропускаем только саму кнопку toggle и popup редактора
             if (e.target.closest && e.target.closest('#cmsEditModeToggle')) return;
             if (e.target.closest && e.target.closest('.cms-inline-edit-popup')) return;
@@ -4945,14 +5023,39 @@
             _openPopup(target, key);
           };
           // capture=true на document — ловим ВСЁ, включая модалки
-          document.addEventListener('click', listener, true);
-        } else {
-          if (listener) { document.removeEventListener('click', listener, true); listener = null; }
-          _closePopup();
+          document.addEventListener('click', _editListener, true);
         }
-      };
+      } else {
+        if (_editListener) { document.removeEventListener('click', _editListener, true); _editListener = null; }
+        _closePopup();
+      }
+    }
 
+    window.cmsInitInlineEdit = function() {
+      if (document.getElementById('cmsEditModeToggle')) return;
+      window.cmsLoadInlineTexts();
+
+      var btn = document.createElement('button');
+      btn.id = 'cmsEditModeToggle';
+      btn.className = 'cms-edit-mode-toggle';
+      btn.setAttribute('data-cms-inline-skip', '1');
+      btn.innerHTML = '<span class="cms-edit-toggle-icon">✏</span>'
+        + '<span class="cms-edit-toggle-label">Редактировать тексты</span>';
+
+      btn.onclick = function(e) { e.stopPropagation(); _setEdit(!_editOn); };
+
+      _editBtn = btn;
+      _setEdit(false);
       document.body.appendChild(btn);
+    };
+
+    // Полный сброс: гасим режим И убираем кнопку. Вызывается при выходе из
+    // админки, чтобы редактирование не «залипало» у неавторизованного юзера.
+    window.cmsTeardownInlineEdit = function() {
+      _setEdit(false);
+      if (_editBtn) { _editBtn.remove(); _editBtn = null; }
+      var stray = document.getElementById('cmsEditModeToggle');
+      if (stray) stray.remove();
     };
 
   })();

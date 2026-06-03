@@ -387,7 +387,7 @@ body {
 /* Стрелка = группа из двух path: видимая тонкая + невидимая широкая для клика */
 .tb-arrows-layer .tb-arrow-vis {
   fill: none;
-  stroke-width: 5;
+  stroke-width: 2.5;
   stroke-linecap: round;
   stroke-linejoin: round;
   pointer-events: none;
@@ -410,11 +410,11 @@ body {
 /* ── ТОКЕНЫ (чемпы на карте) ───────────────────────── */
 .tb-token {
   position: absolute;
-  width: 48px;
-  height: 48px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid var(--tb-blue);
+  border: 2px solid var(--tb-blue);
   box-shadow: 0 0 12px var(--tb-blue-glow), 0 4px 12px rgba(0,0,0,0.5);
   cursor: grab;
   transform: translate(-50%, -50%);
@@ -455,9 +455,9 @@ body {
 }
 .tb-ward-on-map .tb-ward-radius {
   position: absolute;
-  /* радиус = 16% ширины карты в диаметре (≈ радиус видимости WR) */
-  width: 16cqw;
-  height: 16cqw;
+  /* радиус видимости ужат вдвое */
+  width: 8cqw;
+  height: 8cqw;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -466,8 +466,8 @@ body {
 }
 .tb-ward-on-map .tb-ward-dot {
   position: absolute;
-  width: 22px;
-  height: 22px;
+  width: 11px;
+  height: 11px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -667,9 +667,92 @@ body {
   .tb-clear-btn { padding: 6px 8px; font-size: 11px; }
   .tb-layout { padding: 8px 8px; }
   .tb-sidebar { padding: 8px; }
-  .tb-token { width: 38px; height: 38px; border-width: 2px; }
-  .tb-ward-on-map .tb-ward-dot { width: 14px; height: 14px; border-width: 2px; }
+  .tb-token { width: 27px; height: 27px; border-width: 2px; }
+  .tb-ward-on-map .tb-ward-dot { width: 7px; height: 7px; border-width: 2px; }
   .tb-picker-grid { grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 6px; padding: 10px; }
   .tb-pick img { width: 44px; height: 44px; }
   .tb-pick-name { font-size: 10px; max-width: 56px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PHASE 2 — мап-коуч: цвета, роли, карта, карандаш, заметки
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Цветовые свотчи стрелок/карандаша ── */
+.tb-colors { display: inline-flex; gap: 5px; align-items: center; margin-left: 6px; }
+.tb-color {
+  width: 18px; height: 18px; border-radius: 50%; padding: 0; cursor: pointer;
+  border: 2px solid rgba(255,255,255,0.25);
+}
+.tb-color.tb-color-active { border-color: #fff; box-shadow: 0 0 0 2px var(--tb-accent); }
+
+/* ── Вкладки ролей в пикере (как на сайте) ── */
+.tb-picker-roles { display: flex; gap: 6px; padding: 12px 14px 0; flex-wrap: wrap; }
+.tb-prole {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700;
+  padding: 6px 11px; border-radius: 9px; cursor: pointer; color: var(--tb-text-mute);
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+}
+.tb-prole img { width: 15px; height: 15px; object-fit: contain; }
+.tb-prole:hover { color: var(--tb-text); }
+.tb-prole.tb-prole-active { background: var(--tb-accent-dim); border-color: var(--tb-accent); color: var(--tb-accent); }
+
+/* ── Панель карты ── */
+.tb-map-panel {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 14px; background: var(--tb-bg-secondary); border-bottom: 1px solid var(--tb-accent-border);
+}
+.tb-map-panel[hidden] { display: none; }
+.tb-map-panel-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tb-mp-btn {
+  font-size: 12px; font-weight: 700; padding: 7px 12px; border-radius: 9px; cursor: pointer;
+  background: var(--tb-bg-card); border: 1px solid var(--tb-accent-border); color: var(--tb-text);
+}
+.tb-mp-btn:hover { border-color: var(--tb-accent); }
+.tb-mp-toggle.tb-mp-on { background: var(--tb-accent-dim); border-color: var(--tb-accent); color: var(--tb-accent); }
+.tb-mp-reset { color: var(--tb-red); border-color: var(--tb-red-soft); }
+.tb-mp-url {
+  flex: 1; min-width: 160px; font-size: 12px; padding: 7px 10px; border-radius: 9px;
+  background: var(--tb-bg-input); border: 1px solid var(--tb-accent-border); color: var(--tb-text); outline: none;
+}
+.tb-mp-url:focus { border-color: var(--tb-accent); }
+.tb-mp-scale { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--tb-text-mute); }
+.tb-mp-scale input[type=range] { width: 130px; accent-color: var(--tb-accent); }
+.tb-map-panel-hint { font-size: 11px; color: var(--tb-text-faint); }
+
+/* Режим калибровки: карта ловит drag, курсор-перекрестие */
+.tb-board.tb-calib { cursor: move; }
+.tb-board.tb-calib .tb-map-bg { transition: none; }
+.tb-board.tb-calib .tb-tokens-layer,
+.tb-board.tb-calib .tb-arrows-layer { pointer-events: none; }
+
+/* ── Карандаш (свободная линия) ── */
+.tb-arrows-layer .tb-pen {
+  fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+  pointer-events: stroke; cursor: grab;
+}
+
+/* ── Заметки на карте ── */
+.tb-note {
+  position: absolute; transform: translate(-50%, -50%); z-index: 6;
+  min-width: 40px; max-width: 220px;
+  display: flex; align-items: stretch; gap: 0;
+  background: rgba(1, 13, 24, 0.9); border: 1px solid var(--tb-accent-border);
+  border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,0.5); overflow: hidden;
+}
+.tb-note-grip {
+  flex: none; width: 16px; cursor: grab; background: var(--tb-accent-dim);
+  display: flex; align-items: center; justify-content: center; color: var(--tb-accent);
+  font-size: 11px; user-select: none; touch-action: none;
+}
+.tb-note-text {
+  flex: 1; padding: 6px 9px; font-size: 13px; font-weight: 600; color: #ffe9a8;
+  outline: none; min-height: 1em; white-space: pre-wrap; word-break: break-word;
+}
+.tb-note-text:empty::before { content: 'текст…'; color: var(--tb-text-faint); }
+
+@media (max-width: 768px) and (orientation: portrait) {
+  .tb-note-text { font-size: 12px; }
+  .tb-picker-roles { padding: 10px 10px 0; }
+  .tb-prole { padding: 5px 9px; font-size: 11px; }
 }

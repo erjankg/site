@@ -2082,6 +2082,7 @@
         var DD='https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
         filtered.forEach(function(ch){
             var div=document.createElement('div');
+            div.className='pick-card';
             div.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px;border-radius:10px;border:2px solid transparent;transition:all 0.15s;';
             div.onmouseenter=function(){div.style.borderColor='var(--sel-text)';div.style.background='var(--sel-dim)';};
             div.onmouseleave=function(){div.style.borderColor='transparent';div.style.background='';};
@@ -2841,6 +2842,7 @@
         list.forEach(function(c) {
             var isSel = selected.indexOf(c.name) !== -1;
             var wrap = document.createElement('div');
+            wrap.className = 'pick-card';
             wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:2px;border-radius:9px;border:2px solid '+(isSel?'var(--sel-text)':'transparent')+';background:'+(isSel?'var(--sel-dim)':'transparent')+';transition:all 0.12s;';
             var img = document.createElement('img');
             img.src = c.img || '';
@@ -3114,6 +3116,7 @@
         if (bar) bar.remove();
         document.querySelectorAll('.cms-inline-edit-popup').forEach(function(el) { el.remove(); });
         document.querySelectorAll('.cms-edit-btn, .cms-add-btn').forEach(function(el) { el.remove(); });
+        try { if (window.cmsTeardownInlineEdit) window.cmsTeardownInlineEdit(); } catch (e) {}
         try { if (window.wrprRender) window.wrprRender(); } catch (e) {}
         try { if (window.cmsRenderItems && window._cmsLoaded) window.cmsRenderItems(); } catch (e) {}
         try { if (window.cmsRenderRunes && window._cmsLoaded) window.cmsRenderRunes(); } catch (e) {}

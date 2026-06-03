@@ -21,6 +21,17 @@
     <button class="tb-tool" data-tool="arrow" title="Рисовать стрелки (ротации). Можно двигать любой объект зажатием.">
       <span class="tb-tool-icon">↗</span> Стрелка
     </button>
+    <button class="tb-tool" data-tool="pen" title="Свободное рисование карандашом">
+      <span class="tb-tool-icon">✏</span> Карандаш
+    </button>
+    <button class="tb-tool" data-tool="note" title="Текстовая заметка на карте">
+      <span class="tb-tool-icon">📝</span> Заметка
+    </button>
+    <span class="tb-colors" title="Цвет стрелок и карандаша">
+      <button class="tb-color tb-color-active" data-color="#FFD700" style="background:#FFD700" title="Золотой"></button>
+      <button class="tb-color" data-color="#3ca0e6" style="background:#3ca0e6" title="Синяя команда"></button>
+      <button class="tb-color" data-color="#e64646" style="background:#e64646" title="Красная команда"></button>
+    </span>
   </div>
   <div class="tb-toolbar-group">
     <button class="tb-tool tb-tool-ward" data-tool="ward-ally" title="Свой вард (синий)">
@@ -31,15 +42,37 @@
     </button>
   </div>
   <div class="tb-toolbar-group">
+    <button class="tb-mirror-btn" id="tbMapBtn" title="Карта: загрузить свою / калибровать">
+      <span class="tb-tool-icon">🗺</span> Карта
+    </button>
     <button class="tb-mirror-btn" id="tbMirrorBtn" title="Поменять стороны (Baron / Dragon side swap)">
       <span class="tb-tool-icon">⇄</span> Стороны
     </button>
   </div>
   <div class="tb-toolbar-group tb-toolbar-right">
-    <button class="tb-clear-btn" data-clear="arrows" title="Очистить только стрелки">Стрелки</button>
+    <button class="tb-clear-btn" data-clear="arrows" title="Очистить стрелки и карандаш">Стрелки</button>
     <button class="tb-clear-btn" data-clear="wards" title="Очистить только варды">Варды</button>
+    <button class="tb-clear-btn" data-clear="notes" title="Очистить заметки">Заметки</button>
     <button class="tb-clear-btn tb-clear-all" data-clear="all" title="Очистить всё">Всё</button>
   </div>
+</div>
+
+<!-- Панель карты (калибровка / своя картинка) -->
+<div class="tb-map-panel" id="tbMapPanel" hidden>
+  <div class="tb-map-panel-row">
+    <button class="tb-mp-btn" id="tbMapUpload">📁 Загрузить файл</button>
+    <input type="file" id="tbMapFile" accept="image/*" hidden>
+    <input type="text" class="tb-mp-url" id="tbMapUrl" placeholder="…или вставь ссылку на картинку">
+    <button class="tb-mp-btn" id="tbMapUrlApply">OK</button>
+  </div>
+  <div class="tb-map-panel-row">
+    <button class="tb-mp-btn tb-mp-toggle" id="tbMapCalib" title="Двигать карту мышкой, колесо/слайдер — масштаб">🎯 Калибровка</button>
+    <label class="tb-mp-scale">Масштаб
+      <input type="range" id="tbMapScale" min="0.4" max="3" step="0.02" value="1">
+    </label>
+    <button class="tb-mp-btn tb-mp-reset" id="tbMapReset">↺ Сброс карты</button>
+  </div>
+  <div class="tb-map-panel-hint" id="tbMapHint"></div>
 </div>
 
 <main class="tb-layout">
@@ -127,6 +160,14 @@
       <span class="tb-picker-title">Выбери чемпиона</span>
       <input type="text" class="tb-picker-search" id="tbPickerSearch" placeholder="Поиск по имени…" autocomplete="off">
       <button class="tb-picker-close" data-picker-close>×</button>
+    </div>
+    <div class="tb-picker-roles" id="tbPickerRoles">
+      <button class="tb-prole tb-prole-active" data-role="all">Все</button>
+      <button class="tb-prole" data-role="Top"><img src="../image/role_top.webp" alt="">Топ</button>
+      <button class="tb-prole" data-role="Jungle"><img src="../image/role_jungle.webp" alt="">Лес</button>
+      <button class="tb-prole" data-role="Mid"><img src="../image/role_mid.webp" alt="">Мид</button>
+      <button class="tb-prole" data-role="ADC"><img src="../image/role_adc.webp" alt="">АДК</button>
+      <button class="tb-prole" data-role="Support"><img src="../image/role_support.webp" alt="">Сап</button>
     </div>
     <div class="tb-picker-grid" id="tbPickerGrid">
       <div class="tb-picker-loading">Загружаю чемпов…</div>

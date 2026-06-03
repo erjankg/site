@@ -6574,30 +6574,6 @@ body.cms-edit-mode :not(input):not(textarea):not(select):not(#cmsEditModeToggle)
 }
 .cms-edit-toggle-icon { font-size: 14px; }
 
-/* Per-modal edit toggle (injected into modal headers) */
-.cms-modal-edit-toggle {
-  padding: 4px 10px;
-  background: rgba(255, 215, 0, 0.07);
-  border: 1px solid rgba(255, 215, 0, 0.28);
-  color: rgba(255, 215, 0, 0.65);
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 700;
-  margin-right: 6px;
-  transition: var(--tx-mid);
-  flex-shrink: 0;
-}
-.cms-modal-edit-toggle:hover {
-  background: rgba(255, 215, 0, 0.15);
-  color: #ffd700;
-}
-.cms-modal-edit-toggle.active {
-  background: rgba(11, 196, 227, 0.12);
-  border-color: rgba(11, 196, 227, 0.55);
-  color: var(--accent);
-}
-
 /* Inline edit popup */
 .cms-inline-edit-popup {
   position: fixed;
@@ -6915,6 +6891,21 @@ body.anims-frozen *::after {
   position: relative;
 }
 
+/* ── Карточки выбора (модалка «Чемпионы» #scGrid и универсальный
+      выбор чемпиона/предмета/руны #champPickerGrid): подъём + свечение.
+      Карточки строятся в JS с инлайн-стилями, класс вешается там же.
+      Без overflow/блика — иконки тут крупнее рамки, обрезка их ломала. ── */
+.pick-card {
+  position: relative;
+}
+.pick-card img { transition: filter var(--dur-base) var(--ease-snap); }
+.pick-card:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: var(--shadow-md), 0 0 18px var(--accent-glow);
+  z-index: 3;
+}
+.pick-card:hover img { filter: drop-shadow(0 0 5px var(--accent-glow)); }
+
 /* ── Tabs: sliding underline indicator ── */
 .cs-tab {
   position: relative;
@@ -7011,28 +7002,58 @@ body.anims-frozen *::after {
 .dcoop-tab { position: relative; z-index: 1; }
 .dcoop-tab.active { color: var(--accent); background: transparent; border-bottom-color: transparent; }
 
-/* ── Капсула-ховер для ghost-кнопок-переключателей ──
-   (филлованные/иконочные кнопки намеренно не трогаем) */
+/* ═══════════════════════════════════════════════════════════
+   ЕДИНАЯ СИСТЕМА АНИМАЦИИ КНОПОК (через переменные).
+   Меняешь значения тут — меняется поведение ВСЕХ кнопок сразу.
+   ─ press : лёгкое «нажатие» (scale) — на ВСЕХ кнопках сайта
+   ─ capsule: капсула-подложка при наведении — на текстовых/ghost
+              кнопках (иконки-крестики ⚙ ✕ намеренно без капсулы)
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --btn-dur:        160ms;
+  --btn-ease:       cubic-bezier(0.32, 0.72, 0, 1);
+  --btn-press:      0.96;                  /* масштаб при нажатии */
+  --btn-cap-radius: 999px;                 /* радиус капсулы */
+  --btn-row-radius: 10px;                  /* радиус строчных кнопок-рядов */
+  --btn-cap-bg:     var(--accent-dim);     /* фон капсулы при наведении */
+  --btn-cap-bg-on:  var(--accent-dim);     /* фон активной капсулы */
+}
+
+/* ── 1. Нажатие на ВСЕХ кнопках (низкорисково, ничего не ломает) ── */
+button { transition: transform var(--btn-dur) var(--btn-ease); }
+button:active { transform: scale(var(--btn-press)); }
+
+/* ── 2. Капсула-ховер: текстовые / ghost / переключатели ── */
+.lp-btn,
 .lp-btn-v2,
 .ic-range-btn-v2,
-.ic-hit-btn-v2 {
-  border-radius: 999px;
+.ic-hit-btn-v2,
+.header-view-btn,
+.lang-option,
+.dcoop-role-btn,
+.user-menu-item {
+  border-radius: var(--btn-cap-radius);
   transition:
-    background-color var(--dur-base) var(--ease-snap),
-    border-color var(--dur-base) var(--ease-snap),
-    color var(--dur-base) var(--ease-snap),
-    transform var(--dur-fast) var(--ease-snap);
+    background-color var(--btn-dur) var(--btn-ease),
+    border-color var(--btn-dur) var(--btn-ease),
+    color var(--btn-dur) var(--btn-ease),
+    transform var(--btn-dur) var(--btn-ease);
 }
 .lp-btn-v2:hover,
 .ic-range-btn-v2:hover,
-.ic-hit-btn-v2:hover { background-color: var(--accent-dim); }
-.header-view-btn:hover:not(.active) { background: var(--accent-dim); }
+.ic-hit-btn-v2:hover,
+.header-view-btn:hover:not(.active),
+.lang-option:hover:not(.active),
+.dcoop-role-btn:hover:not(.active),
+.user-menu-item:hover { background-color: var(--btn-cap-bg); }
 
-/* у строчных кнопок-рядов скругляем подсветку в капсулу */
-.side-btn,
-.user-menu-item { border-radius: 10px; }
+/* ── 3. Строчные кнопки-ряды (сайдбар) — скруглённая капсула-подсветка ── */
+.side-btn { border-radius: var(--btn-row-radius); }
+.user-menu-item { border-radius: var(--btn-row-radius); }   /* ряд, не таблетка */
+
 @media (prefers-reduced-motion: reduce) {
   .tab-pill { transition-duration: 0.01ms; }
   .cs-list-body { animation-duration: 0.01ms; }
+  button { transition-duration: 0.01ms; }
 }
 

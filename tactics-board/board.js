@@ -151,12 +151,16 @@
   const state = {
     teams: { blue: [null, null, null, null, null], red: [null, null, null, null, null] },
     tokens: {},        // tokenId → { team, idx, name, x, y, el }
-    tool: null,        // null | 'arrow' | 'ward-ally' | 'ward-enemy'
+    tool: null,        // null | 'arrow' | 'pen' | 'note' | 'ward-ally' | 'ward-enemy'
     pickerTarget: null,
     tokenCounter: 0,
     mirrored: false,
     champions: [],     // [{ name, is }]
-    champLoadDone: false
+    champLoadDone: false,
+    arrowColor: '#FFD700',   // цвет стрелок/карандаша
+    pickerRole: 'all',       // фильтр ролей в пикере
+    mapEdit: false,          // режим калибровки карты
+    undo: []                 // стек функций отмены (Ctrl+Z)
   };
 
   const boardEl     = document.getElementById('tbBoard');
@@ -167,6 +171,10 @@
   const pickerGrid  = document.getElementById('tbPickerGrid');
   const pickerSearch= document.getElementById('tbPickerSearch');
   const statusEl    = document.getElementById('tbStatus');
+
+  // ── Отмена (Ctrl+Z) ──
+  function pushUndo(fn) { state.undo.push(fn); if (state.undo.length > 60) state.undo.shift(); }
+  function doUndo() { const fn = state.undo.pop(); if (fn) try { fn(); } catch (e) {} }
 
   // ───────────────────────────────────────────────────────────
   // 4. PICKER — модалка выбора чемпа
@@ -181,11 +189,13 @@
       return;
     }
     const q = (filter || '').trim().toLowerCase();
+    const role = state.pickerRole || 'all';
     const taken = new Set();
     state.teams.blue.forEach(n => n && taken.add(n));
     state.teams.red.forEach(n => n && taken.add(n));
 
     const html = state.champions
+      .filter(c => role === 'all' || (c.is && c.is[role]))
       .filter(c => !q || c.name.toLowerCase().includes(q))
       .map(c => {
         const isTaken = taken.has(c.name) ? ' tb-pick-taken' : '';
@@ -385,7 +395,18 @@
 
   // Главный pointerdown обработчик
   boardEl.addEventListener('pointerdown', e => {
-    // 1) Если ткнули по токену/варду/стрелке — всегда драгаем (в любом режиме)
+    if (e.button && e.button !== 0) return; // правый клик — отдаём contextmenu
+
+    // 0) Режим калибровки карты — двигаем картинку, всё остальное игнорим
+    if (state.mapEdit) { e.preventDefault(); startMapPan(e); return; }
+
+    // Клик по тексту заметки — даём редактировать, не драгаем
+    if (e.target.closest('.tb-note-text')) return;
+    // Клик по ручке заметки — тащим заметку
+    const grip = e.target.closest('.tb-note-grip');
+    if (grip) { e.preventDefault(); startDragNote(grip.parentElement, e); return; }
+
+    // 1) Если ткнули по токену/варду/стрелке/карандашу — всегда драгаем (в любом режиме)
     const token = e.target.closest('.tb-token');
     if (token) { e.preventDefault(); startDragToken(token, e); return; }
     const ward = e.target.closest('.tb-ward-on-map');
@@ -396,6 +417,10 @@
     // 2) Пустая область — действие активного инструмента
     if (state.tool === 'arrow') {
       startArrowDraw(e);
+    } else if (state.tool === 'pen') {
+      startPenDraw(e);
+    } else if (state.tool === 'note') {
+      createNoteAt(e);
     } else if (state.tool === 'ward-ally' || state.tool === 'ward-enemy') {
       placeWard(e);
     }
@@ -404,10 +429,18 @@
 
   boardEl.addEventListener('pointermove', e => {
     if (!dragState || e.pointerId !== dragState.pointerId) return;
-    if (dragState.kind === 'token' || dragState.kind === 'ward') {
+    if (dragState.kind === 'token' || dragState.kind === 'ward' || dragState.kind === 'note') {
       const { x, y } = getBoardCoords(e.clientX, e.clientY);
       dragState.el.style.left = x + '%';
       dragState.el.style.top = y + '%';
+    } else if (dragState.kind === 'mappan') {
+      mapState.offX = dragState.baseOffX + (e.clientX - dragState.startClientX);
+      mapState.offY = dragState.baseOffY + (e.clientY - dragState.startClientY);
+      applyMapTransform();
+    } else if (dragState.kind === 'pen') {
+      const { x, y } = getBoardCoords(e.clientX, e.clientY);
+      dragState.pts.push((x * 10).toFixed(1) + ' ' + (y * 10).toFixed(1));
+      dragState.path.setAttribute('d', 'M ' + dragState.pts.join(' L '));
     } else if (dragState.kind === 'arrow') {
       const rect = boardEl.getBoundingClientRect();
       const dxPct = ((e.clientX - dragState.startClientX) / rect.width) * 100;
@@ -435,18 +468,25 @@
       }
     } else if (dragState.kind === 'ward') {
       dragState.el.classList.remove('tb-token-dragging');
+    } else if (dragState.kind === 'note') {
+      // позиция уже в style — ничего сохранять не надо
+    } else if (dragState.kind === 'mappan') {
+      saveMap();
+    } else if (dragState.kind === 'pen') {
+      // слишком короткий штрих (случайный клик) — удаляем, иначе пишем отмену
+      if (dragState.pts.length < 3) dragState.path.remove();
+      else { const p = dragState.path; pushUndo(() => p.remove()); }
     } else if (dragState.kind === 'arrow-draw') {
-      // Если стрелка слишком короткая — удалить (случайный клик)
       const visPath = dragState.groupEl.querySelector('.tb-arrow-vis');
       const d = (visPath && visPath.getAttribute('d')) || '';
       const parts = d.match(/[-\d.]+/g);
+      let removed = false;
       if (parts && parts.length >= 4) {
         const dx = parseFloat(parts[2]) - parseFloat(parts[0]);
         const dy = parseFloat(parts[3]) - parseFloat(parts[1]);
-        if (Math.sqrt(dx*dx + dy*dy) < 30) dragState.groupEl.remove();
-      } else {
-        dragState.groupEl.remove();
-      }
+        if (Math.sqrt(dx*dx + dy*dy) < 30) { dragState.groupEl.remove(); removed = true; }
+      } else { dragState.groupEl.remove(); removed = true; }
+      if (!removed) { const g = dragState.groupEl; pushUndo(() => g.remove()); }
     }
     dragState = null;
   }
@@ -471,8 +511,8 @@
 
     const visPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
     visPath.setAttribute('class', 'tb-arrow-vis');
-    visPath.setAttribute('stroke', '#FFD700');
-    visPath.style.color = '#FFD700';
+    visPath.setAttribute('stroke', state.arrowColor);
+    visPath.style.color = state.arrowColor;
     visPath.setAttribute('marker-end', 'url(#tbArrowHead)');
     visPath.setAttribute('d', initialD);
 
