@@ -594,6 +594,7 @@
     if (S.view === 'tournament' && S.bracketTab === 'bracket') {
       _drawConnectors();
     }
+    if (window.placeTabPills) window.placeTabPills(root);
   }
   window._csRender = _render;
 

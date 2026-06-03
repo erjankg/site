@@ -6964,3 +6964,75 @@ body.anims-frozen *::after {
   border-radius: var(--r-sm);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Капсульный язык переключателей: скользящая пилюля во вкладках
+   (Турниры .cs-tabs / Кооп-драфт .dcoop-tabs) + капсула-ховер на
+   ghost-кнопках. Пилюлю позиционирует tab-pill.js (--ink-x/ширина/
+   высота через inline-стиль). Источник — вариант из tab-lab.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Сама пилюля — общий элемент, едет за активной вкладкой */
+.tab-pill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-radius: 999px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border-str);
+  box-shadow: 0 0 12px rgba(11, 196, 227, 0.18);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+  will-change: transform, width, height;
+  transition:
+    transform 320ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    width     320ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    height    220ms var(--ease-snap),
+    opacity   180ms var(--ease-snap);
+}
+
+/* ── Турниры: убираем старый подчерк, текст над пилюлей ── */
+.cs-tabs { position: relative; }
+.cs-tab { position: relative; z-index: 1; border-bottom-color: transparent !important; }
+.cs-tab::after { display: none !important; }            /* гасим sliding underline */
+.cs-tab.active { color: var(--accent); border-bottom-color: transparent !important; }
+
+/* лёгкий зум контента при смене вкладки (тело списка пересобирается) */
+.cs-list-body { animation: tabpill-content var(--dur-mid) var(--ease-soft); }
+@keyframes tabpill-content {
+  from { opacity: 0; transform: scale(0.985); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Кооп-драфт: гасим заливку активной, пилюля сама подсветит ── */
+.dcoop-tabs { position: relative; }
+.dcoop-tab { position: relative; z-index: 1; }
+.dcoop-tab.active { color: var(--accent); background: transparent; border-bottom-color: transparent; }
+
+/* ── Капсула-ховер для ghost-кнопок-переключателей ──
+   (филлованные/иконочные кнопки намеренно не трогаем) */
+.lp-btn-v2,
+.ic-range-btn-v2,
+.ic-hit-btn-v2 {
+  border-radius: 999px;
+  transition:
+    background-color var(--dur-base) var(--ease-snap),
+    border-color var(--dur-base) var(--ease-snap),
+    color var(--dur-base) var(--ease-snap),
+    transform var(--dur-fast) var(--ease-snap);
+}
+.lp-btn-v2:hover,
+.ic-range-btn-v2:hover,
+.ic-hit-btn-v2:hover { background-color: var(--accent-dim); }
+.header-view-btn:hover:not(.active) { background: var(--accent-dim); }
+
+/* у строчных кнопок-рядов скругляем подсветку в капсулу */
+.side-btn,
+.user-menu-item { border-radius: 10px; }
+@media (prefers-reduced-motion: reduce) {
+  .tab-pill { transition-duration: 0.01ms; }
+  .cs-list-body { animation-duration: 0.01ms; }
+}
+

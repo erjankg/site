@@ -163,6 +163,8 @@
       document.body.classList.remove('dcoop-fullscreen');
     var _aPanel = document.getElementById('dcoopAssistPanel'); if (_aPanel) _aPanel.parentNode.removeChild(_aPanel);
     }
+
+    if (window.placeTabPill && tabsRow && tab !== 'lobby') window.placeTabPill(tabsRow);
   }
 
   // ─── AUTH GATE ───

@@ -1526,14 +1526,27 @@
 
     var overlay = document.createElement('div');
     overlay.className = 'cms-modal-overlay';
+    // Прижимаем панель к правому краю и тянем на всю высоту.
+    overlay.style.justifyContent = 'flex-end';
+    overlay.style.alignItems = 'stretch';
+    overlay.style.padding = '0';
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
     win.className = 'cms-modal-win';
-    win.style.maxWidth = '1400px';
-    win.style.width = '96vw';
-    win.style.height = '94vh';
-    win.style.maxHeight = '94vh';
+    // Боковая панель справа во всю высоту. position:fixed прибивает её к краям экрана
+    // и не зависит от flex-центрирования/ограничений .cms-modal-win (max-width/max-height).
+    win.style.position = 'fixed';
+    win.style.top = '0';
+    win.style.right = '0';
+    win.style.bottom = '0';
+    win.style.left = 'auto';
+    win.style.width = 'min(880px, 96vw)';
+    win.style.maxWidth = 'none';
+    win.style.height = 'auto';
+    win.style.maxHeight = 'none';
+    win.style.margin = '0';
+    win.style.borderRadius = '16px 0 0 16px';
     win.style.display = 'flex';
     win.style.flexDirection = 'column';
     win.style.overflow = 'hidden';
@@ -1606,7 +1619,7 @@
     // Превью diff
     var preview = document.createElement('div');
     preview.style.cssText = 'flex:1 1 auto;min-height:120px;overflow-y:auto;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:12px;';
-    preview.textContent = 'Превью diff появится после парсинга…';
+    preview.textContent = 'Вставь список в поле выше и нажми «Распарсить» — здесь появится таблица: номер, числа (WR/PR/BR) и выбор чемпиона для каждой строки.';
     win.appendChild(preview);
 
     // Кнопки
