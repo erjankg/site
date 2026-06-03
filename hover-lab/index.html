@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Hover-Lab · песочница hover-анимаций</title>
+  <link rel="stylesheet" href="hover-lab.css">
+</head>
+<body>
+
+  <header class="hl-head">
+    <h1 class="hl-title">✦ Hover-Lab <small>песочница hover-анимаций · не индексируется, не на сайте</small></h1>
+    <div class="hl-controls">
+      <label class="hl-ctrl">
+        Скорость
+        <input id="hlSpeed" type="range" min="0.4" max="2" step="0.1" value="1">
+        <span id="hlSpeedVal" style="width:34px">1.0×</span>
+      </label>
+      <div class="hl-ctrl">
+        Акцент
+        <div class="hl-swatches" id="hlSwatches">
+          <span class="hl-sw active" data-accent="11,196,227"  style="background:#0BC4E3" title="Циан (сайт)"></span>
+          <span class="hl-sw"        data-accent="200,155,60"  style="background:#C89B3C" title="Золото"></span>
+          <span class="hl-sw"        data-accent="180,140,255" style="background:#B48CFF" title="Фиолет"></span>
+          <span class="hl-sw"        data-accent="46,204,113"  style="background:#2ECC71" title="Зелёный"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="hl-wrap" id="hlWrap"></main>
+
+  <script src="hover-lab.js"></script>
+</body>
+</html>

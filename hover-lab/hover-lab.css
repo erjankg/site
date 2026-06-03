@@ -1,0 +1,464 @@
+/* ═══════════════════════════════════════════════════════════
+   Hover-Lab · песочница hover-анимаций для карточек (руны/предметы)
+   Standalone: не зависит от styles.css. Токены скопированы 1:1 с боевого.
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --bg-base:            #010A13;
+  --bg-secondary:       #011520;
+
+  --accent:             #0BC4E3;
+  --accent-glow:        rgba(11, 196, 227, 0.4);
+  --accent-dim:         rgba(11, 196, 227, 0.15);
+  --accent-border:      rgba(11, 196, 227, 0.2);
+  --accent-border-sub:  rgba(11, 196, 227, 0.08);
+  --accent-border-str:  rgba(11, 196, 227, 0.5);
+
+  --text-primary:       #ffffff;
+  --text-secondary:     rgba(255, 255, 255, 0.7);
+  --text-muted:         rgba(255, 255, 255, 0.4);
+
+  --ease-snap:    cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft:    cubic-bezier(0.16, 1, 0.3, 1);
+
+  --dur-fast:    120ms;
+  --dur-base:    200ms;
+  --dur-mid:     300ms;
+
+  --shadow-md:   0 8px 24px rgba(0,0,0,0.4);
+
+  /* множитель скорости (управляется ползунком) */
+  --sp: 1;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background:
+    radial-gradient(ellipse at 18% 0%, rgba(11,196,227,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 100%, rgba(11,196,227,0.05) 0%, transparent 55%),
+    var(--bg-base);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+}
+
+/* ── Шапка ── */
+.hl-head {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  padding: 16px 28px;
+  background: rgba(1, 10, 19, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--accent-border-sub);
+}
+.hl-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.hl-title small {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.hl-controls {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.hl-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.hl-ctrl input[type="range"] { width: 120px; accent-color: var(--accent); }
+.hl-swatches { display: flex; gap: 6px; }
+.hl-sw {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-snap), border-color var(--dur-fast);
+}
+.hl-sw:hover { transform: scale(1.12); }
+.hl-sw.active { border-color: #fff; }
+
+/* ── Сетка вариантов ── */
+.hl-wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+@media (max-width: 900px) { .hl-wrap { grid-template-columns: 1fr; } }
+
+.hl-variant {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--accent-border-sub);
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.hl-variant-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.hl-variant-num {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+}
+.hl-variant-meta { flex: 1 1 auto; min-width: 0; }
+.hl-variant-name {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hl-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+.hl-tag.js { background: rgba(255,200,60,0.12); color: #f1c40f; border-color: rgba(255,200,60,0.3); }
+.hl-variant-desc { font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.45; }
+.hl-copy {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--accent-border-sub);
+  border-radius: 8px;
+  padding: 6px 11px;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-snap);
+  white-space: nowrap;
+}
+.hl-copy:hover { color: var(--accent); border-color: var(--accent-border-str); background: var(--accent-dim); }
+.hl-copy.done { color: #2ecc71; border-color: rgba(46,204,113,0.4); }
+
+/* ── Базовая карточка руны (1:1 с боевого .rune-card) ── */
+.hl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+}
+.h-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid var(--accent-border-sub);
+  border-radius: 10px;
+  padding: 6px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+}
+.h-card img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: block;
+  margin: 0 auto;
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════
+   ВАРИАНТЫ HOVER
+   ════════════════════════════════════════════ */
+
+/* 1 · Shine Sweep — текущая на сайте: диагональный блик + лифт + glow */
+.v-shine .h-card {
+  overflow: hidden;
+  transition:
+    transform   calc(var(--dur-base) * var(--sp)) var(--ease-spring),
+    border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+    box-shadow  calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-shine .h-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.14) 50%, transparent 70%);
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  transition:
+    opacity   calc(var(--dur-fast) * var(--sp)) var(--ease-snap),
+    transform calc(0.65s * var(--sp)) var(--ease-soft);
+}
+.v-shine .h-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px) scale(1.07);
+  box-shadow: var(--shadow-md), 0 0 18px var(--accent-glow);
+  z-index: 2;
+}
+.v-shine .h-card:hover::after { opacity: 1; transform: translateX(110%); }
+
+/* 2 · Lift & Glow — чистый минимализм: подъём + мягкое свечение рамки */
+.v-lift .h-card {
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-spring),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              box-shadow calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-lift .h-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-border-str);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.45), 0 0 0 1px var(--accent-border), 0 0 20px var(--accent-glow);
+  z-index: 2;
+}
+.v-lift .h-card:hover img { filter: drop-shadow(0 0 6px var(--accent-glow)); }
+
+/* 3 · Cursor Spotlight — пятно света следует за курсором (--mx/--my из JS) */
+.v-spotlight .h-card {
+  overflow: hidden;
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-spotlight .h-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%),
+              rgba(11,196,227,0.35), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  transition: opacity calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-spotlight .h-card:hover { border-color: var(--accent-border-str); transform: scale(1.05); z-index: 2; }
+.v-spotlight .h-card:hover::before { opacity: 1; }
+
+/* 4 · 3D Tilt — карточка наклоняется к курсору (rotateX/Y из JS) */
+.v-tilt { perspective: 600px; }
+.v-tilt .h-card {
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-soft),
+              box-shadow calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+  transform-style: preserve-3d;
+}
+.v-tilt .h-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md), 0 0 18px var(--accent-glow);
+  z-index: 2;
+}
+.v-tilt .h-card:hover img { transform: translateZ(18px); transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-soft); }
+
+/* 5 · Magnetic — карточка притягивается к курсору (translate из JS) */
+.v-magnetic .h-card {
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-soft),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              box-shadow calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-magnetic .h-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4), 0 0 16px var(--accent-glow);
+  z-index: 2;
+}
+
+/* 6 · Sparkle Burst — искры разлетаются (любимое «сверкающее», частицы из JS) */
+.v-sparkle .h-card {
+  overflow: visible;
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-spring),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              box-shadow calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-sparkle .h-card:hover {
+  transform: translateY(-2px) scale(1.06);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md), 0 0 22px var(--accent-glow);
+  z-index: 3;
+}
+.hl-spark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  pointer-events: none;
+  background:
+    linear-gradient(currentColor, currentColor) center / 100% 1.4px no-repeat,
+    linear-gradient(currentColor, currentColor) center / 1.4px 100% no-repeat;
+  color: #fff;
+  filter: drop-shadow(0 0 4px var(--accent));
+  transform: translate(-50%, -50%) scale(0) rotate(0deg);
+  animation: hl-spark-fly calc(0.62s * var(--sp)) var(--ease-soft) forwards;
+}
+@keyframes hl-spark-fly {
+  0%   { transform: translate(-50%, -50%) scale(0) rotate(0deg); opacity: 0; }
+  25%  { opacity: 1; }
+  60%  { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(120deg); opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--dx) * 1.4), calc(-50% + var(--dy) * 1.4)) scale(0) rotate(200deg); opacity: 0; }
+}
+
+/* 7 · Pulse Ring — расходящееся кольцо при наведении */
+.v-ring .h-card {
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-spring),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-ring .h-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  pointer-events: none;
+}
+.v-ring .h-card:hover { transform: scale(1.05); border-color: var(--accent-border-str); z-index: 2; }
+.v-ring .h-card:hover::after { animation: hl-ring calc(0.6s * var(--sp)) var(--ease-soft); }
+@keyframes hl-ring {
+  0%   { opacity: 0.9; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.55); }
+}
+
+/* 8 · Conic Border — вращающаяся градиентная рамка */
+.v-conic .h-card {
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-conic .h-card::before {
+  content: "";
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from 0deg, transparent, var(--accent), transparent 40%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-conic .h-card:hover { transform: scale(1.05); z-index: 2; }
+.v-conic .h-card:hover::before { opacity: 1; animation: hl-spin calc(1.6s * var(--sp)) linear infinite; }
+@keyframes hl-spin { to { transform: rotate(1turn); } }
+
+/* 9 · Color Reveal — иконка из ч/б в цвет + лёгкий зум */
+.v-reveal .h-card {
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-spring),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-reveal .h-card img {
+  filter: grayscale(1) brightness(0.75);
+  transition: filter calc(var(--dur-mid) * var(--sp)) var(--ease-snap),
+              transform calc(var(--dur-base) * var(--sp)) var(--ease-spring);
+}
+.v-reveal .h-card:hover { border-color: var(--accent); z-index: 2; }
+.v-reveal .h-card:hover img { filter: grayscale(0) brightness(1); transform: scale(1.12); }
+
+/* 10 · Holo Scanline — голографический блик-полоса бежит вверх */
+.v-holo .h-card {
+  overflow: hidden;
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              box-shadow calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-holo .h-card::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: 45%;
+  top: 100%;
+  background: linear-gradient(to top, transparent, rgba(11,196,227,0.28), transparent);
+  pointer-events: none;
+  opacity: 0;
+}
+.v-holo .h-card:hover {
+  border-color: var(--accent-border-str);
+  box-shadow: inset 0 0 18px rgba(11,196,227,0.18);
+  z-index: 2;
+}
+.v-holo .h-card:hover::after { animation: hl-scan calc(0.9s * var(--sp)) var(--ease-soft) infinite; }
+@keyframes hl-scan {
+  0%   { top: 100%; opacity: 0; }
+  20%  { opacity: 1; }
+  100% { top: -45%; opacity: 0; }
+}
+
+/* 11 · Focus & Dim — наведённая поднимается, соседи гаснут */
+.v-focus:hover .h-card { opacity: 0.4; filter: saturate(0.6); }
+.v-focus .h-card {
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-spring),
+              opacity calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              filter calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap),
+              box-shadow calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-focus .h-card:hover {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.12);
+  border-color: var(--accent);
+  box-shadow: var(--shadow-md), 0 0 18px var(--accent-glow);
+  z-index: 3;
+}
+
+/* 12 · Label Reveal — название выезжает снизу */
+.v-label .h-card {
+  overflow: hidden;
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-spring),
+              border-color calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-label .h-card .h-name {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 2px;
+  background: linear-gradient(to top, rgba(1,10,19,0.95), transparent);
+  color: var(--accent);
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: transform calc(var(--dur-base) * var(--sp)) var(--ease-soft),
+              opacity calc(var(--dur-base) * var(--sp)) var(--ease-snap);
+}
+.v-label .h-card:hover { transform: translateY(-2px); border-color: var(--accent); z-index: 2; }
+.v-label .h-card:hover .h-name { transform: translateY(0); opacity: 1; }
+
+/* ── Доступность ── */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

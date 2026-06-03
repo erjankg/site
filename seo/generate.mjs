@@ -343,7 +343,15 @@ function looksClean(text) {
   }
   return true;
 }
-const tidy = (s) => String(s || '').replace(/\s{2,}/g, ' ').trim();
+const tidy = (s) => String(s || '').replace(/[ \t]{2,}/g, ' ').replace(/ *\n */g, '\n').trim();
+
+// rich-text разметка сайта ([текст|ad], [icon:arm]) → обычный текст для SEO-страниц
+const richToPlain = (s) => String(s || '')
+  .replace(/\[icon:[^\]]*\]/g, '')
+  .replace(/\[([^\]|]*)\|[^\]]*\]/g, '$1')
+  .replace(/[ \t]{2,}/g, ' ')
+  .replace(/ *\n */g, '\n')
+  .trim();
 
 const ITEM_CAT = {
   defensive: 'Защитные предметы', magic: 'Магические предметы', support: 'Предметы поддержки',
@@ -371,9 +379,10 @@ function itemPage(it, s) {
   const name = it.name_ru && it.name_ru !== it.name_en ? it.name_ru : (it.name_en || it.name_ru || it.id);
   const url = `${SITE}/items/${s}/`;
   const catRu = ITEM_CAT[it.category] || 'Предметы';
-  const stats = tidy(it.stats);
+  const stats = richToPlain(it.stats);
   const cost = tidy(it.cost);
-  const desc = looksClean(it.description) ? tidy(it.description) : '';
+  const rawDesc = richToPlain(it.description_ru || it.description);
+  const desc = looksClean(rawDesc) ? rawDesc : '';
 
   const title = `${name} Wild Rift — характеристики, цена, эффект`;
   const metaDesc = `${name} в Wild Rift: ${catRu.toLowerCase()}.${stats ? ' Характеристики: ' + stats + '.' : ''}${cost ? ' Цена: ' + cost + '.' : ''}`;
@@ -386,7 +395,7 @@ function itemPage(it, s) {
 </div>
 <p class="lead">${esc(name)} — ${esc(catRu.toLowerCase())} в League of Legends: Wild Rift.${cost ? ' Стоимость: ' + esc(cost) + '.' : ''}</p>
 ${stats ? `<h2>Характеристики</h2><div class="card"><p>${esc(stats)}</p></div>` : ''}
-${desc ? `<h2>Эффект</h2><div class="card"><p>${esc(desc)}</p></div>` : ''}
+${desc ? `<h2>Эффект</h2><div class="card"><p>${esc(desc).replace(/\n/g, '<br>')}</p></div>` : ''}
 <a class="cta" href="/">Открыть список всех предметов и сборки →</a>`;
 
   return htmlDoc({
@@ -424,7 +433,8 @@ function runePage(r, s) {
   const name = r.name_ru && r.name_ru !== r.name_en ? r.name_ru : (r.name_en || r.id);
   const url = `${SITE}/runes/${s}/`;
   const catRu = RUNE_CAT[r.category] || 'Руны';
-  const desc = looksClean(r.description) ? tidy(r.description) : '';
+  const rawDesc = richToPlain(r.description_ru || r.description);
+  const desc = looksClean(rawDesc) ? rawDesc : '';
   const title = `${name} Wild Rift — руна, эффект и дерево`;
   const metaDesc = `${name} — руна в Wild Rift (${catRu}).${desc ? ' ' + desc.slice(0, 140) : ''}`;
   const body = `
@@ -433,7 +443,7 @@ function runePage(r, s) {
   <div><h1>${esc(name)} — руна Wild Rift</h1><div class="tags"><span class="tag">${esc(catRu)}</span></div></div>
 </div>
 <p class="lead">${esc(name)} — руна из дерева «${esc(catRu)}» в League of Legends: Wild Rift.</p>
-${desc ? `<h2>Эффект руны</h2><div class="card"><p>${esc(desc)}</p></div>` : ''}
+${desc ? `<h2>Эффект руны</h2><div class="card"><p>${esc(desc).replace(/\n/g, '<br>')}</p></div>` : ''}
 <a class="cta" href="/">Открыть все руны и собрать набор →</a>`;
   return htmlDoc({
     title, desc: metaDesc, canonical: url, ogImage: r.image || undefined,
