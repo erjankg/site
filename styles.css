@@ -1120,12 +1120,13 @@ justify-content: center;
 #wrprSection {
 overflow: hidden;
 }
-/* Champions modal — pinned to top on PC, fullscreen on mobile */
+/* Champions modal — на весь экран (как тир-лист): окно занимает 100vw×100dvh
+   (задано инлайном в index.html), поэтому зазоров по краям физически нет.
+   Раньше окно было 92vh по центру → сверху всегда оставалась полоса фона. */
 #sideChampsMask.active {
-align-items: flex-start;
-padding-top: 4vh;
-overflow-y: auto;
-overscroll-behavior: contain;
+align-items: stretch;
+padding: 0;
+overflow: hidden;
 }
 @media (max-width: 768px) and (orientation: portrait) {
 #sideChampsMask.active { align-items: stretch !important; padding-top: 0 !important; overflow-y: hidden !important; }
@@ -1756,8 +1757,49 @@ font-size: 13px; font-weight: 600; cursor: pointer;
 transition: var(--tx-base); width: calc(100% - 16px); text-align: left;
 flex-shrink: 0;
 }
-.side-btn:hover { background: var(--accent-border); color: #fff; }
+/* Combo Premium — hover строк сайдбара (подобран в sidebar-lab).
+   Строка уезжает вправо, слева вырастает светящаяся полоса, иконка
+   подрастает, справа выезжает «›», мягкий ореол. Каждая цветная кнопка
+   играет своим цветом через --btn-accent. */
+.side-btn {
+  --btn-accent: var(--accent);
+  position: relative; overflow: hidden;
+  transition: transform var(--dur-base) var(--ease-soft),
+              background var(--dur-base) var(--ease-soft),
+              color var(--dur-base),
+              box-shadow var(--dur-base) var(--ease-soft);
+}
+.side-btn-coop { --btn-accent: #ff6b6b; }
+.side-btn-tier { --btn-accent: #ffd24a; }
+.side-btn-chat { --btn-accent: #2ecc71; }
+.side-btn-cs   { --btn-accent: #f39c12; }
+
+.side-btn:not(.side-support):not(.side-install):not(.side-version)::before {
+  content: ""; position: absolute; left: 0; top: 18%; bottom: 18%; width: 3px;
+  border-radius: 0 3px 3px 0; background: var(--btn-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--btn-accent) 45%, transparent);
+  transform: scaleY(0); transition: transform var(--dur-base) var(--ease-spring);
+}
+.side-btn:not(.side-support):not(.side-install):not(.side-version):not(.side-btn-tactics):not(.side-btn-changes)::after {
+  content: "\203A"; position: absolute; right: 14px; top: 50%;
+  transform: translate(-6px, -50%); font-size: 18px; font-weight: 700;
+  color: var(--btn-accent); opacity: 0;
+  transition: opacity var(--dur-base), transform var(--dur-base) var(--ease-soft);
+}
+.side-btn .side-icon { transition: transform var(--dur-base) var(--ease-spring), filter var(--dur-base); }
+
+.side-btn:not(.side-support):not(.side-install):not(.side-version):hover {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--btn-accent) 15%, transparent), transparent 85%);
+  color: #fff; transform: translateX(6px);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--btn-accent) 22%, transparent), 0 6px 18px rgba(0,0,0,0.35);
+}
+.side-btn:not(.side-support):not(.side-install):not(.side-version):hover::before { transform: scaleY(1); }
+.side-btn:not(.side-support):not(.side-install):not(.side-version):not(.side-btn-tactics):not(.side-btn-changes):hover::after { opacity: 1; transform: translate(0, -50%); }
+.side-btn:not(.side-support):not(.side-install):not(.side-version):hover .side-icon {
+  transform: scale(1.18); filter: drop-shadow(0 0 6px color-mix(in srgb, var(--btn-accent) 40%, transparent));
+}
 .side-btn:active { transform: scale(0.97); }
+.side-btn:not(.side-support):not(.side-install):not(.side-version):hover:active { transform: translateX(6px) scale(0.97); }
 .side-btn .side-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
 .side-btn.side-support {
 background: linear-gradient(90deg,var(--accent-glow),var(--accent-dim));
@@ -3103,7 +3145,9 @@ font-size: 12px;
 }
 .cms-input:focus { border-color: var(--accent); }
 textarea.cms-input { resize: vertical; min-height: 80px; }
-select.cms-input { cursor: pointer; }
+select.cms-input { cursor: pointer; background-color: #14202e; }
+/* Тёмный фон списка опций: без этого нативный попап рендерится белым на белом. */
+select.cms-input option, select.cms-input optgroup { background-color: #14202e; color: #fff; }
 
 /* Кнопки CMS */
 .cms-btn-save {
@@ -6892,11 +6936,29 @@ body.anims-frozen *::after {
 }
 
 /* ── Карточки выбора (модалка «Чемпионы» #scGrid и универсальный
-      выбор чемпиона/предмета/руны #champPickerGrid): подъём + свечение.
-      Карточки строятся в JS с инлайн-стилями, класс вешается там же.
-      Без overflow/блика — иконки тут крупнее рамки, обрезка их ломала. ── */
+      выбор чемпиона/предмета/руны #champPickerGrid): полный эффект 1+2.
+      Блик живёт на квадратной обёртке .pick-thumb (overflow только у неё),
+      поэтому иконка не режется, а подпись/точки/галочка на карточке целы.
+      Карточки строятся в JS, классы вешаются там же. ── */
 .pick-card {
   position: relative;
+}
+.pick-thumb {
+  position: relative;
+  overflow: hidden;
+}
+.pick-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity   var(--dur-fast) var(--ease-snap),
+    transform 0.6s var(--ease-soft);
 }
 .pick-card img { transition: filter var(--dur-base) var(--ease-snap); }
 .pick-card:hover {
@@ -6904,6 +6966,7 @@ body.anims-frozen *::after {
   box-shadow: var(--shadow-md), 0 0 18px var(--accent-glow);
   z-index: 3;
 }
+.pick-card:hover .pick-thumb::after { opacity: 1; transform: translateX(110%); }
 .pick-card:hover img { filter: drop-shadow(0 0 5px var(--accent-glow)); }
 
 /* ── Tabs: sliding underline indicator ── */

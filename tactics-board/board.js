@@ -609,7 +609,7 @@
   // ЗЕРКАЛО — поменять стороны Baron/Dragon
   document.getElementById('tbMirrorBtn').addEventListener('click', () => {
     state.mirrored = !state.mirrored;
-    mapBgEl.classList.toggle('tb-mirrored', state.mirrored);
+    applyMapTransform();
 
     // Зеркалируем все токены (x → 100-x, y → 100-y)
     for (const id in state.tokens) {
@@ -643,10 +643,202 @@
   });
 
   // ───────────────────────────────────────────────────────────
+  // 11. КАРАНДАШ (свободное рисование)
+  // ───────────────────────────────────────────────────────────
+  function startPenDraw(e) {
+    e.preventDefault();
+    const { x, y } = getBoardCoords(e.clientX, e.clientY);
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('class', 'tb-pen');
+    path.setAttribute('stroke', state.arrowColor);
+    const start = (x * 10).toFixed(1) + ' ' + (y * 10).toFixed(1);
+    path.setAttribute('d', 'M ' + start);
+    arrowsLayer.appendChild(path);
+    boardEl.setPointerCapture(e.pointerId);
+    dragState = { kind: 'pen', path, pts: [start], pointerId: e.pointerId };
+  }
+
+  // ───────────────────────────────────────────────────────────
+  // 12. ТЕКСТОВЫЕ ЗАМЕТКИ
+  // ───────────────────────────────────────────────────────────
+  function createNoteAt(e) {
+    e.preventDefault();
+    const { x, y } = getBoardCoords(e.clientX, e.clientY);
+    const note = document.createElement('div');
+    note.className = 'tb-note';
+    note.style.left = x + '%';
+    note.style.top = y + '%';
+    note.innerHTML = '<div class="tb-note-grip" title="Тащи — двигать, правый клик — удалить">⠿</div>' +
+                     '<div class="tb-note-text" contenteditable="true"></div>';
+    tokensLayer.appendChild(note);
+    pushUndo(() => note.remove());
+    const txt = note.querySelector('.tb-note-text');
+    setTimeout(() => txt.focus(), 0);
+  }
+  function startDragNote(noteEl, e) {
+    noteEl.setPointerCapture(e.pointerId);
+    dragState = { kind: 'note', el: noteEl, pointerId: e.pointerId };
+  }
+
+  // ───────────────────────────────────────────────────────────
+  // 13. КАРТА — своя картинка + калибровка (у каждого в браузере)
+  // ───────────────────────────────────────────────────────────
+  const MAP_KEY = 'tb_map_v1';
+  const DEFAULT_MAP = 'assets/map-square.webp';
+  const mapState = { src: null, offX: 0, offY: 0, scale: 1 };
+
+  function applyMapTransform() {
+    const sign = state.mirrored ? -1 : 1;
+    mapBgEl.style.transform =
+      'translate(' + mapState.offX + 'px,' + mapState.offY + 'px) scale(' + (mapState.scale * sign) + ')';
+  }
+  function setMapImage(src) {
+    mapState.src = src;
+    mapBgEl.src = src || DEFAULT_MAP;
+  }
+  function saveMap() {
+    try { localStorage.setItem(MAP_KEY, JSON.stringify(mapState)); }
+    catch (e) { if (mapHint) mapHint.textContent = 'Картинка слишком большая — показана, но не сохранится между заходами.'; }
+  }
+  function loadMap() {
+    let s = null;
+    try { s = JSON.parse(localStorage.getItem(MAP_KEY) || 'null'); } catch (e) {}
+    if (s) {
+      mapState.src = s.src || null;
+      mapState.offX = s.offX || 0;
+      mapState.offY = s.offY || 0;
+      mapState.scale = s.scale || 1;
+      if (mapState.src) mapBgEl.src = mapState.src;
+    }
+    applyMapTransform();
+    const sc = document.getElementById('tbMapScale'); if (sc) sc.value = mapState.scale;
+  }
+  function resetMap() {
+    mapState.src = null; mapState.offX = 0; mapState.offY = 0; mapState.scale = 1;
+    mapBgEl.src = DEFAULT_MAP;
+    applyMapTransform();
+    const sc = document.getElementById('tbMapScale'); if (sc) sc.value = 1;
+    saveMap();
+    if (mapHint) mapHint.textContent = '';
+  }
+  function startMapPan(e) {
+    boardEl.setPointerCapture(e.pointerId);
+    dragState = { kind: 'mappan', baseOffX: mapState.offX, baseOffY: mapState.offY,
+                  startClientX: e.clientX, startClientY: e.clientY, pointerId: e.pointerId };
+  }
+  // Зум колесом в режиме калибровки
+  boardEl.addEventListener('wheel', e => {
+    if (!state.mapEdit) return;
+    e.preventDefault();
+    const d = e.deltaY < 0 ? 1.08 : 1 / 1.08;
+    mapState.scale = Math.max(0.4, Math.min(3, mapState.scale * d));
+    applyMapTransform();
+    const sc = document.getElementById('tbMapScale'); if (sc) sc.value = mapState.scale;
+    saveMap();
+  }, { passive: false });
+
+  // Сжатие загружаемого файла до ~1200px, чтобы влезло в localStorage
+  function fileToDataUrl(file, cb) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 1200;
+        let w = img.width, h = img.height;
+        if (w > max || h > max) { const k = max / Math.max(w, h); w = Math.round(w * k); h = Math.round(h * k); }
+        const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        try { cb(cv.toDataURL('image/webp', 0.85)); } catch (e) { cb(reader.result); }
+      };
+      img.onerror = () => cb(reader.result);
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── Панель карты ──
+  const mapPanel = document.getElementById('tbMapPanel');
+  const mapHint  = document.getElementById('tbMapHint');
+  document.getElementById('tbMapBtn').addEventListener('click', () => { mapPanel.hidden = !mapPanel.hidden; });
+  document.getElementById('tbMapUpload').addEventListener('click', () => document.getElementById('tbMapFile').click());
+  document.getElementById('tbMapFile').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0]; if (!f) return;
+    fileToDataUrl(f, url => { setMapImage(url); saveMap(); });
+    e.target.value = '';
+  });
+  document.getElementById('tbMapUrlApply').addEventListener('click', () => {
+    const u = (document.getElementById('tbMapUrl').value || '').trim();
+    if (!u) return;
+    setMapImage(u); saveMap(); if (mapHint) mapHint.textContent = '';
+  });
+  document.getElementById('tbMapCalib').addEventListener('click', function () {
+    state.mapEdit = !state.mapEdit;
+    this.classList.toggle('tb-mp-on', state.mapEdit);
+    boardEl.classList.toggle('tb-calib', state.mapEdit);
+    if (mapHint) mapHint.textContent = state.mapEdit ? 'Тащи карту мышкой, колесо или слайдер — масштаб.' : '';
+    if (state.mapEdit) deactivateTool();
+  });
+  document.getElementById('tbMapScale').addEventListener('input', function () {
+    mapState.scale = parseFloat(this.value);
+    applyMapTransform(); saveMap();
+  });
+  document.getElementById('tbMapReset').addEventListener('click', resetMap);
+
+  // ── Цветовые свотчи (стрелки/карандаш) ──
+  document.querySelectorAll('.tb-color').forEach(sw => {
+    sw.addEventListener('click', () => {
+      document.querySelectorAll('.tb-color').forEach(s => s.classList.remove('tb-color-active'));
+      sw.classList.add('tb-color-active');
+      state.arrowColor = sw.dataset.color;
+    });
+  });
+
+  // ── Вкладки ролей в пикере ──
+  document.querySelectorAll('.tb-prole').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tb-prole').forEach(t => t.classList.remove('tb-prole-active'));
+      tab.classList.add('tb-prole-active');
+      state.pickerRole = tab.dataset.role;
+      renderPickerGrid(pickerSearch.value);
+    });
+  });
+
+  // ── Правый клик = удалить любой элемент (с отменой) ──
+  boardEl.addEventListener('contextmenu', e => {
+    const target = e.target.closest('.tb-token, .tb-ward-on-map, .tb-arrow, .tb-pen, .tb-note');
+    if (!target) return;
+    e.preventDefault();
+    const parent = target.parentNode, next = target.nextSibling;
+    if (target.classList.contains('tb-token')) {
+      const id = target.dataset.tokenId;
+      const t = state.tokens[id];
+      if (t) { state.teams[t.team][t.idx] = null; updateSlotUI(t.team, t.idx); delete state.tokens[id]; }
+      target.remove();
+      pushUndo(() => {
+        if (parent) parent.insertBefore(target, next);
+        if (t) { state.tokens[id] = t; state.teams[t.team][t.idx] = t.name; updateSlotUI(t.team, t.idx); }
+      });
+    } else {
+      target.remove();
+      pushUndo(() => { if (parent) parent.insertBefore(target, next); });
+    }
+  });
+
+  // ── Ctrl+Z = отмена (не мешаем редактированию заметки) ──
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'z' || e.key === 'Z' || e.key === 'я' || e.key === 'Я')) {
+      const ae = document.activeElement;
+      if (ae && ae.classList && ae.classList.contains('tb-note-text')) return;
+      e.preventDefault(); doUndo();
+    }
+  });
+
+  // ───────────────────────────────────────────────────────────
   // СТАРТ
   // ───────────────────────────────────────────────────────────
   (async function init() {
     boardEl.dataset.tool = '';
+    loadMap();
     // Сразу подсовываем локальный список, чтобы picker работал даже без сети
     state.champions = FALLBACK_CHAMPS.slice().sort((a, b) => a.name.localeCompare(b.name));
     state.champLoadDone = true;

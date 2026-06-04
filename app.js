@@ -2086,14 +2086,18 @@
             div.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:4px;border-radius:10px;border:2px solid transparent;transition:all 0.15s;';
             div.onmouseenter=function(){div.style.borderColor='var(--sel-text)';div.style.background='var(--sel-dim)';};
             div.onmouseleave=function(){div.style.borderColor='transparent';div.style.background='';};
+            var thumb=document.createElement('div');
+            thumb.className='pick-thumb';
+            thumb.style.cssText='width:100%;aspect-ratio:1;border-radius:8px;';
             var img=document.createElement('img');
             img.src=champIcon(ch.name);
-            img.style.cssText='width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;';
+            img.style.cssText='width:100%;height:100%;border-radius:8px;object-fit:cover;display:block;';
             img.onerror=function(){this.src='';this.style.background='var(--sel-placeholder)';};
+            thumb.appendChild(img);
             var lbl=document.createElement('div');
             lbl.style.cssText='font-size:8px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.15;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
             lbl.textContent=ch.name;
-            div.appendChild(img); div.appendChild(lbl);
+            div.appendChild(thumb); div.appendChild(lbl);
             div.onclick=function(){openChampDetail(ch.name);};
             // Patch dot in champ list + tooltip
             var pI = patchMap[ch.name];
@@ -2851,12 +2855,16 @@
             var wrap = document.createElement('div');
             wrap.className = 'pick-card';
             wrap.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;padding:2px;border-radius:9px;border:2px solid '+(isSel?'var(--sel-text)':'transparent')+';background:'+(isSel?'var(--sel-dim)':'transparent')+';transition:all 0.12s;';
+            var thumb = document.createElement('div');
+            thumb.className = 'pick-thumb';
+            thumb.style.cssText = 'width:100%;aspect-ratio:1;border-radius:7px;';
             var img = document.createElement('img');
             img.src = c.img || '';
             img.title = c.name;
-            img.style.cssText = 'width:100%;aspect-ratio:1;border-radius:7px;object-fit:cover;';
+            img.style.cssText = 'width:100%;height:100%;border-radius:7px;object-fit:cover;display:block;';
             img.onerror = function(){ this.style.background='var(--sel-placeholder)'; this.style.minHeight='32px'; };
-            wrap.appendChild(img);
+            thumb.appendChild(img);
+            wrap.appendChild(thumb);
             if(isSel) {
                 var ck = document.createElement('div');
                 ck.style.cssText = 'position:absolute;top:2px;right:2px;background:var(--sel-text);border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:900;pointer-events:none;';

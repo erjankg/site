@@ -1623,22 +1623,29 @@
 
     var win = document.createElement('div');
     win.className = 'cms-modal-win';
-    // Боковая панель справа во всю высоту. position:fixed прибивает её к краям экрана
-    // и не зависит от flex-центрирования/ограничений .cms-modal-win (max-width/max-height).
+    // Полноэкранное окно: слева — управление, справа — распарсенный список на всю высоту.
     win.style.position = 'fixed';
-    win.style.top = '0';
-    win.style.right = '0';
-    win.style.bottom = '0';
-    win.style.left = 'auto';
-    win.style.width = 'min(880px, 96vw)';
+    win.style.inset = '0';
+    win.style.width = '100vw';
+    win.style.height = '100vh';
     win.style.maxWidth = 'none';
-    win.style.height = 'auto';
     win.style.maxHeight = 'none';
     win.style.margin = '0';
-    win.style.borderRadius = '16px 0 0 16px';
+    win.style.padding = '0';
+    win.style.border = 'none';
+    win.style.borderRadius = '0';
     win.style.display = 'flex';
-    win.style.flexDirection = 'column';
+    win.style.flexDirection = 'row';
     win.style.overflow = 'hidden';
+
+    // Левая колонка: инструкция, селекторы, поле вставки, кнопки. Скроллится при нехватке высоты.
+    var leftCol = document.createElement('div');
+    leftCol.style.cssText = 'flex:0 0 auto;width:min(440px,42vw);display:flex;flex-direction:column;padding:20px 22px;overflow-y:auto;border-right:1px solid rgba(255,255,255,0.1);';
+    // Правая колонка: распарсенный список на всю высоту.
+    var rightCol = document.createElement('div');
+    rightCol.style.cssText = 'flex:1 1 auto;min-width:0;display:flex;flex-direction:column;padding:20px 22px;overflow:hidden;';
+    win.appendChild(leftCol);
+    win.appendChild(rightCol);
 
     // Заголовок
     var hdr = document.createElement('div');
@@ -1646,7 +1653,7 @@
     hdr.innerHTML = '<h3 style="margin:0;color:#fff;font-size:18px;">📥 Импорт винрейтов с lolm.qq.com</h3>' +
       '<button class="cms-bulk-close" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button>';
     hdr.querySelector('.cms-bulk-close').onclick = function() { overlay.remove(); };
-    win.appendChild(hdr);
+    leftCol.appendChild(hdr);
 
     // Инструкция
     var help = document.createElement('div');
@@ -1656,7 +1663,7 @@
       '3. «Распарсить» → получишь нумерованный список с числами. Напротив каждой строки нажми <b>«выбери чемпиона»</b> — откроется сетка с портретами и поиском (по порядку, как на lolm).<br>' +
       '4. «Сохранить».<br>' +
       '<span style="color:rgba(255,255,255,0.5);">Порядок чисел уже стоит «WR → PR → BR» (как на сайте: Win / Appearance / Ban). Уже выбранные чемпы уходят вниз списка.</span>';
-    win.appendChild(help);
+    leftCol.appendChild(help);
 
     // Селекторы ранга и роли
     var sel = document.createElement('div');
@@ -1668,7 +1675,7 @@
         '<select class="cms-input cms-bulk-rank">'+rankOpts+'</select></div>' +
       '<div><label style="display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Роль</label>' +
         '<select class="cms-input cms-bulk-role">'+roleOpts+'</select></div>';
-    win.appendChild(sel);
+    leftCol.appendChild(sel);
 
     // Дефолтные значения из текущего состояния UI
     var rankSelect = sel.querySelector('.cms-bulk-rank');
@@ -1696,20 +1703,20 @@
     Array.prototype.forEach.call(order.querySelectorAll('.cms-bulk-order-lbl'), function(l){
       l.style.cssText = 'color:rgba(255,255,255,0.85);font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;';
     });
-    win.appendChild(order);
+    leftCol.appendChild(order);
 
     // Textarea
     var ta = document.createElement('textarea');
     ta.className = 'cms-input';
     ta.placeholder = 'Вставь сюда таблицу с lolm.qq.com (Ctrl+V)…\n\nПример:\n剑魔\t49.5%\t5.34%\t5.91%\n亚索\t48.4%\t23.5%\t3.19%';
     ta.style.cssText = 'width:100%;min-height:110px;flex:0 0 auto;font-family:Consolas,Monaco,monospace;font-size:12px;line-height:1.4;margin-bottom:10px;';
-    win.appendChild(ta);
+    leftCol.appendChild(ta);
 
     // Превью diff
     var preview = document.createElement('div');
     preview.style.cssText = 'flex:1 1 auto;min-height:120px;overflow-y:auto;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;font-size:12px;color:rgba(255,255,255,0.65);margin-bottom:12px;';
-    preview.textContent = 'Вставь список в поле выше и нажми «Распарсить» — здесь появится таблица: номер, числа (WR/PR/BR) и выбор чемпиона для каждой строки.';
-    win.appendChild(preview);
+    preview.textContent = 'Вставь список слева и нажми «Распарсить» — здесь появится таблица: номер, числа (WR/PR/BR) и выбор чемпиона для каждой строки.';
+    rightCol.appendChild(preview);
 
     // Кнопки
     var btnRow = document.createElement('div');
@@ -1737,7 +1744,7 @@
     btnRow.appendChild(parseBtn);
     btnRow.appendChild(saveBtn);
     btnRow.appendChild(cancelBtn);
-    win.appendChild(btnRow);
+    leftCol.appendChild(btnRow);
 
     overlay.appendChild(win);
     document.body.appendChild(overlay);
