@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Тактическая доска — Wild Rift Stats (BETA)</title>
 <link rel="stylesheet" href="style.css">
+<link id="le-css" rel="stylesheet" href="../layout-editor.css">
 </head>
 <body>
 
@@ -12,104 +13,48 @@
   <div class="tb-header-inner">
     <a href="../index.html" class="tb-back" title="На основной сайт">←</a>
     <h1 class="tb-title">Тактическая доска <span class="tb-beta">BETA</span></h1>
+    <button class="tb-edit-toggle" id="tbEditToggle" title="Редактор раскладки: двигать и менять размер любых кнопок/панелей">✥ Редактор</button>
     <div class="tb-header-hint" id="tbStatus">Песочница — фича в разработке</div>
   </div>
 </header>
 
-<div class="tb-toolbar">
-  <div class="tb-toolbar-group">
-    <button class="tb-tool" data-tool="arrow" title="Рисовать стрелки (ротации). Можно двигать любой объект зажатием.">
-      <span class="tb-tool-icon">↗</span> Стрелка
-    </button>
-    <button class="tb-tool" data-tool="pen" title="Свободное рисование карандашом">
-      <span class="tb-tool-icon">✏</span> Карандаш
-    </button>
-    <button class="tb-tool" data-tool="note" title="Текстовая заметка на карте">
-      <span class="tb-tool-icon">📝</span> Заметка
-    </button>
-    <span class="tb-colors" title="Цвет стрелок и карандаша">
-      <button class="tb-color tb-color-active" data-color="#FFD700" style="background:#FFD700" title="Золотой"></button>
-      <button class="tb-color" data-color="#3ca0e6" style="background:#3ca0e6" title="Синяя команда"></button>
-      <button class="tb-color" data-color="#e64646" style="background:#e64646" title="Красная команда"></button>
-    </span>
-  </div>
-  <div class="tb-toolbar-group">
-    <button class="tb-tool tb-tool-ward" data-tool="ward-ally" title="Свой вард (синий)">
-      <span class="tb-ward-chip tb-ward-chip-ally"></span> Свой
-    </button>
-    <button class="tb-tool tb-tool-ward" data-tool="ward-enemy" title="Вражеский вард (красный)">
-      <span class="tb-ward-chip tb-ward-chip-enemy"></span> Враг
-    </button>
-  </div>
-  <div class="tb-toolbar-group">
-    <button class="tb-mirror-btn" id="tbMapBtn" title="Карта: загрузить свою / калибровать">
-      <span class="tb-tool-icon">🗺</span> Карта
-    </button>
-    <button class="tb-mirror-btn" id="tbMirrorBtn" title="Поменять стороны (Baron / Dragon side swap)">
-      <span class="tb-tool-icon">⇄</span> Стороны
-    </button>
-  </div>
-  <div class="tb-toolbar-group tb-toolbar-right">
-    <button class="tb-clear-btn" data-clear="arrows" title="Очистить стрелки и карандаш">Стрелки</button>
-    <button class="tb-clear-btn" data-clear="wards" title="Очистить только варды">Варды</button>
-    <button class="tb-clear-btn" data-clear="notes" title="Очистить заметки">Заметки</button>
-    <button class="tb-clear-btn tb-clear-all" data-clear="all" title="Очистить всё">Всё</button>
-  </div>
-</div>
-
-<!-- Панель карты (калибровка / своя картинка) -->
-<div class="tb-map-panel" id="tbMapPanel" hidden>
-  <div class="tb-map-panel-row">
-    <button class="tb-mp-btn" id="tbMapUpload">📁 Загрузить файл</button>
-    <input type="file" id="tbMapFile" accept="image/*" hidden>
-    <input type="text" class="tb-mp-url" id="tbMapUrl" placeholder="…или вставь ссылку на картинку">
-    <button class="tb-mp-btn" id="tbMapUrlApply">OK</button>
-  </div>
-  <div class="tb-map-panel-row">
-    <button class="tb-mp-btn tb-mp-toggle" id="tbMapCalib" title="Двигать карту мышкой, колесо/слайдер — масштаб">🎯 Калибровка</button>
-    <label class="tb-mp-scale">Масштаб
-      <input type="range" id="tbMapScale" min="0.4" max="3" step="0.02" value="1">
-    </label>
-    <button class="tb-mp-btn tb-mp-reset" id="tbMapReset">↺ Сброс карты</button>
-  </div>
-  <div class="tb-map-panel-hint" id="tbMapHint"></div>
-</div>
-
 <main class="tb-layout">
 
-  <aside class="tb-sidebar tb-blue-side">
-    <div class="tb-side-header">
-      <span class="tb-side-dot tb-side-dot-blue"></span>
-      <span class="tb-side-title">Синяя</span>
+  <!-- ЛЕВАЯ КОЛОНКА: синяя команда + инструменты рисования -->
+  <aside class="tb-side tb-side-left">
+    <div class="tb-sidebar tb-blue-side" id="tbBlueTeam">
+      <div class="tb-side-header">
+        <span class="tb-side-dot tb-side-dot-blue"></span>
+        <span class="tb-side-title">Синяя</span>
+      </div>
+      <div class="tb-team-slots" data-team="blue">
+        <button class="tb-slot" data-team="blue" data-idx="0"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Топ</span></button>
+        <button class="tb-slot" data-team="blue" data-idx="1"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Лес</span></button>
+        <button class="tb-slot" data-team="blue" data-idx="2"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Мид</span></button>
+        <button class="tb-slot" data-team="blue" data-idx="3"><span class="tb-slot-plus">+</span><span class="tb-slot-label">АДК</span></button>
+        <button class="tb-slot" data-team="blue" data-idx="4"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Саппорт</span></button>
+      </div>
     </div>
-    <div class="tb-team-slots" data-team="blue">
-      <button class="tb-slot" data-team="blue" data-idx="0">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">Топ</span>
-      </button>
-      <button class="tb-slot" data-team="blue" data-idx="1">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">Лес</span>
-      </button>
-      <button class="tb-slot" data-team="blue" data-idx="2">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">Мид</span>
-      </button>
-      <button class="tb-slot" data-team="blue" data-idx="3">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">АДК</span>
-      </button>
-      <button class="tb-slot" data-team="blue" data-idx="4">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">Саппорт</span>
-      </button>
+
+    <div class="tb-panel" id="tbToolsPanel">
+      <div class="tb-panel-title">Инструменты</div>
+      <button class="tb-tool" data-tool="arrow" title="Рисовать стрелки"><span class="tb-tool-icon">↗</span> Стрелка</button>
+      <button class="tb-tool" data-tool="pen" title="Свободное рисование"><span class="tb-tool-icon">✏</span> Карандаш</button>
+      <button class="tb-tool" data-tool="note" title="Текстовая заметка"><span class="tb-tool-icon">📝</span> Заметка</button>
+      <div class="tb-colors" title="Цвет стрелок и карандаша">
+        <button class="tb-color tb-color-active" data-color="#FFD700" style="background:#FFD700" title="Золотой"></button>
+        <button class="tb-color" data-color="#3ca0e6" style="background:#3ca0e6" title="Синяя команда"></button>
+        <button class="tb-color" data-color="#e64646" style="background:#e64646" title="Красная команда"></button>
+      </div>
+      <button class="tb-tool tb-tool-ward" data-tool="ward-ally" title="Свой вард"><span class="tb-ward-chip tb-ward-chip-ally"></span> Свой вард</button>
+      <button class="tb-tool tb-tool-ward" data-tool="ward-enemy" title="Вражеский вард"><span class="tb-ward-chip tb-ward-chip-enemy"></span> Враг вард</button>
     </div>
   </aside>
 
+  <!-- ЦЕНТР: карта на максимум -->
   <section class="tb-board-wrap">
     <div class="tb-board" id="tbBoard">
       <img class="tb-map-bg" id="tbMapBg" src="assets/map-square.webp" alt="Карта Wild Rift" draggable="false">
-
       <svg class="tb-arrows-layer" id="tbArrowsLayer" viewBox="0 0 1000 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <marker id="tbArrowHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="strokeWidth">
@@ -117,37 +62,49 @@
           </marker>
         </defs>
       </svg>
-
       <div class="tb-tokens-layer" id="tbTokensLayer"></div>
     </div>
   </section>
 
-  <aside class="tb-sidebar tb-red-side">
-    <div class="tb-side-header">
-      <span class="tb-side-dot tb-side-dot-red"></span>
-      <span class="tb-side-title">Красная</span>
+  <!-- ПРАВАЯ КОЛОНКА: красная команда + карта + действия -->
+  <aside class="tb-side tb-side-right">
+    <div class="tb-sidebar tb-red-side" id="tbRedTeam">
+      <div class="tb-side-header">
+        <span class="tb-side-dot tb-side-dot-red"></span>
+        <span class="tb-side-title">Красная</span>
+      </div>
+      <div class="tb-team-slots" data-team="red">
+        <button class="tb-slot" data-team="red" data-idx="0"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Топ</span></button>
+        <button class="tb-slot" data-team="red" data-idx="1"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Лес</span></button>
+        <button class="tb-slot" data-team="red" data-idx="2"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Мид</span></button>
+        <button class="tb-slot" data-team="red" data-idx="3"><span class="tb-slot-plus">+</span><span class="tb-slot-label">АДК</span></button>
+        <button class="tb-slot" data-team="red" data-idx="4"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Саппорт</span></button>
+      </div>
     </div>
-    <div class="tb-team-slots" data-team="red">
-      <button class="tb-slot" data-team="red" data-idx="0">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">Топ</span>
-      </button>
-      <button class="tb-slot" data-team="red" data-idx="1">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">Лес</span>
-      </button>
-      <button class="tb-slot" data-team="red" data-idx="2">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">Мид</span>
-      </button>
-      <button class="tb-slot" data-team="red" data-idx="3">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">АДК</span>
-      </button>
-      <button class="tb-slot" data-team="red" data-idx="4">
-        <span class="tb-slot-plus">+</span>
-        <span class="tb-slot-label">Саппорт</span>
-      </button>
+
+    <div class="tb-panel" id="tbMapPanel">
+      <div class="tb-panel-title">🗺 Карта</div>
+      <button class="tb-mp-btn" id="tbMapUpload">📁 Загрузить файл</button>
+      <input type="file" id="tbMapFile" accept="image/*" hidden>
+      <div class="tb-mp-urlrow">
+        <input type="text" class="tb-mp-url" id="tbMapUrl" placeholder="ссылка на картинку">
+        <button class="tb-mp-btn" id="tbMapUrlApply">OK</button>
+      </div>
+      <button class="tb-mp-btn tb-mp-toggle" id="tbMapCalib" title="Двигать карту мышкой, колесо/слайдер — масштаб">🎯 Калибровка</button>
+      <label class="tb-mp-scale">Масштаб <input type="range" id="tbMapScale" min="0.4" max="3" step="0.02" value="1"></label>
+      <button class="tb-mp-btn tb-mp-reset" id="tbMapReset">↺ Сброс карты</button>
+      <div class="tb-map-panel-hint" id="tbMapHint"></div>
+    </div>
+
+    <div class="tb-panel" id="tbActionsPanel">
+      <div class="tb-panel-title">Действия</div>
+      <button class="tb-mirror-btn" id="tbMirrorBtn" title="Поменять стороны (Baron / Dragon)"><span class="tb-tool-icon">⇄</span> Стороны</button>
+      <div class="tb-clear-row">
+        <button class="tb-clear-btn" data-clear="arrows">Стрелки</button>
+        <button class="tb-clear-btn" data-clear="wards">Варды</button>
+        <button class="tb-clear-btn" data-clear="notes">Заметки</button>
+        <button class="tb-clear-btn tb-clear-all" data-clear="all">Всё</button>
+      </div>
     </div>
   </aside>
 
@@ -175,6 +132,8 @@
   </div>
 </div>
 
+<script>window.LE_KEY_PREFIX = 'tb';</script>
+<script src="../layout-editor.js" defer></script>
 <script src="board.js"></script>
 </body>
 </html>

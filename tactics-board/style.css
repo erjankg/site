@@ -227,15 +227,66 @@ body {
 .tb-layout {
   flex: 1;
   display: grid;
-  grid-template-columns: 220px 1fr 220px;
-  gap: 14px;
-  padding: 14px 20px;
-  max-width: 1800px;
-  margin: 0 auto;
+  grid-template-columns: 250px 1fr 250px;
+  gap: 12px;
+  padding: 10px 16px;
+  max-width: none;
+  margin: 0;
   align-items: stretch;
   min-height: 0;
   width: 100%;
 }
+
+/* Боковая колонка: команда + панели инструментов, скролл если не влезает */
+.tb-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.tb-side .tb-sidebar { flex: none; }
+.tb-side .tb-team-slots { flex: none; }
+
+/* Панель инструментов / карты / действий */
+.tb-panel {
+  background: var(--tb-bg-card);
+  border: 1px solid var(--tb-accent-border);
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  backdrop-filter: blur(10px);
+}
+.tb-panel-title {
+  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--tb-text-mute); margin-bottom: 2px;
+}
+.tb-panel .tb-tool,
+.tb-panel .tb-mirror-btn,
+.tb-panel > .tb-mp-btn {
+  width: 100%;
+  justify-content: flex-start;
+}
+.tb-panel .tb-colors { padding: 4px 2px; gap: 8px; }
+.tb-mp-urlrow { display: flex; gap: 6px; }
+.tb-mp-urlrow .tb-mp-url { flex: 1; min-width: 0; }
+.tb-mp-urlrow .tb-mp-btn { width: auto; flex: none; }
+.tb-panel .tb-mp-scale { width: 100%; }
+.tb-panel .tb-mp-scale input[type=range] { flex: 1; width: auto; }
+.tb-clear-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.tb-clear-row .tb-clear-btn { width: 100%; text-align: center; }
+
+/* Кнопка «Редактор» в шапке */
+.tb-edit-toggle {
+  margin-left: 14px; padding: 6px 12px; border-radius: 9px; cursor: pointer;
+  font-size: 12px; font-weight: 700; font-family: inherit; white-space: nowrap;
+  background: rgba(167,139,250,0.12); border: 1px solid rgba(167,139,250,0.4); color: #c4b5fd;
+}
+.tb-edit-toggle:hover { background: rgba(167,139,250,0.2); }
+.tb-edit-toggle.tb-edit-on { background: #a78bfa; border-color: #a78bfa; color: #04101e; }
 
 /* ── SIDEBAR (команды) ──────────────────────────────── */
 .tb-sidebar {
@@ -639,7 +690,7 @@ body {
     padding: 10px 12px;
     max-width: 100%;
   }
-  .tb-sidebar { order: 2; }
+  .tb-side { order: 2; overflow: visible; }
   .tb-board-wrap { order: 1; }
   .tb-board {
     height: auto;

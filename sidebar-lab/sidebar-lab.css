@@ -178,10 +178,13 @@ body.dim::before {
   margin-left: auto; font-size: 9px; font-weight: 900; letter-spacing: 1px;
   padding: 2px 6px; border-radius: 5px; background: #C89B3C; color: var(--bg-base);
 }
-/* спец-кнопки с цветной полоской — как на боевом */
-.sb.draft { background: var(--accent-dim); border-left: 3px solid var(--accent); }
-.sb.tier  { background: rgba(255,215,0,0.06); border-left: 3px solid rgba(255,215,0,0.5); }
-.sb.chat  { background: rgba(46,204,113,0.08); border-left: 3px solid #2ecc71; }
+/* спец-кнопки с цветной полоской — как на боевом. У каждой свой --btn-accent */
+.sb.draft { --btn-accent: var(--accent);  background: var(--accent-dim);        border-left: 3px solid var(--accent); }
+.sb.tier  { --btn-accent: #ffd24a;         background: rgba(255,215,0,0.06);     border-left: 3px solid rgba(255,215,0,0.5); }
+.sb.chat  { --btn-accent: #2ecc71;         background: rgba(46,204,113,0.08);    border-left: 3px solid #2ecc71; }
+.sb.coop  { --btn-accent: #ff6b6b;         background: rgba(255,107,107,0.08);   border-left: 3px solid #ff6b6b; }
+.sb.cs    { --btn-accent: #f39c12;         background: rgba(243,156,18,0.08);    border-left: 3px solid #f39c12; }
+.sb.cs .ic { color: #f39c12; }
 
 /* ════════════════════════════════════════════════════════════
    ВАРИАНТЫ. Каждый — класс .v-xxx на .sl-nav.
@@ -380,6 +383,121 @@ body.dim::before {
   transform: scale(1.15);
   box-shadow: 0 0 0 2px var(--accent-border), 0 0 14px var(--accent-glow);
 }
+
+/* ════════════════════════════════════════════════════════════
+   ЦВЕТНЫЕ КНОПКИ — варианты покруче. Каждая играет своим --btn-accent.
+   ════════════════════════════════════════════════════════════ */
+
+/* Заголовок группы на всю ширину сетки */
+.sl-group {
+  grid-column: 1 / -1;
+  margin: 18px 2px 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.sl-group h2 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: 0.2px; }
+.sl-group p { margin: 6px 0 0; font-size: 12px; color: var(--text-mute); max-width: 70ch; line-height: 1.5; }
+
+/* C1 ─ Combo своим цветом (как уйдёт в боевой по умолчанию) */
+.cv-combo .sb {
+  transition: transform var(--dur-base) var(--ease-soft), background var(--dur-base) var(--ease-soft),
+              color var(--dur-base), box-shadow var(--dur-base) var(--ease-soft);
+}
+.cv-combo .sb::before {
+  content: ""; position: absolute; left: 0; top: 18%; bottom: 18%; width: 3px; border-radius: 0 3px 3px 0;
+  background: var(--btn-accent); box-shadow: 0 0 10px color-mix(in srgb, var(--btn-accent) 45%, transparent);
+  transform: scaleY(0); transition: transform var(--dur-base) var(--ease-spring);
+}
+.cv-combo .sb .ic { transition: transform var(--dur-base) var(--ease-spring), filter var(--dur-base); }
+.cv-combo .sb:hover {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--btn-accent) 15%, transparent), transparent 85%);
+  color: #fff; transform: translateX(6px);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--btn-accent) 22%, transparent), 0 6px 18px rgba(0,0,0,0.35);
+}
+.cv-combo .sb:hover::before { transform: scaleY(1); }
+.cv-combo .sb:hover .ic { transform: scale(1.18); filter: drop-shadow(0 0 6px color-mix(in srgb, var(--btn-accent) 45%, transparent)); }
+
+/* C2 ─ Neon Edge — рамка кнопки целиком загорается своим цветом */
+.cv-edge .sb { transition: color var(--dur-base), background var(--dur-base), box-shadow var(--dur-mid) var(--ease-soft); }
+.cv-edge .sb:hover {
+  color: #fff; background: color-mix(in srgb, var(--btn-accent) 10%, transparent);
+  box-shadow: inset 0 0 0 1px var(--btn-accent), 0 0 18px color-mix(in srgb, var(--btn-accent) 40%, transparent);
+}
+.cv-edge .sb:hover .ic { filter: drop-shadow(0 0 6px var(--btn-accent)); }
+
+/* C3 ─ Color Sweep — цвет заливает строку целиком, текст темнеет */
+.cv-sweep .sb { transition: color var(--dur-base) var(--ease-mat); z-index: 0; }
+.cv-sweep .sb::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
+  background: var(--btn-accent); transform: scaleX(0); transform-origin: left;
+  transition: transform var(--dur-mid) var(--ease-snap);
+}
+.cv-sweep .sb:hover { color: #08121b; }
+.cv-sweep .sb:hover .ic { color: #08121b; }
+.cv-sweep .sb:hover::before { transform: scaleX(1); }
+
+/* C4 ─ Pulse Bar — полоса слева пульсирует + тёплый тинт */
+.cv-pulse .sb { transition: background var(--dur-base), color var(--dur-base), padding-left var(--dur-base) var(--ease-soft); }
+.cv-pulse .sb::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--btn-accent);
+  box-shadow: 0 0 0 var(--btn-accent); opacity: 0.6;
+}
+.cv-pulse .sb:hover {
+  color: #fff; padding-left: 22px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--btn-accent) 20%, transparent), transparent 80%);
+}
+.cv-pulse .sb:hover::before { animation: cv-pulse calc(1.2s * var(--spd)) var(--ease-soft) infinite; }
+@keyframes cv-pulse {
+  0%,100% { box-shadow: 0 0 6px color-mix(in srgb, var(--btn-accent) 50%, transparent); }
+  50%     { box-shadow: 0 0 16px var(--btn-accent), 0 0 26px color-mix(in srgb, var(--btn-accent) 60%, transparent); }
+}
+
+/* C5 ─ Gradient Slide — диагональный градиент своего цвета проезжает насквозь */
+.cv-slide .sb { transition: color var(--dur-base), transform var(--dur-base) var(--ease-soft); }
+.cv-slide .sb::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, color-mix(in srgb, var(--btn-accent) 35%, transparent) 50%, transparent 70%);
+  transform: translateX(-120%); transition: transform var(--dur-slow) var(--ease-soft);
+}
+.cv-slide .sb:hover { color: #fff; transform: translateX(4px); }
+.cv-slide .sb:hover::after { transform: translateX(120%); }
+
+/* C6 ─ Icon Halo — вокруг иконки кольцо своего цвета, цвет заметно растёт */
+.cv-halo .sb { transition: color var(--dur-base), background var(--dur-base); }
+.cv-halo .sb .ic {
+  border-radius: 50%; transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base), color var(--dur-base);
+}
+.cv-halo .sb:hover { color: #fff; background: color-mix(in srgb, var(--btn-accent) 8%, transparent); }
+.cv-halo .sb:hover .ic {
+  transform: scale(1.18); color: var(--btn-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--btn-accent) 30%, transparent), 0 0 16px color-mix(in srgb, var(--btn-accent) 50%, transparent);
+}
+
+/* C7 ─ Spotlight — пятно своего цвета следует за курсором (JS) */
+.cv-spot .sb { transition: color var(--dur-base); }
+.cv-spot .sb::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(90px circle at var(--mx,50%) var(--my,50%), color-mix(in srgb, var(--btn-accent) 30%, transparent), transparent 70%);
+  opacity: 0; transition: opacity var(--dur-base);
+}
+.cv-spot .sb:hover { color: #fff; }
+.cv-spot .sb:hover::before { opacity: 1; }
+
+/* C8 ─ Aurora Pull — отступ + дышащий ореол своего цвета + стрелка */
+.cv-aurora .sb { transition: transform var(--dur-base) var(--ease-soft), color var(--dur-base); }
+.cv-aurora .sb::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(ellipse at 15% 50%, color-mix(in srgb, var(--btn-accent) 32%, transparent), transparent 70%);
+  opacity: 0; transition: opacity var(--dur-mid) var(--ease-soft);
+}
+.cv-aurora .sb::after {
+  content: "›"; position: absolute; right: 14px; top: 50%; transform: translate(-6px,-50%);
+  font-size: 18px; font-weight: 700; color: var(--btn-accent); opacity: 0;
+  transition: opacity var(--dur-base), transform var(--dur-base) var(--ease-soft);
+}
+.cv-aurora .sb:hover { transform: translateX(6px); color: #fff; }
+.cv-aurora .sb:hover::before { opacity: 1; animation: sl-breathe calc(2.6s * var(--spd)) var(--ease-soft) infinite; }
+.cv-aurora .sb:hover::after { opacity: 1; transform: translate(0,-50%); }
 
 @media (max-width: 560px) {
   .sl-wrap { grid-template-columns: 1fr; padding: 16px; }

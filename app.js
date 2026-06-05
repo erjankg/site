@@ -1953,7 +1953,7 @@
                 if (zone._sortable) zone._sortable.destroy();
                 zone._sortable = new window.Sortable(zone, {
                     group: 'tier-' + _tierType,
-                    animation: 180,
+                    animation: 90,
                     ghostClass: 'tier-chip-ghost',
                     chosenClass: 'tier-chip-chosen',
                     dragClass:   'tier-chip-drag',
@@ -3213,11 +3213,6 @@
     var _provider = auth ? new firebase.auth.GoogleAuthProvider() : null;
 
     window.toggleUserMenu = function() {
-        if (!_currentUser) {
-            // Not logged in → sign in
-            authSignIn();
-            return;
-        }
         var menu = document.getElementById('userMenu');
         if (menu) menu.classList.toggle('active');
     };
@@ -3249,6 +3244,12 @@
             _authInProgress = false;
         });
     }
+    window.authSignIn = authSignIn;
+    window.closeUserMenuAndLogin = function() {
+        var menu = document.getElementById('userMenu');
+        if (menu) menu.classList.remove('active');
+        authSignIn();
+    };
 
     window.authSignOut = function() {
         var menu = document.getElementById('userMenu');
@@ -3288,6 +3289,13 @@
         var btn = document.getElementById('authBtn');
         var emailEl = document.getElementById('userMenuEmail');
         if (!btn) return;
+
+        document.querySelectorAll('.guest-only').forEach(function(el) {
+            el.style.display = user ? 'none' : '';
+        });
+        document.querySelectorAll('.auth-only-row').forEach(function(el) {
+            el.style.display = user ? '' : 'none';
+        });
 
         if (user) {
             btn.innerHTML = '';
@@ -5604,7 +5612,7 @@
 
     var _wrprRank = 'чалик';
     var _wrprRole = 'top';
-    var _wrprSortCol = 'wr';
+    var _wrprSortCol = 'manual'; // 'manual' = показываем сохранённый порядок; клик по колонке временно сортирует
     var _wrprSortDir = -1; // -1 = desc (высокий сверху), 1 = asc
 
     // Russian name → English DDragon key
@@ -6064,15 +6072,18 @@
         var thead = document.getElementById('wrprThead');
         if(!thead) return;
         var cols = getWrprCols();
-        var html = '<tr class="wrpr-thead-row">' +
-            '<th class="wrpr-th wrpr-th-num">#</th>' +
-            '<th class="wrpr-th wrpr-th-name" data-i18n="Чемпион">Чемпион</th>';
+        var grip = window._isAdmin ? '<span style="width:20px;flex:0 0 auto;"></span>' : '';
+        var html = '<div class="wrpr-thead-row" style="display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:rgba(255,255,255,0.5);border-bottom:1px solid rgba(255,255,255,0.08);">' +
+            grip +
+            '<span style="width:30px;flex:0 0 auto;text-align:center;">#</span>' +
+            '<span style="flex:1;min-width:0;" data-i18n="Чемпион">Чемпион</span>';
         cols.forEach(function(c){
             var upper = c.key.toUpperCase();
-            html += '<th id="wrprTh' + upper + '" onclick="wrprSort(\'' + c.key + '\')" class="wrpr-th wrpr-th-sort">' +
-                c.label + ' <span id="wrprAr' + upper + '"></span></th>';
+            html += '<span id="wrprTh' + upper + '" onclick="wrprSort(\'' + c.key + '\')" style="width:62px;flex:0 0 auto;text-align:center;cursor:pointer;">' +
+                c.label + ' <span id="wrprAr' + upper + '"></span></span>';
         });
-        html += '</tr>';
+        if (window._isAdmin) html += '<span style="width:30px;flex:0 0 auto;"></span>';
+        html += '</div>';
         thead.innerHTML = html;
     }
     window.openWrprColSettings = function(){
@@ -6121,66 +6132,78 @@
         }
         noData.style.display = 'none';
 
-        var sorted = list.slice().sort(function(a, b) {
-            var colMap = {wr:'wr', pr:'pr', br:'br'};
-            var field = colMap[_wrprSortCol] || 'wr';
-            return _wrprSortDir * (a[field] - b[field]);
-        });
+        var sorted = (_wrprSortCol === 'manual')
+            ? list.slice()
+            : list.slice().sort(function(a, b) {
+                var field = {wr:'wr', pr:'pr', br:'br'}[_wrprSortCol] || 'wr';
+                return _wrprSortDir * (a[field] - b[field]);
+            });
 
+        var isAdmin = !!window._isAdmin;
         tbody.innerHTML = '';
         sorted.forEach(function(d, i) {
-            var tr = document.createElement('tr');
-            tr.style.cssText = 'border-bottom:1px solid rgba(255,255,255,0.04);' + (i % 2 === 0 ? 'background:rgba(255,255,255,0.015);' : '');
+            var row = document.createElement('div');
+            row.className = 'wrpr-row';
+            row.dataset.name = d.name;
+            row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;border-bottom:1px solid rgba(255,255,255,0.04);' + (i % 2 === 0 ? 'background:rgba(255,255,255,0.015);' : '');
 
-            // Rank
-            var tdN = document.createElement('td');
-            tdN.style.cssText = 'padding:8px 5px;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;width:34px;';
-            tdN.textContent = i + 1;
-            tr.appendChild(tdN);
+            // Ручка перетаскивания (только админ)
+            if (isAdmin) {
+                var grip = document.createElement('span');
+                grip.className = 'wrpr-grip';
+                grip.textContent = '⋮⋮';
+                grip.style.cssText = 'width:20px;flex:0 0 auto;cursor:grab;color:rgba(255,255,255,0.3);font-size:15px;letter-spacing:-2px;text-align:center;';
+                row.appendChild(grip);
+            }
 
-            // Champion
-            var tdC = document.createElement('td');
-            tdC.style.cssText = 'padding:8px 7px;';
+            // Номер
+            var nCell = document.createElement('span');
+            nCell.style.cssText = 'width:30px;flex:0 0 auto;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;';
+            nCell.textContent = i + 1;
+            row.appendChild(nCell);
+
+            // Чемпион
+            var cCell = document.createElement('span');
+            cCell.style.cssText = 'flex:1;min-width:0;display:flex;align-items:center;gap:8px;position:relative;';
             var iconUrl = wrprIcon(d.name);
             var engName = _wrprDisplayName[d.name] || d.name;
             var pWR = (window.patchMap || {})[d.name];
-            tdC.innerHTML = '<div style="display:flex;align-items:center;gap:8px;position:relative;">'
-                + '<img loading="lazy" decoding="async" src="' + iconUrl + '" alt="' + engName + '" '
+            cCell.innerHTML = '<img loading="lazy" decoding="async" src="' + iconUrl + '" alt="' + engName + '" '
                 + 'onerror="this.onerror=null;this.style.cssText=\'width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,var(--sel-fill),var(--sel-glow-sub));flex-shrink:0;display:block;\'" '
                 + 'style="width:34px;height:34px;border-radius:7px;object-fit:cover;flex-shrink:0;">'
-                + '<span class="wrpr-champ-name" style="font-size:14px;font-weight:700;color:#fff;">' + engName + '</span>'
-                + (pWR ? '<span class="patch-dot ' + pWR.type + '" style="margin-left:4px;flex-shrink:0;"></span>' : '')
-                + '</div>';
+                + '<span class="wrpr-champ-name" style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + engName + '</span>'
+                + (pWR ? '<span class="patch-dot ' + pWR.type + '" style="margin-left:4px;flex-shrink:0;"></span>' : '');
             if (pWR) {
                 (function(pi, cell) {
                     cell.style.cursor = 'pointer';
                     cell.addEventListener('mouseenter', function(e){ showGlobalPatchTip(e, pi, cell); });
                     cell.addEventListener('mouseleave', function(){ var t=document.getElementById('patchTip'); if(t) t.remove(); });
-                })(pWR, tdC);
+                })(pWR, cCell);
             }
-            tr.appendChild(tdC);
+            row.appendChild(cCell);
 
             // WR/PR/BR в порядке конфига
             cols.forEach(function(c){
-                var td = document.createElement('td');
+                var cell = document.createElement('span');
+                var base = 'width:62px;flex:0 0 auto;text-align:center;';
                 if (c.key === 'wr') {
-                    td.style.cssText = 'padding:8px 7px;text-align:center;font-weight:900;font-size:14px;';
+                    cell.style.cssText = base;
                     var wrColor = d.wr >= 52 ? '#2ecc71' : d.wr >= 50 ? '#f1c40f' : '#e74c3c';
-                    td.innerHTML = '<span style="color:' + wrColor + ';">' + d.wr.toFixed(2) + '%</span>';
+                    cell.innerHTML = '<span style="color:' + wrColor + ';font-weight:900;font-size:14px;">' + d.wr.toFixed(2) + '%</span>';
                 } else if (c.key === 'pr') {
-                    td.style.cssText = 'padding:8px 7px;text-align:center;font-size:14px;color:rgba(255,255,255,0.85);font-weight:700;';
-                    td.textContent = d.pr + '%';
+                    cell.style.cssText = base + 'font-size:14px;color:rgba(255,255,255,0.85);font-weight:700;';
+                    cell.textContent = d.pr + '%';
                 } else if (c.key === 'br') {
-                    td.style.cssText = 'padding:8px 7px;text-align:center;font-size:14px;color:rgba(255,255,255,0.6);';
-                    td.textContent = d.br + '%';
+                    cell.style.cssText = base + 'font-size:14px;color:rgba(255,255,255,0.6);';
+                    cell.textContent = d.br + '%';
                 }
-                tr.appendChild(td);
+                row.appendChild(cell);
             });
 
-            // Admin edit button
-            if (window._isAdmin && window.cmsOpenWinrateEditor) {
-                var tdEdit = document.createElement('td');
-                tdEdit.style.cssText = 'padding:4px 2px;text-align:center;width:32px;';
+            // Кнопка редактирования (только админ)
+            if (isAdmin && window.cmsOpenWinrateEditor) {
+                var eCell = document.createElement('span');
+                eCell.style.cssText = 'width:30px;flex:0 0 auto;text-align:center;';
                 var editBtn = document.createElement('button');
                 editBtn.className = 'cms-edit-btn';
                 editBtn.textContent = '✏';
@@ -6192,29 +6215,52 @@
                         window.cmsOpenWinrateEditor(entry, r, ro);
                     };
                 })(d, _wrprRank, _wrprRole);
-                tdEdit.appendChild(editBtn);
-                tr.appendChild(tdEdit);
+                eCell.appendChild(editBtn);
+                row.appendChild(eCell);
             }
 
-            tbody.appendChild(tr);
+            tbody.appendChild(row);
         });
 
         // Admin: кнопка "Добавить чемпиона"
-        if (window._isAdmin && window.cmsOpenWinrateEditor) {
-            var addRow = document.createElement('tr');
-            addRow.style.cssText = 'border-bottom:none;';
-            var addTd = document.createElement('td');
-            addTd.colSpan = 2 + cols.length + (window._isAdmin ? 1 : 0);
-            addTd.style.cssText = 'padding:10px;text-align:center;';
+        if (isAdmin && window.cmsOpenWinrateEditor) {
+            var addWrap = document.createElement('div');
+            addWrap.style.cssText = 'padding:10px;text-align:center;';
             var addBtn = document.createElement('button');
             addBtn.style.cssText = 'background:rgba(46,204,113,0.1);border:1.5px dashed rgba(46,204,113,0.4);color:#2ecc71;padding:8px 20px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;';
             addBtn.textContent = '+ Добавить чемпиона';
             addBtn.onclick = function() {
                 window.cmsOpenWinrateEditor(null, _wrprRank, _wrprRole);
             };
-            addTd.appendChild(addBtn);
-            addRow.appendChild(addTd);
-            tbody.appendChild(addRow);
+            addWrap.appendChild(addBtn);
+            tbody.appendChild(addWrap);
+        }
+
+        // Admin: перетаскивание строк за ⋮⋮ меняет порядок и сохраняет в Firestore.
+        // Работает только в ручном режиме (когда не включена сортировка по колонке).
+        if (isAdmin && window.Sortable && _wrprSortCol === 'manual') {
+            if (tbody._sortable) { try { tbody._sortable.destroy(); } catch (e) {} }
+            tbody._sortable = new window.Sortable(tbody, {
+                draggable: '.wrpr-row',
+                handle: '.wrpr-grip',
+                animation: 90,
+                ghostClass: 'dnd-row-ghost',
+                chosenClass: 'dnd-row-chosen',
+                dragClass: 'dnd-row-drag',
+                forceFallback: true,
+                fallbackOnBody: true,
+                onEnd: function() {
+                    var order = Array.prototype.map.call(tbody.querySelectorAll('.wrpr-row'), function(el){ return el.dataset.name; });
+                    var byName = {}; list.forEach(function(e){ byName[e.name] = e; });
+                    var newList = order.map(function(nm){ return byName[nm]; }).filter(Boolean);
+                    if (newList.length === list.length) {
+                        WR_DATA[_wrprRank][_wrprRole] = newList;
+                        window.WR_DATA[_wrprRank][_wrprRole] = newList;
+                        if (window.cmsSaveWinrateOrder) window.cmsSaveWinrateOrder(_wrprRank, _wrprRole, newList);
+                    }
+                    wrprRender();
+                }
+            });
         }
     }
 

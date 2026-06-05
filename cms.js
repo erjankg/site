@@ -1090,6 +1090,20 @@
     document.body.appendChild(overlay);
   };
 
+  // Сохранить НОВЫЙ ПОРЯДОК строк роли (для drag-перетаскивания таблицы винрейтов).
+  // merge:true — пишем только поле этой роли, остальные роли документа не трогаем.
+  window.cmsSaveWinrateOrder = function(rank, role, list) {
+    if (!window._isAdmin || !firebase || !firebase.firestore) return;
+    var clean = list.map(function(r) {
+      return { name: r.name, wr: r.wr, ch: (r.ch != null ? r.ch : null), pr: r.pr, br: r.br };
+    });
+    if (window._cmsWinrates && window._cmsWinrates[rank]) window._cmsWinrates[rank][role] = clean;
+    var upd = {}; upd[role] = clean;
+    firebase.firestore().collection('winrates').doc(rank).set(upd, { merge: true })
+      .then(function() { _showToast('Порядок сохранён', 'success'); })
+      .catch(function(err) { _showToast('Ошибка: ' + (err && err.message), 'error'); });
+  };
+
   function _saveWinrateEntry(newData, oldEntry, rank, role) {
     var db = firebase.firestore();
 
@@ -1635,17 +1649,21 @@
     win.style.border = 'none';
     win.style.borderRadius = '0';
     win.style.display = 'flex';
-    win.style.flexDirection = 'row';
+    win.style.flexDirection = 'column';
     win.style.overflow = 'hidden';
 
-    // Левая колонка: инструкция, селекторы, поле вставки, кнопки. Скроллится при нехватке высоты.
+    // Тело: левая колонка (управление) + правая (список). Кнопки — отдельной липкой полосой внизу.
+    var bodyRow = document.createElement('div');
+    bodyRow.style.cssText = 'flex:1 1 auto;display:flex;flex-direction:row;min-height:0;';
+    // Левая колонка: инструкция, селекторы, поле вставки. Скроллится при нехватке высоты.
     var leftCol = document.createElement('div');
     leftCol.style.cssText = 'flex:0 0 auto;width:min(440px,42vw);display:flex;flex-direction:column;padding:20px 22px;overflow-y:auto;border-right:1px solid rgba(255,255,255,0.1);';
     // Правая колонка: распарсенный список на всю высоту.
     var rightCol = document.createElement('div');
     rightCol.style.cssText = 'flex:1 1 auto;min-width:0;display:flex;flex-direction:column;padding:20px 22px;overflow:hidden;';
-    win.appendChild(leftCol);
-    win.appendChild(rightCol);
+    bodyRow.appendChild(leftCol);
+    bodyRow.appendChild(rightCol);
+    win.appendChild(bodyRow);
 
     // Заголовок
     var hdr = document.createElement('div');
@@ -1744,7 +1762,12 @@
     btnRow.appendChild(parseBtn);
     btnRow.appendChild(saveBtn);
     btnRow.appendChild(cancelBtn);
-    leftCol.appendChild(btnRow);
+    btnRow.style.width = '100%';
+    // Липкая нижняя панель на всю ширину — кнопки всегда на виду, не уезжают со скроллом.
+    var bottomBar = document.createElement('div');
+    bottomBar.style.cssText = 'flex:0 0 auto;padding:12px 22px;border-top:1px solid rgba(255,255,255,0.1);background:rgba(8,14,22,0.9);';
+    bottomBar.appendChild(btnRow);
+    win.appendChild(bottomBar);
 
     overlay.appendChild(win);
     document.body.appendChild(overlay);
@@ -1785,33 +1808,37 @@
       if (!parsedRows) return;
       var st = computeState();
 
-      var th = 'color:rgba(255,255,255,0.45);font-weight:700;text-align:left;padding:4px 6px;font-size:10px;text-transform:uppercase;letter-spacing:0.4px;';
-      var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;">' +
-        '<thead><tr>' +
-        '<th style="' + th + 'text-align:center;width:26px;">#</th>' +
-        '<th style="' + th + 'text-align:center;">WR</th>' +
-        '<th style="' + th + 'text-align:center;">PR</th>' +
-        '<th style="' + th + 'text-align:center;">BR</th>' +
-        '<th style="' + th + '">чемпион (выбери)</th>' +
-        '</tr></thead><tbody>';
+      var hc = 'font-size:10px;text-transform:uppercase;letter-spacing:0.4px;color:rgba(255,255,255,0.45);font-weight:700;';
+      var html = '<div style="display:flex;align-items:center;gap:8px;padding:0 8px 6px;' + hc + '">' +
+        '<span style="width:18px;flex:0 0 auto;"></span>' +
+        '<span style="width:24px;text-align:center;flex:0 0 auto;">#</span>' +
+        '<span style="width:58px;text-align:center;flex:0 0 auto;">WR</span>' +
+        '<span style="width:52px;text-align:center;flex:0 0 auto;">PR</span>' +
+        '<span style="width:52px;text-align:center;flex:0 0 auto;">BR</span>' +
+        '<span style="flex:1;min-width:0;">чемпион (тащи за ⋮⋮, выбирай кликом)</span>' +
+        '</div>';
+      html += '<div class="cmswr-rows" style="display:flex;flex-direction:column;gap:6px;">';
 
       parsedRows.forEach(function(r, i) {
-        var rowBg = r._assigned ? '' : 'background:rgba(231,76,60,0.07);';
-        var selBorder = r._assigned ? 'rgba(46,204,113,0.5)' : 'rgba(231,76,60,0.6)';
+        var rowBg = r._assigned ? 'rgba(46,204,113,0.05)' : 'rgba(231,76,60,0.06)';
+        var selBorder = r._assigned ? 'rgba(46,204,113,0.45)' : 'rgba(231,76,60,0.55)';
         // Имя с lolm — только мелкая серая подсказка (для парсинга оно не используется).
         var hint = r._rawName ? '<div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;">lolm: ' + _esc(r._rawName) + '</div>' : '';
         var pickInner = r._assigned
           ? '<img src="' + _esc(_champIconUrl(r._assigned)) + '" alt="" style="width:26px;height:26px;border-radius:6px;object-fit:cover;flex:0 0 auto;" onerror="this.style.display=\'none\'"><span>' + _esc(r._assigned) + '</span>'
           : '<span style="color:rgba(231,76,60,0.95);">▾ выбери чемпиона</span>';
-        html += '<tr style="border-top:1px solid rgba(255,255,255,0.06);' + rowBg + '">' +
-          '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.4);font-size:11px;">' + (i + 1) + '</td>' +
-          '<td style="padding:4px 6px;text-align:center;color:#0bc4e3;font-weight:700;">' + r.wr + '%</td>' +
-          '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.pr + '%</td>' +
-          '<td style="padding:4px 6px;text-align:center;color:rgba(255,255,255,0.6);">' + r.br + '%</td>' +
-          '<td style="padding:4px 6px;"><button type="button" class="cmswr-pick" data-i="' + i + '" style="display:flex;align-items:center;gap:8px;width:100%;padding:5px 8px;font-size:13px;font-weight:700;cursor:pointer;border-radius:8px;border:1.5px solid ' + selBorder + ';background:rgba(255,255,255,0.04);color:#fff;text-align:left;">' + pickInner + '</button>' + hint + '</td>' +
-          '</tr>';
+        html += '<div class="cmswr-row" data-i="' + i + '" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:10px;border:1px solid ' + selBorder + ';background:' + rowBg + ';">' +
+          '<span class="cmswr-grip" style="width:18px;flex:0 0 auto;cursor:grab;color:rgba(255,255,255,0.35);font-size:15px;letter-spacing:-2px;text-align:center;">⋮⋮</span>' +
+          '<span style="width:24px;flex:0 0 auto;text-align:center;color:rgba(255,255,255,0.4);font-size:11px;">' + (i + 1) + '</span>' +
+          '<span style="width:58px;flex:0 0 auto;text-align:center;color:#0bc4e3;font-weight:700;font-size:12px;">' + r.wr + '%</span>' +
+          '<span style="width:52px;flex:0 0 auto;text-align:center;color:rgba(255,255,255,0.6);font-size:12px;">' + r.pr + '%</span>' +
+          '<span style="width:52px;flex:0 0 auto;text-align:center;color:rgba(255,255,255,0.6);font-size:12px;">' + r.br + '%</span>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<button type="button" class="cmswr-pick" data-i="' + i + '" style="display:flex;align-items:center;gap:8px;width:100%;padding:5px 8px;font-size:13px;font-weight:700;cursor:pointer;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:#fff;text-align:left;">' + pickInner + '</button>' + hint +
+          '</div>' +
+          '</div>';
       });
-      html += '</tbody></table>';
+      html += '</div>';
 
       var sum = '<div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.08);padding-top:8px;">';
       sum += '<div style="color:#0bc4e3;font-weight:700;">Назначено: ' + st.assigned.length + ' / ' + parsedRows.length + '</div>';
@@ -1847,6 +1874,23 @@
           });
         };
       });
+
+      // Перетаскивание строк за ⋮⋮ — меняет порядок (Подъём+Резко+Неон, как в песочнице).
+      var rowsBox = preview.querySelector('.cmswr-rows');
+      if (rowsBox && window.Sortable) {
+        if (rowsBox._sortable) { try { rowsBox._sortable.destroy(); } catch (e) {} }
+        rowsBox._sortable = new window.Sortable(rowsBox, {
+          handle: '.cmswr-grip', animation: 90,
+          ghostClass: 'dnd-row-ghost', chosenClass: 'dnd-row-chosen', dragClass: 'dnd-row-drag',
+          forceFallback: true, fallbackOnBody: true,
+          onEnd: function() {
+            var order = Array.prototype.map.call(rowsBox.querySelectorAll('.cmswr-row'),
+              function(el) { return parseInt(el.getAttribute('data-i'), 10); });
+            parsedRows = order.map(function(idx) { return parsedRows[idx]; });
+            renderAssign();
+          }
+        });
+      }
 
       var canSave = st.known.length > 0 && st.dups.length === 0 &&
         (d.added.length || d.changed.length || d.removed.length);

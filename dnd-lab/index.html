@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>DnD Lab — анимации и дизайн перетаскивания</title>
+<style>
+  :root{
+    --bg:#0a0f16; --panel:#0d1b2a; --line:rgba(255,255,255,0.08);
+    --accent:#0bc4e3; --accent2:#2ecc71; --text:#e8eef4; --muted:rgba(255,255,255,0.55);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:radial-gradient(1200px 600px at 70% -10%, #112436 0%, var(--bg) 60%);
+    color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; padding:26px 22px 90px;
+  }
+  h1{margin:0 0 6px; font-size:23px;}
+  .sub{color:var(--muted); font-size:14px; margin-bottom:22px; line-height:1.6; max-width:900px;}
+  .sub b{color:var(--accent);}
+
+  .layout{display:grid; grid-template-columns:310px 1fr; gap:24px; align-items:start;}
+  @media(max-width:860px){ .layout{grid-template-columns:1fr;} }
+
+  .panel{background:linear-gradient(180deg,var(--panel),#0b1622); border:1px solid var(--line);
+         border-radius:16px; padding:18px; box-shadow:0 14px 40px rgba(0,0,0,.35); position:sticky; top:16px;}
+  .grp{margin-bottom:18px;} .grp:last-child{margin-bottom:0;}
+  .grp h3{margin:0 0 4px; font-size:13px; letter-spacing:.4px; text-transform:uppercase; color:var(--accent);}
+  .grp p{margin:0 0 9px; font-size:11px; color:var(--muted); line-height:1.5;}
+  .opts{display:flex; flex-wrap:wrap; gap:6px;}
+  .opt{background:rgba(255,255,255,.05); border:1px solid var(--line); color:rgba(255,255,255,.8);
+       font-size:12px; font-weight:700; padding:6px 11px; border-radius:9px; cursor:pointer; transition:.15s;}
+  .opt:hover{background:rgba(255,255,255,.1); color:var(--text);}
+  .opt.on{background:rgba(11,196,227,.16); border-color:rgba(11,196,227,.6); color:var(--accent);}
+  .now{margin-top:16px; padding-top:13px; border-top:1px solid var(--line); font-size:12px; color:var(--muted); line-height:1.7;}
+  .now b{color:var(--accent2);}
+
+  .demo{background:linear-gradient(180deg,var(--panel),#0b1622); border:1px solid var(--line);
+        border-radius:16px; padding:18px; margin-bottom:22px; box-shadow:0 14px 40px rgba(0,0,0,.3);}
+  .demo h2{margin:0 0 3px; font-size:16px;}
+  .demo .desc{color:var(--muted); font-size:12px; margin:0 0 14px; line-height:1.5;}
+  .reset{background:rgba(255,255,255,.05); border:1px solid var(--line); color:var(--muted);
+         font-size:12px; font-weight:700; padding:6px 13px; border-radius:9px; cursor:pointer; float:right;}
+  .reset:hover{background:rgba(255,255,255,.1); color:var(--text);}
+
+  /* перетаскиваемый элемент — каркас; СКИН задаётся дизайн-пресетом ниже */
+  .dnd-item{ border-radius:12px; touch-action:none; user-select:none; cursor:grab; will-change:transform; }
+  .dnd-item:active{cursor:grabbing;}
+
+  .row{display:flex; align-items:center; gap:12px; padding:9px 13px;}
+  .row .num{width:28px; height:28px; flex:0 0 auto; display:flex; align-items:center; justify-content:center;
+            border-radius:8px; background:rgba(11,196,227,.15); color:var(--accent); font-weight:800; font-size:13px;}
+  .row img{width:40px; height:40px; border-radius:8px; object-fit:cover; background:linear-gradient(135deg,#1c3350,#0c1a2a); pointer-events:none;}
+  .row .nm{font-weight:700; font-size:14px;}
+  .row .grip{margin-left:auto; color:var(--muted); font-size:18px; letter-spacing:-2px;}
+
+  .chip{display:flex; flex-direction:column; align-items:center; gap:5px; width:82px; padding:8px 6px;}
+  .chip img{width:50px; height:50px; border-radius:10px; object-fit:cover; background:linear-gradient(135deg,#1c3350,#0c1a2a); pointer-events:none;}
+  .chip .nm{font-size:11px; color:rgba(255,255,255,.85); text-align:center; line-height:1.1;}
+
+  .rank-list{display:flex; flex-direction:column; gap:8px; max-width:560px;}
+  .pool{display:flex; flex-wrap:wrap; gap:8px; align-content:flex-start; padding:10px; min-height:110px;
+        background:rgba(0,0,0,.22); border:1px solid var(--line); border-radius:12px;}
+  .pool-label{font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:700; margin:14px 0 8px;}
+  .tiers{display:flex; flex-direction:column; gap:8px;}
+  .tier{display:flex; align-items:stretch; border:1px solid var(--line); border-radius:12px; overflow:hidden; min-height:72px;}
+  .tier .badge{width:54px; flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; color:#0a0f16;}
+  .tier .lane{flex:1; display:flex; flex-wrap:wrap; gap:8px; padding:8px; align-content:flex-start;}
+  .tier.s .badge{background:#ff6b6b;} .tier.a .badge{background:#ffa94d;} .tier.b .badge{background:#ffd43b;}
+  .tier.c .badge{background:#69db7c;} .tier.d .badge{background:#4dabf7;}
+
+  .dnd-placeholder{ border:2px dashed rgba(11,196,227,.5); border-radius:12px; background:rgba(11,196,227,.06); box-sizing:border-box; flex:0 0 auto; }
+  .dnd-ghost{ position:fixed; left:0; top:0; margin:0!important; pointer-events:none; z-index:99999; will-change:transform; }
+  .dnd-zone.dnd-over{ outline:2px solid rgba(11,196,227,.25); outline-offset:-2px; border-radius:12px; }
+  .hint{font-size:12px; color:var(--muted); margin-top:12px; clear:both;}
+
+  /* ───── ДИЗАЙН-ПРЕСЕТЫ карточек (на body → ловит и призрака) ───── */
+  body[data-design="glass"]   .dnd-item{ background:rgba(255,255,255,.05); border:1px solid var(--line); backdrop-filter:blur(6px); }
+  body[data-design="solid"]   .dnd-item{ background:#13243a; border:1px solid rgba(255,255,255,.1); }
+  body[data-design="gradient"].dnd-item, body[data-design="gradient"] .dnd-item{ background:linear-gradient(135deg,#17324f,#0d1d30); border:1px solid rgba(255,255,255,.08); }
+  body[data-design="outline"] .dnd-item{ background:rgba(8,16,26,.6); border:1.5px solid rgba(11,196,227,.5); }
+  body[data-design="neon"]    .dnd-item{ background:#0c1726; border:1px solid rgba(11,196,227,.55); box-shadow:0 0 0 1px rgba(11,196,227,.18), 0 0 14px rgba(11,196,227,.22); }
+  body[data-design="flat"]    .dnd-item{ background:#1c2c41; border:none; }
+  body[data-design="frost"]   .dnd-item{ background:rgba(120,170,210,.12); border:1px solid rgba(160,200,235,.25); backdrop-filter:blur(10px); }
+  body[data-design="gold"]    .dnd-item{ background:linear-gradient(135deg,#2a2410,#15130a); border:1px solid rgba(241,196,15,.45); box-shadow:0 0 12px rgba(241,196,15,.12); }
+
+  @keyframes ghostPulse{0%,100%{box-shadow:0 0 0 2px rgba(11,196,227,.55), 0 16px 36px rgba(0,0,0,.5);}50%{box-shadow:0 0 0 5px rgba(11,196,227,.22), 0 22px 46px rgba(0,0,0,.55);}}
+</style>
+</head>
+<body data-design="neon">
+  <h1>🎚️ DnD Lab — анимации и дизайн</h1>
+  <p class="sub">
+    Слева три набора: <b>«Захват»</b> (как ведёт себя карточка под курсором),
+    <b>«Расступание»</b> (как двигаются соседи) и <b>«Дизайн»</b> (как выглядит сама карточка).
+    Меняй и сразу тащи — внизу два примера: список и тир-лист. Выбери сочетание — перенесу в боевой.
+  </p>
+
+  <div class="layout">
+    <div class="panel">
+      <div class="grp"><h3>① Захват</h3><p>Карточка под курсором.</p><div class="opts" id="grabOpts"></div></div>
+      <div class="grp"><h3>② Расступание</h3><p>Соседи уступают место.</p><div class="opts" id="shiftOpts"></div></div>
+      <div class="grp"><h3>③ Дизайн карточки</h3><p>Внешний вид карточек.</p><div class="opts" id="designOpts"></div></div>
+      <div class="now" id="now"></div>
+    </div>
+
+    <div>
+      <section class="demo">
+        <button class="reset" id="resetList">↺ Сбросить</button>
+        <h2>Список (пересортировка)</h2>
+        <p class="desc">Тащи строки вверх/вниз — номера слева пересчитываются на лету.</p>
+        <div class="dnd-zone rank-list" data-axis="y" id="list"></div>
+      </section>
+
+      <section class="demo">
+        <button class="reset" id="resetTier">↺ Сбросить</button>
+        <h2>Тир-лист</h2>
+        <p class="desc">Тащи чемпов из пула в ряды S / A / B / C / D, двигай между рядами и внутри ряда.</p>
+        <div class="tiers" id="tiers"></div>
+        <p class="pool-label">Пул</p>
+        <div class="dnd-zone pool" data-axis="grid" id="tierPool"></div>
+        <p class="hint">Те же анимации и дизайн применяются и тут.</p>
+      </section>
+    </div>
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  var CHAMPS = [
+    ['Aatrox'],['Ahri'],['Akali'],['Ashe'],['Caitlyn'],['Darius'],['Ezreal'],['Garen'],
+    ['Jhin'],['Jinx'],['Katarina'],['Leona'],['LeeSin','Lee Sin'],['Lux'],['Malphite'],
+    ['Morgana'],['Nasus'],['Riven'],['Sett'],['Vayne'],['Yasuo'],['Zed']
+  ];
+  function imgUrl(k){ return 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/'+k+'.png'; }
+
+  function rowItem(name, label){
+    var el = document.createElement('div'); el.className = 'dnd-item row'; el.dataset.champ = name;
+    el.innerHTML = '<span class="num">1</span><img src="'+imgUrl(name)+'" alt="" onerror="this.style.visibility=\'hidden\'">'+
+      '<span class="nm">'+(label||name)+'</span><span class="grip">⋮⋮</span>';
+    return el;
+  }
+  function chipItem(name, label){
+    var el = document.createElement('div'); el.className = 'dnd-item chip'; el.dataset.champ = name;
+    el.innerHTML = '<img src="'+imgUrl(name)+'" alt="" onerror="this.style.visibility=\'hidden\'"><span class="nm">'+(label||name)+'</span>';
+    return el;
+  }
+
+  // ── ПРЕСЕТЫ ──────────────────────────────────────────────
+  var GRAB = [
+    { id:'lift',  label:'Подъём',  suffix:' scale(1.03)',                  shadow:'0 18px 40px rgba(0,0,0,.5)',  opacity:'.97' },
+    { id:'tilt',  label:'Наклон',  suffix:' rotate(-3deg) scale(1.04)',    shadow:'0 22px 46px rgba(0,0,0,.55)', opacity:'.97' },
+    { id:'pop',   label:'Поп',     suffix:' scale(1.08)',                  shadow:'0 0 0 2px rgba(11,196,227,.6),0 18px 40px rgba(0,0,0,.5)', opacity:'1' },
+    { id:'flat',  label:'Минимал', suffix:'',                              shadow:'0 10px 26px rgba(0,0,0,.45)', opacity:'.9' },
+    { id:'press', label:'Нажатие', suffix:' scale(.97)',                   shadow:'0 8px 22px rgba(0,0,0,.5)',   opacity:'.95' },
+    { id:'float', label:'Парение', suffix:' translateY(-4px) scale(1.05)', shadow:'0 28px 52px rgba(0,0,0,.6)',  opacity:'.97' },
+    { id:'rise',  label:'Взлёт',   suffix:' translateY(-9px) scale(1.07)', shadow:'0 34px 60px rgba(0,0,0,.6)',  opacity:'.97' },
+    { id:'pulse', label:'Пульс',   suffix:' scale(1.05)',                  shadow:'',  opacity:'1', anim:'ghostPulse .9s ease-in-out infinite' },
+    { id:'tiltr', label:'Наклон →',suffix:' rotate(4deg) scale(1.04)',     shadow:'0 22px 46px rgba(0,0,0,.55)', opacity:'.97' }
+  ];
+  var SHIFT = [
+    { id:'slide',   label:'Плавно',    transition:'transform .18s ease' },
+    { id:'spring',  label:'Пружина',   transition:'transform .38s cubic-bezier(.34,1.56,.64,1)' },
+    { id:'snap',    label:'Резко',     transition:'transform .09s linear' },
+    { id:'soft',    label:'Мягко',     transition:'transform .32s ease-in-out' },
+    { id:'bounce',  label:'Отскок',    transition:'transform .45s cubic-bezier(.68,-.55,.27,1.55)' },
+    { id:'fade',    label:'Таяние',    transition:'transform .24s ease, opacity .24s ease', fade:true },
+    { id:'elastic', label:'Резинка',   transition:'transform .6s cubic-bezier(.16,1.2,.3,1)' },
+    { id:'glide',   label:'Скольжение',transition:'transform .5s cubic-bezier(.22,1,.36,1)' },
+    { id:'instant', label:'Мгновенно', transition:'transform 0s' }
+  ];
+  var DESIGN = [
+    {id:'glass',label:'Стекло'},{id:'solid',label:'Тёмная'},{id:'gradient',label:'Градиент'},
+    {id:'outline',label:'Контур'},{id:'neon',label:'Неон'},{id:'flat',label:'Плоская'},
+    {id:'frost',label:'Иней'},{id:'gold',label:'Золото'}
+  ];
+  var grab = GRAB[0], shift = SHIFT[2];   // дефолт: Подъём + Резко (+ Неон на body)
+
+  function buildOpts(){
+    wire('grabOpts', GRAB, function(p){ grab=p; }, 0);
+    wire('shiftOpts', SHIFT, function(p){ shift=p; }, 2);
+    wire('designOpts', DESIGN, function(p){ document.body.dataset.design = p.id; }, 4);
+    updateNow();
+  }
+  function wire(id, arr, set, def){
+    var box = document.getElementById(id);
+    arr.forEach(function(p, i){
+      var b = document.createElement('button'); b.className='opt'+(i===def?' on':''); b.textContent=p.label;
+      b.onclick = function(){
+        Array.prototype.forEach.call(box.children, function(c){ c.classList.remove('on'); });
+        b.classList.add('on'); set(p); updateNow();
+      };
+      box.appendChild(b);
+    });
+  }
+  function updateNow(){
+    document.getElementById('now').innerHTML =
+      'Сейчас:<br>① <b>'+grab.label+'</b> · ② <b>'+shift.label+'</b> · ③ <b>'+
+      (DESIGN.filter(function(d){return d.id===document.body.dataset.design;})[0]||{label:'—'}).label+'</b>';
+  }
+
+  // ── ДВИЖОК (pointer + FLIP, мультизонный) ───────────────
+  var drag = null;
+
+  document.addEventListener('pointerdown', function(e){
+    if (e.button !== 0) return;
+    var item = e.target.closest('.dnd-item'); if (!item) return;
+    e.preventDefault();
+
+    var r = item.getBoundingClientRect();
+    var ghost = item.cloneNode(true);
+    ghost.classList.add('dnd-ghost');
+    ghost.style.width = r.width+'px'; ghost.style.height = r.height+'px';
+    if (grab.anim){ ghost.style.animation = grab.anim; } else { ghost.style.boxShadow = grab.shadow; }
+    ghost.style.opacity = grab.opacity;
+    document.body.appendChild(ghost);
+
+    var ph = document.createElement('div'); ph.className = 'dnd-placeholder';
+    ph.style.width = r.width+'px'; ph.style.height = r.height+'px';
+    item.parentNode.insertBefore(ph, item);
+    item.style.display = 'none';
+
+    drag = { item:item, ghost:ghost, ph:ph, demo:item.closest('.demo'),
+             offX:e.clientX-r.left, offY:e.clientY-r.top, x:e.clientX, y:e.clientY,
+             raf:0, overZone:null, lastZone:ph.parentNode, lastRef:undefined };
+    moveGhost(e.clientX, e.clientY);
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  });
+
+  function moveGhost(x, y){
+    drag.ghost.style.transform = 'translate('+(x-drag.offX)+'px,'+(y-drag.offY)+'px)'+grab.suffix;
+  }
+  function onMove(e){
+    if (!drag) return;
+    drag.x=e.clientX; drag.y=e.clientY;
+    if (drag.raf) return;
+    drag.raf = requestAnimationFrame(function(){ drag.raf=0; moveGhost(drag.x,drag.y); reflow(drag.x,drag.y); });
+  }
+
+  function reflow(x, y){
+    drag.ghost.style.pointerEvents = 'none';
+    var under = document.elementFromPoint(x, y);
+    var zone = under ? under.closest('.dnd-zone') : null;
+    if (drag.overZone && drag.overZone !== zone) drag.overZone.classList.remove('dnd-over');
+    if (!zone) return;
+    zone.classList.add('dnd-over'); drag.overZone = zone;
+
+    var ref = insertRef(zone, x, y);
+    if (zone === drag.lastZone && ref === drag.lastRef) return;
+    drag.lastZone = zone; drag.lastRef = ref;
+
+    var items = Array.prototype.slice.call(drag.demo.querySelectorAll('.dnd-item'))
+                  .filter(function(el){ return el !== drag.item; });
+    var before = items.map(function(el){ return el.getBoundingClientRect(); });
+
+    zone.insertBefore(drag.ph, ref);
+
+    items.forEach(function(el, i){
+      var o = before[i], n = el.getBoundingClientRect();
+      var dx = o.left - n.left, dy = o.top - n.top;
+      if (dx || dy){
+        el.style.transition = 'none';
+        el.style.transform = 'translate('+dx+'px,'+dy+'px)';
+        if (shift.fade) el.style.opacity = '0.5';
+        requestAnimationFrame(function(){
+          el.style.transition = shift.transition;
+          el.style.transform = '';
+          if (shift.fade) el.style.opacity = '';
+        });
+      }
+    });
+    renumber();
+  }
+
+  function insertRef(zone, x, y){
+    var axis = zone.dataset.axis || 'y';
+    var kids = Array.prototype.slice.call(zone.children)
+                 .filter(function(el){ return el.classList.contains('dnd-item') && el !== drag.item; });
+    if (!kids.length) return null;
+
+    if (axis === 'y'){
+      for (var i=0;i<kids.length;i++){
+        var r = kids[i].getBoundingClientRect();
+        if (y < r.top + r.height/2) return kids[i];
+      }
+      return null;
+    }
+    // grid (пул / ряды тира)
+    var closest=null, best=Infinity;
+    kids.forEach(function(el){
+      var r=el.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2, d=Math.hypot(x-cx,y-cy);
+      if (d<best){ best=d; closest={el:el,r:r,cx:cx}; }
+    });
+    var beforeIt;
+    if (y < closest.r.top) beforeIt = true;
+    else if (y > closest.r.bottom) beforeIt = false;
+    else beforeIt = x < closest.cx;
+    return beforeIt ? closest.el : nextItem(closest.el);
+  }
+  function nextItem(el){
+    var n = el.nextElementSibling;
+    while (n && (n === drag.item || n === drag.ph)) n = n.nextElementSibling;
+    return n;
+  }
+
+  function onUp(){
+    if (!drag) return;
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', onUp);
+    if (drag.raf){ cancelAnimationFrame(drag.raf); drag.raf=0; }
+    if (drag.overZone) drag.overZone.classList.remove('dnd-over');
+
+    var zone = drag.ph.parentNode;
+    zone.insertBefore(drag.item, drag.ph);
+    drag.item.style.display = '';
+    zone.removeChild(drag.ph);
+
+    var f = drag.item.getBoundingClientRect(), g = drag.ghost;
+    g.style.animation = 'none';
+    g.style.transition = 'transform .16s ease, opacity .16s ease';
+    g.style.transform = 'translate('+f.left+'px,'+f.top+'px)'; g.style.opacity = '0';
+    setTimeout(function(){ if (g.parentNode) g.parentNode.removeChild(g); }, 170);
+
+    drag = null;
+    renumber();
+  }
+
+  function renumber(){
+    var list = document.getElementById('list');
+    var counter = 0;
+    Array.prototype.forEach.call(list.children, function(ch){
+      if (ch.classList.contains('dnd-placeholder')) { counter++; return; }
+      if (!ch.classList.contains('row')) return;
+      if (drag && ch === drag.item) return;
+      counter++;
+      var num = ch.querySelector('.num'); if (num) num.textContent = counter;
+    });
+  }
+
+  // ── построение ──
+  function buildList(){
+    var list = document.getElementById('list'); list.innerHTML = '';
+    CHAMPS.slice(0,14).forEach(function(c){ list.appendChild(rowItem(c[0],c[1])); });
+    renumber();
+  }
+  function buildTier(){
+    var tiers = document.getElementById('tiers'), pool = document.getElementById('tierPool');
+    tiers.innerHTML=''; pool.innerHTML='';
+    ['S','A','B','C','D'].forEach(function(L){
+      var t=document.createElement('div'); t.className='tier '+L.toLowerCase();
+      t.innerHTML='<div class="badge">'+L+'</div>';
+      var lane=document.createElement('div'); lane.className='dnd-zone lane'; lane.dataset.axis='grid';
+      t.appendChild(lane); tiers.appendChild(t);
+    });
+    CHAMPS.forEach(function(c){ pool.appendChild(chipItem(c[0],c[1])); });
+  }
+
+  document.getElementById('resetList').onclick = buildList;
+  document.getElementById('resetTier').onclick = buildTier;
+
+  buildOpts(); buildList(); buildTier();
+})();
+</script>
+</body>
+</html>

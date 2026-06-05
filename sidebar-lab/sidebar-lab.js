@@ -72,6 +72,35 @@ var VARIANTS = [
     desc: 'Голографическая полоса проходит по строке снизу вверх. Технологично, футуристично.' }
 ];
 
+/* ── Только цветные строки (для второй группы) ── */
+var COLORED_SAMPLE = [
+  { ic: '📋', lbl: 'Драфт-помощник', cls: 'draft' },
+  { ic: '🎯', lbl: 'Драфт (серии)',  cls: 'coop' },
+  { ic: '🏆', lbl: 'Тир-лист',       cls: 'tier' },
+  { ic: '💬', lbl: 'Чат',            cls: 'chat' },
+  { ic: '🏆', lbl: 'Киберспорт',     cls: 'cs' }
+];
+
+/* ── Цветные варианты (каждый играет своим цветом кнопки) ── */
+var COLORED_VARIANTS = [
+  { id: 'cv-combo', v: 'cv-combo', sample: 'colored', name: 'Combo (свой цвет)', tag: 'базовый', best: true,
+    desc: 'Тот же Combo Premium, но каждая кнопка светит своим цветом. Уже стоит в боевом по умолчанию — отсюда отталкиваемся.' },
+  { id: 'cv-edge', v: 'cv-edge', sample: 'colored', name: 'Neon Edge',
+    desc: 'Вся рамка кнопки загорается её цветом + внешнее свечение. Кнопка будто «включается». Заметно и дорого.' },
+  { id: 'cv-sweep', v: 'cv-sweep', sample: 'colored', name: 'Color Sweep',
+    desc: 'Цвет заливает строку целиком слева направо, текст становится тёмным. Максимально сочно и читаемо.' },
+  { id: 'cv-pulse', v: 'cv-pulse', sample: 'colored', name: 'Pulse Bar',
+    desc: 'Цветная полоса слева начинает пульсировать-дышать, строка чуть раздвигается. Живой «маячок».' },
+  { id: 'cv-slide', v: 'cv-slide', sample: 'colored', name: 'Gradient Slide',
+    desc: 'Диагональный градиент её цвета проезжает по строке насквозь. Эффект цветного стекла.' },
+  { id: 'cv-halo', v: 'cv-halo', sample: 'colored', name: 'Icon Halo',
+    desc: 'Вокруг иконки загорается кольцо её цвета, иконка перекрашивается и растёт. Фокус на смысле.' },
+  { id: 'cv-spot', v: 'cv-spot', sample: 'colored', js: 'spotlight', name: 'Color Spotlight',
+    desc: 'Пятно её цвета следует за курсором вдоль строки. Тактильно, реагирует на тебя.' },
+  { id: 'cv-aurora', v: 'cv-aurora', sample: 'colored', name: 'Aurora Pull',
+    desc: 'Отступ вправо + дышащий цветной ореол + выезжает «›». Combo, но мягче и атмосфернее.' }
+];
+
 /* ── Готовые CSS-сниппеты под боевой .side-btn (вставлять в styles.css) ── */
 var SNIPPETS = {
   combo:
@@ -210,7 +239,8 @@ var SNIPPETS = {
 function buildNav(v) {
   var nav = document.createElement('div');
   nav.className = 'sl-nav ' + v.v;
-  SAMPLE.forEach(function (r) {
+  var rows = v.sample === 'colored' ? COLORED_SAMPLE : SAMPLE;
+  rows.forEach(function (r) {
     if (r.sec) {
       var s = document.createElement('div');
       s.className = 'sl-section';
@@ -253,47 +283,62 @@ function attachJS(nav, kind) {
   }
 }
 
+function renderCard(wrap, v) {
+  var card = document.createElement('section');
+  card.className = 'sl-card' + (v.featured ? ' featured' : '');
+
+  var head = document.createElement('div');
+  head.className = 'sl-card-head';
+  head.innerHTML =
+    '<div class="sl-card-meta">' +
+    '<div class="sl-name">' + v.name +
+    (v.tag ? '<span class="sl-tag' + (v.best ? ' best' : '') + '">' + v.tag + '</span>' : '') +
+    '</div>' +
+    '<p class="sl-desc">' + v.desc + '</p>' +
+    '</div>';
+
+  if (SNIPPETS[v.id]) {
+    var btn = document.createElement('button');
+    btn.className = 'sl-copy';
+    btn.textContent = 'Скопировать CSS';
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(SNIPPETS[v.id]).then(function () {
+        btn.textContent = '✓ Скопировано';
+        btn.classList.add('done');
+        setTimeout(function () { btn.textContent = 'Скопировать CSS'; btn.classList.remove('done'); }, 1600);
+      });
+    });
+    head.appendChild(btn);
+  }
+  card.appendChild(head);
+
+  var frame = document.createElement('div');
+  frame.className = 'sl-nav-frame';
+  var nav = buildNav(v);
+  frame.appendChild(nav);
+  card.appendChild(frame);
+  wrap.appendChild(card);
+
+  if (v.js) attachJS(nav, v.js);
+}
+
+function renderGroup(wrap, title, desc) {
+  var g = document.createElement('div');
+  g.className = 'sl-group';
+  g.innerHTML = '<h2>' + title + '</h2>' + (desc ? '<p>' + desc + '</p>' : '');
+  wrap.appendChild(g);
+}
+
 function render() {
   var wrap = document.getElementById('slWrap');
   wrap.innerHTML = '';
-  VARIANTS.forEach(function (v) {
-    var card = document.createElement('section');
-    card.className = 'sl-card' + (v.featured ? ' featured' : '');
+  renderGroup(wrap, 'Обычные кнопки сайдбара',
+    'Combo Premium уже стоит в боевом для обычных кнопок. Здесь можно сравнить с другими вариантами.');
+  VARIANTS.forEach(function (v) { renderCard(wrap, v); });
 
-    var head = document.createElement('div');
-    head.className = 'sl-card-head';
-    head.innerHTML =
-      '<div class="sl-card-meta">' +
-      '<div class="sl-name">' + v.name +
-      (v.tag ? '<span class="sl-tag' + (v.best ? ' best' : '') + '">' + v.tag + '</span>' : '') +
-      '</div>' +
-      '<p class="sl-desc">' + v.desc + '</p>' +
-      '</div>';
-
-    if (SNIPPETS[v.id]) {
-      var btn = document.createElement('button');
-      btn.className = 'sl-copy';
-      btn.textContent = 'Скопировать CSS';
-      btn.addEventListener('click', function () {
-        navigator.clipboard.writeText(SNIPPETS[v.id]).then(function () {
-          btn.textContent = '✓ Скопировано';
-          btn.classList.add('done');
-          setTimeout(function () { btn.textContent = 'Скопировать CSS'; btn.classList.remove('done'); }, 1600);
-        });
-      });
-      head.appendChild(btn);
-    }
-    card.appendChild(head);
-
-    var frame = document.createElement('div');
-    frame.className = 'sl-nav-frame';
-    var nav = buildNav(v);
-    frame.appendChild(nav);
-    card.appendChild(frame);
-    wrap.appendChild(card);
-
-    if (v.js) attachJS(nav, v.js);
-  });
+  renderGroup(wrap, 'Цветные кнопки — варианты покруче',
+    'Тир, чат, драфт, серии, киберспорт — у каждой свой цвет слева. Здесь каждый эффект играет цветом конкретной кнопки. Выбери лучший — впишу в боевой как надо (специфика CSS, поэтому без кнопки «Скопировать»).');
+  COLORED_VARIANTS.forEach(function (v) { renderCard(wrap, v); });
 }
 
 /* ── Контролы ── */

@@ -1,0 +1,206 @@
+/* ════════════════════════════════════════════════════════════
+   Profile-Lab — песочница hover-анимаций строк выпадающего меню
+   «Мой профиль» (.user-menu / .user-menu-item с боевого).
+   Токены подобраны 1-в-1 под боевой styles.css, поэтому сниппеты
+   «Скопировать CSS» вставляются в styles.css без правок.
+
+   ВАЖНО: сами варианты-анимации НЕ здесь — они в одном источнике
+   в profile-lab.js (VARIANTS[].css) и инжектятся в <style> на лету.
+   Тот же текст уходит в буфер по кнопке «Скопировать CSS».
+   ════════════════════════════════════════════════════════════ */
+
+:root {
+  --accent-rgb: 11, 196, 227;
+  --accent:        rgb(var(--accent-rgb));
+  --accent-glow:   rgba(var(--accent-rgb), 0.40);
+  --accent-dim:    rgba(var(--accent-rgb), 0.15);
+  --accent-border: rgba(var(--accent-rgb), 0.20);
+
+  --bg-base:    #010A13;
+  --bg-primary: #010d18;
+  --panel:      #04111d;
+
+  /* как боевой .user-menu */
+  --menu-bg:     #0a1622;
+  --menu-border: rgba(var(--accent-rgb), 0.20);
+
+  --text-primary:   #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.80);
+  --text-mute:      rgba(255, 255, 255, 0.45);
+
+  --ease-snap:   cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-mat:    cubic-bezier(0.4, 0, 0.2, 1);
+
+  --spd: 1;
+  --dur-fast: calc(120ms * var(--spd));
+  --dur-base: calc(200ms * var(--spd));
+  --dur-mid:  calc(300ms * var(--spd));
+  --dur-slow: calc(500ms * var(--spd));
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
+  color: var(--text-primary);
+  background:
+    radial-gradient(ellipse at 18% 12%, rgba(var(--accent-rgb), 0.10) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 88%, rgba(30, 10, 80, 0.35) 0%, transparent 50%),
+    linear-gradient(160deg, var(--bg-primary) 0%, var(--bg-base) 55%, #000 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+body.dim { --panel: #020a12; }
+body.dim::before {
+  content: ""; position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── Шапка ── */
+.pl-head {
+  position: sticky; top: 0; z-index: 20;
+  padding: 18px 26px;
+  background: rgba(1, 10, 19, 0.82);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.pl-title {
+  margin: 0 0 14px; font-size: 22px; font-weight: 800; letter-spacing: 0.3px;
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+}
+.pl-title small { font-size: 12px; font-weight: 500; color: var(--text-mute); letter-spacing: 0; }
+
+.pl-controls { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; }
+.pl-ctrl {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; font-weight: 600; color: var(--text-secondary);
+}
+#plSpeed { width: 150px; accent-color: var(--accent); }
+#plSpeedVal { width: 38px; color: var(--accent); font-variant-numeric: tabular-nums; }
+
+.pl-swatches { display: flex; gap: 7px; }
+.pl-sw {
+  width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent; transition: transform var(--dur-fast) var(--ease-spring), border-color var(--dur-fast);
+}
+.pl-sw:hover { transform: scale(1.18); }
+.pl-sw.active { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.4); }
+.pl-custom { display: inline-flex; }
+.pl-custom input { width: 28px; height: 28px; padding: 0; border: none; background: none; cursor: pointer; }
+.pl-bg-toggle { cursor: pointer; user-select: none; }
+.pl-bg-toggle input { accent-color: var(--accent); }
+
+/* ── Сетка карточек-вариантов ── */
+.pl-wrap {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 22px;
+  padding: 26px;
+  align-items: start;
+}
+
+.pl-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.pl-card.featured {
+  border-color: rgba(var(--accent-rgb), 0.5);
+  box-shadow: 0 0 0 1px var(--accent-border), 0 14px 40px rgba(0,0,0,0.5);
+  grid-column: 1 / -1;
+}
+
+.pl-card-head {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.pl-card-meta { flex: 1; min-width: 0; }
+.pl-name {
+  font-size: 14px; font-weight: 800; letter-spacing: 0.2px;
+  display: flex; align-items: center; gap: 8px;
+}
+.pl-tag {
+  font-size: 9px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 5px;
+  background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border);
+}
+.pl-tag.best { background: var(--accent); color: var(--bg-base); border-color: var(--accent); }
+.pl-desc { margin: 6px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--text-mute); }
+
+.pl-copy {
+  flex-shrink: 0; align-self: flex-start;
+  font-size: 11px; font-weight: 700; color: var(--text-secondary);
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 6px 10px; cursor: pointer; white-space: nowrap;
+  transition: all var(--dur-fast) var(--ease-mat);
+}
+.pl-copy:hover { background: var(--accent-dim); border-color: rgba(var(--accent-rgb),0.5); color: var(--accent); }
+.pl-copy.done { background: var(--accent); color: var(--bg-base); border-color: var(--accent); }
+
+/* ── Сцена с выпадающим меню внутри карточки ── */
+.pl-stage {
+  padding: 22px 16px 26px;
+  background:
+    radial-gradient(ellipse at 78% 0%, rgba(var(--accent-rgb), 0.07), transparent 60%),
+    var(--panel);
+  display: flex; justify-content: flex-end;
+}
+
+/* Копия боевой .user-menu */
+.pmenu {
+  width: 230px;
+  background: var(--menu-bg);
+  border: 1.5px solid var(--menu-border);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+/* Копия боевой .user-menu-email */
+.pmenu-email {
+  padding: 8px 12px;
+  font-size: 11px; color: var(--text-mute);
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.12);
+  margin-bottom: 4px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* Базовая строка-кнопка — копия .user-menu-item с боевого */
+.pi {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none; border-radius: 10px;
+  background: none; color: var(--text-secondary);
+  font: inherit; font-size: 13px; font-weight: 700; text-align: left;
+  cursor: pointer; overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.pi .ic { font-size: 15px; width: 20px; text-align: center; flex-shrink: 0; }
+.pi .lbl { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ── Заголовок группы на всю ширину сетки ── */
+.pl-group {
+  grid-column: 1 / -1;
+  margin: 18px 2px 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.pl-group:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+.pl-group h2 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: 0.2px; }
+.pl-group p { margin: 6px 0 0; font-size: 12px; color: var(--text-mute); max-width: 72ch; line-height: 1.5; }
+
+@media (max-width: 560px) {
+  .pl-wrap { grid-template-columns: 1fr; padding: 16px; }
+  .pl-controls { gap: 16px; }
+  .pl-stage { justify-content: center; }
+}

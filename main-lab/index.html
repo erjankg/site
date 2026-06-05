@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Main-Lab · песочница главного экрана</title>
+  <link rel="stylesheet" href="main-lab.css">
+</head>
+<body>
+
+  <header class="ml-head">
+    <h1 class="ml-title">
+      ✦ Main-Lab
+      <small>песочница раскладок и анимаций главного экрана · не индексируется, не на сайте</small>
+    </h1>
+
+    <div class="ml-controls" id="mlControls"></div>
+  </header>
+
+  <main class="ml-stage" id="mlStage">
+    <!-- Мини-карта раскладок -->
+    <div class="ml-layouts" id="mlLayouts"></div>
+
+    <!-- Сам макет главной -->
+    <div class="ml-frame-wrap">
+      <div class="ml-frame" id="mlFrame"></div>
+    </div>
+  </main>
+
+  <div class="ml-toast" id="mlToast"></div>
+
+  <script src="main-lab.js"></script>
+</body>
+</html>

@@ -11,8 +11,12 @@
 (function () {
   'use strict';
 
-  var KEY_PC = 'le_layout_pc';
-  var KEY_MOB = 'le_layout_mobile';
+  // Префикс ключей localStorage (по умолчанию 'le' для главного сайта;
+  // тактическая доска ставит window.LE_KEY_PREFIX='tb' до загрузки, чтобы
+  // черновики не путались с правками главного сайта).
+  var _kp = (window.LE_KEY_PREFIX || 'le');
+  var KEY_PC = _kp + '_layout_pc';
+  var KEY_MOB = _kp + '_layout_mobile';
   var STYLE_ID = 'le-applied-style';
   var SNAP = 6; // порог привязки, px
   var MOB_MAX = 768; // ширина окна <= этого = режим «телефон»

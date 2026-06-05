@@ -756,10 +756,8 @@
     reader.readAsDataURL(file);
   }
 
-  // ── Панель карты ──
-  const mapPanel = document.getElementById('tbMapPanel');
+  // ── Панель карты (всегда открыта в правой колонке) ──
   const mapHint  = document.getElementById('tbMapHint');
-  document.getElementById('tbMapBtn').addEventListener('click', () => { mapPanel.hidden = !mapPanel.hidden; });
   document.getElementById('tbMapUpload').addEventListener('click', () => document.getElementById('tbMapFile').click());
   document.getElementById('tbMapFile').addEventListener('change', e => {
     const f = e.target.files && e.target.files[0]; if (!f) return;
@@ -783,6 +781,18 @@
     applyMapTransform(); saveMap();
   });
   document.getElementById('tbMapReset').addEventListener('click', resetMap);
+
+  // ── Кнопка «Редактор раскладки» (двигать/менять размер любых кнопок) ──
+  const editToggle = document.getElementById('tbEditToggle');
+  if (editToggle) {
+    editToggle.addEventListener('click', () => {
+      if (!window.LayoutEditor) return;
+      const on = document.body.classList.contains('le-on');
+      if (on) window.LayoutEditor.deactivate();
+      else window.LayoutEditor.activate();
+      editToggle.classList.toggle('tb-edit-on', !on);
+    });
+  }
 
   // ── Цветовые свотчи (стрелки/карандаш) ──
   document.querySelectorAll('.tb-color').forEach(sw => {

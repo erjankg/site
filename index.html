@@ -168,7 +168,8 @@
         </button>
         <!-- User Menu Dropdown -->
         <div id="userMenu" class="user-menu">
-            <div id="userMenuEmail" class="user-menu-email"></div>
+            <div id="userMenuEmail" class="user-menu-email auth-only-row"></div>
+            <button class="user-menu-item guest-only" onclick="closeUserMenuAndLogin()" style="display:none" data-i18n="🔑 Войти через Google">🔑 Войти через Google</button>
             <button class="user-menu-item" onclick="closeUserMenuAndOpen('profile')" data-i18n="👤 Мой профиль">👤 Мой профиль</button>
             <button class="user-menu-item" onclick="syncNow()" data-i18n="🔄 Синхронизировать">🔄 Синхронизировать</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenChangelog)cmsOpenChangelog()" style="display:none" data-i18n="📋 История изменений">📋 История изменений</button>
@@ -178,7 +179,7 @@
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenIconsEditor)cmsOpenIconsEditor()" style="display:none" data-i18n="🖼 Иконки">🖼 Иконки</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenSidebarEditor)cmsOpenSidebarEditor()" style="display:none" data-i18n="🔤 Сайдбар">🔤 Сайдбар</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenFontEditor)cmsOpenFontEditor()" style="display:none" data-i18n="🔤 Шрифты сайта">🔤 Шрифты сайта</button>
-            <button class="user-menu-item" onclick="authSignOut()" data-i18n="🚪 Выйти">🚪 Выйти</button>
+            <button class="user-menu-item auth-only-row" onclick="authSignOut()" data-i18n="🚪 Выйти">🚪 Выйти</button>
         </div>
     </header>
 
@@ -220,15 +221,38 @@
   <div style="display:flex;gap:6px;padding:10px 12px 8px;overflow-x:auto;justify-content:center;" id="wrprRankRow"></div>
   <!-- Role filters -->
   <div style="display:flex;gap:6px;padding:0 12px 10px;overflow-x:auto;justify-content:center;" id="wrprRoleRow"></div>
-  <!-- Table -->
-  <div>
-    <table id="wrprTable" style="width:100%;border-collapse:collapse;font-size:14px;">
-      <thead id="wrprThead"></thead>
-      <tbody id="wrprTbody"></tbody>
-    </table>
+  <!-- Table (div-строки: нужно для drag-перетаскивания строк) -->
+  <div id="wrprTable" style="font-size:14px;">
+    <div id="wrprThead"></div>
+    <div id="wrprTbody"></div>
     <div id="wrprNoData" data-i18n="Данные для этого ранга скоро появятся">Данные для этого ранга скоро появятся</div>
   </div>
 </div>
+
+<!-- ══ FOOTER (подвал) ══ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">PRO-WILDRIFT</div>
+      <p class="footer-tagline" data-i18n="Русскоязычный справочник по Wild Rift: статы чемпионов, винрейты, драфтер, руны и предметы. Обновляется каждый патч.">Русскоязычный справочник по Wild Rift: статы чемпионов, винрейты, драфтер, руны и предметы. Обновляется каждый патч.</p>
+    </div>
+    <nav class="footer-nav" aria-label="Разделы сайта">
+      <span class="footer-nav-title" data-i18n="Разделы">Разделы</span>
+      <button class="footer-link" onclick="switchMainView('main')" data-i18n="Статы чемпионов">Статы чемпионов</button>
+      <button class="footer-link" onclick="switchMainView('wrpr')" data-i18n="Винрейты">Винрейты</button>
+      <button class="footer-link" onclick="toggleSidebar()" data-i18n="Все разделы">Все разделы</button>
+    </nav>
+    <nav class="footer-nav" aria-label="Автор и контакты">
+      <span class="footer-nav-title" data-i18n="Автор">Автор</span>
+      <a class="footer-link" href="https://www.twitch.tv/ERjanKG" target="_blank" rel="noopener">Twitch — ERjanKG</a>
+      <button class="footer-link" onclick="window.scrollTo({top:0,behavior:'smooth'})" data-i18n="↑ Наверх">↑ Наверх</button>
+    </nav>
+  </div>
+  <div class="footer-legal">
+    <p class="footer-disclaimer" data-i18n="PRO-WILDRIFT — неофициальный фанатский сайт. Не связан с Riot Games, Inc. и не одобрен ею. League of Legends: Wild Rift и все связанные материалы являются товарными знаками или зарегистрированными товарными знаками Riot Games, Inc.">PRO-WILDRIFT — неофициальный фанатский сайт. Не связан с Riot Games, Inc. и не одобрен ею. League of Legends: Wild Rift и все связанные материалы являются товарными знаками или зарегистрированными товарными знаками Riot Games, Inc.</p>
+    <p class="footer-copy">© 2026 PRO-WILDRIFT · <span data-i18n="сделано фанатами для сообщества Wild Rift">сделано фанатами для сообщества Wild Rift</span></p>
+  </div>
+</footer>
 
 <div class="m-mask" id="mMask" onclick="if(event.target===this)closeM()">
     <div class="m-win" style="width:96vw;max-width:920px;height:88vh;">

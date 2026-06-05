@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Profile-Lab · песочница hover-анимаций меню профиля</title>
+  <link rel="stylesheet" href="profile-lab.css">
+</head>
+<body>
+
+  <header class="pl-head">
+    <h1 class="pl-title">
+      ✦ Profile-Lab
+      <small>песочница hover-анимаций выпадающего меню «Мой профиль» · не индексируется, не на сайте</small>
+    </h1>
+    <div class="pl-controls">
+      <label class="pl-ctrl">
+        Скорость
+        <input id="plSpeed" type="range" min="0.4" max="2" step="0.1" value="1">
+        <span id="plSpeedVal">1.0×</span>
+      </label>
+      <div class="pl-ctrl">
+        Акцент
+        <div class="pl-swatches" id="plSwatches">
+          <span class="pl-sw active" data-accent="11,196,227"  style="background:#0BC4E3" title="Циан (сайт)"></span>
+          <span class="pl-sw"        data-accent="200,155,60"  style="background:#C89B3C" title="Золото"></span>
+          <span class="pl-sw"        data-accent="180,140,255" style="background:#B48CFF" title="Фиолет"></span>
+          <span class="pl-sw"        data-accent="46,204,113"  style="background:#2ECC71" title="Зелёный"></span>
+          <span class="pl-sw"        data-accent="231,76,60"   style="background:#E74C3C" title="Красный"></span>
+          <span class="pl-sw"        data-accent="255,99,164"  style="background:#FF63A4" title="Розовый"></span>
+          <span class="pl-sw"        data-accent="230,126,34"  style="background:#E67E22" title="Оранжевый"></span>
+          <span class="pl-sw"        data-accent="225,240,250" style="background:#E1F0FA" title="Серебро"></span>
+        </div>
+        <label class="pl-custom" title="Свой цвет">
+          <input type="color" id="plCustom" value="#0bc4e3">
+        </label>
+      </div>
+      <label class="pl-ctrl pl-bg-toggle">
+        <input type="checkbox" id="plDim"> Затемнить фон
+      </label>
+    </div>
+  </header>
+
+  <main class="pl-wrap" id="plWrap"></main>
+
+  <script src="profile-lab.js"></script>
+</body>
+</html>

@@ -6795,17 +6795,38 @@ body.anims-frozen *::after {
 /* ── Sortable.js drag classes ── */
 .tier-chip { transition: transform 0.18s ease; }
 .tier-chip-ghost {
-  opacity: 0.3;
-  filter: grayscale(0.5);
+  opacity: 0.25;
+  outline: 2px dashed rgba(11,196,227,0.45);
+  outline-offset: -2px;
+  border-radius: 10px;
 }
 .tier-chip-chosen {
   cursor: grabbing !important;
 }
+/* Выбранный в песочнице вид: Подъём (увеличение без поворота) + Неон (свечение) */
 .tier-chip-drag {
-  opacity: 0.95 !important;
-  transform: scale(1.08) rotate(2deg);
-  box-shadow: 0 10px 28px rgba(0,0,0,0.6),
-              0 0 0 2px var(--accent);
+  opacity: 0.97 !important;
+  transform: scale(1.05);
+  box-shadow: 0 16px 38px rgba(0,0,0,0.55),
+              0 0 0 2px var(--accent),
+              0 0 16px rgba(11,196,227,0.45);
+  border-radius: 10px;
+}
+
+/* Тот же вид (Подъём+Неон) для div-строк: импорт винрейтов, и далее таблица винрейтов */
+.dnd-row-ghost {
+  opacity: 0.25;
+  outline: 2px dashed rgba(11,196,227,0.45);
+  outline-offset: -2px;
+  border-radius: 10px;
+}
+.dnd-row-chosen { cursor: grabbing !important; }
+.dnd-row-drag {
+  opacity: 0.97 !important;
+  transform: scale(1.03);
+  box-shadow: 0 16px 38px rgba(0,0,0,0.55),
+              0 0 0 2px var(--accent),
+              0 0 16px rgba(11,196,227,0.45);
   border-radius: 10px;
 }
 
@@ -7120,3 +7141,121 @@ button:active { transform: scale(var(--btn-press)); }
   button { transition-duration: 0.01ms; }
 }
 
+/* ── Меню «Мой профиль»: hover Combo Premium (фиолетовый) ──
+   Строка уезжает вправо, слева вырастает светящаяся полоса,
+   справа выезжает «›», мягкий ореол. Перебивает простой hover выше. */
+.user-menu {
+  --pm:        #B48CFF;
+  --pm-glow:   rgba(180,140,255,0.45);
+  --pm-dim:    rgba(180,140,255,0.16);
+  --pm-border: rgba(180,140,255,0.30);
+}
+.user-menu-item {
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--dur-base) var(--ease-soft),
+              background var(--dur-base) var(--ease-soft),
+              color var(--dur-base),
+              box-shadow var(--dur-base) var(--ease-soft);
+}
+.user-menu-item::before {
+  content: ""; position: absolute; left: 0; top: 18%; bottom: 18%; width: 3px;
+  border-radius: 0 3px 3px 0; background: var(--pm);
+  box-shadow: 0 0 10px var(--pm-glow);
+  transform: scaleY(0); transform-origin: center;
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+.user-menu-item::after {
+  content: "›"; position: absolute; right: 12px; top: 50%;
+  transform: translate(-6px,-50%); font-size: 17px; font-weight: 700;
+  color: var(--pm); opacity: 0;
+  transition: opacity var(--dur-base), transform var(--dur-base) var(--ease-soft);
+}
+.user-menu-item:hover {
+  background: linear-gradient(90deg, var(--pm-dim), transparent 85%);
+  color: #fff; transform: translateX(6px);
+  box-shadow: inset 0 0 0 1px var(--pm-border), 0 6px 18px rgba(0,0,0,0.35);
+}
+.user-menu-item:hover::before { transform: scaleY(1); }
+.user-menu-item:hover::after  { opacity: 1; transform: translate(0,-50%); }
+
+
+/* ══════════════════════ SITE FOOTER (подвал) ══════════════════════ */
+.site-footer {
+  margin-top: 48px;
+  padding: 40px 20px 26px;
+  border-top: 1px solid var(--accent-border);
+  background: linear-gradient(180deg, transparent, rgba(1, 15, 32, 0.55));
+}
+.footer-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 32px;
+}
+.footer-logo {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-shadow: 0 0 18px var(--accent-glow);
+  margin-bottom: 10px;
+}
+.footer-tagline {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 44ch;
+}
+.footer-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+.footer-nav-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+}
+.footer-link {
+  background: none;
+  border: none;
+  padding: 2px 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+.footer-link:hover {
+  color: var(--accent);
+  transform: translateX(3px);
+}
+.footer-legal {
+  max-width: 1400px;
+  margin: 28px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+.footer-disclaimer {
+  margin: 0 0 10px;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-faint);
+  max-width: 92ch;
+}
+.footer-copy {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+@media (max-width: 720px) {
+  .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+  .site-footer { padding: 32px 16px 20px; }
+}
