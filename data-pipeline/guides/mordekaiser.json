@@ -1,0 +1,376 @@
+{
+  "slug": "mordekaiser",
+  "name": "Mordekaiser",
+  "role": "Барон",
+  "tier": "S",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 54,
+          "pr": 2.3
+        },
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 53.3,
+          "pr": 2.4
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 51.5,
+          "pr": 1.5
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 51.1,
+          "pr": 2.6
+        },
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 50.8,
+          "pr": 1.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 41.7,
+          "pr": 1.3
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 44.2,
+          "pr": 2.2
+        },
+        {
+          "name": "СИОН",
+          "slug": "sion",
+          "wr": 45.6,
+          "pr": 1.6
+        },
+        {
+          "name": "ФИОРА",
+          "slug": "fiora",
+          "wr": 45.7,
+          "pr": 1
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 45.8,
+          "pr": 1
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 53.7,
+          "pr": 1.7
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 52.8,
+          "pr": 2.8
+        },
+        {
+          "name": "РЕНЕКТОН",
+          "slug": "renekton",
+          "wr": 52.4,
+          "pr": 2.4
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 52.2,
+          "pr": 1.4
+        },
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 51.4,
+          "pr": 1.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 41.4,
+          "pr": 1.1
+        },
+        {
+          "name": "СИОН",
+          "slug": "sion",
+          "wr": 44.1,
+          "pr": 1.9
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 44.3,
+          "pr": 2.5
+        },
+        {
+          "name": "К'Санте",
+          "slug": "ksante",
+          "wr": 45.3,
+          "pr": 7.3
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 45.9,
+          "pr": 4.1
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 58,
+          "pr": 1.5
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 56.6,
+          "pr": 2.3
+        },
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 56.6,
+          "pr": 1.7
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 54.3,
+          "pr": 2.9
+        },
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 53.2,
+          "pr": 2.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ИРЕЛИЯ",
+          "slug": "irelia",
+          "wr": 39.5,
+          "pr": 1.1
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 41.6,
+          "pr": 2.3
+        },
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 43,
+          "pr": 1.3
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 45.2,
+          "pr": 1.8
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 45.5,
+          "pr": 2.1
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "top",
+      "date": "2026-04-08",
+      "best": [
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 56,
+          "pr": 2.3
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 55.1,
+          "pr": 2.1
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 54.5,
+          "pr": 1.5
+        },
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 53,
+          "pr": 1.8
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 52.3,
+          "pr": 1.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 32.3,
+          "pr": 1.7
+        },
+        {
+          "name": "ИРЕЛИЯ",
+          "slug": "irelia",
+          "wr": 40,
+          "pr": 1.3
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 42.1,
+          "pr": 1
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 42.4,
+          "pr": 1.8
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 43.1,
+          "pr": 1.9
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Fiora",
+    "Irelia",
+    "Rumble"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Ruby Crystal"
+        ],
+        "core": [
+          "Riftmaker",
+          "Liandry's Torment",
+          "Psychic Projector"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Protobelt"
+        ],
+        "finalBuild": [
+          "Riftmaker",
+          "Liandry's Torment",
+          "Psychic Projector",
+          "Rabadon's Deathcap",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps - Protobelt"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Conqueror",
+    "Unshakeable",
+    "Second Wind",
+    "Overgrowth",
+    "Transcendence"
+  ],
+  "spells": [
+    {
+      "combo": "flash + ignite",
+      "wr": 48.3,
+      "pr": 87.5
+    },
+    {
+      "combo": "flash + teleport",
+      "wr": 47.5,
+      "pr": 9.9
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Obliterate",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Indestructible",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Death's Grasp",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Realm of Death",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

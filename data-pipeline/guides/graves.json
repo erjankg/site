@@ -1,0 +1,371 @@
+{
+  "slug": "graves",
+  "name": "Graves",
+  "role": "Лес",
+  "tier": "S",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 54,
+          "pr": 1.7
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 52.8,
+          "pr": 2.2
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 50.4,
+          "pr": 8.1
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 50.2,
+          "pr": 1.4
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 50.1,
+          "pr": 1.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 40,
+          "pr": 2.1
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 41.7,
+          "pr": 1.7
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 42.8,
+          "pr": 1.6
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 42.9,
+          "pr": 1.9
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 43.8,
+          "pr": 1.2
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 52.3,
+          "pr": 1.7
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 52.3,
+          "pr": 1.3
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 51.8,
+          "pr": 1.4
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 51.6,
+          "pr": 1.9
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 51.1,
+          "pr": 1.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 38.7,
+          "pr": 2.8
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 39,
+          "pr": 1.7
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 40.9,
+          "pr": 1.1
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 41.9,
+          "pr": 2
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 43.8,
+          "pr": 1.6
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 55.1,
+          "pr": 1.8
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 52.1,
+          "pr": 1.1
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 51.3,
+          "pr": 3.5
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 51.2,
+          "pr": 2.1
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 51,
+          "pr": 10
+        }
+      ],
+      "worst": [
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 38.5,
+          "pr": 1.1
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 40.8,
+          "pr": 2.8
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 42.3,
+          "pr": 2.3
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 42.8,
+          "pr": 5.9
+        },
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 43.4,
+          "pr": 3.5
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 61.7,
+          "pr": 2
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 58.5,
+          "pr": 2.2
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 57.6,
+          "pr": 2
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 54.4,
+          "pr": 9.4
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 53.6,
+          "pr": 4.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 30,
+          "pr": 1
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 31.9,
+          "pr": 1.6
+        },
+        {
+          "name": "ЭВЕЛИНН",
+          "slug": "evelynn",
+          "wr": 32.1,
+          "pr": 1.8
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 32.7,
+          "pr": 1.6
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 35.6,
+          "pr": 3.4
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Rammus",
+    "Amumu",
+    "Aatrox"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "The Collector",
+          "Bloodthirster",
+          "Lord Dominik's Regard"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Galeforce"
+        ],
+        "finalBuild": [
+          "The Collector",
+          "Bloodthirster",
+          "Lord Dominik's Regard",
+          "Essence Reaver",
+          "Infinity Edge",
+          "Gluttonous Greaves - Galeforce"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Fleet Footwork",
+    "Sudden Impact",
+    "Hubris",
+    "Eyeball Collector",
+    "Overgrowth"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 47.8,
+      "pr": 99.4
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "End of the Line",
+      "levels": [
+        1,
+        3,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Smoke Screen",
+      "levels": [
+        4,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Quickdraw",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Collateral Damage",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

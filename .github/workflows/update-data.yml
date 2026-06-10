@@ -1,0 +1,45 @@
+name: Update Wild Rift data
+
+# Каждый день тянет свежую стату:
+#  • fetch-wr-stats.mjs  — WR/PR/BR/тир всех чемпионов (источник Tencent CN: mlol.qt.qq.com)
+#  • fetch-all.mjs       — гайды по всем чемпионам: матчапы/предметы/руны/заклинания/прокачка
+# и коммитит обновлённые JSON в data-pipeline/. Данные публичные, секреты не нужны.
+# Запускается по расписанию и вручную (кнопкой Run workflow).
+
+on:
+  schedule:
+    - cron: '23 3 * * *'   # каждый день 03:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch champion win rates (Tencent)
+        run: node data-pipeline/fetch-wr-stats.mjs
+
+      - name: Fetch all champion guides (matchups/items/runes)
+        run: node data-pipeline/fetch-all.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data-pipeline/wr-stats.json data-pipeline/guides
+          if git diff --cached --quiet; then
+            echo "Нет изменений в данных."
+          else
+            git commit -m "chore(data): daily Wild Rift stats refresh [skip ci]"
+            git push
+          fi

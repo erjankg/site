@@ -1,0 +1,391 @@
+{
+  "slug": "jhin",
+  "name": "Jhin",
+  "role": "Дракон",
+  "tier": "S",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 54.1,
+          "pr": 4.5
+        },
+        {
+          "name": "ТРИСТАНА",
+          "slug": "tristana",
+          "wr": 54,
+          "pr": 3.4
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 53.5,
+          "pr": 3.3
+        },
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 52.5,
+          "pr": 3.1
+        },
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 52.5,
+          "pr": 2.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 48.2,
+          "pr": 1.7
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 48.3,
+          "pr": 14.3
+        },
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 48.5,
+          "pr": 7.6
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 49.6,
+          "pr": 3.7
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 50.3,
+          "pr": 2.6
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 55.6,
+          "pr": 3.4
+        },
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 55.6,
+          "pr": 4.1
+        },
+        {
+          "name": "ТРИСТАНА",
+          "slug": "tristana",
+          "wr": 55.4,
+          "pr": 2.8
+        },
+        {
+          "name": "КЕЙТЛИН",
+          "slug": "caitlyn",
+          "wr": 52.8,
+          "pr": 11.1
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 52.2,
+          "pr": 6.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 47.3,
+          "pr": 8.5
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 47.4,
+          "pr": 2
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 48.2,
+          "pr": 16.9
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 49.2,
+          "pr": 3.2
+        },
+        {
+          "name": "ШАЯ",
+          "slug": "xayah",
+          "wr": 50,
+          "pr": 2.9
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 56.1,
+          "pr": 4.2
+        },
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 55.7,
+          "pr": 4.2
+        },
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 54.1,
+          "pr": 2.2
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 54,
+          "pr": 2
+        },
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 53.3,
+          "pr": 3.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 46.3,
+          "pr": 9.5
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 46.7,
+          "pr": 2.5
+        },
+        {
+          "name": "ШАЯ",
+          "slug": "xayah",
+          "wr": 48.5,
+          "pr": 2.4
+        },
+        {
+          "name": "Мисс Фортуна",
+          "slug": "miss-fortune",
+          "wr": 49.5,
+          "pr": 8.4
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 49.9,
+          "pr": 2.3
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 59.1,
+          "pr": 4.9
+        },
+        {
+          "name": "КЕЙТЛИН",
+          "slug": "caitlyn",
+          "wr": 57,
+          "pr": 13.3
+        },
+        {
+          "name": "ДЖИНКС",
+          "slug": "jinx",
+          "wr": 56,
+          "pr": 6.6
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 54.4,
+          "pr": 7.6
+        },
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 54.1,
+          "pr": 3.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 44.1,
+          "pr": 11.1
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 45.7,
+          "pr": 1.9
+        },
+        {
+          "name": "ТРИСТАНА",
+          "slug": "tristana",
+          "wr": 46.2,
+          "pr": 3.3
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 46.3,
+          "pr": 2.8
+        },
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 48.8,
+          "pr": 3
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Draven",
+    "Ashe",
+    "Lucian"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "The Collector",
+          "Magnetic Blaster",
+          "Lord Dominik's Regard"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Galeforce"
+        ],
+        "finalBuild": [
+          "The Collector",
+          "Magnetic Blaster",
+          "Lord Dominik's Regard",
+          "Infinity Edge",
+          "Bloodthirster",
+          "Gluttonous Greaves - Galeforce"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Dark Harvest",
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Celerity"
+  ],
+  "spells": [
+    {
+      "combo": "heal + flash",
+      "wr": 52.9,
+      "pr": 5
+    },
+    {
+      "combo": "barrier + flash",
+      "wr": 52,
+      "pr": 3.9
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 51,
+      "pr": 85.5
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 49.8,
+      "pr": 1.2
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 49.5,
+      "pr": 3.5
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Dancing Grenade",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Deadly Flourish",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Captive Audience",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Curtain Call",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

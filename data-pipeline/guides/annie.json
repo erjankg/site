@@ -1,0 +1,381 @@
+{
+  "slug": "annie",
+  "name": "Annie",
+  "role": "Мид",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 56.1,
+          "pr": 3.8
+        },
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 55.3,
+          "pr": 1.5
+        },
+        {
+          "name": "ЗИГГС",
+          "slug": "ziggs",
+          "wr": 55,
+          "pr": 3.2
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 54.3,
+          "pr": 2.1
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 54.3,
+          "pr": 2.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 44.4,
+          "pr": 1.6
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 45.8,
+          "pr": 1.5
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 48.1,
+          "pr": 4.2
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 48.1,
+          "pr": 3.6
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 48.1,
+          "pr": 3.5
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 60.2,
+          "pr": 2
+        },
+        {
+          "name": "КАССАДИН",
+          "slug": "kassadin",
+          "wr": 59.4,
+          "pr": 1.5
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 58,
+          "pr": 4.1
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 57.9,
+          "pr": 2.9
+        },
+        {
+          "name": "ОРИАННА",
+          "slug": "orianna",
+          "wr": 56.9,
+          "pr": 1.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 43.2,
+          "pr": 3.3
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 45,
+          "pr": 1.7
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 45,
+          "pr": 3.1
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 47.6,
+          "pr": 5.4
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 48,
+          "pr": 4.3
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 61.2,
+          "pr": 2.9
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 58.8,
+          "pr": 2.9
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 58.2,
+          "pr": 3.7
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 58.1,
+          "pr": 4.2
+        },
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 58.1,
+          "pr": 2.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 43.5,
+          "pr": 2.9
+        },
+        {
+          "name": "КАТАРИНА",
+          "slug": "katarina",
+          "wr": 43.6,
+          "pr": 1.3
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 44.4,
+          "pr": 1.2
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 45.5,
+          "pr": 1.9
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 45.7,
+          "pr": 1.6
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 80,
+          "pr": 2.1
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 78.6,
+          "pr": 1.9
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 70,
+          "pr": 4.1
+        },
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 69.2,
+          "pr": 1.8
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 66.7,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 29.2,
+          "pr": 3.3
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 31.6,
+          "pr": 2.6
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 38.1,
+          "pr": 2.9
+        },
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 40,
+          "pr": 1.4
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 41.7,
+          "pr": 1.7
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Syndra",
+    "Lissandra",
+    "Viktor"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Malignance",
+          "Awakened Soulstealer",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Protobelt"
+        ],
+        "finalBuild": [
+          "Malignance",
+          "Awakened Soulstealer",
+          "Rabadon's Deathcap",
+          "Infinity Orb",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Protobelt"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Electrocute",
+    "Hextech Flashtraption",
+    "Transcendence",
+    "Nimbus Cloak",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "ghost + flash",
+      "wr": 51.4,
+      "pr": 3
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 51.2,
+      "pr": 89
+    },
+    {
+      "combo": "flash + teleport",
+      "wr": 50.9,
+      "pr": 4.9
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Disintegrate",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Incinerate",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Molten Shield",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Summon: Tibbers",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

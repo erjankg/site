@@ -1,0 +1,401 @@
+{
+  "slug": "aurelion-sol",
+  "name": "Aurelion Sol",
+  "role": "Мид",
+  "tier": "A",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 55.7,
+          "pr": 1.1
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 52.5,
+          "pr": 5.4
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 51.8,
+          "pr": 1.9
+        },
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 51.7,
+          "pr": 2.6
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 51.5,
+          "pr": 7.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 43.9,
+          "pr": 1.1
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 46.1,
+          "pr": 1.4
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 46.2,
+          "pr": 3.4
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 46.3,
+          "pr": 2.2
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 46.6,
+          "pr": 4.7
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 54.6,
+          "pr": 1.7
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 53.3,
+          "pr": 6
+        },
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 53.2,
+          "pr": 1.4
+        },
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 53.1,
+          "pr": 3
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 52.4,
+          "pr": 2
+        }
+      ],
+      "worst": [
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 36.6,
+          "pr": 1.2
+        },
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 42,
+          "pr": 1.1
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 42.6,
+          "pr": 3
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 42.8,
+          "pr": 2.1
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 44.6,
+          "pr": 3.1
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 58.7,
+          "pr": 1.4
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 56,
+          "pr": 4.1
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 54,
+          "pr": 1.6
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 53.8,
+          "pr": 6.2
+        },
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 53.4,
+          "pr": 2.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "КАССАДИН",
+          "slug": "kassadin",
+          "wr": 43.2,
+          "pr": 1.6
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 43.6,
+          "pr": 2.8
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 43.7,
+          "pr": 2.2
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 44.3,
+          "pr": 1.1
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 45.2,
+          "pr": 2.6
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 67.6,
+          "pr": 1.1
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 67.2,
+          "pr": 2
+        },
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 65.4,
+          "pr": 1.7
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 64.2,
+          "pr": 3.1
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 60,
+          "pr": 1.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 25,
+          "pr": 1.2
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 41.1,
+          "pr": 3
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 43.8,
+          "pr": 1.1
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 44,
+          "pr": 5
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 44.6,
+          "pr": 2.5
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Yone",
+    "Zed",
+    "Yasuo"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Rylai's Crystal Scepter",
+          "Liandry's Torment",
+          "Psychic Projector"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Rylai's Crystal Scepter",
+          "Liandry's Torment",
+          "Psychic Projector",
+          "Rabadon's Deathcap",
+          "Riftmaker",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Dark Harvest",
+    "Botanist",
+    "Absolute Focus",
+    "Gathering Storm",
+    "Overgrowth"
+  ],
+  "spells": [
+    {
+      "combo": "heal + flash",
+      "wr": 52.8,
+      "pr": 2.2
+    },
+    {
+      "combo": "barrier + flash",
+      "wr": 50.6,
+      "pr": 16
+    },
+    {
+      "combo": "flash + teleport",
+      "wr": 50.3,
+      "pr": 12.8
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 49.4,
+      "pr": 25.8
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 49.2,
+      "pr": 33.8
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 47.4,
+      "pr": 5.5
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 46.7,
+      "pr": 3.6
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Breath of Light",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Astral Flight",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Singularity",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Falling Star/ The Skies Descend",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,396 @@
+{
+  "slug": "miss-fortune",
+  "name": "Miss Fortune",
+  "role": "Дракон",
+  "tier": "S+",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 54.8,
+          "pr": 4.3
+        },
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 54.7,
+          "pr": 2.3
+        },
+        {
+          "name": "СИВИР",
+          "slug": "sivir",
+          "wr": 54.4,
+          "pr": 2.2
+        },
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 54.1,
+          "pr": 3.5
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 53.9,
+          "pr": 3.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 47.5,
+          "pr": 10
+        },
+        {
+          "name": "ДЖИН",
+          "slug": "jhin",
+          "wr": 48.2,
+          "pr": 9.3
+        },
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 48.3,
+          "pr": 6.6
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 49.3,
+          "pr": 1.5
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 50.1,
+          "pr": 6
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 55.6,
+          "pr": 2.5
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 54.7,
+          "pr": 3.2
+        },
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 54.6,
+          "pr": 3.2
+        },
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 53.9,
+          "pr": 4.2
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 53.9,
+          "pr": 4.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 47.2,
+          "pr": 7.5
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 47.8,
+          "pr": 12.4
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 48.1,
+          "pr": 1.5
+        },
+        {
+          "name": "ДЖИН",
+          "slug": "jhin",
+          "wr": 48.3,
+          "pr": 10.4
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 49.9,
+          "pr": 4.9
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 58.7,
+          "pr": 3.4
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 56.7,
+          "pr": 2
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 54.4,
+          "pr": 4.9
+        },
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 54.2,
+          "pr": 3.6
+        },
+        {
+          "name": "ДЖИНКС",
+          "slug": "jinx",
+          "wr": 54.1,
+          "pr": 7.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 47.1,
+          "pr": 7.9
+        },
+        {
+          "name": "ЭЗРЕАЛЬ",
+          "slug": "ezreal",
+          "wr": 49.6,
+          "pr": 5
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 50,
+          "pr": 7.2
+        },
+        {
+          "name": "ДЖИН",
+          "slug": "jhin",
+          "wr": 50.5,
+          "pr": 8.8
+        },
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 50.8,
+          "pr": 6.2
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 58.7,
+          "pr": 1.9
+        },
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 57.8,
+          "pr": 3.2
+        },
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 55.1,
+          "pr": 3.5
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 54.7,
+          "pr": 2.2
+        },
+        {
+          "name": "КЕЙТЛИН",
+          "slug": "caitlyn",
+          "wr": 54.1,
+          "pr": 15.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 42.4,
+          "pr": 2.1
+        },
+        {
+          "name": "ТРИСТАНА",
+          "slug": "tristana",
+          "wr": 45.6,
+          "pr": 4.3
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 45.9,
+          "pr": 9.3
+        },
+        {
+          "name": "ДЖИН",
+          "slug": "jhin",
+          "wr": 47.8,
+          "pr": 9.9
+        },
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 49.8,
+          "pr": 6
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Smolder",
+    "Jhin",
+    "Caitlyn"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Duskblade of Draktharr",
+          "Serpent's Fang",
+          "Serylda's Grudge"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Duskblade of Draktharr",
+          "Serpent's Fang",
+          "Serylda's Grudge",
+          "Edge of Night",
+          "Guardian Angel",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Conqueror",
+    "Brutal",
+    "Cut Down",
+    "Legend: Bloodline",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "barrier + flash",
+      "wr": 52.4,
+      "pr": 17
+    },
+    {
+      "combo": "heal + flash",
+      "wr": 51.8,
+      "pr": 23.4
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 51,
+      "pr": 33.6
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 50.3,
+      "pr": 14.8
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 50.2,
+      "pr": 5.1
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 49.9,
+      "pr": 5.6
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Double Up",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Strut",
+      "levels": [
+        3,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Make it Rain",
+      "levels": [
+        2,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Bullet Time",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

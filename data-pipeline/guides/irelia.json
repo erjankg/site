@@ -1,0 +1,477 @@
+{
+  "slug": "irelia",
+  "name": "Irelia",
+  "role": "Барон",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ФИОРА",
+          "slug": "fiora",
+          "wr": 58.3,
+          "pr": 1.4
+        },
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 56.6,
+          "pr": 1.5
+        },
+        {
+          "name": "РЕНЕКТОН",
+          "slug": "renekton",
+          "wr": 56.2,
+          "pr": 1.9
+        },
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 54.7,
+          "pr": 1.8
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 54.5,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 39.9,
+          "pr": 1.1
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 41,
+          "pr": 1.1
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 42.2,
+          "pr": 2.1
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 44.2,
+          "pr": 3.6
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 44.4,
+          "pr": 1.6
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ФИОРА",
+          "slug": "fiora",
+          "wr": 60.3,
+          "pr": 1.6
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 59.1,
+          "pr": 1.8
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 58.3,
+          "pr": 1.7
+        },
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 58.3,
+          "pr": 1.4
+        },
+        {
+          "name": "РЕНЕКТОН",
+          "slug": "renekton",
+          "wr": 57.4,
+          "pr": 2.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 34.5,
+          "pr": 1.7
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 40,
+          "pr": 1.7
+        },
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 42.4,
+          "pr": 1.2
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 44.6,
+          "pr": 4.2
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 45.2,
+          "pr": 1.2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 60.7,
+          "pr": 1.7
+        },
+        {
+          "name": "МОРДЕКАЙЗЕР",
+          "slug": "mordekaiser",
+          "wr": 60.5,
+          "pr": 3.5
+        },
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 58.6,
+          "pr": 1.6
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 55.7,
+          "pr": 3.5
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 55.6,
+          "pr": 1
+        }
+      ],
+      "worst": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 30.2,
+          "pr": 1.2
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 36.2,
+          "pr": 1.6
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 37.5,
+          "pr": 1.6
+        },
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 41.1,
+          "pr": 1.6
+        },
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 44.3,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 78.9,
+          "pr": 2
+        },
+        {
+          "name": "КЕЙЛ",
+          "slug": "kayle",
+          "wr": 70.6,
+          "pr": 1.8
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 64.5,
+          "pr": 3.3
+        },
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 64.3,
+          "pr": 1.5
+        },
+        {
+          "name": "СИНДЖЕД",
+          "slug": "singed",
+          "wr": 64.3,
+          "pr": 1.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 32,
+          "pr": 2.7
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 35.3,
+          "pr": 1.8
+        },
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 40,
+          "pr": 1.1
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 40,
+          "pr": 1.1
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 41.2,
+          "pr": 3.7
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 70,
+          "pr": 3.4
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 68.2,
+          "pr": 7.5
+        },
+        {
+          "name": "СИНДРА",
+          "slug": "syndra",
+          "wr": 60,
+          "pr": 3.4
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 54.5,
+          "pr": 3.8
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 50,
+          "pr": 4.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 22.2,
+          "pr": 6.2
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 30,
+          "pr": 3.4
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 40,
+          "pr": 5.1
+        },
+        {
+          "name": "ЗИГГС",
+          "slug": "ziggs",
+          "wr": 40,
+          "pr": 3.4
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 50,
+          "pr": 4.8
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Malphite",
+    "Wukong",
+    "Poppy"
+  ],
+  "builds": [
+    {
+      "title": "Solo Build",
+      "tier": "A",
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Blade of the Ruined King",
+          "Hullbreaker"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Blade of the Ruined King",
+          "Hullbreaker",
+          "Death's Dance",
+          "Guardian Angel",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    },
+    {
+      "title": "Mid Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Blade of the Ruined King",
+          "Death's Dance"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Blade of the Ruined King",
+          "Death's Dance",
+          "Terminus",
+          "Guardian Angel",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Conqueror",
+    "Demolish",
+    "Second Wind",
+    "Overgrowth",
+    "Sudden Impact"
+  ],
+  "spells": [
+    {
+      "combo": "barrier + flash",
+      "wr": 50.9,
+      "pr": 80.4
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 47.6,
+      "pr": 16.6
+    },
+    {
+      "combo": "flash + teleport",
+      "wr": 45.1,
+      "pr": 2.1
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Bladesurge",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Defiant Dance",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Flawless Duet",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Vanguard's Edge",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

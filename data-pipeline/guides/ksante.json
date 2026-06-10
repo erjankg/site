@@ -1,0 +1,88 @@
+{
+  "slug": "ksante",
+  "name": "K'Sante",
+  "role": "Барон",
+  "tier": "S+",
+  "patch": "7.1f",
+  "dataDate": null,
+  "matchups": [],
+  "counters": [
+    "Ambessa",
+    "Vayne",
+    "Garen"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Ruby Crystal"
+        ],
+        "core": [
+          "Iceborn Gauntlet",
+          "Thornmail",
+          "Unending Despair"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Gargoyle"
+        ],
+        "finalBuild": [
+          "Iceborn Gauntlet",
+          "Thornmail",
+          "Unending Despair",
+          "Mantle of the Twelfth Hour",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps - Gargoyle"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Grasp of the Undying",
+    "Unshakeable",
+    "Second Wind",
+    "Overgrowth",
+    "Last Stand"
+  ],
+  "spells": [],
+  "skillOrder": [
+    {
+      "ability": "Ntofo Strikes",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Path Maker",
+      "levels": [
+        3,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Footwork",
+      "levels": [
+        2,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "All Out",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

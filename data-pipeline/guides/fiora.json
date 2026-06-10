@@ -1,0 +1,381 @@
+{
+  "slug": "fiora",
+  "name": "Fiora",
+  "role": "Барон",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 55.7,
+          "pr": 1.2
+        },
+        {
+          "name": "МОРДЕКАЙЗЕР",
+          "slug": "mordekaiser",
+          "wr": 54.3,
+          "pr": 4.1
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 52.1,
+          "pr": 3.4
+        },
+        {
+          "name": "КЕЙЛ",
+          "slug": "kayle",
+          "wr": 51.3,
+          "pr": 1.1
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 50.6,
+          "pr": 2
+        }
+      ],
+      "worst": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 37.1,
+          "pr": 1.1
+        },
+        {
+          "name": "ИРЕЛИЯ",
+          "slug": "irelia",
+          "wr": 41.7,
+          "pr": 1
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 41.7,
+          "pr": 2.9
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 41.9,
+          "pr": 1.7
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 42.4,
+          "pr": 1.4
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 55.2,
+          "pr": 1.8
+        },
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 55,
+          "pr": 1.6
+        },
+        {
+          "name": "МОРДЕКАЙЗЕР",
+          "slug": "mordekaiser",
+          "wr": 53.1,
+          "pr": 3.5
+        },
+        {
+          "name": "СИОН",
+          "slug": "sion",
+          "wr": 52.6,
+          "pr": 2.8
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 52.4,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "ИРЕЛИЯ",
+          "slug": "irelia",
+          "wr": 39.7,
+          "pr": 1.1
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 41.8,
+          "pr": 1.8
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 43,
+          "pr": 3.5
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 43.6,
+          "pr": 1.5
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 43.8,
+          "pr": 1.5
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 61.8,
+          "pr": 1.2
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 58.8,
+          "pr": 1.7
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 54.2,
+          "pr": 3.4
+        },
+        {
+          "name": "МОРДЕКАЙЗЕР",
+          "slug": "mordekaiser",
+          "wr": 54.2,
+          "pr": 4.1
+        },
+        {
+          "name": "ИРЕЛИЯ",
+          "slug": "irelia",
+          "wr": 54,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 38.6,
+          "pr": 1.9
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 41,
+          "pr": 2.1
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 42.6,
+          "pr": 1.7
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 42.7,
+          "pr": 2.1
+        },
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 43,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 61.3,
+          "pr": 2.2
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 59.4,
+          "pr": 2.2
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 58,
+          "pr": 3.5
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 57.9,
+          "pr": 1.3
+        },
+        {
+          "name": "МОРДЕКАЙЗЕР",
+          "slug": "mordekaiser",
+          "wr": 57.4,
+          "pr": 3.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 20,
+          "pr": 1
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 31.3,
+          "pr": 1.1
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 32.3,
+          "pr": 2.2
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 40.7,
+          "pr": 1.9
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 43.8,
+          "pr": 1.1
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Rumble",
+    "Malphite",
+    "Poppy"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Eclipse",
+          "Hullbreaker"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Goredrinker"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Eclipse",
+          "Hullbreaker",
+          "Spear of Shojin",
+          "Amaranth's Twinguard",
+          "Gluttonous Greaves - Goredrinker"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Conqueror",
+    "Demolish",
+    "Second Wind",
+    "Overgrowth",
+    "Sudden Impact"
+  ],
+  "spells": [
+    {
+      "combo": "flash + teleport",
+      "wr": 47.9,
+      "pr": 24
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 47.1,
+      "pr": 73.6
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 41,
+      "pr": 1.3
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Lunge",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Riposte",
+      "levels": [
+        2,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Bladework",
+      "levels": [
+        3,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Grand Challenge",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

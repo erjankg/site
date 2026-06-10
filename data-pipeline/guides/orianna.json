@@ -1,0 +1,396 @@
+{
+  "slug": "orianna",
+  "name": "Orianna",
+  "role": "Мид",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 53.9,
+          "pr": 1.8
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 53.2,
+          "pr": 1.6
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 51.9,
+          "pr": 1.6
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 51.6,
+          "pr": 8.2
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 51.5,
+          "pr": 4.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 43.3,
+          "pr": 2
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 44.7,
+          "pr": 3.6
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 46,
+          "pr": 2.8
+        },
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 46.6,
+          "pr": 1.1
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 46.6,
+          "pr": 2.6
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 57.7,
+          "pr": 1.4
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 54.6,
+          "pr": 3.4
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 54.6,
+          "pr": 2
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 54.1,
+          "pr": 4.2
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 53,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 43.1,
+          "pr": 1.1
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 43.5,
+          "pr": 4.8
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 43.7,
+          "pr": 2.1
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 45,
+          "pr": 3.2
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 46.5,
+          "pr": 6.2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 57.7,
+          "pr": 1.6
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 57,
+          "pr": 2
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 56.5,
+          "pr": 1
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 56.1,
+          "pr": 1.1
+        },
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 54.8,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 42.2,
+          "pr": 2.5
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 45.7,
+          "pr": 2.1
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 45.9,
+          "pr": 2.6
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 46.4,
+          "pr": 3.6
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 46.5,
+          "pr": 3.7
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 76.7,
+          "pr": 2.7
+        },
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 69.6,
+          "pr": 1.5
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 63.5,
+          "pr": 4.7
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 61.9,
+          "pr": 2.7
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 61.1,
+          "pr": 1.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 43.3,
+          "pr": 1.9
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 46.7,
+          "pr": 5.7
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 46.7,
+          "pr": 2.8
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 46.9,
+          "pr": 4
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 47.2,
+          "pr": 2.3
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Irelia",
+    "Yasuo",
+    "Syndra"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Luden's Echo",
+          "Archangel's Staff",
+          "Infinity Orb"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Luden's Echo",
+          "Seraph's Embrace",
+          "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Conqueror",
+    "Botanist",
+    "Transcendence",
+    "Nimbus Cloak",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "exhaust + flash",
+      "wr": 52.5,
+      "pr": 2
+    },
+    {
+      "combo": "barrier + flash",
+      "wr": 51.1,
+      "pr": 3.6
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 50,
+      "pr": 79
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 49.6,
+      "pr": 10.8
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 48.2,
+      "pr": 1.9
+    },
+    {
+      "combo": "flash + teleport",
+      "wr": 46.3,
+      "pr": 2.1
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Command: Attack",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Command: Dissonance",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Command: Protect",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Command: Shockwave",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

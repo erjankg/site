@@ -1,0 +1,376 @@
+{
+  "slug": "hecarim",
+  "name": "Hecarim",
+  "role": "Лес",
+  "tier": "B",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 55.7,
+          "pr": 1.1
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 54.3,
+          "pr": 1.5
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 53.7,
+          "pr": 2.5
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 53,
+          "pr": 1.1
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 52.7,
+          "pr": 2.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 40.7,
+          "pr": 1.6
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 41.9,
+          "pr": 2.4
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 42.1,
+          "pr": 1.5
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 42.7,
+          "pr": 1.1
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 44.7,
+          "pr": 5.9
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 59.4,
+          "pr": 1.9
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 57.9,
+          "pr": 1.3
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 57.1,
+          "pr": 3.3
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 56.1,
+          "pr": 1.9
+        },
+        {
+          "name": "РЕНГАР",
+          "slug": "rengar",
+          "wr": 55.3,
+          "pr": 1.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 37.6,
+          "pr": 1.7
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 40.9,
+          "pr": 3.1
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 43.3,
+          "pr": 1.7
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 43.4,
+          "pr": 1.4
+        },
+        {
+          "name": "ВИЕГО",
+          "slug": "viego",
+          "wr": 45,
+          "pr": 7.7
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 67.7,
+          "pr": 2.3
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 62.2,
+          "pr": 1.9
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 58.5,
+          "pr": 2.2
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 58.2,
+          "pr": 3.4
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 56.9,
+          "pr": 1.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 33.3,
+          "pr": 1.3
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 43.3,
+          "pr": 3.1
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 43.5,
+          "pr": 2.9
+        },
+        {
+          "name": "НИЛА",
+          "slug": "nilah",
+          "wr": 44.1,
+          "pr": 1.4
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 44.4,
+          "pr": 1.3
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 56.5,
+          "pr": 5.3
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 54.8,
+          "pr": 2
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 52.8,
+          "pr": 3.4
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 51.6,
+          "pr": 1.8
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 51.6,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 36.9,
+          "pr": 2.7
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 40.6,
+          "pr": 1.2
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 41.7,
+          "pr": 6.1
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 42.3,
+          "pr": 2.4
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 43.9,
+          "pr": 1.3
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Master Yi",
+    "Kindred",
+    "Graves"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Manamune",
+          "Serylda's Grudge"
+        ],
+        "boots": [
+          "Ionian Boots of Lucidity",
+          "Glorious"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Muramana",
+          "Serylda's Grudge",
+          "Spear of Shojin",
+          "Death's Dance",
+          "Ionian Boots of Lucidity - Glorious"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Phase Rush",
+    "Axiom Arcanist",
+    "Transcendence",
+    "Nimbus Cloak",
+    "Overgrowth"
+  ],
+  "spells": [
+    {
+      "combo": "ghost + smite",
+      "wr": 48.8,
+      "pr": 97.8
+    },
+    {
+      "combo": "flash + smite",
+      "wr": 46.2,
+      "pr": 2.1
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Rampage",
+      "levels": [
+        1,
+        3,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Spirit of Dread",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Devastating Charge",
+      "levels": [
+        4,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Onslaught of Shadows",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

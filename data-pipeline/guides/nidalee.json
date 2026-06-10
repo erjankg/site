@@ -1,0 +1,371 @@
+{
+  "slug": "nidalee",
+  "name": "Nidalee",
+  "role": "Лес",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 57.2,
+          "pr": 2.8
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 56.9,
+          "pr": 1.6
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 56.2,
+          "pr": 4
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 55.7,
+          "pr": 1.7
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 55.3,
+          "pr": 9.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 41.2,
+          "pr": 1.5
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 44.8,
+          "pr": 1.2
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 45.4,
+          "pr": 1.1
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 45.8,
+          "pr": 1.6
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 46.1,
+          "pr": 3.5
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 64,
+          "pr": 1.2
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 59.7,
+          "pr": 2.2
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 59.1,
+          "pr": 3.1
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 58.1,
+          "pr": 1
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 57.6,
+          "pr": 1.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 41.9,
+          "pr": 1.2
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 45.9,
+          "pr": 1.2
+        },
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 45.9,
+          "pr": 3.5
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 46.2,
+          "pr": 1.4
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 46.8,
+          "pr": 2.6
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 66,
+          "pr": 1.5
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 61.8,
+          "pr": 1
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 61.5,
+          "pr": 5.2
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 58.8,
+          "pr": 2
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 57.8,
+          "pr": 1.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 28.3,
+          "pr": 1.6
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 39.5,
+          "pr": 1.1
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 40.3,
+          "pr": 2.3
+        },
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 44,
+          "pr": 3.4
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 44.8,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 72.7,
+          "pr": 4.3
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 71.4,
+          "pr": 2.8
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 71.4,
+          "pr": 1.8
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 70,
+          "pr": 4
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 69.7,
+          "pr": 4.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 10.5,
+          "pr": 2.5
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 26.3,
+          "pr": 2.5
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 27.3,
+          "pr": 1.4
+        },
+        {
+          "name": "Син Чжао",
+          "slug": "xin-zhao",
+          "wr": 32.6,
+          "pr": 5.7
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 37,
+          "pr": 3.6
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Master Yi",
+    "Rengar",
+    "Galio"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Lich Bane",
+          "Infinity Orb",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Lich Bane",
+          "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Oceanid's Trident",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Dark Harvest",
+    "Sudden Impact",
+    "Tyrant",
+    "Eyeball Collector",
+    "Overgrowth"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 51.6,
+      "pr": 99.6
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Javelin Toss / Takedown",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Bushwhack / Pounce",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Primal Surge / Swipe",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Aspect Of The Cougar",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,704 @@
+{
+  "slug": "brand",
+  "name": "Brand",
+  "role": "Мид",
+  "tier": "S",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 56.4,
+          "pr": 2.7
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 56.3,
+          "pr": 1.3
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 55.8,
+          "pr": 1.3
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 53.9,
+          "pr": 2.4
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 53.4,
+          "pr": 3.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 48.1,
+          "pr": 2.6
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 49.1,
+          "pr": 2.6
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 49.6,
+          "pr": 2.8
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 50,
+          "pr": 1.9
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 50.1,
+          "pr": 6.4
+        }
+      ]
+    },
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 56.4,
+          "pr": 6.5
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 55,
+          "pr": 1.8
+        },
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 54.9,
+          "pr": 3.1
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 54.5,
+          "pr": 2.9
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 54.2,
+          "pr": 2.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 40.8,
+          "pr": 1.6
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 41.7,
+          "pr": 1.3
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 42.9,
+          "pr": 3.2
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 43.7,
+          "pr": 2.1
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 44.7,
+          "pr": 2.3
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 56.2,
+          "pr": 1.5
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 55.4,
+          "pr": 2.6
+        },
+        {
+          "name": "ОРИАННА",
+          "slug": "orianna",
+          "wr": 55,
+          "pr": 1.5
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 54.5,
+          "pr": 4.6
+        },
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 54.5,
+          "pr": 1.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 47.8,
+          "pr": 3.4
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 48.2,
+          "pr": 4.9
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 48.2,
+          "pr": 1.6
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 48.5,
+          "pr": 2.9
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 49.2,
+          "pr": 4
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 56.3,
+          "pr": 3
+        },
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 56,
+          "pr": 6.3
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 54.8,
+          "pr": 3.3
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 54.5,
+          "pr": 2.1
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 53.8,
+          "pr": 1.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 36.9,
+          "pr": 2.2
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 40,
+          "pr": 1.2
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 40.5,
+          "pr": 1.7
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 41.4,
+          "pr": 3.1
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 43.4,
+          "pr": 1.6
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 63,
+          "pr": 1.2
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 57.6,
+          "pr": 2.2
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 56.4,
+          "pr": 1.6
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 55.3,
+          "pr": 1.8
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 54.5,
+          "pr": 2.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "СИНДРА",
+          "slug": "syndra",
+          "wr": 44.8,
+          "pr": 3.1
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 45,
+          "pr": 2.7
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 46.9,
+          "pr": 5.3
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 48.4,
+          "pr": 4.1
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 48.7,
+          "pr": 1.5
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 65.1,
+          "pr": 1.2
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 57.6,
+          "pr": 2.6
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 55.2,
+          "pr": 2.4
+        },
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 55,
+          "pr": 3.1
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 54.6,
+          "pr": 3
+        }
+      ],
+      "worst": [
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 42.2,
+          "pr": 1.3
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 43.5,
+          "pr": 3
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 44.4,
+          "pr": 2
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 45,
+          "pr": 2.3
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 45.8,
+          "pr": 8.6
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 66.7,
+          "pr": 1.6
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 61.3,
+          "pr": 2.3
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 59.1,
+          "pr": 1.7
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 58.1,
+          "pr": 1.6
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 57.2,
+          "pr": 7.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 37.8,
+          "pr": 1.4
+        },
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 40.7,
+          "pr": 2.2
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 41.2,
+          "pr": 3.2
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 44.1,
+          "pr": 1.3
+        },
+        {
+          "name": "КАССАДИН",
+          "slug": "kassadin",
+          "wr": 44.4,
+          "pr": 1
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 69.2,
+          "pr": 1.8
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 68.8,
+          "pr": 2.2
+        },
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 64.3,
+          "pr": 3.8
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 64.3,
+          "pr": 1.9
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 57.1,
+          "pr": 4.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 20,
+          "pr": 1.3
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 30.8,
+          "pr": 1.8
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 36.4,
+          "pr": 1.5
+        },
+        {
+          "name": "ЗИЛЕАН",
+          "slug": "zilean",
+          "wr": 36.4,
+          "pr": 1.5
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 36.4,
+          "pr": 1.5
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Syndra",
+    "Zed",
+    "Lux"
+  ],
+  "builds": [
+    {
+      "title": "Mid Build",
+      "tier": "A",
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Liandry's Torment",
+          "Infinity Orb",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Liandry's Torment",
+          "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Oceanid's Trident",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    },
+    {
+      "title": "Support Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Spectral Sickle"
+        ],
+        "core": [
+          "Black Mist Scythe",
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Black Mist Scythe",
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter",
+          "Oceanid's Trident",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Electrocute",
+    "Battle Zeal",
+    "Cut Down",
+    "Legend: Bloodline",
+    "Transcendence"
+  ],
+  "spells": [
+    {
+      "combo": "barrier + flash",
+      "wr": 53.8,
+      "pr": 3.6
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 52.5,
+      "pr": 6.4
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 52.2,
+      "pr": 1.1
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 52.1,
+      "pr": 2.2
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 51.9,
+      "pr": 83.8
+    },
+    {
+      "combo": "heal + flash",
+      "wr": 50.6,
+      "pr": 1.5
+    },
+    {
+      "combo": "flash + teleport",
+      "wr": 50.3,
+      "pr": 1.1
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Sear",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Pillar of Flame",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Conflagration",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Pyroclasm",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

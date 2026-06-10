@@ -1,0 +1,386 @@
+{
+  "slug": "katarina",
+  "name": "Katarina",
+  "role": "Мид",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 53.8,
+          "pr": 2.8
+        },
+        {
+          "name": "СИНДРА",
+          "slug": "syndra",
+          "wr": 52.9,
+          "pr": 3.1
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 52.5,
+          "pr": 1.3
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 52.3,
+          "pr": 3.9
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 52.2,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 41.2,
+          "pr": 1.2
+        },
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 42.4,
+          "pr": 1.5
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 42.8,
+          "pr": 2.5
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 43.3,
+          "pr": 6.7
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 44,
+          "pr": 4
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 62.8,
+          "pr": 2.5
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 61.8,
+          "pr": 2.2
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 58.7,
+          "pr": 4.4
+        },
+        {
+          "name": "СИНДРА",
+          "slug": "syndra",
+          "wr": 55.6,
+          "pr": 3.7
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 54.7,
+          "pr": 2.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 32.1,
+          "pr": 1.2
+        },
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 39.6,
+          "pr": 1.2
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 43.4,
+          "pr": 3.3
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 44.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 44.3,
+          "pr": 1.5
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 62.5,
+          "pr": 1.1
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 60.2,
+          "pr": 3.2
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 56.9,
+          "pr": 1.7
+        },
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 56.4,
+          "pr": 1.3
+        },
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 55.6,
+          "pr": 2.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 30.7,
+          "pr": 2.9
+        },
+        {
+          "name": "НАСУС",
+          "slug": "nasus",
+          "wr": 33.3,
+          "pr": 1.2
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 35.3,
+          "pr": 1.1
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 37.5,
+          "pr": 1.1
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 37.7,
+          "pr": 5.3
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 80,
+          "pr": 1.5
+        },
+        {
+          "name": "КАССАДИН",
+          "slug": "kassadin",
+          "wr": 75,
+          "pr": 2.3
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 73.9,
+          "pr": 3.4
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 64.5,
+          "pr": 4.5
+        },
+        {
+          "name": "ЗИГГС",
+          "slug": "ziggs",
+          "wr": 62.5,
+          "pr": 2.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 30.8,
+          "pr": 1.9
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 32,
+          "pr": 3.7
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 41.7,
+          "pr": 7
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 41.7,
+          "pr": 7
+        },
+        {
+          "name": "ОРИАННА",
+          "slug": "orianna",
+          "wr": 42.9,
+          "pr": 2.1
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Vex",
+    "Zed",
+    "Lissandra"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Oceanid's Trident"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Quicksilver"
+        ],
+        "finalBuild": [
+          "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Oceanid's Trident",
+          "Riftmaker",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Quicksilver"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "First Strike",
+    "Sudden Impact",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "cleanse + flash",
+      "wr": 48.6,
+      "pr": 1.3
+    },
+    {
+      "combo": "barrier + ignite",
+      "wr": 48.1,
+      "pr": 17.3
+    },
+    {
+      "combo": "barrier + flash",
+      "wr": 47.4,
+      "pr": 4.3
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 46,
+      "pr": 74.8
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Bouncing Blades",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Preparation",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Shunpo",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Death Lotus",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

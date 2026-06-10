@@ -1,0 +1,470 @@
+{
+  "slug": "mel",
+  "name": "Mel",
+  "role": "Мид",
+  "tier": "S+",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 54.6,
+          "pr": 3
+        },
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 53.8,
+          "pr": 1.4
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 53.5,
+          "pr": 1.9
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 53.2,
+          "pr": 1.9
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 52.6,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 46.2,
+          "pr": 2.9
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 47.2,
+          "pr": 3.2
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 47.9,
+          "pr": 4.5
+        },
+        {
+          "name": "ОРИАННА",
+          "slug": "orianna",
+          "wr": 48.4,
+          "pr": 2.3
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 48.5,
+          "pr": 4.2
+        }
+      ]
+    },
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 54.3,
+          "pr": 3.8
+        },
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 53.8,
+          "pr": 7.1
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 53.8,
+          "pr": 4.3
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 53.6,
+          "pr": 1.9
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 52.4,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 40.9,
+          "pr": 1.4
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 42.1,
+          "pr": 1.1
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 42.3,
+          "pr": 2
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 42.5,
+          "pr": 2.4
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 42.7,
+          "pr": 2.4
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 53.7,
+          "pr": 2.4
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 53.5,
+          "pr": 2.9
+        },
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 52.9,
+          "pr": 1.1
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 52.8,
+          "pr": 1.2
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 52.7,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 45.8,
+          "pr": 1.3
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 46,
+          "pr": 2.5
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 46.3,
+          "pr": 4
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 46.6,
+          "pr": 1.5
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 46.7,
+          "pr": 5.2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 58.3,
+          "pr": 1.1
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 56.1,
+          "pr": 3.6
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 54.5,
+          "pr": 1.9
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 54.1,
+          "pr": 2.7
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 53.9,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 33.8,
+          "pr": 1.4
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 39.7,
+          "pr": 2.8
+        },
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 41.9,
+          "pr": 1.1
+        },
+        {
+          "name": "ЗИГГС",
+          "slug": "ziggs",
+          "wr": 42.8,
+          "pr": 5
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 44,
+          "pr": 4.5
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 65.5,
+          "pr": 1.7
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 61.9,
+          "pr": 1.2
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 59.5,
+          "pr": 2.5
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 58.9,
+          "pr": 5.3
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 58.8,
+          "pr": 3
+        }
+      ],
+      "worst": [
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 29.2,
+          "pr": 1.4
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 33.3,
+          "pr": 2.5
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 40,
+          "pr": 3
+        },
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 40,
+          "pr": 1.8
+        },
+        {
+          "name": "НАСУС",
+          "slug": "nasus",
+          "wr": 40.9,
+          "pr": 1.3
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Irelia",
+    "Yone",
+    "Syndra"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Infinity Orb",
+          "Awakened Soulstealer",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Infinity Orb",
+          "Awakened Soulstealer",
+          "Rabadon's Deathcap",
+          "Oceanid's Trident",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Arcane Comet",
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "barrier + flash",
+      "wr": 51.5,
+      "pr": 4.8
+    },
+    {
+      "combo": "flash + teleport",
+      "wr": 51.4,
+      "pr": 3
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 51,
+      "pr": 52.9
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 50.1,
+      "pr": 2.8
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 49.8,
+      "pr": 32.9
+    },
+    {
+      "combo": "heal + flash",
+      "wr": 47.7,
+      "pr": 1.5
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 46.9,
+      "pr": 2
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Radiant Volley",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Rebuttal",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Solar Snare",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Golden Eclipse",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

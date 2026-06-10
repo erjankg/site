@@ -1,0 +1,371 @@
+{
+  "slug": "evelynn",
+  "name": "Evelynn",
+  "role": "Лес",
+  "tier": "C",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 56.5,
+          "pr": 1.8
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 55,
+          "pr": 1.6
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 54.9,
+          "pr": 2.4
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 54.6,
+          "pr": 4.3
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 54,
+          "pr": 1
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 46.5,
+          "pr": 1.7
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 47.1,
+          "pr": 1.1
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 47.6,
+          "pr": 1.7
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 47.9,
+          "pr": 2.1
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 48.5,
+          "pr": 2
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 59.7,
+          "pr": 1.8
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 58,
+          "pr": 1.5
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 56.9,
+          "pr": 1.5
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 56.5,
+          "pr": 1.7
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 55.9,
+          "pr": 2.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 42.4,
+          "pr": 1.9
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 45.8,
+          "pr": 1.4
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 46.1,
+          "pr": 1.9
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 46.9,
+          "pr": 2.5
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 47.5,
+          "pr": 1
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "РЕНГАР",
+          "slug": "rengar",
+          "wr": 59.4,
+          "pr": 1.2
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 58,
+          "pr": 2
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 57.8,
+          "pr": 1.9
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 57.6,
+          "pr": 1.5
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 57.6,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 39,
+          "pr": 2.4
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 41.7,
+          "pr": 1.7
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 46.3,
+          "pr": 1.9
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 47.5,
+          "pr": 4.7
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 47.7,
+          "pr": 1.6
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 71.1,
+          "pr": 2.9
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 68.8,
+          "pr": 2.4
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 68.4,
+          "pr": 1.5
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 67.9,
+          "pr": 4.1
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 62.5,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "РЕНГАР",
+          "slug": "rengar",
+          "wr": 34.6,
+          "pr": 2
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 40,
+          "pr": 1.1
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 41.7,
+          "pr": 2.8
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 42.9,
+          "pr": 1.6
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 44.4,
+          "pr": 2.1
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Rengar",
+    "Twisted Fate",
+    "Lee Sin"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Lich Bane",
+          "Infinity Orb",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Protobelt"
+        ],
+        "finalBuild": [
+          "Lich Bane",
+          "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Awakened Soulstealer",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Protobelt"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "First Strike",
+    "Sudden Impact",
+    "Hubris",
+    "Eyeball Collector",
+    "Transcendence"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 51.7,
+      "pr": 99.3
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Hate Spike",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Allure",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Whiplash",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Last Caress",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,398 @@
+{
+  "slug": "nilah",
+  "name": "Nilah",
+  "role": "Дракон",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 60.5,
+          "pr": 2.4
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 54,
+          "pr": 1.3
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 52.9,
+          "pr": 1.5
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 51.8,
+          "pr": 2.8
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 50.6,
+          "pr": 7.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 38.4,
+          "pr": 1.6
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 39.8,
+          "pr": 1.4
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 40.3,
+          "pr": 2
+        },
+        {
+          "name": "ЭВЕЛИНН",
+          "slug": "evelynn",
+          "wr": 42.2,
+          "pr": 2.3
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 42.2,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 70.9,
+          "pr": 1.7
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 57.5,
+          "pr": 1.3
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 57,
+          "pr": 3.4
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 56.3,
+          "pr": 1.5
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 55.6,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 31.7,
+          "pr": 1.9
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 35.6,
+          "pr": 1.4
+        },
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 36,
+          "pr": 2.8
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 39.4,
+          "pr": 2.2
+        },
+        {
+          "name": "ЭВЕЛИНН",
+          "slug": "evelynn",
+          "wr": 39.5,
+          "pr": 2.7
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 62.1,
+          "pr": 1.3
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 60,
+          "pr": 1.1
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 58.9,
+          "pr": 2.5
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 58.3,
+          "pr": 2.2
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 58.3,
+          "pr": 2.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 33.3,
+          "pr": 1.3
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 35.4,
+          "pr": 2.9
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 35.5,
+          "pr": 1.4
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 38.8,
+          "pr": 2.2
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 41.3,
+          "pr": 2.8
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 80,
+          "pr": 2
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 69.2,
+          "pr": 2.6
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 66.7,
+          "pr": 2.4
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 59.1,
+          "pr": 4.4
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 57.1,
+          "pr": 2.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 20,
+          "pr": 2
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 20,
+          "pr": 2
+        },
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 23.1,
+          "pr": 2.6
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 25,
+          "pr": 2.4
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 30,
+          "pr": 2
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Caitlyn",
+    "Xayah",
+    "Smolder"
+  ],
+  "builds": [
+    {
+      "title": "Duo Build",
+      "tier": "D",
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Bloodthirster",
+          "The Collector",
+          "Lord Dominik's Regard"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Bloodthirster",
+          "The Collector",
+          "Lord Dominik's Regard",
+          "Essence Reaver",
+          "Infinity Edge",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Essence Reaver",
+          "The Collector",
+          "Lord Dominik's Regard"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Essence Reaver",
+          "The Collector",
+          "Lord Dominik's Regard",
+          "Bloodthirster",
+          "Infinity Edge",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Fleet Footwork",
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Second Wind"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 47.8,
+      "pr": 99.6
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Formless Blade",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Jubilant Veil",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Slipstream",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Apotheosis",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

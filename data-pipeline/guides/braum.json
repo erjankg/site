@@ -1,0 +1,396 @@
+{
+  "slug": "braum",
+  "name": "Braum",
+  "role": "Саппорт",
+  "tier": "C",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 60.2,
+          "pr": 4.3
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 53.9,
+          "pr": 1.9
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 53.8,
+          "pr": 3.1
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 53.2,
+          "pr": 1.7
+        },
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 53.2,
+          "pr": 8.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 45.8,
+          "pr": 1.3
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 46,
+          "pr": 3.4
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 47.2,
+          "pr": 1
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 47.6,
+          "pr": 1.8
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 47.7,
+          "pr": 3
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЖАННА",
+          "slug": "janna",
+          "wr": 61.1,
+          "pr": 1
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 57.9,
+          "pr": 5.1
+        },
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 56.8,
+          "pr": 1.9
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 54.2,
+          "pr": 2.1
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 53.7,
+          "pr": 2.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 42.4,
+          "pr": 2.1
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 42.7,
+          "pr": 3
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 45.4,
+          "pr": 3.2
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 46.7,
+          "pr": 1.2
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 46.9,
+          "pr": 2.2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 62.3,
+          "pr": 3.6
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 57.4,
+          "pr": 1.8
+        },
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 55.5,
+          "pr": 5.1
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 54.5,
+          "pr": 3.2
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 54.4,
+          "pr": 2.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 41.4,
+          "pr": 2.7
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 43,
+          "pr": 1.2
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 44.3,
+          "pr": 1.1
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 44.6,
+          "pr": 2
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 45.2,
+          "pr": 3.4
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 64.3,
+          "pr": 1.9
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 61.8,
+          "pr": 1.5
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 61.4,
+          "pr": 3.2
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 60.9,
+          "pr": 1
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 59.1,
+          "pr": 2
+        }
+      ],
+      "worst": [
+        {
+          "name": "СОНА",
+          "slug": "sona",
+          "wr": 35.3,
+          "pr": 1.5
+        },
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 38.6,
+          "pr": 4.6
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 40.3,
+          "pr": 3.2
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 45.9,
+          "pr": 2.7
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 46.5,
+          "pr": 1.9
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Senna",
+    "Bard",
+    "Zilean"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Relic Shield"
+        ],
+        "core": [
+          "Bulwark of the Mountain",
+          "Redemption",
+          "Knight's Vow"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Locket"
+        ],
+        "finalBuild": [
+          "Bulwark of the Mountain",
+          "Redemption",
+          "Knight's Vow",
+          "Frozen Heart",
+          "Force of Nature",
+          "Plated Steelcaps - Locket"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Guardian",
+    "Font of Life",
+    "Second Wind",
+    "Overgrowth",
+    "Ingenious Hunter"
+  ],
+  "spells": [
+    {
+      "combo": "heal + flash",
+      "wr": 52.4,
+      "pr": 25.6
+    },
+    {
+      "combo": "heal + ignite",
+      "wr": 52.2,
+      "pr": 32.1
+    },
+    {
+      "combo": "heal + exhaust",
+      "wr": 51.9,
+      "pr": 5.2
+    },
+    {
+      "combo": "exhaust + ignite",
+      "wr": 51.1,
+      "pr": 5
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 50.5,
+      "pr": 8.6
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 49.7,
+      "pr": 23
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Winter's Bite",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Stand Behind Me",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Unbreakable",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Glacial Fissure",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,376 @@
+{
+  "slug": "nunu-and-willump",
+  "name": "Nunu \\u0026 Willump",
+  "role": "ТАНК / МАГ",
+  "tier": "A",
+  "patch": "7.0g",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 60.5,
+          "pr": 1.7
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 59.8,
+          "pr": 3.8
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 59.8,
+          "pr": 3.6
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 58.6,
+          "pr": 1.7
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 58.3,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 45.6,
+          "pr": 2.4
+        },
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 49.9,
+          "pr": 3.3
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 50.7,
+          "pr": 2.1
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 50.9,
+          "pr": 2.4
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 51.1,
+          "pr": 3.9
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 65,
+          "pr": 2.6
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 59.8,
+          "pr": 1.9
+        },
+        {
+          "name": "РЕНГАР",
+          "slug": "rengar",
+          "wr": 59.4,
+          "pr": 1.1
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 59.1,
+          "pr": 2.8
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 58.7,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 43.3,
+          "pr": 1.5
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 46.7,
+          "pr": 3.3
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 47,
+          "pr": 2.5
+        },
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 48.5,
+          "pr": 3.3
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 49.4,
+          "pr": 2.7
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 66.7,
+          "pr": 3.2
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 65.5,
+          "pr": 1.1
+        },
+        {
+          "name": "ЭВЕЛИНН",
+          "slug": "evelynn",
+          "wr": 65,
+          "pr": 1.5
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 64.9,
+          "pr": 2.1
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 64.3,
+          "pr": 1
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 36.2,
+          "pr": 2.5
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 41.9,
+          "pr": 1.1
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 42.6,
+          "pr": 1.7
+        },
+        {
+          "name": "Син Чжао",
+          "slug": "xin-zhao",
+          "wr": 45,
+          "pr": 4.4
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 45.7,
+          "pr": 1.3
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 80,
+          "pr": 1.9
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 72.7,
+          "pr": 2.1
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 71.4,
+          "pr": 4.1
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 69,
+          "pr": 5.6
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 63.6,
+          "pr": 2.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 30.8,
+          "pr": 2.5
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 35.7,
+          "pr": 2.7
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 38.5,
+          "pr": 2.5
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 38.9,
+          "pr": 3.5
+        },
+        {
+          "name": "Син Чжао",
+          "slug": "xin-zhao",
+          "wr": 44,
+          "pr": 4.8
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Lillia",
+    "Evelynn",
+    "Morgana"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Shimmering Spark"
+        ],
+        "core": [
+          "Searing Crown",
+          "Force of Nature",
+          "Frozen Heart"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Gargoyle"
+        ],
+        "finalBuild": [
+          "Searing Crown",
+          "Force of Nature",
+          "Frozen Heart",
+          "Thornmail",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps - Gargoyle"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Aftershock",
+    "Courage of the Colossus",
+    "Bone Plating",
+    "Overgrowth",
+    "Transcendence"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 54.9,
+      "pr": 91.4
+    },
+    {
+      "combo": "ghost + smite",
+      "wr": 52.7,
+      "pr": 8.4
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Consume",
+      "levels": [
+        1,
+        3,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Biggest Snowball Ever!",
+      "levels": [
+        4,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Snowball Barrage",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Absolute Zero",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

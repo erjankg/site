@@ -1,0 +1,381 @@
+{
+  "slug": "yuumi",
+  "name": "Yuumi",
+  "role": "Саппорт",
+  "tier": "C",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 49.5,
+          "pr": 2
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 49.3,
+          "pr": 3.3
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 49.2,
+          "pr": 4.4
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 48.7,
+          "pr": 1
+        },
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 48.4,
+          "pr": 3.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 39.7,
+          "pr": 3.8
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 39.8,
+          "pr": 2
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 41,
+          "pr": 6.7
+        },
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 41.9,
+          "pr": 6.5
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 41.9,
+          "pr": 3.4
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 50.9,
+          "pr": 2.8
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 50.7,
+          "pr": 3.6
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 50.5,
+          "pr": 1.6
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 50.4,
+          "pr": 3.1
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 47.9,
+          "pr": 8.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 39.9,
+          "pr": 3.7
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 40.5,
+          "pr": 1.5
+        },
+        {
+          "name": "ЗИЛЕАН",
+          "slug": "zilean",
+          "wr": 40.8,
+          "pr": 1.1
+        },
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 40.8,
+          "pr": 3.5
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 41.5,
+          "pr": 2.2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 49.5,
+          "pr": 3.2
+        },
+        {
+          "name": "ЖАННА",
+          "slug": "janna",
+          "wr": 49.3,
+          "pr": 1.5
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 48.8,
+          "pr": 6.7
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 48.4,
+          "pr": 3.5
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 48.3,
+          "pr": 2
+        }
+      ],
+      "worst": [
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 37.6,
+          "pr": 3.1
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 37.7,
+          "pr": 2.2
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 39.3,
+          "pr": 2.6
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 40,
+          "pr": 6
+        },
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 41.1,
+          "pr": 4
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 50.7,
+          "pr": 3.9
+        },
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 50,
+          "pr": 5.7
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 50,
+          "pr": 1
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 48.3,
+          "pr": 5.2
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 48.1,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЗИЛЕАН",
+          "slug": "zilean",
+          "wr": 28.6,
+          "pr": 1.2
+        },
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 28.8,
+          "pr": 3.8
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 29.8,
+          "pr": 2.7
+        },
+        {
+          "name": "СОНА",
+          "slug": "sona",
+          "wr": 31,
+          "pr": 1.7
+        },
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 34.7,
+          "pr": 4.3
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Nautilus",
+    "Thresh",
+    "Alistar"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Spectral Sickle"
+        ],
+        "core": [
+          "Black Mist Scythe",
+          "Harmonic Echo",
+          "Ardent Censer"
+        ],
+        "boots": [
+          "Ionian Boots of Lucidity",
+          "Veil"
+        ],
+        "finalBuild": [
+          "Black Mist Scythe",
+          "Harmonic Echo",
+          "Ardent Censer",
+          "Staff of Flowing Water",
+          "Knight's Vow",
+          "Ionian Boots of Lucidity - Veil"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Aery",
+    "Font of Life",
+    "Bone Plating",
+    "Revitalize",
+    "Transcendence"
+  ],
+  "spells": [
+    {
+      "combo": "heal + ignite",
+      "wr": 45.7,
+      "pr": 55.1
+    },
+    {
+      "combo": "heal + exhaust",
+      "wr": 45.5,
+      "pr": 28
+    },
+    {
+      "combo": "exhaust + ignite",
+      "wr": 43.6,
+      "pr": 15.4
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Prowling Projectile",
+      "levels": [
+        1,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "You and Me!",
+      "levels": [
+        4,
+        7,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Zoomies",
+      "levels": [
+        2,
+        3,
+        6,
+        8
+      ]
+    },
+    {
+      "ability": "Final Chapter",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

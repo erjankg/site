@@ -1,0 +1,401 @@
+{
+  "slug": "gwen",
+  "name": "Gwen",
+  "role": "Барон",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 58.4,
+          "pr": 3
+        },
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 54.5,
+          "pr": 2
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 53.3,
+          "pr": 1.1
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 52.9,
+          "pr": 2
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 51.4,
+          "pr": 1.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 44.3,
+          "pr": 1.5
+        },
+        {
+          "name": "СИОН",
+          "slug": "sion",
+          "wr": 45.2,
+          "pr": 2.5
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 45.6,
+          "pr": 1.3
+        },
+        {
+          "name": "ГАРЕН",
+          "slug": "garen",
+          "wr": 45.6,
+          "pr": 12.6
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 46,
+          "pr": 2.3
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 64.6,
+          "pr": 2.6
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 60.3,
+          "pr": 1.2
+        },
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 55.6,
+          "pr": 1.5
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 55.4,
+          "pr": 1.3
+        },
+        {
+          "name": "РЕНЕКТОН",
+          "slug": "renekton",
+          "wr": 54.8,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 37.7,
+          "pr": 1.1
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 40.3,
+          "pr": 1.3
+        },
+        {
+          "name": "ГАРЕН",
+          "slug": "garen",
+          "wr": 42.8,
+          "pr": 14.8
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 44.8,
+          "pr": 6.7
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 45.8,
+          "pr": 6
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 65.2,
+          "pr": 1.6
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 62.7,
+          "pr": 1.8
+        },
+        {
+          "name": "ФИОРА",
+          "slug": "fiora",
+          "wr": 58.9,
+          "pr": 1.9
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 57.5,
+          "pr": 1.4
+        },
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 57.1,
+          "pr": 1.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 25.8,
+          "pr": 1.1
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 37.5,
+          "pr": 1.1
+        },
+        {
+          "name": "РЕНЕКТОН",
+          "slug": "renekton",
+          "wr": 39.1,
+          "pr": 3.2
+        },
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 39.4,
+          "pr": 1.1
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 41.8,
+          "pr": 2.3
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 77.8,
+          "pr": 2.7
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 75,
+          "pr": 1.8
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 71.4,
+          "pr": 2.1
+        },
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 70,
+          "pr": 1.5
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 68.8,
+          "pr": 2.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 16.7,
+          "pr": 1.8
+        },
+        {
+          "name": "СИНДЖЕД",
+          "slug": "singed",
+          "wr": 27.3,
+          "pr": 1.6
+        },
+        {
+          "name": "К'Санте",
+          "slug": "ksante",
+          "wr": 31.8,
+          "pr": 3.3
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 35.3,
+          "pr": 5.1
+        },
+        {
+          "name": "СИОН",
+          "slug": "sion",
+          "wr": 37.9,
+          "pr": 4.3
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Fiora",
+    "Tryndamere",
+    "Riven"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Ruby Crystal"
+        ],
+        "core": [
+          "Rod of Ages",
+          "Psychic Projector",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Gargoyle"
+        ],
+        "finalBuild": [
+          "Rod of Ages",
+          "Psychic Projector",
+          "Rabadon's Deathcap",
+          "Infinity Orb",
+          "Oceanid's Trident",
+          "Plated Steelcaps - Gargoyle"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Conqueror",
+    "Demolish",
+    "Second Wind",
+    "Overgrowth",
+    "Sudden Impact"
+  ],
+  "spells": [
+    {
+      "combo": "ghost + teleport",
+      "wr": 50.5,
+      "pr": 2.9
+    },
+    {
+      "combo": "flash + teleport",
+      "wr": 48.9,
+      "pr": 23.1
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 48.4,
+      "pr": 50.4
+    },
+    {
+      "combo": "ghost + ignite",
+      "wr": 47.7,
+      "pr": 7.2
+    },
+    {
+      "combo": "barrier + flash",
+      "wr": 47.5,
+      "pr": 4.3
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 46.1,
+      "pr": 9.9
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 45.8,
+      "pr": 1.1
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Snip Snip!",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Hallowed Mist",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Skip 'n Slash",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Needlework",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

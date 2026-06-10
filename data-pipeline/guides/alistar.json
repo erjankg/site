@@ -1,0 +1,381 @@
+{
+  "slug": "alistar",
+  "name": "Alistar",
+  "role": "Саппорт",
+  "tier": "C",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 57.4,
+          "pr": 5.2
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 53.9,
+          "pr": 1.4
+        },
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 53.4,
+          "pr": 8
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 53,
+          "pr": 1.1
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 52.6,
+          "pr": 1.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 42.8,
+          "pr": 1.1
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 43.1,
+          "pr": 2.9
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 46.2,
+          "pr": 3.6
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 46.3,
+          "pr": 2.2
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 46.7,
+          "pr": 2
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 58.5,
+          "pr": 6.2
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 57.3,
+          "pr": 2.3
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 55.3,
+          "pr": 1.2
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 55,
+          "pr": 1.5
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 53.8,
+          "pr": 2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 41.5,
+          "pr": 1.7
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 42.7,
+          "pr": 1
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 43.2,
+          "pr": 1.7
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 43.5,
+          "pr": 3.3
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 45.2,
+          "pr": 1
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 60.7,
+          "pr": 5.2
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 57,
+          "pr": 2
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 56.7,
+          "pr": 3.1
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 55.3,
+          "pr": 1
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 54.2,
+          "pr": 2.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 40,
+          "pr": 1.1
+        },
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 41.8,
+          "pr": 4.6
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 43.3,
+          "pr": 9.5
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 44.4,
+          "pr": 2.4
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 45.8,
+          "pr": 4.3
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 70.2,
+          "pr": 2.6
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 64,
+          "pr": 4.8
+        },
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 58.6,
+          "pr": 7.1
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 57.9,
+          "pr": 2.1
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 55.9,
+          "pr": 3.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 32.4,
+          "pr": 1.9
+        },
+        {
+          "name": "ЗИЛЕАН",
+          "slug": "zilean",
+          "wr": 33.3,
+          "pr": 1.3
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 42,
+          "pr": 8.3
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 42.3,
+          "pr": 1.4
+        },
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 44.2,
+          "pr": 4.8
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Janna",
+    "Zyra",
+    "Ashe"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Relic Shield"
+        ],
+        "core": [
+          "Bulwark of the Mountain",
+          "Zeke's Convergence",
+          "Radiant Virtue"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Protobelt"
+        ],
+        "finalBuild": [
+          "Bulwark of the Mountain",
+          "Zeke's Convergence",
+          "Radiant Virtue",
+          "Frozen Heart",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps - Protobelt"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Ice Overlord",
+    "Courage of the Colossus",
+    "Second Wind",
+    "Overgrowth",
+    "Hextech Flashtraption"
+  ],
+  "spells": [
+    {
+      "combo": "heal + flash",
+      "wr": 50.3,
+      "pr": 3.5
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 49.8,
+      "pr": 86.7
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 48.8,
+      "pr": 8.3
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Pulverize",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Headbutt",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Trample",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Unbreakable Will",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,689 @@
+{
+  "slug": "tryndamere",
+  "name": "Tryndamere",
+  "role": "Лес",
+  "tier": "S",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ФИОРА",
+          "slug": "fiora",
+          "wr": 57.6,
+          "pr": 1.1
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 55.5,
+          "pr": 2.7
+        },
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 53.8,
+          "pr": 1.3
+        },
+        {
+          "name": "МОРДЕКАЙЗЕР",
+          "slug": "mordekaiser",
+          "wr": 53.8,
+          "pr": 5
+        },
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 53.7,
+          "pr": 1.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 38.5,
+          "pr": 1.1
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 39.7,
+          "pr": 2.7
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 42.9,
+          "pr": 1.1
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 43.2,
+          "pr": 4.8
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 43.4,
+          "pr": 1.2
+        }
+      ]
+    },
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 53.8,
+          "pr": 1.1
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 53.5,
+          "pr": 1
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 53.5,
+          "pr": 1.7
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 52.4,
+          "pr": 1.1
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 52,
+          "pr": 1.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 41.3,
+          "pr": 2
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 42.5,
+          "pr": 2.8
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 44.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 45.1,
+          "pr": 6.5
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 45.4,
+          "pr": 1.1
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ИРЕЛИЯ",
+          "slug": "irelia",
+          "wr": 65.5,
+          "pr": 1.1
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 61.1,
+          "pr": 1.9
+        },
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 59.5,
+          "pr": 1.1
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 58.3,
+          "pr": 3.2
+        },
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 57.3,
+          "pr": 1.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 36.8,
+          "pr": 1.2
+        },
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 40.7,
+          "pr": 1.1
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 43.3,
+          "pr": 5.6
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 43.4,
+          "pr": 1.3
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 43.8,
+          "pr": 2.2
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 57.3,
+          "pr": 1.3
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 51.9,
+          "pr": 4.9
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 51.6,
+          "pr": 1.1
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 51.6,
+          "pr": 7.5
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 51.3,
+          "pr": 2.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 43.1,
+          "pr": 1.7
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 43.2,
+          "pr": 3.5
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 45.1,
+          "pr": 3.8
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 45.5,
+          "pr": 2.1
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 46,
+          "pr": 1.5
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 57.3,
+          "pr": 5.1
+        },
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 55.8,
+          "pr": 1.2
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 54.8,
+          "pr": 1.9
+        },
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 53.6,
+          "pr": 1.9
+        },
+        {
+          "name": "КЕЙЛ",
+          "slug": "kayle",
+          "wr": 53.5,
+          "pr": 1.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 37.7,
+          "pr": 4.7
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 38.7,
+          "pr": 1.4
+        },
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 42.6,
+          "pr": 1.1
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 42.7,
+          "pr": 2.8
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 43.1,
+          "pr": 1.6
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 58.1,
+          "pr": 1.1
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 56.4,
+          "pr": 1.8
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 55.5,
+          "pr": 2.7
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 53.2,
+          "pr": 1.4
+        },
+        {
+          "name": "ВИЕГО",
+          "slug": "viego",
+          "wr": 52.7,
+          "pr": 4.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 36.8,
+          "pr": 1.4
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 43,
+          "pr": 1.2
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 43.4,
+          "pr": 2.2
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 45.4,
+          "pr": 4
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 45.8,
+          "pr": 5.9
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 69.6,
+          "pr": 2
+        },
+        {
+          "name": "КЕЙЛ",
+          "slug": "kayle",
+          "wr": 65,
+          "pr": 1.7
+        },
+        {
+          "name": "ИРЕЛИЯ",
+          "slug": "irelia",
+          "wr": 64.7,
+          "pr": 1.5
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 64.7,
+          "pr": 1.5
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 63.6,
+          "pr": 1.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 16.7,
+          "pr": 1
+        },
+        {
+          "name": "ГВЕН",
+          "slug": "gwen",
+          "wr": 25,
+          "pr": 1
+        },
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 35,
+          "pr": 1.7
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 38.9,
+          "pr": 1.5
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 38.9,
+          "pr": 1.5
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 72.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 60.9,
+          "pr": 1.4
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 60.9,
+          "pr": 1.4
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 60.9,
+          "pr": 1.4
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 58.8,
+          "pr": 1
+        }
+      ],
+      "worst": [
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 29.4,
+          "pr": 3
+        },
+        {
+          "name": "ЭВЕЛИНН",
+          "slug": "evelynn",
+          "wr": 31.3,
+          "pr": 1.9
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 35.3,
+          "pr": 1
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 36.4,
+          "pr": 2.6
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 37.5,
+          "pr": 1.9
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Rammus",
+    "Master Yi",
+    "Amumu"
+  ],
+  "builds": [
+    {
+      "title": "Jungle Build",
+      "tier": "B",
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Magnetic Blaster",
+          "Blade of the Ruined King",
+          "Mortal Reminder"
+        ],
+        "boots": [
+          "Berserker's Greaves",
+          "Quicksilver"
+        ],
+        "finalBuild": [
+          "Magnetic Blaster",
+          "Blade of the Ruined King",
+          "Mortal Reminder",
+          "Infinity Edge",
+          "Guardian Angel",
+          "Berserker's Greaves - Quicksilver"
+        ]
+      }
+    },
+    {
+      "title": "Solo Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Blade of the Ruined King",
+          "Magnetic Blaster",
+          "Mortal Reminder"
+        ],
+        "boots": [
+          "Berserker's Greaves",
+          "Quicksilver"
+        ],
+        "finalBuild": [
+          "Blade of the Ruined King",
+          "Magnetic Blaster",
+          "Mortal Reminder",
+          "Infinity Edge",
+          "Guardian Angel",
+          "Berserker's Greaves - Quicksilver"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Lethal Tempo",
+    "Brutal",
+    "Last Stand",
+    "Legend: Alacrity",
+    "Nimbus Cloak"
+  ],
+  "spells": [
+    {
+      "combo": "ghost + flash",
+      "wr": 51.1,
+      "pr": 10.4
+    },
+    {
+      "combo": "ghost + ignite",
+      "wr": 49.8,
+      "pr": 77.7
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 49.3,
+      "pr": 6
+    },
+    {
+      "combo": "ghost + teleport",
+      "wr": 48.3,
+      "pr": 3
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Bloodlust",
+      "levels": [
+        2,
+        3,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Mocking Shout",
+      "levels": [
+        4,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Spinning Slash",
+      "levels": [
+        1,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Undying Rage",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

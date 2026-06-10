@@ -1,0 +1,381 @@
+{
+  "slug": "blitzcrank",
+  "name": "Blitzcrank",
+  "role": "Саппорт",
+  "tier": "B",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 60.3,
+          "pr": 5.4
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 56.5,
+          "pr": 1.4
+        },
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 54.4,
+          "pr": 4.3
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 54.3,
+          "pr": 2.4
+        },
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 54.2,
+          "pr": 3.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 46.7,
+          "pr": 6.5
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 46.9,
+          "pr": 2.3
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 48,
+          "pr": 9.5
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 48.1,
+          "pr": 1.7
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 48.3,
+          "pr": 2.5
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 60.1,
+          "pr": 7
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 57.6,
+          "pr": 1.5
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 56.2,
+          "pr": 2.4
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 54.4,
+          "pr": 2.4
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 53.5,
+          "pr": 3.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 46.7,
+          "pr": 5.8
+        },
+        {
+          "name": "ЗИЛЕАН",
+          "slug": "zilean",
+          "wr": 46.8,
+          "pr": 1.1
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 46.8,
+          "pr": 3.2
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 47.4,
+          "pr": 1.4
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 48,
+          "pr": 9.1
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 59,
+          "pr": 2.1
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 58.9,
+          "pr": 4.8
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 58.2,
+          "pr": 2.8
+        },
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 55.9,
+          "pr": 2.5
+        },
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 54.6,
+          "pr": 4.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 41.9,
+          "pr": 1.7
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 45.8,
+          "pr": 1.3
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 46.4,
+          "pr": 1.1
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 46.4,
+          "pr": 2.7
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 47.1,
+          "pr": 1.4
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 65.3,
+          "pr": 3
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 64.1,
+          "pr": 1.5
+        },
+        {
+          "name": "ЖАННА",
+          "slug": "janna",
+          "wr": 62.9,
+          "pr": 1.4
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 59.5,
+          "pr": 1.5
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 59,
+          "pr": 3.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 35.7,
+          "pr": 1.1
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 39.4,
+          "pr": 1.3
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 41.5,
+          "pr": 4.6
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 44.4,
+          "pr": 5.3
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 44.4,
+          "pr": 1.4
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Leona",
+    "Braum",
+    "Morgana"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Relic Shield"
+        ],
+        "core": [
+          "Bulwark of the Mountain",
+          "Yordle Trap",
+          "Warmog's Armor"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Protobelt"
+        ],
+        "finalBuild": [
+          "Bulwark of the Mountain",
+          "Yordle Trap",
+          "Warmog's Armor",
+          "Frozen Heart",
+          "Kaenic Rookern",
+          "Plated Steelcaps - Protobelt"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Ice Overlord",
+    "Courage of the Colossus",
+    "Second Wind",
+    "Overgrowth",
+    "Hextech Flashtraption"
+  ],
+  "spells": [
+    {
+      "combo": "flash + ignite",
+      "wr": 51.7,
+      "pr": 87.5
+    },
+    {
+      "combo": "heal + flash",
+      "wr": 51.4,
+      "pr": 3.4
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 49.6,
+      "pr": 7
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Rocket Grab",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Overdrive",
+      "levels": [
+        3,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Power Fist",
+      "levels": [
+        2,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Static Field",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

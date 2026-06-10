@@ -1,0 +1,371 @@
+{
+  "slug": "viego",
+  "name": "Viego",
+  "role": "Лес",
+  "tier": "B",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 55.1,
+          "pr": 2.2
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 54.6,
+          "pr": 1.2
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 53.4,
+          "pr": 9.4
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 53.2,
+          "pr": 2.5
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 53,
+          "pr": 7.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 40.5,
+          "pr": 2.2
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 41.8,
+          "pr": 1.5
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 44.2,
+          "pr": 1.7
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 44.9,
+          "pr": 1.1
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 46.6,
+          "pr": 1.6
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 55,
+          "pr": 2.6
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 54.3,
+          "pr": 6
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 54.1,
+          "pr": 1.9
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 53.8,
+          "pr": 3.7
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 53.7,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 40.3,
+          "pr": 2.8
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 41.7,
+          "pr": 1.6
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 42.9,
+          "pr": 2.2
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 44.3,
+          "pr": 1.3
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 45.9,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 57.5,
+          "pr": 1.3
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 57.1,
+          "pr": 1
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 55.4,
+          "pr": 4.5
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 55.2,
+          "pr": 5
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 54.3,
+          "pr": 1.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 38.7,
+          "pr": 2.7
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 41.6,
+          "pr": 1.3
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 43.7,
+          "pr": 1.8
+        },
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 44.6,
+          "pr": 1.6
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 45.3,
+          "pr": 2.1
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 59.7,
+          "pr": 1.7
+        },
+        {
+          "name": "НИЛА",
+          "slug": "nilah",
+          "wr": 59.6,
+          "pr": 1.2
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 58.5,
+          "pr": 1.8
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 58.5,
+          "pr": 1.1
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 58.2,
+          "pr": 5
+        }
+      ],
+      "worst": [
+        {
+          "name": "РЕНГАР",
+          "slug": "rengar",
+          "wr": 39.4,
+          "pr": 1.4
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 39.6,
+          "pr": 2.9
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 39.7,
+          "pr": 1.6
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 41.9,
+          "pr": 4.1
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 42.2,
+          "pr": 1.9
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Rammus",
+    "Amumu",
+    "Warwick"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Essence Reaver",
+          "The Collector",
+          "Lord Dominik's Regard"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Essence Reaver",
+          "The Collector",
+          "Lord Dominik's Regard",
+          "Bloodthirster",
+          "Infinity Edge",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Conqueror",
+    "Unshakeable",
+    "Bone Plating",
+    "Overgrowth",
+    "Legend: Alacrity"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 50.9,
+      "pr": 99.9
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Blade of the Ruined King",
+      "levels": [
+        1,
+        3,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Spectral Maw",
+      "levels": [
+        2,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Harrowed Path",
+      "levels": [
+        4,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Heartbreaker",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

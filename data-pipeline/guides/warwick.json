@@ -1,0 +1,403 @@
+{
+  "slug": "warwick",
+  "name": "Warwick",
+  "role": "Лес",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 60.3,
+          "pr": 2.1
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 58.6,
+          "pr": 1.4
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 58.3,
+          "pr": 4.3
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 57.8,
+          "pr": 1.2
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 57,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 44.7,
+          "pr": 2.2
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 44.8,
+          "pr": 1.1
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 47.8,
+          "pr": 1.8
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 47.9,
+          "pr": 1.4
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 48.2,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 67.4,
+          "pr": 1.8
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 64.4,
+          "pr": 1
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 61,
+          "pr": 3.4
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 59.1,
+          "pr": 2.4
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 58.3,
+          "pr": 1
+        }
+      ],
+      "worst": [
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 44.8,
+          "pr": 1.3
+        },
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 45.2,
+          "pr": 2.8
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 46.1,
+          "pr": 3.1
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 48.3,
+          "pr": 1.4
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 48.6,
+          "pr": 2.5
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 62,
+          "pr": 2
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 59.4,
+          "pr": 2.2
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 57.4,
+          "pr": 1.9
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 55.9,
+          "pr": 2.3
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 55.6,
+          "pr": 5.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 42.9,
+          "pr": 3.3
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 46.4,
+          "pr": 3
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 47.4,
+          "pr": 1.6
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 47.6,
+          "pr": 1
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 47.7,
+          "pr": 3.2
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 76.7,
+          "pr": 1.8
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 74.2,
+          "pr": 1.8
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 72,
+          "pr": 1.5
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 69,
+          "pr": 2.5
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 64.5,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 35.3,
+          "pr": 1
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 37.5,
+          "pr": 2.4
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 41.9,
+          "pr": 1.8
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 42.9,
+          "pr": 2.1
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 43.1,
+          "pr": 3
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Amumu",
+    "Olaf",
+    "Kindred"
+  ],
+  "builds": [
+    {
+      "title": "Jungle Build",
+      "tier": "S",
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Blade of the Ruined King",
+          "Awakened Soulstealer"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Blade of the Ruined King",
+          "Awakened Soulstealer",
+          "Terminus",
+          "Guardian Angel",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    },
+    {
+      "title": "Solo Build",
+      "tier": "A",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Blade of the Ruined King",
+          "Death's Dance"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Goredrinker"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Blade of the Ruined King",
+          "Death's Dance",
+          "Terminus",
+          "Guardian Angel",
+          "Plated Steelcaps - Goredrinker"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Empowerment",
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Overgrowth"
+  ],
+  "spells": [
+    {
+      "combo": "ghost + smite",
+      "wr": 53,
+      "pr": 68.9
+    },
+    {
+      "combo": "flash + smite",
+      "wr": 52.7,
+      "pr": 30.2
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Jaws of the Beast",
+      "levels": [
+        1,
+        3,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Blood Hunt",
+      "levels": [
+        2,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Primal Howl",
+      "levels": [
+        4,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Infinite Duress",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

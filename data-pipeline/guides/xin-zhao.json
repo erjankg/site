@@ -1,0 +1,371 @@
+{
+  "slug": "xin-zhao",
+  "name": "Xin Zhao",
+  "role": "Лес",
+  "tier": "A",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 56.1,
+          "pr": 1.4
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 55.9,
+          "pr": 8.1
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 55.7,
+          "pr": 2.1
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 55.7,
+          "pr": 1.6
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 54.1,
+          "pr": 2.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 42.8,
+          "pr": 1.9
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 45.9,
+          "pr": 2.1
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 47.5,
+          "pr": 1.7
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 47.5,
+          "pr": 1.5
+        },
+        {
+          "name": "ЭВЕЛИНН",
+          "slug": "evelynn",
+          "wr": 47.7,
+          "pr": 2.1
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 58.9,
+          "pr": 1.9
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 56.3,
+          "pr": 1
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 55.5,
+          "pr": 8.5
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 54.5,
+          "pr": 1.7
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 53.9,
+          "pr": 2.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 41.6,
+          "pr": 1.1
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 43,
+          "pr": 2.2
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 44.6,
+          "pr": 2.7
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 46.6,
+          "pr": 2
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 46.6,
+          "pr": 1.9
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 59.7,
+          "pr": 1.2
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 57.3,
+          "pr": 1.5
+        },
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 56,
+          "pr": 1.1
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 54.8,
+          "pr": 1.3
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 54.6,
+          "pr": 2.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 45.4,
+          "pr": 2.6
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 46.4,
+          "pr": 2.9
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 46.4,
+          "pr": 2.1
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 46.9,
+          "pr": 1
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 47.3,
+          "pr": 5.9
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 67.4,
+          "pr": 1.3
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 64.4,
+          "pr": 1.3
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 61.8,
+          "pr": 1
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 59.5,
+          "pr": 1.2
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 59,
+          "pr": 2.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 30.2,
+          "pr": 1.6
+        },
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 39.6,
+          "pr": 1.6
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 42.7,
+          "pr": 2.4
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 42.9,
+          "pr": 1.9
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 44.4,
+          "pr": 2.1
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Rammus",
+    "Shyvana",
+    "Master Yi"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Serpent's Fang",
+          "Serylda's Grudge"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Goredrinker"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Serpent's Fang",
+          "Serylda's Grudge",
+          "Death's Dance",
+          "Guardian Angel",
+          "Gluttonous Greaves - Goredrinker"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Phase Rush",
+    "Unshakeable",
+    "Bone Plating",
+    "Overgrowth",
+    "Sudden Impact"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 51.3,
+      "pr": 98.7
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Three Talon Strike",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Wind Becomes Lightning",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Audacious Charge",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Crescent Guard",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

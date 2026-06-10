@@ -1,0 +1,381 @@
+{
+  "slug": "ahri",
+  "name": "Ahri",
+  "role": "Мид",
+  "tier": "C",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 57.5,
+          "pr": 1.6
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 55.4,
+          "pr": 1.6
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 55.1,
+          "pr": 2.8
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 54.2,
+          "pr": 2.2
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 53.7,
+          "pr": 2.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 44,
+          "pr": 1.4
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 45.5,
+          "pr": 1
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 46.5,
+          "pr": 5.2
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 48.9,
+          "pr": 5
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 49.5,
+          "pr": 4.5
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 60.4,
+          "pr": 1.6
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 58.3,
+          "pr": 1
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 57.2,
+          "pr": 4.2
+        },
+        {
+          "name": "ЗИГГС",
+          "slug": "ziggs",
+          "wr": 56.6,
+          "pr": 2.6
+        },
+        {
+          "name": "КАССАДИН",
+          "slug": "kassadin",
+          "wr": 56,
+          "pr": 1.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 45.9,
+          "pr": 1.4
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 47.3,
+          "pr": 3.7
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 47.6,
+          "pr": 1.2
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 48.3,
+          "pr": 1.4
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 48.4,
+          "pr": 4.3
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 65.2,
+          "pr": 1.8
+        },
+        {
+          "name": "КАССАДИН",
+          "slug": "kassadin",
+          "wr": 64,
+          "pr": 1.4
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 60.9,
+          "pr": 2.5
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 57.7,
+          "pr": 1.1
+        },
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 56.5,
+          "pr": 1.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 45.6,
+          "pr": 2.9
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 45.6,
+          "pr": 1.8
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 46.1,
+          "pr": 2.8
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 46.3,
+          "pr": 4.7
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 46.4,
+          "pr": 4
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 77.8,
+          "pr": 1.1
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 73.7,
+          "pr": 1.2
+        },
+        {
+          "name": "ВЕКС",
+          "slug": "vex",
+          "wr": 69.6,
+          "pr": 1.4
+        },
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 69.2,
+          "pr": 2.4
+        },
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 68.4,
+          "pr": 1.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 37.1,
+          "pr": 2.1
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 40.5,
+          "pr": 2.6
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 42.4,
+          "pr": 2
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 45,
+          "pr": 1.2
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 45.7,
+          "pr": 5.8
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Akali",
+    "Syndra",
+    "Orianna"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Luden's Echo",
+          "Lich Bane",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Luden's Echo",
+          "Lich Bane",
+          "Rabadon's Deathcap",
+          "Infinity Orb",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Electrocute",
+    "Empowered Attack",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "flash + teleport",
+      "wr": 53.6,
+      "pr": 1.3
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 51.9,
+      "pr": 95
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 47.3,
+      "pr": 1.1
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Orb of Deception",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Fox-Fire",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Charm",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Spirit Rush",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

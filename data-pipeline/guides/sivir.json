@@ -1,0 +1,396 @@
+{
+  "slug": "sivir",
+  "name": "Sivir",
+  "role": "Дракон",
+  "tier": "B",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 53,
+          "pr": 1.5
+        },
+        {
+          "name": "ТРИСТАНА",
+          "slug": "tristana",
+          "wr": 50.4,
+          "pr": 3.4
+        },
+        {
+          "name": "ДЖИНКС",
+          "slug": "jinx",
+          "wr": 49.3,
+          "pr": 5
+        },
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 48.7,
+          "pr": 4.4
+        },
+        {
+          "name": "ЭЗРЕАЛЬ",
+          "slug": "ezreal",
+          "wr": 48.3,
+          "pr": 4.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 40,
+          "pr": 1.7
+        },
+        {
+          "name": "ШАЯ",
+          "slug": "xayah",
+          "wr": 42.6,
+          "pr": 2.5
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 43,
+          "pr": 4.3
+        },
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 43.7,
+          "pr": 6.7
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 44.7,
+          "pr": 10.7
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 60.8,
+          "pr": 1.8
+        },
+        {
+          "name": "ТРИСТАНА",
+          "slug": "tristana",
+          "wr": 51.7,
+          "pr": 3
+        },
+        {
+          "name": "ДЖИНКС",
+          "slug": "jinx",
+          "wr": 50.9,
+          "pr": 5.3
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 49.4,
+          "pr": 2.3
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 49.3,
+          "pr": 5.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 37.9,
+          "pr": 1.8
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 42.7,
+          "pr": 12.9
+        },
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 43.4,
+          "pr": 2.7
+        },
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 44.9,
+          "pr": 7.8
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 45.1,
+          "pr": 3.2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 61.9,
+          "pr": 3.2
+        },
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 53.1,
+          "pr": 1.8
+        },
+        {
+          "name": "ТРИСТАНА",
+          "slug": "tristana",
+          "wr": 52.9,
+          "pr": 4.6
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 52.6,
+          "pr": 5.9
+        },
+        {
+          "name": "КЕЙТЛИН",
+          "slug": "caitlyn",
+          "wr": 51.9,
+          "pr": 16.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 40.9,
+          "pr": 2.1
+        },
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 44,
+          "pr": 3.7
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 45.5,
+          "pr": 7.9
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 46.2,
+          "pr": 1.7
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 46.7,
+          "pr": 2.3
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 63.2,
+          "pr": 3.2
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 62.5,
+          "pr": 7.4
+        },
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 62.5,
+          "pr": 3.3
+        },
+        {
+          "name": "КЕЙТЛИН",
+          "slug": "caitlyn",
+          "wr": 56.9,
+          "pr": 14
+        },
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 56.7,
+          "pr": 5
+        }
+      ],
+      "worst": [
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 39.3,
+          "pr": 2.3
+        },
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 39.4,
+          "pr": 5.9
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 41.8,
+          "pr": 5.6
+        },
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 42.4,
+          "pr": 2.8
+        },
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 43.8,
+          "pr": 4
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Kog'Maw",
+    "Smolder",
+    "Vayne"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Bloodthirster",
+          "Navori Quickblades",
+          "Lord Dominik's Regard"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Bloodthirster",
+          "Navori Quickblades",
+          "Lord Dominik's Regard",
+          "Magnetic Blaster",
+          "Infinity Edge",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Lethal Tempo",
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "flash + ignite",
+      "wr": 50.4,
+      "pr": 1.2
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 48.3,
+      "pr": 5.4
+    },
+    {
+      "combo": "heal + flash",
+      "wr": 48,
+      "pr": 12.7
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 47.5,
+      "pr": 5.1
+    },
+    {
+      "combo": "barrier + flash",
+      "wr": 46.8,
+      "pr": 36.3
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 46.2,
+      "pr": 38.7
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Boomerang Blade",
+      "levels": [
+        2,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Ricochet",
+      "levels": [
+        1,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Spell Shield",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "On The Hunt",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

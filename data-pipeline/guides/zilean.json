@@ -1,0 +1,391 @@
+{
+  "slug": "zilean",
+  "name": "Zilean",
+  "role": "Саппорт",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 59.8,
+          "pr": 6.2
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 59.4,
+          "pr": 1.5
+        },
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 56.8,
+          "pr": 6.4
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 54.8,
+          "pr": 1.8
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 54.6,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 47.9,
+          "pr": 2.2
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 48.2,
+          "pr": 1.7
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 48.5,
+          "pr": 1
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 48.7,
+          "pr": 2.3
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 50.1,
+          "pr": 4.4
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 59.2,
+          "pr": 7.4
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 58.3,
+          "pr": 1.2
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 55.7,
+          "pr": 2.3
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 55.4,
+          "pr": 3.3
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 55.4,
+          "pr": 5.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 47.2,
+          "pr": 2.6
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 48,
+          "pr": 1.6
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 48.9,
+          "pr": 3.6
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 49,
+          "pr": 1.6
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 49.2,
+          "pr": 2.1
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 61.2,
+          "pr": 2.9
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 60.6,
+          "pr": 4.5
+        },
+        {
+          "name": "ЖАННА",
+          "slug": "janna",
+          "wr": 57.8,
+          "pr": 1.5
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 57.4,
+          "pr": 1.6
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 57.1,
+          "pr": 1.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 40,
+          "pr": 1.3
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 42.1,
+          "pr": 2.6
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 42.9,
+          "pr": 1.7
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 43.2,
+          "pr": 1.2
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 46.7,
+          "pr": 5.1
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 71.4,
+          "pr": 2.7
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 67.6,
+          "pr": 4.4
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 66.7,
+          "pr": 3.1
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 65,
+          "pr": 2.6
+        },
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 64.3,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 30,
+          "pr": 1.3
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 42.9,
+          "pr": 1.8
+        },
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 45.5,
+          "pr": 2.8
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 46.7,
+          "pr": 3.9
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 47.1,
+          "pr": 4.4
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Maokai",
+    "Rell",
+    "Pyke"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Spectral Sickle"
+        ],
+        "core": [
+          "Black Mist Scythe",
+          "Harmonic Echo",
+          "Ardent Censer"
+        ],
+        "boots": [
+          "Ionian Boots of Lucidity",
+          "Veil"
+        ],
+        "finalBuild": [
+          "Black Mist Scythe",
+          "Harmonic Echo",
+          "Ardent Censer",
+          "Redemption",
+          "Crown of the Shattered Queen",
+          "Ionian Boots of Lucidity - Veil"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Aery",
+    "Font of Life",
+    "Bone Plating",
+    "Revitalize",
+    "Transcendence"
+  ],
+  "spells": [
+    {
+      "combo": "heal + ignite",
+      "wr": 59.9,
+      "pr": 1.1
+    },
+    {
+      "combo": "heal + flash",
+      "wr": 53.4,
+      "pr": 80.9
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 52.3,
+      "pr": 9.1
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 49.6,
+      "pr": 6.2
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 46.6,
+      "pr": 1.1
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Time Bomb",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Twisted Timeflow",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Temporal Mirage",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Chronoshift",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,371 @@
+{
+  "slug": "lillia",
+  "name": "Lillia",
+  "role": "Лес",
+  "tier": "A",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 60.9,
+          "pr": 1.1
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 59.1,
+          "pr": 1.4
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 56.6,
+          "pr": 1.7
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 55.8,
+          "pr": 3.8
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 55.8,
+          "pr": 3.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 41.4,
+          "pr": 1.1
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 46.4,
+          "pr": 1.9
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 46.7,
+          "pr": 1.7
+        },
+        {
+          "name": "ВИЕГО",
+          "slug": "viego",
+          "wr": 47.2,
+          "pr": 5.5
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 48.6,
+          "pr": 2.2
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 64,
+          "pr": 1.2
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 61.2,
+          "pr": 1.4
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 56.3,
+          "pr": 3.2
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 55.1,
+          "pr": 1.3
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 54.3,
+          "pr": 1.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 38,
+          "pr": 1.1
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 44.3,
+          "pr": 2.2
+        },
+        {
+          "name": "ВИЕГО",
+          "slug": "viego",
+          "wr": 46.5,
+          "pr": 5.8
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 47.7,
+          "pr": 1.5
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 48.1,
+          "pr": 2.7
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 63.2,
+          "pr": 2.8
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 60.6,
+          "pr": 1.4
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 59.4,
+          "pr": 1.3
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 58.4,
+          "pr": 1.6
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 57.4,
+          "pr": 2.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 36.9,
+          "pr": 1.7
+        },
+        {
+          "name": "ПАНТЕОН",
+          "slug": "pantheon",
+          "wr": 40.6,
+          "pr": 3.2
+        },
+        {
+          "name": "РЕНГАР",
+          "slug": "rengar",
+          "wr": 43.9,
+          "pr": 1.2
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 44.9,
+          "pr": 3.3
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 45.5,
+          "pr": 2.1
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 69.7,
+          "pr": 2.8
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 69.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 68.1,
+          "pr": 3.9
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 66.7,
+          "pr": 2.8
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 63.2,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 23.8,
+          "pr": 1.8
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 25,
+          "pr": 1.3
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 32.1,
+          "pr": 2.3
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 33.3,
+          "pr": 2
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 33.3,
+          "pr": 1
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Evelynn",
+    "Vi",
+    "Master Yi"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Rod of Ages",
+          "Psychic Projector",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Rod of Ages",
+          "Psychic Projector",
+          "Rabadon's Deathcap",
+          "Riftmaker",
+          "Liandry's Torment",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Phase Rush",
+    "Unshakeable",
+    "Bone Plating",
+    "Overgrowth",
+    "Transcendence"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 52.1,
+      "pr": 99
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Blooming Blows",
+      "levels": [
+        1,
+        3,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Watch Out! Eep!",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Swirlseed",
+      "levels": [
+        4,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Lilting Lullaby",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,534 @@
+{
+  "slug": "tristana",
+  "name": "Tristana",
+  "role": "Дракон",
+  "tier": "B",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 50.7,
+          "pr": 2.2
+        },
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 50.5,
+          "pr": 4.1
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 50.2,
+          "pr": 3.2
+        },
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 50.1,
+          "pr": 4.4
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 50,
+          "pr": 5
+        }
+      ],
+      "worst": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 43.6,
+          "pr": 9.7
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 44.9,
+          "pr": 1.5
+        },
+        {
+          "name": "ДЖИН",
+          "slug": "jhin",
+          "wr": 46,
+          "pr": 8.3
+        },
+        {
+          "name": "ШАЯ",
+          "slug": "xayah",
+          "wr": 46.5,
+          "pr": 2
+        },
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 46.6,
+          "pr": 1.4
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 51.4,
+          "pr": 3.4
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 50.6,
+          "pr": 6
+        },
+        {
+          "name": "ЭЗРЕАЛЬ",
+          "slug": "ezreal",
+          "wr": 50.6,
+          "pr": 4.1
+        },
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 49.4,
+          "pr": 2.3
+        },
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 49.3,
+          "pr": 4.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 39.4,
+          "pr": 1.5
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 41.2,
+          "pr": 1.8
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 42.9,
+          "pr": 3.2
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 43.1,
+          "pr": 12
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 44.6,
+          "pr": 2.5
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 68.6,
+          "pr": 3.5
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 66.7,
+          "pr": 1
+        },
+        {
+          "name": "РЕНЕКТОН",
+          "slug": "renekton",
+          "wr": 62.5,
+          "pr": 1.7
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 62.5,
+          "pr": 1.7
+        },
+        {
+          "name": "СИОН",
+          "slug": "sion",
+          "wr": 60.7,
+          "pr": 1.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 27.3,
+          "pr": 1.5
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 31.8,
+          "pr": 1.5
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 32.6,
+          "pr": 3.2
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 34.8,
+          "pr": 1.6
+        },
+        {
+          "name": "МОРДЕКАЙЗЕР",
+          "slug": "mordekaiser",
+          "wr": 40,
+          "pr": 2.1
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 71.4,
+          "pr": 1.3
+        },
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 70.6,
+          "pr": 1.1
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 62.1,
+          "pr": 1.9
+        },
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 59.1,
+          "pr": 1.4
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 55.6,
+          "pr": 2.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "НАСУС",
+          "slug": "nasus",
+          "wr": 33.3,
+          "pr": 1.2
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 36.8,
+          "pr": 2.4
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 37.9,
+          "pr": 3.7
+        },
+        {
+          "name": "ОРИАННА",
+          "slug": "orianna",
+          "wr": 37.9,
+          "pr": 1.9
+        },
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 40,
+          "pr": 1.9
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 54.8,
+          "pr": 3.5
+        },
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 52.3,
+          "pr": 3.2
+        },
+        {
+          "name": "ШАЯ",
+          "slug": "xayah",
+          "wr": 51.8,
+          "pr": 2.1
+        },
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 51.7,
+          "pr": 2.7
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 51.6,
+          "pr": 6
+        }
+      ],
+      "worst": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 43.9,
+          "pr": 8.4
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 45.3,
+          "pr": 2.3
+        },
+        {
+          "name": "СИВИР",
+          "slug": "sivir",
+          "wr": 47.1,
+          "pr": 2
+        },
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 47.2,
+          "pr": 1.6
+        },
+        {
+          "name": "КЕЙТЛИН",
+          "slug": "caitlyn",
+          "wr": 47.3,
+          "pr": 16.1
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ДЖИНКС",
+          "slug": "jinx",
+          "wr": 59.7,
+          "pr": 6.3
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 59,
+          "pr": 1.6
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 54.5,
+          "pr": 2.3
+        },
+        {
+          "name": "Мисс Фортуна",
+          "slug": "miss-fortune",
+          "wr": 54.4,
+          "pr": 7.2
+        },
+        {
+          "name": "ДЖИН",
+          "slug": "jhin",
+          "wr": 53.8,
+          "pr": 7.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВАРУС",
+          "slug": "varus",
+          "wr": 40.2,
+          "pr": 4.5
+        },
+        {
+          "name": "ШАЯ",
+          "slug": "xayah",
+          "wr": 43.1,
+          "pr": 2.5
+        },
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 46.3,
+          "pr": 3.5
+        },
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 46.6,
+          "pr": 3.1
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 46.9,
+          "pr": 8.8
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Kog'Maw",
+    "Caitlyn",
+    "Draven"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Bloodthirster",
+          "Navori Quickblades",
+          "Lord Dominik's Regard"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Bloodthirster",
+          "Navori Quickblades",
+          "Lord Dominik's Regard",
+          "Magnetic Blaster",
+          "Infinity Edge",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Lethal Tempo",
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "flash + ignite",
+      "wr": 49.9,
+      "pr": 6
+    },
+    {
+      "combo": "heal + flash",
+      "wr": 49.3,
+      "pr": 24
+    },
+    {
+      "combo": "barrier + flash",
+      "wr": 48.5,
+      "pr": 25.8
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 47.9,
+      "pr": 10.3
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 46.3,
+      "pr": 26.3
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 45.7,
+      "pr": 6.8
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Rapid Fire",
+      "levels": [
+        3,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Rocket Jump",
+      "levels": [
+        2,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Explosive Charge",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Buster Shot",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

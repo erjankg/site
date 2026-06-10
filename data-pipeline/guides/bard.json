@@ -1,0 +1,381 @@
+{
+  "slug": "bard",
+  "name": "Bard",
+  "role": "Саппорт",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 57.1,
+          "pr": 1.6
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 52.5,
+          "pr": 5.4
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 52.2,
+          "pr": 4.7
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 51.5,
+          "pr": 3.2
+        },
+        {
+          "name": "ЖАННА",
+          "slug": "janna",
+          "wr": 51.2,
+          "pr": 1.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 32.9,
+          "pr": 1.1
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 40.7,
+          "pr": 2
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 41.9,
+          "pr": 1.5
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 42,
+          "pr": 6.7
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 42.9,
+          "pr": 2.2
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 59.5,
+          "pr": 1.5
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 58.8,
+          "pr": 1.2
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 57.5,
+          "pr": 6.4
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 56,
+          "pr": 3.6
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 54.7,
+          "pr": 3.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 38.1,
+          "pr": 1.5
+        },
+        {
+          "name": "ЗИЛЕАН",
+          "slug": "zilean",
+          "wr": 40,
+          "pr": 1.4
+        },
+        {
+          "name": "СОНА",
+          "slug": "sona",
+          "wr": 40,
+          "pr": 1.1
+        },
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 41.7,
+          "pr": 7.3
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 42.3,
+          "pr": 5.6
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "support",
+      "date": "2026-03-20",
+      "best": [
+        {
+          "name": "СОНА",
+          "slug": "sona",
+          "wr": 66.7,
+          "pr": 1.4
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 60,
+          "pr": 5.5
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 55.7,
+          "pr": 6.2
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 54.8,
+          "pr": 2.4
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 53.3,
+          "pr": 2.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 35,
+          "pr": 1.6
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 35.7,
+          "pr": 1.1
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 37,
+          "pr": 2.1
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 41.7,
+          "pr": 1.9
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 42.3,
+          "pr": 2
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 61.5,
+          "pr": 3.8
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 54.5,
+          "pr": 6.4
+        },
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 54.5,
+          "pr": 3.2
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 50,
+          "pr": 3.5
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 47.8,
+          "pr": 6.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 18.2,
+          "pr": 3.2
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 27.3,
+          "pr": 3.2
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 32.1,
+          "pr": 8.1
+        },
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 33.3,
+          "pr": 5.2
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 36.4,
+          "pr": 3.2
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Nami",
+    "Senna",
+    "Zilean"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Spectral Sickle"
+        ],
+        "core": [
+          "Black Mist Scythe",
+          "Lich Bane",
+          "Infinity Orb"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Black Mist Scythe",
+          "Lich Bane",
+          "Infinity Orb",
+          "Oceanid's Trident",
+          "Rabadon's Deathcap",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Electrocute",
+    "Cheap Shot",
+    "Chain Assault",
+    "Zombie Ward",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "exhaust + flash",
+      "wr": 48.6,
+      "pr": 5.3
+    },
+    {
+      "combo": "heal + flash",
+      "wr": 47.4,
+      "pr": 41.9
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 47,
+      "pr": 50.7
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Cosmic Binding",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Caretaker's Shrine",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Magical Journey",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Tempered Fate",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

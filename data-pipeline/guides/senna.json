@@ -1,0 +1,386 @@
+{
+  "slug": "senna",
+  "name": "Senna",
+  "role": "Саппорт",
+  "tier": "B",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 56.2,
+          "pr": 5.8
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 56,
+          "pr": 1.8
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 54,
+          "pr": 2.5
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 53.9,
+          "pr": 1.4
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 52.8,
+          "pr": 2.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 44.1,
+          "pr": 1.6
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 45,
+          "pr": 2.3
+        },
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 47,
+          "pr": 4.1
+        },
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 47.3,
+          "pr": 4.5
+        },
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 47.5,
+          "pr": 3.1
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 57.3,
+          "pr": 2.5
+        },
+        {
+          "name": "СОНА",
+          "slug": "sona",
+          "wr": 57,
+          "pr": 1.1
+        },
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 55.7,
+          "pr": 7.6
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 54.2,
+          "pr": 1.5
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 53.6,
+          "pr": 3.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 42.9,
+          "pr": 1.5
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 44.5,
+          "pr": 1.1
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 44.5,
+          "pr": 2.8
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 45.2,
+          "pr": 2
+        },
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 46.5,
+          "pr": 3.9
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 62.4,
+          "pr": 5.3
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 58.6,
+          "pr": 2.9
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 58.5,
+          "pr": 1.5
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 56.2,
+          "pr": 1.4
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 55,
+          "pr": 4
+        }
+      ],
+      "worst": [
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 42.4,
+          "pr": 1.1
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 43.4,
+          "pr": 1.1
+        },
+        {
+          "name": "ЗИЛЕАН",
+          "slug": "zilean",
+          "wr": 44.6,
+          "pr": 1.1
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 45.2,
+          "pr": 1.4
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 45.7,
+          "pr": 2
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "НАМИ",
+          "slug": "nami",
+          "wr": 64.6,
+          "pr": 3.8
+        },
+        {
+          "name": "СОНА",
+          "slug": "sona",
+          "wr": 62.8,
+          "pr": 1.7
+        },
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 61.8,
+          "pr": 2.2
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 61.7,
+          "pr": 2.4
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 60.8,
+          "pr": 2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 40,
+          "pr": 2.4
+        },
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 43,
+          "pr": 3.1
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 44,
+          "pr": 2
+        },
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 45.3,
+          "pr": 3
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 47.3,
+          "pr": 2.9
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Blitzcrank",
+    "Pyke",
+    "Nautilus"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Spectral Sickle"
+        ],
+        "core": [
+          "Black Mist Scythe",
+          "Serpent's Fang",
+          "Mortal Reminder"
+        ],
+        "boots": [
+          "Boots of Dynamism",
+          "Galeforce"
+        ],
+        "finalBuild": [
+          "Black Mist Scythe",
+          "Serpent's Fang",
+          "Mortal Reminder",
+          "Magnetic Blaster",
+          "Guardian Angel",
+          "Boots of Dynamism - Galeforce"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Fleet Footwork",
+    "Empowered Attack",
+    "Chain Assault",
+    "Zombie Ward",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "heal + flash",
+      "wr": 51.2,
+      "pr": 70.9
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 50.3,
+      "pr": 9.1
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 47.5,
+      "pr": 16.3
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 46.8,
+      "pr": 1.7
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Piercing Darkness",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Last Embrace",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Curse of the Black Mist",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Dawning Shadow",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

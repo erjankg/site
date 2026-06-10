@@ -1,0 +1,376 @@
+{
+  "slug": "shen",
+  "name": "Shen",
+  "role": "Барон",
+  "tier": "C",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 62.5,
+          "pr": 1
+        },
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 60.7,
+          "pr": 1.6
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 58.9,
+          "pr": 1.1
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 58.3,
+          "pr": 2.5
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 54.4,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 32.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 44.8,
+          "pr": 1.1
+        },
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 45.9,
+          "pr": 1.3
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 46.5,
+          "pr": 3.3
+        },
+        {
+          "name": "СИОН",
+          "slug": "sion",
+          "wr": 46.9,
+          "pr": 2.4
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 66.7,
+          "pr": 1.2
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 63.6,
+          "pr": 1
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 60.2,
+          "pr": 2
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 56,
+          "pr": 2.1
+        },
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 55.6,
+          "pr": 1.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 41,
+          "pr": 3.6
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 41.4,
+          "pr": 1.3
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 43.2,
+          "pr": 1
+        },
+        {
+          "name": "КАМИЛЛА",
+          "slug": "camille",
+          "wr": 43.8,
+          "pr": 1.8
+        },
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 46.7,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "УРГОТ",
+          "slug": "urgot",
+          "wr": 71.4,
+          "pr": 1.7
+        },
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 71,
+          "pr": 1.5
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 67.2,
+          "pr": 2.9
+        },
+        {
+          "name": "НАСУС",
+          "slug": "nasus",
+          "wr": 59.6,
+          "pr": 4.5
+        },
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 58.8,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "ИРЕЛИЯ",
+          "slug": "irelia",
+          "wr": 29.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 32.5,
+          "pr": 1.9
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 37.1,
+          "pr": 1.7
+        },
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 39.4,
+          "pr": 1.6
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 41.7,
+          "pr": 1.1
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ФИОРА",
+          "slug": "fiora",
+          "wr": 70,
+          "pr": 2.6
+        },
+        {
+          "name": "СИОН",
+          "slug": "sion",
+          "wr": 68.8,
+          "pr": 4.2
+        },
+        {
+          "name": "МОРДЕКАЙЗЕР",
+          "slug": "mordekaiser",
+          "wr": 62.5,
+          "pr": 4.2
+        },
+        {
+          "name": "РЕНЕКТОН",
+          "slug": "renekton",
+          "wr": 57.1,
+          "pr": 3.7
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 56.8,
+          "pr": 9.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "НАСУС",
+          "slug": "nasus",
+          "wr": 31.8,
+          "pr": 5.7
+        },
+        {
+          "name": "СЕТТ",
+          "slug": "sett",
+          "wr": 34.5,
+          "pr": 7.6
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 38.5,
+          "pr": 3.4
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 41.7,
+          "pr": 3.1
+        },
+        {
+          "name": "ГАРЕН",
+          "slug": "garen",
+          "wr": 50,
+          "pr": 12.5
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Fiora",
+    "Renekton",
+    "Gnar"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Ruby Crystal"
+        ],
+        "core": [
+          "Heartsteel",
+          "Sunfire Aegis",
+          "Thornmail"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Gargoyle"
+        ],
+        "finalBuild": [
+          "Heartsteel",
+          "Sunfire Aegis",
+          "Thornmail",
+          "Dawnshroud",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps - Gargoyle"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Grasp of the Undying",
+    "Courage of the Colossus",
+    "Second Wind",
+    "Overgrowth",
+    "Sudden Impact"
+  ],
+  "spells": [
+    {
+      "combo": "flash + teleport",
+      "wr": 51.8,
+      "pr": 69.8
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 49.9,
+      "pr": 28.5
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Twilight Assault",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Spirit's Refuge",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Shadow Dash",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Stand United",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

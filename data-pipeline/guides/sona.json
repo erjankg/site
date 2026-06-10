@@ -1,0 +1,381 @@
+{
+  "slug": "sona",
+  "name": "Sona",
+  "role": "Саппорт",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 55.7,
+          "pr": 1.5
+        },
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 53.9,
+          "pr": 7.9
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 53.6,
+          "pr": 1.2
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 53.3,
+          "pr": 3.5
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 53,
+          "pr": 3.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 40.6,
+          "pr": 3.6
+        },
+        {
+          "name": "МАОКАЙ",
+          "slug": "maokai",
+          "wr": 41.3,
+          "pr": 2.3
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 44.6,
+          "pr": 2.4
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 45.1,
+          "pr": 1.4
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 46.2,
+          "pr": 6.1
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "support",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 56.4,
+          "pr": 5.3
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 56.3,
+          "pr": 1.7
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 56.3,
+          "pr": 1.1
+        },
+        {
+          "name": "СЕРАФИНА",
+          "slug": "seraphine",
+          "wr": 55.8,
+          "pr": 2.5
+        },
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 55.5,
+          "pr": 11.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 36.9,
+          "pr": 1.1
+        },
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 41,
+          "pr": 2.8
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 43,
+          "pr": 3.2
+        },
+        {
+          "name": "ТРЕШ",
+          "slug": "thresh",
+          "wr": 43.8,
+          "pr": 4.6
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 44.7,
+          "pr": 2.8
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ПАЙК",
+          "slug": "pyke",
+          "wr": 58,
+          "pr": 1.7
+        },
+        {
+          "name": "АЛИСТАР",
+          "slug": "alistar",
+          "wr": 57.6,
+          "pr": 2.2
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 56.5,
+          "pr": 5.6
+        },
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 55.3,
+          "pr": 1.6
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 54.8,
+          "pr": 2.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 42.4,
+          "pr": 2.2
+        },
+        {
+          "name": "ОРН",
+          "slug": "ornn",
+          "wr": 44.1,
+          "pr": 1.1
+        },
+        {
+          "name": "БЛИЦКРАНК",
+          "slug": "blitzcrank",
+          "wr": 45,
+          "pr": 2.6
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 45.8,
+          "pr": 2.4
+        },
+        {
+          "name": "КАРМА",
+          "slug": "karma",
+          "wr": 46.9,
+          "pr": 4.7
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "support",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЮМИ",
+          "slug": "yuumi",
+          "wr": 69,
+          "pr": 3
+        },
+        {
+          "name": "МИЛИО",
+          "slug": "milio",
+          "wr": 66.7,
+          "pr": 2.1
+        },
+        {
+          "name": "БРАУМ",
+          "slug": "braum",
+          "wr": 64.7,
+          "pr": 3.5
+        },
+        {
+          "name": "ЛУЛУ",
+          "slug": "lulu",
+          "wr": 60,
+          "pr": 5.1
+        },
+        {
+          "name": "ЛЕОНА",
+          "slug": "leona",
+          "wr": 58.3,
+          "pr": 2.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "РЕЛЛ",
+          "slug": "rell",
+          "wr": 10,
+          "pr": 1
+        },
+        {
+          "name": "СЕННА",
+          "slug": "senna",
+          "wr": 37.2,
+          "pr": 4.4
+        },
+        {
+          "name": "ЗИЛЕАН",
+          "slug": "zilean",
+          "wr": 37.5,
+          "pr": 1.6
+        },
+        {
+          "name": "СОРАКА",
+          "slug": "soraka",
+          "wr": 39.4,
+          "pr": 3.4
+        },
+        {
+          "name": "РЭЙКАН",
+          "slug": "rakan",
+          "wr": 41.4,
+          "pr": 3
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Blitzcrank",
+    "Pyke",
+    "Bard"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Relic Shield"
+        ],
+        "core": [
+          "Bulwark of the Mountain",
+          "Archangel's Staff",
+          "Harmonic Echo"
+        ],
+        "boots": [
+          "Ionian Boots of Lucidity",
+          "Veil"
+        ],
+        "finalBuild": [
+          "Bulwark of the Mountain",
+          "Seraph's Embrace",
+          "Harmonic Echo",
+          "Ardent Censer",
+          "Staff of Flowing Water",
+          "Ionian Boots of Lucidity - Veil"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Aery",
+    "Font of Life",
+    "Bone Plating",
+    "Revitalize",
+    "Manaflow Band"
+  ],
+  "spells": [
+    {
+      "combo": "heal + flash",
+      "wr": 50.9,
+      "pr": 79.7
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 50,
+      "pr": 11.8
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 46.3,
+      "pr": 6.2
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Hymn of Valor",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Aria of Perseverance",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Song of Celerity",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Crescendo",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

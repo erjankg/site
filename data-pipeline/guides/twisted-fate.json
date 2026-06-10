@@ -1,0 +1,396 @@
+{
+  "slug": "twisted-fate",
+  "name": "Twisted Fate",
+  "role": "Мид",
+  "tier": "C",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 59.3,
+          "pr": 1.4
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 57.6,
+          "pr": 2.6
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 56.2,
+          "pr": 1.6
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 56.1,
+          "pr": 2.7
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 55.5,
+          "pr": 1.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 48.2,
+          "pr": 1.2
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 48.5,
+          "pr": 1.1
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 49.5,
+          "pr": 5.3
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 50,
+          "pr": 2.7
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 50.2,
+          "pr": 3.1
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ОРИАННА",
+          "slug": "orianna",
+          "wr": 56.5,
+          "pr": 2.5
+        },
+        {
+          "name": "ЗИГГС",
+          "slug": "ziggs",
+          "wr": 56.3,
+          "pr": 2.8
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 56.3,
+          "pr": 1.3
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 56,
+          "pr": 3.3
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 55.9,
+          "pr": 2.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 48.3,
+          "pr": 1.5
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 49,
+          "pr": 1.9
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 49.3,
+          "pr": 4.1
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 49.9,
+          "pr": 4.6
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 50.4,
+          "pr": 4.7
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 59.3,
+          "pr": 1.9
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 58,
+          "pr": 1.1
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 57.4,
+          "pr": 1.6
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 57.3,
+          "pr": 2.2
+        },
+        {
+          "name": "КАТАРИНА",
+          "slug": "katarina",
+          "wr": 56.3,
+          "pr": 1.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 44.7,
+          "pr": 3.5
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 46.5,
+          "pr": 2.2
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 46.7,
+          "pr": 2.5
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 47.8,
+          "pr": 4.1
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 47.9,
+          "pr": 3.8
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 67.6,
+          "pr": 1.4
+        },
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 67.2,
+          "pr": 2.7
+        },
+        {
+          "name": "НАСУС",
+          "slug": "nasus",
+          "wr": 65.4,
+          "pr": 1
+        },
+        {
+          "name": "ЛЮКС",
+          "slug": "lux",
+          "wr": 63.3,
+          "pr": 2.4
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 62.1,
+          "pr": 3.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЭННИ",
+          "slug": "annie",
+          "wr": 30,
+          "pr": 1.2
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 42.1,
+          "pr": 1.5
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 43.8,
+          "pr": 2.9
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 44.8,
+          "pr": 2.3
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 45,
+          "pr": 2.4
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Syndra",
+    "Morgana",
+    "Mel"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Rod of Ages",
+          "Lich Bane",
+          "Nashor's Tooth"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Rod of Ages",
+          "Lich Bane",
+          "Nashor's Tooth",
+          "Rabadon's Deathcap",
+          "Awakened Soulstealer",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Fleet Footwork",
+    "Botanist",
+    "Transcendence",
+    "Nimbus Cloak",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "ghost + flash",
+      "wr": 54.1,
+      "pr": 55.4
+    },
+    {
+      "combo": "barrier + flash",
+      "wr": 53.2,
+      "pr": 1.9
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 51.3,
+      "pr": 36.1
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 51.2,
+      "pr": 1.5
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 50.7,
+      "pr": 2.6
+    },
+    {
+      "combo": "flash + teleport",
+      "wr": 48.4,
+      "pr": 2.1
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Wild Cards",
+      "levels": [
+        3,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Pick A Card",
+      "levels": [
+        1,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Stacked Deck",
+      "levels": [
+        2,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Destiny",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

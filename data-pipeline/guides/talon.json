@@ -1,0 +1,398 @@
+{
+  "slug": "talon",
+  "name": "Talon",
+  "role": "Мид",
+  "tier": "C",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 52.6,
+          "pr": 2.1
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 50.7,
+          "pr": 1.1
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 50.3,
+          "pr": 1.2
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 50.2,
+          "pr": 2.1
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 49.9,
+          "pr": 3.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "РЕНГАР",
+          "slug": "rengar",
+          "wr": 40.5,
+          "pr": 1.2
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 40.7,
+          "pr": 1.9
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 41.9,
+          "pr": 1.9
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 42.9,
+          "pr": 2.9
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 43,
+          "pr": 1.9
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 59,
+          "pr": 2
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 52.7,
+          "pr": 1.2
+        },
+        {
+          "name": "НИЛА",
+          "slug": "nilah",
+          "wr": 52.3,
+          "pr": 1
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 52.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 50.7,
+          "pr": 2.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 40.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 40.8,
+          "pr": 2.2
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 40.9,
+          "pr": 2.2
+        },
+        {
+          "name": "РЕНГАР",
+          "slug": "rengar",
+          "wr": 42.2,
+          "pr": 1.4
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 42.9,
+          "pr": 3.2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 55.9,
+          "pr": 1.6
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 53.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 52.1,
+          "pr": 1.1
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 52.1,
+          "pr": 4
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 51,
+          "pr": 3.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 32.3,
+          "pr": 2.3
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 34.9,
+          "pr": 2.5
+        },
+        {
+          "name": "Син Чжао",
+          "slug": "xin-zhao",
+          "wr": 40.3,
+          "pr": 4.2
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 41.2,
+          "pr": 1.6
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 41.6,
+          "pr": 1.8
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 75,
+          "pr": 1.1
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 68.4,
+          "pr": 1.7
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 64.7,
+          "pr": 1.6
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 60,
+          "pr": 1.8
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 59.1,
+          "pr": 2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 25.8,
+          "pr": 2.9
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 28.6,
+          "pr": 1.9
+        },
+        {
+          "name": "РЕНГАР",
+          "slug": "rengar",
+          "wr": 28.6,
+          "pr": 1.3
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 31.3,
+          "pr": 2.9
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 35.3,
+          "pr": 1.6
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Irelia",
+    "Renekton",
+    "Malphite"
+  ],
+  "builds": [
+    {
+      "title": "Mid Build",
+      "tier": "C",
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Youmuu's Ghostblade",
+          "Serpent's Fang",
+          "Serylda's Grudge"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Youmuu's Ghostblade",
+          "Serpent's Fang",
+          "Serylda's Grudge",
+          "Trinity Force",
+          "Guardian Angel",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "A",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Youmuu's Ghostblade",
+          "Serpent's Fang",
+          "Serylda's Grudge"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Youmuu's Ghostblade",
+          "Serpent's Fang",
+          "Serylda's Grudge",
+          "Trinity Force",
+          "Guardian Angel",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Electrocute",
+    "Sudden Impact",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 46.5,
+      "pr": 99.6
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Noxian Diplomacy",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Rake",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Assassin's Path",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Shadow Assault",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "slug": "taliyah",
+  "name": "Taliyah",
+  "role": "Мид",
+  "tier": "S",
+  "patch": "7.1f",
+  "dataDate": null,
+  "matchups": [],
+  "counters": [
+    "Syndra",
+    "Zed",
+    "Orianna"
+  ],
+  "builds": [
+    {
+      "title": "Mid Build",
+      "tier": "S+",
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Infinity Orb",
+          "Awakened Soulstealer",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Infinity Orb",
+          "Awakened Soulstealer",
+          "Rabadon's Deathcap",
+          "Oceanid's Trident",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "S+",
+      "default": false,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Infinity Orb",
+          "Awakened Soulstealer",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Infinity Orb",
+          "Awakened Soulstealer",
+          "Rabadon's Deathcap",
+          "Oceanid's Trident",
+          "Crown of the Shattered Queen",
+          "Boots of Mana - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Electrocute",
+    "Botanist",
+    "Absolute Focus",
+    "Scorch",
+    "Bone Plating"
+  ],
+  "spells": [],
+  "skillOrder": [
+    {
+      "ability": "Threaded Volley",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Seismic Shove",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Unraveled Earth",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Weaver's Wall",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

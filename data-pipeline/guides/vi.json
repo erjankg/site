@@ -1,0 +1,371 @@
+{
+  "slug": "vi",
+  "name": "Vi",
+  "role": "Лес",
+  "tier": "A",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 56.2,
+          "pr": 1.7
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 54.9,
+          "pr": 1.1
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 54.8,
+          "pr": 1.9
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 54.3,
+          "pr": 2.1
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 54.2,
+          "pr": 4.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 42.5,
+          "pr": 1.6
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 44.5,
+          "pr": 1.8
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 45.4,
+          "pr": 2.1
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 47.5,
+          "pr": 1.6
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 48.4,
+          "pr": 2.3
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 56.5,
+          "pr": 2.1
+        },
+        {
+          "name": "ГРАГАС",
+          "slug": "gragas",
+          "wr": 55.2,
+          "pr": 1
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 55.2,
+          "pr": 1.8
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 54.9,
+          "pr": 3.1
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 54.7,
+          "pr": 6.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 42.9,
+          "pr": 2.2
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 44.8,
+          "pr": 2.5
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 46,
+          "pr": 2.6
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 46.1,
+          "pr": 1.4
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 47,
+          "pr": 1.2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 57.2,
+          "pr": 1.8
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 56.7,
+          "pr": 1.4
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 56.6,
+          "pr": 5
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 56.4,
+          "pr": 1.1
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 56.1,
+          "pr": 2.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 40.1,
+          "pr": 1.8
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 41.8,
+          "pr": 2.6
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 42.6,
+          "pr": 1.4
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 42.9,
+          "pr": 1.2
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 46.8,
+          "pr": 5.8
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 64.4,
+          "pr": 4.9
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 63,
+          "pr": 1.3
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 62.1,
+          "pr": 1.4
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 60.9,
+          "pr": 2.2
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 58.3,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 27.9,
+          "pr": 2.1
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 35.7,
+          "pr": 2.7
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 41,
+          "pr": 1.9
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 45.8,
+          "pr": 2.3
+        },
+        {
+          "name": "Син Чжао",
+          "slug": "xin-zhao",
+          "wr": 47,
+          "pr": 5.6
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Kindred",
+    "Amumu",
+    "Warwick"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Sundered Sky",
+          "Death's Dance"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Stasis"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Sundered Sky",
+          "Death's Dance",
+          "Mortal Reminder",
+          "Guardian Angel",
+          "Gluttonous Greaves - Stasis"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Conqueror",
+    "Unshakeable",
+    "Bone Plating",
+    "Overgrowth",
+    "Sudden Impact"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 51.9,
+      "pr": 99.3
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Vault Breaker",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Blast Shield",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Excessive Force",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Assault and Battery",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

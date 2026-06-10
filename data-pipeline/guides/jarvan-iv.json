@@ -1,0 +1,371 @@
+{
+  "slug": "jarvan-iv",
+  "name": "Jarvan IV",
+  "role": "Лес",
+  "tier": "A",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 55.3,
+          "pr": 1.7
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 55.2,
+          "pr": 1.1
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 54.9,
+          "pr": 8.3
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 54.7,
+          "pr": 1.1
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 54.6,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 45.5,
+          "pr": 1
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 47,
+          "pr": 1.9
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 47.4,
+          "pr": 1.7
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 47.9,
+          "pr": 2.2
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 48.3,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 61.7,
+          "pr": 1.2
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 56.7,
+          "pr": 2
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 56.6,
+          "pr": 1.9
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 56.2,
+          "pr": 8.8
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 55.7,
+          "pr": 1.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 42,
+          "pr": 1.2
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 44.2,
+          "pr": 1.8
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 46.6,
+          "pr": 1.9
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 46.8,
+          "pr": 2.2
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 47.3,
+          "pr": 3
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 59.4,
+          "pr": 2.2
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 59,
+          "pr": 1.1
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 58.5,
+          "pr": 1.8
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 57.4,
+          "pr": 2.2
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 55.9,
+          "pr": 1.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 42.9,
+          "pr": 1.5
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 44.1,
+          "pr": 2.4
+        },
+        {
+          "name": "ШИВАНА",
+          "slug": "shyvana",
+          "wr": 45.1,
+          "pr": 6
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 45.2,
+          "pr": 2.8
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 45.3,
+          "pr": 2.3
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 73.7,
+          "pr": 1
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 70.6,
+          "pr": 2.8
+        },
+        {
+          "name": "ЭККО",
+          "slug": "ekko",
+          "wr": 66.7,
+          "pr": 1.5
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 65.5,
+          "pr": 1.6
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 64.3,
+          "pr": 1.5
+        }
+      ],
+      "worst": [
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 27.9,
+          "pr": 2.3
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 31,
+          "pr": 2.3
+        },
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 33.3,
+          "pr": 2.9
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 33.3,
+          "pr": 1.8
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 39.5,
+          "pr": 2.3
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Rammus",
+    "Master Yi",
+    "Amumu"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Radiant Virtue",
+          "Force of Nature"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Goredrinker"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Radiant Virtue",
+          "Force of Nature",
+          "Frozen Heart",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps - Goredrinker"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Conqueror",
+    "Unshakeable",
+    "Bone Plating",
+    "Overgrowth",
+    "Triumph"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 51.6,
+      "pr": 99.5
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Dragon Strike",
+      "levels": [
+        2,
+        3,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Golden Aegis",
+      "levels": [
+        4,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Demacian Standard",
+      "levels": [
+        1,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Cataclysm",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,381 @@
+{
+  "slug": "urgot",
+  "name": "Urgot",
+  "role": "Барон",
+  "tier": "B",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 52.5,
+          "pr": 1.4
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 51.3,
+          "pr": 1.1
+        },
+        {
+          "name": "НАСУС",
+          "slug": "nasus",
+          "wr": 51.3,
+          "pr": 4.6
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 50.2,
+          "pr": 8.9
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 49.9,
+          "pr": 2.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 41.6,
+          "pr": 1.6
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 42,
+          "pr": 1.1
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 43.2,
+          "pr": 1.6
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 43.7,
+          "pr": 2.8
+        },
+        {
+          "name": "КЕЙЛ",
+          "slug": "kayle",
+          "wr": 44,
+          "pr": 1.5
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "top",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 57,
+          "pr": 1.3
+        },
+        {
+          "name": "РИВЕН",
+          "slug": "riven",
+          "wr": 52.6,
+          "pr": 1.2
+        },
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 52,
+          "pr": 1.2
+        },
+        {
+          "name": "АТРОКС",
+          "slug": "aatrox",
+          "wr": 51.9,
+          "pr": 2.9
+        },
+        {
+          "name": "КЕЙЛ",
+          "slug": "kayle",
+          "wr": 51,
+          "pr": 1.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 37.3,
+          "pr": 1.5
+        },
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 39.3,
+          "pr": 1.4
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 40.8,
+          "pr": 1.2
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 42.3,
+          "pr": 1.4
+        },
+        {
+          "name": "Доктор Мундо",
+          "slug": "dr-mundo",
+          "wr": 42.6,
+          "pr": 2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 58.7,
+          "pr": 2.5
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 56.9,
+          "pr": 1
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 55.6,
+          "pr": 1.3
+        },
+        {
+          "name": "ФИОРА",
+          "slug": "fiora",
+          "wr": 55.4,
+          "pr": 1.6
+        },
+        {
+          "name": "КЕЙЛ",
+          "slug": "kayle",
+          "wr": 54.3,
+          "pr": 1.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 37.8,
+          "pr": 1.3
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 39.4,
+          "pr": 1.7
+        },
+        {
+          "name": "РАМБЛ",
+          "slug": "rumble",
+          "wr": 40,
+          "pr": 1.5
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 40.2,
+          "pr": 2
+        },
+        {
+          "name": "ГАРЕН",
+          "slug": "garen",
+          "wr": 43,
+          "pr": 14.3
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "top",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ГНАР",
+          "slug": "gnar",
+          "wr": 75,
+          "pr": 1.4
+        },
+        {
+          "name": "АМБЕССА",
+          "slug": "ambessa",
+          "wr": 62.5,
+          "pr": 1.4
+        },
+        {
+          "name": "КЕЙЛ",
+          "slug": "kayle",
+          "wr": 60,
+          "pr": 2.2
+        },
+        {
+          "name": "ПОППИ",
+          "slug": "poppy",
+          "wr": 60,
+          "pr": 1.3
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 57.9,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 26.9,
+          "pr": 2.3
+        },
+        {
+          "name": "МАЛЬФИТ",
+          "slug": "malphite",
+          "wr": 30.4,
+          "pr": 2
+        },
+        {
+          "name": "СИНДЖЕД",
+          "slug": "singed",
+          "wr": 33.3,
+          "pr": 1.3
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 33.3,
+          "pr": 1.3
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 34.8,
+          "pr": 2
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Mordekaiser",
+    "Fiora",
+    "Vayne"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Ruby Crystal"
+        ],
+        "core": [
+          "Heartsteel",
+          "Titanic Hydra",
+          "Black Cleaver"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Gargoyle"
+        ],
+        "finalBuild": [
+          "Heartsteel",
+          "Titanic Hydra",
+          "Black Cleaver",
+          "Thornmail",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps - Gargoyle"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Empowerment",
+    "Demolish",
+    "Bone Plating",
+    "Overgrowth",
+    "Brutal"
+  ],
+  "spells": [
+    {
+      "combo": "flash + teleport",
+      "wr": 47.6,
+      "pr": 15.2
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 47.4,
+      "pr": 80
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 46.2,
+      "pr": 1.9
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Corrosive Charge",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Purge",
+      "levels": [
+        2,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Disdain",
+      "levels": [
+        1,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Fear Beyond Death",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

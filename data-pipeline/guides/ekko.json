@@ -1,0 +1,674 @@
+{
+  "slug": "ekko",
+  "name": "Ekko",
+  "role": "Мид",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 57.7,
+          "pr": 1.6
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 55.5,
+          "pr": 1.6
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 54.7,
+          "pr": 1.3
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 53.2,
+          "pr": 1.7
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 52.7,
+          "pr": 1.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 42,
+          "pr": 2.3
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 43,
+          "pr": 1.4
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 43.6,
+          "pr": 1.3
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 43.6,
+          "pr": 1.1
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 44.6,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 57.7,
+          "pr": 2.3
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 54.8,
+          "pr": 3.9
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 54.1,
+          "pr": 1.1
+        },
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 54,
+          "pr": 1.7
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 53.9,
+          "pr": 1.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 38.6,
+          "pr": 2.5
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 39.9,
+          "pr": 1.3
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 42.8,
+          "pr": 3.4
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 43.2,
+          "pr": 3
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 44.2,
+          "pr": 2.9
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 62,
+          "pr": 1.9
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 61.5,
+          "pr": 1.6
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 56.4,
+          "pr": 2.9
+        },
+        {
+          "name": "Мастер Йи",
+          "slug": "master-yi",
+          "wr": 55,
+          "pr": 5.7
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 53.5,
+          "pr": 1.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "РАММУС",
+          "slug": "rammus",
+          "wr": 38.9,
+          "pr": 2.7
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 39.3,
+          "pr": 1.1
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 40,
+          "pr": 1.4
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 40.6,
+          "pr": 1.7
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 41.7,
+          "pr": 1.8
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 59.3,
+          "pr": 1.3
+        },
+        {
+          "name": "ОРИАННА",
+          "slug": "orianna",
+          "wr": 55.2,
+          "pr": 2.1
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 54.6,
+          "pr": 4.4
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 54.5,
+          "pr": 1.4
+        },
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 54.1,
+          "pr": 5
+        }
+      ],
+      "worst": [
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 38,
+          "pr": 1.1
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 39.1,
+          "pr": 4.1
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 39.7,
+          "pr": 3.7
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 40.1,
+          "pr": 5
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 41.6,
+          "pr": 2.9
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 61.5,
+          "pr": 1.4
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 58.1,
+          "pr": 1.1
+        },
+        {
+          "name": "АМУМУ",
+          "slug": "amumu",
+          "wr": 57.8,
+          "pr": 1.6
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 56.5,
+          "pr": 2.4
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 56,
+          "pr": 1.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 36.7,
+          "pr": 1
+        },
+        {
+          "name": "ЭВЕЛИНН",
+          "slug": "evelynn",
+          "wr": 37.7,
+          "pr": 1.8
+        },
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 38.2,
+          "pr": 1.2
+        },
+        {
+          "name": "Син Чжао",
+          "slug": "xin-zhao",
+          "wr": 38.9,
+          "pr": 3.9
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 41.2,
+          "pr": 1.8
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗОИ",
+          "slug": "zoe",
+          "wr": 60.5,
+          "pr": 1.6
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 59.6,
+          "pr": 2.1
+        },
+        {
+          "name": "ЗАЙРА",
+          "slug": "zyra",
+          "wr": 58.6,
+          "pr": 1.2
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 57.8,
+          "pr": 1.8
+        },
+        {
+          "name": "АВРОРА",
+          "slug": "aurora",
+          "wr": 57.4,
+          "pr": 2.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВЕЛ'КОЗ",
+          "slug": "velkoz",
+          "wr": 40.4,
+          "pr": 1.9
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 40.5,
+          "pr": 1.5
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 42.3,
+          "pr": 1.1
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 42.6,
+          "pr": 2.8
+        },
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 42.9,
+          "pr": 2.6
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 75,
+          "pr": 2
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 70,
+          "pr": 1.3
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 63.2,
+          "pr": 2.4
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 61.5,
+          "pr": 1.6
+        },
+        {
+          "name": "ГРЕЙВЗ",
+          "slug": "graves",
+          "wr": 60.6,
+          "pr": 4.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "НИЛА",
+          "slug": "nilah",
+          "wr": 20,
+          "pr": 1.3
+        },
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 27.3,
+          "pr": 1.4
+        },
+        {
+          "name": "ТАЛОН",
+          "slug": "talon",
+          "wr": 31.6,
+          "pr": 2.4
+        },
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 33.3,
+          "pr": 3.4
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 35.3,
+          "pr": 2.1
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ОРИАННА",
+          "slug": "orianna",
+          "wr": 69.2,
+          "pr": 2.6
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 66.7,
+          "pr": 2.4
+        },
+        {
+          "name": "ЗИГГС",
+          "slug": "ziggs",
+          "wr": 65,
+          "pr": 4
+        },
+        {
+          "name": "ГАЛИО",
+          "slug": "galio",
+          "wr": 61.9,
+          "pr": 4.2
+        },
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 58.3,
+          "pr": 2.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 22.2,
+          "pr": 3.6
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 28,
+          "pr": 5
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 30,
+          "pr": 2
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 30.8,
+          "pr": 2.6
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 31.8,
+          "pr": 4.4
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Vex",
+    "Irelia",
+    "Lissandra"
+  ],
+  "builds": [
+    {
+      "title": "Mid Build",
+      "tier": "B",
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Lich Bane",
+          "Infinity Orb",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Protobelt"
+        ],
+        "finalBuild": [
+          "Lich Bane",
+          "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Awakened Soulstealer",
+          "Riftmaker",
+          "Boots of Mana - Protobelt"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Lich Bane",
+          "Nashor's Tooth",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana",
+          "Protobelt"
+        ],
+        "finalBuild": [
+          "Lich Bane",
+          "Nashor's Tooth",
+          "Rabadon's Deathcap",
+          "Awakened Soulstealer",
+          "Riftmaker",
+          "Boots of Mana - Protobelt"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Fleet Footwork",
+    "Battle Zeal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Transcendence"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 49.5,
+      "pr": 99.4
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Timewinder",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Parallel Convergence",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Phase Dive",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Chronobreak",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

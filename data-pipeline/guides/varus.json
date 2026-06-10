@@ -1,0 +1,391 @@
+{
+  "slug": "varus",
+  "name": "Varus",
+  "role": "Дракон",
+  "tier": "B",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 52,
+          "pr": 4.1
+        },
+        {
+          "name": "СИВИР",
+          "slug": "sivir",
+          "wr": 51.3,
+          "pr": 1.9
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 51.2,
+          "pr": 3.4
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 51.1,
+          "pr": 6.1
+        },
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 49.7,
+          "pr": 2.7
+        }
+      ],
+      "worst": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 44.6,
+          "pr": 11.9
+        },
+        {
+          "name": "ДЖИН",
+          "slug": "jhin",
+          "wr": 45.9,
+          "pr": 8.9
+        },
+        {
+          "name": "ШАЯ",
+          "slug": "xayah",
+          "wr": 46.5,
+          "pr": 2.7
+        },
+        {
+          "name": "Мисс Фортуна",
+          "slug": "miss-fortune",
+          "wr": 46.7,
+          "pr": 9.2
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 46.7,
+          "pr": 1.8
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "adc",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 52.7,
+          "pr": 3.8
+        },
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 52.2,
+          "pr": 4
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 51.7,
+          "pr": 7.3
+        },
+        {
+          "name": "СИВИР",
+          "slug": "sivir",
+          "wr": 51,
+          "pr": 1.9
+        },
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 50.6,
+          "pr": 3.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 43.1,
+          "pr": 14
+        },
+        {
+          "name": "ДЖИН",
+          "slug": "jhin",
+          "wr": 44.4,
+          "pr": 9.3
+        },
+        {
+          "name": "ШАЯ",
+          "slug": "xayah",
+          "wr": 45.9,
+          "pr": 3.2
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 46.5,
+          "pr": 2.5
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 47.9,
+          "pr": 3.2
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ДРЕЙВЕН",
+          "slug": "draven",
+          "wr": 51.7,
+          "pr": 3
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 49.6,
+          "pr": 7.6
+        },
+        {
+          "name": "ТВИЧ",
+          "slug": "twitch",
+          "wr": 49,
+          "pr": 1.9
+        },
+        {
+          "name": "СИВИР",
+          "slug": "sivir",
+          "wr": 48.2,
+          "pr": 1.8
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 46.5,
+          "pr": 5.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛЮЦИАН",
+          "slug": "lucian",
+          "wr": 40.7,
+          "pr": 4
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 40.8,
+          "pr": 2.4
+        },
+        {
+          "name": "Мисс Фортуна",
+          "slug": "miss-fortune",
+          "wr": 41.3,
+          "pr": 7.1
+        },
+        {
+          "name": "ВЕЙН",
+          "slug": "vayne",
+          "wr": 41.5,
+          "pr": 6.8
+        },
+        {
+          "name": "САМИРА",
+          "slug": "samira",
+          "wr": 41.7,
+          "pr": 3.9
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "adc",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ТРИСТАНА",
+          "slug": "tristana",
+          "wr": 59.8,
+          "pr": 3.6
+        },
+        {
+          "name": "КАЛИСТА",
+          "slug": "kalista",
+          "wr": 52.4,
+          "pr": 2.1
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 50.7,
+          "pr": 10
+        },
+        {
+          "name": "ДЖИНКС",
+          "slug": "jinx",
+          "wr": 50.3,
+          "pr": 5.5
+        },
+        {
+          "name": "КАЙ'СА",
+          "slug": "kaisa",
+          "wr": 49.3,
+          "pr": 7.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "КОРКИ",
+          "slug": "corki",
+          "wr": 33.3,
+          "pr": 2.8
+        },
+        {
+          "name": "КОГ'МАО",
+          "slug": "kogmaw",
+          "wr": 35.8,
+          "pr": 2.3
+        },
+        {
+          "name": "ДЖИН",
+          "slug": "jhin",
+          "wr": 40.9,
+          "pr": 9.4
+        },
+        {
+          "name": "ЭЗРЕАЛЬ",
+          "slug": "ezreal",
+          "wr": 41,
+          "pr": 5.5
+        },
+        {
+          "name": "ЭШ",
+          "slug": "ashe",
+          "wr": 41.2,
+          "pr": 4.4
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Smolder",
+    "Miss Fortune",
+    "Vayne"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Blade of the Ruined King",
+          "Guinsoo's Rageblade",
+          "Terminus"
+        ],
+        "boots": [
+          "Berserker's Greaves",
+          "Galeforce"
+        ],
+        "finalBuild": [
+          "Blade of the Ruined King",
+          "Guinsoo's Rageblade",
+          "Terminus",
+          "Runaan's Hurricane",
+          "Amaranth's Twinguard",
+          "Berserker's Greaves - Galeforce"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Lethal Tempo",
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Bone Plating"
+  ],
+  "spells": [
+    {
+      "combo": "heal + flash",
+      "wr": 49.5,
+      "pr": 5.2
+    },
+    {
+      "combo": "exhaust + flash",
+      "wr": 49.3,
+      "pr": 3.5
+    },
+    {
+      "combo": "ghost + flash",
+      "wr": 48.5,
+      "pr": 64.8
+    },
+    {
+      "combo": "barrier + flash",
+      "wr": 47.9,
+      "pr": 18.8
+    },
+    {
+      "combo": "cleanse + flash",
+      "wr": 46,
+      "pr": 6.4
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Piercing Arrow",
+      "levels": [
+        1,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Blighted Quiver",
+      "levels": [
+        2,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Hail of Arrows",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Chain of Corruption",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

@@ -1,0 +1,371 @@
+{
+  "slug": "amumu",
+  "name": "Amumu",
+  "role": "Лес",
+  "tier": "C",
+  "patch": "7.1f",
+  "dataDate": "2026-04-20",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 64.1,
+          "pr": 1.3
+        },
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 63.7,
+          "pr": 1.7
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 60.5,
+          "pr": 1.3
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 59.6,
+          "pr": 6.5
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 59.3,
+          "pr": 1.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 47.6,
+          "pr": 1.1
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 48.9,
+          "pr": 1.4
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 50.7,
+          "pr": 1.7
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 51.7,
+          "pr": 1.1
+        },
+        {
+          "name": "НОКТЮРН",
+          "slug": "nocturne",
+          "wr": 51.8,
+          "pr": 2.3
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "jungle",
+      "date": "2026-04-20",
+      "best": [
+        {
+          "name": "Вуконг",
+          "slug": "wukong",
+          "wr": 64,
+          "pr": 1.8
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 62.6,
+          "pr": 1.2
+        },
+        {
+          "name": "ГЕКАРИМ",
+          "slug": "hecarim",
+          "wr": 62.4,
+          "pr": 1.6
+        },
+        {
+          "name": "КА'ЗИКС",
+          "slug": "khazix",
+          "wr": 62,
+          "pr": 1.8
+        },
+        {
+          "name": "Ли Син",
+          "slug": "lee-sin",
+          "wr": 59.3,
+          "pr": 6.8
+        }
+      ],
+      "worst": [
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 45,
+          "pr": 1.4
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 46.9,
+          "pr": 1.4
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 48.6,
+          "pr": 1.9
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 49.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ФИДДЛСТИКС",
+          "slug": "fiddlesticks",
+          "wr": 51,
+          "pr": 2.4
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 70.4,
+          "pr": 1.3
+        },
+        {
+          "name": "Нуну и Виллумп",
+          "slug": "nunu-and-willump",
+          "wr": 63.8,
+          "pr": 1.1
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 63.1,
+          "pr": 2.2
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 62,
+          "pr": 1.7
+        },
+        {
+          "name": "КИНДРЕД",
+          "slug": "kindred",
+          "wr": 61,
+          "pr": 1.3
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛИЛЛИЯ",
+          "slug": "lillia",
+          "wr": 45.9,
+          "pr": 1.5
+        },
+        {
+          "name": "ВАРВИК",
+          "slug": "warwick",
+          "wr": 46.5,
+          "pr": 1.8
+        },
+        {
+          "name": "ЭВЕЛИНН",
+          "slug": "evelynn",
+          "wr": 47.5,
+          "pr": 1.9
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 49.8,
+          "pr": 3.1
+        },
+        {
+          "name": "КАИН",
+          "slug": "kayn",
+          "wr": 50,
+          "pr": 1.8
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "jungle",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "Джарван IV",
+          "slug": "jarvan-iv",
+          "wr": 72.1,
+          "pr": 3.3
+        },
+        {
+          "name": "ВАЙ",
+          "slug": "vi",
+          "wr": 72.1,
+          "pr": 3.3
+        },
+        {
+          "name": "ДАРИУС",
+          "slug": "darius",
+          "wr": 65.5,
+          "pr": 2.2
+        },
+        {
+          "name": "ТРИНДАМИР",
+          "slug": "tryndamere",
+          "wr": 63.6,
+          "pr": 3.3
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 63,
+          "pr": 2.1
+        }
+      ],
+      "worst": [
+        {
+          "name": "НИДАЛИ",
+          "slug": "nidalee",
+          "wr": 28.6,
+          "pr": 1.1
+        },
+        {
+          "name": "ДЖАКС",
+          "slug": "jax",
+          "wr": 40,
+          "pr": 1.1
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 41.4,
+          "pr": 2.2
+        },
+        {
+          "name": "НАУТИЛУС",
+          "slug": "nautilus",
+          "wr": 42.1,
+          "pr": 1.4
+        },
+        {
+          "name": "ВОЛИБИР",
+          "slug": "volibear",
+          "wr": 42.9,
+          "pr": 1.6
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Lillia",
+    "Nocturne",
+    "Nidalee"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Shimmering Spark"
+        ],
+        "core": [
+          "Searing Crown",
+          "Thornmail",
+          "Zeke's Convergence"
+        ],
+        "boots": [
+          "Plated Steelcaps",
+          "Gargoyle"
+        ],
+        "finalBuild": [
+          "Searing Crown",
+          "Thornmail",
+          "Zeke's Convergence",
+          "Frozen Heart",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps - Gargoyle"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Ice Overlord",
+    "Unshakeable",
+    "Bone Plating",
+    "Overgrowth",
+    "Sudden Impact"
+  ],
+  "spells": [
+    {
+      "combo": "flash + smite",
+      "wr": 56.9,
+      "pr": 99.1
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Bandage Toss",
+      "levels": [
+        3,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Despair",
+      "levels": [
+        1,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Tantrum",
+      "levels": [
+        2,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Curse of the Sad Mummy",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

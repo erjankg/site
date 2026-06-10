@@ -1,0 +1,376 @@
+{
+  "slug": "akshan",
+  "name": "Akshan",
+  "role": "Мид",
+  "tier": "D",
+  "patch": "7.1f",
+  "dataDate": "2026-04-12",
+  "matchups": [
+    {
+      "rank": "diamond_plus",
+      "lane": "mid",
+      "date": "2026-04-12",
+      "best": [
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 56.7,
+          "pr": 2
+        },
+        {
+          "name": "ТИМО",
+          "slug": "teemo",
+          "wr": 55.2,
+          "pr": 1.1
+        },
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 54.7,
+          "pr": 2.2
+        },
+        {
+          "name": "КАССАДИН",
+          "slug": "kassadin",
+          "wr": 52.3,
+          "pr": 1.1
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 51.8,
+          "pr": 1.9
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 36.4,
+          "pr": 2.8
+        },
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 37.9,
+          "pr": 1.1
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 38.8,
+          "pr": 2.6
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 40.6,
+          "pr": 3.9
+        },
+        {
+          "name": "Твистед Фэйт",
+          "slug": "twisted-fate",
+          "wr": 41.7,
+          "pr": 3.4
+        }
+      ]
+    },
+    {
+      "rank": "master_plus",
+      "lane": "mid",
+      "date": "2026-04-14",
+      "best": [
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 76.9,
+          "pr": 1.7
+        },
+        {
+          "name": "БРЭНД",
+          "slug": "brand",
+          "wr": 75,
+          "pr": 2.6
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 70,
+          "pr": 1.3
+        },
+        {
+          "name": "КАССАДИН",
+          "slug": "kassadin",
+          "wr": 66.7,
+          "pr": 1.5
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 64.7,
+          "pr": 2.2
+        }
+      ],
+      "worst": [
+        {
+          "name": "КЕННЕН",
+          "slug": "kennen",
+          "wr": 23.5,
+          "pr": 2.2
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 27.3,
+          "pr": 2.8
+        },
+        {
+          "name": "КАТАРИНА",
+          "slug": "katarina",
+          "wr": 30,
+          "pr": 1.3
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 30,
+          "pr": 1.3
+        },
+        {
+          "name": "ДЖЕЙС",
+          "slug": "jayce",
+          "wr": 30.8,
+          "pr": 1.7
+        }
+      ]
+    },
+    {
+      "rank": "challenger",
+      "lane": "mid",
+      "date": "2026-04-08",
+      "best": [
+        {
+          "name": "АКАЛИ",
+          "slug": "akali",
+          "wr": 64.3,
+          "pr": 1.6
+        },
+        {
+          "name": "СМОЛДЕР",
+          "slug": "smolder",
+          "wr": 63.6,
+          "pr": 1.3
+        },
+        {
+          "name": "ВЛАДИМИР",
+          "slug": "vladimir",
+          "wr": 61.8,
+          "pr": 2
+        },
+        {
+          "name": "ФИЗЗ",
+          "slug": "fizz",
+          "wr": 60.6,
+          "pr": 1.9
+        },
+        {
+          "name": "КАССАДИН",
+          "slug": "kassadin",
+          "wr": 59.3,
+          "pr": 1.6
+        }
+      ],
+      "worst": [
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 33.3,
+          "pr": 2.5
+        },
+        {
+          "name": "ЯСУО",
+          "slug": "yasuo",
+          "wr": 36.2,
+          "pr": 4
+        },
+        {
+          "name": "СВЕЙН",
+          "slug": "swain",
+          "wr": 37.1,
+          "pr": 2
+        },
+        {
+          "name": "ЗЕД",
+          "slug": "zed",
+          "wr": 38.1,
+          "pr": 2.5
+        },
+        {
+          "name": "НОРРА",
+          "slug": "norra",
+          "wr": 38.1,
+          "pr": 1.2
+        }
+      ]
+    },
+    {
+      "rank": "super_server",
+      "lane": "mid",
+      "date": "2026-04-09",
+      "best": [
+        {
+          "name": "Аурелион Сол",
+          "slug": "aurelion-sol",
+          "wr": 70,
+          "pr": 4.8
+        },
+        {
+          "name": "РАЙЗ",
+          "slug": "ryze",
+          "wr": 62.5,
+          "pr": 3.9
+        },
+        {
+          "name": "ВЕЙГАР",
+          "slug": "veigar",
+          "wr": 61.5,
+          "pr": 3.1
+        },
+        {
+          "name": "ОРИАННА",
+          "slug": "orianna",
+          "wr": 60,
+          "pr": 3.6
+        },
+        {
+          "name": "МОРГАНА",
+          "slug": "morgana",
+          "wr": 60,
+          "pr": 2.4
+        }
+      ],
+      "worst": [
+        {
+          "name": "ЁНЭ",
+          "slug": "yone",
+          "wr": 26.7,
+          "pr": 3.6
+        },
+        {
+          "name": "ЛИССАНДРА",
+          "slug": "lissandra",
+          "wr": 27.3,
+          "pr": 2.7
+        },
+        {
+          "name": "МЭЛ",
+          "slug": "mel",
+          "wr": 28.6,
+          "pr": 3.4
+        },
+        {
+          "name": "АРИ",
+          "slug": "ahri",
+          "wr": 36.4,
+          "pr": 2.7
+        },
+        {
+          "name": "ВИКТОР",
+          "slug": "viktor",
+          "wr": 38.5,
+          "pr": 3.1
+        }
+      ]
+    }
+  ],
+  "counters": [
+    "Yasuo",
+    "Vex",
+    "Irelia"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "The Collector",
+          "Magnetic Blaster",
+          "Lord Dominik's Regard"
+        ],
+        "boots": [
+          "Gluttonous Greaves",
+          "Galeforce"
+        ],
+        "finalBuild": [
+          "The Collector",
+          "Magnetic Blaster",
+          "Lord Dominik's Regard",
+          "Infinity Edge",
+          "Bloodthirster",
+          "Gluttonous Greaves - Galeforce"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Empowerment",
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Sudden Impact"
+  ],
+  "spells": [
+    {
+      "combo": "barrier + flash",
+      "wr": 47.6,
+      "pr": 2.1
+    },
+    {
+      "combo": "flash + ignite",
+      "wr": 47.2,
+      "pr": 94.8
+    }
+  ],
+  "skillOrder": [
+    {
+      "ability": "Avengerang",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Going Rogue",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Heroic Swing",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Comeuppance",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}
