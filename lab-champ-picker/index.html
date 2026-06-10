@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Champ Picker Lab · песочница модалки выбора чемпионов</title>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   ПАЛИТРА — 1-в-1 как на боевом сайте (styles.css :root)
+   ═══════════════════════════════════════════════════════════ */
+:root{
+  --bg-base:#010A13; --bg-primary:#010d18; --bg-secondary:#011520;
+  --bg-card-glass:rgba(1,10,19,0.6); --bg-overlay:rgba(0,0,0,0.88);
+  --bg-input:rgba(1,15,32,0.6);
+  --accent:#0BC4E3; --accent-rgb:11,196,227;
+  --accent-glow:rgba(11,196,227,0.4); --accent-dim:rgba(11,196,227,0.15);
+  --accent-border:rgba(11,196,227,0.2); --accent-border-sub:rgba(11,196,227,0.08);
+  --accent-border-str:rgba(11,196,227,0.5);
+  --gold:#C89B3C; --gold-glow:rgba(200,155,60,0.4);
+  --text-muted:rgba(255,255,255,0.4); --text-faint:rgba(255,255,255,0.25);
+  --border:rgba(11,196,227,0.2);
+  --sel-placeholder:rgba(0,90,200,0.3);
+  --ease-apple-out:cubic-bezier(0.16,1,0.3,1);
+  --tx-base:transform 0.15s,opacity 0.15s,background-color 0.15s,border-color 0.15s,color 0.15s,box-shadow 0.15s;
+  --tx-slow:transform 0.3s,opacity 0.3s,background-color 0.3s,border-color 0.3s,color 0.3s,box-shadow 0.3s;
+  /* настраиваемые параметры песочницы (меняются JS) */
+  --cell:56px; --cols:2; --enter-dur:0.42s; --open-dur:0.42s;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--accent-border);border-radius:8px;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:
+    radial-gradient(ellipse at 20% 20%,var(--accent-dim) 0%,transparent 50%),
+    linear-gradient(160deg,var(--bg-primary) 0%,var(--bg-base) 50%,var(--bg-base) 100%);
+  min-height:100vh;color:#fff;padding:20px;
+}
+
+/* ───── ШАПКА ПЕСОЧНИЦЫ ───── */
+.lab-top{max-width:1200px;margin:0 auto 18px;}
+.lab-title{font-size:24px;font-weight:900;letter-spacing:-0.02em;
+  background:linear-gradient(100deg,var(--accent),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.lab-sub{color:var(--text-muted);font-size:13px;margin-top:4px;line-height:1.5;}
+
+/* ───── ПАНЕЛЬ ВАРИАНТОВ ───── */
+.variants{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;}
+.variant-btn{
+  background:var(--bg-card-glass);border:2px solid var(--accent-border);
+  color:rgba(255,255,255,0.8);border-radius:12px;padding:10px 16px;
+  font-size:13px;font-weight:800;cursor:pointer;transition:var(--tx-base);
+  display:flex;flex-direction:column;gap:2px;align-items:flex-start;min-width:140px;
+}
+.variant-btn small{font-weight:600;font-size:10px;color:var(--text-muted);}
+.variant-btn:hover{border-color:var(--accent-border-str);transform:translateY(-2px);}
+.variant-btn.on{
+  border-color:var(--accent);background:linear-gradient(135deg,var(--accent-dim),var(--bg-secondary));
+  box-shadow:0 0 18px var(--accent-glow);color:#fff;
+}
+
+/* ───── ПАНЕЛЬ ПАРАМЕТРОВ ───── */
+.params{
+  max-width:1200px;margin:0 auto;background:var(--bg-card-glass);
+  border:1px solid var(--accent-border-sub);border-radius:16px;padding:14px 16px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 20px;backdrop-filter:blur(8px);
+}
+.p-group{display:flex;flex-direction:column;gap:6px;}
+.p-label{font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:0.04em;}
+.seg{display:flex;gap:4px;flex-wrap:wrap;}
+.seg button{
+  flex:1;min-width:fit-content;background:var(--bg-input);border:1.5px solid var(--accent-border);
+  color:rgba(255,255,255,0.6);border-radius:8px;padding:6px 8px;font-size:11px;font-weight:700;cursor:pointer;transition:var(--tx-base);white-space:nowrap;
+}
+.seg button:hover{border-color:var(--accent-border-str);color:#fff;}
+.seg button.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);}
+.p-group input[type=range]{width:100%;accent-color:var(--accent);}
+.p-val{font-size:10px;color:var(--text-muted);}
+
+.open-row{max-width:1200px;margin:18px auto 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.btn-open{
+  background:linear-gradient(135deg,var(--accent),var(--accent-border-str));color:#fff;border:none;
+  border-radius:12px;padding:12px 22px;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 4px 20px var(--accent-glow);transition:var(--tx-base);
+}
+.btn-open:hover{transform:translateY(-2px);box-shadow:0 6px 28px var(--accent-glow);}
+.btn-open:active{transform:scale(0.96);}
+.hint{color:var(--text-muted);font-size:12px;}
+
+/* ═══════════════════════════════════════════════════════════
+   МОДАЛКА — базовый каркас как на боевом
+   ═══════════════════════════════════════════════════════════ */
+.m-mask{
+  position:fixed;inset:0;background:var(--bg-overlay);backdrop-filter:blur(6px);
+  display:none;z-index:2000;align-items:center;justify-content:center;
+}
+.m-mask.active{display:flex;}
+.m-mask.active>.m-win{animation:modalRiseBlurIn var(--open-dur) var(--ease-apple-out) both;}
+.m-mask.closing>.m-win{animation:modalRiseBlurOut 0.18s cubic-bezier(0.4,0,1,1) forwards;}
+@keyframes modalRiseBlurIn{from{opacity:0;filter:blur(12px);transform:translateY(40px) scale(0.98);}to{opacity:1;filter:blur(0);transform:none;}}
+@keyframes modalRiseBlurOut{from{opacity:1;transform:none;}to{opacity:0;filter:blur(10px);transform:translateY(16px) scale(0.98);}}
+/* варианты анимации открытия */
+.m-mask[data-open=fade].active>.m-win{animation:openFade var(--open-dur) ease both;}
+@keyframes openFade{from{opacity:0;}to{opacity:1;}}
+.m-mask[data-open=zoom].active>.m-win{animation:openZoom var(--open-dur) var(--ease-apple-out) both;}
+@keyframes openZoom{from{opacity:0;transform:scale(0.88);}to{opacity:1;transform:none;}}
+.m-mask[data-open=slide].active>.m-win{animation:openSlide var(--open-dur) var(--ease-apple-out) both;}
+@keyframes openSlide{from{opacity:0;transform:translateY(80px);}to{opacity:1;transform:none;}}
+.m-mask[data-open=flip].active>.m-win{animation:openFlip var(--open-dur) var(--ease-apple-out) both;transform-origin:center top;}
+@keyframes openFlip{from{opacity:0;transform:perspective(1200px) rotateX(14deg) translateY(40px);}to{opacity:1;transform:none;}}
+.m-mask[data-open=spring].active>.m-win{animation:openSpring var(--open-dur) cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes openSpring{from{opacity:0;transform:translateY(60px) scale(.9);}to{opacity:1;transform:none;}}
+
+.m-win{
+  background:linear-gradient(135deg,var(--bg-primary) 0%,var(--bg-base) 100%);
+  width:96vw;max-width:920px;height:88vh;border-radius:20px;border:2px solid var(--border);
+  display:flex;flex-direction:column;position:relative;box-shadow:0 24px 70px rgba(0,0,0,0.85);overflow:hidden;
+}
+.mhdr{
+  display:flex;align-items:center;gap:8px;padding:10px 12px;
+  border-bottom:1px solid var(--accent-border-sub);flex-shrink:0;
+  background:linear-gradient(135deg,var(--bg-primary) 0%,var(--bg-base) 100%);
+}
+.mhdr-t{font-size:15px;font-weight:800;color:var(--accent);flex:1;}
+.mhdr-count{font-size:12px;font-weight:800;color:var(--gold);background:rgba(200,155,60,0.12);
+  border:1px solid rgba(200,155,60,0.3);border-radius:20px;padding:4px 12px;}
+.btn-close-x{
+  background:var(--bg-card-glass);color:rgba(255,255,255,0.85);border:2px solid var(--accent-border);
+  border-radius:12px;width:44px;height:44px;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 12px rgba(0,0,0,0.4);transition:transform 0.15s,background 0.15s,border-color 0.15s;flex-shrink:0;
+}
+.btn-close-x:hover{background:var(--accent-border);border-color:var(--accent-border-str);transform:scale(1.07);}
+.btn-close-x:active{transform:scale(0.9);}
+
+.m-search{padding:12px 15px;}
+.m-search input{
+  width:100%;padding:12px 15px;border-radius:12px;background:var(--bg-input);
+  border:2px solid var(--border);color:#fff;font-size:14px;font-weight:600;transition:var(--tx-base);
+}
+.m-search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 15px var(--accent-glow);}
+.m-search input::placeholder{color:var(--text-faint);}
+
+/* GRID — 5 равных колонок-ролей */
+.m-grid{flex:1;display:flex;flex-direction:row;gap:6px;padding:6px 10px 12px;overflow-y:auto;align-items:start;}
+.m-role-container{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;align-items:center;}
+.m-role-spacer{width:1px;align-self:stretch;background:var(--accent-border-sub);flex-shrink:0;}
+
+.m-role{
+  width:100%;background:linear-gradient(135deg,var(--bg-primary) 0%,var(--bg-secondary) 100%);
+  padding:10px 4px;border-radius:12px;text-align:center;cursor:pointer;border:2px solid transparent;
+  transition:var(--tx-slow);box-shadow:0 4px 15px rgba(0,0,0,0.3);position:relative;overflow:hidden;
+}
+/* иконка роли — фиксированный КВАДРАТ + object-fit:contain.
+   Файлы role_*.webp нормализованы (280×280, глиф 0.729 у всех) → коэффициенты не нужны. */
+.m-role img{width:100%;max-width:48px;aspect-ratio:1;height:auto;object-fit:contain;display:block;margin:0 auto;filter:brightness(0.9) contrast(1.1);transition:var(--tx-slow);}
+.m-role:hover{transform:translateY(-2px);}
+.m-role:hover img{filter:brightness(1.2) contrast(1.2);}
+.m-role.on{border-color:var(--accent-border-str);background:linear-gradient(135deg,var(--accent-glow) 0%,var(--bg-secondary) 100%);
+  box-shadow:0 0 12px var(--accent-border),0 4px 15px rgba(0,0,0,0.3);}
+.m-role.on img{filter:brightness(1.2) drop-shadow(0 0 4px var(--text-muted));}
+.role-count{position:absolute;top:5px;right:6px;font-size:9px;font-weight:800;color:var(--text-muted);
+  background:rgba(0,0,0,0.4);border-radius:10px;padding:1px 6px;}
+
+.m-role-champs{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:3px;width:100%;align-items:start;}
+
+.m-item{
+  position:relative;background:transparent;padding:2px;border-radius:8px;text-align:center;
+  cursor:pointer;transition:var(--tx-base);
+  width:100%;display:flex;flex-direction:column;align-items:stretch;gap:2px;
+}
+/* iconwrap = контейнер: размер аватарки НЕ зависит от длины имени (align-items:stretch + cqw) */
+.iconwrap{position:relative;width:100%;container-type:inline-size;}
+.m-item .av{
+  width:100%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:34cqw;font-weight:900;letter-spacing:-0.04em;color:rgba(255,255,255,0.92);
+  background:linear-gradient(135deg,hsl(var(--h,200),46%,30%),hsl(var(--h,200),52%,15%));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.07);user-select:none;
+  transition:box-shadow 0.18s,transform 0.18s,filter 0.18s,outline 0.18s;
+}
+.m-item .nm{font-size:9px;width:100%;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  color:rgba(255,255,255,0.45);line-height:1.2;font-weight:700;}
+.m-item.on .nm{color:#fff;}
+/* выбранное по умолчанию — кольцо на самой аватарке (живёт с любой формой) */
+.m-item.on .av{box-shadow:inset 0 0 0 2px var(--accent),0 0 10px var(--accent-glow);}
+
+.empty{flex:1;opacity:0.8;font-size:14px;text-align:center;padding:20px;color:var(--text-muted);}
+
+/* ═══════════════════════════════════════════════════════════
+   ПАРАМЕТРЫ-МОДИФИКАТОРЫ (на .m-grid через data-*)
+   ═══════════════════════════════════════════════════════════ */
+
+/* размер ячейки: ограничиваем ширину iconwrap → аватарка не больше --cell */
+.m-grid[data-fixed=true] .iconwrap{max-width:var(--cell);margin:0 auto;}
+
+/* колонки: auto = авто-заполнение по --cell */
+.m-grid[data-cols=auto] .m-role-champs{grid-template-columns:repeat(auto-fill,minmax(var(--cell),1fr));}
+
+/* ── ФОРМА АВАТАРКИ ── */
+.m-grid[data-shape=round] .av{border-radius:8px;}
+.m-grid[data-shape=circle] .av{border-radius:50%;}
+.m-grid[data-shape=squircle] .av{border-radius:30%;}
+.m-grid[data-shape=hex] .av{border-radius:0;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);box-shadow:none;}
+.m-grid[data-shape=hex] .m-item.on .av{filter:drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 2px var(--accent));}
+
+/* ── ПОДПИСЬ ИМЕНИ ── */
+.m-grid[data-name=none] .m-item .nm{display:none;}
+.m-grid[data-name=hover] .m-item .nm{opacity:0;transition:opacity 0.15s;}
+.m-grid[data-name=hover] .m-item:hover .nm{opacity:1;}
+.m-grid[data-name=wrap] .m-item .nm{white-space:normal;line-height:1.05;}
+.m-grid[data-name=overlay] .m-item .nm{
+  position:absolute;left:0;right:0;bottom:0;padding:10px 2px 3px;font-size:8px;
+  background:linear-gradient(to top,rgba(0,0,0,0.88),transparent);border-radius:0 0 8px 8px;
+}
+
+/* ── HOVER-ЭФФЕКТЫ (все на .av — работают с любой формой) ── */
+.m-grid[data-hover=scale] .m-item:hover .av{transform:scale(1.08);}
+.m-grid[data-hover=zoom] .m-item:hover{transform:scale(1.14);z-index:2;}
+.m-grid[data-hover=zoom] .m-item:hover .av{box-shadow:0 6px 18px rgba(0,0,0,0.6);}
+.m-grid[data-hover=glow] .m-item:hover .av{box-shadow:0 0 16px var(--accent-glow),0 0 4px var(--accent);}
+.m-grid[data-hover=lift] .m-item:hover{transform:translateY(-4px);}
+.m-grid[data-hover=lift] .m-item:hover .av{box-shadow:0 8px 20px rgba(0,0,0,0.55);}
+.m-grid[data-hover=ring] .m-item:hover .av{outline:2px solid var(--accent);outline-offset:2px;}
+.m-grid[data-hover=tilt] .m-item:hover .av{transform:perspective(300px) rotateX(10deg) rotateY(-10deg) scale(1.05);}
+.m-grid[data-hover=bright] .m-item:hover .av{filter:brightness(1.4) saturate(1.25);}
+
+/* ── ЧЕК-БЕЙДЖ ── (✓ круг / точка / ромб / выкл) */
+.m-item .badge{
+  position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;
+  background:var(--accent);color:#01222a;font-size:11px;font-weight:900;
+  display:none;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.5);
+  border:2px solid var(--bg-base);transform:scale(0);transition:transform 0.25s var(--ease-apple-out);z-index:3;
+}
+.m-grid:not([data-badge=none]) .m-item.on .badge{display:flex;transform:scale(1);}
+.m-grid[data-badge=dot] .m-item.on .badge{font-size:0;width:11px;height:11px;}
+.m-grid[data-badge=diamond] .m-item.on .badge{font-size:0;border-radius:3px;transform:rotate(45deg);}
+
+/* ── ВЫБРАННОЕ ── (рамка / заливка / неон / подъём / золото / гасить) */
+.m-grid[data-sel=fill] .m-item.on{background:var(--accent-dim);border-radius:8px;}
+.m-grid[data-sel=fill] .m-item.on .av{box-shadow:inset 0 0 0 2px var(--accent),0 0 14px var(--accent-glow);}
+.m-grid[data-sel=neon] .m-item.on .av{animation:neonPulse 1.5s ease-in-out infinite;}
+@keyframes neonPulse{0%,100%{box-shadow:inset 0 0 0 2px var(--accent),0 0 8px var(--accent);}50%{box-shadow:inset 0 0 0 2px var(--accent),0 0 20px var(--accent),0 0 6px var(--accent);}}
+.m-grid[data-sel=lift] .m-item.on{transform:translateY(-3px);}
+.m-grid[data-sel=lift] .m-item.on .av{box-shadow:inset 0 0 0 2px var(--accent),0 8px 18px rgba(0,0,0,0.5);}
+.m-grid[data-sel=gold] .m-item.on .av{box-shadow:inset 0 0 0 2px var(--gold),0 0 12px var(--gold-glow);}
+.m-grid[data-sel=dim] .m-item:not(.on){opacity:0.7;filter:saturate(0.8);}
+.m-grid[data-sel=dim] .m-item.on{opacity:1;filter:none;}
+
+/* ── ФОН КОЛОНКИ РОЛИ ── */
+.m-grid[data-colbg=glass] .m-role-container{background:rgba(255,255,255,0.03);border:1px solid var(--accent-border-sub);border-radius:14px;padding:6px;}
+.m-grid[data-colbg=frame] .m-role-container{border:1px solid var(--accent-border);border-radius:14px;padding:6px;background:linear-gradient(180deg,var(--accent-border-sub),transparent);}
+
+/* ── ПЛОТНОСТЬ ── */
+.m-grid[data-gap=compact] .m-role-champs{gap:2px;}
+.m-grid[data-gap=normal] .m-role-champs{gap:4px;}
+.m-grid[data-gap=roomy] .m-role-champs{gap:8px;}
+
+/* ── АНИМАЦИЯ ПОЯВЛЕНИЯ КАРТОЧЕК ── только при открытии (класс .anim-in), не при выборе */
+.m-grid.anim-in[data-enter=rise] .m-item{animation:cellRise var(--enter-dur) var(--ease-apple-out) both;}
+.m-grid.anim-in[data-enter=scale] .m-item{animation:cellScale var(--enter-dur) var(--ease-apple-out) both;}
+.m-grid.anim-in[data-enter=wave] .m-item{animation:cellWave var(--enter-dur) var(--ease-apple-out) both;}
+@keyframes cellRise{from{opacity:0;transform:translateY(10px) scale(0.92);}to{opacity:1;transform:none;}}
+@keyframes cellScale{from{opacity:0;transform:scale(0.5);}to{opacity:1;transform:none;}}
+@keyframes cellWave{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:none;}}
+
+/* ── ТЕМА: стекло (variant C) ── */
+.m-win[data-theme=glass]{background:linear-gradient(135deg,rgba(1,21,32,0.85),rgba(1,10,19,0.92));backdrop-filter:blur(20px);}
+.m-win[data-theme=glass] .m-role{background:linear-gradient(135deg,rgba(11,196,227,0.06),rgba(1,21,32,0.4));backdrop-filter:blur(6px);border-color:var(--accent-border-sub);}
+.m-win[data-theme=glass] .m-role-container{background:rgba(255,255,255,0.02);border-radius:14px;padding:6px;}
+.m-win[data-theme=glass] .m-item .av{box-shadow:0 4px 12px rgba(0,0,0,0.4);}
+
+/* ── ТЕМА: hextech gold (variant D) ── */
+.m-win[data-theme=hextech]{--accent:#C89B3C;--accent-rgb:200,155,60;--accent-glow:rgba(200,155,60,0.4);
+  --accent-dim:rgba(200,155,60,0.15);--accent-border:rgba(200,155,60,0.25);--accent-border-str:rgba(200,155,60,0.55);
+  --border:rgba(200,155,60,0.25);border-color:rgba(200,155,60,0.4);
+  background:linear-gradient(135deg,#0a0a10 0%,#01060c 100%);
+}
+.m-win[data-theme=hextech] .mhdr-t{color:var(--gold);}
+.m-win[data-theme=hextech] .m-role.on{box-shadow:0 0 18px var(--gold-glow),0 4px 15px rgba(0,0,0,0.4);}
+.m-win[data-theme=hextech] .m-role.on img{filter:brightness(1.3) drop-shadow(0 0 6px var(--gold));}
+.m-win[data-theme=hextech] .m-item.on{box-shadow:0 0 14px var(--gold-glow);}
+.m-win[data-theme=hextech] .badge{background:var(--gold);color:#1a1206;}
+
+/* ripple при выборе (variant D) */
+.ripple{position:absolute;border-radius:50%;background:rgba(var(--accent-rgb),0.5);
+  transform:scale(0);animation:rip 0.5s ease-out forwards;pointer-events:none;}
+@keyframes rip{to{transform:scale(2.6);opacity:0;}}
+
+/* ═══ ВЕРХНЯЯ СТРОКА: недавние / избранные ═══ */
+.m-toprow{display:none;align-items:center;gap:8px;padding:6px 15px 8px;overflow-x:auto;flex-shrink:0;border-bottom:1px solid var(--accent-border-sub);}
+.m-win[data-topstrip=recent] .m-toprow,
+.m-win[data-topstrip=fav] .m-toprow,
+.m-win[data-topstrip=both] .m-toprow{display:flex;}
+.strip-label{font-size:11px;font-weight:900;color:var(--text-muted);flex-shrink:0;padding:0 2px;}
+.strip-item{width:42px !important;flex-shrink:0;}
+.strip-empty{font-size:11px;color:var(--text-faint);padding:4px 0;}
+
+/* ═══ ЧИПСЫ-ФИЛЬТРЫ РОЛЕЙ (единая сетка) ═══ */
+.m-chips{display:none;gap:6px;flex-wrap:wrap;padding:8px 15px;flex-shrink:0;}
+.m-win[data-layout=single] .m-chips{display:flex;}
+.chip{
+  display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:22px;
+  border:1.5px solid var(--accent-border);background:var(--bg-input);color:rgba(255,255,255,0.7);
+  font-weight:800;font-size:12px;cursor:pointer;transition:var(--tx-base);white-space:nowrap;
+}
+.chip img{width:18px;height:18px;aspect-ratio:1;object-fit:contain;filter:brightness(0.9);}
+.chip:hover{border-color:var(--accent-border-str);color:#fff;transform:translateY(-1px);}
+.chip.on{background:var(--accent-dim);border-color:var(--accent);color:var(--accent);box-shadow:0 0 12px var(--accent-glow);}
+.chip.on img{filter:brightness(1.3) drop-shadow(0 0 3px var(--accent));}
+
+/* ═══ ЕДИНАЯ СЕТКА ═══ */
+.m-win[data-layout=single] .m-grid{display:block;padding:8px 16px 16px;}
+.single-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cell),1fr));gap:12px;}
+.m-win[data-layout=single] .m-grid[data-gap=compact] .single-grid{gap:6px;}
+.m-win[data-layout=single] .m-grid[data-gap=roomy] .single-grid{gap:18px;}
+
+/* ═══ ЗВЁЗДОЧКА «В ИЗБРАННОЕ» ═══ */
+.m-item .star{
+  position:absolute;top:-5px;left:-5px;width:18px;height:18px;border-radius:50%;
+  background:rgba(0,0,0,0.6);color:var(--text-muted);font-size:10px;cursor:pointer;z-index:3;
+  display:none;align-items:center;justify-content:center;border:1px solid var(--accent-border-sub);
+}
+.m-win[data-topstrip=fav] .m-grid .m-item:hover .star,
+.m-win[data-topstrip=both] .m-grid .m-item:hover .star{display:flex;}
+.m-item .star.fav{display:flex;color:var(--gold);background:rgba(0,0,0,0.75);border-color:var(--gold-glow);}
+.strip-item .star{display:none !important;}
+
+/* ═══ ФУТЕР «ГОТОВО» ═══ */
+.m-foot{display:none;padding:10px 15px;border-top:1px solid var(--accent-border-sub);flex-shrink:0;
+  background:linear-gradient(0deg,var(--bg-primary),transparent);}
+.m-win[data-foot=done] .m-foot{display:block;}
+.btn-done{width:100%;padding:13px;border:none;border-radius:12px;cursor:pointer;font-size:14px;font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent-border-str));color:#fff;box-shadow:0 4px 18px var(--accent-glow);transition:var(--tx-base);}
+.btn-done:hover{transform:translateY(-2px);}
+.btn-done:active{transform:scale(0.98);}
+.m-win[data-theme=hextech] .btn-done{background:linear-gradient(135deg,var(--gold),#9a7522);}
+
+@media (max-width:600px){
+  .m-grid{flex-direction:column;}
+  .m-role-spacer{display:none;}
+  body{padding:12px;}
+}
+</style>
+</head>
+<body>
+
+<div class="lab-top">
+  <div class="lab-title">⚔ Champ Picker Lab</div>
+  <div class="lab-sub">Песочница модалки выбора чемпионов для таблицы статистики (кнопка «Champions»).<br>
+  Выбери вариант сверху, покрути параметры справа, нажми «Открыть модалку» и посмотри. Боевой сайт не тронут — когда выберешь, перенесу в бой.</div>
+
+  <div class="variants" id="variants">
+    <button class="variant-btn on" data-v="A">A · Baseline<small>как сейчас на сайте</small></button>
+    <button class="variant-btn" data-v="B">B · Polished<small>чек-бейдж, счётчики, плавность</small></button>
+    <button class="variant-btn" data-v="C">C · Glass Spotlight<small>стекло, имя на портрете</small></button>
+    <button class="variant-btn" data-v="D">D · Hextech Gold<small>золото, ripple, премиум</small></button>
+    <button class="variant-btn" data-v="E">E · Compact<small>плотно, 4 колонки</small></button>
+    <button class="variant-btn" data-v="F">F · Radical<small>единая сетка + чипсы ролей, как в игре</small></button>
+  </div>
+</div>
+
+<div class="params" id="params">
+  <div class="p-group">
+    <span class="p-label">Раскладка</span>
+    <div class="seg" data-k="layout"><button data-val="roles" class="on">по ролям (колонки)</button><button data-val="single">единая сетка + чипсы</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Верхняя строка</span>
+    <div class="seg" data-k="topstrip"><button data-val="none" class="on">нет</button><button data-val="recent">недавние</button><button data-val="fav">избранные</button><button data-val="both">оба</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Нижняя кнопка</span>
+    <div class="seg" data-k="foot"><button data-val="none" class="on">нет</button><button data-val="done">Готово (N)</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Колонок в роли</span>
+    <div class="seg" data-k="cols"><button data-val="1">1</button><button data-val="2" class="on">2</button><button data-val="3">3</button><button data-val="4">4</button><button data-val="auto">auto</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Размер карточки <span class="p-val" id="cellVal">56px</span></span>
+    <input type="range" id="cellRange" min="36" max="84" value="56">
+  </div>
+  <div class="p-group">
+    <span class="p-label">Подпись имени</span>
+    <div class="seg" data-k="name"><button data-val="under" class="on">снизу</button><button data-val="overlay">на портрете</button><button data-val="hover">по ховеру</button><button data-val="wrap">в 2 строки</button><button data-val="none">скрыть</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Форма аватарки</span>
+    <div class="seg" data-k="shape"><button data-val="round" class="on">скругл.</button><button data-val="circle">круг</button><button data-val="squircle">squircle</button><button data-val="hex">шестиуг.</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Hover-эффект</span>
+    <div class="seg" data-k="hover"><button data-val="scale" class="on">scale</button><button data-val="zoom">zoom</button><button data-val="glow">glow</button><button data-val="lift">lift</button><button data-val="ring">ring</button><button data-val="tilt">tilt 3D</button><button data-val="bright">яркость</button><button data-val="none">нет</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Выбранное</span>
+    <div class="seg" data-k="sel"><button data-val="border" class="on">рамка</button><button data-val="fill">заливка</button><button data-val="neon">неон-пульс</button><button data-val="lift">подъём</button><button data-val="gold">золото</button><button data-val="dim">+ гасить др.</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Чек-бейдж</span>
+    <div class="seg" data-k="badge"><button data-val="check">✓ круг</button><button data-val="dot">● точка</button><button data-val="diamond">◆ ромб</button><button data-val="none" class="on">выкл</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Счётчики ролей</span>
+    <div class="seg" data-k="rolecount"><button data-val="num">число</button><button data-val="frac">дробь n/всего</button><button data-val="none" class="on">выкл</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Фон колонки</span>
+    <div class="seg" data-k="colbg"><button data-val="none" class="on">нет</button><button data-val="glass">стекло</button><button data-val="frame">рамка</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Плотность</span>
+    <div class="seg" data-k="gap"><button data-val="compact">компактно</button><button data-val="normal" class="on">норма</button><button data-val="roomy">просторно</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Сортировка</span>
+    <div class="seg" data-k="sort"><button data-val="alpha" class="on">по алфавиту</button><button data-val="selfirst">выбранные сверху</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Анимация карточек</span>
+    <div class="seg" data-k="enter"><button data-val="rise">снизу</button><button data-val="scale">масштаб</button><button data-val="wave">волной</button><button data-val="none" class="on">выкл</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Анимация открытия</span>
+    <div class="seg" data-k="open"><button data-val="rise" class="on">rise-blur</button><button data-val="fade">fade</button><button data-val="zoom">zoom</button><button data-val="slide">slide</button><button data-val="flip">flip 3D</button><button data-val="spring">spring</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Скорость открытия <span class="p-val" id="openVal">0.42s</span></span>
+    <input type="range" id="openRange" min="200" max="700" step="20" value="420">
+  </div>
+</div>
+
+<div class="open-row">
+  <button class="btn-open" onclick="openM()">▶ Открыть модалку</button>
+  <button class="btn-open" style="background:var(--bg-card-glass);box-shadow:none;border:2px solid var(--accent-border);" onclick="replay()">↻ Проиграть анимацию</button>
+  <span class="hint" id="selHint">Выбрано: 0</span>
+</div>
+
+<!-- ═══ МОДАЛКА ═══ -->
+<div class="m-mask" id="mMask" data-open="rise" onclick="if(event.target===this)closeM()">
+  <div class="m-win" id="mWin" data-theme="default" data-layout="roles" data-topstrip="none" data-foot="none">
+    <div class="mhdr">
+      <button class="btn-close-x" onclick="closeM()">←</button>
+      <span class="mhdr-t">Champions</span>
+      <span class="mhdr-count" id="hdrCount" style="display:none;">0 выбрано</span>
+    </div>
+    <div class="m-search"><input type="text" id="mSearch" placeholder="🔍 Поиск..." oninput="drawM()"></div>
+    <div class="m-toprow" id="mToprow"></div>
+    <div class="m-chips" id="mChips"></div>
+    <div class="m-grid" id="mGrid"
+      data-name="under" data-hover="scale" data-sel="border" data-badge="none"
+      data-rolecount="none" data-enter="none" data-fixed="false" data-cols="2"
+      data-shape="round" data-colbg="none" data-gap="normal" data-sort="alpha"></div>
+    <div class="m-foot"><button class="btn-done" onclick="closeM()">✓ Готово (<span id="doneN">0</span>)</button></div>
+  </div>
+</div>
+
+<script>
+/* ───── РОСТЕР (демо-данные, аватарки — буквы, без сетевых картинок) ───── */
+const ROSTER=[
+  // Top
+  ['Aatrox','Aatrox','Top'],['Camille','Camille','Top'],['Darius','Darius','Top'],['Fiora','Fiora','Top'],
+  ['Garen','Garen','Top'],['Gnar','Gnar','Top'],['Sett','Sett','Top'],['Renekton','Renekton','Top'],
+  ['Jax','Jax','Top'],['Malphite','Malphite','Top'],['Ornn','Ornn','Top'],['Shen','Shen','Top'],
+  ['Nasus','Nasus','Top'],['Morde','Mordekaiser','Top'],['Riven','Riven','Top'],['Wukong','MonkeyKing','Top'],
+  ['Singed','Singed','Top'],['Kayle','Kayle','Top'],['Tryndamere','Tryndamere','Top'],['Volibear','Volibear','Top'],
+  // Jungle
+  ['Amumu','Amumu','Jungle'],['Graves','Graves','Jungle'],['Hecarim','Hecarim','Jungle'],['Khazix','Khazix','Jungle'],
+  ['Lee Sin','LeeSin','Jungle'],['Vi','Vi','Jungle'],['Xin Zhao','XinZhao','Jungle'],['Rammus','Rammus','Jungle'],
+  ['Kayn','Kayn','Jungle'],['Nunu','Nunu','Jungle'],['Pantheon','Pantheon','Jungle'],['Diana','Diana','Jungle'],
+  ['Viego','Viego','Jungle'],['Warwick','Warwick','Jungle'],['Evelynn','Evelynn','Jungle'],['Jarvan','JarvanIV','Jungle'],
+  ['Lillia','Lillia','Jungle'],['Nocturne','Nocturne','Jungle'],['Rengar','Rengar','Jungle'],['Shyvana','Shyvana','Jungle'],
+  ['Kindred','Kindred','Jungle'],['Fiddle','FiddleSticks','Jungle'],['Gragas','Gragas','Jungle'],['Olaf','Olaf','Jungle'],
+  // Mid
+  ['Ahri','Ahri','Mid'],['Akali','Akali','Mid'],['Annie','Annie','Mid'],['Brand','Brand','Mid'],
+  ['Ekko','Ekko','Mid'],['Fizz','Fizz','Mid'],['Katarina','Katarina','Mid'],['Lux','Lux','Mid'],
+  ['Orianna','Orianna','Mid'],['Syndra','Syndra','Mid'],['Veigar','Veigar','Mid'],['Yasuo','Yasuo','Mid'],
+  ['Zed','Zed','Mid'],['Zoe','Zoe','Mid'],['Vex','Vex','Mid'],['Lissandra','Lissandra','Mid'],
+  ['T. Fate','TwistedFate','Mid'],['Galio','Galio','Mid'],['Kassadin','Kassadin','Mid'],['Kennen','Kennen','Mid'],
+  ['Vladimir','Vladimir','Mid'],['Yone','Yone','Mid'],['Ziggs','Ziggs','Mid'],
+  // ADC
+  ['Ashe','Ashe','ADC'],['Caitlyn','Caitlyn','ADC'],['Corki','Corki','ADC'],['Draven','Draven','ADC'],
+  ['Ezreal','Ezreal','ADC'],['Jhin','Jhin','ADC'],['Jinx','Jinx','ADC'],['KaiSa','Kaisa','ADC'],
+  ['Lucian','Lucian','ADC'],['M. Fortune','MissFortune','ADC'],['Samira','Samira','ADC'],['Sivir','Sivir','ADC'],
+  ['Tristana','Tristana','ADC'],['Twitch','Twitch','ADC'],['Varus','Varus','ADC'],['Vayne','Vayne','ADC'],
+  ['Zeri','Zeri','ADC'],['Xayah','Xayah','ADC'],['Kalista','Kalista','ADC'],['KogMaw','KogMaw','ADC'],
+  // Support
+  ['Alistar','Alistar','Support'],['Bard','Bard','Support'],['Blitzcrank','Blitzcrank','Support'],['Braum','Braum','Support'],
+  ['Janna','Janna','Support'],['Karma','Karma','Support'],['Leona','Leona','Support'],['Lulu','Lulu','Support'],
+  ['Nami','Nami','Support'],['Nautilus','Nautilus','Support'],['Pyke','Pyke','Support'],['Rakan','Rakan','Support'],
+  ['Senna','Senna','Support'],['Soraka','Soraka','Support'],['Thresh','Thresh','Support'],['Yuumi','Yuumi','Support'],
+  ['Morgana','Morgana','Support'],['Sona','Sona','Support'],['Zilean','Zilean','Support'],['Zyra','Zyra','Support'],
+  ['Maokai','Maokai','Support'],
+].map(a=>({name:a[0],key:a[1],role:a[2]}));
+
+const ROLES=['Top','Jungle','Mid','ADC','Support'];
+const roleIcons={Top:'../image/role_top.webp',Jungle:'../image/role_jungle.webp',Mid:'../image/role_mid.webp',ADC:'../image/role_adc.webp',Support:'../image/role_support.webp'};
+/* буквы-аватарки вместо сетевых картинок — ноль запросов, ноль лагов */
+function initials(name){
+  const parts=name.replace(/[^A-Za-z .]/g,' ').split(/[ .]+/).filter(Boolean);
+  if(parts.length>=2) return (parts[0][0]+parts[1][0]).toUpperCase();
+  return name.slice(0,2).toUpperCase();
+}
+function hue(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h;}
+
+const selected=new Set();
+const favorites=new Set();
+let recent=[];
+let roleFilter='All';
+let theme='default';
+
+const byName=(a,b)=>a.name.localeCompare(b.name,'en',{sensitivity:'base'});
+const selFirst=(a,b)=>(selected.has(a.name)?0:1)-(selected.has(b.name)?0:1)||byName(a,b);
+
+/* ───── ФАБРИКА КАРТОЧКИ (общая для сетки по ролям, единой сетки и строки) ───── */
+function makeItem(c,idx,opts){
+  opts=opts||{};
+  const btn=document.createElement('div');
+  btn.className='m-item '+(opts.strip?'strip-item ':'')+(selected.has(c.name)?'on':'');
+  btn.dataset.name=c.name;
+  if(idx!=null) btn.style.animationDelay=Math.min(idx*12,400)+'ms';
+
+  const wrap=document.createElement('div');wrap.className='iconwrap';
+  const av=document.createElement('div');
+  av.className='av';av.textContent=initials(c.name);av.title=c.name;av.style.setProperty('--h',hue(c.name));
+  wrap.appendChild(av);
+  if(!opts.strip){
+    const nm=document.createElement('div');nm.className='nm';nm.textContent=c.name;wrap.appendChild(nm);
+  }
+  btn.appendChild(wrap);
+
+  if(!opts.strip){
+    const badge=document.createElement('div');badge.className='badge';badge.textContent='✓';btn.appendChild(badge);
+    const star=document.createElement('div');
+    star.className='star'+(favorites.has(c.name)?' fav':'');star.textContent='★';star.title='В избранное';
+    star.onclick=(e)=>{e.stopPropagation();toggleFav(c.name);};
+    btn.appendChild(star);
+  }
+  btn.onclick=(e)=>toggleChamp(c,btn,e);
+  return btn;
+}
+
+/* ───── ОТРИСОВКА (полная пересборка — только при открытии/поиске/смене параметра) ───── */
+function drawM(){
+  const grid=document.getElementById('mGrid');
+  const layout=document.getElementById('mWin').dataset.layout||'roles';
+  grid.innerHTML='';
+  if(layout==='single') drawSingle(grid); else drawRoles(grid);
+  buildChips();
+  renderStrip();
+}
+
+function drawRoles(grid){
+  const q=(document.getElementById('mSearch').value||'').trim().toLowerCase();
+  let cellIdx=0;
+  ROLES.forEach((role,ri)=>{
+    const all=ROSTER.filter(x=>x.role===role);
+    let champs=(q?all.filter(x=>x.name.toLowerCase().includes(q)):all).slice().sort(byName);
+    if(grid.dataset.sort==='selfirst') champs.sort(selFirst);
+    if(q&&champs.length===0) return;
+
+    const container=document.createElement('div');
+    container.className='m-role-container';container.dataset.role=role;
+
+    const onCount=all.filter(x=>selected.has(x.name)).length;
+    const roleDiv=document.createElement('div');
+    roleDiv.className='m-role '+(all.length>0&&onCount===all.length?'on':'');
+    roleDiv.innerHTML='<img loading="lazy" data-role="'+role+'" src="'+roleIcons[role]+'" alt="'+role+'">'+
+      roleCountSpan(onCount,all.length,grid.dataset.rolecount);
+    roleDiv.onclick=()=>toggleRole(role,container);
+    container.appendChild(roleDiv);
+
+    const champGrid=document.createElement('div');champGrid.className='m-role-champs';
+    champs.forEach(c=>champGrid.appendChild(makeItem(c,cellIdx++)));
+    container.appendChild(champGrid);
+    grid.appendChild(container);
+
+    if(ri<ROLES.length-1&&!q){
+      const sp=document.createElement('div');sp.className='m-role-spacer';grid.appendChild(sp);
+    }
+  });
+  if(q&&grid.children.length===0){
+    const e=document.createElement('div');e.className='empty';e.textContent='Ничего не найдено';grid.appendChild(e);
+  }
+}
+
+function drawSingle(grid){
+  const q=(document.getElementById('mSearch').value||'').trim().toLowerCase();
+  let champs=ROSTER.filter(c=>roleFilter==='All'||c.role===roleFilter);
+  if(q) champs=champs.filter(c=>c.name.toLowerCase().includes(q));
+  champs=champs.slice().sort(byName);
+  if(grid.dataset.sort==='selfirst') champs.sort(selFirst);
+
+  const sg=document.createElement('div');sg.className='single-grid';
+  let i=0;
+  champs.forEach(c=>sg.appendChild(makeItem(c,i++)));
+  if(champs.length===0){
+    const e=document.createElement('div');e.className='empty';e.textContent='Ничего не найдено';e.style.gridColumn='1/-1';sg.appendChild(e);
+  }
+  grid.appendChild(sg);
+}
+
+/* ───── ЧИПСЫ-ФИЛЬТРЫ РОЛЕЙ (единая сетка) ───── */
+const CHIPS=[['All','Все',null],['Top','Top','Top'],['Jungle','JG','Jungle'],['Mid','Mid','Mid'],['ADC','ADC','ADC'],['Support','Sup','Support']];
+function buildChips(){
+  const box=document.getElementById('mChips');box.innerHTML='';
+  CHIPS.forEach(([val,label,role])=>{
+    const total=val==='All'?ROSTER.length:ROSTER.filter(x=>x.role===val).length;
+    const on=val==='All'?selected.size:ROSTER.filter(x=>x.role===val&&selected.has(x.name)).length;
+    const ch=document.createElement('div');
+    ch.className='chip'+(roleFilter===val?' on':'');
+    ch.innerHTML=(role?'<img data-role="'+role+'" src="'+roleIcons[role]+'" alt="">':'')+
+      '<span>'+label+(on?' ('+on+')':'')+'</span>';
+    ch.onclick=()=>{roleFilter=val;drawM();};
+    box.appendChild(ch);
+  });
+}
+
+/* ───── ВЕРХНЯЯ СТРОКА: недавние / избранные ───── */
+function renderStrip(){
+  const mode=document.getElementById('mWin').dataset.topstrip||'none';
+  const row=document.getElementById('mToprow');row.innerHTML='';
+  if(mode==='none') return;
+  const addGroup=(label,names)=>{
+    if(!names.length) return false;
+    const l=document.createElement('span');l.className='strip-label';l.textContent=label;row.appendChild(l);
+    names.forEach(n=>{const c=ROSTER.find(x=>x.name===n);if(c)row.appendChild(makeItem(c,null,{strip:true}));});
+    return true;
+  };
+  let any=false;
+  if(mode==='fav'||mode==='both') any=addGroup('★',[...favorites])||any;
+  if(mode==='recent'||mode==='both') any=addGroup('🕐',recent.slice(0,12))||any;
+  if(!any){
+    const e=document.createElement('span');e.className='strip-empty';
+    e.textContent=(mode==='fav')?'Наведи на чемпа и нажми ★ — попадёт в избранное'
+      :(mode==='recent')?'Выбранные чемпы появятся здесь'
+      :'★ избранное (по звезде) и 🕐 недавние появятся здесь';
+    row.appendChild(e);
+  }
+}
+
+/* ───── ВЫБОР ───── */
+function syncChampEls(name){
+  const on=selected.has(name);
+  document.querySelectorAll('.m-item[data-name="'+CSS.escape(name)+'"]').forEach(el=>el.classList.toggle('on',on));
+}
+function pushRecent(name){recent=recent.filter(n=>n!==name);recent.unshift(name);if(recent.length>14)recent.pop();}
+
+/* выбор одного чемпа — БЕЗ пересборки сетки (никакого дёрганья) */
+function toggleChamp(c,btn,e){
+  if(theme==='hextech'&&btn) spawnRipple(btn,e);
+  if(selected.has(c.name)) selected.delete(c.name);
+  else{selected.add(c.name);pushRecent(c.name);}
+  syncChampEls(c.name);
+  updateRoleState(c.role);
+  renderStrip();
+  buildChips();
+  syncCount();
+}
+/* клик по роли — переключает всех её чемпов, тоже в месте */
+function toggleRole(role,container){
+  const all=ROSTER.filter(x=>x.role===role);
+  const isAll=all.length>0&&all.every(x=>selected.has(x.name));
+  all.forEach(x=>{if(isAll)selected.delete(x.name);else{if(!selected.has(x.name))pushRecent(x.name);selected.add(x.name);}});
+  all.forEach(x=>syncChampEls(x.name));
+  updateRoleState(role);
+  renderStrip();
+  buildChips();
+  syncCount();
+}
+function toggleFav(name){
+  if(favorites.has(name)) favorites.delete(name); else favorites.add(name);
+  document.querySelectorAll('.m-item[data-name="'+CSS.escape(name)+'"] .star')
+    .forEach(s=>s.classList.toggle('fav',favorites.has(name)));
+  renderStrip();
+}
+function roleCountText(on,total,mode){return mode==='frac'?on+'/'+total:String(on);}
+function roleCountSpan(on,total,mode){
+  return mode==='none'||!mode?'':'<span class="role-count">'+roleCountText(on,total,mode)+'</span>';
+}
+function updateRoleState(role){
+  const all=ROSTER.filter(x=>x.role===role);
+  const onCount=all.filter(x=>selected.has(x.name)).length;
+  const cont=document.querySelector('.m-role-container[data-role="'+role+'"]');
+  if(!cont)return;
+  cont.querySelector('.m-role').classList.toggle('on',all.length>0&&onCount===all.length);
+  const rc=cont.querySelector('.role-count');
+  if(rc) rc.textContent=roleCountText(onCount,all.length,document.getElementById('mGrid').dataset.rolecount);
+}
+/* анимация появления — только при открытии/replay, и только если включена */
+function playEntrance(){
+  const g=document.getElementById('mGrid');
+  if(g.dataset.enter==='none'||!g.dataset.enter) return;
+  g.classList.remove('anim-in');void g.offsetWidth;g.classList.add('anim-in');
+  clearTimeout(g._t);g._t=setTimeout(()=>g.classList.remove('anim-in'),1100);
+}
+
+function spawnRipple(el,e){
+  const r=document.createElement('span');r.className='ripple';
+  const rect=el.getBoundingClientRect();const s=Math.max(rect.width,rect.height);
+  r.style.width=r.style.height=s+'px';
+  r.style.left=(e.clientX-rect.left-s/2)+'px';
+  r.style.top=(e.clientY-rect.top-s/2)+'px';
+  el.appendChild(r);setTimeout(()=>r.remove(),550);
+}
+
+function syncCount(){
+  const n=selected.size;
+  document.getElementById('selHint').textContent='Выбрано: '+n;
+  document.getElementById('hdrCount').textContent=n+' выбрано';
+  const dn=document.getElementById('doneN');if(dn) dn.textContent=n;
+}
+
+/* ───── ОТКРЫТИЕ / ЗАКРЫТИЕ ───── */
+function openM(){const m=document.getElementById('mMask');m.classList.remove('closing');m.classList.add('active');drawM();syncCount();playEntrance();}
+function closeM(){const m=document.getElementById('mMask');m.classList.add('closing');setTimeout(()=>{m.classList.remove('active','closing');},180);}
+function replay(){const w=document.getElementById('mWin');const m=document.getElementById('mMask');if(!m.classList.contains('active'))return openM();w.style.animation='none';void w.offsetWidth;w.style.animation='';drawM();playEntrance();}
+
+/* ───── ВАРИАНТЫ (пресеты) ───── */
+const GRID_KEYS=['name','hover','sel','badge','rolecount','enter','fixed','cols','shape','colbg','gap','sort'];
+const WIN_KEYS=['layout','topstrip','foot'];
+const PRESETS={
+  A:{cols:'2',cell:56,name:'under',hover:'scale',sel:'border',badge:'none',rolecount:'none',enter:'none',open:'rise',openDur:420,theme:'default',hdrcount:false,fixed:'false',shape:'round',colbg:'none',gap:'normal',sort:'alpha',layout:'roles',topstrip:'none',foot:'none'},
+  B:{cols:'2',cell:58,name:'under',hover:'lift',sel:'fill',badge:'check',rolecount:'frac',enter:'rise',open:'rise',openDur:420,theme:'default',hdrcount:true,fixed:'false',shape:'round',colbg:'glass',gap:'normal',sort:'alpha',layout:'roles',topstrip:'recent',foot:'done'},
+  C:{cols:'2',cell:64,name:'overlay',hover:'ring',sel:'fill',badge:'check',rolecount:'num',enter:'scale',open:'zoom',openDur:460,theme:'glass',hdrcount:true,fixed:'true',shape:'squircle',colbg:'glass',gap:'roomy',sort:'alpha',layout:'roles',topstrip:'none',foot:'done'},
+  D:{cols:'2',cell:60,name:'under',hover:'glow',sel:'gold',badge:'diamond',rolecount:'frac',enter:'wave',open:'spring',openDur:480,theme:'hextech',hdrcount:true,fixed:'false',shape:'hex',colbg:'frame',gap:'normal',sort:'selfirst',layout:'roles',topstrip:'fav',foot:'done'},
+  E:{cols:'4',cell:42,name:'none',hover:'zoom',sel:'border',badge:'none',rolecount:'none',enter:'none',open:'fade',openDur:300,theme:'default',hdrcount:false,fixed:'true',shape:'round',colbg:'none',gap:'compact',sort:'alpha',layout:'roles',topstrip:'none',foot:'none'},
+  F:{cols:'auto',cell:74,name:'under',hover:'lift',sel:'fill',badge:'check',rolecount:'none',enter:'scale',open:'zoom',openDur:460,theme:'default',hdrcount:true,fixed:'false',shape:'squircle',colbg:'none',gap:'roomy',sort:'alpha',layout:'single',topstrip:'both',foot:'done'},
+};
+
+function applyPreset(v){
+  const p=PRESETS[v];theme=p.theme;
+  const win=document.getElementById('mWin');win.dataset.theme=p.theme;
+  const g=document.getElementById('mGrid');
+  GRID_KEYS.forEach(k=>{g.dataset[k]=p[k];});
+  WIN_KEYS.forEach(k=>{win.dataset[k]=p[k];});
+  document.getElementById('mMask').dataset.open=p.open;
+  if(p.cols!=='auto') document.documentElement.style.setProperty('--cols',p.cols);
+  document.documentElement.style.setProperty('--cell',p.cell+'px');
+  document.documentElement.style.setProperty('--open-dur',(p.openDur/1000)+'s');
+  document.documentElement.style.setProperty('--enter-dur',(p.enter==='none'?'0s':'0.4s'));
+  document.getElementById('hdrCount').style.display=p.hdrcount?'inline-block':'none';
+  GRID_KEYS.forEach(k=>setSeg(k,p[k]));WIN_KEYS.forEach(k=>setSeg(k,p[k]));setSeg('open',p.open);
+  document.getElementById('cellRange').value=p.cell;document.getElementById('cellVal').textContent=p.cell+'px';
+  document.getElementById('openRange').value=p.openDur;document.getElementById('openVal').textContent=(p.openDur/1000)+'s';
+  if(document.getElementById('mMask').classList.contains('active')) replay();
+}
+function setSeg(k,val){
+  document.querySelectorAll('.seg[data-k="'+k+'"] button').forEach(b=>b.classList.toggle('on',b.dataset.val===val));
+}
+
+/* ───── СЛУШАТЕЛИ КОНТРОЛОВ ───── */
+document.getElementById('variants').addEventListener('click',e=>{
+  const b=e.target.closest('.variant-btn');if(!b)return;
+  document.querySelectorAll('.variant-btn').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  applyPreset(b.dataset.v);
+});
+
+document.getElementById('params').addEventListener('click',e=>{
+  const b=e.target.closest('.seg button');if(!b)return;
+  const k=b.parentElement.dataset.k,val=b.dataset.val;
+  setSeg(k,val);
+  const g=document.getElementById('mGrid');
+  if(k==='open'){document.getElementById('mMask').dataset.open=val;}
+  else if(WIN_KEYS.includes(k)){document.getElementById('mWin').dataset[k]=val;}
+  else{g.dataset[k]=val;}
+  if(k==='cols'&&val!=='auto') document.documentElement.style.setProperty('--cols',val);
+  if(k==='enter') document.documentElement.style.setProperty('--enter-dur',val==='none'?'0s':'0.4s');
+  drawM();
+  if(k==='enter'&&val!=='none') playEntrance();
+  if(k==='open'&&document.getElementById('mMask').classList.contains('active')) replay();
+});
+
+document.getElementById('cellRange').oninput=e=>{
+  document.documentElement.style.setProperty('--cell',e.target.value+'px');
+  document.getElementById('cellVal').textContent=e.target.value+'px';
+  document.getElementById('mGrid').dataset.fixed='true';
+};
+document.getElementById('openRange').oninput=e=>{
+  document.documentElement.style.setProperty('--open-dur',(e.target.value/1000)+'s');
+  document.getElementById('openVal').textContent=(e.target.value/1000)+'s';
+};
+
+/* старт */
+applyPreset('A');
+openM();
+</script>
+</body>
+</html>

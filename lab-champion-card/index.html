@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Песочница карточки чемпиона</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="stylesheet" href="champion-card-lab.css?v=7">
+</head>
+<body>
+  <header class="lab-top">
+    <div class="lab-top-title">
+      <span class="lab-logo">⚔</span>
+      <div>
+        <div class="lab-h1">Карточка чемпиона — песочница</div>
+        <div class="lab-sub">Выбери раскладку сверху, крути параметры справа. Боевой сайт не трогается.</div>
+      </div>
+    </div>
+    <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
+  </header>
+
+  <nav id="variantBar" class="variant-bar"><!-- кнопки раскладок генерятся в JS --></nav>
+
+  <main class="lab-main">
+    <section class="stage" id="stage">
+      <div class="stage-inner" id="stageInner"><!-- карточка рендерится сюда --></div>
+    </section>
+
+    <aside class="panel" id="panel"><!-- параметры генерятся в JS --></aside>
+  </main>
+
+  <script src="champion-card-lab.js?v=7"></script>
+</body>
+</html>

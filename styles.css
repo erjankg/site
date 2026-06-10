@@ -7259,3 +7259,9 @@ button:active { transform: scale(var(--btn-press)); }
   .footer-inner { grid-template-columns: 1fr; gap: 24px; }
   .site-footer { padding: 32px 16px 20px; }
 }
+/* ПК: сдвигаем только подвал вправо на ширину всегда-открытого сайдбара (240px),
+   чтобы его левый край не уезжал под сайдбар. Остальная страница не трогается. */
+@media (min-width: 769px) {
+  .footer-inner,
+  .footer-legal { margin-left: 264px; margin-right: auto; }
+}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Tier Lab — живой tiermaker (пул снизу + перетаскивание)</title>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
+<style>
+  :root{ --bg:#0a0f16; --panel:#0d1b2a; --line:rgba(255,255,255,.1); --accent:#0bc4e3; --text:#e8eef4; --muted:rgba(255,255,255,.55); }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:radial-gradient(1000px 500px at 70% -10%,#112436,var(--bg) 60%);
+        color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; padding:20px; }
+  h1{margin:0 0 6px; font-size:21px;}
+  .sub{color:var(--muted); font-size:13px; margin:0 0 14px; max-width:860px; line-height:1.6;}
+  .sub b{color:var(--accent);}
+
+  .opts{display:flex; gap:18px; flex-wrap:wrap; margin-bottom:14px; align-items:center;}
+  .grp{display:flex; align-items:center; gap:6px;}
+  .grp .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); font-weight:700;}
+  .seg{display:flex; gap:3px; background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:9px; padding:3px;}
+  .seg button{background:none; border:none; color:rgba(255,255,255,.7); font-size:12px; font-weight:700; padding:5px 11px; border-radius:6px; cursor:pointer;}
+  .seg button.on{background:rgba(11,196,227,.18); color:var(--accent);}
+
+  .stage{ border:1px solid var(--line); border-radius:14px; background:linear-gradient(180deg,var(--panel),#0b1622);
+          box-shadow:0 18px 50px rgba(0,0,0,.4); padding:14px; min-height:60vh; }
+  .stage.side{display:flex; gap:14px; align-items:stretch;}
+
+  /* тиры — ряды */
+  .tiers.rows{display:flex; flex-direction:column; gap:8px;}
+  .tiers.rows .tier{display:flex; align-items:stretch; border:1px solid var(--line); border-radius:12px; overflow:hidden; min-height:64px;}
+  .tiers.rows .badge{width:52px; flex:0 0 auto; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; color:#fff;}
+  .tiers.rows .lane{flex:1; display:flex; flex-wrap:wrap; gap:6px; padding:7px; align-content:flex-start; min-height:60px;}
+
+  /* тиры — колонки */
+  .tiers.cols{display:flex; gap:8px; align-items:flex-start; overflow-x:auto; padding-bottom:6px;}
+  .tiers.cols .tier{flex:1; min-width:120px; display:flex; flex-direction:column;}
+  .tiers.cols .badge{height:40px; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:900; color:#fff; border-radius:9px; margin-bottom:6px;}
+  .tiers.cols .lane{flex:1; display:flex; flex-wrap:wrap; gap:6px; padding:6px; background:rgba(255,255,255,.02); border-radius:8px; align-content:flex-start; min-height:120px;}
+
+  /* пул */
+  .pool-wrap{ }
+  .pool-wrap .plabel{font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); font-weight:700; margin:14px 0 8px;}
+  .pool{display:flex; flex-wrap:wrap; gap:6px; padding:10px; background:rgba(0,0,0,.22); border:1px dashed rgba(255,255,255,.15); border-radius:12px; align-content:flex-start; min-height:80px;}
+  .stage.side .pool-wrap{width:230px; flex:0 0 auto; display:flex; flex-direction:column;}
+  .stage.side .pool-wrap .plabel{margin-top:0;}
+  .stage.side .pool{flex:1; overflow-y:auto;}
+  .stage.side .tiers-col{flex:1; min-width:0;}
+
+  /* чипы. user-drag:none — чтобы браузер не тащил саму картинку (тот самый чёрный «🚫») */
+  .chip{border-radius:9px; background:linear-gradient(135deg,#1c3350,#0c1a2a); object-fit:cover; cursor:grab; will-change:transform; flex:0 0 auto;
+        -webkit-user-drag:none; user-drag:none; user-select:none; -webkit-touch-callout:none;}
+  /* размер отдельно: в тирах (tsz-*) и в пуле (psz-*) */
+  .tiers.tsz-s .chip{width:38px;height:38px;} .tiers.tsz-m .chip{width:48px;height:48px;} .tiers.tsz-l .chip{width:60px;height:60px;}
+  .pool.psz-s .chip{width:38px;height:38px;}  .pool.psz-m .chip{width:48px;height:48px;}  .pool.psz-l .chip{width:60px;height:60px;}
+
+  /* выбранный вид перетаскивания: Подъём + Неон (Резко = animation:90) */
+  .tl-ghost{opacity:.25; outline:2px dashed rgba(11,196,227,.5); outline-offset:-2px; border-radius:9px;}
+  .tl-chosen{cursor:grabbing !important;}
+  .tl-drag{opacity:.97 !important; transform:scale(1.06); box-shadow:0 16px 36px rgba(0,0,0,.55), 0 0 0 2px var(--accent), 0 0 16px rgba(11,196,227,.45);}
+  .hint{font-size:12px; color:var(--muted); margin-top:12px;}
+</style>
+</head>
+<body>
+  <h1>🏆 Tier Lab — живой tiermaker</h1>
+  <p class="sub">Чемпы лежат <b>в пуле</b>, тащишь их вверх в ряды <b>S+ / S / A / B / C / D</b> — по-настоящему (анимация Подъём+Резко+Неон). Без кнопки «Изменить» — всё всегда таскается. Покрути опции, скажи что нравится.</p>
+
+  <div class="opts">
+    <div class="grp"><span class="lbl">Раскладка</span><div class="seg" id="segLayout"><button data-v="rows" class="on">Ряды</button><button data-v="cols">Колонки</button></div></div>
+    <div class="grp"><span class="lbl">Пул</span><div class="seg" id="segPool"><button data-v="bottom" class="on">Снизу</button><button data-v="side">Сбоку</button></div></div>
+    <div class="grp"><span class="lbl">Размер в тирах</span><div class="seg" id="segTierSize"><button data-v="s">S</button><button data-v="m" class="on">M</button><button data-v="l">L</button></div></div>
+    <div class="grp"><span class="lbl">Размер в пуле</span><div class="seg" id="segPoolSize"><button data-v="s">S</button><button data-v="m" class="on">M</button><button data-v="l">L</button></div></div>
+    <button id="reset" style="margin-left:auto;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:700;padding:7px 13px;border-radius:9px;cursor:pointer;">↺ Сбросить</button>
+  </div>
+
+  <div class="stage sz-m" id="stage"></div>
+  <p class="hint">Тащи чемпа из пула в любой тир, между тирами, обратно в пул. Меняй раскладку/пул/размер сверху — расстановка сохраняется.</p>
+
+<script>
+(function(){
+  var COLORS = {'S+':'#FF3A3A','S':'#C43A3A','A':'#C46A1C','B':'#BC9800','C':'#1E8848','D':'#555566'};
+  var KEYS = ['S+','S','A','B','C','D'];
+  var CHAMPS = ['Aatrox','Ahri','Akali','Ashe','Caitlyn','Darius','Ezreal','Garen','Jhin','Jinx',
+                'Katarina','Leona','LeeSin','Lux','Malphite','Nasus','Riven','Sett','Teemo','Vayne','Yasuo','Zed'];
+  function ic(n){ return 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/'+n+'.png'; }
+  // draggable="false" — браузер не тащит саму картинку (убирает чёрный «🚫»), тащит только SortableJS
+  function chip(n){ return '<img class="chip" draggable="false" data-champ="'+n+'" src="'+ic(n)+'" onerror="this.style.visibility=\'hidden\'" alt="'+n+'">'; }
+
+  var layout='rows', poolPos='bottom', tierSize='m', poolSize='m';
+  var stage = document.getElementById('stage');
+
+  // расстановка чемпов по зонам — чтобы НЕ сбрасывалась при смене опций
+  function emptyPlacement(){ var p={pool:CHAMPS.slice()}; KEYS.forEach(function(k){p[k]=[];}); return p; }
+  var placement = emptyPlacement();
+  function snapshot(){
+    var p={};
+    stage.querySelectorAll('[data-zone]').forEach(function(z){
+      p[z.dataset.zone] = Array.prototype.map.call(z.querySelectorAll('.chip'), function(c){ return c.dataset.champ; });
+    });
+    placement = p;
+  }
+  function chipsFor(zone){ return (placement[zone]||[]).map(chip).join(''); }
+
+  function build(){
+    stage.className = 'stage' + (poolPos==='side' ? ' side' : '');
+    var tiersHTML = '<div class="tiers '+layout+' tsz-'+tierSize+'">' + KEYS.map(function(k){
+      return '<div class="tier"><div class="badge" style="background:'+COLORS[k]+';">'+k+'</div><div class="lane" data-zone="'+k+'">'+chipsFor(k)+'</div></div>';
+    }).join('') + '</div>';
+    var poolHTML = '<div class="pool-wrap"><div class="plabel">Пул чемпионов</div><div class="pool psz-'+poolSize+'" data-zone="pool">'+chipsFor('pool')+'</div></div>';
+    stage.innerHTML = (poolPos==='side') ? '<div class="tiers-col">'+tiersHTML+'</div>'+poolHTML : tiersHTML+poolHTML;
+    initSortable();
+  }
+
+  function initSortable(){
+    if (!window.Sortable) return;
+    stage.querySelectorAll('[data-zone]').forEach(function(zone){
+      new window.Sortable(zone, {
+        group:'tier', animation:90,
+        ghostClass:'tl-ghost', chosenClass:'tl-chosen', dragClass:'tl-drag',
+        forceFallback:true, fallbackOnBody:true
+      });
+    });
+  }
+
+  function seg(id, set){
+    var box=document.getElementById(id);
+    box.addEventListener('click', function(e){
+      var b=e.target.closest('button'); if(!b) return;
+      Array.prototype.forEach.call(box.children, function(c){ c.classList.remove('on'); });
+      b.classList.add('on'); snapshot(); set(b.dataset.v); build();
+    });
+  }
+  seg('segLayout', function(v){ layout=v; });
+  seg('segPool', function(v){ poolPos=v; });
+  seg('segTierSize', function(v){ tierSize=v; });
+  seg('segPoolSize', function(v){ poolSize=v; });
+  document.getElementById('reset').onclick = function(){ placement = emptyPlacement(); build(); };
+
+  build();
+})();
+</script>
+</body>
+</html>

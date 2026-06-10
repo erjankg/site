@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Песочница Hover-раскрытие</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="stylesheet" href="hover-reveal-lab.css?v=15">
+</head>
+<body>
+  <header class="lab-top">
+    <div class="lab-top-title">
+      <span class="lab-logo">🃏</span>
+      <div>
+        <div class="lab-h1">Пикер чемпионов — песочница</div>
+        <div class="lab-sub">Поиск + фильтр по роли сверху. Клик по чемпиону → открывается стеклянная карточка с инфой. Боевой сайт не трогается.</div>
+      </div>
+    </div>
+    <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
+  </header>
+
+  <nav id="variantBar" class="variant-bar"></nav>
+
+  <main class="lab-main">
+    <section class="stage">
+      <div id="hrHint" class="hint"></div>
+      <div id="hrStage" class="hr-stage"></div>
+    </section>
+    <aside class="panel" id="panel"></aside>
+  </main>
+
+  <div id="hrOverlay" class="hr-overlay" hidden></div>
+
+  <script src="hover-reveal-lab.js?v=15"></script>
+</body>
+</html>
