@@ -7,12 +7,14 @@
 | Файл | Что делает | Источник |
 |------|-----------|----------|
 | `fetch-wr-stats.mjs` | WR / пикрейт / банрейт / тир **всех чемпионов** | Tencent CN (`mlol.qt.qq.com`) напрямую |
+| `fetch-base-stats.mjs` | **Базовые статы** всех чемпионов: AD/HP/мана/броня/MR (+рост), скорость передвижения, реген, роли, ресурс; дальность и скорость атаки | Tencent (`game.gtimg.cn/.../js/hero/<id>.js`) + Riot Data Dragon (дальность/AS) |
 | `fetch-guide.mjs` | Гайд по **одному** чемпиону: матчапы, сборки, руны, заклинания, прокачка, контры | wildriftallstats.ru |
 | `fetch-all.mjs` | То же, но по **всем 138** чемпионам сразу | wildriftallstats.ru |
 
 ## Что получается (результат)
 
 - `wr-stats.json` — список всех чемпионов с винрейтом/тиром.
+- `base-stats.json` — базовые статы всех чемпионов (заменяет ручную Google-таблицу; сайт читает его первым, таблица — запасной источник).
 - `guides/<чемпион>.json` — полный гайд по каждому (138 файлов).
 - `guides/_index.json` — оглавление (имя, роль, тир).
 
@@ -20,6 +22,7 @@
 
 ```bash
 node data-pipeline/fetch-wr-stats.mjs      # винрейты всех чемпионов
+node data-pipeline/fetch-base-stats.mjs    # базовые статы всех чемпионов
 node data-pipeline/fetch-guide.mjs aatrox  # гайд одного чемпиона (для проверки)
 node data-pipeline/fetch-all.mjs           # гайды всех 138
 node data-pipeline/fetch-all.mjs 5         # только первые 5 (быстрая проверка)

@@ -1,0 +1,137 @@
+/* ===== Мета-хаб · премиум-стекло (циан+золото) · 3 бенто-раскладки ===== */
+:root{
+  --bg:#050a12; --bg2:#081320;
+  --acc:#0BC4E3; --acc-dim:#0b8ca3; --gold:#C89B3C; --gold-soft:#e6c87a;
+  --good:#4ade80; --bad:#f87171;
+  --txt:#eaf4fb; --txt-dim:#8aa3b5; --txt-faint:#5a7286;
+  --r:18px; --gap:14px;
+  --glass-bd:rgba(255,255,255,.09); --glass-bg:rgba(255,255,255,.045);
+  --tier-Splus:var(--gold); --tier-S:var(--acc); --tier-A:#5fd6a0; --tier-B:#cdd8e0; --tier-C:#9fb0bd; --tier-D:#6f8494;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:'Segoe UI',system-ui,sans-serif; color:var(--txt); background:var(--bg);
+  min-height:100vh;
+  background-image:
+    radial-gradient(900px 500px at 80% -10%, rgba(11,196,227,.10), transparent 60%),
+    radial-gradient(700px 500px at 0% 110%, rgba(200,155,60,.08), transparent 60%),
+    linear-gradient(180deg,#040810,#06101c);
+  background-attachment:fixed;
+}
+.wrap{max-width:1320px; margin:0 auto; padding:22px 20px 60px}
+
+/* ---------- Шапка ---------- */
+.hub-top{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:18px}
+.hub-title{font-size:26px; font-weight:800; letter-spacing:.3px; margin:0; display:flex; align-items:center; gap:10px}
+.hub-title b{background:linear-gradient(90deg,var(--acc),var(--gold-soft)); -webkit-background-clip:text; background-clip:text; color:transparent}
+.hub-badge{font-size:12px; color:var(--txt-dim); border:1px solid var(--glass-bd); border-radius:999px; padding:5px 11px; background:var(--glass-bg); backdrop-filter:blur(10px)}
+.hub-badge b{color:var(--gold-soft); font-weight:700}
+.spacer{flex:1}
+
+/* пилюли рангов + переключатель раскладок */
+.pills{display:inline-flex; gap:4px; padding:4px; border-radius:999px; background:rgba(255,255,255,.04); border:1px solid var(--glass-bd); backdrop-filter:blur(10px)}
+.pill{appearance:none; border:0; background:transparent; color:var(--txt-dim); font:inherit; font-size:13px; font-weight:600; padding:7px 14px; border-radius:999px; cursor:pointer; transition:.18s; white-space:nowrap}
+.pill:hover{color:var(--txt)}
+.pill.on{color:#03121a; background:linear-gradient(90deg,var(--acc),#3dd9ee); box-shadow:0 4px 14px rgba(11,196,227,.35)}
+.pills.gold .pill.on{background:linear-gradient(90deg,var(--gold),var(--gold-soft)); box-shadow:0 4px 14px rgba(200,155,60,.3); color:#1c1304}
+
+/* ---------- Бенто-сетка ---------- */
+.bento{display:grid; gap:var(--gap); grid-auto-rows:minmax(96px,auto)}
+/* A · Витрина (герой доминирует) */
+.bento[data-v="A"]{grid-template-columns:repeat(4,1fr); grid-template-areas:
+  "feat feat feat top"
+  "feat feat feat top"
+  "mov  mov  mu   top"
+  "co   bd   bd   top";}
+/* B · Мозаика (равновесие) */
+.bento[data-v="B"]{grid-template-columns:repeat(4,1fr); grid-template-areas:
+  "feat feat top  top"
+  "feat feat top  top"
+  "mov  mu   bd   bd"
+  "mov  co   bd   bd";}
+/* C · Дашборд (плотно, данные вперёд) */
+.bento[data-v="C"]{grid-template-columns:repeat(4,1fr); grid-template-areas:
+  "top top  mov  mu"
+  "top top  mov  co"
+  "feat feat mov  bd"
+  "feat feat mov  bd";}
+.t-featured{grid-area:feat} .t-top{grid-area:top} .t-movers{grid-area:mov}
+.t-matchup{grid-area:mu} .t-counter{grid-area:co} .t-build{grid-area:bd}
+
+/* ---------- Стеклянная плитка ---------- */
+.tile{position:relative; border-radius:var(--r); background:var(--glass-bg); border:1px solid var(--glass-bd);
+  backdrop-filter:blur(18px) saturate(1.45); box-shadow:0 8px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+  padding:15px 16px; overflow:hidden; transition:transform .25s, box-shadow .25s, border-color .25s; min-height:0}
+.tile:hover{transform:translateY(-3px); border-color:rgba(11,196,227,.4); box-shadow:0 14px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(11,196,227,.15)}
+.tile h3{margin:0 0 11px; font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--txt-faint); display:flex; align-items:center; gap:7px}
+.tile h3 .ic{font-size:14px}
+.tile h3 .tag{margin-left:auto; font-size:10px; letter-spacing:.5px; color:var(--gold-soft); border:1px solid rgba(200,155,60,.4); border-radius:6px; padding:2px 7px; text-transform:none}
+
+/* ---------- Чемпион патча ---------- */
+.t-featured{padding:0; display:flex; flex-direction:column; justify-content:flex-end; color:#fff; min-height:300px}
+.feat-bg{position:absolute; inset:0; background-size:cover; background-position:center 22%; transform:scale(1.04); transition:transform .6s}
+.t-featured:hover .feat-bg{transform:scale(1.09)}
+.feat-shade{position:absolute; inset:0; background:linear-gradient(180deg,rgba(5,10,18,.15) 0%,rgba(5,10,18,.55) 55%,rgba(5,10,18,.93) 100%)}
+.feat-eyebrow{position:absolute; top:15px; left:16px; font-size:11px; letter-spacing:1.4px; text-transform:uppercase; color:var(--gold-soft); font-weight:700; text-shadow:0 1px 6px #000}
+.feat-body{position:relative; padding:16px 18px 18px}
+.feat-name{font-size:34px; font-weight:850; line-height:1; margin:0 0 4px; text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.feat-role{font-size:13px; color:var(--txt-dim); margin-bottom:14px}
+.feat-stats{display:flex; gap:10px}
+.fstat{flex:1; background:rgba(8,16,26,.5); border:1px solid var(--glass-bd); border-radius:12px; padding:9px 11px; backdrop-filter:blur(8px)}
+.fstat .k{font-size:10px; letter-spacing:.6px; text-transform:uppercase; color:var(--txt-faint)}
+.fstat .v{font-size:20px; font-weight:800; margin-top:2px}
+.fstat.wr .v{color:var(--acc)}
+
+/* ---------- Тир-бейдж ---------- */
+.tier{display:inline-grid; place-items:center; min-width:24px; height:24px; padding:0 6px; border-radius:7px; font-size:12px; font-weight:800; color:#03121a; background:var(--tier-B)}
+.tier[data-t="S+"]{background:var(--tier-Splus); color:#1c1304; box-shadow:0 0 12px rgba(200,155,60,.5)}
+.tier[data-t="S"]{background:var(--tier-S); color:#03121a; box-shadow:0 0 12px rgba(11,196,227,.4)}
+.tier[data-t="A"]{background:var(--tier-A)} .tier[data-t="B"]{background:var(--tier-B)}
+.tier[data-t="C"]{background:var(--tier-C)} .tier[data-t="D"]{background:var(--tier-D)}
+.feat-tier{position:absolute; top:13px; right:14px; width:38px; height:38px; border-radius:11px; font-size:17px; box-shadow:0 4px 16px rgba(0,0,0,.4)}
+
+/* ---------- Список топ-WR ---------- */
+.row{display:flex; align-items:center; gap:11px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.05)}
+.row:last-child{border-bottom:0}
+.av{width:34px; height:34px; border-radius:9px; object-fit:cover; background:#0d1a27; border:1px solid var(--glass-bd); flex:none}
+.row .nm{font-size:14px; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.row .rl{font-size:11px; color:var(--txt-faint)}
+.row .right{margin-left:auto; display:flex; align-items:center; gap:9px}
+.wrbar{width:62px; height:6px; border-radius:4px; background:rgba(255,255,255,.08); overflow:hidden}
+.wrbar i{display:block; height:100%; background:linear-gradient(90deg,var(--acc-dim),var(--acc))}
+.wrnum{font-size:13px; font-weight:800; color:var(--acc); min-width:42px; text-align:right}
+
+/* ---------- Movers ---------- */
+.mov-grid{display:grid; grid-template-columns:1fr 1fr; gap:6px 16px}
+.mov-col h4{margin:0 0 4px; font-size:11px; font-weight:700; letter-spacing:.5px; color:var(--txt-faint)}
+.mov-col.up h4{color:var(--good)} .mov-col.down h4{color:var(--bad)}
+.mov-item{display:flex; align-items:center; gap:7px; padding:4px 0; font-size:13px}
+.mov-item .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.mov-item .d{margin-left:auto; font-weight:800; font-size:12px}
+.mov-item .d.up{color:var(--good)} .mov-item .d.down{color:var(--bad)}
+
+/* ---------- Матчап / Контра дня ---------- */
+.duel{display:flex; align-items:center; gap:10px}
+.duel .who{display:flex; align-items:center; gap:9px; flex:1; min-width:0}
+.duel .who .nm{font-size:15px; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.duel .vs{font-size:11px; font-weight:800; color:var(--txt-faint); padding:0 2px}
+.duel .pct{font-size:19px; font-weight:850}
+.pct.good{color:var(--good)} .pct.bad{color:var(--bad)}
+.duel-sub{margin-top:9px; font-size:12px; color:var(--txt-dim)}
+.duel-sub b{color:var(--txt)}
+
+/* ---------- Билд дня ---------- */
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px}
+.chip{font-size:12px; padding:5px 10px; border-radius:9px; background:rgba(11,196,227,.10); border:1px solid rgba(11,196,227,.22); color:#bfeefa; white-space:nowrap}
+.chip.gold{background:rgba(200,155,60,.12); border-color:rgba(200,155,60,.3); color:var(--gold-soft)}
+.bd-block{margin-bottom:11px}
+.bd-block .lbl{font-size:11px; letter-spacing:.5px; text-transform:uppercase; color:var(--txt-faint); margin-bottom:5px}
+
+.foot{margin-top:26px; text-align:center; font-size:12px; color:var(--txt-faint)}
+.foot b{color:var(--txt-dim)}
+
+@media(max-width:900px){
+  .bento[data-v]{grid-template-columns:1fr 1fr; grid-template-areas:
+    "feat feat" "top top" "mov mov" "mu co" "bd bd";}
+}

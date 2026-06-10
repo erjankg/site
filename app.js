@@ -341,7 +341,6 @@
         { key:'mana',  label:'Mana', labelShort:'MN', icon:'💧', iconClass:'stat-icon-mana' },
         { key:'armor', label:'AR',   icon:'🛡', iconClass:'stat-icon-armor' },
         { key:'mrez',  label:'MR',   icon:'✦', iconClass:'stat-icon-mr' },
-        { key:'range', label:'RNG',  icon:'🏹', iconClass:'stat-icon-range', desktopOnly:true },
     ];
     function getStatsCols(){
         var cfg = window._colSettings ? window._colSettings.load('stats', STATS_COL_DEFS) : { order: STATS_COL_DEFS.map(function(d){return d.key;}), hidden: [] };
@@ -370,7 +369,6 @@
         thead.innerHTML = html;
     }
     window.openStatsColSettings = function(){
-        // Для модалки скрываем range из desktopOnly? Нет — пусть тоже можно скрывать.
         window._colSettings.open('stats', STATS_COL_DEFS, 'Настройка столбцов STATS', function(){
             buildStatsHeader();
             renderFull();
@@ -458,31 +456,41 @@
         if(skEl) skEl.style.display = 'block';
         document.getElementById('statTable').style.visibility = 'hidden';
 
-        let tsv;
+        // Источник базовых статов: сначала файл робота (data-pipeline/base-stats.json,
+        // обновляется автоматически каждый день), при сбое — запасная Google-таблица (G_URL).
+        let rows;
         try {
-            console.log('Fetching champions from:', G_URL);
-            tsv = await fetch(G_URL).then(function(r){ return r.text(); });
-            console.log('Data received, length:', tsv.length);
-            if(tsv.trim().startsWith('<!') || tsv.trim().startsWith('<html')) {
-                throw new Error('Google Sheet вернул HTML вместо TSV — лист не опубликован!');
+            const res = await fetch('data-pipeline/base-stats.json', { cache: 'no-cache' });
+            if(!res.ok) throw new Error('HTTP ' + res.status);
+            const json = await res.json();
+            rows = json.champions;
+            if(!Array.isArray(rows) || rows.length < 100) throw new Error('base-stats.json пуст или повреждён');
+            console.log('Champions from base-stats.json:', rows.length, '(DDragon', json.ddragonVersion + ')');
+        } catch(jsonErr) {
+            console.warn('base-stats.json недоступен, беру Google-таблицу:', jsonErr.message);
+            try {
+                const tsv = await fetch(G_URL).then(function(r){ return r.text(); });
+                if(tsv.trim().startsWith('<!') || tsv.trim().startsWith('<html')) {
+                    throw new Error('Google Sheet вернул HTML вместо TSV — лист не опубликован!');
+                }
+                const lines = tsv.trim().split('\n');
+                const heads = lines[0].split('\t').map(h => h.trim());
+                rows = lines.slice(1).map(l => {
+                    const c = l.split('\t'); const o = {};
+                    heads.forEach((h, i) => o[h] = c[i]?.trim());
+                    return o;
+                });
+            } catch(fetchErr) {
+                console.error('Fetch failed:', fetchErr);
+                const skEl = document.getElementById('skeletonOverlay');
+                if(skEl) skEl.style.display = 'none';
+                document.getElementById('statTable').style.visibility = 'visible';
+                document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">'+t('Ошибка: ') + (fetchErr.message || t('Не удалось загрузить данные')) + '</td></tr>';
+                return;
             }
-            // Патч-ноты теперь грузятся из Firestore через cmsLoadPatchnotes()
-        } catch(fetchErr) {
-            console.error('Fetch failed:', fetchErr);
-            const skEl = document.getElementById('skeletonOverlay');
-            if(skEl) skEl.style.display = 'none';
-            document.getElementById('statTable').style.visibility = 'visible';
-            document.getElementById('statBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:rgba(255,255,255,0.4);">'+t('Ошибка: ') + (fetchErr.message || t('Не удалось загрузить данные')) + '</td></tr>';
-            return;
         }
 
-        const lines = tsv.trim().split('\n');
-        const heads = lines[0].split('\t').map(h => h.trim());
-        
-        raw = lines.slice(1).map(l => {
-            const c = l.split('\t');
-            const o = {};
-            heads.forEach((h, i) => o[h] = c[i]?.trim());
+        raw = rows.map(o => {
             return {
                 name: o["Champion"],
                 ad_b: +o["AD_Base"], ad_g: +o["AD_Growth"],
@@ -491,8 +499,12 @@
                 ar_b: +o["Armor_Base"], ar_g: +o["Armor_Growth"],
                 mr_b: +o["MR_Base"], mr_g: +o["MR_Growth"],
                 rng_b: +o["Range_Base"] || 0, rng_g: +o["Range_Growth"] || 0,
+                as_b: +o["AS_Base"] || 0, as_g: +o["AS_Growth"] || 0,
+                ms_b: +o["MS_Base"] || 0,
+                hpreg_b: +o["HPRegen_Base"] || 0, hpreg_g: +o["HPRegen_Growth"] || 0,
+                mpreg_b: +o["MPRegen_Base"] || 0, mpreg_g: +o["MPRegen_Growth"] || 0,
                 res: o["Resource"],
-                is: { 
+                is: {
                     Top: +o["Is_Top"]==1, 
                     Jungle: +o["Is_Jungle"]==1, 
                     Mid: +o["Is_Mid"]==1, 
@@ -633,13 +645,6 @@
                 const k = c.key;
                 const v = item[k];
                 let cls = (k===sK) ? 'active-col ' : '';
-                if(k === 'range') {
-                    // Range без tier-coloring
-                    cls = (c.desktopOnly ? 'col-range ' : '') + (k===sK ? 'active-col' : '');
-                    td.className = cls.trim();
-                    td.textContent = Math.round(v);
-                    return;
-                }
                 if(v >= thres[k].s) cls += 's';
                 else if(v >= thres[k].a) cls += 'a';
                 else if(v <= thres[k].c) cls += 'c';
@@ -724,29 +729,19 @@
                 const k = c.key;
                 const v = item[k];
                 const td = document.createElement('td');
-                if(k === 'range') {
-                    td.className = (c.desktopOnly ? 'col-range' : '') + (sK==='range' ? ' active-col' : '');
-                    td.textContent = Math.round(v);
-                    if(item.g.range) {
-                        td.addEventListener('mouseenter', (ev) => showT(ev, item.g.range));
-                        td.addEventListener('mousemove', moveT);
-                        td.addEventListener('mouseleave', hideT);
-                    }
-                } else {
-                    let cls = (k===sK) ? 'active-col ' : '';
-                    if(v >= thres[k].s) cls += 's';
-                    else if(v >= thres[k].a) cls += 'a';
-                    else if(v <= thres[k].c) cls += 'c';
-                    else cls += 'b';
-                    let txt = Math.round(v);
-                    if(k==='mana' && item.res==='Energy') txt = 'NRG';
-                    else if(k==='mana' && v===0) txt = '0';
-                    td.className = cls;
-                    td.textContent = txt;
-                    td.addEventListener('mouseenter', (ev) => showT(ev, item.g[k]));
-                    td.addEventListener('mousemove', moveT);
-                    td.addEventListener('mouseleave', hideT);
-                }
+                let cls = (k===sK) ? 'active-col ' : '';
+                if(v >= thres[k].s) cls += 's';
+                else if(v >= thres[k].a) cls += 'a';
+                else if(v <= thres[k].c) cls += 'c';
+                else cls += 'b';
+                let txt = Math.round(v);
+                if(k==='mana' && item.res==='Energy') txt = 'NRG';
+                else if(k==='mana' && v===0) txt = '0';
+                td.className = cls;
+                td.textContent = txt;
+                td.addEventListener('mouseenter', (ev) => showT(ev, item.g[k]));
+                td.addEventListener('mousemove', moveT);
+                td.addEventListener('mouseleave', hideT);
                 tr.appendChild(td);
             });
             body.appendChild(tr);

@@ -29,6 +29,9 @@ jobs:
       - name: Fetch champion win rates (Tencent)
         run: node data-pipeline/fetch-wr-stats.mjs
 
+      - name: Fetch champion base stats (Tencent + Data Dragon)
+        run: node data-pipeline/fetch-base-stats.mjs
+
       - name: Fetch all champion guides (matchups/items/runes)
         run: node data-pipeline/fetch-all.mjs
 
@@ -36,7 +39,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data-pipeline/wr-stats.json data-pipeline/guides
+          git add data-pipeline/wr-stats.json data-pipeline/base-stats.json data-pipeline/guides
           if git diff --cached --quiet; then
             echo "Нет изменений в данных."
           else
