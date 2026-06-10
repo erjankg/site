@@ -73,8 +73,9 @@ async function getJSON(url, tries = 3) {
   }
 }
 
-// ранговые бракеты Tencent (срезы 0-4). Точное соответствие уточним при подключении к сайту.
-const RANK = { 0: 'all', 1: 'r1', 2: 'r2', 3: 'r3', 4: 'r4' };
+// ранговые бракеты Tencent (срезы 0-4). Подтверждено из index.js страницы статы Tencent
+// (`// 段位，默认为 0：钻石以上` = ранг, дефолт 0 = алмаз+). Нейминг как у wildriftallstats.
+const RANK = { 0: 'diamond_plus', 1: 'master_plus', 2: 'challenger', 3: 'apex', 4: 'all' };
 
 // английское имя зашито в ссылке на постер: .../Posters/Garen_0.jpg → "Garen"
 function nameFromPoster(poster) {
@@ -145,7 +146,7 @@ async function main() {
   console.log(`✓ Готово. Чемпионов-строк: ${out.length}, снимок: ${snapshotDate}`);
   console.log(`✓ Записано: ${outPath}`);
   const noRU = [...new Set(out.filter(c => c.nameEN && !RU[c.nameEN]).map(c => c.nameEN))];
-  console.log(`Топ-10 по WR (бракет «all»):`);
+  console.log(`Топ-10 по WR (бракет Diamond+):`);
   for (const c of out.filter(c => c.rankSlice === '0').slice(0, 10)) console.log(`   ${c.wr}%  ${c.name}  · ${c.role} · тир ${c.tier} · PR ${c.pr}% BR ${c.br}%`);
   if (noRU.length) console.log(`\n⚠ Нет в русском словаре (показываю по-английски): ${noRU.join(', ')}`);
 
