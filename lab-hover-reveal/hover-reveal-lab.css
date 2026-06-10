@@ -446,3 +446,132 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   .champ-card.tp-left .d-tabwrap{flex-direction:column}
   .champ-card.tp-left .d-tabbar{flex-direction:row;flex:none}
 }
+
+/* ── ЕДИНЫЙ БЛОК СТАТОВ (Часть 2): все статы одним стилем, всё в стекле ── */
+.xstats{margin-top:4px;border-radius:14px;padding:11px 13px;display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.xstats.glass{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.035));border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+/* чипсы */
+.xs-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:30px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px)}
+.xs-chip .xs-ic{font-size:14px;line-height:1}
+.xs-chip .xs-v{font-family:var(--cf);font-weight:900;font-size:15px;color:#eaf6ff}
+.xs-chip .xs-l{font-size:11px;color:rgba(230,243,251,.55)}
+/* бейджи — наследуют .champ-card .d-badge, добавляем только иконку слева */
+.xstats.xs-badges{gap:8px}
+.xstats .xs-badge .bl{display:inline-flex;align-items:center;gap:5px}
+/* бары */
+.xstats.xs-bars{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.xs-bar{min-width:0}
+.xs-bt{display:flex;justify-content:space-between;gap:8px;font-size:11px;margin-bottom:4px;color:rgba(230,243,251,.7)}
+.xs-bt b{font-family:var(--cf);font-size:13px}
+.xs-bk{height:7px;border-radius:7px;background:rgba(255,255,255,.08);overflow:hidden}
+.xs-bk i{display:block;height:100%;border-radius:7px;transition:width .25s}
+/* плитки */
+.xstats.xs-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.xs-tile{display:flex;flex-direction:column;align-items:center;gap:2px;padding:11px 8px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px)}
+.xs-tile .xs-t-ic{font-size:16px;line-height:1}
+.xs-tile .xs-t-v{font-family:var(--cf);font-weight:900;font-size:19px;color:#eaf6ff}
+.xs-tile .xs-t-l{font-size:10px;color:rgba(230,243,251,.55)}
+/* кольца (радиальные шкалы) */
+.xstats.xs-rings{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 10px;justify-items:center}
+.xs-ring{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;width:64px}
+.xs-ring svg{width:56px;height:56px;transform:rotate(-90deg)}
+.xs-rg-bg{fill:none;stroke:rgba(255,255,255,.1);stroke-width:6}
+.xs-rg-fg{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .3s}
+.xs-r-v{position:absolute;top:20px;left:0;right:0;text-align:center;font-family:var(--cf);font-weight:900;font-size:13px;color:#eaf6ff}
+.xs-r-l{font-size:10px;color:rgba(230,243,251,.6);text-align:center}
+
+/* ── СРАВНЕНИЕ (новое): 2 карточки рядом + общий ползунок уровня сверху ── */
+.cmp-wrap,.cmp-pick{position:relative;border-radius:20px;padding:18px;background:linear-gradient(180deg,rgba(8,22,33,.92),rgba(4,12,20,.96));border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(16px) saturate(1.15);box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.07)}
+.cmp-wrap{width:min(980px,95vw);max-height:92vh;overflow-y:auto}
+.cmp-wrap .d-close,.cmp-pick .d-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#eaf6ff;font-size:15px;cursor:pointer;backdrop-filter:blur(6px);z-index:3}
+.cmp-top{display:flex;align-items:center;gap:14px;justify-content:center;margin:2px 0 16px;flex-wrap:wrap}
+.cmp-title{font-weight:900;font-size:15px;color:#dff2fb}
+.cmp-lvl{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:9px 16px;min-width:260px}
+.cmp-lvl>span{font-size:11px;font-weight:800;letter-spacing:.5px;color:rgba(230,243,251,.55)}
+.cmp-lvl b{font-family:var(--cf);font-size:16px;color:var(--accent);min-width:22px;text-align:center}
+.cmp-lvl input[type=range]{flex:1}
+.cmp-swap{background:rgba(11,196,227,.1);border:1px solid rgba(11,196,227,.3);color:var(--accent);font-size:16px;border-radius:10px;width:40px;height:36px;cursor:pointer;transition:.14s}
+.cmp-swap:hover{background:rgba(11,196,227,.22)}
+.cmp-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cmp-card{border-radius:16px;padding:14px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(8px)}
+.cmp-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.cmp-port{width:54px;height:54px;object-fit:cover;border:1px solid rgba(255,255,255,.15)}
+.cmp-id{flex:1;min-width:0}
+.cmp-name{font-size:17px;font-weight:900;color:#eaf6ff;line-height:1.1}
+.cmp-tier{font-weight:900;font-size:13px;color:var(--tc);border:1px solid var(--tc);border-radius:8px;padding:2px 9px}
+.cmp-wr{font-size:12px;color:rgba(230,243,251,.65);margin-bottom:10px}
+.cmp-wr b{color:#eaf6ff;font-family:var(--cf)}
+.cmp-card .xstats{margin-top:0}
+/* пикер «с кем сравнить» */
+.cmp-pick{width:min(720px,92vw);max-height:82vh;overflow-y:auto}
+.cmp-pick-h{display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:14px;color:#dff2fb}
+.cmp-pick-h>span{flex:1;text-align:center}
+.cmp-pick-h b{color:var(--accent)}
+.cmp-back{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#cdeefb;border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:12px}
+.cmp-pick .pick-search{width:100%;margin-bottom:12px}
+.cmp-pick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.cmp-pick-c{display:flex;flex-direction:column;align-items:center;gap:5px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:9px 6px;cursor:pointer;transition:.14s}
+.cmp-pick-c:hover{border-color:var(--accent);background:rgba(11,196,227,.1);transform:translateY(-2px)}
+.cmp-pick-c img{width:46px;height:46px;border-radius:10px}
+.cmp-pick-c span{font-size:11px;color:#dff2fb;font-weight:700;text-align:center}
+@media (max-width:720px){ .cmp-cards{grid-template-columns:1fr} }
+
+/* ── АНТИ-ДЁРГАНЬЕ: цифры моноширинные + фикс. ширина значений, чтобы при смене уровня
+      блок НЕ переносился и модалка НЕ прыгала (см. правило «no layout jerk») ── */
+.xstats{font-variant-numeric:tabular-nums}
+.xs-num{font-variant-numeric:tabular-nums}
+.xs-chip .xs-v{min-width:4ch;text-align:right;display:inline-block}
+.xstats .xs-badge .bv{min-width:4ch;text-align:right;display:inline-block}
+.xs-bar .xs-bt b{min-width:4ch;text-align:right;display:inline-block}
+.xs-tile .xs-t-v{min-width:4ch}
+/* подсветка «кто выше» в сравнении — ТОЛЬКО цвет (ширина не меняется → нет дёрганья) */
+.xs-num.st-hi{color:#43e08a!important}
+.xs-num.st-lo{color:rgba(230,243,251,.42)!important}
+/* сплэш-вид карточек сравнения = ТЕ ЖЕ классы что у главной карты (champ-card):
+   сплэш-фон (.cd-bg) + скрим (.cd-scrim) + свечение (.cglow) наследуются автоматически.
+   .cmp-tw — обёртка для 3D-наклона, .cmp-mini — сужает карту под две рядом. */
+.cmp-tw{width:100%;min-width:0;transition:transform .16s ease-out;transform-style:preserve-3d}
+.champ-card.cmp-mini{width:100%;max-height:none;border-radius:18px}
+.champ-card.cmp-mini .d-head.compact{padding:14px 14px 6px}
+.champ-card.cmp-mini .d-body{padding:14px}
+.champ-card.cmp-mini .d-portrait{width:58px;height:58px}
+.champ-card.cmp-mini .cmp-wr{margin-bottom:10px}
+
+/* ── режим «Таблица»: статы строчками, чемпионы столбцами-панельками ──
+   фикс. высоты строк/шапки → ничего не прыгает при смене уровня (см. «no layout jerk»).
+   левый столбец-подписи липкий, при 5-6 чемпах включается тонкий боковой скролл. */
+.cmp-wrap.is-table{width:min(1120px,96vw);overflow:auto}
+.cmp-table{display:flex;gap:10px;align-items:flex-start;min-width:min-content;--headh:104px;--rowh:42px}
+.cmpc-bar .cmp-table{--rowh:50px}
+.cmp-table::-webkit-scrollbar{height:8px}
+.ct-labels{position:sticky;left:0;z-index:4;flex:0 0 118px;display:flex;flex-direction:column;gap:6px;
+  background:linear-gradient(90deg,rgba(8,22,33,.97) 78%,rgba(8,22,33,0))}
+.ct-corner{height:var(--headh);display:flex;align-items:flex-end;padding:0 4px 12px;font-size:11px;font-weight:900;letter-spacing:.6px;color:rgba(230,243,251,.5)}
+.ct-lbl{height:var(--rowh);display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#cfe6f3;padding-left:4px;white-space:nowrap}
+.ct-lbl span{font-size:14px}
+.ct-col{flex:1 1 156px;min-width:156px;display:flex;flex-direction:column;gap:6px;padding-bottom:8px;border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(8px) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.ct-colh{position:relative;height:var(--headh);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:10px 10px 9px;border-bottom:1px solid rgba(255,255,255,.08)}
+.ct-port{width:50px;height:50px;object-fit:cover;border:1px solid rgba(255,255,255,.16)}
+.ct-nm{font-size:14px;font-weight:900;color:#eaf6ff;text-align:center;line-height:1.05}
+.ct-tier{font-weight:900;font-size:11px;color:var(--tc);border:1px solid var(--tc);border-radius:7px;padding:1px 7px}
+.ct-wr{font-size:11px;color:rgba(230,243,251,.6)}
+.ct-wr b{color:#eaf6ff;font-family:var(--cf)}
+.ct-rm{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:7px;border:1px solid rgba(255,120,128,.3);
+  background:rgba(255,80,90,.12);color:#ff9aa2;font-size:11px;line-height:1;cursor:pointer;transition:.14s}
+.ct-rm:hover{background:rgba(255,80,90,.28)}
+.ct-cell{height:var(--rowh);margin:0 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  border-radius:9px;background:rgba(255,255,255,.025);font-variant-numeric:tabular-nums}
+.ct-v{display:flex;align-items:center;gap:5px;font-family:var(--cf);font-size:15px;font-weight:800;color:#eaf6ff}
+.ct-ar{font-style:normal;font-size:10px}
+.ct-ar.up{color:#43e08a}.ct-ar.dn{color:#ff7a85}
+.ct-bar{width:calc(100% - 8px);height:5px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}
+.ct-bar i{display:block;height:100%;border-radius:3px}
+.ct-add{flex:0 0 74px;align-self:stretch;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  border-radius:16px;border:1.5px dashed rgba(255,255,255,.2);background:rgba(255,255,255,.03);color:var(--accent);cursor:pointer;transition:.15s}
+.ct-add:hover{border-color:var(--accent);background:rgba(11,196,227,.1);transform:translateY(-1px)}
+.ct-add span{font-size:28px;line-height:1}
+.ct-add i{font-size:10px;font-style:normal;color:rgba(230,243,251,.6)}
+@media (max-width:560px){ .ct-labels{flex-basis:96px} .ct-col{min-width:130px;flex-basis:130px} }

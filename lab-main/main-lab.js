@@ -34,6 +34,15 @@
       {v:'dim',  t:'Затемнение'},
       {v:'blur', t:'Блюр фона'},
     ]},
+    menuanim:{label:'Анимация меню (из кнопки)', val:'genie', items:[
+      {v:'genie',  t:'Джинн (плавно)'},
+      {v:'pop',    t:'Пружина'},
+      {v:'unfold', t:'Разворот'},
+      {v:'zoom',   t:'Зум (быстро)'},
+      {v:'drop',   t:'Падение'},
+      {v:'flip',   t:'Флип 3D'},
+      {v:'fade',   t:'Фейд'},
+    ]},
     srowh:{label:'Статы · ховер строки',     val:'white',  items:HLITE},
     srows:{label:'Статы · выбранная строка', val:'accent', items:HLITE},
     scolh:{label:'Статы · ховер столбца',    val:'white',  items:HLITE},
@@ -167,7 +176,7 @@
   const S = {
     layout:'base', view:'hub', selRow:0,
     switcher:'glass', level:'chipdrag', tbl:'cards', anim:'slide', density:'normal', bg:'splash',
-    srowh:'white', srows:'accent', scolh:'white', scols:'accent', wrowh:'white', wrows:'accent', menufx:'dim',
+    srowh:'white', srows:'accent', scolh:'white', scols:'accent', wrowh:'white', wrows:'accent', menufx:'dim', menuanim:'genie',
     rail:'float', railanim:'fade', railbtn:'minimal', railact:'border',
     radius:'medium', glow:'soft', tblfont:'medium', island:true, thstyle:'glass',
     tlayout:'rows', tpool:'bottom', tsize:'m', psize:'m', tierOpen:false,
@@ -317,14 +326,14 @@
         <span class="f-ind"></span></div>
       <div class="f-h-right">
         <div class="f-menu"><button class="f-admin" id="fAdmin">⚙ Админ</button>
-          <div class="f-dd" id="fAdminDD"><b>Админ-инструменты</b><span>📋 История изменений</span><span>⚙ Настройки лейаута</span><span>🎚 Редактор позиций</span><span>🖼 Иконки</span><span>🔤 Шрифты</span><span>🏷 Категории</span><span>📰 Изменения</span><span>🧹 Очистить патч-ноты</span></div></div>
+          <div class="f-dd f-dd-r" id="fAdminDD"><b>Админ-инструменты</b><span>📋 История изменений</span><span>⚙ Настройки лейаута</span><span>🎚 Редактор позиций</span><span>🖼 Иконки</span><span>🔤 Шрифты</span><span>🏷 Категории</span><span>📰 Изменения</span><span>🧹 Очистить патч-ноты</span></div></div>
         <button class="f-pill-btn">RU</button>
         <div class="f-menu"><div class="f-ava" id="fAva"></div>
           <div class="f-dd f-dd-r" id="fAvaDD"><b>satyndy…@gmail.com</b><span>👤 Мой профиль</span><span id="fSettingsBtn">⚙ Настройки</span><span>🔄 Синхронизировать</span><span>🚪 Выйти</span></div>
           <div class="f-dd f-dd-r f-dd-wide" id="fSettingsDD"><b>Настройки отображения</b>
             ${Object.keys(PROFOPTS).map(k=>{const o=PROFOPTS[k];return `<div class="tl-grp"><span class="tl-glabel">${o.label}</span><div class="tl-seg" data-popt="${k}">${o.items.map(it=>`<button data-v="${it.v}" class="${it.v===S[k]?'on':''}">${it.t}</button>`).join('')}</div></div>`;}).join('')}</div></div>
       </div></div>`;
-    frame.innerHTML = side + `<div class="f-app">${head}<div class="f-central" id="fCentral"></div></div>`;
+    frame.innerHTML = side + `<div class="f-app">${head}<div class="f-central" id="fCentral"></div></div><div class="ml-dim"></div>`;
     frame.querySelectorAll('.f-tab').forEach(b=>b.onclick=()=>{
       S.view=b.dataset.v;
       frame.querySelectorAll('.f-tab').forEach(x=>x.classList.toggle('on',x===b));
@@ -335,9 +344,10 @@
     const anyOpen=()=>['fAdminDD','fAvaDD','fSettingsDD'].some(id=>{const d=$('#'+id);return d&&d.classList.contains('open');});
     const syncMenu=()=>{frame.dataset.menuopen=anyOpen()?'on':'off';};
     const closeDD=()=>{['fAdminDD','fAvaDD','fSettingsDD'].forEach(id=>{const d=$('#'+id);if(d)d.classList.remove('open');});syncMenu();};
-    if(adminBtn) adminBtn.onclick=e=>{e.stopPropagation();const o=$('#fAdminDD').classList.contains('open');closeDD();if(!o)$('#fAdminDD').classList.add('open');syncMenu();};
-    if(avaBtn) avaBtn.onclick=e=>{e.stopPropagation();const o=$('#fAvaDD').classList.contains('open');closeDD();if(!o)$('#fAvaDD').classList.add('open');syncMenu();};
-    if(setBtn) setBtn.onclick=e=>{e.stopPropagation();$('#fAvaDD').classList.remove('open');$('#fSettingsDD').classList.toggle('open');syncMenu();};
+    const openOne=(id,btn)=>{const dd=$('#'+id);if(!dd)return;const o=dd.classList.contains('open');closeDD();if(!o){originFrom(dd,btn);dd.classList.add('open');}syncMenu();};
+    if(adminBtn) adminBtn.onclick=e=>{e.stopPropagation();openOne('fAdminDD',adminBtn);};
+    if(avaBtn) avaBtn.onclick=e=>{e.stopPropagation();openOne('fAvaDD',avaBtn);};
+    if(setBtn) setBtn.onclick=e=>{e.stopPropagation();$('#fAvaDD').classList.remove('open');const dd=$('#fSettingsDD');const o=dd.classList.contains('open');if(!o){originFrom(dd,avaBtn);dd.classList.add('open');}else dd.classList.remove('open');syncMenu();};
     frame.querySelectorAll('#fSettingsDD .tl-seg').forEach(seg=>{const key=seg.dataset.popt;seg.querySelectorAll('button').forEach(b=>b.onclick=ev=>{ev.stopPropagation();S[key]=b.dataset.v;seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));applyAttrs();});});
     document.addEventListener('click',closeDD);
     frame.querySelectorAll('.side-btn').forEach(b=>b.onclick=()=>{
@@ -353,6 +363,7 @@
     const box = $('#fCentral');
     box.innerHTML = ({stats:statsView,wrpr:wrprView,hub:hubView,tier:tierView,patch:patchView,tactics:tacticsView}[S.view])();
     if(['stats','wrpr'].includes(S.view)) wireRows();
+    if(S.view==='wrpr') wireWrSort();
     if(S.view==='stats'){ if(S.level==='chipdrag') wireChipdrag(); wireHeaders(); }
     if(S.view==='tier'){ initTierSortable(); wireTierControls(); }
     if(S.view==='patch') wirePatch();
@@ -396,19 +407,36 @@
     });
   }
 
+  let wrSort={k:'wr',d:-1};
+  function wireWrSort(){
+    const wl=frame.querySelector('.f-wrlist');
+    frame.querySelectorAll('.wr-head .wr-sortable').forEach(h=>{
+      h.onclick=()=>{
+        const k=h.dataset.sort;
+        if(wrSort.k===k) wrSort.d*=-1; else { wrSort.k=k; wrSort.d=-1; }
+        renderCentral();
+      };
+      h.onmouseenter=()=>{ if(wl) wl.dataset.hovcol=h.dataset.sort; };
+      h.onmouseleave=()=>{ if(wl) wl.removeAttribute('data-hovcol'); };
+    });
+  }
   function wrprView(){
     const ranks=['Все ранги','Бронза','Золото','Платина','Алмаз','Мастер+'];
     const roles=['Все роли','Соло','Лес','Мид','Дракон','Саппорт'];
-    const sorted=[...CH].sort((a,b)=>b.wr-a.wr);
+    const TIER_ORD={'s+':6,s:5,a:4,b:3,c:2,d:1};
+    const val=(c,k)=> k==='tier' ? (TIER_ORD[String(c.tier).toLowerCase()]||0) : +c[k];
+    const sorted=[...CH].sort((a,b)=>(val(a,wrSort.k)-val(b,wrSort.k))*wrSort.d);
+    const arr=k=> wrSort.k===k ? (wrSort.d<0?' ▼':' ▲') : '';
+    const hc=(k,t)=>`<span class="wr-cell wr-sortable ${wrSort.k===k?'wr-srt on':''}" data-sort="${k}">${t}${arr(k)}</span>`;
     const list = `<div class="f-card f-wrlist">
-      <div class="wr-head"><span class="wr-rank">#</span><span class="wr-name-h">Чемпион</span><span class="wr-sp"></span><span class="wr-cell">Тир</span><span class="wr-cell wr-srt">WR ▼</span><span class="wr-cell">PR</span><span class="wr-cell">BR</span></div>
+      <div class="wr-head"><span class="wr-rank">#</span><span class="wr-name-h">Чемпион</span><span class="wr-sp"></span>${hc('tier','Тир')}${hc('wr','WR')}${hc('pr','PR')}${hc('br','BR')}</div>
       ${sorted.map((c,i)=>`<div class="wr-row" data-row="${CH.indexOf(c)}" style="--i:${i}">
         <span class="wr-rank">${i+1}</span>
         <span class="wr-name"><span class="f-port" style="background:${c.g}">${c.i}</span><span class="f-cname">${c.n}</span></span>
         <span class="wr-sp"></span>
-        <span class="wr-cell"><span class="f-tierbadge tb-${c.tier}">${c.tier.toUpperCase()}</span></span>
-        <span class="wr-cell wr-val ${wrCls(c.wr)}">${c.wr.toFixed(1)}%</span>
-        <span class="wr-cell wr-mut">${c.pr}%</span><span class="wr-cell wr-mut">${c.br}%</span>
+        <span class="wr-cell wr-c-tier"><span class="f-tierbadge tb-${c.tier}">${c.tier.toUpperCase()}</span></span>
+        <span class="wr-cell wr-val wr-c-wr ${wrCls(c.wr)}">${c.wr.toFixed(1)}%</span>
+        <span class="wr-cell wr-mut wr-c-pr">${c.pr}%</span><span class="wr-cell wr-mut wr-c-br">${c.br}%</span>
         <span class="wr-extra"><span class="wr-trend ${(TREND[c.n]||0)>=0?'up':'down'}">${(TREND[c.n]||0)>=0?'▲':'▼'}${Math.abs(TREND[c.n]||0).toFixed(1)}</span><svg class="wr-spark" viewBox="0 0 60 18" preserveAspectRatio="none"><polyline points="${sparkPts(c.wr,TREND[c.n]||0)}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg></span></div>`).join('')}</div>`;
     const body = `<div class="f-wrpr">
       <div class="f-wrpr-head">📊<span class="ttl">WinRate &amp; PickRate</span><span class="upd">обновлено 04.04.2026</span></div>
@@ -452,7 +480,7 @@
     const settings=`<div class="tl-settings ${S.tierOpen?'open':''}" id="tlSettings">
       ${Object.keys(TIEROPTS).map(k=>{const o=TIEROPTS[k];return `<div class="tl-grp"><span class="tl-glabel">${o.label}</span><div class="tl-seg" data-topt="${k}">${o.items.map(it=>`<button data-v="${it.v}" class="${it.v===S[k]?'on':''}">${it.t}</button>`).join('')}</div></div>`;}).join('')}
       <button class="tl-reset" id="tlReset">↺ Сбросить расстановку</button></div>`;
-    const bar=`<div class="tl-bar"><span class="tl-title">🎖 Тир-лист</span><button class="tl-gear ${S.tierOpen?'on':''}" id="tlGear">⚙ Настройки</button></div>`;
+    const bar=`<div class="tl-bar"><span class="tl-title">🎖 Тир-лист</span><button class="tl-gear ${S.tierOpen?'on':''}" id="tlGear" title="Настройки">⚙</button></div>`;
     return rpWrap(`<div class="f-tier">${bar}${settings}<div class="tl-board">${tiers}${pool}</div></div>`);
   }
   function tierSnapshot(){
@@ -466,8 +494,28 @@
       new Sortable(zone,{group:'tier',animation:90,ghostClass:'tl-ghost',chosenClass:'tl-chosen',dragClass:'tl-drag',forceFallback:true,fallbackOnBody:true,onEnd:tierSnapshot});
     });
   }
+  // origin = центр кнопки (панель растёт ИЗ кнопки) + клемп: не вылезать за фрейм
+  function originFrom(dd,btn){
+    if(!dd||!btn)return;
+    dd.style.left='';dd.style.right='';const pt=dd.style.transform;dd.style.transform='none';
+    // клемп по ГРАНИЦАМ ОКНА (не фрейма) — чтобы панель не уходила за экран
+    const vr={left:8,right:window.innerWidth-8};
+    let pr=dd.getBoundingClientRect();
+    let shift=0;
+    if(pr.right>vr.right) shift=vr.right-pr.right;
+    if(pr.left+shift<vr.left) shift=vr.left-pr.left;
+    if(shift){dd.style.left=(dd.offsetLeft+shift)+'px';dd.style.right='auto';pr=dd.getBoundingClientRect();}
+    dd.style.transform=pt;
+    const br=btn.getBoundingClientRect();
+    // X = центр кнопки внутри панели, Y = верхний край панели (она прямо под кнопкой) → растёт из-под кнопки
+    const ox=Math.max(0,Math.min(pr.width, br.left+br.width/2-pr.left));
+    dd.style.transformOrigin=`${ox.toFixed(1)}px 0px`;
+  }
   function wireTierControls(){
-    const gear=$('#tlGear'); if(gear) gear.onclick=()=>{S.tierOpen=!S.tierOpen;$('#tlSettings').classList.toggle('open',S.tierOpen);gear.classList.toggle('on',S.tierOpen);};
+    const gear=$('#tlGear');
+    const setTier=(open)=>{S.tierOpen=open;const s=$('#tlSettings');if(s){if(open)originFrom(s,gear);s.classList.toggle('open',open);}if(gear)gear.classList.toggle('on',open);frame.dataset.menuopen=open?'on':'off';};
+    if(gear) gear.onclick=e=>{e.stopPropagation();setTier(!S.tierOpen);};
+    if(!frame._tlOutside){frame._tlOutside=true;document.addEventListener('click',e=>{if(S.tierOpen&&!e.target.closest('#tlSettings')&&!e.target.closest('#tlGear'))setTier(false);});}
     frame.querySelectorAll('.tl-seg').forEach(seg=>{const key=seg.dataset.topt;seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{S[key]=b.dataset.v;seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));applyAttrs();});});
     const rb=$('#tlReset'); if(rb) rb.onclick=()=>{tierInit();renderCentral();};
     frame.querySelectorAll('.tl-chip').forEach(c=>c.addEventListener('click',()=>{selChamp=TIERMAP[c.dataset.champ];updatePreview();}));
@@ -607,7 +655,7 @@
   function applyAttrs(){
     frame.dataset.layout=S.layout; frame.dataset.view=S.view;
     frame.dataset.switcher=S.switcher; frame.dataset.tbl=S.tbl;
-    frame.dataset.srowh=S.srowh; frame.dataset.srows=S.srows; frame.dataset.scolh=S.scolh; frame.dataset.scols=S.scols; frame.dataset.wrowh=S.wrowh; frame.dataset.wrows=S.wrows; frame.dataset.menufx=S.menufx;
+    frame.dataset.srowh=S.srowh; frame.dataset.srows=S.srows; frame.dataset.scolh=S.scolh; frame.dataset.scols=S.scols; frame.dataset.wrowh=S.wrowh; frame.dataset.wrows=S.wrows; frame.dataset.menufx=S.menufx; frame.dataset.menuanim=S.menuanim;
     frame.dataset.anim=S.anim; frame.dataset.bg=S.bg; frame.dataset.density=S.density;
     frame.dataset.rail=S.rail; frame.dataset.railanim=S.railanim; frame.dataset.railbtn=S.railbtn; frame.dataset.railact=S.railact;
     frame.dataset.radius=S.radius; frame.dataset.glow=S.glow; frame.dataset.tblfont=S.tblfont; frame.dataset.island=S.island?'on':'off';
@@ -679,4 +727,6 @@ data: layout="${S.layout}" view="${S.view}" switcher="${S.switcher}" level="${S.
   // пре-прогрев reflow-пути раздвигания рельса — первое наведение без рывка (синхронно, без промежуточной отрисовки)
   try{ const _pc=frame.style.gridTemplateColumns; frame.style.gridTemplateColumns='252px 1fr'; void frame.offsetWidth; frame.style.gridTemplateColumns=_pc; }catch(e){}
   window.addEventListener('resize', positionIndicator);
+  // видимый штамп сборки — если число свежее, значит грузится новый код (не кеш)
+  (function(){const b=document.createElement('div');b.textContent='build 18';b.style.cssText='position:fixed;bottom:8px;right:10px;z-index:99999;background:#0BC4E3;color:#001016;font:800 12px system-ui,sans-serif;padding:4px 10px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.4);';document.body.appendChild(b);})();
 })();

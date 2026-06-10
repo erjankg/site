@@ -1388,6 +1388,59 @@ box-shadow: 0 0 12px var(--accent-border-str);
 background: var(--accent-dim);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Модалка выбора чемпионов (#mMask) — стекло + сплеш-арт + WR-шторка
+   (перенос из lab-champ-picker, 2026-06-07). Всё scoped под #mMask,
+   чтобы НЕ задеть другие модалки, у которых те же .m-win/.m-mask.
+   ═══════════════════════════════════════════════════════════ */
+/* матовое стекло окна — за ним размывается сплеш-арт */
+#mMask .m-win {
+  background: linear-gradient(135deg, rgba(1,21,32,0.60), rgba(1,10,19,0.74));
+  backdrop-filter: blur(22px) saturate(1.25);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.14);
+  z-index: 1;
+}
+#mMask .mhdr { background: transparent; border-bottom: 1px solid rgba(255,255,255,0.10); }
+#mMask .m-search input { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+#mMask .m-role { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.08); box-shadow: none; backdrop-filter: blur(4px); position: relative; }
+#mMask .m-role-spacer { background: rgba(255,255,255,0.10); }
+
+/* сплеш-арт за стеклом (1 картинка, лежит внутри маски ПОД окном) */
+#mMask .cp-splash {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg');
+  background-size: cover; background-position: center 18%;
+}
+#mMask .cp-splash::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+
+/* счётчик «выбрано/всего» на иконке роли */
+#mMask .m-role-count {
+  position: absolute; top: 5px; right: 6px; font-size: 9px; font-weight: 800;
+  color: rgba(255,255,255,0.55); background: rgba(0,0,0,0.4); border-radius: 10px; padding: 1px 6px;
+}
+
+/* карточка чемпа: зум картинки ВНУТРИ рамки + WR-шторка снизу по ховеру */
+#mMask .cp-iconwrap { position: relative; width: 100%; overflow: hidden; border-radius: 8px; container-type: inline-size; }
+#mMask .cp-iconwrap img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; transition: transform 0.18s; }
+#mMask .m-item:hover { transform: none; }
+#mMask .m-item:hover .cp-iconwrap img { transform: scale(1.08); }
+#mMask .cp-wr {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 2px;
+  background: linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.45));
+  font-size: 22cqw; font-weight: 900; line-height: 1; text-align: center; letter-spacing: -0.02em;
+  transform: translateY(101%); transition: transform 0.2s var(--ease-apple-out); z-index: 2; pointer-events: none;
+}
+#mMask .m-item:hover .cp-wr { transform: translateY(0); }
+#mMask .cp-wr.wr-low { color: #ff5d5d; }   /* <50 */
+#mMask .cp-wr.wr-mid { color: var(--gold); } /* 50–52 */
+#mMask .cp-wr.wr-high { color: #46e08a; }   /* >52 */
+
+/* открытие slide 0.5s (только этой модалки) */
+#mMask.active > .m-win { animation: cpSlideIn 0.5s var(--ease-apple-out) both; }
+@keyframes cpSlideIn { from { opacity: 0; transform: translateY(80px); } to { opacity: 1; transform: none; } }
+
 /* BODY SCROLL LOCK */
 body.modal-open { overflow: hidden !important; touch-action: none; position: fixed; inset: 0; width: 100%; }
 body.sidebar-open { overflow: hidden !important; touch-action: none; position: fixed; inset: 0; width: 100%; }

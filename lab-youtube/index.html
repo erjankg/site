@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Песочница видео сильных игроков</title>
+<link rel="preconnect" href="https://i.ytimg.com">
+<link rel="preconnect" href="https://www.youtube.com">
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="stylesheet" href="youtube-lab.css?v=9">
+</head>
+<body>
+  <div class="lab-bg" id="labBg"></div>
+
+  <header class="lab-top">
+    <div class="lab-top-title">
+      <span class="lab-logo">▶</span>
+      <div>
+        <div class="lab-h1">Видео сильных игроков — песочница</div>
+        <div class="lab-sub">Блок под гайдом на странице чемпа. Настройки сворачиваются кнопкой справа. Боевой сайт не трогается.</div>
+      </div>
+    </div>
+    <div class="lab-top-btns">
+      <button id="toggleBtn" class="lab-toggle">▲ Свернуть настройки</button>
+      <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
+    </div>
+  </header>
+
+  <section class="settings glassy" id="settings"><!-- все настройки генерятся в JS --></section>
+
+  <main class="lab-main">
+    <section class="stage" id="stage">
+      <div class="stage-inner" id="stageInner"><!-- блок видео рендерится сюда --></div>
+    </section>
+  </main>
+
+  <script src="youtube-lab.js?v=9"></script>
+</body>
+</html>

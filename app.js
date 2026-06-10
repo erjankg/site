@@ -768,6 +768,21 @@
     function render() { renderFull(); }
 
     
+    // Реальный WR чемпиона из WR_DATA (ранг 'чалик'), лучший среди его ролей. null если нет данных.
+    function wrLookup(name){
+        try {
+            var rd = ((window.WR_DATA || WR_DATA) || {})['чалик'] || {};
+            var norm = function(s){ return (s||'').toString().toLowerCase().replace(/[^a-zа-яё0-9]/gi,''); };
+            var key = norm(name), best = null;
+            ['top','jungle','mid','adc','support'].forEach(function(r){
+                (rd[r] || []).forEach(function(o){
+                    if(o && norm(o.name) === key){ var v = +o.wr; if(!isNaN(v) && (best === null || v > best)) best = v; }
+                });
+            });
+            return best;
+        } catch(e){ return null; }
+    }
+
     // Remove champion from table (only from selection, NOT from data)
     function drawM() {
         const grid = document.getElementById('mGrid');
@@ -789,10 +804,11 @@
             const container = document.createElement('div');
             container.className = 'm-role-container';
 
-            const isAll = allChampsInRole.length > 0 && allChampsInRole.every(x => selected.has(x.name));
+            const _onCnt = allChampsInRole.filter(x => selected.has(x.name)).length;
+            const isAll = allChampsInRole.length > 0 && _onCnt === allChampsInRole.length;
             const roleDiv = document.createElement('div');
             roleDiv.className = 'm-role ' + (isAll ? 'on' : '');
-            roleDiv.innerHTML = '<img loading="lazy" decoding="async" src="' + roleIcons[role] + '" alt="' + role + '">';
+            roleDiv.innerHTML = '<img loading="lazy" decoding="async" src="' + roleIcons[role] + '" alt="' + role + '"><span class="m-role-count">' + _onCnt + '/' + allChampsInRole.length + '</span>';
             roleDiv.onclick = () => roleT(role, isAll);
             container.appendChild(roleDiv);
 
@@ -805,15 +821,24 @@
                 const isOn = selected.has(c.name);
                 btn.className = 'm-item ' + (isOn ? 'on' : '');
 
+                const wrap = document.createElement('div');
+                wrap.className = 'cp-iconwrap';
+
                 const mImg = document.createElement('img');
                 mImg.src = champIcon(c.name);
                 mImg.alt = c.name;
                 mImg.title = c.name;
                 mImg.onerror = function(){ this.style.background='var(--sel-placeholder)'; this.src=''; };
+                wrap.appendChild(mImg);
 
-                const nm = document.createElement('div');
-                nm.style.cssText = 'font-size:7px;color:'+(isOn?'#fff':'rgba(255,255,255,0.45)')+';text-align:center;line-height:1.1;width:100%;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
-                nm.textContent = c.name;
+                // WR-шторка: выезжает по ховеру, только % винрейта (цвет по порогам)
+                var _wr = wrLookup(c.name);
+                if(_wr != null){
+                    var sh = document.createElement('div');
+                    sh.className = 'cp-wr ' + (_wr < 50 ? 'wr-low' : (_wr <= 52 ? 'wr-mid' : 'wr-high'));
+                    sh.textContent = _wr.toFixed(1) + '%';
+                    wrap.appendChild(sh);
+                }
 
                 // Patch dot in modal + tooltip
                 var pI2 = patchMap[c.name];
@@ -828,8 +853,7 @@
                         el.addEventListener('click', function(e){ showGlobalPatchTip(e, pi, el); });
                     })(pI2, btn);
                 }
-                btn.appendChild(mImg);
-                btn.appendChild(nm);
+                btn.appendChild(wrap);
 
                 btn.onclick = () => {
                     if(selected.has(c.name)) selected.delete(c.name);

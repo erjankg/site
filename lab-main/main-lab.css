@@ -181,7 +181,7 @@ body.ml-min .ml-title{margin-bottom:0;}
 .ml-frame[data-railact="dot"] .side-btn.active::after{content:"";position:absolute;left:5px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc);}
 
 /* ══ HEADER + NAV ══ */
-.f-app{display:flex;flex-direction:column;min-width:0;}
+.f-app{display:flex;flex-direction:column;min-width:0;position:relative;}
 .f-head{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--acc-border-sub);}
 .f-logo{font-size:19px;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,#fff,var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap;}
 .f-h-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
@@ -189,18 +189,37 @@ body.ml-min .ml-title{margin-bottom:0;}
 .f-ava{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#ff9ec5,#b48cff);cursor:pointer;border:1px solid var(--acc-border);}
 /* меню профиля + единый Админ */
 .f-menu{position:relative;}
+/* открытое меню поднимается НАД слоем затемнения, чтобы само не темнело */
+.f-menu:has(.f-dd.open){z-index:var(--z-pop);}
 .f-admin{padding:7px 13px;border-radius:9px;font-size:12px;font-weight:700;background:rgba(255,255,255,0.05);border:1px solid var(--acc-border-sub);color:var(--t2);cursor:pointer;transition:color .15s,border-color .15s;}
 .f-admin:hover{color:var(--acc);border-color:var(--acc-border);}
-.f-dd{position:absolute;top:calc(100% + 10px);left:0;min-width:214px;display:flex;flex-direction:column;gap:2px;padding:8px;border-radius:14px;
-  background:rgba(8,16,26,.72);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);
-  border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 44px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);z-index:40;
-  opacity:0;visibility:hidden;transform:translateY(-8px) scale(.98);pointer-events:none;
-  transition:opacity .18s ease,transform .2s cubic-bezier(.34,1.45,.64,1),visibility .18s;}
+/* варианты анимации открытия меню (выбор сверху). Все растут ИЗ кнопки и закрываются В кнопку
+   (transform-origin = центр кнопки, задаёт JS). Отличаются стартовым масштабом/кривой/скоростью. */
+.ml-frame{--ddclosed:scale(.1);--ddtime:.36s;--ddease:cubic-bezier(.2,.9,.28,1);}
+.ml-frame[data-menuanim="pop"]   {--ddclosed:scale(.2); --ddtime:.42s;--ddease:cubic-bezier(.34,1.56,.64,1);}
+.ml-frame[data-menuanim="unfold"]{--ddclosed:scale(.04);--ddtime:.46s;--ddease:cubic-bezier(.16,1,.3,1);}
+.ml-frame[data-menuanim="zoom"]  {--ddclosed:scale(.55);--ddtime:.24s;--ddease:ease-out;}
+.ml-frame[data-menuanim="drop"]  {--ddclosed:translateY(-26px) scale(.94);--ddtime:.32s;--ddease:cubic-bezier(.2,.9,.3,1);}
+.ml-frame[data-menuanim="flip"]  {--ddclosed:perspective(900px) rotateX(-82deg);--ddtime:.42s;--ddease:cubic-bezier(.2,.8,.3,1);}
+.ml-frame[data-menuanim="fade"]  {--ddclosed:scale(.985);--ddtime:.22s;--ddease:ease;}
+/* панель «вырастает» из кнопки. Стекло — СВЕТЛОЕ, как основные панели. */
+.f-dd{position:absolute;top:calc(100% + 8px);left:0;min-width:218px;display:flex;flex-direction:column;gap:2px;padding:8px;border-radius:14px;
+  background:rgba(255,255,255,.085);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.18);box-shadow:0 14px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.22);z-index:var(--z-pop);
+  opacity:0;visibility:hidden;transform:var(--ddclosed);pointer-events:none;
+  transition:transform var(--ddtime) var(--ddease),opacity .2s ease,visibility var(--ddtime);}
 .f-dd.f-dd-r{left:auto;right:0;}
-.f-dd.open{opacity:1;visibility:visible;transform:none;pointer-events:auto;}
-.f-dd b{font-size:11px;color:var(--t3);font-weight:700;padding:4px 8px 7px;border-bottom:1px solid var(--acc-border-sub);margin-bottom:4px;}
-.f-dd span{padding:8px 10px;border-radius:8px;font-size:13px;color:var(--t2);cursor:pointer;transition:background .12s,color .12s;}
-.f-dd span:hover{background:var(--acc-dim);color:var(--acc);}
+.f-dd.f-dd-wide{min-width:540px;}
+.f-dd.open{transform:none;opacity:1;visibility:visible;pointer-events:auto;box-shadow:0 0 0 100vmax rgba(0,0,0,.55),0 14px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.22);}
+/* пока панель развёрнута — прячем саму кнопку (панель = её продолжение) */
+.f-menu:has(.f-dd.open) > .f-admin,.f-menu:has(.f-dd.open) > .f-ava{opacity:0;pointer-events:none;transition:opacity .14s ease;}
+.f-dd{gap:5px;}
+.f-dd b{font-size:11px;color:rgba(234,243,251,.7);font-weight:700;padding:4px 8px 7px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:2px;}
+/* каждый пункт меню — стеклянная ячейка, ЯРКИЙ белый текст */
+.f-dd span{padding:9px 11px;border-radius:9px;font-size:13px;color:#eef5fc;font-weight:600;cursor:pointer;text-shadow:0 1px 2px rgba(0,0,0,.5);
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
+  transition:background .14s,color .14s,border-color .14s,transform .14s;}
+.f-dd span:hover{background:rgba(255,255,255,.26);border-color:rgba(255,255,255,.38);color:#fff;transform:translateX(2px);}
 
 /* nav — всегда пилюля-ползунок, варианты скинят индикатор */
 .f-nav{position:relative;display:inline-flex;align-items:center;gap:0;margin:0 auto;padding:4px;background:rgba(255,255,255,0.05);border:1px solid var(--acc-border-sub);border-radius:24px;}
@@ -296,7 +315,11 @@ body.ml-min .ml-title{margin-bottom:0;}
 
 /* ══ ПОДСВЕТКА: раздельно ховер/выбор строки и столбца статов (HLITE: white/accent/gold/grad/edge/frost) ══ */
 @keyframes ml-sweep{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-.f-tbl td.colhl,.f-tbl td.colhover,.f-tbl tbody tr:hover td,.f-tbl tbody tr.sel td{border-radius:8px;transition:background .14s,box-shadow .14s;}
+/* подсветка: НЕ скругляем каждую ячейку (это рвало углы и «обрезало» номер). Строка уже пилюля (см. td:first/last-child выше) */
+.f-tbl td.colhl,.f-tbl td.colhover,.f-tbl tbody tr:hover td,.f-tbl tbody tr.sel td{transition:background .14s,box-shadow .14s;}
+/* столбец подсвечивается вертикальной пилюлей: скругление только у верхней и нижней ячейки, середина квадратная */
+.f-tbl tbody tr:first-child td.colhl,.f-tbl tbody tr:first-child td.colhover{border-radius:8px 8px 0 0;}
+.f-tbl tbody tr:last-child td.colhl,.f-tbl tbody tr:last-child td.colhover{border-radius:0 0 8px 8px;}
 .f-tbl th.colhl .th-pill,.f-tbl th.colhover .th-pill{background:var(--acc-dim);color:var(--acc);border-color:var(--acc-border-str);}
 /* СТАТЫ · ховер строки (srowh) */
 .ml-frame[data-srowh="white"]  .f-tbl tbody tr:hover td{background:rgba(255,255,255,.12);}
@@ -369,6 +392,18 @@ body.ml-min .ml-title{margin-bottom:0;}
 .wr-sp{flex:0 0 var(--wr-gap);}
 .wr-cell{flex:0 0 58px;text-align:center;font-weight:700;font-size:13px;}
 .wr-srt{color:var(--acc);}
+.wr-sortable{cursor:pointer;user-select:none;border-radius:6px;transition:color .14s,background .14s;}
+.wr-sortable:hover{color:var(--t1);background:rgba(255,255,255,.06);}
+.wr-sortable.on{color:var(--acc);}
+/* ховер столбца таблицы винрейтов — наследует выбранный вариант (data-scolh), как у статов */
+.ml-frame{--wrhot:var(--acc-dim);}
+.ml-frame[data-scolh="white"]{--wrhot:rgba(255,255,255,.12);}
+.ml-frame[data-scolh="gold"]{--wrhot:rgba(200,155,60,.16);}
+.ml-frame[data-scolh="grad"]{--wrhot:linear-gradient(180deg,rgba(255,255,255,.14),transparent);}
+.ml-frame[data-scolh="frost"]{--wrhot:rgba(255,255,255,.16);}
+.f-wrlist[data-hovcol="tier"] .wr-c-tier,.f-wrlist[data-hovcol="wr"] .wr-c-wr,.f-wrlist[data-hovcol="pr"] .wr-c-pr,.f-wrlist[data-hovcol="br"] .wr-c-br{background:var(--wrhot);border-radius:8px;transition:background .14s,box-shadow .14s;}
+.ml-frame[data-scolh="edge"] :is(.f-wrlist[data-hovcol="tier"] .wr-c-tier,.f-wrlist[data-hovcol="wr"] .wr-c-wr,.f-wrlist[data-hovcol="pr"] .wr-c-pr,.f-wrlist[data-hovcol="br"] .wr-c-br){background:transparent;box-shadow:inset 0 0 0 1.5px var(--acc);}
+.ml-frame[data-scolh="frost"] :is(.f-wrlist[data-hovcol="tier"] .wr-c-tier,.f-wrlist[data-hovcol="wr"] .wr-c-wr,.f-wrlist[data-hovcol="pr"] .wr-c-pr,.f-wrlist[data-hovcol="br"] .wr-c-br){-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}
 .wr-val{font-weight:900;} .wr-g{color:var(--good);} .wr-m{color:var(--gold);} .wr-b{color:var(--bad);} .wr-n{color:var(--t1);}
 .wr-mut{color:var(--t3);}
 /* 🆕 WR-тренд + спарклайн (заполняет пустое место справа строки) */
@@ -423,7 +458,7 @@ body.ml-min .ml-title{margin-bottom:0;}
 .hub-news li{font-size:12px;color:var(--t2);display:flex;gap:8px;line-height:1.4;} .hub-news li b{color:var(--t1);} .hub-news .d{flex:0 0 auto;}
 
 /* ══ TIER-МЕЙКЕР (перенос из tier-layout-lab: реальный drag + параметры) ══ */
-.f-tier{margin:18px 20px 22px;display:flex;flex-direction:column;gap:12px;}
+.f-tier{margin:18px 20px 22px;display:flex;flex-direction:column;gap:12px;position:relative;}
 .tl-board{display:flex;flex-direction:column;gap:14px;}
 .ml-frame[data-tpool="side"] .tl-board{flex-direction:row;align-items:stretch;}
 /* тулбар тира + настройки внутри вида */
@@ -431,8 +466,15 @@ body.ml-min .ml-title{margin-bottom:0;}
 .tl-title{font-size:16px;font-weight:800;}
 .tl-gear{margin-left:auto;padding:7px 13px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--acc);background:var(--acc-dim);border:1px solid var(--acc-border-str);transition:background .15s,color .15s;}
 .tl-gear:hover,.tl-gear.on{background:var(--acc);color:#001016;}
-.tl-settings{display:none;flex-wrap:wrap;gap:14px 22px;align-items:center;padding:14px 16px;border-radius:12px;background:var(--bg-card);border:1px solid var(--acc-border);}
-.tl-settings.open{display:flex;}
+/* растёт из кнопки ⚙ (scale из её центра), поверх доски (не раздвигает), фон затемняется. Светлое стекло. */
+.tl-settings{position:absolute;top:46px;right:0;z-index:var(--z-pop);width:min(580px,100%);
+  display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;padding:16px 18px;border-radius:14px;
+  background:rgba(255,255,255,.085);-webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+  border:1px solid rgba(255,255,255,.18);box-shadow:0 16px 44px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.22);
+  opacity:0;visibility:hidden;transform:var(--ddclosed);pointer-events:none;
+  transition:transform var(--ddtime) var(--ddease),opacity .2s ease,visibility var(--ddtime);}
+.tl-settings.open{transform:none;opacity:1;visibility:visible;pointer-events:auto;box-shadow:0 0 0 100vmax rgba(0,0,0,.55),0 16px 44px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.22);}
+.f-tier:has(.tl-settings.open) .tl-gear{opacity:0;pointer-events:none;transition:opacity .14s ease;}
 .tl-grp{display:flex;flex-direction:column;gap:5px;}
 .tl-glabel{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--t3);}
 .tl-seg{display:inline-flex;gap:3px;padding:3px;border-radius:9px;background:rgba(255,255,255,0.04);border:1px solid var(--acc-border-sub);}
@@ -653,7 +695,7 @@ body.ml-min .ml-title{margin-bottom:0;}
 .ft-when{font-size:11px;font-weight:800;color:var(--acc);} .ft-name{font-size:15px;font-weight:800;margin:3px 0;} .ft-stage{font-size:12px;color:var(--t3);}
 
 /* ══ ФОН: СПЛЭШ-АРТ (живой фон — чтобы стекло реально преломляло картинку) ══ */
-.ml-frame[data-bg="splash"]::before{opacity:1;z-index:0;
+.ml-frame[data-bg="splash"]::before{opacity:1;z-index:0;height:1100px;bottom:auto;
   background:linear-gradient(rgba(1,10,19,.48),rgba(1,10,19,.72)),var(--splash-img,url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg'));
   background-size:cover;background-position:center 16%;transition:transform .25s ease;}
 .ml-frame[data-parallax="on"][data-bg="splash"]::before{transform:scale(1.08) translate(calc(var(--px,0)*-16px),calc(var(--py,0)*-14px));}
@@ -699,9 +741,14 @@ body.ml-min .ml-title{margin-bottom:0;}
 
 /* открытие меню профиль/админ — фон (контент+рельс) мягко затемняется/блюрится через оверлей (плавно, без рывка) */
 .f-central{position:relative;}
-.f-central::after,.f-side::after{content:"";position:absolute;inset:0;z-index:60;pointer-events:none;opacity:0;background:#000;transition:opacity .22s ease,backdrop-filter .22s ease;}
-.ml-frame[data-menuopen="on"][data-menufx="dim"] :is(.f-central,.f-side)::after{opacity:.5;}
-.ml-frame[data-menuopen="on"][data-menufx="blur"] :is(.f-central,.f-side)::after{opacity:.28;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);}
+/* ── ЕДИНАЯ ШКАЛА Z-СЛОЁВ (одно место; новые элементы берут отсюда → конфликтов нет) ── */
+.ml-frame{--z-rail:8;--z-dim:200;--z-pop:210;}
+/* затемнение — ОТДЕЛЬНЫЙ реальный div (не ::after, чтобы не конфликтовать с glassnoise::after).
+   pointer-events:none ВСЕГДА — слой только визуальный, клики проходят сквозь (закрытие — через JS). */
+/* затемнение делает тень-прожектор у самого меню (.f-dd.open). .ml-dim = РАЗМЫТИЕ фона при открытии.
+   Блюр статичный, плавность через opacity (cross-fade без лага анимации backdrop-filter). */
+.ml-dim{position:absolute;inset:0;z-index:var(--z-dim);pointer-events:none;opacity:0;background:transparent;-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);transition:opacity .25s ease;border-radius:inherit;}
+.ml-frame[data-menuopen="on"] .ml-dim{opacity:1;}
 
 /* ══ TOAST ══ */
 .ml-toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,30px);padding:11px 20px;border-radius:11px;font-size:13px;font-weight:700;background:var(--acc);color:#001016;box-shadow:0 8px 30px var(--acc-glow);opacity:0;pointer-events:none;transition:all .3s;z-index:100;white-space:pre-line;text-align:center;}

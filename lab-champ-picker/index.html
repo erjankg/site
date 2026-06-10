@@ -166,8 +166,23 @@ body{
   cursor:pointer;transition:var(--tx-base);
   width:100%;display:flex;flex-direction:column;align-items:stretch;gap:2px;
 }
-/* iconwrap = контейнер: размер аватарки НЕ зависит от длины имени (align-items:stretch + cqw) */
-.iconwrap{position:relative;width:100%;container-type:inline-size;}
+/* iconwrap = контейнер: размер аватарки НЕ зависит от длины имени (align-items:stretch + cqw).
+   overflow:hidden → зум картинки на ховере остаётся ВНУТРИ рамки + шторка WR прячется за низ. */
+.iconwrap{position:relative;width:100%;container-type:inline-size;overflow:hidden;border-radius:8px;}
+
+/* ── WR-ШТОРКА: выезжает снизу по ховеру, только % винрейта ── */
+.wr-shutter{
+  position:absolute;left:0;right:0;bottom:0;padding:3px 2px;
+  background:linear-gradient(to top,rgba(0,0,0,0.92),rgba(0,0,0,0.45));
+  font-size:22cqw;font-weight:900;line-height:1;text-align:center;letter-spacing:-0.02em;
+  transform:translateY(101%);transition:transform 0.2s var(--ease-apple-out);
+  z-index:2;pointer-events:none;
+}
+.m-item:hover .wr-shutter{transform:translateY(0);}
+.wr-low{color:#ff5d5d;}            /* <50 — красный */
+.wr-mid{color:var(--gold);}        /* 50–52 — золотой */
+.wr-high{color:#46e08a;}           /* >52 — зелёный */
+.m-grid[data-wrshutter=off] .wr-shutter{display:none;}
 .m-item .av{
   width:100%;aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;
   font-size:34cqw;font-weight:900;letter-spacing:-0.04em;color:rgba(255,255,255,0.92);
@@ -217,7 +232,7 @@ body{
 .m-grid[data-hover=glow] .m-item:hover .av{box-shadow:0 0 16px var(--accent-glow),0 0 4px var(--accent);}
 .m-grid[data-hover=lift] .m-item:hover{transform:translateY(-4px);}
 .m-grid[data-hover=lift] .m-item:hover .av{box-shadow:0 8px 20px rgba(0,0,0,0.55);}
-.m-grid[data-hover=ring] .m-item:hover .av{outline:2px solid var(--accent);outline-offset:2px;}
+.m-grid[data-hover=ring] .m-item:hover .av{box-shadow:inset 0 0 0 2px var(--accent),0 0 16px var(--accent-glow);}
 .m-grid[data-hover=tilt] .m-item:hover .av{transform:perspective(300px) rotateX(10deg) rotateY(-10deg) scale(1.05);}
 .m-grid[data-hover=bright] .m-item:hover .av{filter:brightness(1.4) saturate(1.25);}
 
@@ -332,6 +347,42 @@ body{
 .btn-done:active{transform:scale(0.98);}
 .m-win[data-theme=hextech] .btn-done{background:linear-gradient(135deg,var(--gold),#9a7522);}
 
+/* ═══════════════════════════════════════════════════════════
+   СТЕКЛО МОДАЛКИ + СПЛЕШ-ФОН (стекло = стандарт сайта)
+   ═══════════════════════════════════════════════════════════ */
+/* матовое стекло окна — за ним размывается сплеш-арт → стекло «заметно» */
+.m-win[data-glass=on]{
+  background:linear-gradient(135deg,rgba(1,21,32,0.60),rgba(1,10,19,0.74));
+  backdrop-filter:blur(22px) saturate(1.25);-webkit-backdrop-filter:blur(22px) saturate(1.25);
+  border:1px solid rgba(255,255,255,0.14);
+  box-shadow:0 24px 70px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.14);
+}
+.m-win[data-glass=on] .mhdr{background:transparent;border-bottom:1px solid rgba(255,255,255,0.10);}
+.m-win[data-glass=on] .m-search input{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);}
+.m-win[data-glass=on] .m-role{background:rgba(255,255,255,0.05);backdrop-filter:blur(4px);border-color:rgba(255,255,255,0.08);box-shadow:none;}
+.m-win[data-glass=on] .m-role-spacer{background:rgba(255,255,255,0.10);}
+
+/* сплеш-арт за стеклом (лежит внутри маски, ПОД окном) */
+.mask-splash{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-size:cover;background-position:center 18%;
+  opacity:0;transition:opacity 0.35s;
+}
+.m-win{z-index:1;}
+.m-mask:not([data-fonbg=none]) .mask-splash{opacity:1;}
+/* когда фон-сплеш включён — собственная заливка маски светлее, чтобы арт было видно */
+.m-mask:not([data-fonbg=none]){background:rgba(0,0,0,0.40);}
+/* обработка сплеша (варианты) */
+.m-mask[data-fonbg=dark] .mask-splash::after{content:"";position:absolute;inset:0;background:rgba(0,0,0,0.5);}
+.m-mask[data-fonbg=blur] .mask-splash{filter:blur(16px) brightness(0.72);transform:scale(1.12);}
+.m-mask[data-fonbg=tint] .mask-splash::after{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(11,196,227,0.40),rgba(1,10,19,0.62));}
+/* какой арт (1 картинка, без лагов) */
+.m-mask[data-art=ahri]   .mask-splash{background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg');}
+.m-mask[data-art=jinx]   .mask-splash{background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg');}
+.m-mask[data-art=yasuo]  .mask-splash{background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg');}
+.m-mask[data-art=lux]    .mask-splash{background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg');}
+.m-mask[data-art=ezreal] .mask-splash{background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ezreal_0.jpg');}
+
 @media (max-width:600px){
   .m-grid{flex-direction:column;}
   .m-role-spacer{display:none;}
@@ -353,6 +404,7 @@ body{
     <button class="variant-btn" data-v="D">D · Hextech Gold<small>золото, ripple, премиум</small></button>
     <button class="variant-btn" data-v="E">E · Compact<small>плотно, 4 колонки</small></button>
     <button class="variant-btn" data-v="F">F · Radical<small>единая сетка + чипсы ролей, как в игре</small></button>
+    <button class="variant-btn" data-v="FIN" style="border-color:var(--gold);">★ Финал<small>твой выбор + WR-шторка → это перенесём</small></button>
   </div>
 </div>
 
@@ -368,6 +420,18 @@ body{
   <div class="p-group">
     <span class="p-label">Нижняя кнопка</span>
     <div class="seg" data-k="foot"><button data-val="none" class="on">нет</button><button data-val="done">Готово (N)</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">🪟 Стекло модалки</span>
+    <div class="seg" data-k="glass"><button data-val="on">вкл</button><button data-val="off" class="on">выкл</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">🖼 Сплеш-фон за стеклом</span>
+    <div class="seg" data-k="fonbg"><button data-val="none" class="on">нет</button><button data-val="clean">чистый</button><button data-val="dark">+ тёмный</button><button data-val="blur">+ блюр</button><button data-val="tint">+ тонировка</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">Арт чемпа (фон)</span>
+    <div class="seg" data-k="art"><button data-val="ahri" class="on">Ahri</button><button data-val="jinx">Jinx</button><button data-val="yasuo">Yasuo</button><button data-val="lux">Lux</button><button data-val="ezreal">Ezreal</button></div>
   </div>
   <div class="p-group">
     <span class="p-label">Колонок в роли</span>
@@ -396,6 +460,10 @@ body{
   <div class="p-group">
     <span class="p-label">Чек-бейдж</span>
     <div class="seg" data-k="badge"><button data-val="check">✓ круг</button><button data-val="dot">● точка</button><button data-val="diamond">◆ ромб</button><button data-val="none" class="on">выкл</button></div>
+  </div>
+  <div class="p-group">
+    <span class="p-label">WR-шторка (ховер)</span>
+    <div class="seg" data-k="wrshutter"><button data-val="on" class="on">вкл</button><button data-val="off">выкл</button></div>
   </div>
   <div class="p-group">
     <span class="p-label">Счётчики ролей</span>
@@ -434,8 +502,9 @@ body{
 </div>
 
 <!-- ═══ МОДАЛКА ═══ -->
-<div class="m-mask" id="mMask" data-open="rise" onclick="if(event.target===this)closeM()">
-  <div class="m-win" id="mWin" data-theme="default" data-layout="roles" data-topstrip="none" data-foot="none">
+<div class="m-mask" id="mMask" data-open="rise" data-fonbg="none" data-art="ahri" onclick="if(event.target===this)closeM()">
+  <div class="mask-splash"></div>
+  <div class="m-win" id="mWin" data-theme="default" data-glass="off" data-layout="roles" data-topstrip="none" data-foot="none">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeM()">←</button>
       <span class="mhdr-t">Champions</span>
@@ -447,7 +516,7 @@ body{
     <div class="m-grid" id="mGrid"
       data-name="under" data-hover="scale" data-sel="border" data-badge="none"
       data-rolecount="none" data-enter="none" data-fixed="false" data-cols="2"
-      data-shape="round" data-colbg="none" data-gap="normal" data-sort="alpha"></div>
+      data-shape="round" data-colbg="none" data-gap="normal" data-sort="alpha" data-wrshutter="on"></div>
     <div class="m-foot"><button class="btn-done" onclick="closeM()">✓ Готово (<span id="doneN">0</span>)</button></div>
   </div>
 </div>
@@ -499,6 +568,9 @@ function initials(name){
   return name.slice(0,2).toUpperCase();
 }
 function hue(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return h;}
+/* демо-винрейт (стабильный на чемпа, 46.0–54.4). На боевом заменим реальным из источника. */
+function wrOf(name){let h=0;for(let i=0;i<name.length;i++)h=(h*131+name.charCodeAt(i))>>>0;return 46+(h%85)/10;}
+function wrClass(w){return w<50?'wr-low':(w<=52?'wr-mid':'wr-high');}
 
 const selected=new Set();
 const favorites=new Set();
@@ -523,6 +595,9 @@ function makeItem(c,idx,opts){
   wrap.appendChild(av);
   if(!opts.strip){
     const nm=document.createElement('div');nm.className='nm';nm.textContent=c.name;wrap.appendChild(nm);
+    const w=wrOf(c.name);
+    const sh=document.createElement('div');sh.className='wr-shutter '+wrClass(w);sh.textContent=w.toFixed(1)+'%';
+    wrap.appendChild(sh);
   }
   btn.appendChild(wrap);
 
@@ -714,30 +789,34 @@ function closeM(){const m=document.getElementById('mMask');m.classList.add('clos
 function replay(){const w=document.getElementById('mWin');const m=document.getElementById('mMask');if(!m.classList.contains('active'))return openM();w.style.animation='none';void w.offsetWidth;w.style.animation='';drawM();playEntrance();}
 
 /* ───── ВАРИАНТЫ (пресеты) ───── */
-const GRID_KEYS=['name','hover','sel','badge','rolecount','enter','fixed','cols','shape','colbg','gap','sort'];
-const WIN_KEYS=['layout','topstrip','foot'];
+const GRID_KEYS=['name','hover','sel','badge','rolecount','enter','fixed','cols','shape','colbg','gap','sort','wrshutter'];
+const WIN_KEYS=['layout','topstrip','foot','glass'];
+const MASK_KEYS=['fonbg','art'];
 const PRESETS={
-  A:{cols:'2',cell:56,name:'under',hover:'scale',sel:'border',badge:'none',rolecount:'none',enter:'none',open:'rise',openDur:420,theme:'default',hdrcount:false,fixed:'false',shape:'round',colbg:'none',gap:'normal',sort:'alpha',layout:'roles',topstrip:'none',foot:'none'},
-  B:{cols:'2',cell:58,name:'under',hover:'lift',sel:'fill',badge:'check',rolecount:'frac',enter:'rise',open:'rise',openDur:420,theme:'default',hdrcount:true,fixed:'false',shape:'round',colbg:'glass',gap:'normal',sort:'alpha',layout:'roles',topstrip:'recent',foot:'done'},
-  C:{cols:'2',cell:64,name:'overlay',hover:'ring',sel:'fill',badge:'check',rolecount:'num',enter:'scale',open:'zoom',openDur:460,theme:'glass',hdrcount:true,fixed:'true',shape:'squircle',colbg:'glass',gap:'roomy',sort:'alpha',layout:'roles',topstrip:'none',foot:'done'},
-  D:{cols:'2',cell:60,name:'under',hover:'glow',sel:'gold',badge:'diamond',rolecount:'frac',enter:'wave',open:'spring',openDur:480,theme:'hextech',hdrcount:true,fixed:'false',shape:'hex',colbg:'frame',gap:'normal',sort:'selfirst',layout:'roles',topstrip:'fav',foot:'done'},
-  E:{cols:'4',cell:42,name:'none',hover:'zoom',sel:'border',badge:'none',rolecount:'none',enter:'none',open:'fade',openDur:300,theme:'default',hdrcount:false,fixed:'true',shape:'round',colbg:'none',gap:'compact',sort:'alpha',layout:'roles',topstrip:'none',foot:'none'},
-  F:{cols:'auto',cell:74,name:'under',hover:'lift',sel:'fill',badge:'check',rolecount:'none',enter:'scale',open:'zoom',openDur:460,theme:'default',hdrcount:true,fixed:'false',shape:'squircle',colbg:'none',gap:'roomy',sort:'alpha',layout:'single',topstrip:'both',foot:'done'},
+  A:{cols:'2',cell:56,name:'under',hover:'scale',sel:'border',badge:'none',rolecount:'none',enter:'none',open:'rise',openDur:420,theme:'default',hdrcount:false,fixed:'false',shape:'round',colbg:'none',gap:'normal',sort:'alpha',layout:'roles',topstrip:'none',foot:'none',wrshutter:'off',glass:'off',fonbg:'none',art:'ahri'},
+  B:{cols:'2',cell:58,name:'under',hover:'lift',sel:'fill',badge:'check',rolecount:'frac',enter:'rise',open:'rise',openDur:420,theme:'default',hdrcount:true,fixed:'false',shape:'round',colbg:'glass',gap:'normal',sort:'alpha',layout:'roles',topstrip:'recent',foot:'done',wrshutter:'on',glass:'off',fonbg:'none',art:'ahri'},
+  C:{cols:'2',cell:64,name:'overlay',hover:'ring',sel:'fill',badge:'check',rolecount:'num',enter:'scale',open:'zoom',openDur:460,theme:'glass',hdrcount:true,fixed:'true',shape:'squircle',colbg:'glass',gap:'roomy',sort:'alpha',layout:'roles',topstrip:'none',foot:'done',wrshutter:'on',glass:'on',fonbg:'clean',art:'lux'},
+  D:{cols:'2',cell:60,name:'under',hover:'glow',sel:'gold',badge:'diamond',rolecount:'frac',enter:'wave',open:'spring',openDur:480,theme:'hextech',hdrcount:true,fixed:'false',shape:'hex',colbg:'frame',gap:'normal',sort:'selfirst',layout:'roles',topstrip:'fav',foot:'done',wrshutter:'on',glass:'off',fonbg:'none',art:'ahri'},
+  E:{cols:'4',cell:42,name:'none',hover:'zoom',sel:'border',badge:'none',rolecount:'none',enter:'none',open:'fade',openDur:300,theme:'default',hdrcount:false,fixed:'true',shape:'round',colbg:'none',gap:'compact',sort:'alpha',layout:'roles',topstrip:'none',foot:'none',wrshutter:'off',glass:'off',fonbg:'none',art:'ahri'},
+  F:{cols:'auto',cell:74,name:'under',hover:'lift',sel:'fill',badge:'check',rolecount:'none',enter:'scale',open:'zoom',openDur:460,theme:'default',hdrcount:true,fixed:'false',shape:'squircle',colbg:'none',gap:'roomy',sort:'alpha',layout:'single',topstrip:'both',foot:'done',wrshutter:'on',glass:'on',fonbg:'tint',art:'jinx'},
+  FIN:{cols:'2',cell:56,name:'none',hover:'scale',sel:'border',badge:'none',rolecount:'frac',enter:'none',open:'slide',openDur:500,theme:'default',hdrcount:false,fixed:'false',shape:'round',colbg:'none',gap:'normal',sort:'alpha',layout:'roles',topstrip:'none',foot:'none',wrshutter:'on',glass:'on',fonbg:'dark',art:'ahri'},
 };
 
 function applyPreset(v){
   const p=PRESETS[v];theme=p.theme;
   const win=document.getElementById('mWin');win.dataset.theme=p.theme;
+  const mask=document.getElementById('mMask');
   const g=document.getElementById('mGrid');
   GRID_KEYS.forEach(k=>{g.dataset[k]=p[k];});
   WIN_KEYS.forEach(k=>{win.dataset[k]=p[k];});
-  document.getElementById('mMask').dataset.open=p.open;
+  MASK_KEYS.forEach(k=>{mask.dataset[k]=p[k];});
+  mask.dataset.open=p.open;
   if(p.cols!=='auto') document.documentElement.style.setProperty('--cols',p.cols);
   document.documentElement.style.setProperty('--cell',p.cell+'px');
   document.documentElement.style.setProperty('--open-dur',(p.openDur/1000)+'s');
   document.documentElement.style.setProperty('--enter-dur',(p.enter==='none'?'0s':'0.4s'));
   document.getElementById('hdrCount').style.display=p.hdrcount?'inline-block':'none';
-  GRID_KEYS.forEach(k=>setSeg(k,p[k]));WIN_KEYS.forEach(k=>setSeg(k,p[k]));setSeg('open',p.open);
+  GRID_KEYS.forEach(k=>setSeg(k,p[k]));WIN_KEYS.forEach(k=>setSeg(k,p[k]));MASK_KEYS.forEach(k=>setSeg(k,p[k]));setSeg('open',p.open);
   document.getElementById('cellRange').value=p.cell;document.getElementById('cellVal').textContent=p.cell+'px';
   document.getElementById('openRange').value=p.openDur;document.getElementById('openVal').textContent=(p.openDur/1000)+'s';
   if(document.getElementById('mMask').classList.contains('active')) replay();
@@ -759,6 +838,7 @@ document.getElementById('params').addEventListener('click',e=>{
   setSeg(k,val);
   const g=document.getElementById('mGrid');
   if(k==='open'){document.getElementById('mMask').dataset.open=val;}
+  else if(MASK_KEYS.includes(k)){document.getElementById('mMask').dataset[k]=val;}
   else if(WIN_KEYS.includes(k)){document.getElementById('mWin').dataset[k]=val;}
   else{g.dataset[k]=val;}
   if(k==='cols'&&val!=='auto') document.documentElement.style.setProperty('--cols',val);

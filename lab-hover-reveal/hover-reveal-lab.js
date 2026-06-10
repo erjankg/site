@@ -53,6 +53,39 @@ var POOL=[
    strong:[{n:'Yasuo',k:'Yasuo'},{n:'Zed',k:'Zed'}],weak:[{n:'Darius',k:'Darius'}],combo:[{n:'Yasuo',k:'Yasuo'}]}
 ];
 
+// ── ДОП. СТАТЫ (новое, Часть 2): скорость атаки / передвижения / реген HP / реген маны ──
+// Реальные базовые значения + рост (на боевом придут из base-stats.json). asg — %/уровень.
+var XSTATS={
+  Ezreal:{as:0.625,asg:2.5,ms:340,hpreg:6,hpregg:0.68,mpreg:9,mpregg:0.9,res:'Mana'},
+  Caitlyn:{as:0.681,asg:4,ms:335,hpreg:6,hpregg:0.55,mpreg:12,mpregg:0.7,res:'Mana'},
+  Jinx:{as:0.625,asg:1,ms:335,hpreg:7.5,hpregg:0.55,mpreg:12,mpregg:1.3,res:'Mana'},
+  Ahri:{as:0.668,asg:2.2,ms:355,hpreg:7.5,hpregg:0.68,mpreg:18,mpregg:1.1,res:'Mana'},
+  Yasuo:{as:0.697,asg:3.5,ms:355,hpreg:12,hpregg:0.94,mpreg:0,mpregg:0,res:'None'},
+  Lux:{as:0.669,asg:3,ms:360,hpreg:7.5,hpregg:0.55,mpreg:9,mpregg:1.1,res:'Mana'},
+  Thresh:{as:0.625,asg:3.5,ms:345,hpreg:10.5,hpregg:0.81,mpreg:12,mpregg:1.3,res:'Mana'},
+  Zed:{as:0.651,asg:3.3,ms:355,hpreg:9,hpregg:0.68,mpreg:0,mpregg:0,res:'Energy'},
+  LeeSin:{as:0.651,asg:3,ms:355,hpreg:10.5,hpregg:0.68,mpreg:0,mpregg:0,res:'Energy'},
+  Garen:{as:0.625,asg:3.65,ms:350,hpreg:7.5,hpregg:0.55,mpreg:0,mpregg:0,res:'None'},
+  Darius:{as:0.625,asg:1,ms:350,hpreg:7.5,hpregg:0.81,mpreg:9,mpregg:0.5,res:'Mana'},
+  Soraka:{as:0.625,asg:2.14,ms:340,hpreg:6,hpregg:0.55,mpreg:18,mpregg:0.5,res:'Mana'},
+  Malphite:{as:0.736,asg:3.4,ms:340,hpreg:9,hpregg:0.81,mpreg:15,mpregg:0.7,res:'Mana'}
+};
+POOL.forEach(function(c){ if(XSTATS[c.key]) c.x=XSTATS[c.key]; });
+
+// ── ЕДИНЫЙ список ВСЕХ статов (базовые + новые) — показываем одним блоком, одним стилем ──
+// src:'base' → значение из c.s (масштаб по уровню через dStat); src:'x' → из c.x (через xVal)
+var ALLSTATS=[
+  {id:'ad',   lbl:'AD',        ic:'⚔', color:'var(--c-ad)',  max:140,  dec:0, src:'base'},
+  {id:'hp',   lbl:'HP',        ic:'✚', color:'var(--c-hp)',  max:2600, dec:0, src:'base'},
+  {id:'arm',  lbl:'Броня',     ic:'🛡',color:'var(--c-arm)', max:160,  dec:0, src:'base'},
+  {id:'mr',   lbl:'Mrez',      ic:'✦', color:'var(--c-mr)',  max:95,   dec:0, src:'base'},
+  {id:'rng',  lbl:'RNG',       ic:'🏹',color:'var(--c-rng)', max:650,  dec:0, src:'base'},
+  {id:'as',   lbl:'Ск.Атк',    ic:'⚡', color:'#f6c945',      max:1.2,  dec:2, src:'x'},
+  {id:'ms',   lbl:'Ск.Пер',    ic:'👟', color:'#7ee0c0',      max:400,  dec:0, src:'x'},
+  {id:'hpreg',lbl:'HP regen',  ic:'❤️', color:'#5ad17a',      max:22,   dec:1, src:'x'},
+  {id:'mpreg',lbl:'Mana regen',ic:'🔷', color:'#5aa9ff',      max:22,   dec:1, src:'x'}
+];
+
 var DTIER={S:'#ff4d6d',A:'#ff9f43',B:'#ffd93d',C:'#54d98c',D:'#7ec8e3'};
 
 // готовый цвет «гаммы» сплэша под каждого чемпа (надёжный фолбэк, т.к. ddragon без CORS)
@@ -101,6 +134,9 @@ var LAYOUTS=[
 ];
 
 var CONTROLS=[
+  {key:'statStyle', label:'⭐ Статы: стиль (ВСЕ вместе)', type:'seg', opts:[['badges','Бейджи'],['chips','Чипсы'],['bars','Бары'],['tiles','Плитки'],['rings','Кольца']]},
+  {key:'cmpCard',   label:'⚖ Карточки сравнения', type:'seg', opts:[['glass','Стекло'],['splash','Сплэш 3D'],['table','Таблица']]},
+  {key:'cmpCell',   label:'⚖ Таблица: вид ячейки', type:'seg', opts:[['bar','Число+бар'],['num','Число'],['arrow','Число+стрелка']]},
   {key:'size',    label:'Размер карточек (сетка)', type:'seg', opts:[['s','Мелкие'],['m','Средние'],['l','Крупные']]},
   {key:'hover',   label:'Ховер (сетка)', type:'seg', opts:[['reveal','Раскрытие'],['scale','Масштаб'],['lift','Подъём'],['glow','Подсветка'],['tilt','3D-наклон']]},
   {key:'reveal',  label:'Что показывать (Веер и др.)', type:'seg', opts:[['radar','Радар качеств'],['rows','Список'],['bars','Бары'],['mini','Мини']]},
@@ -123,7 +159,7 @@ var CONTROLS=[
   {key:'tabPos',   label:'📄 Вкладки: где', type:'seg', opts:[['top','Сверху'],['left','Слева']]},
   {key:'tabStyle', label:'📄 Вкладки: стиль', type:'seg', opts:[['pills','Пилюли'],['underline','Подчёркивание']]}
 ];
-var DEFAULTS={layout:'grid', size:'m', hover:'reveal', reveal:'radar', backdrop:'glass', glass:'on', speed:'normal', accent:'#0BC4E3', radius:14,
+var DEFAULTS={layout:'grid', statStyle:'chips', cmpCard:'glass', cmpCell:'bar', size:'m', hover:'reveal', reveal:'radar', backdrop:'glass', glass:'on', speed:'normal', accent:'#0BC4E3', radius:14,
   cardBg:'parallax', cardTilt:'on', cardScrim:'med', cardGlow:'on', cgrad1:'#0BC4E3', cgrad2:'#011520', cangle:170, autoColor:'on', iconShape:'round',
   pageSize:'l', tabPos:'top', tabStyle:'pills'};
 var CSCRIM={off:0, soft:0.32, med:0.55, strong:0.78};
@@ -170,8 +206,18 @@ function applyVars(){
   r.setProperty('--cangle', S.cangle+'deg');
   r.setProperty('--cscrim', String(CSCRIM[S.cardScrim]!==undefined?CSCRIM[S.cardScrim]:0.55));
 }
-var _openC=null;
-function refreshOpenCard(){ var ov=document.getElementById('hrOverlay'); if(_openC && ov && !ov.hidden) openDetail(_openC); }
+var _openC=null, _cmpC=null;
+var _cmpArr=null;          // массив чемпов в сравнении (общий для всех режимов)
+var CMP_MAX=6;             // максимум колонок в режиме «Таблица»
+// единая точка входа: рисует сравнение в зависимости от выбранного режима
+function renderCompare(){
+  if(!_cmpArr || !_cmpArr.length) return;
+  if(S.cmpCard==='table') openCompareTable();
+  else openCompare(_cmpArr[0], _cmpArr[1]||_cmpArr[0]);
+}
+function startCompare(c1,c2){ _cmpArr=[c1,c2]; renderCompare(); }
+function refreshOpenCard(){ var ov=document.getElementById('hrOverlay'); if(!ov || ov.hidden) return;
+  if(_cmpArr) renderCompare(); else if(_openC) openDetail(_openC); }
 
 // ════════════════════════════════════════════════════════════════
 // Рендер: переключатель сетка / витрина-варианты
@@ -300,9 +346,56 @@ function dBadges(c){
 function dWrbr(c){
   return '<div class="d-wrbr"><span><b>'+c.wr+'%</b> WR</span><i>·</i><span><b>'+c.pr+'%</b> PR</span><i>·</i><span><b>'+c.br+'%</b> BR</span></div>';
 }
+// ── ДОП. СТАТЫ (новое): значение с учётом уровня ──
+function xVal(c,id){
+  var x=c.x; if(!x) return null;
+  if(id==='as')    return x.as*(1+(x.asg/100)*(DLVL-1));   // asg — %/уровень
+  if(id==='ms')    return x.ms;                            // скорость передвижения роста не имеет
+  if(id==='hpreg') return x.hpreg+x.hpregg*(DLVL-1);
+  if(id==='mpreg') return (x.res!=='Mana')?null:(x.mpreg+x.mpregg*(DLVL-1)); // у безманных/энергии — прочерк
+  return null;
+}
+// значение любого стата (базового или нового) с учётом уровня
+function aVal(c,it){ return it.src==='base' ? dStat(c.s[it.id],it.id) : xVal(c,it.id); }
+// класс подсветки в сравнении: у кого значение выше (только ЦВЕТ — ширина не меняется, модалка не дёргается)
+function statCmpCls(v, ov){
+  if(v===null && ov===null) return '';
+  if(v===null) return ' st-lo'; if(ov===null) return ' st-hi';
+  if(Math.abs(v-ov)<1e-9) return '';
+  return v>ov ? ' st-hi' : ' st-lo';
+}
+// cmp (необязательно) — функция(d,v)→класс подсветки для режима сравнения
+function buildStatsInner(c, cmp){
+  return ALLSTATS.map(function(d){
+    var v=aVal(c,d), txt=(v===null)?'—':(+v).toFixed(d.dec);
+    var hc=cmp?cmp(d,v):'';
+    if(S.statStyle==='bars'){
+      var pct=(v===null)?0:Math.max(4,Math.min(100,Math.round(v/d.max*100)));
+      return '<div class="xs-bar"><div class="xs-bt"><span>'+d.ic+' '+d.lbl+'</span><b class="xs-num'+hc+'" style="color:'+d.color+'">'+txt+'</b></div>'+
+        '<div class="xs-bk"><i style="width:'+pct+'%;background:'+d.color+'"></i></div></div>';
+    }
+    if(S.statStyle==='chips')
+      return '<div class="xs-chip"><span class="xs-ic" style="color:'+d.color+'">'+d.ic+'</span><span class="xs-v xs-num'+hc+'">'+txt+'</span><span class="xs-l">'+d.lbl+'</span></div>';
+    if(S.statStyle==='tiles')
+      return '<div class="xs-tile"><span class="xs-t-ic" style="color:'+d.color+'">'+d.ic+'</span><span class="xs-t-v xs-num'+hc+'">'+txt+'</span><span class="xs-t-l">'+d.lbl+'</span></div>';
+    if(S.statStyle==='rings'){
+      var C=163.36, pct=(v===null)?0:Math.max(0,Math.min(1,v/d.max)), off=(C*(1-pct)).toFixed(1);
+      return '<div class="xs-ring"><svg viewBox="0 0 64 64"><circle class="xs-rg-bg" cx="32" cy="32" r="26"/>'+
+        '<circle class="xs-rg-fg" cx="32" cy="32" r="26" stroke="'+d.color+'" stroke-dasharray="'+C+'" stroke-dashoffset="'+off+'"/></svg>'+
+        '<span class="xs-r-v xs-num'+hc+'">'+txt+'</span><span class="xs-r-l">'+d.lbl+'</span></div>';
+    }
+    // badges (по умолчанию)
+    return '<div class="d-badge xs-badge"><span class="bl">'+d.ic+' '+d.lbl+'</span><span class="bv xs-num'+hc+'" style="color:'+d.color+'">'+txt+'</span></div>';
+  }).join('');
+}
+function buildStats(c, boxId, cmp){
+  return '<div id="'+(boxId||'statBox')+'" class="xstats xs-'+S.statStyle+' glass">'+buildStatsInner(c,cmp)+'</div>';
+}
 function dActions(){
-  return '<div class="d-actions">'+[['⚔','Сборки'],['📖','Гайд'],['★','В избранное']].map(function(a){
-    return '<button class="d-btn" type="button">'+a[0]+' '+a[1]+'</button>';}).join('')+'</div>';
+  return '<div class="d-actions">'+
+    '<button class="d-btn d-cmp" type="button">⚖ Сравнить</button>'+
+    [['⚔','Сборки'],['📖','Гайд'],['★','В избранное']].map(function(a){
+      return '<button class="d-btn" type="button">'+a[0]+' '+a[1]+'</button>';}).join('')+'</div>';
 }
 function dLevel(){
   var fill=Math.round((DLVL-1)/14*100);
@@ -395,7 +488,7 @@ function mountTab(c){
 }
 
 function openDetail(c){
-  _openC=c;
+  _openC=c; _cmpC=null; _cmpArr=null;
   var ov=document.getElementById('hrOverlay');
   ov.className='hr-overlay bd-'+S.backdrop+(S.autoColor==='on'?' art-tint':'');
   if(S.autoColor==='on') ov.style.setProperty('--artcolor', ARTCOL[c.key]||S.accent); else ov.style.removeProperty('--artcolor');
@@ -415,7 +508,7 @@ function openDetail(c){
   ov.innerHTML='<div class="cp-tiltwrap'+(S.cardTilt==='on'?' tilting':'')+'"><div class="'+cardCls+'" id="champCard">'+bgLayer+
     '<button class="d-close" type="button">✕</button>'+header+
     '<div class="d-body"><div class="d-grid">'+
-      '<div class="d-col">'+dActions()+dWrbr(c)+dLevel()+dBadges(c)+'</div>'+
+      '<div class="d-col">'+dActions()+dWrbr(c)+dLevel()+buildStats(c)+'</div>'+
       '<div class="d-col">'+dMatch(c)+'</div>'+
     '</div></div></div></div>';
   ov.hidden=false;
@@ -427,8 +520,9 @@ function openDetail(c){
   var sl=ov.querySelector('#dLvl');
   if(sl) sl.oninput=function(){ DLVL=+this.value; this.style.setProperty('--fill',Math.round((DLVL-1)/14*100)+'%');
     ov.querySelector('#dLvlNum').textContent=DLVL;
-    SDEF.forEach(function(s){ var b=ov.querySelector('[data-d="'+s.id+'"]'); if(b) b.textContent=dStat(c.s[s.id],s.id); }); };
+    var sb=ov.querySelector('#statBox'); if(sb) sb.innerHTML=buildStatsInner(c); };
   ov.querySelectorAll('.d-mu-add').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); b.style.transform='scale(1.3) rotate(90deg)'; setTimeout(function(){b.style.transform='';},180); }; });
+  var cmpBtn=ov.querySelector('.d-cmp'); if(cmpBtn) cmpBtn.onclick=function(){ openComparePicker(c); };
 
   if(S.autoColor==='on') artColor(c.key,function(col){ if(col && !ov.hidden && _openC===c) ov.style.setProperty('--artcolor',col); });
 
@@ -444,17 +538,189 @@ function openDetail(c){
   }
 }
 function closeDetail(){
-  _openC=null;
+  _openC=null; _cmpC=null; _cmpArr=null;
   var ov=document.getElementById('hrOverlay');
   ov.classList.remove('show');
   setTimeout(function(){ ov.hidden=true; ov.innerHTML=''; },260);
 }
+
+// ════════════════════════════════════════════════════════════════
+// СРАВНЕНИЕ (новое): кнопка «Сравнить» → пикер → две карточки + общий ползунок уровня
+// ════════════════════════════════════════════════════════════════
+function openComparePicker(c1){
+  var ov=document.getElementById('hrOverlay');
+  ov.className='hr-overlay bd-'+S.backdrop; ov.style.removeProperty('--artcolor');
+  var list=POOL.filter(function(x){ return x.key!==c1.key; });
+  ov.innerHTML='<div class="cmp-pick glass">'+
+    '<div class="cmp-pick-h"><button class="cmp-back" type="button">← Назад</button>'+
+      '<span>С кем сравнить <b>'+c1.name+'</b>?</span><button class="d-close" type="button">✕</button></div>'+
+    '<input id="cmpSearch" class="pick-search" type="text" placeholder="🔍 Поиск чемпиона…">'+
+    '<div class="cmp-pick-grid">'+list.map(function(x){
+      return '<button class="cmp-pick-c" data-k="'+x.key+'" type="button"><img src="'+icon(x.key)+'" alt="" loading="lazy"><span>'+x.name+'</span></button>';
+    }).join('')+'</div></div>';
+  ov.hidden=false; requestAnimationFrame(function(){ ov.classList.add('show'); });
+  ov.querySelector('.d-close').onclick=closeDetail;
+  ov.querySelector('.cmp-back').onclick=function(){ openDetail(c1); };
+  var srch=ov.querySelector('#cmpSearch');
+  srch.oninput=function(){ var q=this.value.trim().toLowerCase();
+    ov.querySelectorAll('.cmp-pick-c').forEach(function(b){
+      var nm=b.querySelector('span').textContent.toLowerCase();
+      b.style.display=(!q||nm.indexOf(q)>=0)?'':'none'; }); };
+  ov.querySelectorAll('.cmp-pick-c').forEach(function(b){ b.onclick=function(){
+    var c2=POOL.find(function(x){ return x.key===b.dataset.k; }); if(c2) startCompare(c1,c2); }; });
+}
+function compareCardHTML(c, boxId, cmp){
+  if(S.cmpCard==='splash'){
+    // 1-в-1 как ГЛАВНАЯ карточка: те же классы champ-card (сплэш-фон + скрим + свечение),
+    // обёртка cp-tiltwrap даёт 3D-наклон, .cmp-mini сужает под две рядом.
+    var tier='<span class="d-tier" style="--tc:'+(DTIER[c.tier]||'var(--accent)')+'">'+c.tier+'</span>';
+    var tags='<div class="d-tags">'+c.tags.map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>';
+    var port='<img class="d-portrait ic-'+S.iconShape+'" src="'+icon(c.key)+'" alt="">';
+    var nameBlock='<div class="d-nameRow"><div class="d-name">'+c.name+'</div>'+tier+'</div><div class="d-role">'+c.role+'</div>'+tags;
+    return '<div class="cp-tiltwrap cmp-tw"><div class="hr-detail champ-card cmp-mini cbg-parallax cglow">'+
+      '<div class="cd-bg" style="background-image:url('+splashArt(c.key)+')"></div><div class="cd-scrim"></div>'+
+      '<div class="d-head compact">'+port+'<div>'+nameBlock+'</div></div>'+
+      '<div class="d-body"><div class="cmp-wr"><b>'+c.wr+'%</b> WR · <b>'+c.pr+'%</b> PR · <b>'+c.br+'%</b> BR</div>'+
+        buildStats(c, boxId, cmp)+'</div></div></div>';
+  }
+  // лёгкий стеклянный режим
+  var head='<div class="cmp-head"><img class="cmp-port ic-'+S.iconShape+'" src="'+icon(c.key)+'" alt="">'+
+      '<div class="cmp-id"><div class="cmp-name">'+c.name+'</div><div class="d-role">'+c.role+'</div></div>'+
+      '<span class="cmp-tier" style="--tc:'+(DTIER[c.tier]||'var(--accent)')+'">'+c.tier+'</span></div>';
+  var wr='<div class="cmp-wr"><b>'+c.wr+'%</b> WR · <b>'+c.pr+'%</b> PR · <b>'+c.br+'%</b> BR</div>';
+  return '<div class="cmp-card glass">'+head+wr+buildStats(c, boxId, cmp)+'</div>';
+}
+function openCompare(c1, c2){
+  _openC=c1; _cmpC=c2; _cmpArr=[c1,c2];
+  var ov=document.getElementById('hrOverlay');
+  ov.className='hr-overlay bd-'+S.backdrop; ov.style.removeProperty('--artcolor');
+  var cmpL=function(d,v){ return statCmpCls(v, aVal(c2,d)); };  // подсветка: левый против правого
+  var cmpR=function(d,v){ return statCmpCls(v, aVal(c1,d)); };
+  ov.innerHTML='<div class="cmp-wrap glass">'+
+    '<button class="d-close" type="button">✕</button>'+
+    '<div class="cmp-top"><div class="cmp-title">⚖ Сравнение</div>'+
+      '<div class="cmp-lvl"><span>УРОВЕНЬ</span><b id="cmpLvlNum">'+DLVL+'</b>'+
+        '<input type="range" id="cmpLvl" min="1" max="15" value="'+DLVL+'" style="--fill:'+Math.round((DLVL-1)/14*100)+'%"></div>'+
+      '<button class="cmp-swap" type="button" title="Поменять местами">⇄</button></div>'+
+    '<div class="cmp-cards">'+compareCardHTML(c1,'statBoxL',cmpL)+compareCardHTML(c2,'statBoxR',cmpR)+'</div>'+
+  '</div>';
+  ov.hidden=false; requestAnimationFrame(function(){ ov.classList.add('show'); });
+  ov.querySelector('.d-close').onclick=closeDetail;
+  ov.onclick=function(e){ if(e.target===ov) closeDetail(); };
+  var sl=ov.querySelector('#cmpLvl');
+  sl.oninput=function(){ DLVL=+this.value; this.style.setProperty('--fill',Math.round((DLVL-1)/14*100)+'%');
+    ov.querySelector('#cmpLvlNum').textContent=DLVL;
+    var l=ov.querySelector('#statBoxL'); if(l) l.innerHTML=buildStatsInner(c1,cmpL);
+    var r=ov.querySelector('#statBoxR'); if(r) r.innerHTML=buildStatsInner(c2,cmpR); };
+  var sw=ov.querySelector('.cmp-swap'); if(sw) sw.onclick=function(){ openCompare(c2,c1); };
+  // 3D-наклон + параллакс сплэш-карточек (как у главной): наклоняем обёртку, фон едет
+  ov.querySelectorAll('.cmp-tw').forEach(function(tw){
+    var bg=tw.querySelector('.cd-bg');
+    tw.addEventListener('mousemove',function(e){ var r=tw.getBoundingClientRect(); var px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
+      tw.style.transform='perspective(1400px) rotateY('+(px*6)+'deg) rotateX('+(-py*6)+'deg)';
+      if(bg) bg.style.transform='scale(1.16) translate('+(px*-20)+'px,'+(py*-20)+'px)'; });
+    tw.addEventListener('mouseleave',function(){ tw.style.transform=''; if(bg) bg.style.transform='scale(1.1)'; });
+  });
+}
+// ════════════════════════════════════════════════════════════════
+// СРАВНЕНИЕ · режим «Таблица»: статы строчками, чемпионы столбцами, кнопка «+»
+// ════════════════════════════════════════════════════════════════
+function ctCell(c, d, list){
+  var v=aVal(c,d);
+  var nums=list.map(function(x){ return aVal(x,d); }).filter(function(x){ return x!==null; });
+  var mx=nums.length?Math.max.apply(null,nums):null, mn=nums.length?Math.min.apply(null,nums):null;
+  var spread=(mx!==null && mx!==mn);
+  var cls=''; if(v!==null && spread){ cls = v===mx ? ' st-hi' : (v===mn ? ' st-lo' : ''); }
+  var txt=(v===null)?'—':(+v).toFixed(d.dec);
+  var inner='<b class="ct-v xs-num'+cls+'">'+txt;
+  if(S.cmpCell==='arrow' && v!==null && spread) inner += (v===mx)?'<i class="ct-ar up">▲</i>':'<i class="ct-ar dn">▼</i>';
+  inner+='</b>';
+  if(S.cmpCell==='bar'){
+    var pct=(v===null)?0:Math.max(4,Math.min(100,Math.round(v/d.max*100)));
+    inner+='<div class="ct-bar"><i style="width:'+pct+'%;background:'+d.color+'"></i></div>';
+  }
+  return '<div class="ct-cell">'+inner+'</div>';
+}
+function cmpTableInner(list){
+  var labels='<div class="ct-labels"><div class="ct-corner">СТАТЫ</div>'+
+    ALLSTATS.map(function(d){ return '<div class="ct-lbl"><span style="color:'+d.color+'">'+d.ic+'</span> '+d.lbl+'</div>'; }).join('')+'</div>';
+  var cols=list.map(function(c,i){
+    return '<div class="ct-col">'+
+      '<div class="ct-colh">'+
+        (list.length>2?'<button class="ct-rm" data-i="'+i+'" type="button" title="Убрать">✕</button>':'')+
+        '<img class="ct-port ic-'+S.iconShape+'" src="'+icon(c.key)+'" alt="">'+
+        '<div class="ct-nm">'+c.name+'</div>'+
+        '<span class="ct-tier" style="--tc:'+(DTIER[c.tier]||'var(--accent)')+'">'+c.tier+'</span>'+
+        '<div class="ct-wr"><b>'+c.wr+'%</b> WR</div>'+
+      '</div>'+
+      ALLSTATS.map(function(d){ return ctCell(c,d,list); }).join('')+
+    '</div>';
+  }).join('');
+  var add = list.length<CMP_MAX ? '<button class="ct-add" type="button"><span>＋</span><i>чемпион</i></button>' : '';
+  return labels+cols+add;
+}
+function bindTableBody(ov, list){
+  ov.querySelectorAll('.ct-rm').forEach(function(b){ b.onclick=function(){
+    _cmpArr.splice(+b.dataset.i,1); openCompareTable(); }; });
+  var add=ov.querySelector('.ct-add'); if(add) add.onclick=openComparePickerAdd;
+}
+function openCompareTable(){
+  var list=_cmpArr.slice(0,CMP_MAX);
+  var ov=document.getElementById('hrOverlay');
+  ov.className='hr-overlay bd-'+S.backdrop; ov.style.removeProperty('--artcolor');
+  ov.innerHTML='<div class="cmp-wrap is-table glass cmpc-'+S.cmpCell+'">'+
+    '<button class="d-close" type="button">✕</button>'+
+    '<div class="cmp-top"><div class="cmp-title">⚖ Сравнение · '+list.length+'</div>'+
+      '<div class="cmp-lvl"><span>УРОВЕНЬ</span><b id="cmpLvlNum">'+DLVL+'</b>'+
+        '<input type="range" id="cmpLvl" min="1" max="15" value="'+DLVL+'" style="--fill:'+Math.round((DLVL-1)/14*100)+'%"></div></div>'+
+    '<div class="cmp-table">'+cmpTableInner(list)+'</div>'+
+  '</div>';
+  ov.hidden=false; requestAnimationFrame(function(){ ov.classList.add('show'); });
+  ov.querySelector('.d-close').onclick=closeDetail;
+  ov.onclick=function(e){ if(e.target===ov) closeDetail(); };
+  bindTableBody(ov, list);
+  var sl=ov.querySelector('#cmpLvl');
+  sl.oninput=function(){ DLVL=+this.value; this.style.setProperty('--fill',Math.round((DLVL-1)/14*100)+'%');
+    ov.querySelector('#cmpLvlNum').textContent=DLVL;
+    var tb=ov.querySelector('.cmp-table'); if(tb){ tb.innerHTML=cmpTableInner(list); bindTableBody(ov,list); } };
+}
+function openComparePickerAdd(){
+  var ov=document.getElementById('hrOverlay');
+  ov.className='hr-overlay bd-'+S.backdrop; ov.style.removeProperty('--artcolor');
+  var have=_cmpArr.map(function(c){ return c.key; });
+  var list=POOL.filter(function(x){ return have.indexOf(x.key)<0; });
+  ov.innerHTML='<div class="cmp-pick glass">'+
+    '<div class="cmp-pick-h"><button class="cmp-back" type="button">← Назад</button>'+
+      '<span>Добавить чемпиона в сравнение</span><button class="d-close" type="button">✕</button></div>'+
+    '<input id="cmpSearchA" class="pick-search" type="text" placeholder="🔍 Поиск чемпиона…">'+
+    '<div class="cmp-pick-grid">'+list.map(function(x){
+      return '<button class="cmp-pick-c" data-k="'+x.key+'" type="button"><img src="'+icon(x.key)+'" alt="" loading="lazy"><span>'+x.name+'</span></button>';
+    }).join('')+'</div></div>';
+  ov.hidden=false; requestAnimationFrame(function(){ ov.classList.add('show'); });
+  ov.querySelector('.d-close').onclick=closeDetail;
+  ov.querySelector('.cmp-back').onclick=openCompareTable;
+  var srch=ov.querySelector('#cmpSearchA');
+  srch.oninput=function(){ var q=this.value.trim().toLowerCase();
+    ov.querySelectorAll('.cmp-pick-c').forEach(function(b){
+      var nm=b.querySelector('span').textContent.toLowerCase();
+      b.style.display=(!q||nm.indexOf(q)>=0)?'':'none'; }); };
+  ov.querySelectorAll('.cmp-pick-c').forEach(function(b){ b.onclick=function(){
+    var c=POOL.find(function(x){ return x.key===b.dataset.k; });
+    if(c && _cmpArr.length<CMP_MAX) _cmpArr.push(c); openCompareTable(); }; });
+}
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeDetail(); });
 
 // ── старт ──
-document.getElementById('resetBtn').onclick=function(){ S=Object.assign({},DEFAULTS); fRole='all'; fQ=''; buildLayoutBar(); buildPanel(); render(); };
+var LS=null;
+document.getElementById('resetBtn').onclick=function(){ S=Object.assign({},DEFAULTS); fRole='all'; fQ=''; buildLayoutBar(); buildPanel(); render(); if(LS) LS.clearSaved(); };
 buildLayoutBar();
 buildPanel();
 render();
+// настройки лаба: память (анти-сброс) + код настроек (копировать/вставить) + пресеты
+if(window.LabSettings){
+  LS=LabSettings.attach({ id:'hover-reveal', defaults:DEFAULTS, mount:'#labTools',
+    getState:function(){ return S; },
+    apply:function(st){ S=Object.assign({},DEFAULTS,st); buildLayoutBar(); buildPanel(); render(); refreshOpenCard(); } });
+}
 
 })();
