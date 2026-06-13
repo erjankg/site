@@ -50,6 +50,17 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/skill-nudge.mjs",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

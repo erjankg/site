@@ -78,11 +78,13 @@ service cloud.firestore {
           || (request.auth.uid == adminUid() && request.resource.data.isAdmin is bool)
         );
 
-      allow update: if request.auth != null
-        && request.auth.uid == userId
-        && (
-          // либо isAdmin не трогается (никаких изменений по этому полю)
-          (
+      // Самозапись юзера в свой документ (с защитой поля isAdmin),
+      // ЛИБО владелец-админ модерирует любой документ (чистка PII/модерация),
+      // но даже админ НЕ может выдать isAdmin чужому аккаунту.
+      allow update: if request.auth != null && (
+        (
+          request.auth.uid == userId
+          && (
             (
               !('isAdmin' in request.resource.data.keys())
               && !('isAdmin' in resource.data.keys())
@@ -92,12 +94,20 @@ service cloud.firestore {
               && 'isAdmin' in resource.data.keys()
               && request.resource.data.isAdmin == resource.data.isAdmin
             )
+            || request.auth.uid == adminUid()
           )
-          // либо это владелец сайта — ему можно
-          || request.auth.uid == adminUid()
-        );
+        )
+        || (
+          isAdmin()
+          && (
+            !('isAdmin' in request.resource.data.keys())
+            || request.resource.data.isAdmin == false
+            || userId == adminUid()
+          )
+        )
+      );
 
-      allow delete: if request.auth != null && request.auth.uid == userId;
+      allow delete: if request.auth != null && (request.auth.uid == userId || isAdmin());
     }
 
     // ═══════════════════════════════════════════
