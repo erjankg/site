@@ -12,8 +12,27 @@ const tier = (t) => `<span class="tier" data-t="${t}">${t}</span>`;
 const ROLE_RU = { Baron: 'Барон', Mid: 'Мид', Jungle: 'Лес', Dragon: 'Дракон', Support: 'Саппорт', top: 'Барон', jungle: 'Лес', mid: 'Мид' };
 const role = (r) => ROLE_RU[r] || r || '';
 
-let rank = 'diamond_plus';
-let variant = 'A';
+const DEFAULTS = {
+  layout: 'A',          // ФИНАЛ: A · Витрина (переключатель убран)
+  place: 'top',         // ФИНАЛ: шапка/пиллы сверху (переключатель убран)
+  hero: 'normal',       // ФИНАЛ: размер героя — Норм (переключатель убран)
+  heroFx: 'parallax',   // ФИНАЛ: параллакс+3D героя (god-tier, переключатель убран)
+  density: 'normal',    // ГЛОБАЛ (хаб сайта); в лабе = превью
+  radius: 'normal',     // ГЛОБАЛ (хаб сайта); в лабе = превью
+  glass: 'normal',      // сила стекла — ГЛОБАЛ (хаб сайта); в лабе = превью
+  glasstint: 'neutral', // оттенок стекла — ГЛОБАЛ (хаб сайта); в лабе = превью
+  glassbd: 'thin',      // граница стекла — ГЛОБАЛ (хаб сайта); в лабе = превью
+  grain: 'off',         // зерно/шум — ГЛОБАЛ (хаб сайта); в лабе = превью
+  art: 'Amumu',         // сплэш-арт — ГЛОБАЛ (ОДИН на весь сайт); в лабе = превью
+  hover: 'on',          // hover плиток — ГЛОБАЛ (хаб сайта); в лабе = превью
+  rank: 'diamond_plus', // фильтр рангов — живой пользовательский контрол (пиллы в шапке)
+};
+let S = Object.assign({}, DEFAULTS);
+// живые алиасы для render-функций
+let rank = S.rank;
+let variant = S.layout;
+// доступные сплэш-арты (постеры Tencent) — варианты за стеклом
+const ARTS = [['none', 'Градиент'], ['Amumu', 'Амуму'], ['MonkeyKing', 'Вуконг'], ['Sett', 'Сетт'], ['Vayne', 'Вейн'], ['Teemo', 'Тимо'], ['Warwick', 'Варвик'], ['Rammus', 'Раммус']];
 
 function featured(d) {
   return `<div class="tile t-featured">
@@ -86,20 +105,120 @@ function render() {
   $('#bento').dataset.v = variant;
   $('#bento').innerHTML = featured(r.featured) + topWR(r.topWR) + movers(r.moversUp, r.moversDown)
     + duel(M.matchupOfDay, 'best') + duel(M.counterOfDay, 'worst') + build(M.buildOfDay);
+  attachHeroFx();
 }
 
-function buildControls() {
-  // ранги
-  const rp = $('#rankPills');
-  rp.innerHTML = M.ranks.map((rk) => `<button class="pill ${rk === rank ? 'on' : ''}" data-r="${rk}">${M.rankLabels[rk]}</button>`).join('');
-  rp.onclick = (e) => { const b = e.target.closest('.pill'); if (!b) return; rank = b.dataset.r; [...rp.children].forEach((c) => c.classList.toggle('on', c.dataset.r === rank)); render(); };
-  // раскладки
-  const vp = $('#variantPills');
-  const V = { A: 'A · Витрина', B: 'B · Мозаика', C: 'C · Дашборд' };
-  vp.innerHTML = Object.entries(V).map(([k, t]) => `<button class="pill ${k === variant ? 'on' : ''}" data-v="${k}">${t}</button>`).join('');
-  vp.onclick = (e) => { const b = e.target.closest('.pill'); if (!b) return; variant = b.dataset.v; [...vp.children].forEach((c) => c.classList.toggle('on', c.dataset.v === variant)); render(); };
+/* ═══════════ 3D-наклон + параллакс «Чемпиона патча» (как в hover-reveal-лабе) ═══════════ */
+function attachHeroFx() {
+  const el = $('.t-featured'); if (!el) return;
+  el.dataset.fx = S.heroFx;
+  if (S.heroFx === 'none') { el.onmousemove = el.onmouseleave = null; return; }
+  const bg = el.querySelector('.feat-bg');
+  el.onmousemove = (e) => {
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+    el.style.transform = `perspective(900px) rotateY(${px * 7}deg) rotateX(${-py * 7}deg)`;
+    if (S.heroFx === 'parallax' && bg) bg.style.transform = `scale(1.12) translate(${px * -22}px, ${py * -22}px)`;
+  };
+  el.onmouseleave = () => { el.style.transform = ''; if (bg) bg.style.transform = ''; };
+}
+
+/* ═══════════ Фильтр рангов (живёт в шапке или в плавающем попапе) ═══════════ */
+function rankPillsHTML() {
+  return M.ranks.map((rk) => `<button class="pill ${rk === S.rank ? 'on' : ''}" data-r="${rk}">${M.rankLabels[rk]}</button>`).join('');
+}
+function wireRankPills(host) {
+  if (!host) return;
+  host.innerHTML = rankPillsHTML();
+  host.onclick = (e) => {
+    const b = e.target.closest('.pill'); if (!b) return;
+    S.rank = rank = b.dataset.r;
+    document.querySelectorAll('#rankPills .pill, #hubGearPop .pill').forEach((c) => c.classList.toggle('on', c.dataset.r === S.rank));
+    render();
+  };
+}
+
+/* ═══════════ Дизайн-полоса лаба ═══════════
+   ФИНАЛ (зафиксировано дефолтом, переключатели убраны): раскладка A·Витрина,
+   шапка top·Сверху, размер героя normal, эффект героя parallax (god-tier).
+   Стекло/визуалка (стекло·оттенок·граница·зерно·сплэш·плотность·углы·hover) =
+   ГЛОБАЛЬНОЕ на боевом (один хаб сайта); здесь — лаб-превью «для нас», не переносится. */
+const GROUPS = [
+  { key: 'art', label: 'Сплэш-арт за стеклом (глобал · превью)', items: ARTS.map(([v, t]) => ({ v, t })) },
+  { key: 'glasstint', label: 'Вид стекла · оттенок (глобал · превью)', items: [{ v: 'neutral', t: 'Нейтральное' }, { v: 'cyan', t: 'Циан' }, { v: 'gold', t: 'Золото' }, { v: 'warm', t: 'Тёплое' }, { v: 'cold', t: 'Холодное' }, { v: 'dark', t: 'Тёмное' }] },
+  { key: 'glass', label: 'Сила стекла (глобал · превью)', items: [{ v: 'soft', t: 'Слабое' }, { v: 'normal', t: 'Норм' }, { v: 'strong', t: 'Сильное' }] },
+  { key: 'glassbd', label: 'Граница стекла (глобал · превью)', items: [{ v: 'thin', t: 'Тонкая' }, { v: 'glow', t: 'Свечение' }, { v: 'none', t: 'Без' }] },
+  { key: 'grain', label: 'Зерно/шум (глобал · превью)', items: [{ v: 'off', t: 'Выкл' }, { v: 'on', t: 'Вкл' }] },
+  { key: 'density', label: 'Плотность (глобал · превью)', items: [{ v: 'compact', t: 'Компактно' }, { v: 'normal', t: 'Норм' }, { v: 'roomy', t: 'Просторно' }] },
+  { key: 'radius', label: 'Углы (глобал · превью)', items: [{ v: 'sharp', t: 'Острые' }, { v: 'normal', t: 'Норм' }, { v: 'round', t: 'Круглые' }] },
+  { key: 'hover', label: 'Hover плиток (глобал · превью)', items: [{ v: 'on', t: 'Вкл' }, { v: 'off', t: 'Выкл' }] },
+];
+function buildStrip() {
+  const host = $('#stripBody');
+  host.innerHTML = GROUPS.map((g) => `<div class="lg"><span class="lg-lbl">${g.label}</span>
+    <div class="lg-seg${g.gold ? ' gold' : ''}" data-key="${g.key}">
+      ${g.items.map((it) => `<button data-v="${it.v}" class="${S[g.key] === it.v ? 'on' : ''}">${it.t}</button>`).join('')}
+    </div></div>`).join('');
+  host.querySelectorAll('.lg-seg').forEach((seg) => {
+    const key = seg.dataset.key;
+    seg.onclick = (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      S[key] = b.dataset.v;
+      seg.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+      applyState();
+    };
+  });
+}
+
+/* ═══════════ Применить весь набор настроек ═══════════ */
+function applyState() {
+  rank = S.rank; variant = S.layout;
+  const w = $('#wrap');
+  w.dataset.place = S.place;
+  w.dataset.density = S.density;
+  w.dataset.radius = S.radius;
+  w.dataset.glass = S.glass;
+  w.dataset.glasstint = S.glasstint;
+  w.dataset.glassbd = S.glassbd;
+  w.dataset.grain = S.grain;
+  w.dataset.hero = S.hero;
+  w.dataset.hover = S.hover;
+  // сплэш-арт за стеклом (один на весь хаб, выбранный из вариантов)
+  const art = $('#hubArt');
+  if (S.art && S.art !== 'none') { art.style.backgroundImage = `url('${poster(S.art)}')`; art.classList.add('on'); }
+  else { art.classList.remove('on'); }
+  // размещение фильтра рангов: плавающая ⚙ или в шапке
+  const gear = $('#hubGear'), pop = $('#hubGearPop');
+  if (S.place === 'float') {
+    gear.hidden = false;
+    pop.innerHTML = `<div class="pop-ttl">Ранг</div><div class="pills" id="gearRank">${rankPillsHTML()}</div>`;
+    wireRankPills($('#gearRank'));
+  } else {
+    gear.hidden = true; pop.hidden = true;
+    wireRankPills($('#rankPills'));
+  }
+  render();
 }
 
 $('#patchBadge').innerHTML = `Патч <b>${M.patch}</b> · обновлено <b>${M.updated}</b> · источник <b>lolm.qq.com</b>`;
-buildControls();
-render();
+
+// сворачивание дизайн-полосы
+$('#labMin').onclick = () => {
+  const min = document.body.classList.toggle('lab-min');
+  $('#labMin').textContent = min ? '▼ Показать настройки' : '▲ Свернуть настройки';
+};
+// плавающая шестерёнка
+$('#hubGear').onclick = () => { const p = $('#hubGearPop'); p.hidden = !p.hidden; };
+
+buildStrip();
+applyState();
+
+/* ═══════════ Память лаба + пресеты + 📋Код/📥Вставить ═══════════ */
+let LS = null;
+if (window.LabSettings) {
+  LS = LabSettings.attach({
+    id: 'metahub', defaults: DEFAULTS, mount: '#labTools',
+    getState: () => S,
+    apply: (st) => { S = Object.assign({}, DEFAULTS, st); buildStrip(); applyState(); },
+  });
+}

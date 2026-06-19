@@ -124,44 +124,60 @@ function artColor(key, cb){
 // ════════════════════════════════════════════════════════════════
 var LAYOUTS=[
   {id:'grid',     name:'Пикер-сетка', desc:'много чемпов, для боевого'},
-  {id:'fan',      name:'Веер',        desc:'god-tier 🔥'},
-  {id:'zoom',     name:'Зум-оверлей', desc:'крупнее поверх'},
-  {id:'flip',     name:'Переворот',   desc:'статы на обороте'},
-  {id:'curtain',  name:'Шторка',      desc:'выезжает снизу'},
-  {id:'side',     name:'Вбок',        desc:'панель сбоку'},
-  {id:'spotlight',name:'Прожектор',   desc:'соседи в блюр'},
-  {id:'deck',     name:'Колода',      desc:'стопка веером'}
+  {id:'fan',      name:'Веер',        desc:'god-tier 🔥'}
 ];
 
 var CONTROLS=[
   {key:'statStyle', label:'⭐ Статы: стиль (ВСЕ вместе)', type:'seg', opts:[['badges','Бейджи'],['chips','Чипсы'],['bars','Бары'],['tiles','Плитки'],['rings','Кольца']]},
-  {key:'cmpCard',   label:'⚖ Карточки сравнения', type:'seg', opts:[['glass','Стекло'],['splash','Сплэш 3D'],['table','Таблица']]},
-  {key:'cmpCell',   label:'⚖ Таблица: вид ячейки', type:'seg', opts:[['bar','Число+бар'],['num','Число'],['arrow','Число+стрелка']]},
+  {key:'cmpCell',   label:'⚖ Таблица сравнения: вид ячейки', type:'seg', opts:[['bar','Число+бар'],['num','Число'],['arrow','Число+стрелка']]},
   {key:'size',    label:'Размер карточек (сетка)', type:'seg', opts:[['s','Мелкие'],['m','Средние'],['l','Крупные']]},
-  {key:'hover',   label:'Ховер (сетка)', type:'seg', opts:[['reveal','Раскрытие'],['scale','Масштаб'],['lift','Подъём'],['glow','Подсветка'],['tilt','3D-наклон']]},
-  {key:'reveal',  label:'Что показывать (Веер и др.)', type:'seg', opts:[['radar','Радар качеств'],['rows','Список'],['bars','Бары'],['mini','Мини']]},
+  {key:'hover',   label:'Ховер по чемпам (сетка)', type:'seg', opts:[['shine','Блик ✨'],['reveal','Раскрытие'],['scale','Масштаб'],['lift','Подъём'],['glow','Подсветка'],['tilt','3D-наклон'],['none','Выкл']]},
   {key:'backdrop',label:'Фон при открытии', type:'seg', opts:[['glass','Стекло'],['blur','Блюр'],['darken','Затемнение'],['vignette','Виньетка'],['none','Нет']]},
-  {key:'glass',   label:'Стекло модалки', type:'seg', opts:[['on','Вкл'],['off','Выкл']]},
   {key:'speed',   label:'Скорость', type:'seg', opts:[['slow','Медленно'],['normal','Средне'],['fast','Быстро']]},
   {key:'accent',  label:'Цвет акцента', type:'color', swatches:['#0BC4E3','#64d2ff','#6D3FF5','#2ecc71','#e8820a','#e74c3c']},
   {key:'radius',  label:'Скругление', type:'range', min:0, max:24, step:2, unit:'px'},
-  // ── параметры КАРТОЧКИ-ШАПКИ (god-tier: 3D + параллакс + сплэш) ──
-  {key:'cardBg',  label:'🃏 Карта: фон', type:'seg', opts:[['parallax','Параллакс'],['fullbody','Фулл-боди'],['banner','Баннер'],['none','Нет']]},
-  {key:'cardTilt',label:'🃏 Карта: 3D-наклон', type:'seg', opts:[['on','Вкл'],['off','Выкл']]},
   {key:'cardScrim',label:'🃏 Карта: затемнение', type:'seg', opts:[['off','Нет'],['soft','Слабо'],['med','Средне'],['strong','Сильно']]},
-  {key:'autoColor',label:'📄 Фон-ореол: цвет из арта', type:'seg', opts:[['on','Вкл'],['off','Выкл']]},
-  {key:'cardGlow',label:'📄 Свечение страницы', type:'seg', opts:[['on','Вкл'],['off','Выкл']]},
   {key:'cgrad1',  label:'📄 Градиент 1', type:'color', swatches:['#0BC4E3','#011520','#6D3FF5','#010A13']},
   {key:'cgrad2',  label:'📄 Градиент 2', type:'color', swatches:['#011520','#010A13','#6D3FF5','#e74c3c']},
   {key:'cangle',  label:'📄 Угол градиента', type:'range', min:0, max:360, step:5, unit:'°'},
   {key:'iconShape',label:'📄 Форма иконки', type:'seg', opts:[['round','Скругл'],['circle','Круг'],['squircle','Squircle']]},
   {key:'pageSize', label:'📄 Размер страницы', type:'seg', opts:[['m','Компакт'],['l','Средне'],['xl','Широко']]},
   {key:'tabPos',   label:'📄 Вкладки: где', type:'seg', opts:[['top','Сверху'],['left','Слева']]},
-  {key:'tabStyle', label:'📄 Вкладки: стиль', type:'seg', opts:[['pills','Пилюли'],['underline','Подчёркивание']]}
+  {key:'tabStyle', label:'📄 Вкладки: стиль', type:'seg', opts:[['pills','Пилюли'],['underline','Подчёркивание']]},
+  {key:'abilLayout', label:'⚔ Умения: раскладка', type:'seg', opts:[['railTop','Иконки сверху'],['railLeft','Рельс слева'],['list','Списком (все сразу)'],['compact','Компактно']]},
+  {key:'statLabels', label:'📊 Статы: вид', type:'seg', opts:[['names','Названия'],['icons','Иконки']]},
+  // ── НОВОЕ: что показывать на КРАТКОЙ карточке (попап A3). Базовое (портрет/имя/тир/роль/WR/«Подробнее») всегда. ──
+  {key:'bPickBan', label:'B1 · Пик/бан рейты',        type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bArch',    label:'B2 · Архетип + сложность',  type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bCounter', label:'B3 · Топ-контра',           type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bRadar',   label:'B4 · Мини-радар качеств',   type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bTrend',   label:'B5 · Тренд винрейта ↑↓',    type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bSpark',   label:'B6 · Спарклайн 7 дней',     type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bItem',    label:'B7 · Ядро сборки',          type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bPhases',  label:'B8 · Сила по фазам',        type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bAvg',     label:'B9 · Выше/ниже среднего',   type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  // ── НОВОЕ: СТРАНИЦА чемпа (по «Подробнее») ──
+  {key:'pageLayout', label:'📄 Страница: раскладка',   type:'seg', isNew:true, opts:[['sidebar','Карточка слева'],['top','Карточка сверху'],['single','Вкладки']]},
+  {key:'bgKenBurns', label:'🎬 Фон: «дыхание» (Ken Burns)', type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bgParallax', label:'🎬 Фон: параллакс от мышки', type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'bgTilt',     label:'🎬 Фон: наклон карты',      type:'seg', isNew:true, opts:[['off','Выкл'],['on','Вкл']]},
+  {key:'pgLearn',    label:'🎓 Страница: блок «Учиться»', type:'seg', isNew:true, opts:[['on','Вкл'],['off','Выкл']]},
+  {key:'clickOpens', label:'👆 Клик по чемпу открывает', type:'seg', isNew:true, opts:[['popup','Попап (потом стр.)'],['page','Сразу страницу']]},
+  {key:'pgBtnPos',   label:'🔘 Кнопки страницы: где',   type:'seg', isNew:true, opts:[['side','Справа в шапке'],['topbar','В верх. панели'],['under','Под сводкой']]},
+  {key:'linkStyle',  label:'🔘 Кнопки: вид',            type:'seg', isNew:true, opts:[['text','С текстом'],['icons','Только иконки']]},
+  // ── НОВОЕ: кнопки модалки «Сравнить» ──
+  {key:'cmpClosePos', label:'⚖ Сравнить: «Закрыть» где', type:'seg', isNew:true, opts:[['right','Справа'],['left','Слева'],['title','В заголовке']]},
+  {key:'cmpAddPos',   label:'⚖ Сравнить: «+ чемпион» где', type:'seg', isNew:true, opts:[['col','Столбцом'],['top','Сверху'],['bottom','Внизу']]},
+  {key:'cmpRmShow',   label:'⚖ Сравнить: «убрать» (✕)',  type:'seg', isNew:true, opts:[['always','Всегда'],['hover','При наведении'],['off','Скрыть']]},
+  {key:'cmpBtnStyle', label:'⚖ Сравнить: кнопки вид',    type:'seg', isNew:true, opts:[['text','Иконки+текст'],['icon','Только иконки']]}
 ];
-var DEFAULTS={layout:'grid', statStyle:'chips', cmpCard:'glass', cmpCell:'bar', size:'m', hover:'reveal', reveal:'radar', backdrop:'glass', glass:'on', speed:'normal', accent:'#0BC4E3', radius:14,
+var DEFAULTS={layout:'grid', statStyle:'chips', cmpCell:'bar', size:'m', hover:'shine', reveal:'radar', backdrop:'glass', glass:'on', speed:'normal', accent:'#0BC4E3', radius:14,
   cardBg:'parallax', cardTilt:'on', cardScrim:'med', cardGlow:'on', cgrad1:'#0BC4E3', cgrad2:'#011520', cangle:170, autoColor:'on', iconShape:'round',
-  pageSize:'l', tabPos:'top', tabStyle:'pills'};
+  pageSize:'l', tabPos:'top', tabStyle:'pills', abilLayout:'railTop', statLabels:'names',
+  bPickBan:'on', bArch:'on', bCounter:'off', bRadar:'on', bTrend:'on', bSpark:'off', bItem:'off', bPhases:'off', bAvg:'off',
+  pageLayout:'sidebar', bgKenBurns:'on', bgParallax:'on', bgTilt:'on', pgLearn:'on',
+  clickOpens:'page', pgBtnPos:'side', linkStyle:'text',
+  cmpClosePos:'right', cmpAddPos:'col', cmpRmShow:'always', cmpBtnStyle:'text'};
 var CSCRIM={off:0, soft:0.32, med:0.55, strong:0.78};
 var S=Object.assign({},DEFAULTS);
 var CELL={s:'66px', m:'88px', l:'118px'};
@@ -181,18 +197,34 @@ function buildLayoutBar(){
 }
 function buildPanel(){
   var p=document.getElementById('panel');
-  p.innerHTML=CONTROLS.map(function(c){
+  p.innerHTML='<div class="panel-hd"><b>⚙ Настройки лаба</b><button class="panel-x" type="button" title="Свернуть">✕</button></div>'+CONTROLS.map(function(c){
     var inner='';
     if(c.type==='seg') inner='<div class="seg">'+c.opts.map(function(o){return '<button data-k="'+c.key+'" data-o="'+o[0]+'" class="'+(S[c.key]===o[0]?'on':'')+'">'+o[1]+'</button>';}).join('')+'</div>';
     else if(c.type==='color') inner='<div class="color-row"><input type="color" data-k="'+c.key+'" value="'+S[c.key]+'"><span class="cval">'+S[c.key]+'</span></div><div class="swatches">'+(c.swatches||[]).map(function(sw){return '<span class="swatch" data-k="'+c.key+'" data-sw="'+sw+'" style="background:'+sw+'"></span>';}).join('')+'</div>';
     else if(c.type==='range') inner='<input type="range" data-k="'+c.key+'" min="'+c.min+'" max="'+c.max+'" step="'+c.step+'" value="'+S[c.key]+'">';
     var badge=c.type==='range'?'<span class="ctrl-val" id="val-'+c.key+'">'+S[c.key]+(c.unit||'')+'</span>':'';
-    return '<div class="ctrl"><div class="ctrl-label">'+c.label+badge+'</div>'+inner+'</div>';
+    return '<div class="ctrl'+(c.isNew?' is-new':'')+'"><div class="ctrl-label">'+c.label+badge+'</div>'+inner+'</div>';
   }).join('');
   p.querySelectorAll('.seg button[data-k]').forEach(function(b){ b.onclick=function(){ S[b.dataset.k]=b.dataset.o; buildPanel(); render(); refreshOpenCard(); }; });
   p.querySelectorAll('input[type=color]').forEach(function(inp){ inp.oninput=function(){ S[inp.dataset.k]=inp.value; inp.nextElementSibling.textContent=inp.value; applyVars(); }; });
   p.querySelectorAll('.swatch').forEach(function(sw){ sw.onclick=function(){ S[sw.dataset.k]=sw.dataset.sw; buildPanel(); applyVars(); }; });
   p.querySelectorAll('input[type=range]').forEach(function(inp){ inp.oninput=function(){ S[inp.dataset.k]=+inp.value; var u=(CONTROLS.find(function(c){return c.key===inp.dataset.k;})||{}).unit||''; var b=document.getElementById('val-'+inp.dataset.k); if(b)b.textContent=inp.value+u; applyVars(); }; });
+  var px=p.querySelector('.panel-x'); if(px) px.onclick=function(){ setPanelOpen(false); };
+}
+// ── плавающая панель настроек: поверх ВСЕХ оверлеев, сворачиваемая, состояние в памяти ──
+var _PANEL_KEY='lab-panel:hover-reveal';
+function setPanelOpen(open){
+  document.body.classList.toggle('panel-hidden', !open);
+  var g=document.getElementById('panelGear'); if(g) g.textContent=open?'✕':'⚙';
+  try{ localStorage.setItem(_PANEL_KEY, open?'1':'0'); }catch(e){}
+}
+function setupPanel(){
+  if(document.getElementById('panelGear')) return;
+  var g=document.createElement('button'); g.id='panelGear'; g.type='button'; g.title='Настройки лаба';
+  document.body.appendChild(g);
+  g.onclick=function(){ setPanelOpen(document.body.classList.contains('panel-hidden')); };
+  var saved; try{ saved=localStorage.getItem(_PANEL_KEY); }catch(e){}
+  setPanelOpen(saved!=='0');  // по умолчанию открыта
 }
 function applyVars(){
   var r=document.documentElement.style;
@@ -207,17 +239,18 @@ function applyVars(){
   r.setProperty('--cscrim', String(CSCRIM[S.cardScrim]!==undefined?CSCRIM[S.cardScrim]:0.55));
 }
 var _openC=null, _cmpC=null;
+var _openMode=null;        // 'popup' | 'page' | null — что сейчас открыто (для перерисовки при смене настроек)
+var _pageFromPopup=false;  // страница открыта из попапа? («Назад» → попап, иначе → закрыть)
 var _cmpArr=null;          // массив чемпов в сравнении (общий для всех режимов)
 var CMP_MAX=6;             // максимум колонок в режиме «Таблица»
 // единая точка входа: рисует сравнение в зависимости от выбранного режима
 function renderCompare(){
   if(!_cmpArr || !_cmpArr.length) return;
-  if(S.cmpCard==='table') openCompareTable();
-  else openCompare(_cmpArr[0], _cmpArr[1]||_cmpArr[0]);
+  openCompareTable();   // сравнение всегда = таблица-столбцы (можно добавлять чемпов)
 }
 function startCompare(c1,c2){ _cmpArr=[c1,c2]; renderCompare(); }
 function refreshOpenCard(){ var ov=document.getElementById('hrOverlay'); if(!ov || ov.hidden) return;
-  if(_cmpArr) renderCompare(); else if(_openC) openDetail(_openC); }
+  if(_cmpArr) renderCompare(); else if(_openMode==='page' && _openC) openPage(_openC); else if(_openC) openDetail(_openC); }
 
 // ════════════════════════════════════════════════════════════════
 // Рендер: переключатель сетка / витрина-варианты
@@ -260,7 +293,7 @@ function renderPicker(){
 }
 function updateCount(){ var el=document.getElementById('pickCount'); if(el) el.textContent=filtered().length+' / '+POOL.length; }
 function bindCards(){
-  document.querySelectorAll('.pick-card').forEach(function(el){ el.onclick=function(){ DLVL=10; _openTab='matchups'; openDetail(POOL[+el.dataset.i]); }; });
+  document.querySelectorAll('.pick-card').forEach(function(el){ el.onclick=function(){ openFromGrid(POOL[+el.dataset.i]); }; });
   var grid=document.getElementById('pickGrid');
   if(grid && S.hover==='tilt'){
     grid.onmousemove=function(e){ var card=e.target.closest('.pick-card'); if(!card) return;
@@ -280,10 +313,10 @@ function renderShowcase(){
     var els=stage.querySelectorAll('.hr-card'), m=(els.length-1)/2;
     els.forEach(function(el,i){ el.style.transform='rotate('+((i-m)*5)+'deg) translateY('+Math.abs(i-m)*7+'px)'; el.style.zIndex=String(20-Math.abs(i-m)); });
   }
-  stage.querySelectorAll('.hr-card').forEach(function(el){ el.addEventListener('click',function(){ DLVL=10; _openTab='matchups'; openDetail(POOL[+el.dataset.i]); }); });
+  stage.querySelectorAll('.hr-card').forEach(function(el){ el.addEventListener('click',function(){ openFromGrid(POOL[+el.dataset.i]); }); });
 }
 function showHint(){
-  return ({fan:'Наведи — раздвинет соседей',zoom:'Наведи — крупнее поверх',flip:'Наведи — перевернётся',curtain:'Наведи — шторка снизу',side:'Наведи — панель сбоку',spotlight:'Наведи — соседи в блюр',deck:'Наведи на любую в стопке'}[S.layout]||'Наведи на чемпа')+' · клик → стеклянная карточка';
+  return 'Наведи — раздвинет соседей · клик → стеклянная карточка';
 }
 function cardHTML(c,i){
   var cls='hr-card glow';
@@ -393,8 +426,9 @@ function buildStats(c, boxId, cmp){
 }
 function dActions(){
   return '<div class="d-actions">'+
+    '<button class="d-btn d-more" type="button">Подробнее →</button>'+
     '<button class="d-btn d-cmp" type="button">⚖ Сравнить</button>'+
-    [['⚔','Сборки'],['📖','Гайд'],['★','В избранное']].map(function(a){
+    [['★','В избранное']].map(function(a){
       return '<button class="d-btn" type="button">'+a[0]+' '+a[1]+'</button>';}).join('')+'</div>';
 }
 function dLevel(){
@@ -409,6 +443,31 @@ function dMatch(c){
     return '<div class="d-mu"><div class="d-mu-h"><span>'+title+'</span><button class="d-mu-add" type="button">+</button></div><div class="d-mu-l">'+chips+'</div></div>';
   }
   return '<div class="d-matchups">'+box('СИЛЁН ПРОТИВ',c.strong)+box('СЛАБ ПРОТИВ',c.weak)+box('КОМБО',c.combo)+'</div>';
+}
+// ── КРАТКАЯ СВОДКА карточки (попап A3): базовое + B1–B9 по тумблерам ──
+function _avgWR(){ var s=0; POOL.forEach(function(x){s+=x.wr;}); return s/POOL.length; }
+function _weekTrend(c){ var h=_history(c); return +(h[0].wr-h[h.length-1].wr).toFixed(1); }
+function trendArrow(d){ return d>0.05?'<i class="tr-up">▲ '+d.toFixed(1)+'</i>':d<-0.05?'<i class="tr-dn">▼ '+Math.abs(d).toFixed(1)+'</i>':'<i class="tr-fl">—</i>'; }
+function miniSpark(c){
+  var h=_history(c).map(function(x){return x.wr;}).reverse();
+  var mn=Math.min.apply(0,h),mx=Math.max.apply(0,h),rg=(mx-mn)||1;
+  var pts=h.map(function(v,i){return (i/(h.length-1)*88).toFixed(1)+','+(22-(v-mn)/rg*18).toFixed(1);}).join(' ');
+  return '<svg class="db-spark" viewBox="0 0 88 24" preserveAspectRatio="none"><polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/></svg>';
+}
+function dBrief(c){
+  var wrCol=c.wr>=50?'#43e08a':'#ff6b6b', parts=[];
+  parts.push('<div class="db-wr"><b style="color:'+wrCol+'">'+c.wr+'%</b><span>WR</span>'+(S.bTrend==='on'?trendArrow(_weekTrend(c)):'')+'</div>');
+  if(S.bPickBan==='on') parts.push('<div class="db-chip">'+c.pr+'%<i>PR</i></div><div class="db-chip">'+c.br+'%<i>BR</i></div>');
+  if(S.bAvg==='on'){ var d=+(c.wr-_avgWR()).toFixed(1); parts.push('<div class="db-chip '+(d>=0?'good':'bad')+'">'+(d>=0?'+':'')+d+'% к среднему</div>'); }
+  if(S.bArch==='on') parts.push('<div class="db-chip db-arch">'+c.tags.join(' · ')+' · сложн. '+c.r.diff+'/10</div>');
+  if(S.bCounter==='on'){ var st=c.strong[0],wk=c.weak[0];
+    parts.push('<div class="db-chip good">▲ силён: '+(st?st.n:'—')+'</div><div class="db-chip bad">▼ слаб: '+(wk?wk.n:'—')+'</div>'); }
+  if(S.bItem==='on'){ var it=_pick(c,'it',ITEMS,1)[0]; if(it) parts.push('<div class="db-chip db-item"><img src="'+it.ic+'" alt="">'+it.n+'</div>'); }
+  if(S.bPhases==='on'){ var ph=[['Ранняя',c.r.mobility],['Средняя',c.r.power],['Поздняя',c.r.dmg]];
+    parts.push('<div class="db-phases">'+ph.map(function(p){return '<div class="db-ph"><span>'+p[0]+'</span><i style="width:'+(p[1]*10)+'%"></i></div>';}).join('')+'</div>'); }
+  var spark=S.bSpark==='on'?'<div class="db-sparkwrap"><span>WR·7д</span>'+miniSpark(c)+'</div>':'';
+  var radar=S.bRadar==='on'?'<div class="db-radar">'+radarSVG(c)+'</div>':'';
+  return '<div class="d-brief"><div class="db-main">'+parts.join('')+spark+'</div>'+radar+'</div>';
 }
 // ════════════════════════════════════════════════════════════════
 // Демо-данные вкладок (детерминированно от имени чемпа). Реальные — позже из источника.
@@ -471,24 +530,146 @@ function tabOverview(c){
     '<div class="d-col">'+dMatch(c)+'</div>'+
   '</div>';
 }
-var TABS=[['matchups','Матчапы'],['items','Предметы'],['runes','Руны'],['spells','Заклинания'],['history','История']];
-var _openTab='matchups';
-function tabHTML(c){
-  return _openTab==='items'?tabItems(c):_openTab==='runes'?tabRunes(c):
-         _openTab==='spells'?tabSpells(c):_openTab==='history'?tabHistory(c):tabMatchups(c);
+// ════════════════════════════════════════════════════════════════
+// СЕТКА СТАТОВ 5×4 (как игровое окно чемпа). Иконки вместо подписей (подписи — тумблер).
+// «Живые» статы считаются по уровню; статы от предметов = 0 на базе (как в игре).
+// ════════════════════════════════════════════════════════════════
+var CRIT_DMG=200;  // базовый урон крита (%), глобальная константа WR
+var ENERGY_POOL=200, ENERGY_REGEN=50;  // у энергетиков фикс
+// порядок РОВНО как на скрине Эржана (5 строк × 4)
+var GRID20=[
+  {id:'ad',  lbl:'AD',         ic:'⚔', color:'var(--c-ad)'},
+  {id:'ap',  lbl:'AP',         ic:'🔮', color:'#b07bff'},
+  {id:'hp',  lbl:'Тек. HP',    ic:'✚', color:'var(--c-hp)'},
+  {id:'res', lbl:'Ресурс',     ic:'🔷', color:'#5aa9ff'},
+  {id:'arm', lbl:'Броня',      ic:'🛡', color:'var(--c-arm)'},
+  {id:'mr',  lbl:'Mrez',       ic:'✦', color:'var(--c-mr)'},
+  {id:'as',  lbl:'Ск. атаки',  ic:'⏩', color:'#f6c945'},
+  {id:'ah',  lbl:'Ускор. умений',ic:'⏳', color:'#7ee0c0'},
+  {id:'critc',lbl:'Шанс крита', ic:'🎯', color:'#ff9f43'},
+  {id:'critd',lbl:'Урон крита', ic:'💥', color:'#ff6b6b'},
+  {id:'hpreg',lbl:'Реген HP',   ic:'💚', color:'#5ad17a'},
+  {id:'resreg',lbl:'Реген ресурса',ic:'🔁', color:'#5aa9ff'},
+  {id:'arpen',lbl:'Проб. брони',ic:'🪓', color:'#e8a05a'},
+  {id:'mpen', lbl:'Проб. магии',ic:'🔪', color:'#c08bff'},
+  {id:'arpenp',lbl:'Проб. брони %',ic:'🪓', color:'#e8a05a'},
+  {id:'mpenp',lbl:'Проб. магии %',ic:'🔪', color:'#c08bff'},
+  {id:'pvamp',lbl:'Физ. вампиризм',ic:'🩸', color:'#ff6b6b'},
+  {id:'mvamp',lbl:'Маг. вампиризм',ic:'🧪', color:'#c08bff'},
+  {id:'ms',  lbl:'Ск. перемещ.',ic:'👟', color:'#7ee0c0'},
+  {id:'ten', lbl:'Стойкость',  ic:'💪', color:'#f6c945'}
+];
+// значение ячейки сетки с учётом уровня. Возвращает строку (с %/«—» где надо).
+function gridVal(c,id){
+  var x=c.x||{};
+  switch(id){
+    case 'ad':  return String(dStat(c.s.ad,'ad'));
+    case 'hp':  return String(dStat(c.s.hp,'hp'));
+    case 'arm': return String(dStat(c.s.arm,'arm'));
+    case 'mr':  return String(dStat(c.s.mr,'mr'));
+    case 'as':  return (x.as?(x.as*(1+(x.asg/100)*(DLVL-1))):0).toFixed(2);
+    case 'ms':  return String(x.ms||0);
+    case 'hpreg': return (x.hpreg?(x.hpreg+x.hpregg*(DLVL-1)):0).toFixed(1);
+    case 'res':  return x.res==='Energy'?String(ENERGY_POOL):x.res==='Mana'?'—':'—';
+    case 'resreg':return x.res==='Energy'?String(ENERGY_REGEN):x.res==='Mana'?(x.mpreg+x.mpregg*(DLVL-1)).toFixed(1):'—';
+    case 'critd': return CRIT_DMG+'%';
+    case 'ap': case 'ah': case 'arpen': case 'mpen': return '0';
+    case 'critc': case 'arpenp': case 'mpenp': case 'pvamp': case 'mvamp': case 'ten': return '0%';
+    default: return '0';
+  }
 }
-function mountTab(c){
-  var el=document.getElementById('dTab'); if(!el) return;
-  el.innerHTML=tabHTML(c);
-  var sl=el.querySelector('#dLvl');
-  if(sl) sl.oninput=function(){ DLVL=+this.value; this.style.setProperty('--fill',Math.round((DLVL-1)/14*100)+'%');
-    var n=el.querySelector('#dLvlNum'); if(n)n.textContent=DLVL;
-    SDEF.forEach(function(s){var b=el.querySelector('[data-d="'+s.id+'"]'); if(b)b.textContent=dStat(c.s[s.id],s.id);}); };
+// заголовок ресурса меняется по чемпу (Энергия/Мана/Нет)
+function resLabel(c){ var r=(c.x||{}).res; return r==='Energy'?'Энергия':r==='Mana'?'Мана':'Ресурс'; }
+function statGridInner(c){
+  var icons=(S.statLabels==='icons');  // по умолчанию — НАЗВАНИЯ (как в игре), иконки опционально
+  return GRID20.map(function(d){
+    var lbl=d.id==='res'?resLabel(c):d.id==='resreg'?('Реген '+resLabel(c).toLowerCase()):d.lbl;
+    var val=gridVal(c,d.id);
+    var dim=(val==='0'||val==='0%'||val==='—')?' g-dim':'';
+    var lead=icons
+      ? '<span class="g-ic" style="color:'+d.color+'">'+d.ic+'</span>'
+      : '<span class="g-l" style="color:'+d.color+'">'+lbl+'</span>';
+    return '<div class="g-cell'+dim+'" title="'+lbl+'">'+lead+
+      '<span class="g-v" data-g="'+d.id+'">'+val+'</span></div>';
+  }).join('');
+}
+function tabStatsGrid(c){
+  return '<div id="statGrid" class="stat-grid">'+statGridInner(c)+'</div>';
+}
+
+// ════════════════════════════════════════════════════════════════
+// ВКЛАДКА «УМЕНИЯ»: под-вкладки Пассивка/Q/W/E/R + видео + EN-текст + числа по рангам.
+// 5 раскладок (abilLayout) — одинаковая начинка, разное расположение через CSS.
+// ════════════════════════════════════════════════════════════════
+var SLOTLBL={passive:'Пасс',q:'Q',w:'W',e:'E',r:'R'};
+var _abilSlot='q';
+function abilOf(c){ return (window.LAB_ABIL&&window.LAB_ABIL[c.key])||[]; }
+function abilCost(sp){
+  if(!sp.cost||sp.costType==='None') return '';
+  var unit=sp.costType==='Mana'?'маны':'эн.';
+  return '<span class="ab-meta-cost">◈ '+sp.cost+' '+unit+'</span>';
+}
+function abilVars(sp){
+  var rows=[];
+  if(sp.cd) rows.push({l:'Перезарядка',v:sp.cd+' c'});
+  (sp.vars||[]).forEach(function(v){ rows.push({l:v.l,v:v.v}); });
+  if(!rows.length) return '';
+  return '<div class="ab-vars">'+rows.map(function(r){
+    var ranks=String(r.v).split('/');
+    var vv=ranks.length>1?ranks.map(function(x){return '<i>'+x+'</i>';}).join('<u>/</u>'):'<i>'+r.v+'</i>';
+    return '<div class="ab-var"><span class="ab-var-l">'+r.l+'</span><span class="ab-var-v">'+vv+'</span></div>';
+  }).join('')+'</div>';
+}
+function abilInfo(sp){
+  return '<div class="ab-head"><img class="ab-head-ic" src="'+sp.icon+'" alt="">'+
+      '<div class="ab-head-t"><div class="ab-name">'+sp.name+'</div>'+
+      '<div class="ab-meta"><span class="ab-slot">'+(SLOTLBL[sp.slot]||sp.slot)+'</span>'+abilCost(sp)+'</div></div></div>'+
+    '<div class="ab-desc">'+sp.desc+'</div>'+abilVars(sp);
+}
+function abilRail(c){
+  var ab=abilOf(c);
+  return '<div class="abil-rail">'+ab.map(function(sp){
+    return '<button class="ab-ico'+(sp.slot===_abilSlot?' on':'')+'" data-slot="'+sp.slot+'" title="'+sp.name+'">'+
+      '<img src="'+sp.icon+'" alt=""><span>'+(SLOTLBL[sp.slot]||sp.slot)+'</span></button>';
+  }).join('')+'</div>';
+}
+function tabAbilities(c){
+  var ab=abilOf(c);
+  if(!ab.length) return '<div class="d-panel"><div class="d-empty">умения подгрузятся на боевом</div></div>';
+  // «списком» / «компактно» — показываем ВСЕ умения сразу (без под-вкладок)
+  if(S.abilLayout==='list' || S.abilLayout==='compact'){
+    return '<div class="abil abil-'+S.abilLayout+'">'+ab.map(function(sp){
+      return '<div class="abil-card">'+abilInfo(sp)+'</div>';
+    }).join('')+'</div>';
+  }
+  // «иконки сверху» / «рельс слева» — рельс + выбранное умение
+  var sp=ab.filter(function(s){return s.slot===_abilSlot;})[0]||ab[0];
+  return '<div class="abil abil-'+S.abilLayout+'">'+abilRail(c)+
+    '<div class="abil-main"><div class="abil-info">'+abilInfo(sp)+'</div></div></div>';
+}
+
+// ── 6 вкладок карточки (сверху). 1я = Умения, 2я = Статы, далее старые. ──
+var DTABS=[['abilities','⚔ Умения'],['stats','📊 Статы'],['matchups','⚔ Матчапы'],['items','🛡 Предметы'],['runes','🔮 Руны'],['history','📈 История']];
+var _openTab='abilities';
+function tabContentHTML(c){
+  return _openTab==='stats'?tabStatsGrid(c):
+         _openTab==='matchups'?dMatch(c):
+         _openTab==='items'?tabItems(c):
+         _openTab==='runes'?tabRunes(c):
+         _openTab==='history'?tabHistory(c):tabAbilities(c);
+}
+// перерисовать активную вкладку + повесить её обработчики
+function mountDetailTab(ov,c){
+  var el=ov.querySelector('#dTab'); if(!el) return;
+  el.innerHTML=tabContentHTML(c);
+  // под-вкладки умений
+  el.querySelectorAll('.ab-ico').forEach(function(b){ b.onclick=function(){ _abilSlot=b.dataset.slot; mountDetailTab(ov,c); }; });
+  // кнопки «+» в матчапах
   el.querySelectorAll('.d-mu-add').forEach(function(b){ b.onclick=function(e){e.stopPropagation(); b.style.transform='scale(1.3) rotate(90deg)'; setTimeout(function(){b.style.transform='';},180);}; });
 }
 
 function openDetail(c){
-  _openC=c; _cmpC=null; _cmpArr=null;
+  _openC=c; _cmpC=null; _cmpArr=null; _openMode='popup';
   var ov=document.getElementById('hrOverlay');
   ov.className='hr-overlay bd-'+S.backdrop+(S.autoColor==='on'?' art-tint':'');
   if(S.autoColor==='on') ov.style.setProperty('--artcolor', ARTCOL[c.key]||S.accent); else ov.style.removeProperty('--artcolor');
@@ -507,22 +688,18 @@ function openDetail(c){
   var cardCls='hr-detail champ-card cbg-'+S.cardBg+' ps-'+S.pageSize+(S.cardGlow==='on'?' cglow':'');
   ov.innerHTML='<div class="cp-tiltwrap'+(S.cardTilt==='on'?' tilting':'')+'"><div class="'+cardCls+'" id="champCard">'+bgLayer+
     '<button class="d-close" type="button">✕</button>'+header+
-    '<div class="d-body"><div class="d-grid">'+
-      '<div class="d-col">'+dActions()+dWrbr(c)+dLevel()+buildStats(c)+'</div>'+
-      '<div class="d-col">'+dMatch(c)+'</div>'+
-    '</div></div></div></div>';
+    '<div class="d-body">'+
+      '<div class="d-toolbar">'+dBrief(c)+'</div>'+
+      dActions()+
+    '</div></div></div>';
   ov.hidden=false;
   requestAnimationFrame(function(){ ov.classList.add('show'); });
   ov.querySelector('.d-close').onclick=closeDetail;
   ov.onclick=function(e){ if(e.target===ov) closeDetail(); };
 
-  // уровень + кнопки «+»
-  var sl=ov.querySelector('#dLvl');
-  if(sl) sl.oninput=function(){ DLVL=+this.value; this.style.setProperty('--fill',Math.round((DLVL-1)/14*100)+'%');
-    ov.querySelector('#dLvlNum').textContent=DLVL;
-    var sb=ov.querySelector('#statBox'); if(sb) sb.innerHTML=buildStatsInner(c); };
-  ov.querySelectorAll('.d-mu-add').forEach(function(b){ b.onclick=function(e){ e.stopPropagation(); b.style.transform='scale(1.3) rotate(90deg)'; setTimeout(function(){b.style.transform='';},180); }; });
+  // попап лёгкий: только сводка + действия. Полная инфа — на СТРАНИЦЕ (по «Подробнее»).
   var cmpBtn=ov.querySelector('.d-cmp'); if(cmpBtn) cmpBtn.onclick=function(){ openComparePicker(c); };
+  var moreBtn=ov.querySelector('.d-more'); if(moreBtn) moreBtn.onclick=function(){ _pageFromPopup=true; openPage(c); };
 
   if(S.autoColor==='on') artColor(c.key,function(col){ if(col && !ov.hidden && _openC===c) ov.style.setProperty('--artcolor',col); });
 
@@ -538,10 +715,151 @@ function openDetail(c){
   }
 }
 function closeDetail(){
-  _openC=null; _cmpC=null; _cmpArr=null;
+  _openC=null; _cmpC=null; _cmpArr=null; _openMode=null;
   var ov=document.getElementById('hrOverlay');
   ov.classList.remove('show');
   setTimeout(function(){ ov.hidden=true; ov.innerHTML=''; },260);
+}
+
+// ════════════════════════════════════════════════════════════════
+// СТРАНИЦА ЧЕМПА (по «Подробнее»). 2 раскладки: 2 колонки / обычный с вкладками.
+// Сюда переехала вся начинка; попап остался лёгким. SEO-страница = тот же контент.
+// ════════════════════════════════════════════════════════════════
+function pgSec(title, inner){ return '<div class="pg-sec"><div class="pg-h">'+title+'</div>'+inner+'</div>'; }
+function secAbilities(c){ return pgSec('⚔ Умения', '<div id="pgAbil">'+tabAbilities(c)+'</div>'); }
+function secStats(c){ return pgSec('📊 Статы по уровню', dLevel()+tabStatsGrid(c)); }
+function secBuild(c){ return pgSec('🛡 Сборки', tabItems(c)); }
+function secRunes(c){ return pgSec('🔮 Руны и заклинания', tabRunes(c)+tabSpells(c)); }
+function secMatch(c){
+  var counters=(c.weak||[]).map(function(x){return '<span class="d-chip"><img src="'+icon(x.k)+'" alt="">'+x.n+'</span>';}).join('')||'<span class="d-empty">—</span>';
+  return pgSec('⚔ Матчапы и контры', tabMatchups(c)+'<div class="pg-counters"><span class="pg-ct-l">⚠ Осторожно против:</span>'+counters+'</div>');
+}
+function secHistory(c){ return pgSec('📈 История WR/PR/BR', tabHistory(c)); }
+function pgSkillOrder(c){
+  var max=['Q','E','W'];  // демо-приоритет максивания
+  var dots=[];
+  for(var lv=1;lv<=15;lv++){ var s=([1,3,5,7,9].indexOf(lv)>=0)?'Q':([4,8,11].indexOf(lv)>=0)?'W':([2,6,10].indexOf(lv)>=0)?'E':([5,9,13].indexOf(lv)>=0)?'R':'Q';
+    dots.push('<span class="sk-dot sk-'+s+'">'+lv+'</span>'); }
+  return pgSec('⬆ Порядок прокачки', '<div class="pg-skill"><div class="sk-max">Максить: '+max.map(function(s){return '<b>'+s+'</b>';}).join(' › ')+' · Ульта <b>R</b> на 5/9/13</div><div class="sk-row">'+dots.join('')+'</div></div>');
+}
+function pgLearn(c){
+  if(S.pgLearn!=='on') return '';
+  var rnd=_rng(_seed(c.name+'learn'));
+  var yt=[{t:c.name+': лучший билд и комбо (гайд)',ch:'WildRift Mastery',v:(40+Math.floor(rnd()*180))+'K'},
+          {t:'Как карри на '+c.name+' — макро и тимфайты',ch:'Rift Academy',v:(20+Math.floor(rnd()*120))+'K'}];
+  var tw=[{ch:c.name+'OTP',live:rnd()>0.5,vw:(Math.floor(rnd()*30)/10+0.3).toFixed(1)+'K'},
+          {ch:'ProRift_'+c.key,live:rnd()>0.6,vw:(Math.floor(rnd()*20)/10+0.2).toFixed(1)+'K'}];
+  var ytHTML=yt.map(function(v){return '<a class="lrn-yt" href="#" onclick="return false"><span class="lrn-thumb" style="background-image:url('+splashArt(c.key)+')"><i class="lrn-play">▶</i></span>'+
+    '<span class="lrn-yt-t">'+v.t+'</span><span class="lrn-yt-m">'+v.ch+' · '+v.v+' просм.</span></a>';}).join('');
+  var twHTML=tw.map(function(s){return '<a class="lrn-tw" href="#" onclick="return false"><span class="lrn-tw-ch">'+s.ch+'</span>'+
+    (s.live?'<span class="lrn-live">🔴 LIVE · '+s.vw+'</span>':'<span class="lrn-off">оффлайн</span>')+'</a>';}).join('');
+  return pgSec('🎓 Учиться у мейнеров', '<div class="lrn-wrap"><div class="lrn-col"><div class="lrn-sub">▶ YouTube</div>'+ytHTML+'</div>'+
+    '<div class="lrn-col"><div class="lrn-sub">🟣 Twitch</div>'+twHTML+'<div class="lrn-note">демо · список ведём вручную, LIVE — авто</div></div></div>');
+}
+function pageActions(c){
+  var ic=S.linkStyle==='icons';
+  return '<div class="pg-actions">'+
+    '<a class="pg-link guide" href="#" onclick="return false" title="Гайд">▶'+(ic?'':' Гайд')+'</a>'+
+    '<a class="pg-link yt" href="#" onclick="return false" title="YouTube">'+(ic?'▶':'YouTube')+'</a>'+
+    '<a class="pg-link tw" href="#" onclick="return false" title="Twitch">'+(ic?'🟣':'Twitch')+'</a>'+
+    '<button class="pg-link pg-cmp" type="button" title="Сравнить">⚖'+(ic?'':' Сравнить')+'</button>'+
+    '<button class="pg-link pg-fav" type="button" title="В избранное">★'+(ic?'':' Избранное')+'</button>'+
+  '</div>';
+}
+// ШАПКА страницы = наша god-tier карточка (сплэш + 3D-наклон + параллакс)
+function pageHeader(c, sideActions){
+  var tier='<span class="d-tier" style="--tc:'+(DTIER[c.tier]||'var(--accent)')+'">'+c.tier+'</span>';
+  return '<div class="pg-herowrap'+(S.bgTilt==='on'?' tilting':'')+'">'+
+    '<div class="pg-hero cbg-parallax'+(S.cardGlow==='on'?' cglow':'')+'">'+
+      '<div class="cd-bg" style="background-image:url('+splashArt(c.key)+')"></div><div class="cd-scrim"></div>'+
+      '<div class="pg-hero-in">'+
+        '<img class="pg-portrait ic-'+S.iconShape+'" src="'+icon(c.key)+'" alt="">'+
+        '<div class="pg-head-main">'+
+          '<div class="d-nameRow"><div class="pg-name">'+c.name+'</div>'+tier+'</div>'+
+          '<div class="pg-role">'+c.role+' · '+c.tags.join(' · ')+'</div>'+
+          dBrief(c)+
+        '</div>'+
+        (sideActions?'<div class="pg-hero-side">'+sideActions+'</div>':'')+
+      '</div>'+
+    '</div></div>';
+}
+var PGTABS=[['abilities','⚔ Умения'],['stats','📊 Статы'],['build','🛡 Сборки'],['runes','🔮 Руны'],['matchups','⚔ Матчапы'],['history','📈 История']];
+var _pageTab='abilities';
+function pgTabContent(c){
+  return _pageTab==='stats'?secStats(c):_pageTab==='build'?secBuild(c):_pageTab==='runes'?secRunes(c):
+         _pageTab==='matchups'?secMatch(c):_pageTab==='history'?secHistory(c):_pageTab==='learn'?pgLearn(c):
+         (secAbilities(c)+pgSkillOrder(c));
+}
+function pageTwoCol(c){
+  return '<div class="pg-2col">'+
+    '<div class="pg-col">'+secAbilities(c)+pgSkillOrder(c)+secStats(c)+'</div>'+
+    '<div class="pg-col">'+secBuild(c)+secRunes(c)+secMatch(c)+secHistory(c)+pgLearn(c)+'</div>'+
+  '</div>';
+}
+function pageSingle(c){
+  var tabs=PGTABS.slice(); if(S.pgLearn==='on') tabs.push(['learn','🎓 Учиться']);
+  return '<div class="pg-tabbar ts-'+S.tabStyle+'">'+tabs.map(function(t){return '<button class="pg-tab'+(_pageTab===t[0]?' on':'')+'" data-pt="'+t[0]+'">'+t[1]+'</button>';}).join('')+'</div>'+
+    '<div id="pgTab" class="pg-tabwrap">'+pgTabContent(c)+'</div>';
+}
+// привязать обработчики содержимого страницы (умения/ползунок/«+»)
+function bindPageContent(ov,c){
+  var ab=ov.querySelector('#pgAbil');
+  ov.querySelectorAll('.ab-ico').forEach(function(b){ b.onclick=function(){ _abilSlot=b.dataset.slot;
+    var a=ov.querySelector('#pgAbil'); if(a){ a.innerHTML=tabAbilities(c); bindPageContent(ov,c); } }; });
+  var sl=ov.querySelector('#dLvl');
+  if(sl) sl.oninput=function(){ DLVL=+this.value; this.style.setProperty('--fill',Math.round((DLVL-1)/14*100)+'%');
+    var n=ov.querySelector('#dLvlNum'); if(n)n.textContent=DLVL; var g=ov.querySelector('#statGrid'); if(g)g.innerHTML=statGridInner(c); };
+  ov.querySelectorAll('.d-mu-add').forEach(function(b){ b.onclick=function(e){e.stopPropagation(); b.style.transform='scale(1.3) rotate(90deg)'; setTimeout(function(){b.style.transform='';},180);}; });
+}
+// клик по чемпу в сетке: попап (A3) или сразу страница (A2) — по настройке
+function openFromGrid(c){ DLVL=10; _pageTab='abilities'; if(S.clickOpens==='page'){ _pageFromPopup=false; openPage(c); } else openDetail(c); }
+function openPage(c){
+  _openC=c; _cmpC=null; _cmpArr=null; _openMode='page';
+  var ov=document.getElementById('hrOverlay');
+  ov.className='hr-overlay champ-page-ov bd-'+S.backdrop+' show';
+  ov.hidden=false;
+  var actions=pageActions(c);
+  var body, topbarBtns='';
+  if(S.pageLayout==='sidebar'){
+    // КАРТОЧКА СЛЕВА (sticky) + данные в 2 колонки справа
+    body='<div class="pg-shell">'+
+      '<aside class="pg-side">'+pageHeader(c, actions)+'</aside>'+
+      '<div class="pg-data">'+
+        '<div class="pg-col">'+secAbilities(c)+pgSkillOrder(c)+secStats(c)+'</div>'+
+        '<div class="pg-col">'+secBuild(c)+secRunes(c)+secMatch(c)+secHistory(c)+pgLearn(c)+'</div>'+
+      '</div></div>';
+  } else {
+    // карточка сверху (top) или вкладки (single)
+    var header=pageHeader(c, S.pgBtnPos==='side'?actions:'');
+    topbarBtns=S.pgBtnPos==='topbar'?actions:'';
+    var underBtns=S.pgBtnPos==='under'?'<div class="pg-actions-under">'+actions+'</div>':'';
+    body=header+underBtns+'<div class="pg-content">'+(S.pageLayout==='single'?pageSingle(c):pageTwoCol(c))+'</div>';
+  }
+  ov.innerHTML='<div class="champ-page pl-'+S.pageLayout+'">'+
+    '<div class="pg-bgwrap"><div class="pg-bg'+(S.bgKenBurns==='on'?' kb':'')+'" style="background-image:url('+splashArt(c.key)+')"></div><div class="pg-scrim"></div></div>'+
+    '<div class="pg-inner">'+
+      '<div class="pg-topbar"><button class="pg-back" type="button">← Назад</button><div class="pg-topbar-btns">'+topbarBtns+'</div><button class="d-close" type="button">✕</button></div>'+
+      body+
+    '</div></div>';
+  ov.querySelector('.d-close').onclick=closeDetail;
+  ov.querySelector('.pg-back').onclick=function(){ if(_pageFromPopup) openDetail(c); else closeDetail(); };
+  var cmp=ov.querySelector('.pg-cmp'); if(cmp) cmp.onclick=function(){ openComparePicker(c); };
+  // вкладки (обычная раскладка)
+  ov.querySelectorAll('.pg-tab').forEach(function(b){ b.onclick=function(){
+    _pageTab=b.dataset.pt; ov.querySelectorAll('.pg-tab').forEach(function(x){x.classList.toggle('on',x===b);});
+    var t=ov.querySelector('#pgTab'); if(t){ t.innerHTML=pgTabContent(c); bindPageContent(ov,c); }
+  }; });
+  bindPageContent(ov,c);
+  // 3D-наклон + параллакс НА САМОЙ КАРТОЧКЕ-ШАПКЕ (отдельные тумблеры)
+  var wrap=ov.querySelector('.pg-herowrap'), hbg=ov.querySelector('.pg-hero .cd-bg');
+  if(wrap && (S.bgParallax==='on' || S.bgTilt==='on')){
+    wrap.addEventListener('mousemove',function(e){
+      var r=wrap.getBoundingClientRect(), px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
+      if(S.bgTilt==='on') wrap.style.transform='perspective(1600px) rotateY('+(px*5)+'deg) rotateX('+(-py*5)+'deg)';
+      if(S.bgParallax==='on' && hbg) hbg.style.transform='scale(1.14) translate('+(px*-22)+'px,'+(py*-18)+'px)';
+    });
+    wrap.addEventListener('mouseleave',function(){ wrap.style.transform=''; if(hbg) hbg.style.transform=''; });
+  }
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -643,7 +961,7 @@ function ctCell(c, d, list){
 }
 function cmpTableInner(list){
   var labels='<div class="ct-labels"><div class="ct-corner">СТАТЫ</div>'+
-    ALLSTATS.map(function(d){ return '<div class="ct-lbl"><span style="color:'+d.color+'">'+d.ic+'</span> '+d.lbl+'</div>'; }).join('')+'</div>';
+    ALLSTATS.map(function(d){ return '<div class="ct-lbl">'+d.lbl+'</div>'; }).join('')+'</div>';
   var cols=list.map(function(c,i){
     return '<div class="ct-col">'+
       '<div class="ct-colh">'+
@@ -656,24 +974,31 @@ function cmpTableInner(list){
       ALLSTATS.map(function(d){ return ctCell(c,d,list); }).join('')+
     '</div>';
   }).join('');
-  var add = list.length<CMP_MAX ? '<button class="ct-add" type="button"><span>＋</span><i>чемпион</i></button>' : '';
+  var add = (S.cmpAddPos==='col' && list.length<CMP_MAX) ? '<button class="ct-add" type="button"><span>＋</span><i>чемпион</i></button>' : '';
   return labels+cols+add;
 }
 function bindTableBody(ov, list){
   ov.querySelectorAll('.ct-rm').forEach(function(b){ b.onclick=function(){
     _cmpArr.splice(+b.dataset.i,1); openCompareTable(); }; });
-  var add=ov.querySelector('.ct-add'); if(add) add.onclick=openComparePickerAdd;
+  ov.querySelectorAll('.ct-add').forEach(function(b){ b.onclick=openComparePickerAdd; });
 }
 function openCompareTable(){
   var list=_cmpArr.slice(0,CMP_MAX);
   var ov=document.getElementById('hrOverlay');
   ov.className='hr-overlay bd-'+S.backdrop; ov.style.removeProperty('--artcolor');
-  ov.innerHTML='<div class="cmp-wrap is-table glass cmpc-'+S.cmpCell+'">'+
-    '<button class="d-close" type="button">✕</button>'+
+  var canAdd=list.length<CMP_MAX;
+  var addLbl=S.cmpBtnStyle==='icon'?'＋':'＋ чемпион';
+  var closeBtn='<button class="d-close" type="button">✕</button>';
+  var addTop=(S.cmpAddPos==='top'&&canAdd)?'<button class="ct-add ct-add-bar" type="button">'+addLbl+'</button>':'';
+  var addBottom=(S.cmpAddPos==='bottom'&&canAdd)?'<div class="cmp-addbar"><button class="ct-add ct-add-bar" type="button">'+addLbl+'</button></div>':'';
+  ov.innerHTML='<div class="cmp-wrap is-table glass cmpc-'+S.cmpCell+' cclose-'+S.cmpClosePos+' cmp-rm-'+S.cmpRmShow+' cmp-btn-'+S.cmpBtnStyle+'">'+
+    (S.cmpClosePos!=='title'?closeBtn:'')+
     '<div class="cmp-top"><div class="cmp-title">⚖ Сравнение · '+list.length+'</div>'+
       '<div class="cmp-lvl"><span>УРОВЕНЬ</span><b id="cmpLvlNum">'+DLVL+'</b>'+
-        '<input type="range" id="cmpLvl" min="1" max="15" value="'+DLVL+'" style="--fill:'+Math.round((DLVL-1)/14*100)+'%"></div></div>'+
+        '<input type="range" id="cmpLvl" min="1" max="15" value="'+DLVL+'" style="--fill:'+Math.round((DLVL-1)/14*100)+'%"></div>'+
+      addTop+(S.cmpClosePos==='title'?closeBtn:'')+'</div>'+
     '<div class="cmp-table">'+cmpTableInner(list)+'</div>'+
+    addBottom+
   '</div>';
   ov.hidden=false; requestAnimationFrame(function(){ ov.classList.add('show'); });
   ov.querySelector('.d-close').onclick=closeDetail;
@@ -715,12 +1040,15 @@ var LS=null;
 document.getElementById('resetBtn').onclick=function(){ S=Object.assign({},DEFAULTS); fRole='all'; fQ=''; buildLayoutBar(); buildPanel(); render(); if(LS) LS.clearSaved(); };
 buildLayoutBar();
 buildPanel();
+setupPanel();
 render();
 // настройки лаба: память (анти-сброс) + код настроек (копировать/вставить) + пресеты
 if(window.LabSettings){
-  LS=LabSettings.attach({ id:'hover-reveal', defaults:DEFAULTS, mount:'#labTools',
+  LS=LabSettings.attach({ id:'hover-reveal', defaults:DEFAULTS, mount:'#labTools', schema:3,
     getState:function(){ return S; },
-    apply:function(st){ S=Object.assign({},DEFAULTS,st); buildLayoutBar(); buildPanel(); render(); refreshOpenCard(); } });
+    apply:function(st){ S=Object.assign({},DEFAULTS,st);
+      if(!LAYOUTS.some(function(l){ return l.id===S.layout; })) S.layout='grid';
+      buildLayoutBar(); buildPanel(); render(); refreshOpenCard(); } });
 }
 
 })();

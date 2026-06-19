@@ -1,49 +1,52 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Profile-Lab · песочница hover-анимаций меню профиля</title>
-  <link rel="stylesheet" href="profile-lab.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Песочница — Мой профиль</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="stylesheet" href="profile-lab.css?v=2">
 </head>
 <body>
-
-  <header class="pl-head">
-    <h1 class="pl-title">
-      ✦ Profile-Lab
-      <small>песочница hover-анимаций выпадающего меню «Мой профиль» · не индексируется, не на сайте</small>
-    </h1>
-    <div class="pl-controls">
-      <label class="pl-ctrl">
-        Скорость
-        <input id="plSpeed" type="range" min="0.4" max="2" step="0.1" value="1">
-        <span id="plSpeedVal">1.0×</span>
-      </label>
-      <div class="pl-ctrl">
-        Акцент
-        <div class="pl-swatches" id="plSwatches">
-          <span class="pl-sw active" data-accent="11,196,227"  style="background:#0BC4E3" title="Циан (сайт)"></span>
-          <span class="pl-sw"        data-accent="200,155,60"  style="background:#C89B3C" title="Золото"></span>
-          <span class="pl-sw"        data-accent="180,140,255" style="background:#B48CFF" title="Фиолет"></span>
-          <span class="pl-sw"        data-accent="46,204,113"  style="background:#2ECC71" title="Зелёный"></span>
-          <span class="pl-sw"        data-accent="231,76,60"   style="background:#E74C3C" title="Красный"></span>
-          <span class="pl-sw"        data-accent="255,99,164"  style="background:#FF63A4" title="Розовый"></span>
-          <span class="pl-sw"        data-accent="230,126,34"  style="background:#E67E22" title="Оранжевый"></span>
-          <span class="pl-sw"        data-accent="225,240,250" style="background:#E1F0FA" title="Серебро"></span>
-        </div>
-        <label class="pl-custom" title="Свой цвет">
-          <input type="color" id="plCustom" value="#0bc4e3">
-        </label>
+  <header class="lab-top">
+    <div class="lab-top-title">
+      <span class="lab-logo">👤</span>
+      <div>
+        <div class="lab-h1">Мой профиль — песочница</div>
+        <div class="lab-sub">Слева редактор, справа живая карточка (как тебя видят другие). Аватар = сплэш любимого чемпа, он же фон за стеклом. Боевой сайт не трогается.</div>
       </div>
-      <label class="pl-ctrl pl-bg-toggle">
-        <input type="checkbox" id="plDim"> Затемнить фон
-      </label>
     </div>
+    <div id="labTools"></div>
+    <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
   </header>
 
-  <main class="pl-wrap" id="plWrap"></main>
+  <nav id="variantBar" class="variant-bar"></nav>
 
-  <script src="profile-lab.js"></script>
+  <main id="labMain" class="lab-main">
+    <section class="editor glassy" id="editor"></section>
+    <section class="preview-wrap" id="previewWrap">
+      <div class="preview-card glassy" id="previewCard"></div>
+    </section>
+  </main>
+
+  <!-- Пикер чемпионов (стекло) -->
+  <div id="champPicker" class="cp-mask" hidden>
+    <div class="cp-win glassy">
+      <div class="cp-head">
+        <span id="cpTitle" class="cp-title">Выбрать чемпиона</span>
+        <button id="cpClose" class="cp-close">✕</button>
+      </div>
+      <input id="cpSearch" class="cp-search" type="text" placeholder="Поиск чемпиона…" autocomplete="off">
+      <div id="cpGrid" class="cp-grid"></div>
+      <div class="cp-foot">
+        <span id="cpHint" class="cp-hint"></span>
+        <button id="cpDone" class="cp-done">Готово</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../lab-settings.js?v=3"></script>
+  <script src="profile-lab.js?v=2"></script>
 </body>
 </html>

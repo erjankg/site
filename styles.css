@@ -335,6 +335,8 @@ html {
 width: 100%;
 max-width: 100%;
 overflow-x: clip; /* clip не создаёт новый scroll container — Chrome скрывает адресную строку */
+scrollbar-gutter: stable; /* место под вертикальный скролл зарезервировано всегда — ширина окна
+                             не «дышит» между видами, вкладки в шапке не ездят на ширину скроллбара */
 }
 
 body {
@@ -444,18 +446,33 @@ animation: twinkle2 4.5s ease-in-out infinite alternate;
   --bg-base:            #010A13;
   --bg-primary:         #010d18;
   --bg-secondary:       #011520;
-  --bg-card:            rgba(1, 10, 19, 0.85);
-  --bg-card-glass:      rgba(1, 10, 19, 0.6);
+  /* Поверхности карточек/инпутов — СТЕКЛО (subtle белый тинт): внутренности модалок
+     сливаются со стеклянным окном, а не тёмные блоки. Один источник на все ~59 мест. */
+  --bg-card:            rgba(255, 255, 255, 0.05);
+  --bg-card-glass:      rgba(255, 255, 255, 0.035);
   --bg-overlay:         rgba(0, 0, 0, 0.88);
-  --bg-input:           rgba(1, 15, 32, 0.6);
+  --bg-input:           rgba(255, 255, 255, 0.04);
+  /* ── СПЛЕШ-АРТ ЗА СТЕКЛОМ ── ОДИН на весь сайт (источник правды).
+     Меняешь арт здесь — меняется во всех стеклянных окнах сразу. */
+  --site-splash:        url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg');
 
-  /* ── ACCENT cyan ── */
-  --accent:             #0BC4E3;
-  --accent-glow:        rgba(11, 196, 227, 0.4);
-  --accent-dim:         rgba(11, 196, 227, 0.15);
-  --accent-border:      rgba(11, 196, 227, 0.2);
-  --accent-border-sub:  rgba(11, 196, 227, 0.08);
-  --accent-border-str:  rgba(11, 196, 227, 0.5);
+  /* ── ACCENT (через --accent-rgb → меняешь ОДИН раз в ⚙, рекрашивается весь сайт) ── */
+  --accent-rgb:         11, 196, 227;
+  --accent:             rgb(var(--accent-rgb));
+  --accent-glow:        rgba(var(--accent-rgb), 0.4);
+  --accent-dim:         rgba(var(--accent-rgb), 0.15);
+  --accent-border:      rgba(var(--accent-rgb), 0.2);
+  --accent-border-sub:  rgba(var(--accent-rgb), 0.08);
+  --accent-border-str:  rgba(var(--accent-rgb), 0.5);
+
+  /* ── ЛЕВЫЙ ОТСТУП ШЕЛЛА (тонкий рельс) — ОДНА переменная для контента/модалок/подвала.
+     Раньше всё было прибито к 240px (старый широкий сайдбар) → щель. Теперь меняешь рельс
+     = меняешь только это. ── */
+  --shell-left:         96px;
+
+  /* ── ПРАВЫЙ РЕЗЕРВ под фикс. карточку чемпа (#champSidePanel). ОДНА переменная:
+     отбивка контента + компенсация на шапке, чтобы вкладки не дёргались между видами. ── */
+  --sidecard-reserve:   348px;
 
   /* ── GOLD accent ── */
   --gold:               #C89B3C;
@@ -914,16 +931,11 @@ table-layout: fixed;
 
 /* Champ cell content fills full width (X + name) */
 #statTable td:first-child { text-align: left; }
-.champ-cell { width: 100%; }
 
 /* Prevent any click/tap focus highlight from changing row look */
 #statTable td, #statTable th { outline: none; }
 
 /* table widths: see consolidated section */
-
-.x-btn{ width: 20px; height: 20px; border-radius: 7px; font-size: 14px; }
-.name-tag{ padding: 5px 6px; border-radius: 8px; font-size: 11px; }
-
 
 th {
 background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-base) 100%);
@@ -984,80 +996,13 @@ transition: var(--tx-base);
 #statTable tbody tr:hover td:first-child {
     border-left: 2px solid var(--accent-border-str);
 }
-#statTable tbody tr:hover .name-tag {
-    background: transparent;
-    border-color: var(--accent);
-}
 }
 
-.champ-cell{
-display:flex;
-align-items:center;
-gap:8px;
-width: 100%;
-}
-
-/* Champ cell: keep X + name neat and fill the cell */
-.champ-cell .name-tag{
-flex: 1;
-min-width: 0;
-display: block;
-width: 100%;
-overflow: hidden;
-text-overflow: clip;
-white-space: nowrap;
-}
-.x-btn{
-width: 16px;
-height: 16px;
-border-radius: 5px;
-font-size: 10px;
-border: 1px solid rgba(255, 64, 64, 0.35);
-background: linear-gradient(135deg, rgba(255, 60, 60, 0.18) 0%, rgba(255, 60, 60, 0.08) 100%);
-color: #ff6b6b;
-font-weight: 700;
-cursor: pointer;
-display:flex;
-align-items:center;
-justify-content:center;
-user-select:none;
-}
-	        @media (hover: hover) and (pointer: fine) {
-	            .x-btn:hover{
-	                background: linear-gradient(135deg, rgba(255, 60, 60, 0.28) 0%, rgba(255, 60, 60, 0.12) 100%);
-	                transform: translateY(-1px);
-	            }
-	        }
 /* Champions column styling (width is defined above via #statTable td:first-child) */
 #statTable td:first-child {
 font-size: 12px;
 text-align: left;
 padding-left: 8px;
-}
-
-.name-tag {
-background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-base) 100%);
-padding: 6px 14px;
-border-radius: 999px;
-display: inline-block;
-white-space: nowrap;
-border: 1px solid var(--accent-dim);
-transition: var(--tx-mid);
-cursor: pointer;
-font-size: 13px;
-}
-
-@media (hover: hover) and (pointer: fine) {
-.name-tag:hover {
-    border-color: var(--accent);
-}
-}
-
-.name-tag.pinned {
-background: linear-gradient(135deg, var(--accent) 0%, #C89B3C 100%);
-color: var(--bg-base);
-font-weight: 700;
-box-shadow: 0 0 10px var(--accent-glow);
 }
 
 /* TIERS */
@@ -1088,8 +1033,8 @@ box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 .m-mask {
 position: fixed;
 inset: 0;
-background: var(--bg-overlay);
-backdrop-filter: blur(6px);
+background: rgba(2,9,15,0.74);
+backdrop-filter: blur(7px);
 display: none;
 z-index: 2000;
 padding: 0;
@@ -1158,7 +1103,10 @@ flex-shrink: 0;
 position: sticky;
 top: 0;
 z-index: 5;
-background: linear-gradient(135deg,var(--bg-primary) 0%,var(--bg-base) 100%);
+/* шапка наследует стекло окна (не свой тёмный градиент); блюр держит читаемость при скролле */
+background: rgba(var(--accent-rgb), 0.04);
+-webkit-backdrop-filter: blur(10px) saturate(1.4);
+backdrop-filter: blur(10px) saturate(1.4);
 }
 .mhdr-t {
 font-size: 15px;
@@ -1410,7 +1358,7 @@ background: var(--accent-dim);
 /* сплеш-арт за стеклом (1 картинка, лежит внутри маски ПОД окном) */
 #mMask .cp-splash {
   position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background-image: url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg');
+  background-image: var(--site-splash);
   background-size: cover; background-position: center 18%;
 }
 #mMask .cp-splash::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
@@ -1485,37 +1433,11 @@ td { font-size: 9px; padding: 6px 1px; }
 
 
 
-/* CHAMPION ICONS (Data Dragon) */
-.champ-icon {
-width: 48px;
-height: 48px;
-border-radius: 8px;
-object-fit: cover;
-flex-shrink: 0;
-border: 1px solid var(--accent-border);
-}
-/* Mobile: hide name, show number inside cell */
+/* Mobile: компактный портрет + спрятать имя в карточке-строке */
 @media (max-width: 768px) and (orientation: portrait) {
-.champ-icon { width: 42px; height: 42px; border-radius: 8px; }
-.champ-cell .name-tag { display: none !important; }
-.champ-cell {
-    justify-content: flex-start;
-    gap: 3px;
-    padding-left: 4px;
-    overflow: hidden;
-}
-}
-/* Row number badge */
-.row-num {
-font-size: 10px;
-color: var(--text-muted);
-min-width: 14px;
-text-align: center;
-flex-shrink: 0;
-font-weight: 700;
-}
-@media (max-width: 768px) and (orientation: portrait) {
-.row-num { font-size: 8px; min-width: 10px; }
+#statTable .f-port { width: 42px; height: 42px; }
+#statTable .f-cname { display: none; }
+#statTable .f-name-cell { gap: 4px; padding-left: 4px; overflow: hidden; }
 }
 /* Modal champion items with icons */
 /* m-item uses width:100% and aspect-ratio:1 for icons — see .m-item CSS above */
@@ -1584,11 +1506,6 @@ box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
 overflow: hidden;
 }
 
-/* Pinned icon ring */
-.champ-icon.icon-pinned {
-border: 2px solid var(--accent) !important;
-box-shadow: 0 0 6px var(--accent-border-str);
-}
 
 /* ── Damage Calculator ── */
 .calc-field { display:flex; flex-direction:column; gap:5px; }
@@ -1786,7 +1703,7 @@ padding: 18px 16px 14px;
 border-bottom: 1px solid var(--accent-border);
 display: flex; align-items: center; gap: 10px;
 flex-shrink: 0; position: sticky; top: 0; z-index: 1;
-background: var(--bg-secondary);
+background: transparent;
 }
 .side-logo { font-size: 22px; }
 .side-title { font-size: 14px; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
@@ -1990,24 +1907,21 @@ margin-top: 10px; text-align: center; opacity: 0.92; min-height: 12px;
 }
 #statTable thead th span[id^="ar-"]:empty::before { content: "▼"; }
 
-/* Champion cell layout */
-.champ-cell { display: flex; align-items: center; width: 100%; max-width: 100%; }
-.champ-cell .name-tag { flex: 0 0 auto; width: auto; }
-.champ-cell .x-btn { flex: 0 0 auto; width: 16px; height: 16px; min-width: 16px; font-size: 10px; }
-
 /* ── DESKTOP ── */
 @media (min-width: 769px) {
-.lvl-container, .table-wrap-outer { max-width: 60%; margin-left: auto; margin-right: auto; }
-#wrprSection { max-width: 50% !important; }
-#statTable th:first-child, #statTable td:first-child { width: 36%; }
-#statTable th:not(:first-child), #statTable td:not(:first-child) { width: 12.8%; }
+/* КОМПАКТНО (Эржан: растянутая таблица = глаз теряет строки/значения, столбцы далеко друг от друга).
+   Таблицы статов/винрейта держим узкими и по центру; карточка чемпа справа (её место резервирует .app-wrapper). */
+.lvl-container, .table-wrap-outer { max-width: 620px; margin-left: auto; margin-right: auto; }
+#wrprSection { max-width: 620px !important; margin-left: auto; margin-right: auto; }
+/* Колонка чемпа фиксирована, стат-столбцы авто-распределяются (число столбцов меняется через ⚙) */
+#statTable th:first-child, #statTable td:first-child { width: 34%; }
+#statTable th:not(:first-child), #statTable td:not(:first-child) { width: auto; }
 .btn-champ-cfg { font-size: 13px; padding: 9px 16px; border-radius: 12px; }
-.champ-cell .name-tag { font-size: 16px; padding: 7px 18px; }
-.champ-icon { width: 55px; height: 55px; border-radius: 10px; }
-.champ-cell .x-btn { width: 20px; height: 20px; min-width: 20px; font-size: 11px; }
-.champ-cell { justify-content: flex-start; gap: 10px; }
-.champ-cell .name-tag { display: inline-block; text-align: center; flex: 0 0 auto; }
-.champ-cell .x-btn { margin-right: 6px; }
+/* Много столбцов статов → таблица растёт на всю ширину, правая карточка убирается (не мешает) */
+body[data-widestats="on"] .lvl-container,
+body[data-widestats="on"] .table-wrap-outer { max-width: none; }
+body[data-widestats="on"] #champSidePanel { display: none !important; }
+body[data-widestats="on"] .app-wrapper { padding-right: 24px; }
 }
 
 /* ── MOBILE ── */
@@ -2022,10 +1936,6 @@ margin-top: 10px; text-align: center; opacity: 0.92; min-height: 12px;
 content: attr(data-short); position: absolute; inset: 0;
 display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 10px; pointer-events: none;
 }
-.champ-icon { width: 42px; height: 42px; border-radius: 8px; }
-.champ-cell .name-tag { display: none; }
-.champ-cell { justify-content: flex-start; gap: 3px; padding-left: 2px; overflow: hidden; }
-.row-num { font-size: 8px; min-width: 10px; }
 .btn-champ-cfg { font-size: 12px; padding: 8px 14px; border-radius: 12px; }
 input[type="range"] { height: 3.4px; }
 #ruler { display: none; }
@@ -2293,6 +2203,139 @@ border-bottom-right-radius:4px;
 .chat-bubble-del { font-size:10px; color:rgba(255,255,255,0.2); cursor:pointer; padding:2px; display:none; }
 .chat-bubble-row:hover .chat-bubble-del { display:inline; }
 @media (hover: none) { .chat-bubble-del { display:inline !important; } }
+
+/* ── Чат: реакции / ответы / карточки / упоминания / вложения ── */
+.chat-bubble-row { position:relative; }
+.chat-mention { color:var(--accent); font-weight:700; }
+.chat-bubble-row.me .chat-mention { color:#02323d; }
+
+/* цитата-ответ внутри пузыря */
+.chat-reply-quote { display:block; border-left:2px solid var(--accent); padding:2px 8px; margin-bottom:5px; border-radius:5px; background:rgba(11,196,227,0.08); overflow:hidden; }
+.chat-reply-quote .qn { display:block; font-size:10px; font-weight:800; color:var(--accent); }
+.chat-reply-quote .qt { display:block; font-size:11px; color:rgba(255,255,255,0.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chat-bubble-row.me .chat-reply-quote { border-left-color:rgba(2,30,40,0.6); background:rgba(2,30,40,0.16); }
+.chat-bubble-row.me .chat-reply-quote .qn { color:#02323d; }
+.chat-bubble-row.me .chat-reply-quote .qt { color:rgba(2,30,40,0.7); }
+
+/* чипы-реакции */
+.chat-reacts { display:flex; flex-wrap:wrap; gap:4px; margin-top:5px; }
+.chat-rchip { display:inline-flex; align-items:center; gap:3px; font:inherit; font-size:11px; font-weight:700; padding:2px 7px; border-radius:11px; cursor:pointer; border:1px solid var(--accent-border-sub); background:rgba(255,255,255,0.06); color:#fff; transition:.1s; }
+.chat-rchip:hover { border-color:var(--accent); }
+.chat-rchip.mine { background:rgba(11,196,227,0.18); border-color:rgba(11,196,227,0.5); }
+.chat-bubble-row.me .chat-rchip { background:rgba(2,30,40,0.16); color:#02323d; border-color:rgba(2,30,40,0.22); }
+.chat-bubble-row.me .chat-rchip.mine { background:rgba(2,30,40,0.34); }
+
+/* инструменты при наведении */
+.chat-row-tools { position:absolute; top:-12px; display:none; gap:1px; background:rgba(10,22,34,0.96); border:1px solid var(--accent-border-sub); border-radius:10px; padding:2px; box-shadow:0 8px 22px rgba(0,0,0,0.45); z-index:6; }
+.chat-bubble-row:not(.me) .chat-row-tools { left:42px; }
+.chat-bubble-row.me .chat-row-tools { right:42px; }
+.chat-bubble-row:hover .chat-row-tools { display:flex; }
+@media (hover: none) { .chat-row-tools { display:flex !important; } }
+.chat-row-tools button { background:none; border:none; color:rgba(255,255,255,0.55); font-size:13px; cursor:pointer; padding:4px 6px; border-radius:7px; line-height:1; }
+.chat-row-tools button:hover { background:rgba(11,196,227,0.16); color:#fff; }
+
+/* эмодзи-пикер реакции */
+.chat-react-pop { position:fixed; z-index:9300; display:flex; gap:1px; padding:4px; border-radius:13px; background:rgba(10,22,34,0.98); border:1px solid var(--accent-border-sub); box-shadow:0 14px 34px rgba(0,0,0,0.55); }
+.chat-react-pop button { background:none; border:none; font-size:18px; cursor:pointer; padding:3px 5px; border-radius:8px; transition:.1s; }
+.chat-react-pop button:hover { background:rgba(11,196,227,0.16); transform:scale(1.25); }
+
+/* карточка-ссылка (вложение) */
+.chat-card { margin-top:5px; width:min(280px,72vw); border:1px solid var(--accent-border-sub); border-radius:13px; overflow:hidden; background:rgba(8,18,28,0.5); }
+.chat-bubble-row.me .chat-card { background:rgba(2,18,26,0.22); border-color:rgba(2,30,40,0.3); }
+.chat-card-h { display:flex; align-items:center; gap:9px; padding:9px 11px; }
+.chat-card-ic { width:34px; height:34px; border-radius:9px; flex-shrink:0; background:linear-gradient(135deg,var(--bg-primary,#0a7ea4),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:16px; color:#02121a; overflow:hidden; }
+.chat-card-ic.round { border-radius:50%; }
+.chat-card-ic img { width:100%; height:100%; object-fit:cover; }
+.chat-card-tt { min-width:0; }
+.chat-card-tt .t { font-size:12.5px; font-weight:800; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chat-card-tt .s { font-size:10.5px; color:rgba(255,255,255,0.55); font-weight:600; }
+.chat-bubble-row.me .chat-card-tt .t { color:#02323d; }
+.chat-bubble-row.me .chat-card-tt .s { color:rgba(2,30,40,0.7); }
+.chat-card-btn { display:block; width:100%; text-align:center; font:inherit; font-size:11.5px; font-weight:800; cursor:pointer; color:var(--accent); background:rgba(11,196,227,0.1); border:none; border-top:1px solid var(--accent-border-sub); padding:9px; }
+.chat-card-btn:hover { background:rgba(11,196,227,0.2); }
+.chat-bubble-row.me .chat-card-btn { color:#02323d; background:rgba(2,30,40,0.18); border-top-color:rgba(2,30,40,0.25); }
+
+/* строка «отвечаю на…» над полем ввода */
+.chat-reply-bar { display:flex; align-items:center; gap:8px; padding:8px 14px; border-top:1px solid var(--accent-border-sub); background:rgba(11,196,227,0.07); font-size:12px; flex-shrink:0; }
+.chat-reply-bar .crb-ic { color:var(--accent); font-weight:800; font-size:14px; }
+.chat-reply-bar .crb-tx { flex:1; min-width:0; color:rgba(255,255,255,0.6); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.chat-reply-bar .crb-tx b { color:var(--accent); }
+.chat-reply-bar .crb-x { background:none; border:none; color:rgba(255,255,255,0.55); cursor:pointer; font-size:14px; flex-shrink:0; }
+.chat-reply-bar .crb-x:hover { color:#fff; }
+
+/* кнопка-скрепка в поле ввода */
+.chat-attach { flex-shrink:0; background:rgba(255,255,255,0.05); border:1.5px solid var(--accent-border); color:rgba(255,255,255,0.7); width:38px; height:38px; border-radius:50%; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.chat-attach:hover { color:var(--accent); border-color:var(--accent); }
+
+/* меню вложений */
+.chat-attach-menu { position:fixed; z-index:9300; display:flex; flex-direction:column; gap:2px; width:220px; padding:6px; border-radius:14px; border:1px solid var(--accent-border-sub); background:rgba(10,22,34,0.96); box-shadow:0 20px 50px rgba(0,0,0,0.5); }
+.chat-attach-menu .cam-h { font-size:9.5px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:rgba(255,255,255,0.4); padding:4px 10px 2px; }
+.chat-attach-menu button { display:flex; align-items:center; gap:9px; font:inherit; font-size:12.5px; font-weight:700; color:#fff; background:none; border:none; border-radius:9px; padding:8px 10px; cursor:pointer; text-align:left; }
+.chat-attach-menu button:hover { background:rgba(11,196,227,0.14); }
+.chat-attach-menu .ai { font-size:16px; width:20px; text-align:center; }
+
+/* пикер чемпиона для карточки */
+.chat-champ-pick { position:fixed; inset:0; z-index:9400; display:flex; align-items:center; justify-content:center; background:rgba(2,8,14,0.6); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); }
+.chat-champ-pick .ccp-box { width:min(560px,94vw); max-height:80vh; display:flex; flex-direction:column; background:rgba(12,26,38,0.96); border:1px solid var(--accent-border-sub); border-radius:16px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.55); }
+.chat-champ-pick .ccp-head { display:flex; align-items:center; gap:8px; padding:12px 14px; border-bottom:1px solid var(--accent-border-sub); }
+.chat-champ-pick .ccp-title { flex:1; font-size:13px; font-weight:800; color:#fff; }
+.chat-champ-pick .ccp-x { background:rgba(0,0,0,0.3); border:none; color:#fff; width:26px; height:26px; border-radius:50%; cursor:pointer; }
+.chat-champ-pick .ccp-search { margin:10px 14px 6px; padding:9px 14px; border-radius:20px; border:1.5px solid var(--accent-border); background:rgba(255,255,255,0.05); color:#fff; font-size:14px; outline:none; }
+.chat-champ-pick .ccp-search:focus { border-color:var(--accent); }
+.chat-champ-pick .ccp-grid { flex:1; overflow:auto; display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:6px; padding:8px 14px 14px; }
+.chat-champ-pick .ccp-grid::-webkit-scrollbar { width:0; display:none; }
+.chat-champ-pick .ccp-cell { display:flex; flex-direction:column; align-items:center; gap:4px; padding:7px 4px; border:1px solid transparent; border-radius:11px; background:rgba(255,255,255,0.04); cursor:pointer; }
+.chat-champ-pick .ccp-cell:hover { border-color:var(--accent); background:rgba(11,196,227,0.12); }
+.chat-champ-pick .ccp-cell img { width:42px; height:42px; border-radius:9px; object-fit:cover; }
+.chat-champ-pick .ccp-cell span { font-size:10.5px; color:rgba(255,255,255,0.8); text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+
+/* бейдж упоминания на кнопке чата */
+#sidebarChatBadge.mention { background:#ff4d4d !important; color:#fff !important; animation:chatMentionPulse 1s ease infinite; }
+@keyframes chatMentionPulse { 0%,100% { box-shadow:0 0 0 0 rgba(255,77,77,0.5); } 50% { box-shadow:0 0 0 5px rgba(255,77,77,0); } }
+
+/* ── Чат: СТЕКЛО реально размывает сплэш-арт ЗА стеклом (как #mMask) ──
+   Сплэш = отдельный слой ПОД окном, заранее размытый (filter:blur) → блюр
+   гарантированно виден; панели — лёгкое полупрозрачное стекло поверх. */
+#chatSystemMask .m-win.tg-chat-wrap { position:relative; background:#0a1828 !important; overflow:hidden; }
+/* слой сплэша, РАЗМЫТЫЙ (inset/scale убирают прозрачные края от блюра) */
+#chatSystemMask .m-win.tg-chat-wrap::before {
+  content:''; position:absolute; inset:-60px; z-index:0;
+  background:var(--site-splash) center top / cover no-repeat;
+  -webkit-filter:blur(26px) saturate(1.35); filter:blur(26px) saturate(1.35);
+  transform:scale(1.08);
+}
+/* лёгкая тонировка для читаемости (НЕ глухая — блюр должен быть виден) */
+#chatSystemMask .m-win.tg-chat-wrap::after {
+  content:''; position:absolute; inset:0; z-index:0;
+  background:linear-gradient(180deg, rgba(6,16,26,0.40), rgba(6,16,26,0.56));
+}
+/* панели поверх — полупрозрачные, размытый арт просвечивает */
+#chatSystemMask .tg-sidebar {
+  position:relative; z-index:1; background:rgba(10,22,34,0.34) !important;
+  -webkit-backdrop-filter:blur(8px) saturate(1.3); backdrop-filter:blur(8px) saturate(1.3);
+}
+#chatSystemMask .tg-chat-panel {
+  position:relative; z-index:1; background:rgba(10,22,34,0.12) !important;
+  -webkit-backdrop-filter:blur(8px) saturate(1.3); backdrop-filter:blur(8px) saturate(1.3);
+}
+#chatSystemMask .tg-chat-header,
+#chatSystemMask .chat-input-row,
+#chatSystemMask .chat-reply-bar { background:rgba(6,16,26,0.30) !important; }
+#chatSystemMask .chat-messages { background:transparent !important; }
+
+/* НЕ на весь экран: на ПК чат докается ПРАВЕЕ рельса (96px) — рельс ВСЕГДА виден.
+   Работает независимо от pc-chat-mode (на случай если JS-режим не сработал). */
+@media (min-width:769px) {
+  #chatSystemMask.active {
+    left:var(--shell-left) !important;
+    width:calc(100vw - var(--shell-left)) !important;
+    right:0 !important;
+  }
+  #chatSystemMask .m-win.tg-chat-wrap {
+    width:100% !important; max-width:100% !important;
+  }
+}
+
 /* ── Input row ── */
 .chat-input-row { display:flex; gap:8px; padding:10px 14px; border-top:1px solid var(--accent-border-sub); flex-shrink:0; }
 .chat-input { flex:1; background:rgba(255,255,255,0.05); border:1.5px solid var(--accent-border); border-radius:20px; padding:9px 16px; color:#fff; font-size:16px; font-weight:600; outline:none; font-family:inherit; }
@@ -2626,8 +2669,8 @@ font-size: 12px;
 /* ── PC CHAT MODE (sidebar stays left, users panel moves right) ── */
 @media (min-width: 769px) {
     body.pc-chat-mode #chatSystemMask {
-        left: 240px !important;
-        width: calc(100vw - 240px) !important;
+        left: var(--shell-left) !important;
+        width: calc(100vw - var(--shell-left)) !important;
     }
     body.pc-chat-mode #sideOverlay {
         display: none !important;
@@ -2709,9 +2752,11 @@ font-size: 12px;
 @media (min-width: 769px) {
   /* Любая модалка сдвинута в правую область, за сайдбар. z-index модалок
      (8100+, задаётся в app.js) выше сайдбара (8001) → «позади сайдбара» невозможно. */
+  /* Тёмная маска (затемнение) — ВСЕГДА на весь экран, рельс плавает поверх.
+     Отступ под рельс (--shell-left) — у КОНТЕНТА, не у затемнения (иначе обрез). */
   .m-mask {
-    left: 240px;
-    width: calc(100vw - 240px);
+    left: 0;
+    width: 100vw;
   }
   /* Фуллскрин-исключения (драфтер, кооп-драфт) занимают весь экран. */
   .m-mask.m-fullscreen {
@@ -2876,7 +2921,8 @@ font-size: 12px;
 .calc-body {
   width: 100vw;
   height: 100dvh;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-base) 100%);
+  background: rgba(var(--glass-tint,255,255,255), 0.07);
+  -webkit-backdrop-filter: blur(26px) saturate(1.4); backdrop-filter: blur(26px) saturate(1.4);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2986,6 +3032,10 @@ font-size: 12px;
 .stat-icon-mana  { color: var(--stat-mana); }
 .stat-icon-armor { color: var(--stat-armor); }
 .stat-icon-mr    { color: var(--stat-mr); }
+.stat-icon-as    { color: #ffb347; }
+.stat-icon-ms    { color: #7fdca4; }
+.stat-icon-hpreg { color: #ff9aa2; }
+.stat-icon-mpreg { color: #8fb8ff; }
 
 /* ── CALCULATOR COLUMNS ── */
 .calc-col-my {
@@ -5093,7 +5143,7 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
 @media (min-width: 769px) {
   .cms-fullscreen-editor {
     position: fixed !important;
-    left: 240px !important;
+    left: var(--shell-left) !important;
     top: 0 !important;
     right: 0 !important;
     bottom: 0 !important;
@@ -5398,8 +5448,8 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
 /* PC: changes panel — та же ширина что и другие side panels */
 @media (min-width: 769px) {
   #changesMask.sidebar-modal.active {
-    left: 240px !important;
-    width: calc(100vw - 240px) !important;
+    left: var(--shell-left) !important;
+    width: calc(100vw - var(--shell-left)) !important;
   }
   .changes-win {
     max-width: none;
@@ -6435,13 +6485,14 @@ body.dcoop-fullscreen .dcoop-win .dcoop-tabs { display: none !important; }
   z-index: 10;
 }
 .cs-popup {
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-base) 100%);
-  border: 1px solid var(--border);
+  background: rgba(var(--glass-tint,255,255,255), 0.10);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5); backdrop-filter: blur(22px) saturate(1.5);
+  border: 1px solid var(--glass-bd);
   border-radius: 16px;
   padding: 20px;
   min-width: 280px;
   max-width: 90vw;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55);
 }
 .cs-popup-title { font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 16px; }
 .cs-popup-bo    { font-size: 11px; background: var(--accent-dim); color: var(--accent); padding: 2px 7px; border-radius: 8px; margin-left: 6px; }
@@ -6991,7 +7042,6 @@ body.anims-frozen *::after {
 
 /* ── Иконки чемпионов и тир-листа (голые <img>): подъём + свечение
       (часть эффекта «2»; бегущую полосу на <img> наложить нельзя) ── */
-.champ-icon,
 .tierlist-champ-icon {
   transition:
     transform   var(--dur-base) var(--ease-spring),
@@ -6999,7 +7049,6 @@ body.anims-frozen *::after {
     box-shadow  var(--dur-base) var(--ease-snap),
     filter      var(--dur-base) var(--ease-snap);
 }
-.champ-icon:hover,
 .tierlist-champ-icon:hover {
   transform: translateY(-3px) scale(1.08);
   border-color: var(--accent);
@@ -7312,9 +7361,424 @@ button:active { transform: scale(var(--btn-press)); }
   .footer-inner { grid-template-columns: 1fr; gap: 24px; }
   .site-footer { padding: 32px 16px 20px; }
 }
-/* ПК: сдвигаем только подвал вправо на ширину всегда-открытого сайдбара (240px),
-   чтобы его левый край не уезжал под сайдбар. Остальная страница не трогается. */
+/* ПК: подвал выравниваем под левый край контента (тонкий рельс 66px + зазор),
+   чтобы его левый край не уезжал под рельс. Остальная страница не трогается. */
 @media (min-width: 769px) {
   .footer-inner,
-  .footer-legal { margin-left: 264px; margin-right: auto; }
+  .footer-legal { margin-left: var(--shell-left); margin-right: auto; }
 }
+
+/* ════ Вкладки-виды — ПОРТ из lab-main (.f-nav пилюля + .f-ind скользящая, switcher=glass) ════ */
+.f-nav { position: relative; display: inline-flex; align-items: center; gap: 0; margin: 0 auto; padding: 4px;
+  background: rgba(255,255,255,0.05); border: 1px solid var(--accent-border-sub); border-radius: 24px; }
+.f-tab { appearance: none; border: 0; cursor: pointer; font-family: inherit; padding: 8px 14px; border-radius: 18px;
+  font-size: 13px; font-weight: 700; color: rgba(255,255,255,.55); background: transparent; position: relative; z-index: 2;
+  transition: color .2s; white-space: nowrap; }
+.f-tab:hover { color: #fff; }
+.f-tab.active { color: #fff; }
+.f-ind { position: absolute; left: 0; top: 4px; bottom: 4px; z-index: 1; border-radius: 18px; opacity: 0;
+  background: rgba(255,255,255,0.14); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.22); box-shadow: 0 4px 16px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.25);
+  transition: transform .32s cubic-bezier(.34,1.4,.64,1), width .32s ease; pointer-events: none; }
+@media (max-width: 768px) {
+  .f-tab { padding: 6px 10px; font-size: 11px; }
+}
+
+/* ════ M1.2 · Сайдбар → тонкий hover-рельс (перенос каркаса lab-main) ════
+   ПК: #sidePanel тонкий (66px, только иконки), при наведении плавно
+   раскрывается до 240px ОВЕРЛЕЕМ (контент не двигается). Контент — на всю
+   ширину рядом с рельсом. Мобайл не трогаем (гамбургер + слайд как было). */
+@media (min-width: 769px) {
+  #sidePanel {
+    width: 66px;
+    overflow-x: hidden;
+    z-index: 8050;
+    transition: width .22s cubic-bezier(.4,0,.2,1) !important;
+  }
+  #sidePanel:hover { width: 240px; box-shadow: 10px 0 40px rgba(0,0,0,.55); }
+
+  /* тонкое состояние — только иконки по центру, подписи спрятаны */
+  #sidePanel:not(:hover) #sideHeader { justify-content: center; padding: 18px 0 14px; }
+  #sidePanel:not(:hover) .side-title,
+  #sidePanel:not(:hover) .side-subtitle,
+  #sidePanel:not(:hover) .side-section { display: none; }
+  #sidePanel:not(:hover) .side-btn {
+    justify-content: flex-start;            /* иконка на ОДНОМ месте в обоих состояниях — не дёргается */
+    font-size: 0 !important;                /* прячет голую текст-подпись; у .side-icon свой размер */
+    padding-left: 16px; padding-right: 8px; /* как в раскрытом — без сдвига при раскрытии */
+    background: transparent !important;     /* спец-кнопки (Драфт/Чат) без цветного фона в тонком виде */
+    border-left: 0 !important;              /* и без цветной полоски слева */
+    transform: none !important;             /* без сдвига вправо в тонком виде */
+  }
+  #sidePanel:not(:hover) .side-btn > span:not(.side-icon) { display: none; } /* бейджи BETA/чат/версия */
+  #sidePanel:hover .side-btn { font-size: 13px; }
+
+  /* контент — на всю ширину, рядом с тонким рельсом (feedback_use_full_width) */
+  .app-wrapper { max-width: none; margin: 0; padding: 15px 24px 90px 90px; }
+}
+
+/* ════ M1.3a · Фон-сплэш за стеклом + пользовательские настройки отображения ════
+   Сайт уже стеклянный (.lvl-container/.table-wrap-outer = bg-card-glass + blur),
+   поэтому сплэш проявляется сквозь них сам. Управление — в ⚙ Настройки профиля.
+   data-атрибуты вешаются на <html> (это ОСОЗНАННОЕ глобальное оформление-стандарт). */
+#siteSplash {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-size: cover; background-position: center 16%; background-repeat: no-repeat;
+}
+#siteSplash::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(160deg,
+    rgba(var(--scrim-rgb,1,12,22), var(--splash-dim,.42)) 0%,
+    rgba(var(--scrim-rgb,1,12,22), calc(var(--splash-dim,.42) + .08)) 60%,
+    rgba(var(--scrim-rgb,1,12,22), calc(var(--splash-dim,.42) + .14)) 100%);
+}
+/* Затемнение фона — насколько виден сплэш за стеклом (пользовательское) */
+html[data-dim="none"]   { --splash-dim: .24; }
+html[data-dim="light"]  { --splash-dim: .42; }
+html[data-dim="mid"]    { --splash-dim: .58; }
+html[data-dim="strong"] { --splash-dim: .74; }
+/* Оттенок стекла — база-цвет скрима (прозрачность берётся из затемнения) */
+html[data-glasstint="accent"] { --scrim-rgb: 3,26,38; }
+html[data-glasstint="warm"]   { --scrim-rgb: 26,18,8; }
+html[data-glasstint="cool"]   { --scrim-rgb: 6,14,30; }
+/* ════ ДИЗАЙН-СИСТЕМА · единый владелец стекла (порт из lab-main) ════
+   <html> = хозяин. Переменные стекла определены ОДИН раз, рулятся из ⚙.
+   ВСЕ панели наследуют через :is(). Меняешь в одном месте → меняется везде. */
+html[data-glass="on"]{
+  --glass-tint:255,255,255; --glass-op:.06; --glass-blur:10px; --glass-sat:1.15;
+  --glass-bd-c:rgba(255,255,255,.12); --glass-hl:inset 0 1px 0 rgba(255,255,255,.16); --glass-glow:0 0 0 transparent;
+  --ds-r:16px;
+}
+html[data-glasspow="light"]  { --glass-op:.04;  --glass-blur:6px;  }
+html[data-glasspow="mid"]    { --glass-op:.06;  --glass-blur:10px; }
+html[data-glasspow="strong"] { --glass-op:.085; --glass-blur:16px; }
+html[data-glasspow="ultra"]  { --glass-op:.11;  --glass-blur:24px; }
+html[data-glasstint="accent"]{ --glass-tint:11,196,227; }
+html[data-glasstint="warm"]  { --glass-tint:255,205,150; }
+html[data-glasstint="cool"]  { --glass-tint:150,200,255; }
+html[data-glasssat="norm"]   { --glass-sat:1.15; }
+html[data-glasssat="rich"]   { --glass-sat:1.6; }
+html[data-glasssat="max"]    { --glass-sat:2.2; }
+html[data-glassborder="glow"]{ --glass-bd-c:var(--accent-border-str); --glass-glow:0 0 18px var(--accent-glow); }
+html[data-glassborder="none"]{ --glass-bd-c:transparent; }
+html[data-glass="on"] :is(.lvl-container,.table-wrap-outer,#wrprSection,#champSidePanel,.m-win,.user-menu,.lang-dropdown,.ss-modal,.hub-hero,.f-kpi,.hub-card,.hub-tool){
+  background:rgba(var(--glass-tint),var(--glass-op))!important;
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border:1px solid var(--glass-bd-c)!important;
+  border-radius:var(--ds-r)!important;
+  box-shadow:0 8px 30px rgba(0,0,0,.35),var(--glass-hl),var(--glass-glow);
+  transition:background .25s,box-shadow .25s,border-color .25s,backdrop-filter .25s;
+}
+/* Плотность / шрифт таблиц (пользовательское) */
+html[data-density="cozy"]  #statTable td, html[data-density="cozy"]  #statTable th { padding-top: 13px; padding-bottom: 13px; }
+html[data-density="dense"] #statTable td, html[data-density="dense"] #statTable th { padding-top: 5px;  padding-bottom: 5px; }
+html[data-tblfont="small"] #statTable td { font-size: 11px; }
+html[data-tblfont="large"] #statTable td { font-size: 14px; }
+/* Попап «⚙ Настройки» (стекло) */
+.ss-ov { position: fixed; inset: 0; z-index: 10050; display: flex; align-items: center; justify-content: center;
+  background: rgba(2,8,14,.55); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+.ss-modal { width: min(440px,92vw); max-height: 88vh; overflow-y: auto; border-radius: 18px; padding: 18px 20px 20px;
+  background: rgba(10,22,32,.86); -webkit-backdrop-filter: blur(22px) saturate(1.6); backdrop-filter: blur(22px) saturate(1.6);
+  border: 1px solid rgba(255,255,255,.16); box-shadow: 0 30px 80px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.2); }
+.ss-h { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.ss-title { font-size: 15px; font-weight: 800; color: #eaf6ff; }
+.ss-x { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); color: #cfe9f8; width: 30px; height: 30px; border-radius: 9px; cursor: pointer; font-size: 15px; }
+.ss-x:hover { background: rgba(255,255,255,.14); }
+.ss-grp { margin-bottom: 14px; }
+.ss-label { font-size: 12px; font-weight: 700; color: rgba(235,247,255,.75); margin-bottom: 7px; }
+.ss-seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.ss-seg button { font: inherit; font-size: 12px; font-weight: 700; color: #cfe9f8; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14); border-radius: 9px; padding: 7px 11px; cursor: pointer; transition: .14s; }
+.ss-seg button:hover { background: rgba(11,196,227,.14); border-color: rgba(11,196,227,.4); }
+.ss-seg button.on { background: rgba(11,196,227,.2); border-color: rgba(11,196,227,.7); color: #fff; }
+.ss-color { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.ss-color input[type="color"] { width: 44px; height: 32px; border: 1px solid rgba(255,255,255,.2); border-radius: 8px; background: none; cursor: pointer; padding: 0; }
+.ss-color span { font-size: 12px; color: rgba(235,247,255,.7); }
+
+/* Запасные переменные для попапа ⚙ и правой карточки (главные панели рулит дизайн-система выше) */
+:root {
+  --glass-bg: rgba(255,255,255,.09);
+  --glass-bd: rgba(255,255,255,.18);
+  --glass-hl-legacy: inset 0 1px 0 rgba(255,255,255,.24);
+}
+/* Липкая шапка таблицы — светлое стекло (как панели сайта), чуть плотнее строк чтобы не просвечивали при скролле */
+#statTable thead th {
+  background: rgba(var(--glass-tint,255,255,255), 0.13) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(1.5); backdrop-filter: blur(16px) saturate(1.5);
+}
+/* Рельс — тоже frosted (единый стандарт шела, чуть темнее: вертикальная полоса) */
+@media (min-width: 769px) {
+  #sidePanel {
+    background: rgba(12,24,36,.38) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4);
+    border-right: 1px solid var(--glass-bd);
+  }
+}
+
+/* ════ M1.4 · Правая панель карточки чемпа (виды Статы/WinRate) ════ */
+@media (min-width: 769px) {
+  body[data-sidecard="on"] .app-wrapper { padding-right: var(--sidecard-reserve); }
+  /* Вкладки НЕ должны прыгать между видами: держим шапку в позиции вида «Статы» всегда.
+     При sidecard=on шапку и так сжимает padding .app-wrapper; при off добавляем тот же
+     резерв самой шапке → центр вкладок одинаковый во ВСЕХ видах. */
+  body[data-sidecard="off"] header { padding-right: var(--sidecard-reserve); }
+}
+#champSidePanel {
+  position: fixed; top: 84px; right: 20px; width: 312px;
+  max-height: calc(100vh - 104px); overflow-y: auto; z-index: 40;
+  border-radius: 18px; padding: 18px;
+  background: var(--glass-bg); border: 1px solid var(--glass-bd);
+  box-shadow: 0 10px 34px rgba(0,0,0,.34), var(--glass-hl);
+  -webkit-backdrop-filter: blur(var(--glass-blur,14px)) saturate(1.5); backdrop-filter: blur(var(--glass-blur,14px)) saturate(1.5);
+  display: none;
+}
+body[data-sidecard="on"] #champSidePanel { display: flex; flex-direction: column; gap: 12px; }
+@media (max-width: 768px) { #champSidePanel { display: none !important; } }
+/* Правая карточка чемпа — лабовый вид .f-preview (реальные данные + сплэш-арт) */
+.csc-hint { color: rgba(255,255,255,.4); font-size: 13px; text-align: center; padding: 40px 8px; line-height: 1.5; }
+#champSidePanel .big { height: 150px; border-radius: 12px; overflow: hidden; position: relative; background: linear-gradient(135deg, var(--accent-dim), rgba(255,255,255,.04)); }
+#champSidePanel .big img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+#champSidePanel .big::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.5), transparent 55%); pointer-events: none; }
+#champSidePanel h3 { font-size: 18px; font-weight: 800; color: #eaf6ff; line-height: 1.1; }
+#champSidePanel .csc-role { font-size: 12px; color: rgba(255,255,255,.5); margin-top: -6px; }
+#champSidePanel .meta { display: flex; gap: 8px; flex-wrap: wrap; }
+#champSidePanel .tag { font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 7px; background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+#champSidePanel .csc-btn { margin-top: 4px; width: 100%; padding: 10px; border-radius: 11px; background: rgba(11,196,227,.18); border: 1px solid rgba(11,196,227,.5); color: #dff2fb; font-weight: 800; font-size: 13px; cursor: pointer; transition: .14s; }
+#champSidePanel .csc-btn:hover { background: rgba(11,196,227,.3); }
+
+/* ════ M1.5 · Таблица статов — строки-карточки (лабовый вид, логика боевой сохранена) ════
+   Перевод с border-collapse на отдельные строки-пилюли: зазор между строк,
+   полупрозрачный фон строки + скруглённые концы → сквозь зазоры играет сплэш. */
+#statTable { border-collapse: separate; border-spacing: 0 7px; }
+#statTable tbody td {
+  background: rgba(255,255,255,.055);
+  border-top: 1px solid transparent; border-bottom: 1px solid transparent;
+}
+#statTable tbody td:first-child { border-radius: 11px 0 0 11px; }
+#statTable tbody td:last-child  { border-radius: 0 11px 11px 0; }
+#statTable tbody tr:nth-child(even) { background: transparent; }     /* зебра убрана — теперь карточки */
+#statTable tbody tr:hover { background: transparent; }
+#statTable tbody tr:hover td { background: rgba(255,255,255,.13); }
+#statTable tbody tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+
+/* WinRate — те же строки-карточки (инлайн-стили строк перебиваем !important) */
+#wrprSection .wrpr-row {
+  background: rgba(255,255,255,.055) !important;
+  border-bottom: 0 !important;
+  border-radius: 11px !important;
+  padding: 9px 10px !important;
+  margin-bottom: 7px !important;
+}
+#wrprSection .wrpr-row:hover {
+  background: rgba(255,255,255,.13) !important;
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* ════ M1.6 · Рельс как в lab-main: иконки-плитки + кнопки-пилюли + циан-актив ════ */
+@media (min-width: 769px) {
+  /* Иконка = стеклянная плитка (а не голый эмодзи) */
+  #sidePanel .side-btn .side-icon {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    display: inline-grid; place-items: center; font-size: 17px; flex-shrink: 0;
+    transition: background .15s, box-shadow .15s, transform .15s;
+  }
+  /* Раскрытый рельс: каждая кнопка = стеклянная пилюля (спец-цвета убраны, как в лабе) */
+  #sidePanel:hover .side-btn {
+    background: rgba(255,255,255,.045) !important;
+    border-left: 0 !important;
+    border-radius: 11px !important;
+  }
+  #sidePanel:hover .side-btn:hover { background: rgba(255,255,255,.11) !important; }
+  #sidePanel:hover .side-btn:hover .side-icon { background: rgba(255,255,255,.12); }
+  /* Активная кнопка (открыт её инструмент) — циан-плитка + циан-текст */
+  #sidePanel .side-btn.side-active { color: var(--accent) !important; background: rgba(11,196,227,.10) !important; }
+  #sidePanel .side-btn.side-active .side-icon {
+    background: var(--accent-dim); border-color: var(--accent-border-str);
+    box-shadow: 0 0 0 1px var(--accent-border-str) inset, 0 0 12px var(--accent-glow);
+  }
+}
+
+/* ════ M1.7 · Рельс-островок + полный лабовый скин таблицы статов ════ */
+@media (min-width: 769px) {
+  /* Рельс = плавающий островок (лаб data-rail=float), а не квадрат во всю высоту */
+  #sidePanel {
+    top: 14px; left: 14px; bottom: 14px; height: auto;
+    border-radius: 18px;
+    border: 1px solid var(--glass-bd);
+    box-shadow: 0 14px 40px rgba(0,0,0,.5);
+  }
+  .app-wrapper { padding-left: var(--shell-left); }   /* контент после островка-рельса (одна переменная) */
+}
+/* Таблица статов — ховер строки (лабовый скин) */
+#statTable tbody tr:hover td { background: rgba(255,255,255,.12) !important; border-bottom-color: transparent !important; }
+#statTable tbody tr:hover td:first-child { border-left: 0 !important; box-shadow: inset 3px 0 0 var(--accent) !important; }
+/* сорт-столбец — мягкая подсветка вместо старой accent-заливки */
+#statTable td.active-col { background: rgba(255,255,255,.05) !important; }
+
+/* WinRate — тот же стеклянный контейнер, что у таблицы статов (чтобы сплэш играл сквозь, а не тёмный фон) */
+#wrprSection {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-bd);
+  border-radius: 18px;
+  padding: 14px 16px;
+  -webkit-backdrop-filter: blur(var(--glass-blur,12px)) saturate(1.5);
+  backdrop-filter: blur(var(--glass-blur,12px)) saturate(1.5);
+  box-shadow: 0 10px 34px rgba(0,0,0,.34), var(--glass-hl);
+}
+
+/* ════ Уровень → ЧИПЫ (порт .f-chip из lab-main). Единственный контрол, мышь+тач. ════ */
+.lvl-chips-wrap { width: 100%; }
+.lvl-container .ruler { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+#ruler .lvl-pill {
+  width: 30px; height: 30px; min-width: 30px; padding: 0; border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; cursor: pointer; color: rgba(255,255,255,.6);
+  background: rgba(255,255,255,0.04); border: 1px solid var(--accent-border-sub);
+  user-select: none; -webkit-user-select: none; touch-action: none;
+  transition: transform .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease;
+}
+#ruler .lvl-pill:hover { color: #fff; border-color: var(--accent-border); transform: translateY(-2px); }
+#ruler .lvl-pill.on { color: #001016; background: var(--accent); border-color: var(--accent); box-shadow: 0 2px 10px var(--accent-glow); }
+.lvl-chiphint { font-size: 11px; color: rgba(255,255,255,.4); margin-left: 6px; align-self: center; }
+.lvl-num { font-size: 34px; font-weight: 900; line-height: 1; color: #fff; text-shadow: 0 0 24px var(--accent-glow); }
+
+/* ════ M2 · МЕТА-ХАБ — ПОРТ из lab-main (классы .f-hub/.hub-*, переменные → боевые) ════ */
+.f-port { width: 38px; height: 38px; border-radius: 9px; flex: 0 0 auto; display: grid; place-items: center; font-size: 13px; font-weight: 900; color: #001016; border: 1px solid rgba(255,255,255,0.12); object-fit: cover; }
+.f-hub { display: flex; flex-direction: column; gap: 16px; }
+.hub-hero { display: flex; gap: 18px; padding: 18px; border-radius: 16px; background: linear-gradient(120deg, var(--accent-dim), transparent 70%), var(--bg-card); border: 1px solid var(--accent-border); overflow: hidden; }
+.hub-hero .big { width: 120px; height: 120px; border-radius: 14px; flex: 0 0 auto; display: grid; place-items: center; font-size: 44px; font-weight: 900; color: #001016; box-shadow: 0 0 30px var(--accent-glow); object-fit: cover; }
+.hub-hero .info { display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+.hub-hero .lbl { font-size: 11px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: var(--accent); }
+.hub-hero h2 { font-size: 28px; font-weight: 900; color: #fff; }
+.hub-hero .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.hub-hero .tag { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 7px; background: rgba(255,255,255,0.05); border: 1px solid var(--accent-border-sub); color: var(--text-secondary); }
+.hub-hero .cta { margin-top: 8px; align-self: flex-start; padding: 9px 18px; border-radius: 9px; font-size: 13px; font-weight: 800; cursor: pointer; color: #001016; background: var(--accent); border: 0; box-shadow: 0 3px 14px var(--accent-glow); }
+.f-kpis { display: flex; gap: 12px; }
+.f-kpi { flex: 1; padding: 14px 16px; border-radius: 16px; background: var(--bg-card); border: 1px solid var(--accent-border-sub); position: relative; overflow: hidden; }
+.f-kpi::after { content: ""; position: absolute; right: -20px; top: -20px; width: 80px; height: 80px; border-radius: 50%; background: var(--accent-dim); filter: blur(8px); }
+.f-kpi .k-lbl { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text-muted); }
+.f-kpi .k-val { font-size: 22px; font-weight: 900; margin-top: 5px; color: #fff; }
+.f-kpi .k-sub { font-size: 11px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+.hub-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 14px; }
+.hub-card { padding: 14px 16px; border-radius: 16px; background: var(--bg-card); border: 1px solid var(--accent-border-sub); }
+.hub-card h4 { font-size: 13px; font-weight: 800; margin-bottom: 11px; display: flex; align-items: center; gap: 7px; color: #fff; }
+.hub-card .pill { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; background: var(--accent-dim); color: var(--accent); border: 1px solid var(--accent-border); }
+.hc-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.hc-row:last-child { border-bottom: 0; }
+.hc-row .f-port { width: 30px; height: 30px; font-size: 11px; }
+.hc-n { font-weight: 700; color: #fff; font-size: 13px; }
+.hc-v { margin-left: auto; font-weight: 900; font-size: 13px; }
+.wr-g { color: #46e08a; } .wr-b { color: #ff5d5d; }
+.hc-pool { display: flex; flex-wrap: wrap; gap: 10px; }
+.hc-champ { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-secondary); }
+.hc-champ .f-port { width: 42px; height: 42px; font-size: 13px; }
+.hc-cp { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12.5px; }
+.hc-cp .f-port { width: 28px; height: 28px; font-size: 11px; }
+.hc-cp b { color: #fff; } .hc-arr { color: var(--text-muted); font-size: 11px; } .hc-vs { color: var(--accent); font-weight: 600; }
+.hc-tour { display: flex; align-items: center; gap: 9px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12.5px; }
+.hc-tour:last-child { border-bottom: 0; }
+.hc-tour b { color: #fff; } .hc-dot { font-size: 10px; } .hc-when { margin-left: auto; color: var(--text-muted); font-size: 11px; }
+.hc-news { list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0; margin: 0; }
+.hc-news li { font-size: 12px; color: var(--text-secondary); } .hc-news b { color: #fff; }
+.hub-tools { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.hub-tool { padding: 16px 12px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--accent-border-sub); text-align: center; cursor: pointer; transition: all .18s; }
+.hub-tool:hover { border-color: var(--accent-border-str); transform: translateY(-3px); background: var(--accent-dim); }
+.hub-tool .ti { font-size: 26px; } .hub-tool .tn { font-size: 12px; font-weight: 700; margin-top: 7px; color: var(--text-secondary); }
+
+/* ════ 🔥 ВЕЕР-витрина меты — ПОРТ из lab-hover-reveal (layout v-fan), классы mh-* ════ */
+.mh-fan-wrap > h4 { font-size: 14px; font-weight: 800; margin: 0 0 10px; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.mh-fan-stage { display: flex; justify-content: center; align-items: flex-start; gap: 14px; width: 100%; perspective: 1600px; }
+.mh-card {
+  position: relative; flex: 1 1 0; max-width: 200px; border-radius: 16px; overflow: hidden; cursor: pointer;
+  border: 1px solid rgba(11,196,227,.18); background: linear-gradient(180deg, rgba(1,21,32,.7), rgba(1,10,19,.96));
+  transition: flex-grow .4s cubic-bezier(.2,.8,.25,1), max-width .4s cubic-bezier(.2,.8,.25,1),
+              transform .4s cubic-bezier(.2,.8,.25,1), box-shadow .4s, border-color .4s;
+}
+.mh-fan-stage:hover .mh-card { flex-grow: .6; max-width: 150px; }
+.mh-fan-stage .mh-card:hover { flex-grow: 2.6; max-width: 430px; transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 25px 60px rgba(0,0,0,.6), 0 0 50px rgba(11,196,227,.4); }
+.mh-art { height: 220px; position: relative; }
+.mh-art img { width: 100%; height: 100%; object-fit: cover; object-position: center 14%; display: block; }
+.mh-shade { position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: linear-gradient(180deg, transparent 38%, rgba(1,10,19,.96)); }
+.mh-body { position: relative; z-index: 2; padding: 14px; margin-top: -52px; }
+.mh-name { font-size: 18px; font-weight: 900; color: #fff; line-height: 1.1; }
+.mh-role { font-size: 11px; color: rgba(230,243,251,.55); margin-bottom: 2px; }
+.mh-reveal { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .4s, opacity .32s; }
+.mh-card:hover .mh-reveal { max-height: 320px; opacity: 1; margin-top: 6px; }
+.mh-reveal .rv-mini { display: flex; gap: 10px; margin-top: 6px; }
+.mh-reveal .rv-mini > div { flex: 1; text-align: center; background: rgba(255,255,255,.05); border-radius: 8px; padding: 6px; }
+.mh-reveal .rv-mini .mv { font-size: 16px; font-weight: 900; }
+.mh-reveal .rv-mini .ml { font-size: 9px; color: rgba(230,243,251,.5); }
+.mh-reveal .click-tip { font-size: 10px; color: rgba(230,243,251,.4); text-align: center; margin-top: 6px; }
+/* мобайл: аккордеон по hover не работает на тач → 2-колоночная сетка без раздвигания */
+@media (max-width: 768px) {
+  .mh-fan-stage { flex-wrap: wrap; }
+  .mh-card, .mh-fan-stage:hover .mh-card, .mh-fan-stage .mh-card:hover { flex: 1 1 44%; max-width: none; transform: none; }
+  .mh-reveal { max-height: 320px; opacity: 1; margin-top: 6px; }
+}
+
+/* ════ 🎖 ТИР-ЛИСТ — ПОРТ из lab-main (.f-tier/.tl-*), инлайн tiermaker. Переменные лаба→боевые ════ */
+.f-tier { margin: 0; display: flex; flex-direction: column; gap: 12px; position: relative; }
+.tl-board { display: flex; flex-direction: column; gap: 14px; }
+.f-tier[data-tpool="side"] .tl-board { flex-direction: row; align-items: stretch; }
+.tl-bar { display: flex; align-items: center; gap: 10px; }
+.tl-title { font-size: 16px; font-weight: 800; color: #fff; }
+.tl-gear { margin-left: auto; padding: 7px 13px; border-radius: 9px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--accent); background: var(--accent-dim); border: 1px solid var(--accent-border-str); transition: background .15s, color .15s; }
+.tl-gear:hover, .tl-gear.on { background: var(--accent); color: #001016; }
+.tl-settings { position: absolute; top: 46px; right: 0; z-index: 50; width: min(580px,100%); display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; padding: 16px; border-radius: 14px; background: var(--bg-card); border: 1px solid var(--accent-border-sub); transform: scale(.96); opacity: 0; visibility: hidden; pointer-events: none; transform-origin: top right; transition: transform .16s ease, opacity .16s ease; }
+.tl-settings.open { transform: none; opacity: 1; visibility: visible; pointer-events: auto; box-shadow: 0 0 0 100vmax rgba(0,0,0,.55), 0 16px 44px rgba(0,0,0,.45); }
+.f-tier:has(.tl-settings.open) .tl-gear { opacity: 0; pointer-events: none; }
+.tl-grp { display: flex; flex-direction: column; gap: 5px; }
+.tl-glabel { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--text-muted); }
+.tl-seg { display: inline-flex; gap: 3px; padding: 3px; border-radius: 9px; background: rgba(255,255,255,0.04); border: 1px solid var(--accent-border-sub); }
+.tl-seg button { border: 0; cursor: pointer; font-family: inherit; padding: 5px 11px; border-radius: 6px; font-size: 12px; font-weight: 700; color: var(--text-secondary); background: transparent; transition: background .15s, color .15s; }
+.tl-seg button:hover { color: #fff; }
+.tl-seg button.on { color: #001016; background: var(--accent); }
+.tl-reset { grid-column: 1 / -1; margin-left: auto; background: rgba(255,255,255,.05); border: 1px solid var(--accent-border-sub); color: var(--text-secondary); font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 8px; cursor: pointer; }
+.tl-reset:hover { color: var(--accent); border-color: var(--accent-border-str); }
+.tl-tiers { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
+.f-tier[data-tlayout="cols"] .tl-tiers { flex-direction: row; gap: 8px; align-items: flex-start; overflow-x: auto; padding-bottom: 6px; }
+.tl-tier { display: flex; align-items: stretch; border: 1px solid var(--accent-border-sub); border-radius: 12px; overflow: hidden; min-height: 64px; background: var(--bg-card); }
+.f-tier[data-tlayout="cols"] .tl-tier { flex-direction: column; flex: 1; min-width: 120px; }
+.tl-badge { width: 52px; flex: 0 0 auto; display: grid; place-items: center; font-size: 18px; font-weight: 900; color: #fff; }
+.f-tier[data-tlayout="cols"] .tl-badge { width: auto; height: 38px; border-radius: 9px; margin: 6px; }
+.tl-lane { flex: 1; display: flex; flex-wrap: wrap; gap: 6px; padding: 7px; align-content: flex-start; min-height: 56px; }
+.tl-poolwrap { display: flex; flex-direction: column; }
+.f-tier[data-tpool="side"] .tl-poolwrap { width: 240px; flex: 0 0 auto; }
+.tl-plabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--text-muted); margin: 0 0 8px; }
+.tl-pool { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; background: rgba(0,0,0,.22); border: 1px dashed var(--accent-border-sub); border-radius: 12px; align-content: flex-start; min-height: 80px; }
+.f-tier[data-tpool="side"] .tl-pool { flex: 1; overflow-y: auto; }
+.tl-chip { border-radius: 9px; cursor: grab; flex: 0 0 auto; display: grid; place-items: center; width: 48px; height: 48px; overflow: hidden; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.05); user-select: none; -webkit-user-drag: none; }
+.tl-chip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.f-tier[data-tsize="s"] .tl-lane .tl-chip { width: 38px; height: 38px; }
+.f-tier[data-tsize="m"] .tl-lane .tl-chip { width: 48px; height: 48px; }
+.f-tier[data-tsize="l"] .tl-lane .tl-chip { width: 60px; height: 60px; }
+.f-tier[data-psize="s"] .tl-pool .tl-chip { width: 38px; height: 38px; }
+.f-tier[data-psize="m"] .tl-pool .tl-chip { width: 48px; height: 48px; }
+.f-tier[data-psize="l"] .tl-pool .tl-chip { width: 60px; height: 60px; }
+.tl-ghost { opacity: .25; outline: 2px dashed var(--accent-border-str); outline-offset: -2px; border-radius: 9px; }
+.tl-chosen { cursor: grabbing !important; }
+.tl-drag { opacity: .97 !important; transform: scale(1.06); box-shadow: 0 16px 36px rgba(0,0,0,.55), 0 0 0 2px var(--accent); }
+@media (max-width: 768px) {
+  .f-tier[data-tpool="side"] .tl-board { flex-direction: column; }
+  .f-tier[data-tpool="side"] .tl-poolwrap { width: auto; }
+  .f-tier[data-tlayout="cols"] .tl-tiers { flex-direction: column; }
+}
+
+/* ════ Таблица статов — ЛАБОВАЯ разметка строки (.f-tbl: .f-name-cell/.f-port/.f-cname/.s-X) ════ */
+#statTable .f-name-cell { display: flex; align-items: center; gap: 10px; padding-left: 6px; text-align: left; }
+#statTable .f-num { color: var(--text-faint); font-size: 11px; min-width: 18px; flex-shrink: 0; }
+#statTable .f-x { width: 18px; height: 18px; flex-shrink: 0; border-radius: 5px; display: grid; place-items: center; font-size: 10px; color: #e74c3c; background: rgba(231,76,60,.12); border: 1px solid rgba(231,76,60,.3); cursor: pointer; padding: 0; line-height: 1; }
+#statTable .f-x:hover { background: rgba(231,76,60,.28); color: #fff; }
+#statTable .f-port { width: 38px; height: 38px; border-radius: 9px; flex: 0 0 auto; object-fit: cover; border: 1px solid rgba(255,255,255,.12); display: block; }
+#statTable .f-cname { font-weight: 700; color: #fff; font-size: 14px; cursor: pointer; }
+#statTable td.s-ad    { color: #ff6b6b; }
+#statTable td.s-hp    { color: var(--gold); }
+#statTable td.s-mana  { color: #5da9ff; }
+#statTable td.s-armor { color: var(--gold); }
+#statTable td.s-mrez  { color: var(--accent); }
+#statTable td.s-range { color: #fff; }
+#statTable td.s-as    { color: #ffb347; }
+#statTable td.s-ms    { color: #7fdca4; }
+#statTable td.s-hpreg { color: #ff9aa2; }
+#statTable td.s-mpreg { color: #8fb8ff; }

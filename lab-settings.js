@@ -56,13 +56,18 @@ function attach(opts){
   var wkey='lab:'+id, pkey='lab-presets:'+id;
   var mount=document.querySelector(opts.mount||'#labTools');
 
-  // 1) восстановить сохранённый рабочий набор
+  var schema=opts.schema||1;
+
+  // 1) восстановить сохранённый рабочий набор. ВСЕГДА восстанавливаем (НИКОГДА не стираем
+  //    настройки юзера — это вся суть памяти лаба). Мерж с DEFAULTS делает сам лаб в apply,
+  //    так что отсутствующие новые ключи берут дефолт, а выбор юзера сохраняется.
+  // при смене schema старый набор игнорируем (иначе устаревшие значения перетирают новые дефолты)
   var saved=loadJSON(wkey);
-  if(saved && saved.s) try{ apply(saved.s); }catch(e){}
+  if(saved && saved.s && (saved.sc==null || saved.sc===schema)) try{ apply(saved.s); }catch(e){}
 
   // 2) автосохранение (ловит любые изменения, не трогая обработчики лаба)
   var last='';
-  function tick(){ try{ var cur=JSON.stringify(getState()); if(cur!==last){ last=cur; saveJSON(wkey,{lab:id,v:1,s:getState()}); } }catch(e){} }
+  function tick(){ try{ var cur=JSON.stringify(getState()); if(cur!==last){ last=cur; saveJSON(wkey,{lab:id,v:1,sc:schema,s:getState()}); } }catch(e){} }
   setInterval(tick,700);
   window.addEventListener('beforeunload',tick);
 

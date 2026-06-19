@@ -3,27 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>Lab · Мета-хаб (бенто, стекло)</title>
-  <link rel="stylesheet" href="metahub.css?v=1">
+  <link rel="stylesheet" href="metahub.css?v=3">
 </head>
 <body>
-  <div class="wrap">
-    <div class="hub-top">
-      <h1 class="hub-title">🔮 <b>Мета-хаб</b></h1>
-      <span class="hub-badge" id="patchBadge"></span>
+
+  <!-- ░░ ДИЗАЙН-ПОЛОСА ЛАБА (сворачивается) — подбор раскладок/панелей ░░ -->
+  <div class="lab-strip" id="labStrip">
+    <div class="lab-strip-head">
+      <span class="lab-strip-ttl">🧪 Дизайн-полоса · Мета-хаб</span>
       <span class="spacer"></span>
-      <div class="pills gold" id="variantPills"></div>
+      <button class="lab-min" id="labMin" type="button">▲ Свернуть настройки</button>
     </div>
-    <div class="hub-top" style="margin-top:-6px">
-      <div class="pills" id="rankPills"></div>
-    </div>
+    <div id="labTools" hidden></div>
+    <div class="lab-strip-body" id="stripBody"></div>
+  </div>
+
+  <!-- ░░ ОДИН сплэш-арт за стеклом на весь хаб (то, что размывают плитки) ░░ -->
+  <div class="hub-art" id="hubArt"></div>
+
+  <div class="wrap" id="wrap" data-place="top">
+    <header class="hub-header" id="hubHeader">
+      <div class="hub-top">
+        <h1 class="hub-title">🔮 <b>Мета-хаб</b></h1>
+        <span class="hub-badge" id="patchBadge"></span>
+        <span class="spacer"></span>
+      </div>
+      <div class="hub-filter">
+        <div class="pills" id="rankPills"></div>
+      </div>
+    </header>
 
     <div class="bento" id="bento" data-v="A"></div>
 
-    <div class="foot">Песочница · реальные данные из <b>data-pipeline/</b> · переключай <b>раскладку</b> (золотые) и <b>ранг</b> (циан)</div>
+    <div class="foot">Песочница · реальные данные из <b>data-pipeline/</b> · ФИНАЛ: раскладка <b>A·Витрина</b>, шапка сверху, герой норм+параллакс. В полосе сверху — только глобальная визуалка (превью, на боевой наследуется)</div>
   </div>
 
-  <script src="meta-data.js?v=1"></script>
-  <script src="metahub.js?v=1"></script>
+  <!-- ░░ Плавающая ⚙ (для варианта размещения «плавающая») ░░ -->
+  <button class="hub-gear" id="hubGear" type="button" hidden>⚙</button>
+  <div class="hub-gear-pop glassy" id="hubGearPop" hidden></div>
+
+  <script src="../lab-settings.js"></script>
+  <script src="meta-data.js?v=2"></script>
+  <script src="metahub.js?v=4"></script>
 </body>
 </html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Калькулятор урона — Wild Rift</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="preconnect" href="https://www.wildriftfire.com">
+<link rel="stylesheet" href="damage-calc-lab.css?v=30">
+<script>/* embed-режим (айфрейм на боевом ?embed=1): прячем лаб-обвязку ДО рендера — без мигания */
+  if(/[?&]embed=1/.test(location.search)) document.documentElement.classList.add('embed');</script>
+</head>
+<body>
+  <div class="lab-bg" id="labBg"></div>
+
+  <header class="lab-top">
+    <div class="lab-top-title">
+      <span class="lab-logo">⚔</span>
+      <div>
+        <div class="lab-h1">Калькулятор урона</div>
+        <div class="lab-sub">Сверху — варианты раскладки/кнопок/дизайна. ⚙ внутри окна — настройки для тебя. Демо-числа умений, реальные подтянем.</div>
+      </div>
+    </div>
+    <div class="lab-top-btns">
+      <div id="labTools" hidden></div>
+      <button id="toggleBtn" class="lab-toggle">▲ Свернуть настройки</button>
+      <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
+    </div>
+  </header>
+
+  <section class="settings glassy" id="settings"><!-- дизайн-полоса лаба генерится в JS --></section>
+
+  <main class="lab-main">
+    <section class="stage" id="stage">
+      <div class="stage-inner" id="stageInner"><!-- модалка калькулятора рендерится сюда --></div>
+    </section>
+  </main>
+
+  <script src="../lab-settings.js"></script>
+  <script src="champ-base.js?v=1"></script>
+  <script src="damage-calc-lab.js?v=30"></script>
+</body>
+</html>

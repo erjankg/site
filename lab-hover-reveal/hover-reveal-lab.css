@@ -17,6 +17,11 @@ body{
     linear-gradient(160deg,var(--bg-primary) 0%, var(--bg-base) 55%, var(--bg-base) 100%);
   background-attachment:fixed;min-height:100vh;display:flex;flex-direction:column;
 }
+/* ── ЕДИНЫЙ сплэш-арт на фоне всего сайта (один на все модалки), чтобы стеклу было
+      что размывать. Затемнён градиентом для читаемости. По правилу feedback_lab_rules. ── */
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:linear-gradient(155deg,rgba(1,8,14,.80),rgba(1,8,14,.90)),
+             url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg') center/cover no-repeat;}
 
 /* шапка / панель / варианты — общий стиль лабов */
 .lab-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;border-bottom:1px solid rgba(11,196,227,.12);background:rgba(1,13,24,.6);backdrop-filter:blur(10px)}
@@ -276,6 +281,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .hv-glow .pick-card:hover .pc-av{border-color:var(--accent);box-shadow:0 0 22px color-mix(in srgb,var(--accent) 55%,transparent)}
 .hv-tilt .pick-card{transition:none;will-change:transform}
 .hv-tilt .pick-card:hover .pc-av{border-color:var(--accent)}
+/* Shine Sweep — диагональный блик пробегает по карточке + подъём + свечение (как сейчас на боевом) */
+.hv-shine .pick-card{transition:transform .18s cubic-bezier(.2,.8,.25,1)}
+.hv-shine .pick-card:hover{transform:translateY(-6px);z-index:3}
+.hv-shine .pick-card:hover .pc-av{border-color:var(--accent);box-shadow:0 12px 28px rgba(0,0,0,.55),0 0 24px color-mix(in srgb,var(--accent) 45%,transparent)}
+.hv-shine .pc-av::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.30) 47%,rgba(255,255,255,.55) 50%,rgba(255,255,255,.30) 53%,transparent 70%);
+  transform:translateX(-130%)}
+.hv-shine .pick-card:hover .pc-av::after{transform:translateX(130%);transition:transform .6s ease}
+/* Выкл — никаких эффектов */
+.hv-none .pick-card:hover .pc-av{border-color:rgba(255,255,255,.12)}
 
 /* ════════════════════════════════════════════════════════════════
    ФИНАЛЬНАЯ СТЕКЛЯННАЯ КАРТОЧКА (перенос из champion-card-lab)
@@ -355,9 +370,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
    ════════════════════════════════════════════════════════════════ */
 /* страница на ВЕСЬ ЭКРАН (overlay = вся площадь, без рамки/центрованной модалки) */
 .hr-overlay.page{padding:0;align-items:stretch;justify-content:stretch}
-.champ-page{position:relative;width:100%;height:100%;max-height:100%;overflow-y:auto;border:none;border-radius:0;background:transparent;padding:32px 22px}
-.champ-page::-webkit-scrollbar{width:10px}
-.champ-page::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent) 30%,transparent);border-radius:8px}
+.hr-overlay.champ-page-ov::-webkit-scrollbar{width:10px}
+.hr-overlay.champ-page-ov::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent) 30%,transparent);border-radius:8px}
 /* контент — центровая колонка, ширину задаёт размер страницы */
 .cp-inner{margin:0 auto;max-width:1000px}
 .champ-page.ps-m .cp-inner{max-width:780px}
@@ -481,7 +495,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .xs-r-l{font-size:10px;color:rgba(230,243,251,.6);text-align:center}
 
 /* ── СРАВНЕНИЕ (новое): 2 карточки рядом + общий ползунок уровня сверху ── */
-.cmp-wrap,.cmp-pick{position:relative;border-radius:20px;padding:18px;background:linear-gradient(180deg,rgba(8,22,33,.92),rgba(4,12,20,.96));border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(16px) saturate(1.15);box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.07)}
+.cmp-wrap,.cmp-pick{position:relative;border-radius:20px;padding:18px;background:linear-gradient(180deg,rgba(10,24,36,.58),rgba(5,14,22,.7));border:1px solid rgba(255,255,255,.14);-webkit-backdrop-filter:blur(22px) saturate(1.3);backdrop-filter:blur(22px) saturate(1.3);box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.09)}
 .cmp-wrap{width:min(980px,95vw);max-height:92vh;overflow-y:auto}
 .cmp-wrap .d-close,.cmp-pick .d-close{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#eaf6ff;font-size:15px;cursor:pointer;backdrop-filter:blur(6px);z-index:3}
 .cmp-top{display:flex;align-items:center;gap:14px;justify-content:center;margin:2px 0 16px;flex-wrap:wrap}
@@ -540,18 +554,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 /* ── режим «Таблица»: статы строчками, чемпионы столбцами-панельками ──
    фикс. высоты строк/шапки → ничего не прыгает при смене уровня (см. «no layout jerk»).
    левый столбец-подписи липкий, при 5-6 чемпах включается тонкий боковой скролл. */
-.cmp-wrap.is-table{width:min(1120px,96vw);overflow:auto}
-.cmp-table{display:flex;gap:10px;align-items:flex-start;min-width:min-content;--headh:104px;--rowh:42px}
+/* окно подгоняется ПОД содержимое (2 чемпа = узко, не на весь экран); скролл только если реально не влезает */
+.cmp-wrap.is-table{width:-moz-fit-content;width:fit-content;max-width:96vw;max-height:92vh;overflow:auto}
+.cmp-table{display:flex;gap:10px;align-items:flex-start;width:-moz-fit-content;width:fit-content;--headh:104px;--rowh:42px}
 .cmpc-bar .cmp-table{--rowh:50px}
 .cmp-table::-webkit-scrollbar{height:8px}
-.ct-labels{position:sticky;left:0;z-index:4;flex:0 0 118px;display:flex;flex-direction:column;gap:6px;
+.ct-labels{position:sticky;left:0;z-index:4;flex:0 0 96px;display:flex;flex-direction:column;gap:6px;
   background:linear-gradient(90deg,rgba(8,22,33,.97) 78%,rgba(8,22,33,0))}
 .ct-corner{height:var(--headh);display:flex;align-items:flex-end;padding:0 4px 12px;font-size:11px;font-weight:900;letter-spacing:.6px;color:rgba(230,243,251,.5)}
 .ct-lbl{height:var(--rowh);display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#cfe6f3;padding-left:4px;white-space:nowrap}
 .ct-lbl span{font-size:14px}
-.ct-col{flex:1 1 156px;min-width:156px;display:flex;flex-direction:column;gap:6px;padding-bottom:8px;border-radius:16px;
-  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.1);
-  backdrop-filter:blur(8px) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.ct-col{flex:0 0 auto;width:124px;display:flex;flex-direction:column;gap:6px;padding-bottom:8px;border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.1);
+  -webkit-backdrop-filter:blur(8px) saturate(1.1);backdrop-filter:blur(8px) saturate(1.1);
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.07),inset -1px 0 0 rgba(255,255,255,.045),inset 0 1px 0 rgba(255,255,255,.07)}
+/* прозрачные вертикальные линеечки-разделители между статами в столбце — глаз сравнивает по строке */
+.ct-cell{position:relative}
+.ct-cell::before{content:'';position:absolute;left:0;right:0;top:0;height:1px;background:rgba(255,255,255,.05)}
+.ct-col .ct-cell:first-of-type::before{display:none}
 .ct-colh{position:relative;height:var(--headh);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   padding:10px 10px 9px;border-bottom:1px solid rgba(255,255,255,.08)}
 .ct-port{width:50px;height:50px;object-fit:cover;border:1px solid rgba(255,255,255,.16)}
@@ -575,3 +595,252 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .ct-add span{font-size:28px;line-height:1}
 .ct-add i{font-size:10px;font-style:normal;color:rgba(230,243,251,.6)}
 @media (max-width:560px){ .ct-labels{flex-basis:96px} .ct-col{min-width:130px;flex-basis:130px} }
+
+/* ══════════════════════════════════════════════════════════════════
+   КАРТОЧКА v2: тулбар (WR+уровень) · вкладки сверху · сетка статов 5×4 · умения (5 раскладок)
+   ══════════════════════════════════════════════════════════════════ */
+.champ-card .d-toolbar{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:stretch;margin-bottom:12px}
+.champ-card .d-toolbar .d-wrbr{margin:0}
+.champ-card .d-toolbar .d-level{margin:0}
+.champ-card .d-toolbar .d-level-row b{font-size:20px}
+
+/* вкладки сверху */
+.champ-card .d-tabbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.champ-card .d-tab{cursor:pointer;font-size:12.5px;font-weight:800;padding:9px 14px;border-radius:11px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);color:rgba(230,243,251,.72);backdrop-filter:blur(6px);transition:.15s;white-space:nowrap}
+.champ-card .d-tab:hover{background:rgba(255,255,255,.12);color:#eaf6ff}
+.champ-card .d-tab.on{background:color-mix(in srgb,var(--accent) 22%,rgba(255,255,255,.06));border-color:color-mix(in srgb,var(--accent) 55%,transparent);color:#fff;
+  box-shadow:0 4px 16px color-mix(in srgb,var(--accent) 28%,transparent)}
+/* стиль «подчёркивание» */
+.champ-card .d-tabbar.ts-underline{gap:2px;border-bottom:1px solid rgba(255,255,255,.1)}
+.champ-card .ts-underline .d-tab{background:none;border:none;border-radius:0;border-bottom:2px solid transparent;backdrop-filter:none;padding:9px 12px}
+.champ-card .ts-underline .d-tab.on{background:none;box-shadow:none;border-bottom-color:var(--accent)}
+.champ-card .d-tabwrap{min-height:300px}
+
+/* ── СЕТКА СТАТОВ 5×4 (игровое окно) ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat-grid .g-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:12px 6px;border-radius:12px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(6px);min-height:74px;text-align:center}
+.stat-grid .g-ic{font-size:18px;line-height:1}
+.stat-grid .g-v{font-size:18px;font-weight:900;font-family:var(--cf);color:#eaf6ff;letter-spacing:.3px}
+.stat-grid .g-l{font-size:11px;font-weight:700;line-height:1.15;letter-spacing:.2px}
+.stat-grid .g-cell.g-dim{opacity:.42}
+.stat-grid .g-cell.g-dim .g-v{color:rgba(230,243,251,.6);font-weight:700}
+
+/* ── ВКЛАДКА УМЕНИЙ ── */
+.abil{display:flex;flex-direction:column;gap:14px}
+.abil-rail{display:flex;gap:8px;flex-wrap:wrap}
+.ab-ico{cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 6px 4px;border-radius:12px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(6px);transition:.14s;min-width:56px}
+.ab-ico img{width:42px;height:42px;border-radius:9px;object-fit:cover;background:#0a141d}
+.ab-ico span{font-size:11px;font-weight:800;color:rgba(230,243,251,.7)}
+.ab-ico:hover{background:rgba(255,255,255,.13)}
+.ab-ico.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,rgba(255,255,255,.05));box-shadow:0 4px 16px color-mix(in srgb,var(--accent) 30%,transparent)}
+.ab-ico.on span{color:#fff}
+.abil-main{display:flex;flex-direction:column;gap:14px;min-width:0}
+.abil-video{min-width:0}
+.ab-vid{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:14px;display:block;background:#050c14;border:1px solid rgba(255,255,255,.1)}
+.ab-novid{display:grid;place-items:center;color:rgba(230,243,251,.4);font-size:12px;font-style:italic}
+.abil-info{display:flex;flex-direction:column;gap:11px;min-width:0}
+.ab-head{display:flex;align-items:center;gap:11px}
+.ab-head-ic{width:46px;height:46px;border-radius:11px;object-fit:cover;background:#0a141d;flex:0 0 auto}
+.ab-name{font-size:18px;font-weight:900;color:#fff;line-height:1.1}
+.ab-meta{display:flex;align-items:center;gap:9px;margin-top:4px}
+.ab-slot{font-size:10px;font-weight:800;letter-spacing:.5px;padding:2px 8px;border-radius:8px;background:color-mix(in srgb,var(--accent) 24%,rgba(255,255,255,.06));color:#fff}
+.ab-meta-cost{font-size:11px;color:#5aa9ff;font-weight:700}
+.ab-desc{font-size:13px;line-height:1.5;color:rgba(230,243,251,.82)}
+.ab-vars{display:flex;flex-direction:column;gap:6px}
+.ab-var{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 11px;border-radius:9px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09)}
+.ab-var-l{font-size:11.5px;color:rgba(230,243,251,.6)}
+.ab-var-v{font-family:var(--cf);font-size:13px;color:#eaf6ff;font-weight:700}
+.ab-var-v i{font-style:normal}.ab-var-v u{color:rgba(255,255,255,.25);text-decoration:none;margin:0 2px}
+
+/* раскладки умений */
+.abil-videoSide .abil-main{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start}
+.abil-railLeft{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start}
+.abil-railLeft .abil-rail{flex-direction:column}
+.abil-videoBg .abil-main{position:relative;min-height:360px;border-radius:14px;overflow:hidden}
+.abil-videoBg .abil-video{position:absolute;inset:0}
+.abil-videoBg .ab-vid{height:100%;border-radius:14px;border:none}
+.abil-videoBg .abil-info{position:relative;z-index:2;margin-top:auto;padding:48px 16px 16px 16px;
+  background:linear-gradient(0deg,rgba(2,8,14,.9) 30%,rgba(2,8,14,.45) 65%,transparent)}
+.abil-compact .abil-main{display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start}
+.abil-compact .ab-vid{aspect-ratio:16/9}
+@media (max-width:680px){
+  .abil-videoSide .abil-main,.abil-railLeft,.abil-compact .abil-main{grid-template-columns:1fr}
+  .abil-railLeft .abil-rail{flex-direction:row}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── НОВЫЕ настройки лаба (B1–B9) — выделены другим цветом (фиолетовый), чтобы сразу видеть ── */
+.panel .ctrl.is-new{position:relative;background:linear-gradient(180deg,rgba(141,93,255,.12),rgba(141,93,255,.04));
+  border:1px solid rgba(141,93,255,.3);border-radius:10px;padding:10px 12px;margin:6px 0}
+.panel .ctrl.is-new .ctrl-label{color:#c5b3ff}
+.panel .ctrl.is-new .seg button{border-color:rgba(141,93,255,.28)}
+.panel .ctrl.is-new .seg button.on{background:#8d5dff;border-color:#8d5dff;color:#fff;box-shadow:0 0 12px rgba(141,93,255,.5)}
+.panel .ctrl.is-new::after{content:'НОВОЕ';position:absolute;top:-7px;right:10px;font-size:8px;font-weight:900;letter-spacing:1px;
+  color:#fff;background:#8d5dff;padding:2px 6px;border-radius:6px}
+
+/* ── КРАТКАЯ СВОДКА карточки (попап A3) ── */
+.champ-card .d-brief{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px;backdrop-filter:blur(6px)}
+.champ-card .db-main{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}
+.champ-card .db-wr{display:flex;align-items:baseline;gap:6px}
+.champ-card .db-wr b{font-size:26px;font-family:var(--cf);line-height:1}
+.champ-card .db-wr span{font-size:11px;color:rgba(230,243,251,.5);font-weight:700}
+.champ-card .db-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#eaf6ff;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:5px 11px}
+.champ-card .db-chip i{font-style:normal;color:rgba(230,243,251,.45);font-size:10px}
+.champ-card .db-chip.good{color:#43e08a;border-color:rgba(67,224,138,.3)}
+.champ-card .db-chip.bad{color:#ff6b6b;border-color:rgba(255,107,107,.3)}
+.champ-card .db-chip.db-arch{color:rgba(230,243,251,.8)}
+.champ-card .db-chip.db-item img{width:20px;height:20px;border-radius:5px;object-fit:cover}
+.champ-card .db-wr .tr-up{color:#43e08a;font-style:normal;font-size:12px;font-weight:800}
+.champ-card .db-wr .tr-dn{color:#ff6b6b;font-style:normal;font-size:12px;font-weight:800}
+.champ-card .db-wr .tr-fl{color:rgba(255,255,255,.35);font-style:normal;font-size:12px}
+.champ-card .db-phases{display:flex;flex-direction:column;gap:3px;min-width:130px}
+.champ-card .db-ph{display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(230,243,251,.6)}
+.champ-card .db-ph span{flex:0 0 48px}
+.champ-card .db-ph i{flex:1;height:6px;border-radius:6px;background:linear-gradient(90deg,var(--accent),color-mix(in srgb,var(--accent) 40%,transparent))}
+.champ-card .db-sparkwrap{display:flex;flex-direction:column;gap:2px}
+.champ-card .db-sparkwrap span{font-size:9px;color:rgba(230,243,251,.5);font-weight:700}
+.champ-card .db-spark{width:88px;height:24px}
+.champ-card .db-radar{flex:0 0 auto;width:150px;margin:-10px -6px -16px 0}
+.champ-card .db-radar svg{width:100%;height:auto}
+.champ-card .d-btn.d-more{background:color-mix(in srgb,var(--accent) 24%,rgba(255,255,255,.06));border-color:color-mix(in srgb,var(--accent) 55%,transparent);color:#fff;font-weight:800}
+.champ-card .d-btn.d-more:hover{background:color-mix(in srgb,var(--accent) 38%,rgba(255,255,255,.08))}
+
+/* ══════════════════════════════════════════════════════════════════
+   СТРАНИЦА ЧЕМПА (по «Подробнее») — 2 раскладки + анимир. фон
+   ══════════════════════════════════════════════════════════════════ */
+.hr-overlay.champ-page-ov{align-items:flex-start;justify-content:center;padding:0;overflow-y:auto}
+.champ-page{position:relative;width:100%;min-height:100vh;background:linear-gradient(180deg,#010a13,#010a13)}
+.pg-bgwrap{position:fixed;inset:0;z-index:0;overflow:hidden}
+.pg-bg{position:absolute;inset:-4%;background-size:cover;background-position:center 18%;opacity:.5;transition:transform .2s ease-out}
+.pg-bg.kb{animation:pgKenBurns 26s ease-in-out infinite alternate}
+@keyframes pgKenBurns{0%{transform:scale(1.06) translate(0,0)}100%{transform:scale(1.16) translate(-2%,-3%)}}
+.pg-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(1,8,16,.55) 0%,rgba(1,8,16,.78) 55%,#010a13 100%)}
+.pg-inner{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:18px 26px 60px}
+.pg-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.pg-back{cursor:pointer;font-size:13px;font-weight:800;padding:9px 16px;border-radius:11px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#eaf6ff;backdrop-filter:blur(8px);transition:.14s}
+.pg-back:hover{background:rgba(255,255,255,.16)}
+.champ-page .d-close{position:static;width:38px;height:38px;border-radius:11px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font-size:16px;cursor:pointer;backdrop-filter:blur(8px)}
+
+/* шапка-личность (краткая сводка уехала влево-вверх) */
+.pg-head{display:flex;align-items:flex-start;gap:18px;padding:18px 20px;border-radius:18px;margin-bottom:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(14px) saturate(1.1);box-shadow:0 22px 60px rgba(0,0,0,.45)}
+.pg-portrait{width:96px;height:96px;border-radius:18px;object-fit:cover;flex:0 0 auto;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.pg-portrait.ic-circle{border-radius:50%}.pg-portrait.ic-squircle{border-radius:30px}
+.pg-head-main{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:8px}
+.pg-name{font-size:30px;font-weight:900;color:#fff;line-height:1}
+.pg-role{font-size:13px;color:rgba(230,243,251,.7);font-weight:700}
+.pg-head .d-brief{margin-top:2px}
+.pg-head-side{display:flex;flex-direction:column;gap:7px;flex:0 0 auto}
+.pg-link{cursor:pointer;text-align:center;font-size:12px;font-weight:800;padding:8px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#eaf6ff;text-decoration:none;transition:.14s}
+.pg-link:hover{background:rgba(255,255,255,.16)}
+.pg-link.guide{border-color:color-mix(in srgb,var(--accent) 55%,transparent);background:color-mix(in srgb,var(--accent) 20%,rgba(255,255,255,.06))}
+.pg-link.yt{border-color:rgba(255,0,0,.4)}.pg-link.tw{border-color:rgba(145,70,255,.5)}
+
+/* раскладки */
+.pg-2col{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;align-items:start}
+.pg-col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.pg-content{min-width:0}
+.pg-sec{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px 18px;backdrop-filter:blur(10px)}
+.pg-h{font-size:15px;font-weight:900;color:#fff;margin-bottom:13px;letter-spacing:.3px}
+
+/* вкладки (обычная раскладка) */
+.pg-tabbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.pg-tab{cursor:pointer;font-size:13px;font-weight:800;padding:10px 16px;border-radius:11px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:rgba(230,243,251,.72);backdrop-filter:blur(8px);transition:.15s}
+.pg-tab:hover{background:rgba(255,255,255,.12);color:#eaf6ff}
+.pg-tab.on{background:color-mix(in srgb,var(--accent) 22%,rgba(255,255,255,.06));border-color:color-mix(in srgb,var(--accent) 55%,transparent);color:#fff;box-shadow:0 4px 16px color-mix(in srgb,var(--accent) 28%,transparent)}
+.pg-tabbar.ts-underline{gap:2px;border-bottom:1px solid rgba(255,255,255,.1)}
+.pg-tabbar.ts-underline .pg-tab{background:none;border:none;border-radius:0;border-bottom:2px solid transparent;backdrop-filter:none}
+.pg-tabbar.ts-underline .pg-tab.on{background:none;box-shadow:none;border-bottom-color:var(--accent)}
+
+/* порядок прокачки */
+.pg-skill{display:flex;flex-direction:column;gap:10px}
+.sk-max{font-size:13px;color:rgba(230,243,251,.8)}.sk-max b{color:#fff;font-size:15px}
+.sk-row{display:flex;flex-wrap:wrap;gap:5px}
+.sk-dot{width:30px;height:30px;display:grid;place-items:center;border-radius:8px;font-size:11px;font-weight:800;color:#021;background:rgba(255,255,255,.2)}
+.sk-Q{background:#5aa9ff}.sk-W{background:#5ad17a}.sk-E{background:#f6c945}.sk-R{background:#ff6b6b;color:#fff}
+
+/* матчапы-контры */
+.pg-counters{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:12px}
+.pg-ct-l{font-size:12px;color:#ff9f43;font-weight:700;margin-right:4px}
+
+/* блок «Учиться» */
+.lrn-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.lrn-sub{font-size:12px;font-weight:800;color:rgba(230,243,251,.6);margin-bottom:9px;letter-spacing:.4px}
+.lrn-yt{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:2px 11px;text-decoration:none;margin-bottom:11px}
+.lrn-thumb{grid-row:1/3;width:92px;height:52px;border-radius:9px;background-size:cover;background-position:center 20%;display:grid;place-items:center;position:relative}
+.lrn-play{color:#fff;font-size:16px;text-shadow:0 2px 8px #000;background:rgba(0,0,0,.45);width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
+.lrn-yt-t{font-size:13px;font-weight:700;color:#eaf6ff;line-height:1.25;align-self:end}
+.lrn-yt-m{font-size:11px;color:rgba(230,243,251,.55)}
+.lrn-tw{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(145,70,255,.1);border:1px solid rgba(145,70,255,.28);text-decoration:none;margin-bottom:8px}
+.lrn-tw-ch{font-size:13px;font-weight:800;color:#eaf6ff}
+.lrn-live{font-size:11px;font-weight:800;color:#ff5b5b}
+.lrn-off{font-size:11px;color:rgba(230,243,251,.4)}
+.lrn-note{font-size:10px;color:rgba(230,243,251,.4);font-style:italic;margin-top:4px}
+
+@media (max-width:900px){ .pg-2col{grid-template-columns:1fr} .lrn-wrap{grid-template-columns:1fr} .pg-head{flex-wrap:wrap} .pg-head-side{flex-direction:row;width:100%} }
+
+/* ── ШАПКА-КАРТОЧКА страницы = god-tier (сплэш + 3D-наклон + параллакс) ── */
+.pg-herowrap{perspective:1600px;margin-bottom:18px;transition:transform .15s ease-out;transform-style:preserve-3d}
+.pg-hero{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.14);box-shadow:0 22px 60px rgba(0,0,0,.5)}
+.pg-hero.cglow{box-shadow:0 22px 60px rgba(0,0,0,.5),0 0 60px color-mix(in srgb,var(--accent) 26%,transparent)}
+.pg-hero .cd-bg{position:absolute;inset:0;background-size:cover;background-position:center 16%;opacity:.6;border-radius:inherit;transition:transform .18s ease-out}
+.pg-hero.cbg-parallax .cd-bg{transform:scale(1.1)}
+.pg-hero .cd-scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(1,8,16,.38),rgba(1,8,16,.82));border-radius:inherit;pointer-events:none}
+.pg-hero-in{position:relative;z-index:2;display:flex;align-items:flex-start;gap:18px;padding:22px}
+.pg-hero-side{display:flex;flex-direction:column;gap:7px;flex:0 0 auto}
+
+/* размещение кнопок страницы */
+.pg-topbar-btns{flex:1;display:flex;justify-content:center;gap:7px}
+.pg-actions{display:flex;flex-wrap:wrap;gap:7px}
+.pg-actions-under{display:flex;margin:-8px 0 18px}
+
+/* ── Умения без видео: раскладки «списком» и «компактно» (все умения сразу) ── */
+.abil-list,.abil-compact{display:flex;flex-direction:column;gap:12px}
+.abil-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:14px 16px}
+.abil-compact{gap:8px}
+.abil-compact .abil-card{padding:10px 13px}
+.abil-compact .ab-name{font-size:15px}
+.abil-compact .ab-desc{font-size:12px;line-height:1.4}
+.abil-compact .ab-vars{flex-direction:row;flex-wrap:wrap;gap:5px}
+.abil-compact .ab-var{padding:4px 9px}
+
+/* ── Модалка «Сравнить»: варианты кнопок ── */
+.cmp-wrap.cclose-left .d-close{left:12px;right:auto}
+.cmp-wrap.cclose-title .d-close{position:static;width:34px;height:34px}
+.cmp-wrap.cmp-rm-hover .ct-rm{opacity:0;transition:opacity .15s}
+.cmp-wrap.cmp-rm-hover .ct-colh:hover .ct-rm{opacity:1}
+.cmp-wrap.cmp-rm-off .ct-rm{display:none}
+.ct-add-bar{flex:0 0 auto;flex-direction:row;align-self:center;gap:6px;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:800;color:var(--accent)}
+.cmp-addbar{display:flex;justify-content:center;padding:14px 0 2px}
+.cmp-wrap.cmp-btn-icon .ct-add i{display:none}
+
+/* ── Раскладка «Карточка слева» (sidebar): карточка sticky слева + данные в 2 колонки ── */
+.pg-shell{display:grid;grid-template-columns:330px 1fr;gap:18px;align-items:start}
+.pg-side{position:sticky;top:14px}
+.pg-side .pg-herowrap{margin-bottom:0}
+.pg-side .pg-hero-in{flex-direction:column;align-items:stretch;gap:13px;padding:18px}
+.pg-side .pg-portrait{width:84px;height:84px}
+.pg-side .pg-hero-side{flex-direction:column}
+.pg-side .pg-link{text-align:center}
+.pg-data{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;min-width:0}
+@media(max-width:1050px){ .pg-shell{grid-template-columns:1fr} .pg-side{position:static} .pg-data{grid-template-columns:1fr} .pg-side .pg-hero-in{flex-direction:row;align-items:flex-start} }
+
+/* ══ ПЛАВАЮЩАЯ панель настроек: поверх ВСЕХ оверлеев, сворачиваемая (память состояния) ══ */
+.panel{position:fixed;top:0;right:0;bottom:0;width:374px;max-width:92vw;height:auto;max-height:100vh;z-index:100001;
+  border-radius:16px 0 0 16px;transition:transform .26s cubic-bezier(.2,.8,.25,1);box-shadow:-14px 0 50px rgba(0,0,0,.55)}
+body.panel-hidden .panel{transform:translateX(102%)}
+.panel-hd{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;gap:10px;
+  background:rgba(1,13,24,.94);backdrop-filter:blur(8px);padding:8px 2px 10px;margin:0 0 6px;z-index:3;border-bottom:1px solid rgba(11,196,227,.12)}
+.panel-hd b{font-size:13px;font-weight:800;color:#eaf6ff}
+.panel-x{width:30px;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#eaf6ff;font-size:14px;cursor:pointer;transition:.14s}
+.panel-x:hover{background:rgba(255,80,90,.2);border-color:rgba(255,120,128,.4)}
+#panelGear{position:fixed;right:16px;bottom:16px;z-index:100002;width:50px;height:50px;border-radius:14px;
+  border:1px solid rgba(11,196,227,.45);background:rgba(8,20,30,.9);color:#eaf6ff;font-size:21px;cursor:pointer;
+  display:grid;place-items:center;backdrop-filter:blur(10px);box-shadow:0 8px 26px rgba(0,0,0,.5);transition:.15s}
+#panelGear:hover{background:rgba(11,196,227,.22);transform:scale(1.06)}

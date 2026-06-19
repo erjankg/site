@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Песочница — Чат</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="stylesheet" href="chat-lab.css?v=5">
+</head>
+<body>
+  <header class="lab-top">
+    <div class="lab-top-title">
+      <span class="lab-logo">💬</span>
+      <div>
+        <div class="lab-h1">Чат — песочница</div>
+        <div class="lab-sub">По каждому пункту сверху — несколько вариантов. Рабочее: пиши/отправляй (Enter); наведи на сообщение → 😊 реакция и ↩ ответить (реакции-чипы кликаются, ответ цепляется цитатой); клик по юзеру → профиль (роль/ранг/ссылка) + «Упомянуть» (засветит 💬 в рельсе слева); 📎 — кинуть «кнопку-ссылку» (чемп/матчапы/тир-лист/сборка/предмет/фото). Сплэш-арт и силу стекла на боевом задаёт ГЛОБАЛЬНАЯ юзер-панель главного окна — тут для превью.</div>
+      </div>
+    </div>
+    <div class="lab-top-btns">
+      <div id="labTools"></div>
+      <button id="toggleBtn" class="lab-toggle">▲ Свернуть настройки</button>
+      <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
+    </div>
+  </header>
+
+  <section class="settings" id="settings"><!-- дизайн-полоса генерится в JS --></section>
+
+  <main class="lab-main">
+    <div class="chat-stage" id="stage"><!-- чат рендерится сюда --></div>
+  </main>
+
+  <footer class="lab-foot">
+    Выбери по каждому пункту вариант → потом скажешь <b>«этот»</b>, и я зафиксирую (/finalize) и перенесу в боевой.
+  </footer>
+
+  <script src="../lab-settings.js"></script>
+  <script src="chat-lab.js?v=5"></script>
+</body>
+</html>

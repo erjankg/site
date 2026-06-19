@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Песочница — Карточка предмета / Сборка</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="preconnect" href="https://www.wildriftfire.com">
+<link rel="stylesheet" href="item-card-lab.css?v=9">
+</head>
+<body>
+  <div class="lab-bg" id="labBg"></div>
+
+  <header class="lab-top">
+    <div class="lab-top-title">
+      <span class="lab-logo">🛡</span>
+      <div>
+        <div class="lab-h1">Пикер предметов/рун → карточка — песочница</div>
+        <div class="lab-sub">Сетка иконок (⚙ размер) → клик открывает карточку с 3 вкладками. Дефолтное стекло, фон главного экрана за ним. Сверху — настройки для нас.</div>
+      </div>
+    </div>
+    <div class="lab-top-btns">
+      <div id="labTools"></div>
+      <button id="toggleBtn" class="lab-toggle">▲ Свернуть настройки</button>
+      <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
+    </div>
+  </header>
+
+  <section class="settings" id="settings"><!-- дизайн-полоса лаба генерится в JS --></section>
+
+  <main class="lab-main">
+    <section class="stage" id="stage">
+      <div class="stage-inner" id="stageInner"><!-- карточка / сборка рендерится сюда --></div>
+    </section>
+  </main>
+
+  <script src="../lab-settings.js"></script>
+  <script src="item-card-lab.js?v=9"></script>
+</body>
+</html>

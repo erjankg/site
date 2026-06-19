@@ -155,7 +155,8 @@ body.yt-min .settings{display:none}
 }
 .vid-block::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit;
   background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,0) 40%);}
-.vb-head,.vb-filters,.vid-block .vb-grid{position:relative;z-index:1}
+.vb-head{position:relative;z-index:5}
+.vb-filters,.vid-block .vb-grid{position:relative;z-index:1}
 .vb-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .vb-title{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:900;color:#dff2fb}
 .vb-title .yt-mark{
@@ -267,11 +268,28 @@ body.yt-min .settings{display:none}
 .vhover-cta{align-self:flex-start;font-size:12px;font-weight:800;color:#fff;
   background:#ff2d2d;border-radius:8px;padding:6px 13px;box-shadow:0 3px 14px rgba(255,45,45,.5)}
 
-/* ── бейдж языка ── */
+/* ── бейдж языка / матчапа ── */
 .badge-lang{background:rgba(var(--hi),.16);border:1px solid rgba(var(--hi),.32);color:#fff;font-weight:800}
+.badge-vs{background:rgba(231,76,60,.16);border:1px solid rgba(231,76,60,.42);color:#ff9d92}
 
-/* ── канал-реупа под именем игрока ── */
+/* ── ранг / PRO рядом с именем ── */
+.vrank{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;
+  color:#ffd766;background:rgba(255,207,77,.14);border:1px solid rgba(255,207,77,.42);
+  border-radius:5px;padding:2px 6px;margin-left:7px;vertical-align:middle}
+.vrank.is-pro{color:#ffe08a;background:rgba(255,207,77,.22);box-shadow:0 0 10px rgba(255,207,77,.35)}
+
+/* ── канал-реупа + оригинал под именем игрока ── */
 .vchan{display:block;font-size:10.5px;font-weight:600;color:rgba(230,243,251,.42);margin-top:3px}
+.vreup{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:#ffb3a8;
+  background:rgba(231,76,60,.16);border:1px solid rgba(231,76,60,.36);border-radius:4px;padding:1px 5px;margin-left:3px}
+.vorig{color:#9fe3f5;text-decoration:none;font-weight:700}
+.vorig:hover{text-decoration:underline}
+
+/* ── таймкоды (клик → видео с момента) ── */
+.vstamps{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.vstamp{font-size:10.5px;font-weight:700;color:#dff2fb;cursor:pointer;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:3px 8px;transition:.14s}
+.vstamp:hover{background:rgba(var(--hi),.16);border-color:rgba(var(--hi),.5);color:#fff;transform:translateY(-1px)}
 
 /* ── фильтр-чипы ── */
 .vb-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
@@ -283,6 +301,8 @@ body.yt-min .settings{display:none}
 .fchip:hover{background:rgba(var(--hi),.12);border-color:rgba(var(--hi),.4)}
 .fchip.on{background:rgba(var(--hi),.18);border-color:rgba(var(--hi),.7);color:#fff;box-shadow:0 0 0 1px rgba(var(--hi),.4)}
 .fchip-sep{width:1px;height:20px;background:rgba(255,255,255,.16);margin:0 4px}
+.fchip-sel{font-family:inherit;appearance:auto}
+.fchip-sel option{background:#011520;color:#e6f3fb}
 
 /* ── Раскладка A: ряд карточек ── */
 .lay-row .vb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--gap)}

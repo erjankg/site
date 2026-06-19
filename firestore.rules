@@ -116,21 +116,33 @@ service cloud.firestore {
     match /globalChat/{msgId} {
       allow read: if true;
 
-      // Писать можно только от своего имени, с лимитом длины и без подделки админа
+      // Писать можно только от своего имени, с лимитом длины и без подделки админа.
+      // Текст может быть пустым, ЕСЛИ есть вложение-карточка (card). Доп. опц. поля:
+      // replyTo (ответ-цитата), card (кнопка-ссылка), mentions (теги), reactions.
       allow create: if request.auth != null
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.text is string
-        && request.resource.data.text.size() > 0
         && request.resource.data.text.size() <= 1000
+        && (request.resource.data.text.size() > 0 || ('card' in request.resource.data.keys()))
         && request.resource.data.name is string
         && request.resource.data.name.size() <= 100
         && (!('photoURL' in request.resource.data.keys()) || request.resource.data.photoURL is string)
+        && (!('replyTo' in request.resource.data.keys()) || request.resource.data.replyTo is map)
+        && (!('card' in request.resource.data.keys()) || request.resource.data.card is map)
+        && (!('mentions' in request.resource.data.keys()) || request.resource.data.mentions is list)
+        && (!('reactions' in request.resource.data.keys()) || request.resource.data.reactions is map)
         && (
           !('isAdmin' in request.resource.data.keys())
           || request.resource.data.isAdmin == false
           || (request.resource.data.isAdmin == true && request.auth.uid == adminUid())
         )
-        && request.resource.data.keys().hasOnly(['text','name','uid','photoURL','isAdmin','ts','isSystem']);
+        && request.resource.data.keys().hasOnly(['text','name','uid','photoURL','isAdmin','ts','isSystem','replyTo','card','mentions','reactions']);
+
+      // Обновлять можно ТОЛЬКО поле reactions (поставить/снять свою реакцию),
+      // не трогая текст/автора. Защищает от подмены чужого сообщения.
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions'])
+        && (request.resource.data.reactions is map);
 
       // Удалять — только админ
       allow delete: if isAdmin();

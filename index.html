@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <!-- CSP: ограничиваем источники скриптов/стилей/коннектов. unsafe-inline нужен из-за inline onclick= в HTML и inline стилей. -->
     <!-- TODO security: убрать 'unsafe-inline' из script-src — перевести inline onclick= на addEventListener (крупный рефактор), тогда CSP станет полноценной защитой от XSS. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src * data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://www.gstatic.com wss://*.firebaseio.com; frame-src https://*.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src * data: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firebasestorage.googleapis.com https://docs.google.com https://*.googleusercontent.com https://www.gstatic.com wss://*.firebaseio.com; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'self'">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Wild Rift Stats — Статы чемпионов, драфтер, винрейты, руны, предметы</title>
@@ -148,9 +148,16 @@
             <span></span><span></span><span></span>
         </button>
         <div id="headerCenter">
-            <button id="viewBtnMain" class="header-view-btn active" data-cms-inline="misc.viewBtnMain" onclick="switchMainView('main')">Stats</button>
             <div class="logo"><a id="nickname" href="#" data-cms-inline="misc.headerTitle" aria-label="PRO-WILDRIFT">PRO-WILDRIFT</a></div>
-            <button id="viewBtnWrpr" class="header-view-btn" data-cms-inline="misc.viewBtnWrpr" onclick="switchMainView('wrpr')">WinRate</button>
+            <nav class="f-nav" id="viewTabs">
+                <button id="viewBtnMain" class="f-tab active" data-view="main" data-cms-inline="misc.viewBtnMain" onclick="switchMainView('main')">Статы</button>
+                <button id="viewBtnWrpr" class="f-tab" data-view="wrpr" data-cms-inline="misc.viewBtnWrpr" onclick="switchMainView('wrpr')">WinRate</button>
+                <button class="f-tab" data-view="hub" onclick="switchMainView('hub')">Мета-хаб</button>
+                <button class="f-tab" data-view="tier" onclick="switchMainView('tier')">Тир-лист</button>
+                <button class="f-tab" data-view="patch" onclick="switchMainView('patch')">Патч</button>
+                <button class="f-tab" data-view="tactics" onclick="switchMainView('tactics')">Тактич</button>
+                <span class="f-ind"></span>
+            </nav>
         </div>
         <div class="lang-wrapper" id="langWrapper">
             <button class="lang-btn" id="langBtn" onclick="openLangDropdown(event)" aria-label="Switch language" title="RU / EN">
@@ -171,6 +178,7 @@
             <div id="userMenuEmail" class="user-menu-email auth-only-row"></div>
             <button class="user-menu-item guest-only" onclick="closeUserMenuAndLogin()" style="display:none" data-i18n="🔑 Войти через Google">🔑 Войти через Google</button>
             <button class="user-menu-item" onclick="closeUserMenuAndOpen('profile')" data-i18n="👤 Мой профиль">👤 Мой профиль</button>
+            <button class="user-menu-item" onclick="if(window.openDisplaySettings)openDisplaySettings()" data-i18n="⚙ Настройки">⚙ Настройки</button>
             <button class="user-menu-item" onclick="syncNow()" data-i18n="🔄 Синхронизировать">🔄 Синхронизировать</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenChangelog)cmsOpenChangelog()" style="display:none" data-i18n="📋 История изменений">📋 История изменений</button>
             <button class="user-menu-item admin-only" onclick="if(window.cmsOpenLayoutEditor)cmsOpenLayoutEditor()" style="display:none" data-i18n="⚙ Настройки лейаута">⚙ Настройки лейаута</button>
@@ -190,9 +198,7 @@
             <span class="patch-badge" data-cms-inline="misc.patchBadge">Patch 7.0f</span>
             <button class="lvl-col-cfg-btn" onclick="openStatsColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button>
         </div>
-        <div class="slider-wrapper">
-            <input type="range" id="lvlRange" min="1" max="15" value="10"
-                oninput="document.getElementById('lvlLabel').textContent=this.value;">
+        <div class="lvl-chips-wrap">
             <div class="ruler" id="ruler"></div>
         </div>
     </div>
@@ -277,99 +283,9 @@
       <button class="btn-close-x" onclick="closeCalc()">←</button>
       <span class="mhdr-t" data-i18n="⚔ Калькулятор урона">⚔ Калькулятор урона</span>
     </div>
-    <div style="flex:1;overflow-y:auto;padding:16px;min-height:0;">
-    <div class="calc-grid-v2">
-
-      <!-- ══ COL 1: МОЙ ЧЕМПИОН ══ -->
-      <div class="calc-panel calc-panel--my">
-        <div class="calc-panel-label calc-panel-label--my" data-i18n="🟢 МОЙ ЧЕМПИОН">🟢 МОЙ ЧЕМПИОН</div>
-        <div id="calcMyBadge" class="calc-badge calc-badge--my">
-          <img id="calcMyIcon" class="calc-badge-icon" src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png">
-          <span id="calcMyName" class="calc-badge-name">🪆 Манекен</span>
-          <button onclick="openChampPicker('🟢 Мой чемпион',window._calcPickMy)" title="Сменить чемпиона" data-i18n="Сменить чемпиона" data-i18n-attr="title" class="btn-swap">⇄</button>
-        </div>
-        <div id="calcMyLvlWrap" style="display:none;">
-          <div class="calc-lvl-row">
-            <span class="calc-lvl-lbl" data-i18n="УРОВЕНЬ">УРОВЕНЬ</span>
-            <span id="calcMyLvlNum" class="calc-lvl-num-v2"></span>
-          </div>
-          <input type="range" id="calcMyLvlSlider" min="1" max="15" value="1" class="calc-slider" oninput="calcMyLvlChange()">
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div class="calc-stat-row">
-            <span class="calc-stat-lbl-v2">AD</span>
-            <input type="number" id="cMyAD" placeholder="100" value="100" min="0" class="calc-input calc-input-v2 calc-input--my" oninput="calcRun()">
-            <span class="calc-plus calc-plus--my">+</span>
-            <input type="number" id="cMyADBonus" placeholder="0" min="0" class="calc-input calc-input-v2 calc-input--my calc-input--bonus" oninput="calcRun()">
-          </div>
-          <div class="calc-stat-row">
-            <span class="calc-stat-lbl-v2" data-i18n="% Проб.">% Проб.</span>
-            <input type="number" id="cMyPen" placeholder="0" min="0" max="100" class="calc-input calc-input-v2 calc-input--my" oninput="clampInput(this);calcRun()">
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ COL 2: ЦЕЛЬ ══ -->
-      <div class="calc-panel calc-panel--tgt">
-        <div class="calc-panel-label calc-panel-label--tgt" data-i18n="🔴 ЦЕЛЬ">🔴 ЦЕЛЬ</div>
-        <div id="calcTgtBadge" class="calc-badge calc-badge--tgt">
-          <img id="calcTgtIcon" class="calc-badge-icon" src="https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Sion.png">
-          <span id="calcTgtName" class="calc-badge-name">🪆 Манекен</span>
-          <button onclick="openChampPicker('🔴 Цель',window._calcPickTgt)" title="Сменить чемпиона" data-i18n="Сменить чемпиона" data-i18n-attr="title" class="btn-swap">⇄</button>
-        </div>
-        <div id="calcTgtLvlWrap" style="display:none;">
-          <div class="calc-lvl-row">
-            <span class="calc-lvl-lbl" data-i18n="УРОВЕНЬ">УРОВЕНЬ</span>
-            <span id="calcTgtLvlNum" class="calc-lvl-num-v2"></span>
-          </div>
-          <input type="range" id="calcTgtLvlSlider" min="1" max="15" value="1" class="calc-slider" oninput="calcTgtLvlChange()">
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div class="calc-stat-row">
-            <span class="calc-stat-lbl-v2" data-i18n="Броня">Броня</span>
-            <input type="number" id="cTgtArmor" placeholder="100" value="100" min="0" class="calc-input calc-input-v2 calc-input--tgt" oninput="calcRun()">
-            <span class="calc-plus calc-plus--tgt">+</span>
-            <input type="number" id="cTgtArmorBonus" placeholder="0" min="0" class="calc-input calc-input-v2 calc-input--tgt calc-input--bonus" oninput="calcRun()">
-          </div>
-          <div class="calc-stat-row">
-            <span class="calc-stat-lbl-v2">HP</span>
-            <input type="number" id="cTgtHpMax" placeholder="2000" value="2000" min="0" class="calc-input calc-input-v2 calc-input--tgt" oninput="calcRun()">
-            <span class="calc-plus calc-plus--tgt">+</span>
-            <input type="number" id="cTgtHpBonus" placeholder="0" min="0" class="calc-input calc-input-v2 calc-input--tgt calc-input--bonus" oninput="calcRun()">
-          </div>
-          <div class="calc-stat-row">
-            <span class="calc-stat-lbl-v2" data-i18n="Тек. HP">Тек. HP</span>
-            <input type="number" id="cTgtHpCur" placeholder="2000" value="2000" min="0" class="calc-input calc-input-v2 calc-input--tgt" oninput="calcRun()">
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ COL 3: РЕЗУЛЬТАТ ══ -->
-      <div id="calcRes" class="calc-panel calc-panel--result" style="display:none;">
-        <div class="calc-panel-label calc-panel-label--result" data-i18n="📊 РЕЗУЛЬТАТ">📊 РЕЗУЛЬТАТ</div>
-        <div class="calc-res-stat">
-          <div class="calc-res-stat-lbl" data-i18n="Эфф. броня">Эфф. броня</div>
-          <div class="calc-res-stat-val" id="rEff" style="color:#5dade2;">—</div>
-        </div>
-        <div class="calc-res-stat">
-          <div class="calc-res-stat-lbl" data-i18n="Снижение урона">Снижение урона</div>
-          <div class="calc-res-stat-val" id="rMit" style="color:#ff3b5c;">—</div>
-        </div>
-        <div class="calc-dmg-box">
-          <div class="calc-dmg-lbl" data-i18n="✅ Нанесено урона">✅ Нанесено урона</div>
-          <div class="calc-dmg-val" id="rDmg">—</div>
-        </div>
-        <div id="rHpBar" style="display:none;margin-top:8px;">
-          <div class="calc-hp-bar-v2">
-            <div id="rHpFill" class="calc-hp-fill-v2" style="width:0%;"></div>
-          </div>
-          <div id="rHpPct" class="calc-hp-pct-v2"></div>
-        </div>
-        <div id="rFormula" class="calc-formula-v2"></div>
-      </div>
-
-    </div><!-- /grid -->
-    </div><!-- /scroll -->
+    <!-- НОВЫЙ калькулятор (изолированный модуль calc-app/) — порт из lab-damage-calc 2026-06-16 -->
+    <iframe id="calcFrame" title="Калькулятор урона" loading="lazy"
+      style="flex:1;width:100%;border:0;min-height:0;background:#010A13;display:block;"></iframe>
   </div>
 </div>
 
@@ -565,8 +481,6 @@ Stormarrow: При максимальных зарядах следующая б
   <button class="side-btn" onclick="sidebarOpen('runes')"><span class="side-icon">💎</span>Руны</button>
   <button class="side-btn side-btn-draft" onclick="sidebarOpen('draft')"><span class="side-icon">📋</span>Драфт-помощник</button>
   <button class="side-btn side-btn-coop" onclick="sidebarOpen('draftCoop')"><span class="side-icon">🎯</span>Драфт (серии)</button>
-  <button class="side-btn side-btn-tier" onclick="sidebarOpen('tierMenu')"><span class="side-icon">🏆</span>Тир-лист</button>
-  <a class="side-btn side-btn-tactics" href="tactics-board/" style="text-decoration:none;display:flex;align-items:center;"><span class="side-icon">🗺</span>Тактическая доска<span style="margin-left:auto;font-size:9px;font-weight:900;padding:2px 6px;border-radius:5px;background:#C89B3C;color:#010A13;letter-spacing:1.2px;">BETA</span></a>
 
   <button class="side-btn admin-only" id="sideBtnCategories" onclick="if(window.cmsOpenCategoriesEditor)cmsOpenCategoriesEditor()" style="display:none"><span class="side-icon">🏷</span>Категории</button>
 
@@ -1149,7 +1063,9 @@ Stormarrow: При максимальных зарядах следующая б
           <div class="sk-stack"><span class="sk sk-line sk-w-25 sk-h-sm"></span><span class="sk sk-line sk-w-50"></span></div>
         </div>
       </div>
+      <div id="chatReplyBar" class="chat-reply-bar" style="display:none;"></div>
       <div id="chatInputArea" class="chat-input-row" style="display:none;">
+        <button class="chat-attach" onclick="openChatAttach(event)" title="Прикрепить кнопку-ссылку" aria-label="Прикрепить">📎</button>
         <input class="chat-input" id="chatInput" type="text" placeholder="Написать сообщение..." data-i18n="Написать сообщение..." data-i18n-attr="placeholder" maxlength="300" onkeydown="if(event.key==='Enter')tgSendMsg()">
         <button class="chat-send" onclick="tgSendMsg()">➤</button>
       </div>

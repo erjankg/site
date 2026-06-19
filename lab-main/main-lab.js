@@ -63,6 +63,10 @@
       {v:'warm',    t:'Тёплое'},
       {v:'cool',    t:'Холодное'},
     ]},
+    // ── Уникальные настройки видео-блока (перенос из lab-youtube) — в пульте хозяина ──
+    ytTitle:{label:'🎬 Видео · название', val:'on', items:[{v:'on',t:'Показывать'},{v:'off',t:'Скрыть'}]},
+    ytMarkOld:{label:'🎬 Видео · старые патчи', val:'on', items:[{v:'on',t:'Глушить'},{v:'off',t:'Норм'}]},
+    ytSort:{label:'🎬 Видео · сортировка', val:'on', items:[{v:'on',t:'Свежие сверху'},{v:'off',t:'Как есть'}]},
   };
 
   /* Пользовательские настройки — ВНУТРИ «Мой профиль → Настройки» (на боевом — настройка юзера) */
@@ -184,6 +188,7 @@
     bg1:'#04121f', bg2:'#01070e', bgpos:60, bgang:160,
     wrpull:80, rightpanel:true, winloss:true, wrtrend:false,
     glass:true, glasspow:'mid', glasstint:'neutral', glasssat:'norm', glassborder:'thin', glassnoise:false, parallax:false, splashart:'lux',
+    ytTitle:'on', ytMarkOld:'on', ytSort:'on',   // уникальные настройки видео-блока (перенос из lab-youtube) — в пульте хозяина
   };
 
   const $ = s => document.querySelector(s);
@@ -246,7 +251,7 @@
           S[key] = b.dataset.v;
           seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
           applyAttrs();
-          if(key==='level') renderCentral();
+          if(['level','ytTitle','ytMarkOld','ytSort'].includes(key)) renderCentral();
           if(['anim','hover','tbl','density'].includes(key)) replay();
         };
       });
@@ -367,6 +372,7 @@
     if(S.view==='stats'){ if(S.level==='chipdrag') wireChipdrag(); wireHeaders(); }
     if(S.view==='tier'){ initTierSortable(); wireTierControls(); }
     if(S.view==='patch') wirePatch();
+    if(S.view==='hub') ytWire(box);
     applyWR();
     positionIndicator();
     if(['stats','wrpr','patch'].includes(S.view)) replay(); else frame.classList.remove('anim-run');
@@ -447,6 +453,73 @@
   }
   const wrCls = v => !S.winloss ? 'wr-n' : (v>=50?'wr-g':'wr-b');
 
+  /* ── Видео сильных игроков — ПОРТ из lab-youtube (раскладка feat). Демо-данные. ── */
+  const YT_VIDEOS=[
+    {uid:'v1',player:'KKM',role:'top',vs:'Гарен',patch:'5.2',lang:'cn',rank:'Rank 1',channel:'WR China Replays',reupload:true,originalUrl:'https://www.bilibili.com/',id:'yCm6Jk0Bcww',title:'Challenger катка — идеальное комбо',dur:'24:10',stamps:[{t:'2:15',label:'старт линии'},{t:'8:40',label:'тимфайт'}]},
+    {uid:'v2',player:'Long',role:'top',vs:'Дариус',patch:'5.2',lang:'cn',rank:'Challenger',channel:'Rift Highlights',reupload:true,originalUrl:'https://www.bilibili.com/',id:'yCm6Jk0Bcww',title:'Карри игра, разбор тимфайтов',dur:'31:48'},
+    {uid:'v3',player:'Shadow',role:'top',vs:'Гарен',patch:'5.2',lang:'en',rank:'Challenger',channel:'Challenger Plays',id:'yCm6Jk0Bcww',title:'Riven vs Garen — доминация на линии',dur:'17:22'},
+    {uid:'v4',player:'Нагибатор',role:'top',vs:'Камилла',patch:'5.2',lang:'ru',rank:'PRO',channel:'НагибаторWR',id:'yCm6Jk0Bcww',title:'Как карри на Ривен — гайд по комбо',dur:'22:05'},
+    {uid:'v5',player:'Yuuki',role:'top',vs:'Гарен',patch:'5.1',lang:'en',channel:'ProGuides',id:'yCm6Jk0Bcww',title:'Агрессивный старт против Гарена',dur:'19:02'},
+    {uid:'v6',player:'GerSe',role:'top',vs:'Дариус',patch:'5.0',lang:'ru',channel:'WR Гайды РУ',id:'yCm6Jk0Bcww',title:'Старая катка — для истории',dur:'27:33'}
+  ];
+  const YT_ROLE={top:'Топ',jng:'Лес',mid:'Мид',adc:'АДК',sup:'Сап'}, YT_LANG={ru:'RU',en:'EN',cn:'CN'}, YT_CUR='5.2';
+  let YT_SAVED=new Set(), YT_F={lang:'all',vs:'all',saved:false};
+  function ytPatchNum(p){const a=String(p).split('.').map(n=>parseInt(n,10)||0);return a[0]*100+(a[1]||0);}
+  function ytOld(p){return ytPatchNum(p)<ytPatchNum(YT_CUR);}
+  function ytThumb(id){return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;}
+  function ytInit(n){return (n||'?').trim().charAt(0).toUpperCase();}
+  function ytSec(t){const p=String(t).split(':').map(n=>parseInt(n,10)||0);return p.length===2?p[0]*60+p[1]:p[0];}
+  function ytCard(v,opts={}){
+    const old=(S.ytMarkOld==='on')&&ytOld(v.patch),saved=YT_SAVED.has(v.uid);
+    const roleB=`<span class="badge badge-role r-${v.role}">${YT_ROLE[v.role]||v.role}</span>`;
+    const langB=v.lang?`<span class="badge badge-lang">${YT_LANG[v.lang]||v.lang}</span>`:'';
+    const vsB=v.vs?`<span class="badge badge-vs">vs ${v.vs}</span>`:'';
+    const patchB=`<span class="badge badge-patch">патч ${v.patch}</span>`;
+    const oldB=old?`<span class="badge badge-old">старый патч</span>`:'';
+    const rankB=v.rank?`<span class="vrank ${v.rank==='PRO'?'is-pro':''}">${v.rank}</span>`:'';
+    const titleH=(S.ytTitle==='on'&&v.title&&!opts.noTitle)?`<div class="vtitle">${v.title}</div>`:'';
+    const sub=opts.bigName?`<small>${YT_ROLE[v.role]||''}</small>`:'';
+    const reup=v.reupload?` <span class="vreup">реупа</span>`:'';
+    const orig=v.originalUrl?` · <a class="vorig" href="${v.originalUrl}" target="_blank" rel="noopener">оригинал ↗</a>`:'';
+    const chan=v.channel?`<span class="vchan">залил: ${v.channel}${reup}${orig}</span>`:'';
+    const stamps=(v.stamps&&v.stamps.length)?`<div class="vstamps">${v.stamps.map(s=>`<button class="vstamp" data-vid="${v.id}" data-sec="${ytSec(s.t)}">▸ ${s.t} ${s.label}</button>`).join('')}</div>`:'';
+    return `<article class="vcard ${old?'is-old':''}" data-id="${v.id}" data-uid="${v.uid}">
+      <div class="vthumb"><img src="${ytThumb(v.id)}" alt="${v.player}" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${v.id}/0.jpg'">
+        <button class="vsave ${saved?'on':''}" data-save="${v.uid}" title="Сохранить">★</button>
+        <span class="vdur">${v.dur||''}</span><div class="vplay"><div class="pbtn"></div></div>
+        <div class="vhover"><div class="vhover-title">${v.title||v.player}</div><span class="vhover-cta">▶ Смотреть</span></div></div>
+      <div class="vmeta"><div class="vplayer"><span class="vavatar">${ytInit(v.player)}</span>
+        <span class="vname">${v.player}${rankB}${sub}${chan}</span></div>${titleH}
+        <div class="vbadges">${roleB}${langB}${vsB}${patchB}${oldB}</div>${stamps}</div></article>`;
+  }
+  function ytFiltered(){let l=YT_VIDEOS.slice();
+    if(YT_F.lang!=='all')l=l.filter(v=>v.lang===YT_F.lang);
+    if(YT_F.vs!=='all')l=l.filter(v=>v.vs===YT_F.vs);
+    if(YT_F.saved)l=l.filter(v=>YT_SAVED.has(v.uid));
+    if(S.ytSort==='on')l.sort((a,b)=>ytPatchNum(b.patch)-ytPatchNum(a.patch));
+    return l;}
+  function ytHtml(){
+    const list=ytFiltered();
+    const langChips=[{k:'all',t:'Все'},{k:'ru',t:'RU'},{k:'en',t:'EN'},{k:'cn',t:'CN'}];
+    const vsList=[...new Set(YT_VIDEOS.map(v=>v.vs).filter(Boolean))];
+    const head=`<div class="vb-head"><div><div class="vb-title"><span class="yt-mark">▶</span> Видео сильных игроков</div><div class="vb-sub">катки топ-игроков · гайды</div></div></div>`;
+    const filters=`<div class="vb-filters">${langChips.map(c=>`<button class="fchip ${YT_F.lang===c.k?'on':''}" data-flang="${c.k}">${c.t}</button>`).join('')}<span class="fchip-sep"></span><select class="fchip fchip-sel" id="ytVs"><option value="all">vs: все</option>${vsList.map(x=>`<option value="${x}" ${YT_F.vs===x?'selected':''}>vs ${x}</option>`).join('')}</select><span class="fchip-sep"></span><button class="fchip ${YT_F.saved?'on':''}" data-fsaved>★ Сохранённые</button></div>`;
+    let grid;
+    if(!list.length){grid=`<div class="yt-empty">Ничего не найдено по фильтрам.</div>`;}
+    else{const [first,...rest]=list;grid=`<div class="vb-grid"><div class="feat">${ytCard(first,{bigName:true})}</div><div class="vb-side">${rest.map(v=>ytCard(v,{noTitle:true})).join('')}</div></div>`;}
+    return `<div class="yt-block lay-feat">${head}${filters}${grid}</div>`;
+  }
+  function ytWire(root){
+    function play(card,id,sec){const t=card.querySelector('.vthumb');t.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0${sec?'&start='+sec:''}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;card.classList.add('playing');}
+    root.querySelectorAll('.yt-block .vcard').forEach(card=>card.addEventListener('click',e=>{if(e.target.closest('.vsave')||e.target.closest('.vstamp')||e.target.closest('.vorig'))return;if(card.classList.contains('playing'))return;play(card,card.dataset.id);}));
+    root.querySelectorAll('.yt-block .vstamp').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();play(b.closest('.vcard'),b.dataset.vid,b.dataset.sec);}));
+    root.querySelectorAll('.yt-block .vsave').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const u=btn.dataset.save;if(YT_SAVED.has(u))YT_SAVED.delete(u);else YT_SAVED.add(u);btn.classList.toggle('on');if(YT_F.saved)ytRerender(root);}));
+    root.querySelectorAll('.yt-block [data-flang]').forEach(c=>c.addEventListener('click',()=>{YT_F.lang=c.dataset.flang;ytRerender(root);}));
+    const vs=root.querySelector('#ytVs');if(vs)vs.addEventListener('change',e=>{YT_F.vs=e.target.value;ytRerender(root);});
+    const fs=root.querySelector('[data-fsaved]');if(fs)fs.addEventListener('click',()=>{YT_F.saved=!YT_F.saved;ytRerender(root);});
+  }
+  function ytRerender(root){const wrap=root.querySelector('.yt-block');if(!wrap)return;const n=document.createElement('div');n.innerHTML=ytHtml();wrap.replaceWith(n.firstElementChild);ytWire(root);}
+
   function hubView(){
     const hero=ch('Garen');
     const top5=[...CH].sort((a,b)=>b.wr-a.wr).slice(0,5);
@@ -469,7 +542,8 @@
         <div class="hub-card"><h4>📰 Что нового <span class="pill">Patch 7.0f</span></h4><ul class="hc-news"><li>🟢 <b>Garen</b> усилен — Q +8%</li><li>🔴 <b>Camille</b> ослаблена — щит −10%</li><li>✦ Добавлен <b>Ambessa</b></li><li>⚙ Реворк «Кровожадника»</li></ul></div>
         <div class="hub-card"><h4>🛠 Лучшие сборки патча</h4>${[ch('Garen'),ch('Ahri')].map(c=>`<div class="hc-build">${port(c)}<b>${c.n}</b><span class="hc-items">🗡 🛡 ⚔ 👢</span></div>`).join('')}</div>
       </div>
-      <div class="hub-tools">${tools.map(t=>`<div class="hub-tool"><div class="ti">${t[0]}</div><div class="tn">${t[1]}</div></div>`).join('')}</div></div>`;
+      <div class="hub-tools">${tools.map(t=>`<div class="hub-tool"><div class="ti">${t[0]}</div><div class="tn">${t[1]}</div></div>`).join('')}</div>
+      ${ytHtml()}</div>`;
   }
 
   function tchip(name){ const c=TIERMAP[name]; return `<div class="tl-chip" data-champ="${name}" title="${name}" style="background:${c.g}">${c.i}</div>`; }

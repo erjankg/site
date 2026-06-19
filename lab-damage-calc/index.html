@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Песочница — Калькулятор урона</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="preconnect" href="https://www.wildriftfire.com">
+<link rel="stylesheet" href="damage-calc-lab.css?v=18">
+</head>
+<body>
+  <div class="lab-bg" id="labBg"></div>
+
+  <header class="lab-top">
+    <div class="lab-top-title">
+      <span class="lab-logo">⚔</span>
+      <div>
+        <div class="lab-h1">Калькулятор урона — песочница</div>
+        <div class="lab-sub">Модалка «⚔ Калькулятор урона» сайдбара. Сверху — настройки для нас (варианты), внутри окна — ⚙ для посетителя. Боевой сайт не трогается.</div>
+      </div>
+    </div>
+    <div class="lab-top-btns">
+      <div id="labTools" hidden></div>
+      <button id="toggleBtn" class="lab-toggle">▲ Свернуть настройки</button>
+      <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
+    </div>
+  </header>
+
+  <section class="settings glassy" id="settings"><!-- дизайн-полоса лаба генерится в JS --></section>
+
+  <main class="lab-main">
+    <section class="stage" id="stage">
+      <div class="stage-inner" id="stageInner"><!-- модалка калькулятора рендерится сюда --></div>
+    </section>
+  </main>
+
+  <script src="../lab-settings.js"></script>
+  <script src="damage-calc-lab.js?v=18"></script>
+</body>
+</html>

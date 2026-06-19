@@ -341,6 +341,11 @@
         { key:'mana',  label:'Mana', labelShort:'MN', icon:'💧', iconClass:'stat-icon-mana' },
         { key:'armor', label:'AR',   icon:'🛡', iconClass:'stat-icon-armor' },
         { key:'mrez',  label:'MR',   icon:'✦', iconClass:'stat-icon-mr' },
+        { key:'range', label:'RNG',  icon:'🏹', iconClass:'stat-icon-range' },
+        { key:'as',    label:'AS',   icon:'⚡', iconClass:'stat-icon-as',    defHidden:true },
+        { key:'ms',    label:'MS',   icon:'👟', iconClass:'stat-icon-ms',    defHidden:true },
+        { key:'hpreg', label:'HP5',  icon:'💗', iconClass:'stat-icon-hpreg', defHidden:true },
+        { key:'mpreg', label:'MP5',  icon:'🔷', iconClass:'stat-icon-mpreg', defHidden:true },
     ];
     function getStatsCols(){
         var cfg = window._colSettings ? window._colSettings.load('stats', STATS_COL_DEFS) : { order: STATS_COL_DEFS.map(function(d){return d.key;}), hidden: [] };
@@ -367,6 +372,8 @@
         });
         html += '</tr>';
         thead.innerHTML = html;
+        // Много столбцов (юзер включил доп-статы) → таблица растёт, правая карточка убирается чтоб не мешать
+        try { document.body.setAttribute('data-widestats', cols.length > 6 ? 'on' : 'off'); } catch(e){}
     }
     window.openStatsColSettings = function(){
         window._colSettings.open('stats', STATS_COL_DEFS, 'Настройка столбцов STATS', function(){
@@ -515,7 +522,7 @@
         }).filter(x => x.name);
         console.log('Champions loaded:', raw.length);
         // Expose for draft.js and other external modules
-        try { window._champsRaw = raw; window._champIcon = champIcon; document.dispatchEvent(new CustomEvent('champsLoaded')); } catch(e){}
+        try { window._champsRaw = raw; window._champIcon = champIcon; window._champKey = champKey; document.dispatchEvent(new CustomEvent('champsLoaded')); } catch(e){}
         
         // Default: ADC only on first load (unless saved state exists)
         const _hasSaved = (() => { try { return !!localStorage.getItem('sel'); } catch(e){ return false; } })();
@@ -535,6 +542,8 @@
 
     function createRuler() {
         const ruler = document.getElementById('ruler');
+        if(!ruler) return;
+        ruler.innerHTML = '';
         for(let i = 1; i <= 15; i++) {
             const span = document.createElement('span');
             span.innerText = i;
@@ -542,32 +551,54 @@
             span.classList.add('lvl-pill');
             span.setAttribute('role','button');
             span.tabIndex = 0;
-            span.onclick = () => {
-                lvl = i;
-                const rng = document.getElementById('lvlRange');
-                if(rng) rng.value = String(i);
-                document.getElementById('lvlLabel').innerText = i;
-                updateRuler();
-                renderUpdate();
-            };
-            span.onkeydown = (e) => {
-                if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); span.click(); }
-            };
-            if(i === lvl) span.classList.add('active');
+            span.dataset.lvl = i;
+            span.onclick = () => setLevel(i);
+            span.onkeydown = (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); span.click(); } };
             ruler.appendChild(span);
         }
+        const hint = document.createElement('span');
+        hint.className = 'lvl-chiphint';
+        hint.textContent = 'зажми и тяни →';
+        ruler.appendChild(hint);
+        wireChipdrag(ruler);
+        updateRuler();
+    }
+    // ЕДИНЫЙ ИСТОЧНИК уровня — чипы рулят напрямую (слайдер убран, без крюка)
+    window.setLevel = function(n) {
+        lvl = Math.max(1, Math.min(15, n | 0));
+        window._curLvl = lvl;
+        const lbl = document.getElementById('lvlLabel'); if(lbl) lbl.textContent = lvl;
+        updateRuler();
+        renderUpdate();
+        try { if(window.ChampSidePanel && window.ChampSidePanel.current && window.ChampSidePanel.current()) window.ChampSidePanel.render(window.ChampSidePanel.current()); } catch(e){}
+    };
+    // chipdrag: зажал и тянешь по чипам (мышь + тач)
+    function wireChipdrag(ruler) {
+        let dragging = false;
+        function pick(e) {
+            const cx = e.clientX != null ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const cy = e.clientY != null ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+            const el = document.elementFromPoint(cx, cy);
+            const pill = el && el.closest ? el.closest('.lvl-pill') : null;
+            if(pill && pill.dataset.lvl) setLevel(+pill.dataset.lvl);
+        }
+        ruler.addEventListener('pointerdown', (e) => { dragging = true; try{ruler.setPointerCapture(e.pointerId);}catch(_){} pick(e); });
+        ruler.addEventListener('pointermove', (e) => { if(dragging) pick(e); });
+        window.addEventListener('pointerup', () => { dragging = false; });
     }
 
     function updateRuler() {
+        // как в лабе: подсвечен ТОЛЬКО текущий чип (не прогресс-бар)
         for(let i = 1; i <= 15; i++) {
             const el = document.getElementById('lvl-' + i);
-            if(el) el.classList.toggle('active', i === lvl);
+            if(el) el.classList.toggle('on', i === lvl);
         }
     }
 
     // Compute data array for current level + sort
     function computeData() {
         const f = (b, g) => b + (lvl - 1) * g;
+        const fAS = (b, gp) => b * (1 + (gp / 100) * (lvl - 1));   // AS растёт в процентах за уровень
         const data = raw.filter(x => selected.has(x.name)).map(x => ({
             name: x.name, res: x.res,
             ad:   f(x.ad_b, x.ad_g),
@@ -576,11 +607,12 @@
             armor:f(x.ar_b, x.ar_g),
             mrez: f(x.mr_b, x.mr_g),
             range:f(x.rng_b, x.rng_g),
-            g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g, range:x.rng_g}
+            as:   fAS(x.as_b, x.as_g),
+            ms:   x.ms_b,
+            hpreg:f(x.hpreg_b, x.hpreg_g),
+            mpreg:f(x.mpreg_b, x.mpreg_g),
+            g: {ad:x.ad_g, hp:x.hp_g, mana:x.mn_g, armor:x.ar_g, mrez:x.mr_g, range:x.rng_g, as:x.as_g, ms:0, hpreg:x.hpreg_g, mpreg:x.mpreg_g}
         })).sort((a,b) => {
-            var aTop = _movedToTop.has(a.name) || pinned.has(a.name) ? 1 : 0;
-            var bTop = _movedToTop.has(b.name) || pinned.has(b.name) ? 1 : 0;
-            if(aTop !== bTop) return bTop - aTop;
             return sD === 'desc' ? b[sK] - a[sK] : a[sK] - b[sK];
         });
         const getT = (k) => {
@@ -589,6 +621,14 @@
         };
         const thres = { ad:getT('ad'), hp:getT('hp'), mana:getT('mana'), armor:getT('armor'), mrez:getT('mrez') };
         return { data, thres };
+    }
+
+    // Форматирование значения ячейки по столбцу (десятичные для AS/реген, NRG для энергии)
+    function fmtStatVal(k, v, item){
+        if(k === 'mana'){ if(item.res === 'Energy') return 'NRG'; if(v === 0) return '0'; return Math.round(v); }
+        if(k === 'as') return (Math.round(v * 1000) / 1000).toFixed(3);     // 0.651
+        if(k === 'hpreg' || k === 'mpreg') return Math.round(v * 10) / 10;  // 6 / 6.5
+        return Math.round(v);                                               // ad/hp/armor/mrez/range/ms
     }
 
     // Global patch tooltip function
@@ -630,13 +670,13 @@
             el.innerText = (c.key===sK) ? (sD==='desc'?'▼':'▲') : '';
             el.style.color = (c.key===sK) ? '#e74c3c' : '';
         });
-        const { data, thres } = computeData();
+        const { data } = computeData();
         const rows = document.querySelectorAll('#statBody tr');
         // If row count changed (e.g. champion removed) — fall back to full render
         if(rows.length !== data.length) { renderFull(); return; }
         data.forEach((item, idx) => {
             const tr = rows[idx];
-            const numEl = tr.querySelector('.row-num');
+            const numEl = tr.querySelector('.f-num');
             if(numEl) numEl.textContent = idx + 1;
             const tds = tr.querySelectorAll('td:not(:first-child)');
             cols.forEach((c, ki) => {
@@ -644,16 +684,8 @@
                 if(!td) return;
                 const k = c.key;
                 const v = item[k];
-                let cls = (k===sK) ? 'active-col ' : '';
-                if(v >= thres[k].s) cls += 's';
-                else if(v >= thres[k].a) cls += 'a';
-                else if(v <= thres[k].c) cls += 'c';
-                else cls += 'b';
-                td.className = cls;
-                let txt = Math.round(v);
-                if(k==='mana' && item.res==='Energy') txt = 'NRG';
-                else if(k==='mana' && v===0) txt = '0';
-                td.textContent = txt;
+                td.className = (k===sK ? 'active-col ' : '') + 's-' + k;   // цвет по СТОЛБЦУ
+                td.textContent = fmtStatVal(k, v, item);
             });
         });
     }
@@ -671,44 +703,37 @@
             el.innerText = (c.key===sK) ? (sD==='desc'?'▼':'▲') : '';
             el.style.color = (c.key===sK) ? '#e74c3c' : '';
         });
-        const { data, thres } = computeData();
+        const { data } = computeData();
         body.innerHTML = '';
         data.forEach((item, idx) => {
             const tr = document.createElement('tr');
-            const isP = pinned.has(item.name) || _movedToTop.has(item.name);
+            tr.style.cursor = 'pointer';
+            // Клик по строке → показать чемпа в правой карточке (модалку НЕ открываем;
+            // правую карточку обновляет делегированный слушатель #statBody, полная карточка — кнопка «Подробнее →»)
             tr.addEventListener('click', () => {
                 tr.classList.add('row-flash');
                 setTimeout(() => tr.classList.remove('row-flash'), 400);
             });
+            // ── ЛАБОВАЯ разметка строки (.f-name-cell > f-num + f-x + f-port + f-cname) ──
             const tdChamp = document.createElement('td');
-            tdChamp.className = 'champ-cell';
+            const nameCell = document.createElement('div');
+            nameCell.className = 'f-name-cell';
             const numSpan = document.createElement('span');
-            numSpan.className = 'row-num';
+            numSpan.className = 'f-num';
             numSpan.textContent = idx + 1;
-            tdChamp.appendChild(numSpan);
             const btnX = document.createElement('button');
-            btnX.className = 'x-btn'; btnX.type = 'button'; btnX.textContent = '×';
-            btnX.title = 'Remove from table';
+            btnX.className = 'f-x'; btnX.type = 'button'; btnX.textContent = '✕';
+            btnX.title = t('Убрать из таблицы');
             btnX.addEventListener('click', (ev) => { ev.stopPropagation(); removeC(item.name); });
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'name-tag ' + (isP ? 'pinned' : '');
-            nameSpan.textContent = item.name;
-            nameSpan.addEventListener('click', (ev) => { ev.stopPropagation(); moveToTop(item.name); });
-            // Double-click → open growth chart
-
             const champImg = document.createElement('img');
-            champImg.alt = ''; champImg.className = 'champ-icon';
+            champImg.alt = ''; champImg.className = 'f-port';
             champImg.src = champIcon(item.name);
             champImg.onerror = function(){ champImgError(this, item.name); };
-            champImg.style.cursor = 'pointer';
-            champImg.title = isP ? t('Закреплён (нажми чтобы снять)') : t('Нажми чтобы закрепить');
-            if(isP) champImg.classList.add('icon-pinned');
-            champImg.addEventListener('click', (ev) => { ev.stopPropagation(); moveToTop(item.name); });
 
-            // Patch indicator
+            // Patch indicator (обёртка вокруг портрета)
             const pInfo = patchMap[item.name];
             const champWrap = document.createElement('div');
-            champWrap.style.cssText = 'position:relative;display:inline-block;flex-shrink:0;';
+            champWrap.style.cssText = 'position:relative;display:inline-flex;flex-shrink:0;';
             champWrap.appendChild(champImg);
             if(pInfo) {
                 const dot = document.createElement('div');
@@ -717,28 +742,22 @@
                 dot.dataset.change = pInfo.change;
                 dot.dataset.type = pInfo.type;
                 champWrap.appendChild(dot);
-                (function(pi, el){
-                    el.addEventListener('mouseenter', function(e){ showGlobalPatchTip(e, pi, el); });
-                    el.addEventListener('mouseleave', function(){ var t=document.getElementById('patchTip'); if(t) t.remove(); });
-                    el.addEventListener('click', function(e){ showGlobalPatchTip(e, pi, el); });
-                })(pInfo, champWrap);
+                champWrap.addEventListener('mouseenter', function(e){ showGlobalPatchTip(e, pInfo, champWrap); });
+                champWrap.addEventListener('mouseleave', function(){ var t=document.getElementById('patchTip'); if(t) t.remove(); });
+                dot.addEventListener('click', function(e){ e.stopPropagation(); showGlobalPatchTip(e, pInfo, champWrap); });
             }
-            tdChamp.appendChild(btnX); tdChamp.appendChild(champWrap); tdChamp.appendChild(nameSpan);
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'f-cname';
+            nameSpan.textContent = item.name;
+            nameCell.appendChild(numSpan); nameCell.appendChild(btnX); nameCell.appendChild(champWrap); nameCell.appendChild(nameSpan);
+            tdChamp.appendChild(nameCell);
             tr.appendChild(tdChamp);
             colsH.forEach(c => {
                 const k = c.key;
                 const v = item[k];
                 const td = document.createElement('td');
-                let cls = (k===sK) ? 'active-col ' : '';
-                if(v >= thres[k].s) cls += 's';
-                else if(v >= thres[k].a) cls += 'a';
-                else if(v <= thres[k].c) cls += 'c';
-                else cls += 'b';
-                let txt = Math.round(v);
-                if(k==='mana' && item.res==='Energy') txt = 'NRG';
-                else if(k==='mana' && v===0) txt = '0';
-                td.className = cls;
-                td.textContent = txt;
+                td.className = (k===sK ? 'active-col ' : '') + 's-' + k;   // цвет по СТОЛБЦУ (как lab-main)
+                td.textContent = fmtStatVal(k, v, item);
                 td.addEventListener('mouseenter', (ev) => showT(ev, item.g[k]));
                 td.addEventListener('mousemove', moveT);
                 td.addEventListener('mouseleave', hideT);
@@ -895,14 +914,7 @@
 
     function initApp() {
         buildStatsHeader();
-        document.getElementById('lvlRange').oninput = (e) => {
-            lvl = +e.target.value;
-            const lbl = document.getElementById('lvlLabel');
-            lbl.textContent = lvl;
-            /* animation removed */
-            updateRuler();
-            renderUpdate();
-        };
+        // Уровень рулится чипами (createRuler/setLevel) — слайдер убран.
     }
 
 
@@ -1105,7 +1117,11 @@
     var _calcTgtChamp = null, _calcTgtLvl = 1;
     var _calcRange = 'melee';
 
-    window.openCalc = function() { openModal('calcMask'); setTimeout(calcRun, 50); };
+    window.openCalc = function() {
+        var fr = document.getElementById('calcFrame');
+        if (fr && !fr.getAttribute('src')) fr.setAttribute('src', 'calc-app/index.html?embed=1');  // ленивая загрузка модуля калькулятора (?embed=1 = чистый режим без лаб-полосы)
+        openModal('calcMask');
+    };
     window.closeCalc = function() { closeModal('calcMask'); };
 
     window.openChanges = function() {
@@ -1753,7 +1769,14 @@
         {key:'sup',label:'Support',icon:'\uD83D\uDC9B'}
     ];
     window.openTierlist = function(type) {
-        _tierType = type||'champs';
+        type = type||'champs';
+        // Чемпионский тир → инлайн-вид (порт lab-main), а НЕ старая фуллскрин-модалка.
+        if (type === 'champs' && window.switchMainView) {
+            if (window.closeTierlistMenu) window.closeTierlistMenu();
+            window.switchMainView('tier');
+            return;
+        }
+        _tierType = type;
         _tierEditMode = false;
         _tierRole = 'all';
         _tierItemCat = 'all';
@@ -2143,6 +2166,32 @@
         var m=document.getElementById('sideChampsMask');
         if(m&&m.classList.contains('active')) scBuildGrid();
     });
+    // HTML секции гайда (сборки/руны/заклинания/прокачка) из data-pipeline/guides
+    function cdGuideHTML(g){
+        var esc=function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+        var card=function(inner){ return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--sel-border-sub);border-radius:12px;padding:12px 14px;">'+inner+'</div>'; };
+        var h=function(txt){ return '<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--accent);margin-bottom:8px;">'+txt+'</div>'; };
+        var lbl=function(txt){ return '<div style="font-size:10px;color:rgba(255,255,255,0.4);margin:6px 0 4px;">'+txt+'</div>'; };
+        var chip=function(txt){ return '<span style="display:inline-block;font-size:12px;font-weight:600;color:#fff;background:rgba(255,255,255,0.06);border:1px solid var(--sel-border-sub);border-radius:7px;padding:4px 9px;margin:0 5px 5px 0;">'+esc(txt)+'</span>'; };
+        var out='';
+        var b=g.builds&&g.builds[0]&&g.builds[0].items;
+        if(b){
+            var inner=h('🛠 '+esc(g.builds[0].title||'Сборка')+(g.builds[0].tier?(' · тир '+esc(g.builds[0].tier)):''));
+            if(b.starting&&b.starting.length) inner+=lbl('Старт')+b.starting.map(chip).join('');
+            if(b.core&&b.core.length) inner+=lbl('Ядро')+b.core.map(chip).join('');
+            if(b.boots&&b.boots.length) inner+=lbl('Ботинки')+b.boots.map(chip).join('');
+            out+=card(inner);
+        }
+        if(g.runes&&g.runes.length) out+=card(h('💎 Руны')+g.runes.map(chip).join(''));
+        if(g.spells&&g.spells.length) out+=card(h('✨ Заклинания')+g.spells.map(function(s){ return chip((s.combo||s)+(s && s.wr?(' · '+s.wr+'%'):'')); }).join(''));
+        if(g.skillOrder&&g.skillOrder.length){
+            var so=g.skillOrder.map(function(s){ return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;"><span style="flex:1;font-size:12px;color:#fff;">'+esc(s.ability)+'</span><span style="font-size:11px;color:var(--accent);font-weight:700;">'+(s.levels||[]).join(', ')+'</span></div>'; }).join('');
+            out+=card(h('📈 Прокачка скиллов')+so);
+        }
+        if(!out) return '';
+        var dd=g.dataDate?('<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:10px;">Источник: гайды WR · '+esc(g.dataDate)+'</div>'):'';
+        return '<div style="font-size:13px;font-weight:800;color:#fff;margin:6px 0 10px;">📖 Гайд</div><div style="display:grid;grid-template-columns:'+(window.innerWidth<=768?'1fr':'1fr 1fr')+';gap:12px;align-items:start;">'+out+'</div>'+dd;
+    }
     window.openChampDetail=function(name){
         var champ=raw.find(function(x){return x.name===name;});
         var el=document.getElementById('champDetailContent');
@@ -2410,6 +2459,17 @@
         }
         el.appendChild(mainGrid);
         renderMatchups(name);
+        // ── Гайд из data-pipeline (сборки/руны/прокачка) — полной шириной, асинхронно ──
+        var guideBox=document.createElement('div');
+        guideBox.id='cdGuide';
+        guideBox.style.cssText='margin-top:18px;';
+        guideBox.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,0.35);padding:6px 0;">Загрузка гайда…</div>';
+        el.appendChild(guideBox);
+        if(window.ChampGuides){
+            window.ChampGuides.load(name).then(function(g){
+                guideBox.innerHTML = g ? cdGuideHTML(g) : '';
+            }).catch(function(){ guideBox.innerHTML=''; });
+        } else { guideBox.innerHTML=''; }
         openModal('champDetailMask');
     };
     window.closeChampDetail=function(){closeModal('champDetailMask');};
@@ -3110,23 +3170,6 @@
             if (window.cmsRenderItems) window.cmsRenderItems();
             if (window.cmsRenderRunes) window.cmsRenderRunes();
         });
-        // Загружаем винрейты из Firestore
-        if (typeof window.cmsLoadWinrates === 'function') {
-            console.log('[CMS] Загружаем винрейты...');
-            window.cmsLoadWinrates(function() {
-                var cmsWR = window.cmsGetWinrateData && window.cmsGetWinrateData();
-                console.log('[CMS] cmsWR загружен, ранги:', cmsWR ? Object.keys(cmsWR) : 'null');
-                if (cmsWR && Object.keys(cmsWR).length > 0) {
-                    // Заменяем хардкод WR_DATA данными из Firestore
-                    Object.keys(cmsWR).forEach(function(rank) {
-                        if (window.WR_DATA) window.WR_DATA[rank] = cmsWR[rank];
-                    });
-                    console.log('[CMS] WR_DATA обновлён из Firestore');
-                }
-            });
-        } else {
-            console.warn('[CMS] cmsLoadWinrates не найден');
-        }
         // Загружаем патч-ноты из Firestore (заменяют Google Sheets данные)
         if (typeof window.cmsLoadPatchnotes === 'function') {
             window.cmsLoadPatchnotes(function() {
@@ -3146,8 +3189,6 @@
         document.querySelectorAll('.admin-only').forEach(function(el) {
             el.style.display = 'none';
         });
-        var bar = document.getElementById('wrprAdminBar');
-        if (bar) bar.remove();
         document.querySelectorAll('.cms-inline-edit-popup').forEach(function(el) { el.remove(); });
         document.querySelectorAll('.cms-edit-btn, .cms-add-btn').forEach(function(el) { el.remove(); });
         try { if (window.cmsTeardownInlineEdit) window.cmsTeardownInlineEdit(); } catch (e) {}
@@ -4053,15 +4094,17 @@
             // re-check after init
         }
         if (lastTs > _chatLastSeenTs) {
-            var unread = 0;
+            var unread = 0, mentioned = false;
             _chatMessages.forEach(function(msg) {
-                if (getMsgTs(msg) > _chatLastSeenTs) unread++;
+                if (getMsgTs(msg) > _chatLastSeenTs) { unread++; if (msgMentionsMe(msg)) mentioned = true; }
             });
             badge.textContent = unread > 9 ? '9+' : String(unread);
             badge.style.display = 'inline-block';
+            badge.classList.toggle('mention', mentioned);
         } else {
             badge.style.display = 'none';
             badge.textContent = '';
+            badge.classList.remove('mention');
         }
     }
 
@@ -4336,9 +4379,149 @@
         container.scrollTop = container.scrollHeight;
     }
 
+    // ═══════════════════════════════════════════
+    // ЧАТ: реакции / ответы / карточки / упоминания
+    // ═══════════════════════════════════════════
+    var REACT_EMOJIS = ['👍','🔥','😂','❤️','😮','😢'];
+    var _chatReply = null; // {id,name,text}
+
+    function _myUid() { return _currentUser ? _currentUser.uid : null; }
+    function _findChatMsg(id) {
+        for (var i = 0; i < _chatMessages.length; i++) { if (_chatMessages[i]._id === id) return _chatMessages[i]; }
+        return null;
+    }
+
+    // reactions хранятся как map эмодзи → массив uid
+    function reactionEntries(msg) {
+        var r = msg.reactions || {}, out = [];
+        Object.keys(r).forEach(function(e) {
+            var uids = Array.isArray(r[e]) ? r[e] : [];
+            if (!uids.length) return;
+            out.push({ e: e, n: uids.length, mine: !!(_myUid() && uids.indexOf(_myUid()) >= 0) });
+        });
+        return out;
+    }
+    function toggleReaction(msgId, emoji) {
+        if (!db || !_currentUser) { showToast(t('Войди чтобы реагировать')); return; }
+        var ref = db.collection('globalChat').doc(msgId);
+        db.runTransaction(function(tx) {
+            return tx.get(ref).then(function(doc) {
+                if (!doc.exists) return;
+                var reactions = doc.data().reactions || {};
+                var uids = Array.isArray(reactions[emoji]) ? reactions[emoji].slice() : [];
+                var idx = uids.indexOf(_currentUser.uid);
+                if (idx >= 0) uids.splice(idx, 1); else uids.push(_currentUser.uid);
+                if (uids.length) reactions[emoji] = uids; else delete reactions[emoji];
+                tx.update(ref, { reactions: reactions });
+            });
+        }).catch(function(e) { console.warn('react err', e); });
+    }
+    window.tgToggleReaction = toggleReaction;
+
+    // ─── эмодзи-пикер реакции ───
+    function openReactPicker(btn, msgId) {
+        var old = document.querySelector('.chat-react-pop'); if (old) old.remove();
+        var pop = document.createElement('div'); pop.className = 'chat-react-pop';
+        REACT_EMOJIS.forEach(function(e) {
+            var b = document.createElement('button'); b.textContent = e;
+            b.onclick = function(ev) { ev.stopPropagation(); pop.remove(); toggleReaction(msgId, e); };
+            pop.appendChild(b);
+        });
+        document.body.appendChild(pop);
+        var br = btn.getBoundingClientRect();
+        pop.style.left = Math.max(6, Math.min(br.left, window.innerWidth - pop.offsetWidth - 6)) + 'px';
+        var top = br.top - pop.offsetHeight - 6; if (top < 6) top = br.bottom + 6;
+        pop.style.top = top + 'px';
+        setTimeout(function() { document.addEventListener('click', function h() { if (pop.parentNode) pop.remove(); document.removeEventListener('click', h); }); }, 0);
+    }
+
+    // ─── ответы ───
+    window.setChatReply = function(msgId) {
+        var msg = _findChatMsg(msgId); if (!msg) return;
+        _chatReply = { id: msgId, name: (msg.uid === _myUid() ? t('Вы') : (msg.name || t('Аноним'))), text: (msg.text || (msg.card ? t('вложение') : '')) };
+        renderChatReplyBar();
+        var inp = document.getElementById('chatInput'); if (inp) inp.focus();
+    };
+    window.cancelChatReply = function() { _chatReply = null; renderChatReplyBar(); };
+    function renderChatReplyBar() {
+        var bar = document.getElementById('chatReplyBar'); if (!bar) return;
+        bar.innerHTML = '';
+        if (!_chatReply) { bar.style.display = 'none'; return; }
+        bar.style.display = 'flex';
+        var ic = document.createElement('span'); ic.className = 'crb-ic'; ic.textContent = '↩';
+        var tx = document.createElement('span'); tx.className = 'crb-tx';
+        var b = document.createElement('b'); b.textContent = _chatReply.name;
+        tx.appendChild(document.createTextNode(t('Ответ') + ' ')); tx.appendChild(b);
+        tx.appendChild(document.createTextNode(': ' + _chatReply.text));
+        var x = document.createElement('button'); x.className = 'crb-x'; x.textContent = '✕'; x.onclick = window.cancelChatReply;
+        bar.appendChild(ic); bar.appendChild(tx); bar.appendChild(x);
+    }
+
+    // ─── упоминания ───
+    function parseMentions(text) {
+        var out = [], re = /@([^\s@]{1,40})/g, m;
+        while ((m = re.exec(text))) { if (out.indexOf(m[1]) < 0) out.push(m[1]); }
+        return out;
+    }
+    function msgMentionsMe(msg) {
+        if (!msg.mentions || !_currentUser) return false;
+        var me = (_currentUser.displayName || '').split(/\s+/)[0].toLowerCase();
+        if (!me) return false;
+        return msg.mentions.some(function(n) { return String(n).toLowerCase() === me; });
+    }
+    // текст с подсветкой @упоминаний — безопасно, через DOM-узлы
+    function appendTextWithMentions(parent, text) {
+        text = text || '';
+        var re = /@([^\s@]{1,40})/g, last = 0, m;
+        while ((m = re.exec(text))) {
+            if (m.index > last) parent.appendChild(document.createTextNode(text.slice(last, m.index)));
+            var sp = document.createElement('span'); sp.className = 'chat-mention'; sp.textContent = '@' + m[1];
+            parent.appendChild(sp);
+            last = m.index + m[0].length;
+        }
+        if (last < text.length) parent.appendChild(document.createTextNode(text.slice(last)));
+    }
+
+    // ─── карточки-ссылки (deep-link контента сайта) ───
+    function renderChatCard(card) {
+        var el = document.createElement('div'); el.className = 'chat-card';
+        var head = document.createElement('div'); head.className = 'chat-card-h';
+        var ic = document.createElement('div'); ic.className = 'chat-card-ic';
+        var title = card.name || '', sub = '', label = t('Открыть');
+        function champPic(name) {
+            try { var src = window._champIcon ? window._champIcon(name) : ''; if (src) { var im = document.createElement('img'); im.src = src; im.onerror = function(){ this.style.display='none'; }; ic.classList.add('round'); ic.appendChild(im); return; } } catch (e) {}
+            ic.textContent = (name || '?').charAt(0).toUpperCase();
+        }
+        if (card.type === 'champion') { champPic(card.name); sub = t('Чемпион'); label = t('Открыть чемпиона'); }
+        else if (card.type === 'matchup') { champPic(card.name); title = t('Матчапы') + ' · ' + card.name; sub = t('контры и фавориты'); label = t('Открыть матчапы'); }
+        else if (card.type === 'build') { champPic(card.name); title = t('Сборка') + ' · ' + card.name; sub = t('ядро и руны'); label = t('Открыть сборку'); }
+        else if (card.type === 'tier') { ic.textContent = '🏆'; title = t('Тир-лист') + (card.patch ? ' · ' + card.patch : ''); sub = t('актуальная мета'); label = t('Открыть тир-лист'); }
+        else if (card.type === 'item') { ic.textContent = '📦'; title = card.name || t('Предмет'); sub = t('Предмет'); label = t('Открыть предмет'); }
+        else { ic.textContent = '🔗'; }
+        head.appendChild(ic);
+        var tt = document.createElement('div'); tt.className = 'chat-card-tt';
+        var t1 = document.createElement('div'); t1.className = 't'; t1.textContent = title;
+        var t2 = document.createElement('div'); t2.className = 's'; t2.textContent = sub;
+        tt.appendChild(t1); tt.appendChild(t2); head.appendChild(tt); el.appendChild(head);
+        var btn = document.createElement('button'); btn.className = 'chat-card-btn'; btn.textContent = label + ' →';
+        btn.onclick = function(e) { e.stopPropagation(); openCardTarget(card); };
+        el.appendChild(btn);
+        return el;
+    }
+    function openCardTarget(card) {
+        try {
+            if (card.type === 'tier') { if (window.sidebarOpen) sidebarOpen('tierMenu'); return; }
+            if (card.type === 'item') { if (window.sidebarOpen) sidebarOpen('items'); return; }
+            if (window.openChampionByName) { window.openChampionByName(card.name); return; }
+            if (window.openChampDetail) { window.openChampDetail(card.name); return; }
+            if (window.sidebarOpen) sidebarOpen('sideChamps');
+        } catch (e) { console.warn('openCardTarget', e); }
+    }
+
     function renderBubble(container, msg, isMe, showAdmin) {
         var row = document.createElement('div');
         row.className = 'chat-bubble-row' + (isMe ? ' me' : '');
+        if (msg._id) row.dataset.id = msg._id;
 
         var av = document.createElement('div');
         av.className = 'chat-bubble-av';
@@ -4362,10 +4545,25 @@
             bubble.appendChild(nameEl);
         }
 
-        var textEl = document.createElement('div');
-        textEl.style.fontWeight = '400';
-        textEl.textContent = msg.text || '';
-        bubble.appendChild(textEl);
+        // цитата-ответ
+        if (msg.replyTo) {
+            var q = document.createElement('div'); q.className = 'chat-reply-quote';
+            var qn = document.createElement('span'); qn.className = 'qn'; qn.textContent = msg.replyTo.name || '';
+            var qt = document.createElement('span'); qt.className = 'qt'; qt.textContent = msg.replyTo.text || t('вложение');
+            q.appendChild(qn); q.appendChild(qt);
+            bubble.appendChild(q);
+        }
+
+        if (msg.text) {
+            var textEl = document.createElement('div');
+            textEl.className = 'chat-bubble-text';
+            textEl.style.fontWeight = '400';
+            appendTextWithMentions(textEl, msg.text);
+            bubble.appendChild(textEl);
+        }
+
+        // карточка-вложение
+        if (msg.card) bubble.appendChild(renderChatCard(msg.card));
 
         var meta = document.createElement('div');
         meta.className = 'chat-bubble-meta';
@@ -4384,7 +4582,34 @@
             meta.appendChild(delBtn);
         }
         bubble.appendChild(meta);
+
+        // чипы-реакции
+        var reacts = reactionEntries(msg);
+        if (reacts.length) {
+            var rWrap = document.createElement('div'); rWrap.className = 'chat-reacts';
+            reacts.forEach(function(r) {
+                var chip = document.createElement('button');
+                chip.className = 'chat-rchip' + (r.mine ? ' mine' : '');
+                chip.textContent = r.e + ' ' + r.n;
+                chip.onclick = function(e) { e.stopPropagation(); toggleReaction(msg._id, r.e); };
+                rWrap.appendChild(chip);
+            });
+            bubble.appendChild(rWrap);
+        }
+
         row.appendChild(bubble);
+
+        // инструменты при наведении: реакция / ответить (только залогиненным, не на системных)
+        if (_currentUser && msg._id && !msg.isSystem) {
+            var tools = document.createElement('div'); tools.className = 'chat-row-tools';
+            var rb = document.createElement('button'); rb.title = t('Реакция'); rb.textContent = '😊';
+            rb.onclick = function(e) { e.stopPropagation(); openReactPicker(rb, msg._id); };
+            var qb = document.createElement('button'); qb.title = t('Ответить'); qb.textContent = '↩';
+            qb.onclick = function(e) { e.stopPropagation(); window.setChatReply(msg._id); };
+            tools.appendChild(rb); tools.appendChild(qb);
+            row.appendChild(tools);
+        }
+
         container.appendChild(row);
     }
 
@@ -4398,6 +4623,9 @@
         if (!input) return;
         var text = (input.value || '').trim();
         if (!text) return;
+
+        var replySnapshot = _chatReply;
+        var mentions = parseMentions(text);
 
         // Ensure chat listener is running (restart if died)
         if (!_chatListener) { startChatListener(); }
@@ -4414,27 +4642,23 @@
             if (input) input.disabled = false;
         }, 5000);
 
-        db.collection('globalChat').add({
+        var payload = {
             text: text,
             name: _currentUser.displayName || _currentUser.email || t('Аноним'),
             uid: _currentUser.uid,
             photoURL: _currentUser.photoURL || '',
             isAdmin: _isAdmin || false,
             ts: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(function() {
+        };
+        if (replySnapshot) payload.replyTo = { id: replySnapshot.id || '', name: replySnapshot.name || '', text: (replySnapshot.text || '').slice(0, 140) };
+        if (mentions.length) payload.mentions = mentions.slice(0, 10);
+
+        db.collection('globalChat').add(payload).then(function() {
             clearTimeout(_sendFallback);
             if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = '➤'; }
             if (input) input.disabled = false;
-            // Cleanup old messages beyond 100
-            db.collection('globalChat').orderBy('ts','asc').get().then(function(snap) {
-                if (snap.size > 100) {
-                    var toDelete = snap.size - 100;
-                    var batch = db.batch();
-                    var i = 0;
-                    snap.forEach(function(doc) { if (i < toDelete) { batch.delete(doc.ref); i++; } });
-                    batch.commit();
-                }
-            });
+            window.cancelChatReply();
+            cleanupOldChat();
         }).catch(function(err) {
             clearTimeout(_sendFallback);
             console.error('Send error:', err);
@@ -4444,6 +4668,106 @@
         });
     }
     window.sendChatMsg = sendGlobalMsg;
+
+    function cleanupOldChat() {
+        db.collection('globalChat').orderBy('ts', 'asc').get().then(function(snap) {
+            if (snap.size > 100) {
+                var toDelete = snap.size - 100;
+                var batch = db.batch();
+                var i = 0;
+                snap.forEach(function(doc) { if (i < toDelete) { batch.delete(doc.ref); i++; } });
+                batch.commit();
+            }
+        }).catch(function() {});
+    }
+
+    // ─── поделиться карточкой-ссылкой (📎) ───
+    function sendCardMessage(card, text) {
+        if (!db || !_currentUser) { showToast(t('Войди чтобы делиться')); return; }
+        var payload = {
+            text: (text || '').slice(0, 1000),
+            name: _currentUser.displayName || _currentUser.email || t('Аноним'),
+            uid: _currentUser.uid,
+            photoURL: _currentUser.photoURL || '',
+            isAdmin: _isAdmin || false,
+            card: card,
+            ts: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        db.collection('globalChat').add(payload).then(function() { cleanupOldChat(); })
+            .catch(function(err) { showToast(t('Ошибка отправки: ') + (err.code || err.message || '')); });
+    }
+    window.sendChatCard = sendCardMessage;
+
+    // ─── меню «прикрепить кнопку-ссылку» ───
+    window.openChatAttach = function(ev) {
+        if (ev) ev.stopPropagation();
+        if (!_currentUser) { showToast(t('Войди чтобы делиться')); return; }
+        var old = document.querySelector('.chat-attach-menu'); if (old) { old.remove(); return; }
+        var menu = document.createElement('div'); menu.className = 'chat-attach-menu';
+        var items = [
+            ['champion', '🧙', t('Карточка чемпиона')],
+            ['matchup', '⚔️', t('Матчапы чемпа')],
+            ['build', '🛠️', t('Сборка чемпа')],
+            ['tier', '🏆', t('Тир-лист')]
+        ];
+        var h = document.createElement('div'); h.className = 'cam-h'; h.textContent = t('Скинуть кнопку-ссылку'); menu.appendChild(h);
+        items.forEach(function(it) {
+            var b = document.createElement('button');
+            var ic = document.createElement('span'); ic.className = 'ai'; ic.textContent = it[1];
+            b.appendChild(ic); b.appendChild(document.createTextNode(it[2]));
+            b.onclick = function(e) {
+                e.stopPropagation(); menu.remove();
+                if (it[0] === 'tier') { sendCardMessage({ type: 'tier' }); showToast(t('Карточка отправлена')); }
+                else openChatChampPicker(it[0]);
+            };
+            menu.appendChild(b);
+        });
+        document.body.appendChild(menu);
+        var btn = ev && ev.currentTarget ? ev.currentTarget : document.querySelector('.chat-attach');
+        if (btn) {
+            var br = btn.getBoundingClientRect();
+            menu.style.left = Math.max(6, br.left) + 'px';
+            menu.style.top = (br.top - menu.offsetHeight - 8) + 'px';
+        }
+        setTimeout(function() { document.addEventListener('click', function hh() { if (menu.parentNode) menu.remove(); document.removeEventListener('click', hh); }); }, 0);
+    };
+
+    // ─── выбор чемпиона для карточки ───
+    function openChatChampPicker(type) {
+        var old = document.querySelector('.chat-champ-pick'); if (old) old.remove();
+        var ov = document.createElement('div'); ov.className = 'chat-champ-pick';
+        var box = document.createElement('div'); box.className = 'ccp-box';
+        var head = document.createElement('div'); head.className = 'ccp-head';
+        var title = document.createElement('div'); title.className = 'ccp-title';
+        title.textContent = (type === 'matchup' ? t('Матчапы') : type === 'build' ? t('Сборка') : t('Чемпион')) + ' — ' + t('выбери чемпиона');
+        var xb = document.createElement('button'); xb.className = 'ccp-x'; xb.textContent = '✕'; xb.onclick = function() { ov.remove(); };
+        head.appendChild(title); head.appendChild(xb); box.appendChild(head);
+        var search = document.createElement('input'); search.className = 'ccp-search'; search.type = 'text'; search.placeholder = t('Поиск чемпиона...');
+        box.appendChild(search);
+        var grid = document.createElement('div'); grid.className = 'ccp-grid'; box.appendChild(grid);
+        ov.appendChild(box); document.body.appendChild(ov);
+        ov.onclick = function(e) { if (e.target === ov) ov.remove(); };
+
+        var champs = (window._champsRaw || []).map(function(c) { return c.name; }).filter(Boolean);
+        if (!champs.length) champs = ['Камилла', 'Дариус', 'Гарен', 'Ясуо', 'Зед', 'Ари', 'Люкс', 'Джинкс'];
+        function draw(q) {
+            grid.innerHTML = '';
+            var ql = (q || '').toLowerCase();
+            champs.filter(function(n) { return !ql || n.toLowerCase().indexOf(ql) >= 0; }).slice(0, 120).forEach(function(n) {
+                var cell = document.createElement('button'); cell.className = 'ccp-cell';
+                var im = document.createElement('img');
+                try { im.src = window._champIcon ? window._champIcon(n) : ''; } catch (e) {}
+                im.onerror = function() { this.style.display = 'none'; };
+                var nm = document.createElement('span'); nm.textContent = n;
+                cell.appendChild(im); cell.appendChild(nm);
+                cell.onclick = function() { ov.remove(); sendCardMessage({ type: type, name: n }); showToast(t('Карточка отправлена')); };
+                grid.appendChild(cell);
+            });
+        }
+        draw('');
+        search.oninput = function() { draw(search.value); };
+        setTimeout(function() { search.focus(); }, 30);
+    }
 
     function deleteChatMsg(docId) {
         if (!db) return;
@@ -5894,17 +6218,50 @@
         },
         'алмаз': { top:[], jungle:[], mid:[], adc:[], support:[] },
         'мастер': { top:[], jungle:[], mid:[], adc:[], support:[] },
-        'грандмастер': { top:[], jungle:[], mid:[], adc:[], support:[] },
         'суверен': { top:[], jungle:[], mid:[], adc:[], support:[] },
+        'все': { top:[], jungle:[], mid:[], adc:[], support:[] },
     };
     // Экспортируем для CMS
     window.WR_DATA = WR_DATA;
 
+    // Реальные винрейты по ВСЕМ рангам из data-pipeline/wr-stats.json (Tencent WR, робот обновляет).
+    // Заполняет WR_DATA[ru-ранг][роль]. Роли в данных = WR-линии: Baron=Топ, Dragon=АДК.
+    // При сбое fetch — остаётся хардкод-фолбэк (чалик).
+    (function loadWrStats(){
+        var RANK_MAP = { diamond_plus:'алмаз', master_plus:'мастер', challenger:'чалик', apex:'суверен', all:'все' };
+        var ROLE_MAP = { baron:'top', jungle:'jungle', mid:'mid', dragon:'adc', support:'support' };
+        fetch('data-pipeline/wr-stats.json', { cache:'no-cache' })
+            .then(function(r){ return r.ok ? r.json() : null; })
+            .then(function(j){
+                if(!j || !Array.isArray(j.champions) || !j.champions.length) return;
+                var fresh = {};
+                Object.keys(RANK_MAP).forEach(function(slug){ fresh[RANK_MAP[slug]] = { top:[], jungle:[], mid:[], adc:[], support:[] }; });
+                j.champions.forEach(function(c){
+                    var ru = RANK_MAP[c.rank], role = ROLE_MAP[(c.role||'').toLowerCase()];
+                    if(!ru || !role || !fresh[ru][role]) return;
+                    fresh[ru][role].push({ name: c.nameEN || c.name, wr:+c.wr, ch:(c.wrTrend==null?null:+c.wrTrend), pr:+c.pr||0, br:+c.br||0, tier:c.tier||null });
+                });
+                Object.keys(fresh).forEach(function(ru){
+                    WR_DATA[ru] = WR_DATA[ru] || { top:[], jungle:[], mid:[], adc:[], support:[] };
+                    Object.keys(fresh[ru]).forEach(function(role){
+                        fresh[ru][role].sort(function(a,b){ return b.wr - a.wr; });
+                        if(fresh[ru][role].length) WR_DATA[ru][role] = fresh[ru][role];
+                    });
+                });
+                console.log('[WR] wr-stats.json загружен, ранги:', Object.keys(fresh).join(','), 'снимок', j.snapshotDate || '');
+                try { if(typeof wrprUpdateButtons === 'function') wrprUpdateButtons(); if(typeof wrprRender === 'function') wrprRender(); } catch(e){}
+                try { var ph = document.getElementById('viewPlaceholder'); if(window.renderMetaHub && ph && ph.querySelector('.f-hub')) window.renderMetaHub(ph); } catch(e){}
+                try { var pt = document.getElementById('viewPlaceholder'); if(window.renderTierBoard && pt && pt.querySelector('.f-tier')) window.renderTierBoard(pt); } catch(e){}
+            })
+            .catch(function(e){ console.warn('[WR] wr-stats.json недоступен:', e.message); });
+    })();
+
     var _WRPR_RANKS = [
-        {id:'мастер', label:t('Мастер')},
-        {id:'грандмастер', label:t('ГМ')},
+        {id:'алмаз', label:t('Алмаз+')},
+        {id:'мастер', label:t('Мастер+')},
         {id:'чалик', label:t('Чалик')},
         {id:'суверен', label:t('Суверен')},
+        {id:'все', label:t('Все')},
     ];
     var _WRPR_ROLES = [
         {id:'top', label:t('Топ')},
@@ -5918,42 +6275,66 @@
     window.switchMainView = function(view) {
         var mainEl = document.querySelector('.table-wrap-outer');
         var wrprEl = document.getElementById('wrprSection');
-        var btnMain = document.getElementById('viewBtnMain');
-        var btnWrpr = document.getElementById('viewBtnWrpr');
         if (!mainEl || !wrprEl) return;
         var lvlEl = document.querySelector('.lvl-container');
-        if (view === 'wrpr') {
-            mainEl.style.display = 'none';
-            wrprEl.style.display = 'flex';
-            if (lvlEl) lvlEl.style.display = 'none';
-            if (btnMain) btnMain.classList.remove('active');
-            if (btnWrpr) btnWrpr.classList.add('active');
-            wrprBuildFilters();
-            wrprRender();
-        } else {
-            mainEl.style.display = '';
-            wrprEl.style.display = 'none';
-            if (lvlEl) lvlEl.style.display = '';
-            if (btnMain) btnMain.classList.add('active');
-            if (btnWrpr) btnWrpr.classList.remove('active');
+
+        // Виды, которые пока открывают существующее окно/страницу (Фазы M2/M3)
+        if (view === 'tactics') { window.location.href = 'tactics-board/'; return; }
+
+        // Плейсхолдер-секция для будущих инлайн-видов (Мета-хаб = M2, Патч = M3)
+        var phEl = document.getElementById('viewPlaceholder');
+        if (!phEl) {
+            phEl = document.createElement('div');
+            phEl.id = 'viewPlaceholder';
+            phEl.style.cssText = 'display:none;padding:64px 20px;text-align:center;color:rgba(255,255,255,0.45);font-size:15px;';
+            mainEl.parentNode.insertBefore(phEl, mainEl.nextSibling);
         }
+        var placeholder = (view === 'hub' || view === 'patch' || view === 'tier');
+
+        mainEl.style.display = (view === 'main') ? '' : 'none';
+        if (lvlEl) lvlEl.style.display = (view === 'main') ? '' : 'none';
+        wrprEl.style.display = (view === 'wrpr') ? 'flex' : 'none';
+        phEl.style.display = placeholder ? 'block' : 'none';
+        // правая карточка чемпа — на видах Статы/WinRate
+        document.body.setAttribute('data-sidecard', (view === 'main' || view === 'wrpr') ? 'on' : 'off');
+
+        if (placeholder) {
+            if (view === 'hub' && window.renderMetaHub) {
+                phEl.style.cssText = 'display:block;padding:18px 22px 24px;text-align:left;';
+                window.renderMetaHub(phEl);
+            } else if (view === 'tier' && window.renderTierBoard) {
+                phEl.style.cssText = 'display:block;padding:18px 22px 24px;text-align:left;';
+                window.renderTierBoard(phEl);
+            } else {
+                phEl.style.cssText = 'display:block;padding:64px 20px;text-align:center;color:rgba(255,255,255,0.45);font-size:15px;';
+                phEl.textContent = '📰 Патч — появится в Фазе M3';
+            }
+        }
+        if (view === 'wrpr') { wrprBuildFilters(); wrprRender(); }
+
+        // активная вкладка + скользящая пилюля
+        var tabs = document.querySelectorAll('#viewTabs .f-tab');
+        for (var i = 0; i < tabs.length; i++) {
+            tabs[i].classList.toggle('active', tabs[i].getAttribute('data-view') === view);
+        }
+        if (window.positionViewInd) window.positionViewInd();
     };
+
+    // Скользящая пилюля-индикатор под активной вкладкой (порт .f-ind из lab-main)
+    window.positionViewInd = function() {
+        var nav = document.getElementById('viewTabs'); if (!nav) return;
+        var ind = nav.querySelector('.f-ind'); var act = nav.querySelector('.f-tab.active');
+        if (!ind || !act) return;
+        ind.style.width = act.offsetWidth + 'px';
+        ind.style.transform = 'translateX(' + act.offsetLeft + 'px)';
+        ind.style.opacity = '1';
+    };
+    window.addEventListener('load', function(){ window.positionViewInd(); });
+    window.addEventListener('resize', function(){ window.positionViewInd(); });
 
     // Keep openWRPR as alias for sidebar nav compatibility
     window.openWRPR = function() { window.switchMainView('wrpr'); };
 
-    // CMS: позволяет cms.js вызвать перерисовку после сохранения
-    window.wrprRenderFromCMS = function() {
-        // Обновляем WR_DATA из CMS
-        var cmsWR = window.cmsGetWinrateData && window.cmsGetWinrateData();
-        if (cmsWR) {
-            Object.keys(cmsWR).forEach(function(rank) {
-                WR_DATA[rank] = cmsWR[rank];
-                window.WR_DATA[rank] = cmsWR[rank];
-            });
-        }
-        wrprRender();
-    };
     // Экспортируем wrprRender для отладки
     window.wrprRender = wrprRender;
 
@@ -6028,33 +6409,6 @@
             ro.appendChild(b);
         });
         wrprUpdateButtons();
-
-        // Admin: кнопка bulk-импорта винрейтов с lolm.qq.com
-        // Рисуется отдельным блоком сразу после ряда ролей, видна только админу.
-        try {
-            var adminBar = document.getElementById('wrprAdminBar');
-            if (window._isAdmin && window.cmsOpenWinrateBulkImport) {
-                if (!adminBar) {
-                    adminBar = document.createElement('div');
-                    adminBar.id = 'wrprAdminBar';
-                    adminBar.style.cssText = 'display:flex;justify-content:center;padding:0 12px 10px;';
-                    var btn = document.createElement('button');
-                    btn.id = 'wrprImportBtn';
-                    btn.type = 'button';
-                    btn.textContent = '📥 Импорт винрейтов с lolm.qq.com';
-                    btn.title = 'Массово обновить таблицу из буфера обмена';
-                    btn.style.cssText = 'background:rgba(11,196,227,0.12);border:1.5px dashed rgba(11,196,227,0.45);color:#0bc4e3;padding:7px 16px;border-radius:18px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap;';
-                    btn.onclick = function() {
-                        if (window.cmsOpenWinrateBulkImport) window.cmsOpenWinrateBulkImport();
-                    };
-                    adminBar.appendChild(btn);
-                    // Вставляем после ряда ролей
-                    if (ro && ro.parentNode) ro.parentNode.insertBefore(adminBar, ro.nextSibling);
-                }
-            } else if (adminBar) {
-                adminBar.remove();
-            }
-        } catch(e) {}
     }
 
     function wrprUpdateButtons() {
@@ -6158,22 +6512,12 @@
                 return _wrprSortDir * (a[field] - b[field]);
             });
 
-        var isAdmin = !!window._isAdmin;
         tbody.innerHTML = '';
         sorted.forEach(function(d, i) {
             var row = document.createElement('div');
             row.className = 'wrpr-row';
             row.dataset.name = d.name;
             row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;border-bottom:1px solid rgba(255,255,255,0.04);' + (i % 2 === 0 ? 'background:rgba(255,255,255,0.015);' : '');
-
-            // Ручка перетаскивания (только админ)
-            if (isAdmin) {
-                var grip = document.createElement('span');
-                grip.className = 'wrpr-grip';
-                grip.textContent = '⋮⋮';
-                grip.style.cssText = 'width:20px;flex:0 0 auto;cursor:grab;color:rgba(255,255,255,0.3);font-size:15px;letter-spacing:-2px;text-align:center;';
-                row.appendChild(grip);
-            }
 
             // Номер
             var nCell = document.createElement('span');
@@ -6219,68 +6563,9 @@
                 row.appendChild(cell);
             });
 
-            // Кнопка редактирования (только админ)
-            if (isAdmin && window.cmsOpenWinrateEditor) {
-                var eCell = document.createElement('span');
-                eCell.style.cssText = 'width:30px;flex:0 0 auto;text-align:center;';
-                var editBtn = document.createElement('button');
-                editBtn.className = 'cms-edit-btn';
-                editBtn.textContent = '✏';
-                editBtn.title = 'Редактировать';
-                editBtn.style.cssText = 'position:static;opacity:1;';
-                (function(entry, r, ro) {
-                    editBtn.onclick = function(e) {
-                        e.stopPropagation();
-                        window.cmsOpenWinrateEditor(entry, r, ro);
-                    };
-                })(d, _wrprRank, _wrprRole);
-                eCell.appendChild(editBtn);
-                row.appendChild(eCell);
-            }
-
             tbody.appendChild(row);
         });
 
-        // Admin: кнопка "Добавить чемпиона"
-        if (isAdmin && window.cmsOpenWinrateEditor) {
-            var addWrap = document.createElement('div');
-            addWrap.style.cssText = 'padding:10px;text-align:center;';
-            var addBtn = document.createElement('button');
-            addBtn.style.cssText = 'background:rgba(46,204,113,0.1);border:1.5px dashed rgba(46,204,113,0.4);color:#2ecc71;padding:8px 20px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;';
-            addBtn.textContent = '+ Добавить чемпиона';
-            addBtn.onclick = function() {
-                window.cmsOpenWinrateEditor(null, _wrprRank, _wrprRole);
-            };
-            addWrap.appendChild(addBtn);
-            tbody.appendChild(addWrap);
-        }
-
-        // Admin: перетаскивание строк за ⋮⋮ меняет порядок и сохраняет в Firestore.
-        // Работает только в ручном режиме (когда не включена сортировка по колонке).
-        if (isAdmin && window.Sortable && _wrprSortCol === 'manual') {
-            if (tbody._sortable) { try { tbody._sortable.destroy(); } catch (e) {} }
-            tbody._sortable = new window.Sortable(tbody, {
-                draggable: '.wrpr-row',
-                handle: '.wrpr-grip',
-                animation: 90,
-                ghostClass: 'dnd-row-ghost',
-                chosenClass: 'dnd-row-chosen',
-                dragClass: 'dnd-row-drag',
-                forceFallback: true,
-                fallbackOnBody: true,
-                onEnd: function() {
-                    var order = Array.prototype.map.call(tbody.querySelectorAll('.wrpr-row'), function(el){ return el.dataset.name; });
-                    var byName = {}; list.forEach(function(e){ byName[e.name] = e; });
-                    var newList = order.map(function(nm){ return byName[nm]; }).filter(Boolean);
-                    if (newList.length === list.length) {
-                        WR_DATA[_wrprRank][_wrprRole] = newList;
-                        window.WR_DATA[_wrprRank][_wrprRole] = newList;
-                        if (window.cmsSaveWinrateOrder) window.cmsSaveWinrateOrder(_wrprRank, _wrprRole, newList);
-                    }
-                    wrprRender();
-                }
-            });
-        }
     }
 
 })();
@@ -6302,11 +6587,13 @@
             // Добавить недостающие (новые столбцы после обновления)
             defKeys.forEach(function(k){ if(order.indexOf(k) === -1) order.push(k); });
             var hidden = Array.isArray(c.hidden) ? c.hidden.filter(function(k){ return defKeys.indexOf(k) !== -1; }) : [];
+            // Новые столбцы с defHidden (появились после обновления, не были в сейве юзера) → скрыты по умолчанию
+            defs.forEach(function(d){ if(d.defHidden && (c.order || []).indexOf(d.key) === -1 && hidden.indexOf(d.key) === -1) hidden.push(d.key); });
             return { order: order, hidden: hidden };
         } catch(e){ return defaultConfig(defs); }
     }
     function defaultConfig(defs){
-        return { order: defs.map(function(d){ return d.key; }), hidden: [] };
+        return { order: defs.map(function(d){ return d.key; }), hidden: defs.filter(function(d){ return d.defHidden; }).map(function(d){ return d.key; }) };
     }
     function saveConfig(tableId, cfg){
         try { localStorage.setItem(storageKey(tableId), JSON.stringify(cfg)); } catch(e){}
@@ -6394,5 +6681,453 @@
         reset: resetConfig,
         open: openModal
     };
+})();
+
+/* ════════════════════════════════════════════════════════════════
+   M1.3a · Настройки отображения сайта (⚙ Мой профиль → Настройки).
+   Перенос пользовательских настроек из lab-main. Хранится в localStorage,
+   применяется data-атрибутами на <html> (осознанное глобальное оформление).
+   Управляет: фон-сплэш за стеклом (6 чемпов + свой цвет), оттенок стекла,
+   сила стекла, плотность таблиц, шрифт таблиц.
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  var DD = 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash';
+  var SPLASH = {
+    lux:    "url('"+DD+"/Lux_0.jpg')",
+    thresh: "url('"+DD+"/Thresh_0.jpg')",
+    ahri:   "url('"+DD+"/Ahri_0.jpg')",
+    yasuo:  "url('"+DD+"/Yasuo_0.jpg')",
+    jinx:   "url('"+DD+"/Jinx_0.jpg')",
+    brand:  "radial-gradient(ellipse at 28% 18%,rgba(11,196,227,.38),transparent 55%),radial-gradient(ellipse at 78% 82%,rgba(200,155,60,.30),transparent 55%),linear-gradient(135deg,#02121f,#0a0617)"
+  };
+  var DEF = { splash:'thresh', splashcolor:'#04121f', accent:'#0BC4E3', dim:'light', glasspow:'mid', glasstint:'neutral', glasssat:'rich', glassborder:'thin', density:'normal', tblfont:'medium' };
+  var KEY = 'site-settings';
+  function load(){ try { return Object.assign({}, DEF, JSON.parse(localStorage.getItem(KEY)||'{}')); } catch(e){ return Object.assign({}, DEF); } }
+  function persist(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+  var S = load();
+
+  var OPTS = [
+    { k:'splash',    label:'Арт фона за стеклом', items:[
+      {v:'lux',t:'Lux'},{v:'thresh',t:'Thresh'},{v:'ahri',t:'Ahri'},{v:'yasuo',t:'Yasuo'},{v:'jinx',t:'Jinx'},{v:'brand',t:'Бренд'},{v:'color',t:'Свой цвет'} ]},
+    { k:'dim',       label:'Затемнение фона (виден сплэш)', items:[{v:'none',t:'Нет'},{v:'light',t:'Слабо'},{v:'mid',t:'Средне'},{v:'strong',t:'Сильно'}] },
+    { k:'glasspow',  label:'Сила стекла',     items:[{v:'light',t:'Лёгкое'},{v:'mid',t:'Среднее'},{v:'strong',t:'Сильное'},{v:'ultra',t:'Экстрим'}] },
+    { k:'glasstint', label:'Оттенок стекла',  items:[{v:'neutral',t:'Нейтр.'},{v:'accent',t:'Акцент'},{v:'warm',t:'Тёплое'},{v:'cool',t:'Холодное'}] },
+    { k:'glasssat',  label:'Насыщенность стекла', items:[{v:'norm',t:'Обычная'},{v:'rich',t:'Сочная'},{v:'max',t:'Максимум'}] },
+    { k:'glassborder', label:'Граница стекла', items:[{v:'thin',t:'Тонкая'},{v:'glow',t:'Свечение'},{v:'none',t:'Без'}] },
+    { k:'density',   label:'Плотность таблиц',items:[{v:'cozy',t:'Просторно'},{v:'normal',t:'Средне'},{v:'dense',t:'Плотно'}] },
+    { k:'tblfont',   label:'Шрифт таблиц',    items:[{v:'small',t:'Мелкий'},{v:'medium',t:'Средний'},{v:'large',t:'Крупный'}] }
+  ];
+
+  function ensureSplash(){
+    var el = document.getElementById('siteSplash');
+    if (!el){ el = document.createElement('div'); el.id = 'siteSplash'; document.body.appendChild(el); }
+    return el;
+  }
+  function apply(){
+    var h = document.documentElement;
+    h.setAttribute('data-glass', 'on');
+    h.setAttribute('data-dim', S.dim);
+    h.setAttribute('data-glasspow', S.glasspow);
+    h.setAttribute('data-glasstint', S.glasstint);
+    h.setAttribute('data-glasssat', S.glasssat);
+    h.setAttribute('data-glassborder', S.glassborder);
+    h.setAttribute('data-density', S.density);
+    h.setAttribute('data-tblfont', S.tblfont);
+    // Акцент-цвет → --accent-rgb (один раз → рекрашивается весь сайт: заголовки, кнопки, рамки)
+    var hex = (S.accent || '#0BC4E3').replace('#','');
+    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    var r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+    if (!isNaN(r) && !isNaN(g) && !isNaN(b)) h.style.setProperty('--accent-rgb', r+', '+g+', '+b);
+    var el = ensureSplash();
+    if (S.splash === 'color') {
+      h.setAttribute('data-splashmode','color');
+      el.style.backgroundImage = 'none';
+      el.style.backgroundColor = S.splashcolor || '#04121f';
+    } else {
+      h.setAttribute('data-splashmode','art');
+      el.style.backgroundColor = '';
+      el.style.backgroundImage = SPLASH[S.splash] || SPLASH.thresh;
+    }
+  }
+
+  function build(){
+    var ov = document.createElement('div'); ov.className = 'ss-ov';
+    var grps = OPTS.map(function(o){
+      return '<div class="ss-grp"><div class="ss-label">'+o.label+'</div>'+
+        '<div class="ss-seg" data-k="'+o.k+'">'+
+          o.items.map(function(it){ return '<button data-v="'+it.v+'" class="'+(S[o.k]===it.v?'on':'')+'">'+it.t+'</button>'; }).join('')+
+        '</div>'+
+        (o.k==='splash' ? '<div class="ss-color" style="'+(S.splash==='color'?'':'display:none')+'"><input type="color" value="'+(S.splashcolor||'#04121f')+'"><span>свой цвет фона</span></div>' : '')+
+      '</div>';
+    }).join('');
+    var accentGrp = '<div class="ss-grp"><div class="ss-label">Цвет акцента (заголовки · кнопки · рамки)</div>'+
+      '<div class="ss-color"><input type="color" id="ssAccent" value="'+(S.accent||'#0BC4E3')+'"><span>основной цвет сайта</span></div></div>';
+    ov.innerHTML = '<div class="ss-modal">'+
+      '<div class="ss-h"><div class="ss-title">⚙ Настройки отображения</div><button class="ss-x" title="Закрыть">✕</button></div>'+
+      grps + accentGrp + '</div>';
+    document.body.appendChild(ov);
+
+    function close(){ ov.remove(); }
+    ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
+    ov.querySelector('.ss-x').onclick = close;
+    var colorWrap = ov.querySelector('.ss-color');
+    ov.querySelectorAll('.ss-seg').forEach(function(seg){
+      var k = seg.getAttribute('data-k');
+      seg.querySelectorAll('button').forEach(function(b){
+        b.onclick = function(){
+          S[k] = b.getAttribute('data-v');
+          seg.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x===b); });
+          if (k==='splash' && colorWrap) colorWrap.style.display = (S.splash==='color') ? '' : 'none';
+          persist(); apply();
+        };
+      });
+    });
+    var ci = ov.querySelector('.ss-color input[type="color"]');
+    if (ci) ci.oninput = function(){ S.splashcolor = ci.value; if (S.splash==='color'){ persist(); apply(); } };
+    var ac = ov.querySelector('#ssAccent');
+    if (ac) ac.oninput = function(){ S.accent = ac.value; persist(); apply(); };
+  }
+
+  window.openDisplaySettings = function(){
+    var um = document.getElementById('userMenu'); if (um) um.classList.remove('active');
+    if (!document.querySelector('.ss-ov')) build();
+  };
+
+  apply();
+})();
+
+/* ════════════════════════════════════════════════════════════════
+   M1.4 · Правая панель карточки чемпа (виды Статы/WinRate).
+   Клик по строке таблицы → карточка выбранного чемпа справа
+   (портрет, роли, статы на текущем уровне, «Подробнее» → модалка).
+   Данные из глобального window._champsRaw / _champIcon.
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  var sel = null;
+  function panel(){ var p=document.getElementById('champSidePanel'); if(!p){ p=document.createElement('div'); p.id='champSidePanel'; document.body.appendChild(p);} return p; }
+  function lvl(){ return window._curLvl || 10; }
+  function champs(){ return window._champsRaw || []; }
+  function icon(n){ return window._champIcon ? window._champIcon(n) : ''; }
+  function roles(c){ var r=[]; if(c.is){ if(c.is.Top)r.push('Соло'); if(c.is.Jungle)r.push('Лес'); if(c.is.Mid)r.push('Мид'); if(c.is.ADC)r.push('АДК'); if(c.is.Support)r.push('Сап'); } return r.join(' · '); }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function statAt(b,g,L){ return Math.round((b||0) + ((L-1)*(g||0))); }
+
+  function splash(n){ var k = window._champKey ? window._champKey(n) : n; return 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/' + k + '_0.jpg'; }
+
+  function render(name){
+    var p = panel();
+    var c = champs().find(function(x){ return x.name === name; });
+    if(!c){ p.innerHTML = '<div class="csc-hint">Кликни чемпиона в таблице — здесь будет его карточка</div>'; return; }
+    sel = name;
+    var L = lvl();
+    var energy = c.res === 'Energy';
+    // 6 реальных статов на текущем уровне → пилюли-теги (лабовый .tag формат)
+    var tags = [
+      '⚔ ' + statAt(c.ad_b,c.ad_g,L) + ' AD',
+      '✚ ' + statAt(c.hp_b,c.hp_g,L) + ' HP',
+      '🛡 ' + statAt(c.ar_b,c.ar_g,L) + ' Броня',
+      '✦ ' + statAt(c.mr_b,c.mr_g,L) + ' Mрез',
+      (energy ? '⚡ Энергия' : '💧 ' + statAt(c.mn_b,c.mn_g,L) + ' Мана'),
+      '🏹 ' + statAt(c.rng_b,c.rng_g,L) + ' Дальн.'
+    ];
+    p.innerHTML =
+      '<div class="big"><img alt="" src="' + splash(name) + '"></div>' +
+      '<h3>' + esc(name) + '</h3>' +
+      '<div class="csc-role">' + (roles(c) || '—') + ' · ур.' + L + '</div>' +
+      '<div class="meta">' + tags.map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('') + '</div>' +
+      '<button class="csc-btn" type="button">Подробнее →</button>';
+    // сплэш не нашёлся (WR-эксклюзив) → падаем на квадратную иконку, потом прячем
+    var bigImg = p.querySelector('.big img');
+    if(bigImg){
+      var triedIcon = false;
+      bigImg.onerror = function(){ if(!triedIcon){ triedIcon = true; this.src = icon(name); } else { this.style.display = 'none'; } };
+    }
+    var b = p.querySelector('.csc-btn'); if(b) b.onclick = function(){ if(window.openChampDetail) window.openChampDetail(name); };
+  }
+
+  // делегированный клик по строкам таблицы статов → выбрать чемпа в карточку
+  document.addEventListener('click', function(e){
+    var body = document.getElementById('statBody'); if(!body) return;
+    var tr = e.target.closest('tr'); if(!tr || !body.contains(tr)) return;
+    var nm = tr.querySelector('.f-cname'); if(nm) render(nm.textContent.trim());
+  });
+  // карточка пересчитывается при смене уровня
+  document.addEventListener('input', function(e){ if(e.target && e.target.id === 'lvlRange' && sel) render(sel); });
+  // авто-первый чемп когда данные загрузились
+  document.addEventListener('champsLoaded', function(){ if(!sel){ var c = champs()[0]; if(c) render(c.name); else render(null); } });
+
+  // панель видна на главном экране по умолчанию (вид Статы); switchMainView переключает
+  try { document.body.setAttribute('data-sidecard','on'); } catch(e){}
+  if(!champs().length) render(null);
+  else if(!sel){ render(champs()[0].name); }
+
+  window.ChampSidePanel = { render: render, current: function(){ return sel; } };
+})();
+
+/* ════════════════════════════════════════════════════════════════
+   M2 · МЕТА-ХАБ — ПОРТ из lab-main hubView (вид «Мета-хаб»).
+   Структура+стиль 1-в-1 из лаба; данные РЕАЛЬНЫЕ из WR_DATA['чалик'] (Challenger) +
+   реальные иконки чемпов. Турниры/новости пока заглушки (нет источника).
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function icon(n){ return window._champIcon ? window._champIcon(n) : ''; }
+  function roleRu(r){ return {top:'Соло',jungle:'Лес',mid:'Мид',adc:'АДК',support:'Сап'}[r] || r; }
+  function tierOf(wr){ return wr>=53?'S':wr>=51?'A':wr>=49?'B':'C'; }
+  function wrCls(v){ return v>=50?'wr-g':'wr-b'; }
+  function port(n){ return '<img class="f-port" src="'+icon(n)+'" alt="" onerror="this.style.visibility=\'hidden\'">'; }
+  function splash(n){ var k = window._champKey ? window._champKey(n) : n; return 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/' + k + '_0.jpg'; }
+  function chRaw(n){ return (window._champsRaw||[]).find(function(x){ return x.name===n; }); }
+  // 🔥 ВЕЕР-витрина меты — ПОРТ из lab-hover-reveal (layout v-fan + раскрытие «мини»).
+  // Раздвигающаяся витрина топ-N чемпов: наведение растит карту и раскрывает AD/HP/WR.
+  function fanHTML(list){
+    return '<div class="mh-fan-wrap"><h4>🔥 Витрина меты <span class="pill">Топ-'+list.length+' Challenger</span></h4>'+
+      '<div class="mh-fan-stage v-fan">'+list.map(function(c){
+        var cr = chRaw(c.name);
+        var ad = cr ? Math.round(cr.ad_b) : '—';
+        var hp = cr ? Math.round(cr.hp_b) : '—';
+        return '<div class="mh-card glow" data-champ="'+esc(c.name)+'">'+
+          '<div class="mh-art"><img src="'+splash(c.name)+'" alt="" onerror="this.onerror=null;this.src=\''+icon(c.name)+'\'"></div>'+
+          '<div class="mh-shade"></div>'+
+          '<div class="mh-body">'+
+            '<div class="mh-name">'+esc(c.name)+'</div>'+
+            '<div class="mh-role">'+roleRu(c.role)+'</div>'+
+            '<div class="mh-reveal"><div class="rv-mini">'+
+              '<div><div class="mv" style="color:#e8820a">'+ad+'</div><div class="ml">⚔ AD</div></div>'+
+              '<div><div class="mv" style="color:#43e08a">'+hp+'</div><div class="ml">✚ HP</div></div>'+
+              '<div><div class="mv" style="color:'+(c.wr>=50?'#43e08a':'#ff6b6b')+'">'+c.wr.toFixed(1)+'%</div><div class="ml">WR</div></div>'+
+            '</div><div class="click-tip">клик → подробнее</div></div>'+
+          '</div>'+
+        '</div>';
+      }).join('')+'</div></div>';
+  }
+
+  // Реальные данные из WR_DATA. Заполнен только ранг 'чалик' (Challenger) —
+  // алмаз/мастер/ГМ/суверен пока пустые (ждут Firestore/пайплайн).
+  function wrPool(){
+    var rd = (window.WR_DATA || {})['чалик'] || {};
+    var out = [];
+    ['top','jungle','mid','adc','support'].forEach(function(role){
+      (rd[role] || []).forEach(function(o){
+        if(o && o.name && !isNaN(+o.wr)) out.push({ name:o.name, wr:+o.wr, pr:+o.pr||0, br:+o.br||0, role:role });
+      });
+    });
+    return out;
+  }
+  // лучший вход на чемпа (по WR), дедуп между ролями
+  function bestPerChamp(pool){
+    var m = {};
+    pool.forEach(function(o){ if(!m[o.name] || o.wr > m[o.name].wr) m[o.name] = o; });
+    return Object.keys(m).map(function(k){ return m[k]; });
+  }
+
+  // ── Гайды чемпов (data-pipeline/guides): матчапы/контры/сборки/руны/прокачка ──
+  var GUIDE_BASE = 'data-pipeline/guides/';
+  var _gIndex = null, _gCache = {}, _gAlias = { monkeyking:'wukong' };
+  function _gnorm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+  function guideIndex(){
+    if(_gIndex) return _gIndex;
+    _gIndex = fetch(GUIDE_BASE + '_index.json', { cache:'no-cache' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(j){ var map = {}; if(j && j.champions) j.champions.forEach(function(c){ map[_gnorm(c.name)] = c.slug; }); return map; })
+      .catch(function(){ return {}; });
+    return _gIndex;
+  }
+  function loadGuide(name){
+    return guideIndex().then(function(map){
+      var n = _gnorm(name), slug = map[n] || _gAlias[n] || n;
+      if(_gCache[slug]) return _gCache[slug];
+      _gCache[slug] = fetch(GUIDE_BASE + slug + '.json', { cache:'no-cache' })
+        .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+      return _gCache[slug];
+    });
+  }
+  window.ChampGuides = { load: loadGuide, index: guideIndex };
+
+  var _lastHero = null;   // имя героя дня (для подгрузки его гайда в renderMetaHub)
+
+  function kpiCards(pool, champs){
+    var topWr = champs.slice().sort(function(a,b){ return b.wr-a.wr; })[0];
+    var mostBan = pool.slice().sort(function(a,b){ return b.br-a.br; })[0];
+    var roleSum = {}; pool.forEach(function(o){ roleSum[o.role] = (roleSum[o.role]||0) + o.pr; });
+    var metaRole = Object.keys(roleSum).sort(function(a,b){ return roleSum[b]-roleSum[a]; })[0];
+    return '<div class="f-kpi"><div class="k-lbl">Топ винрейт</div><div class="k-val">'+(topWr?esc(topWr.name):'—')+'</div><div class="k-sub">'+(topWr?topWr.wr.toFixed(1)+'% WR':'')+'</div></div>'+
+      '<div class="f-kpi"><div class="k-lbl">Мета-роль</div><div class="k-val">'+(metaRole?roleRu(metaRole):'—')+'</div><div class="k-sub">по пикрейту</div></div>'+
+      '<div class="f-kpi"><div class="k-lbl">Самый банимый</div><div class="k-val">'+(mostBan?esc(mostBan.name):'—')+'</div><div class="k-sub">'+(mostBan?mostBan.br.toFixed(1)+'% банов':'')+'</div></div>'+
+      '<div class="f-kpi"><div class="k-lbl">Чемпионов</div><div class="k-val">'+champs.length+'</div><div class="k-sub">ранг Challenger</div></div>';
+  }
+  function hubHTML(){
+    var pool = wrPool();
+    var tools=[['👥','Чемпионы','sideChamps'],['⚔','Калькулятор','calc'],['📦','Предметы','items'],['💎','Руны','runes'],['📋','Драфтер','draftCoop'],['🏆','Киберспорт','cybersport']];
+    var toolsHTML = '<div class="hub-tools">'+tools.map(function(t){ return '<div class="hub-tool" data-tool="'+t[2]+'"><div class="ti">'+t[0]+'</div><div class="tn">'+t[1]+'</div></div>'; }).join('')+'</div>';
+    if(!pool.length){
+      return '<div class="f-hub"><div class="hub-card"><h4>📈 Мета-хаб</h4><div style="color:var(--text-muted);font-size:13px;padding:8px 0;">Данные WinRate ещё загружаются…</div></div>'+toolsHTML+'</div>';
+    }
+    var champs = bestPerChamp(pool);
+    var byWr  = champs.slice().sort(function(a,b){ return b.wr-a.wr; });
+    var hero  = byWr[0];
+    _lastHero = hero.name;
+    var top5  = byWr.slice(0,5);
+    var sTier = byWr.filter(function(c){ return c.wr>=52; }).slice(0,10);
+    var topPr = champs.slice().sort(function(a,b){ return b.pr-a.pr; }).slice(0,5);
+    var topBr = champs.slice().sort(function(a,b){ return b.br-a.br; }).slice(0,5);
+    var tours=[['🔴','WR Masters','сегодня 18:00'],['🟡','Asia Cup','завтра 14:00'],['⚪','EU Open','12.06']];
+    return '<div class="f-hub">'+
+      '<div class="hub-hero"><img class="big" src="'+icon(hero.name)+'" alt="" onerror="this.style.visibility=\'hidden\'">'+
+        '<div class="info"><span class="lbl">★ Лидер мета · Challenger</span><h2>'+esc(hero.name)+'</h2>'+
+          '<div class="row"><span class="tag">🎖 Тир '+tierOf(hero.wr)+'</span><span class="tag">📈 '+hero.wr.toFixed(1)+'% WR</span><span class="tag">🗺 '+roleRu(hero.role)+'</span></div>'+
+          '<button class="cta" data-tool="sideChamps">Открыть гайды →</button></div></div>'+
+      '<div class="f-kpis">'+kpiCards(pool, champs)+'</div>'+
+      fanHTML(top5)+
+      '<div class="hub-cards">'+
+        '<div class="hub-card"><h4>📈 Топ-5 по винрейту <span class="pill">Challenger</span></h4>'+top5.map(function(c){ return '<div class="hc-row">'+port(c.name)+'<span class="hc-n">'+esc(c.name)+'</span><span class="hc-v '+wrCls(c.wr)+'">'+c.wr.toFixed(1)+'%</span></div>'; }).join('')+'</div>'+
+        '<div class="hub-card"><h4>🎖 S-тир сейчас</h4><div class="hc-pool">'+sTier.map(function(c){ return '<div class="hc-champ">'+port(c.name)+'<span>'+esc(c.name)+'</span></div>'; }).join('')+'</div></div>'+
+        '<div class="hub-card"><h4>🎯 Топ по пикрейту</h4>'+topPr.map(function(c){ return '<div class="hc-row">'+port(c.name)+'<span class="hc-n">'+esc(c.name)+'</span><span class="hc-v">'+c.pr.toFixed(1)+'%</span></div>'; }).join('')+'</div>'+
+        '<div class="hub-card"><h4>🚫 Топ по банрейту</h4>'+topBr.map(function(c){ return '<div class="hc-row">'+port(c.name)+'<span class="hc-n">'+esc(c.name)+'</span><span class="hc-v wr-b">'+c.br.toFixed(1)+'%</span></div>'; }).join('')+'</div>'+
+        '<div class="hub-card" id="mhBuild"><h4>🛠 Сборка дня <span class="pill">'+esc(hero.name)+'</span></h4><div class="hc-mini" style="color:var(--text-muted);font-size:12px;padding:4px 0;">загрузка…</div></div>'+
+        '<div class="hub-card" id="mhCounter"><h4>⚔ Контрят '+esc(hero.name)+'</h4><div class="hc-mini" style="color:var(--text-muted);font-size:12px;padding:4px 0;">загрузка…</div></div>'+
+        '<div class="hub-card"><h4>🏆 Ближайшие турниры</h4>'+tours.map(function(t){ return '<div class="hc-tour"><span class="hc-dot">'+t[0]+'</span><b>'+t[1]+'</b><span class="hc-when">'+t[2]+'</span></div>'; }).join('')+'</div>'+
+        '<div class="hub-card"><h4>📰 Что нового <span class="pill">Patch 7.0f</span></h4><ul class="hc-news"><li>Раздел в разработке — патч-ноты подключим к ленте изменений</li></ul></div>'+
+      '</div>'+
+      toolsHTML+
+    '</div>';
+  }
+  window.renderMetaHub = function(mount){
+    if(!mount) return;
+    mount.innerHTML = hubHTML();
+    mount.querySelectorAll('[data-tool]').forEach(function(el){
+      el.addEventListener('click', function(){ if(window.sidebarOpen) window.sidebarOpen(el.getAttribute('data-tool')); });
+    });
+    mount.querySelectorAll('[data-champ]').forEach(function(el){
+      el.addEventListener('click', function(){ if(window.openChampDetail) window.openChampDetail(el.getAttribute('data-champ')); });
+    });
+    // Реальная сборка + контры героя дня из гайда (асинхронно; при сбое — «нет данных»)
+    if(_lastHero){
+      loadGuide(_lastHero).then(function(g){
+        var bEl = mount.querySelector('#mhBuild .hc-mini');
+        if(bEl){
+          var b = g && g.builds && g.builds[0] && g.builds[0].items;
+          var core = b ? (b.core || []).concat((b.boots && b.boots[0]) ? [b.boots[0]] : []) : [];
+          bEl.innerHTML = core.length
+            ? core.map(function(it){ return '<div class="hc-row" style="padding:5px 0;"><span class="hc-n" style="font-size:12.5px;">🔹 '+esc(it)+'</span></div>'; }).join('')
+            : 'нет данных';
+        }
+        var cEl = mount.querySelector('#mhCounter .hc-mini');
+        if(cEl){
+          var cs = (g && g.counters) || [];
+          cEl.innerHTML = cs.length
+            ? '<div class="hc-pool">'+cs.map(function(n){ return '<div class="hc-champ">'+port(n)+'<span>'+esc(n)+'</span></div>'; }).join('')+'</div>'
+            : 'нет данных';
+        }
+      });
+    }
+  };
+})();
+
+/* ════════════════════════════════════════════════════════════════
+   🎖 ТИР-ЛИСТ — ПОРТ из lab-main (инлайн tiermaker .f-tier/.tl-*).
+   Разметка/CSS/sortable 1-в-1 из лаба; чемпы РЕАЛЬНЫЕ (иконки + авто-тир
+   из WR-данных S+/S/A/B/C/D), перетаскивание, ⚙ 4 настройки (localStorage),
+   «↺ Сброс к мете». Заменяет старую фуллскрин-модалку чемпионского тира.
+   ════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  var TIERKEYS=['S+','S','A','B','C','D'];
+  var TIERCOLORS={'S+':'#FF3A3A','S':'#C43A3A','A':'#C46A1C','B':'#BC9800','C':'#1E8848','D':'#555566'};
+  var TIER_ORD={'S+':6,'S':5,'A':4,'B':3,'C':2,'D':1};
+  var TIEROPTS={
+    tlayout:{label:'Раскладка',items:[['rows','Ряды'],['cols','Колонки']]},
+    tpool:{label:'Пул',items:[['bottom','Снизу'],['side','Сбоку']]},
+    tsize:{label:'Размер в тирах',items:[['s','S'],['m','M'],['l','L']]},
+    psize:{label:'Размер в пуле',items:[['s','S'],['m','M'],['l','L']]}
+  };
+  var DEF={tlayout:'rows',tpool:'bottom',tsize:'m',psize:'m'};
+  var S=loadSettings();
+  function loadSettings(){ try{ var o=JSON.parse(localStorage.getItem('tier-settings')||'{}'); var r={}; Object.keys(DEF).forEach(function(k){ r[k]=o[k]||DEF[k]; }); return r; }catch(e){ return JSON.parse(JSON.stringify(DEF)); } }
+  function saveSettings(){ try{ localStorage.setItem('tier-settings',JSON.stringify(S)); }catch(e){} }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function icon(n){ return window._champIcon ? window._champIcon(n) : ''; }
+
+  // Источник: WR_DATA. Берём лучший (высший) тир чемпа среди его ролей.
+  function wrChamps(){
+    var rd = window.WR_DATA || {};
+    var rank = (rd['все'] && roleHasData(rd['все'])) ? 'все' : (rd['чалик'] ? 'чалик' : Object.keys(rd)[0]);
+    var pool = rd[rank] || {};
+    var best = {};
+    ['top','jungle','mid','adc','support'].forEach(function(ro){
+      (pool[ro]||[]).forEach(function(c){
+        var tier = (c.tier && TIER_ORD[c.tier]) ? c.tier : tierFromWr(+c.wr);
+        var ord = TIER_ORD[tier];
+        if(!best[c.name] || ord > best[c.name].ord) best[c.name] = { name:c.name, tier:tier, ord:ord };
+      });
+    });
+    return Object.keys(best).map(function(n){ return best[n]; });
+  }
+  // фолбэк, если в данных нет поля tier (хардкод-WR) — раскидать по винрейту
+  function tierFromWr(wr){ return wr>=53?'S+':wr>=51.5?'S':wr>=50?'A':wr>=48.5?'B':wr>=47?'C':'D'; }
+  function roleHasData(r){ return ['top','jungle','mid','adc','support'].some(function(ro){ return (r[ro]||[]).length; }); }
+
+  function autoPlacement(){
+    var p={pool:[]}; TIERKEYS.forEach(function(k){ p[k]=[]; });
+    wrChamps().sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(c){ (p[c.tier]||p.pool).push(c.name); });
+    return p;
+  }
+  var _placement=null;
+  function placement(){
+    if(_placement) return _placement;
+    var auto=autoPlacement();
+    var all={}; Object.keys(auto).forEach(function(z){ auto[z].forEach(function(n){ all[n]=1; }); });
+    try{
+      var saved=JSON.parse(localStorage.getItem('tier-placement')||'null');
+      if(saved && saved.pool){
+        // сверка с актуальным ростером: выкинуть ушедших, докинуть новых в пул
+        var seen={}, p={pool:[]}; TIERKEYS.forEach(function(k){ p[k]=[]; });
+        ['pool'].concat(TIERKEYS).forEach(function(z){ (saved[z]||[]).forEach(function(n){ if(all[n] && !seen[n]){ seen[n]=1; p[z].push(n); } }); });
+        Object.keys(all).forEach(function(n){ if(!seen[n]) p.pool.push(n); });
+        _placement=p; return _placement;
+      }
+    }catch(e){}
+    _placement=auto; return _placement;
+  }
+  function savePlacement(){ try{ localStorage.setItem('tier-placement',JSON.stringify(_placement)); }catch(e){} }
+
+  function tchip(name){ return '<div class="tl-chip" data-champ="'+esc(name)+'" title="'+esc(name)+'"><img src="'+icon(name)+'" alt="" onerror="this.style.visibility=\'hidden\'"></div>'; }
+  function render(mount){
+    if(!mount) return;
+    if(!roleHasData((window.WR_DATA||{})['чалик']||{}) && !wrChamps().length){
+      mount.innerHTML='<div style="padding:48px 20px;text-align:center;color:rgba(255,255,255,.45);">Данные WinRate ещё загружаются…</div>';
+      return;
+    }
+    var p=placement();
+    var tiers='<div class="tl-tiers">'+TIERKEYS.map(function(k){ return '<div class="tl-tier"><div class="tl-badge" style="background:'+TIERCOLORS[k]+'">'+k+'</div><div class="tl-lane" data-zone="'+k+'">'+(p[k]||[]).map(tchip).join('')+'</div></div>'; }).join('')+'</div>';
+    var pool='<div class="tl-poolwrap"><div class="tl-plabel">Пул чемпионов</div><div class="tl-pool" data-zone="pool">'+(p.pool||[]).map(tchip).join('')+'</div></div>';
+    var settings='<div class="tl-settings" id="tlSettings">'+Object.keys(TIEROPTS).map(function(key){ var o=TIEROPTS[key]; return '<div class="tl-grp"><span class="tl-glabel">'+o.label+'</span><div class="tl-seg" data-topt="'+key+'">'+o.items.map(function(it){ return '<button data-v="'+it[0]+'" class="'+(it[0]===S[key]?'on':'')+'">'+it[1]+'</button>'; }).join('')+'</div></div>'; }).join('')+'<button class="tl-reset" id="tlReset">↺ Сбросить к мете</button></div>';
+    var bar='<div class="tl-bar"><span class="tl-title">🎖 Тир-лист</span><button class="tl-gear" id="tlGear" title="Настройки">⚙</button></div>';
+    mount.innerHTML='<div class="f-tier" data-tlayout="'+S.tlayout+'" data-tpool="'+S.tpool+'" data-tsize="'+S.tsize+'" data-psize="'+S.psize+'">'+bar+settings+'<div class="tl-board">'+tiers+pool+'</div></div>';
+    wire(mount);
+    initSortable(mount);
+  }
+  function wire(mount){
+    var fTier=mount.querySelector('.f-tier');
+    var gear=mount.querySelector('#tlGear'), sett=mount.querySelector('#tlSettings');
+    if(gear) gear.onclick=function(e){ e.stopPropagation(); var open=!sett.classList.contains('open'); sett.classList.toggle('open',open); gear.classList.toggle('on',open); };
+    if(!document._tlOutside){ document._tlOutside=true; document.addEventListener('click',function(e){ var s=document.getElementById('tlSettings'); if(s&&s.classList.contains('open')&&!e.target.closest('#tlSettings')&&!e.target.closest('#tlGear')){ s.classList.remove('open'); var g=document.getElementById('tlGear'); if(g)g.classList.remove('on'); } }); }
+    mount.querySelectorAll('.tl-seg').forEach(function(seg){ var key=seg.dataset.topt; seg.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ S[key]=b.dataset.v; saveSettings(); seg.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on',x===b); }); if(fTier) fTier.setAttribute('data-'+key,b.dataset.v); }; }); });
+    var rb=mount.querySelector('#tlReset'); if(rb) rb.onclick=function(){ _placement=autoPlacement(); try{ localStorage.removeItem('tier-placement'); }catch(e){} render(mount); };
+  }
+  function snapshot(mount){
+    var p={}; mount.querySelectorAll('.f-tier [data-zone]').forEach(function(z){ p[z.dataset.zone]=Array.prototype.map.call(z.querySelectorAll('.tl-chip'),function(c){ return c.dataset.champ; }); });
+    _placement=p; savePlacement();
+  }
+  function initSortable(mount){
+    if(!window.Sortable) return;
+    mount.querySelectorAll('.f-tier [data-zone]').forEach(function(zone){
+      new window.Sortable(zone,{ group:'tier', animation:90, ghostClass:'tl-ghost', chosenClass:'tl-chosen', dragClass:'tl-drag', forceFallback:true, fallbackOnBody:true, onEnd:function(){ snapshot(mount); } });
+    });
+  }
+  window.renderTierBoard = function(mount){ render(mount); };
 })();
 

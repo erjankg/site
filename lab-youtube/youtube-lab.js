@@ -11,13 +11,19 @@
 const CHAMPION = { name: 'Ривен', role: 'Баронова линия' };
 
 const VIDEOS = [
-  { uid: 'v1', player: 'KKM',       role: 'top', patch: '5.2', lang: 'cn', channel: 'WR China Replays', id: 'yCm6Jk0Bcww', title: 'Challenger катка — идеальное комбо', dur: '24:10' },
-  { uid: 'v2', player: 'Long',      role: 'top', patch: '5.2', lang: 'cn', channel: 'Rift Highlights',  id: 'yCm6Jk0Bcww', title: 'Карри игра, разбор тимфайтов', dur: '31:48' },
-  { uid: 'v3', player: 'Shadow',    role: 'top', patch: '5.2', lang: 'en', channel: 'Challenger Plays', id: 'yCm6Jk0Bcww', title: 'Riven vs Garen — доминация на линии', dur: '17:22' },
-  { uid: 'v4', player: 'Нагибатор', role: 'top', patch: '5.2', lang: 'ru', channel: 'НагибаторWR',      id: 'yCm6Jk0Bcww', title: 'Как карри на Ривен — гайд по комбо', dur: '22:05' },
-  { uid: 'v5', player: 'Yuuki',     role: 'top', patch: '5.1', lang: 'en', channel: 'ProGuides',        id: 'yCm6Jk0Bcww', title: 'Агрессивный старт против Гарена', dur: '19:02' },
-  { uid: 'v6', player: 'GerSe',     role: 'top', patch: '5.0', lang: 'ru', channel: 'WR Гайды РУ',       id: 'yCm6Jk0Bcww', title: 'Старая катка — для истории', dur: '27:33' },
+  { uid: 'v1', player: 'KKM',       role: 'top', vs: 'Гарен',   patch: '5.2', lang: 'cn', rank: 'Rank 1',     channel: 'WR China Replays', reupload: true, originalUrl: 'https://www.bilibili.com/', id: 'yCm6Jk0Bcww', title: 'Challenger катка — идеальное комбо', dur: '24:10', stamps: [{ t: '2:15', label: 'старт линии' }, { t: '8:40', label: 'тимфайт' }, { t: '14:05', label: '1v2 аутплей' }] },
+  { uid: 'v2', player: 'Long',      role: 'top', vs: 'Дариус',  patch: '5.2', lang: 'cn', rank: 'Challenger', channel: 'Rift Highlights',  reupload: true, originalUrl: 'https://www.bilibili.com/', id: 'yCm6Jk0Bcww', title: 'Карри игра, разбор тимфайтов', dur: '31:48', stamps: [{ t: '5:30', label: 'обмен' }, { t: '19:12', label: 'клатч' }] },
+  { uid: 'v3', player: 'Shadow',    role: 'top', vs: 'Гарен',   patch: '5.2', lang: 'en', rank: 'Challenger', channel: 'Challenger Plays', id: 'yCm6Jk0Bcww', title: 'Riven vs Garen — доминация на линии', dur: '17:22' },
+  { uid: 'v4', player: 'Нагибатор', role: 'top', vs: 'Камилла', patch: '5.2', lang: 'ru', rank: 'PRO',        channel: 'НагибаторWR',      id: 'yCm6Jk0Bcww', title: 'Как карри на Ривен — гайд по комбо', dur: '22:05', stamps: [{ t: '0:45', label: 'руны/билд' }, { t: '6:10', label: 'комбо' }] },
+  { uid: 'v5', player: 'Yuuki',     role: 'top', vs: 'Гарен',   patch: '5.1', lang: 'en', channel: 'ProGuides',        id: 'yCm6Jk0Bcww', title: 'Агрессивный старт против Гарена', dur: '19:02' },
+  { uid: 'v6', player: 'GerSe',     role: 'top', vs: 'Дариус',  patch: '5.0', lang: 'ru', channel: 'WR Гайды РУ',       id: 'yCm6Jk0Bcww', title: 'Старая катка — для истории', dur: '27:33' },
 ];
+
+/* «5:20» → секунды (для перехода по таймкоду) */
+function mmssToSec(t) {
+  const p = String(t).split(':').map(n => parseInt(n, 10) || 0);
+  return p.length === 2 ? p[0] * 60 + p[1] : p[0];
+}
 
 const ROLE_LABEL = { top: 'Топ', jng: 'Лес', mid: 'Мид', adc: 'АДК', sup: 'Сап' };
 const LANG_LABEL = { ru: 'RU', en: 'EN', cn: 'CN' };
@@ -85,19 +91,20 @@ const VARIANTS = [
 
 /* — состояние песочницы — */
 const DEFAULTS = {
-  variant: 'row',
-  bg: 'lux',              // арт фона (сплэш) — стандарт лабов
-  glasspow: 'mid',        // сила стекла
-  tint: 'neutral',        // СТЕКЛО — оттенок (neutral = бело-матовое)
-  glasssat: 'rich',       // насыщенность стекла
-  glassborder: 'thin',    // граница стекла
-  glassnoise: false,      // зерно/шум
-  bgdim: 'mid',           // фон: затемнение
+  variant: 'feat',        // ФИНАЛ (зафиксировано): B · Главное + мелкие
+  bg: 'lux',              // арт фона (сплэш) — ЛАБ-ПРЕВЬЮ (на боевом глобальный сплэш сайта)
+  glasspow: 'mid',        // сила стекла — ГЛОБАЛЬНАЯ (хаб сайта); в лабе = дизайн-полоса превью
+  tint: 'accent',         // ФИНАЛ (зафиксировано): Акцент (циан)
+  glasssat: 'norm',       // насыщенность — ГЛОБАЛЬНАЯ (хаб сайта); в лабе = превью
+  glassborder: 'thin',    // граница — ГЛОБАЛЬНАЯ (хаб сайта); в лабе = превью
+  glassnoise: false,      // зерно/шум — ГЛОБАЛЬНОЕ (хаб сайта); в лабе = превью
+  bgdim: 'mid',           // фон: затемнение — ЛАБ-ПРЕВЬЮ
   curPatch: '5.2',        // текущий патч сайта (полу-авто простановка + пометка старых)
-  showTitle: true,     // показывать название ролика (подтягивается с ютуба)
+  showTitle: true,     // показывать название ролика — ⚙ ЮЗЕРСКАЯ (единственная в блоке)
   markOld: true,       // приглушать видео со старого патча
   sortPatch: true,     // свежий патч сверху
   fLang: 'all',        // фильтр по языку
+  fVs: 'all',          // фильтр по матчапу (против кого)
   fSaved: false,       // фильтр: только сохранённые ★
   fPatch: false,       // фильтр: только текущий патч
   radius: 14,
@@ -105,6 +112,7 @@ const DEFAULTS = {
 };
 let state = { ...DEFAULTS };
 let usersetOpen = false;   // открыт ли попап ⚙ настроек юзера (внутри блока)
+let LS = null;             // общий механизм памяти лаба (lab-settings.js)
 
 /* — сравнение патчей «5.2» vs «5.0» → число — */
 function patchNum(p) {
@@ -125,12 +133,23 @@ function cardHTML(v, opts = {}) {
   const saved = SAVED.has(v.uid);
   const roleBadge = `<span class="badge badge-role r-${v.role}">${ROLE_LABEL[v.role] || v.role}</span>`;
   const langBadge = v.lang ? `<span class="badge badge-lang">${LANG_LABEL[v.lang] || v.lang}</span>` : '';
+  const vsBadge = v.vs ? `<span class="badge badge-vs">vs ${v.vs}</span>` : '';
   const patchBadge = `<span class="badge badge-patch">патч ${v.patch}</span>`;
   const oldBadge = old ? `<span class="badge badge-old">старый патч</span>` : '';
+  const rankBadge = v.rank ? `<span class="vrank ${v.rank === 'PRO' ? 'is-pro' : ''}">${v.rank}</span>` : '';
   const titleHTML = (state.showTitle && v.title && !opts.noTitle)
     ? `<div class="vtitle">${v.title}</div>` : '';
   const subRole = opts.bigName ? `<small>${ROLE_LABEL[v.role] || ''} · ${CHAMPION.name}</small>` : '';
-  const channel = v.channel ? `<span class="vchan">залил: ${v.channel}</span>` : '';
+
+  // атрибуция: играет ИГРОК (имя), залил КАНАЛ; реупа-бейдж + ссылка «оригинал»
+  const reup = v.reupload ? ` <span class="vreup">реупа</span>` : '';
+  const orig = v.originalUrl ? ` · <a class="vorig" href="${v.originalUrl}" target="_blank" rel="noopener">оригинал ↗</a>` : '';
+  const channel = v.channel ? `<span class="vchan">залил: ${v.channel}${reup}${orig}</span>` : '';
+
+  // таймкоды (клик → видео с нужной секунды)
+  const stamps = (v.stamps && v.stamps.length)
+    ? `<div class="vstamps">${v.stamps.map(s => `<button class="vstamp" data-vid="${v.id}" data-sec="${mmssToSec(s.t)}">▸ ${s.t} ${s.label}</button>`).join('')}</div>`
+    : '';
 
   return `
     <article class="vcard glassy ${old ? 'is-old' : ''}" data-id="${v.id}" data-uid="${v.uid}">
@@ -148,36 +167,23 @@ function cardHTML(v, opts = {}) {
       <div class="vmeta">
         <div class="vplayer">
           <span class="vavatar">${initial(v.player)}</span>
-          <span class="vname">${v.player}${subRole}${channel}</span>
+          <span class="vname">${v.player}${rankBadge}${subRole}${channel}</span>
         </div>
         ${titleHTML}
-        <div class="vbadges">${roleBadge}${langBadge}${patchBadge}${oldBadge}</div>
+        <div class="vbadges">${roleBadge}${langBadge}${vsBadge}${patchBadge}${oldBadge}</div>
+        ${stamps}
       </div>
     </article>`;
 }
 
-/* ── ⚙ НАСТРОЙКИ ЮЗЕРА (попап в стекле, для посетителя — не дизайн-полоса лаба) ── */
+/* ── ⚙ НАСТРОЙКИ ЮЗЕРА (попап в стекле, для посетителя — не дизайн-полоса лаба).
+   Стекло (сила/насыщенность/граница) тут НЕ живёт — оно ГЛОБАЛЬНОЕ (один хаб сайта),
+   блок его наследует. Здесь — только контентный тогл этого блока. ── */
 function usersetHTML() {
   return `
     <div class="vb-userset glassy ${usersetOpen ? 'open' : ''}" id="vbUserset">
       <div class="us-title">Настройки</div>
-      <div class="ctrl">
-        <div class="ctrl-label">Сила стекла</div>
-        <select id="usGlasspow">
-          ${GLASS_POW.map(g => `<option value="${g.key}" ${g.key === state.glasspow ? 'selected' : ''}>${g.label}</option>`).join('')}
-        </select>
-      </div>
-      <div class="ctrl">
-        <div class="ctrl-label">Плотность <span class="val">${state.gap}px</span></div>
-        <input type="range" id="usGap" min="6" max="24" value="${state.gap}">
-      </div>
-      <div class="ctrl">
-        <div class="ctrl-label">Скругление <span class="val">${state.radius}px</span></div>
-        <input type="range" id="usRadius" min="0" max="24" value="${state.radius}">
-      </div>
       <div class="ctrl ctrl-toggle"><label class="toggle"><input type="checkbox" id="usShowTitle" ${state.showTitle ? 'checked' : ''}> Показывать название ролика</label></div>
-      <div class="ctrl ctrl-toggle"><label class="toggle"><input type="checkbox" id="usMarkOld" ${state.markOld ? 'checked' : ''}> Приглушать старые патчи</label></div>
-      <div class="ctrl ctrl-toggle"><label class="toggle"><input type="checkbox" id="usSortPatch" ${state.sortPatch ? 'checked' : ''}> Свежий патч сверху</label></div>
     </div>`;
 }
 
@@ -185,6 +191,7 @@ function usersetHTML() {
 function filteredVideos() {
   let list = VIDEOS.slice();
   if (state.fLang !== 'all') list = list.filter(v => v.lang === state.fLang);
+  if (state.fVs !== 'all') list = list.filter(v => v.vs === state.fVs);
   if (state.fSaved) list = list.filter(v => SAVED.has(v.uid));
   if (state.fPatch) list = list.filter(v => patchNum(v.patch) >= patchNum(state.curPatch));
   if (state.sortPatch) list.sort((a, b) => patchNum(b.patch) - patchNum(a.patch));
@@ -209,9 +216,15 @@ function blockHTML() {
     </div>`;
 
   const langChips = [{ k: 'all', t: 'Все' }, { k: 'ru', t: 'RU' }, { k: 'en', t: 'EN' }, { k: 'cn', t: 'CN' }];
+  const vsList = [...new Set(VIDEOS.map(v => v.vs).filter(Boolean))];
   const filters = `
     <div class="vb-filters">
       ${langChips.map(c => `<button class="fchip ${state.fLang === c.k ? 'on' : ''}" data-flang="${c.k}">${c.t}</button>`).join('')}
+      <span class="fchip-sep"></span>
+      <select class="fchip fchip-sel" id="fVs">
+        <option value="all" ${state.fVs === 'all' ? 'selected' : ''}>vs: все матчапы</option>
+        ${vsList.map(x => `<option value="${x}" ${state.fVs === x ? 'selected' : ''}>vs ${x}</option>`).join('')}
+      </select>
       <span class="fchip-sep"></span>
       <button class="fchip ${state.fSaved ? 'on' : ''}" data-fsaved>★ Сохранённые</button>
       <button class="fchip ${state.fPatch ? 'on' : ''}" data-fpatch>Только текущий патч</button>
@@ -261,16 +274,29 @@ function renderStage() {
     <div class="guide-mock glassy"><span class="gm-tag">Предметы</span> ↑ сборка предметов (заглушка)</div>
     ${blockHTML()}`;
 
-  // клик по карточке → подгружаем плеер (тяжёлый iframe только по требованию)
+  // подгрузить плеер (тяжёлый iframe только по требованию), опц. с нужной секунды
+  function play(card, id, sec) {
+    const t = card.querySelector('.vthumb');
+    const start = sec ? `&start=${sec}` : '';
+    t.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0${start}"
+      allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+    card.classList.add('playing');
+  }
+
+  // клик по карточке → запуск видео (кроме клика по звезде/таймкоду/ссылке)
   inner.querySelectorAll('.vcard').forEach(card => {
     card.addEventListener('click', e => {
-      if (e.target.closest('.vsave')) return;       // клик по звезде — не запускаем видео
+      if (e.target.closest('.vsave') || e.target.closest('.vstamp') || e.target.closest('.vorig')) return;
       if (card.classList.contains('playing')) return;
-      const id = card.dataset.id;
-      const t = card.querySelector('.vthumb');
-      t.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0"
-        allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
-      card.classList.add('playing');
+      play(card, card.dataset.id);
+    });
+  });
+
+  // таймкоды → запуск с нужной секунды
+  inner.querySelectorAll('.vstamp').forEach(b => {
+    b.addEventListener('click', e => {
+      e.stopPropagation();
+      play(b.closest('.vcard'), b.dataset.vid, b.dataset.sec);
     });
   });
 
@@ -289,6 +315,8 @@ function renderStage() {
   // фильтр-чипы
   inner.querySelectorAll('[data-flang]').forEach(c =>
     c.addEventListener('click', () => { state.fLang = c.dataset.flang; renderStage(); }));
+  const fvs = inner.querySelector('#fVs');
+  if (fvs) fvs.addEventListener('change', e => { state.fVs = e.target.value; renderStage(); });
   const fs = inner.querySelector('[data-fsaved]');
   if (fs) fs.addEventListener('click', () => { state.fSaved = !state.fSaved; renderStage(); });
   const fp = inner.querySelector('[data-fpatch]');
@@ -305,20 +333,7 @@ function renderStage() {
       gear.classList.toggle('on', usersetOpen);
     });
     pop.addEventListener('click', e => e.stopPropagation());
-    pop.querySelector('#usGlasspow').onchange = e => { state.glasspow = e.target.value; applyLook(); };
-    pop.querySelector('#usGap').oninput = e => {
-      state.gap = +e.target.value;
-      e.target.previousElementSibling.querySelector('.val').textContent = state.gap + 'px';
-      document.documentElement.style.setProperty('--gap', state.gap + 'px');
-    };
-    pop.querySelector('#usRadius').oninput = e => {
-      state.radius = +e.target.value;
-      e.target.previousElementSibling.querySelector('.val').textContent = state.radius + 'px';
-      document.documentElement.style.setProperty('--radius', state.radius + 'px');
-    };
     pop.querySelector('#usShowTitle').onchange = e => { state.showTitle = e.target.checked; renderStage(); };
-    pop.querySelector('#usMarkOld').onchange = e => { state.markOld = e.target.checked; renderStage(); };
-    pop.querySelector('#usSortPatch').onchange = e => { state.sortPatch = e.target.checked; renderStage(); };
   }
 }
 
@@ -348,23 +363,24 @@ function renderSettings() {
   const s = document.getElementById('settings');
   const patches = ['5.0', '5.1', '5.2', '5.3'].map(x => ({ key: x, label: x }));
 
+  // ФИНАЛ: раскладка (feat) и оттенок стекла (accent) зафиксированы дефолтом — убраны из полосы.
+  // Стекло (сила/насыщенность/граница/зерно) = ГЛОБАЛЬНОЕ на боевом (один хаб сайта); здесь
+  // эти контролы — лаб-превью «для нас» (увидеть как сядет), на боевой НЕ переносятся.
   s.innerHTML =
-    selCtrl('variant', 'Раскладка', VARIANTS, state.variant) +
-    selCtrl('bg', 'Арт фона (сплэш)', SPLASHES, state.bg) +
-    selCtrl('tint', 'Стекло — оттенок', GLASS_TINTS, state.tint) +
-    selCtrl('glasssat', 'Насыщенность', GLASS_SAT, state.glasssat) +
-    selCtrl('glassborder', 'Граница', GLASS_BORDER, state.glassborder) +
-    selCtrl('bgdim', 'Фон: затемнение', BG_DIMS, state.bgdim) +
+    selCtrl('bg', 'Арт фона (лаб-превью)', SPLASHES, state.bg) +
+    selCtrl('bgdim', 'Затемнение фона (лаб-превью)', BG_DIMS, state.bgdim) +
+    selCtrl('glasspow', 'Сила стекла (глобал · превью)', GLASS_POW, state.glasspow) +
+    selCtrl('glasssat', 'Насыщенность стекла (глобал · превью)', GLASS_SAT, state.glasssat) +
+    selCtrl('glassborder', 'Граница стекла (глобал · превью)', GLASS_BORDER, state.glassborder) +
     selCtrl('curPatch', 'Текущий патч (симуляция)', patches, state.curPatch) +
-    `<div class="ctrl ctrl-toggle"><label class="toggle"><input type="checkbox" id="glassnoise" ${state.glassnoise ? 'checked' : ''}> Зерно / шум</label></div>`;
+    `<div class="ctrl ctrl-toggle"><label class="toggle"><input type="checkbox" id="glassnoise" ${state.glassnoise ? 'checked' : ''}> Зерно / шум (глобал · превью)</label></div>`;
 
   s.querySelector('#bg').onchange = e => { state.bg = e.target.value; applyLook(); };
-  s.querySelector('#tint').onchange = e => { state.tint = e.target.value; applyLook(); };
+  s.querySelector('#bgdim').onchange = e => { state.bgdim = e.target.value; applyLook(); };
+  s.querySelector('#glasspow').onchange = e => { state.glasspow = e.target.value; applyLook(); };
   s.querySelector('#glasssat').onchange = e => { state.glasssat = e.target.value; applyLook(); };
   s.querySelector('#glassborder').onchange = e => { state.glassborder = e.target.value; applyLook(); };
-  s.querySelector('#bgdim').onchange = e => { state.bgdim = e.target.value; applyLook(); };
   s.querySelector('#glassnoise').onchange = e => { state.glassnoise = e.target.checked; applyLook(); };
-  s.querySelector('#variant').onchange = e => { state.variant = e.target.value; renderStage(); };
   s.querySelector('#curPatch').onchange = e => { state.curPatch = e.target.value; renderStage(); };
 }
 
@@ -377,6 +393,7 @@ document.getElementById('toggleBtn').addEventListener('click', () => {
 /* ── сброс ── */
 document.getElementById('resetBtn').addEventListener('click', () => {
   state = { ...DEFAULTS };
+  if (LS) LS.clearSaved();
   renderSettings(); renderStage(); applyLook();
 });
 
@@ -384,3 +401,12 @@ document.getElementById('resetBtn').addEventListener('click', () => {
 renderSettings();
 renderStage();
 applyLook();
+
+/* ── память лаба + код/вставить/пресеты (общий lab-settings.js) ── */
+if (window.LabSettings) {
+  LS = LabSettings.attach({
+    id: 'youtube', defaults: DEFAULTS, mount: '#labTools', schema: 2,
+    getState: () => state,
+    apply: st => { state = Object.assign({}, DEFAULTS, st); renderSettings(); renderStage(); applyLook(); },
+  });
+}

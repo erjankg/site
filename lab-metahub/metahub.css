@@ -4,7 +4,7 @@
   --acc:#0BC4E3; --acc-dim:#0b8ca3; --gold:#C89B3C; --gold-soft:#e6c87a;
   --good:#4ade80; --bad:#f87171;
   --txt:#eaf4fb; --txt-dim:#8aa3b5; --txt-faint:#5a7286;
-  --r:18px; --gap:14px;
+  --r:18px; --gap:14px; --pad:15px; --blur:18px; --featmin:300px;
   --glass-bd:rgba(255,255,255,.09); --glass-bg:rgba(255,255,255,.045);
   --tier-Splus:var(--gold); --tier-S:var(--acc); --tier-A:#5fd6a0; --tier-B:#cdd8e0; --tier-C:#9fb0bd; --tier-D:#6f8494;
 }
@@ -56,20 +56,51 @@ body{
   "top top  mov  co"
   "feat feat mov  bd"
   "feat feat mov  bd";}
+/* D · Колонки (герой слева во всю высоту, данные справа) */
+.bento[data-v="D"]{grid-template-columns:repeat(4,1fr); grid-template-areas:
+  "feat feat top top"
+  "feat feat top top"
+  "feat feat mov mov"
+  "mu   co   bd  bd";}
+/* E · Журнал (герой — широкий баннер сверху) */
+.bento[data-v="E"]{grid-template-columns:repeat(4,1fr); grid-template-areas:
+  "feat feat feat feat"
+  "feat feat feat feat"
+  "top  top  mov  mov"
+  "mu   co   bd   bd";}
+/* F · Фокус (герой в центре, окружён панелями) */
+.bento[data-v="F"]{grid-template-columns:repeat(4,1fr); grid-template-areas:
+  "top  feat feat mov"
+  "top  feat feat mov"
+  "co   feat feat bd"
+  "mu   feat feat bd";}
+/* G · Равная сетка (все панели одного веса) */
+.bento[data-v="G"]{grid-template-columns:repeat(4,1fr); grid-template-areas:
+  "feat feat top top"
+  "feat feat top top"
+  "mov  mov  mu  mu"
+  "co   co   bd  bd";}
+/* H · Лента (узкий герой + поток данных) */
+.bento[data-v="H"]{grid-template-columns:repeat(4,1fr); grid-template-areas:
+  "feat top  top  mov"
+  "feat top  top  mov"
+  "feat mu   co   bd"
+  "feat mu   co   bd";}
 .t-featured{grid-area:feat} .t-top{grid-area:top} .t-movers{grid-area:mov}
 .t-matchup{grid-area:mu} .t-counter{grid-area:co} .t-build{grid-area:bd}
 
 /* ---------- Стеклянная плитка ---------- */
 .tile{position:relative; border-radius:var(--r); background:var(--glass-bg); border:1px solid var(--glass-bd);
-  backdrop-filter:blur(18px) saturate(1.45); box-shadow:0 8px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
-  padding:15px 16px; overflow:hidden; transition:transform .25s, box-shadow .25s, border-color .25s; min-height:0}
-.tile:hover{transform:translateY(-3px); border-color:rgba(11,196,227,.4); box-shadow:0 14px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(11,196,227,.15)}
+  -webkit-backdrop-filter:blur(var(--blur)) saturate(1.45); backdrop-filter:blur(var(--blur)) saturate(1.45);
+  box-shadow:0 8px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
+  padding:var(--pad); overflow:hidden; transition:transform .25s, box-shadow .25s, border-color .25s; min-height:0}
+.wrap[data-hover="on"] .tile:hover{transform:translateY(-3px); border-color:rgba(11,196,227,.4); box-shadow:0 14px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(11,196,227,.15)}
 .tile h3{margin:0 0 11px; font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--txt-faint); display:flex; align-items:center; gap:7px}
 .tile h3 .ic{font-size:14px}
 .tile h3 .tag{margin-left:auto; font-size:10px; letter-spacing:.5px; color:var(--gold-soft); border:1px solid rgba(200,155,60,.4); border-radius:6px; padding:2px 7px; text-transform:none}
 
 /* ---------- Чемпион патча ---------- */
-.t-featured{padding:0; display:flex; flex-direction:column; justify-content:flex-end; color:#fff; min-height:300px}
+.t-featured{padding:0; display:flex; flex-direction:column; justify-content:flex-end; color:#fff; min-height:var(--featmin)}
 .feat-bg{position:absolute; inset:0; background-size:cover; background-position:center 22%; transform:scale(1.04); transition:transform .6s}
 .t-featured:hover .feat-bg{transform:scale(1.09)}
 .feat-shade{position:absolute; inset:0; background:linear-gradient(180deg,rgba(5,10,18,.15) 0%,rgba(5,10,18,.55) 55%,rgba(5,10,18,.93) 100%)}
@@ -134,4 +165,107 @@ body{
 @media(max-width:900px){
   .bento[data-v]{grid-template-columns:1fr 1fr; grid-template-areas:
     "feat feat" "top top" "mov mov" "mu co" "bd bd";}
+  .wrap[data-place="left"],.wrap[data-place="rail"]{display:block}
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ДИЗАЙН-ПОЛОСА ЛАБА (сверху, сворачивается) — только для подбора
+   ═══════════════════════════════════════════════════════════ */
+.lab-strip{position:sticky; top:0; z-index:200; background:linear-gradient(180deg,rgba(8,18,28,.96),rgba(5,12,20,.93));
+  border-bottom:1px solid var(--glass-bd); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px);
+  box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.lab-strip-head{display:flex; align-items:center; gap:14px; padding:10px 18px; flex-wrap:wrap}
+.lab-strip-ttl{font-size:13px; font-weight:800; color:var(--gold-soft); letter-spacing:.3px; white-space:nowrap}
+.lab-strip-tools{margin-left:auto}
+.lab-min{font:inherit; font-size:12px; font-weight:700; color:#dff2fb; background:rgba(255,255,255,.06);
+  border:1px solid var(--glass-bd); border-radius:10px; padding:7px 12px; cursor:pointer; white-space:nowrap; transition:.14s}
+.lab-min:hover{background:rgba(11,196,227,.14); border-color:rgba(11,196,227,.4)}
+.lab-strip-body{display:flex; gap:10px 18px; flex-wrap:wrap; align-items:flex-start; padding:4px 18px 14px;
+  max-height:340px; overflow:auto; transition:max-height .28s ease, opacity .2s, padding .28s}
+.lab-strip-body::-webkit-scrollbar{width:8px} .lab-strip-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12); border-radius:8px}
+body.lab-min .lab-strip-body{max-height:0; opacity:0; padding-top:0; padding-bottom:0; overflow:hidden}
+
+.lg{display:flex; flex-direction:column; gap:6px}
+.lg-lbl{font-size:10.5px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--txt-faint)}
+.lg-seg{display:inline-flex; gap:3px; padding:3px; border-radius:11px; background:rgba(255,255,255,.04); border:1px solid var(--glass-bd)}
+.lg-seg button{appearance:none; border:0; background:transparent; color:var(--txt-dim); font:inherit; font-size:12px; font-weight:600;
+  padding:6px 11px; border-radius:8px; cursor:pointer; transition:.16s; white-space:nowrap}
+.lg-seg button:hover{color:var(--txt)}
+.lg-seg button.on{color:#03121a; background:linear-gradient(90deg,var(--acc),#3dd9ee); box-shadow:0 3px 10px rgba(11,196,227,.3)}
+.lg-seg.gold button.on{background:linear-gradient(90deg,var(--gold),var(--gold-soft)); color:#1c1304; box-shadow:0 3px 10px rgba(200,155,60,.3)}
+
+/* ═══════════ Сплэш-арт за стеклом (один на весь хаб) ═══════════ */
+.hub-art{position:fixed; inset:0; z-index:0; pointer-events:none; background-size:cover; background-position:center 20%;
+  opacity:0; transition:opacity .4s}
+.hub-art.on{opacity:.9}
+.wrap{position:relative; z-index:1}
+
+/* ═══════════ Плотность ═══════════ */
+.wrap[data-density="compact"]{--gap:9px; --pad:11px}
+.wrap[data-density="normal"]{--gap:14px; --pad:15px}
+.wrap[data-density="roomy"]{--gap:22px; --pad:21px}
+/* ═══════════ Радиус углов ═══════════ */
+.wrap[data-radius="sharp"]{--r:6px}
+.wrap[data-radius="normal"]{--r:18px}
+.wrap[data-radius="round"]{--r:28px}
+/* ═══════════ Сила стекла ═══════════ */
+.wrap[data-glass="soft"]{--blur:8px; --glass-bg:rgba(255,255,255,.03)}
+.wrap[data-glass="normal"]{--blur:18px; --glass-bg:rgba(255,255,255,.045)}
+.wrap[data-glass="strong"]{--blur:30px; --glass-bg:rgba(255,255,255,.07)}
+/* ═══════════ Размер «Чемпиона патча» ═══════════ */
+.wrap[data-hero="compact"]{--featmin:220px}
+.wrap[data-hero="normal"]{--featmin:300px}
+.wrap[data-hero="huge"]{--featmin:420px}
+
+/* ═══════════ 3D-наклон + параллакс «Чемпиона патча» (как hover-reveal) ═══════════ */
+.t-featured{transition:transform .18s ease-out, box-shadow .25s, border-color .25s}
+.t-featured[data-fx="tilt"],.t-featured[data-fx="parallax"]{clip-path:inset(0 round var(--r)); will-change:transform; -webkit-backface-visibility:hidden; backface-visibility:hidden}
+.t-featured[data-fx="parallax"] .feat-bg{transition:transform .2s ease-out}
+
+/* ═══════════ ВИД СТЕКЛА (оттенок) — перебивает цвет основы ═══════════ */
+.wrap[data-glasstint="cyan"]{--glass-bg:rgba(11,196,227,.10); --glass-bd:rgba(11,196,227,.30)}
+.wrap[data-glasstint="gold"]{--glass-bg:rgba(200,155,60,.11); --glass-bd:rgba(200,155,60,.32)}
+.wrap[data-glasstint="warm"]{--glass-bg:rgba(255,176,120,.10); --glass-bd:rgba(255,176,120,.28)}
+.wrap[data-glasstint="cold"]{--glass-bg:rgba(120,178,255,.10); --glass-bd:rgba(120,178,255,.28)}
+.wrap[data-glasstint="dark"]{--glass-bg:rgba(8,16,26,.55); --glass-bd:rgba(255,255,255,.10)}
+/* граница стекла */
+.wrap[data-glassbd="none"] .tile{border-color:transparent}
+.wrap[data-glassbd="glow"] .tile{border-color:rgba(11,196,227,.5);
+  box-shadow:0 8px 30px rgba(0,0,0,.35), 0 0 0 1px rgba(11,196,227,.28), 0 0 22px rgba(11,196,227,.2), inset 0 1px 0 rgba(255,255,255,.08)}
+/* зерно/шум поверх стекла */
+.wrap[data-grain="on"] .tile::after{content:''; position:absolute; inset:0; z-index:2; pointer-events:none; opacity:.06; mix-blend-mode:overlay; border-radius:inherit;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ═══════════ РАЗМЕЩЕНИЕ ШАПКИ/КНОПОК ═══════════ */
+/* top — по умолчанию (заголовок + фильтр сверху по центру строкой) */
+.hub-header .hub-filter{margin:0 0 18px}
+/* left — заголовок слева, фильтр под ним, всё прижато влево */
+.wrap[data-place="left"] .hub-top{flex-direction:column; align-items:flex-start; gap:8px}
+.wrap[data-place="left"] .spacer{display:none}
+.wrap[data-place="left"] .hub-filter{justify-content:flex-start}
+/* rail — левый вертикальный сайдбар-рельс: шапка слева колонкой, бенто справа */
+.wrap[data-place="rail"]{display:grid; grid-template-columns:220px 1fr; gap:var(--gap); align-items:start}
+.wrap[data-place="rail"] .hub-header{position:sticky; top:74px; display:flex; flex-direction:column; gap:14px}
+.wrap[data-place="rail"] .hub-top{flex-direction:column; align-items:flex-start; gap:10px}
+.wrap[data-place="rail"] .hub-top .spacer{display:none}
+.wrap[data-place="rail"] .hub-filter .pills{flex-direction:column; align-items:stretch; border-radius:14px}
+.wrap[data-place="rail"] .hub-filter .pill{text-align:left}
+.wrap[data-place="rail"] .bento{grid-column:2}
+.wrap[data-place="rail"] .foot{grid-column:1 / -1}
+/* float — шапка скрыта, фильтр прячется под плавающую ⚙ */
+.wrap[data-place="float"] .hub-header{display:none}
+
+/* ═══════════ Плавающая ⚙ + попап (стекло) ═══════════ */
+.hub-gear{position:fixed; right:22px; bottom:22px; z-index:150; width:52px; height:52px; border-radius:16px;
+  font-size:22px; cursor:pointer; color:var(--txt); border:1px solid var(--glass-bd);
+  background:var(--glass-bg); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);
+  box-shadow:0 10px 30px rgba(0,0,0,.45); transition:transform .18s, border-color .18s}
+.hub-gear:hover{transform:rotate(35deg) scale(1.05); border-color:rgba(11,196,227,.5)}
+.hub-gear-pop{position:fixed; right:22px; bottom:84px; z-index:150; min-width:230px; padding:14px;
+  border-radius:16px; border:1px solid var(--glass-bd)}
+.hub-gear-pop .pop-ttl{font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--txt-faint); margin-bottom:9px}
+.hub-gear-pop .pills{flex-direction:column; align-items:stretch}
+
+/* стекло на попапе/любой модалке (стандарт сайта) */
+.glassy{background:var(--glass-bg); -webkit-backdrop-filter:blur(20px) saturate(1.4); backdrop-filter:blur(20px) saturate(1.4);
+  box-shadow:0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.06)}
