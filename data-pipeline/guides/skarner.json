@@ -6,7 +6,11 @@
   "patch": "7.1g",
   "dataDate": null,
   "matchups": [],
-  "counters": [],
+  "counters": [
+    "Lillia",
+    "Olaf",
+    "Master Yi"
+  ],
   "builds": [
     {
       "title": "Build 1",
@@ -18,8 +22,8 @@
         ],
         "core": [
           "Searing Crown",
-          "Zeke's Convergence",
-          "Thornmail"
+          "Sunfire Aegis",
+          "Unending Despair"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -27,10 +31,10 @@
         ],
         "finalBuild": [
           "Searing Crown",
-          "Zeke's Convergence",
-          "Thornmail",
-          "Frozen Heart",
+          "Sunfire Aegis",
+          "Unending Despair",
           "Amaranth's Twinguard",
+          "Force of Nature",
           "Plated Steelcaps - Gargoyle"
         ]
       }
@@ -41,7 +45,7 @@
     "Unshakeable",
     "Bone Plating",
     "Overgrowth",
-    "Transcendence"
+    "Nimbus Cloak"
   ],
   "spells": [],
   "skillOrder": [
