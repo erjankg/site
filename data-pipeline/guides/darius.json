@@ -3,7 +3,7 @@
   "name": "Darius",
   "role": "Барон",
   "tier": "S",
-  "patch": "7.1g",
+  "patch": "7.1h",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -566,36 +566,9 @@
   ],
   "builds": [
     {
-      "title": "Solo Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
-          "Trinity Force",
-          "Sterak's Gage",
-          "Amaranth's Twinguard"
-        ],
-        "boots": [
-          "Plated Steelcaps",
-          "Protobelt"
-        ],
-        "finalBuild": [
-          "Trinity Force",
-          "Sterak's Gage",
-          "Amaranth's Twinguard",
-          "Dead Man's Plate",
-          "Force of Nature",
-          "Plated Steelcaps - Protobelt"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "B",
-      "default": false,
       "items": {
         "starting": [
           "Long Sword"

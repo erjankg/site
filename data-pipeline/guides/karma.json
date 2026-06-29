@@ -3,7 +3,7 @@
   "name": "Karma",
   "role": "Саппорт",
   "tier": "C",
-  "patch": "7.1g",
+  "patch": "7.1h",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,8 +290,8 @@
   ],
   "builds": [
     {
-      "title": "Support Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -313,33 +313,6 @@
           "Redemption",
           "Frozen Heart",
           "Ionian Boots of Lucidity - Veil"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "D",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Luden's Echo",
-          "Bandle Fantasy",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Boots of Mana",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Luden's Echo",
-          "Bandle Fantasy",
-          "Rabadon's Deathcap",
-          "Malignance",
-          "Horizon Focus",
-          "Boots of Mana - Stasis"
         ]
       }
     }
