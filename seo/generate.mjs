@@ -23,8 +23,25 @@ const ROOT = path.resolve(__dirname, '..');
 const SITE = 'https://pro-wildrift.com';
 const PROJECT = 'wildrift-stats-600c0';
 const G_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQnqVwUluQiuho1Wj6A3tZRvDJsLlyAZYmg0soWy4EJ_Un00P8e3Y2EAo3Iv6KvMm5HPwce_0AnzPfb/pub?gid=0&single=true&output=tsv';
-const DDV = '14.24.1';
+let DDV = '14.24.1'; // фолбэк-версия ddragon; заменяется на актуальную в resolveDDV()
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
+
+// Актуальная версия ddragon для иконок чемпионов: берём последнюю из versions.json
+// (первый элемент — самая свежая). Если сеть недоступна — остаёмся на фолбэке выше,
+// чтобы новые чемпионы не давали 404 в og:image.
+async function resolveDDV() {
+  try {
+    const versions = await fetch('https://ddragon.leagueoflegends.com/api/versions.json').then(r => r.json());
+    if (Array.isArray(versions) && /^\d+\.\d+/.test(versions[0] || '')) {
+      DDV = versions[0];
+      console.log('[seo] ddragon версия:', DDV);
+    } else {
+      console.warn('[seo] versions.json в неожиданном формате, фолбэк DDV=' + DDV);
+    }
+  } catch (e) {
+    console.warn('[seo] versions.json недоступен, фолбэк DDV=' + DDV + ' —', e.message);
+  }
+}
 
 // ── helpers ──────────────────────────────────────────────────────────────
 const esc = (s) => String(s == null ? '' : s)
@@ -58,16 +75,46 @@ const RU2EN = extractObj('WR_CHAMP_KEYS');        // 'Аатрокс' -> 'Aatrox
 const DISP = extractObj('_wrprDisplayName');       // 'JarvanIV' -> 'Jarvan IV'
 const SPECIAL_ICON = extractObj('_wrprSpecialIcons'); // 'Norra' -> url/path
 
+// Обратная карта EN->RU. У одного канонического EN бывает несколько ключей
+// (русское имя, английское, сокращения-алиасы). Для показа предпочитаем кириллицу.
 const EN2RU = {};
-for (const [ru, en] of Object.entries(RU2EN)) EN2RU[en] = ru;
+for (const [ru, en] of Object.entries(RU2EN)) {
+  const isCyr = /[а-яё]/i.test(ru);
+  if (!(en in EN2RU) || isCyr) EN2RU[en] = ru;
+}
+
+// Карта алиасов сайта: сокращённые имена из таблицы -> ddragon-ключ.
+// Живёт внутри function champKey(n) в app.js как `const m = { … }`.
+function extractChampAlias() {
+  const m = appjs.match(/function champKey[\s\S]*?const m = \{([\s\S]*?)\n\s*\};/);
+  if (!m) { console.warn('[seo] champKey alias map not found'); return {}; }
+  const out = {};
+  const re = /(['"])(.+?)\1\s*:\s*(['"])(.+?)\3/g;
+  let r;
+  while ((r = re.exec(m[1]))) out[r[2]] = r[4];
+  return out;
+}
+const CHAMP_ALIAS = extractChampAlias();
+
+// Канонизация имени из таблицы ТОЛЬКО для отображения/данных (имя, иконка, винрейт),
+// НЕ для slug/URL. Сокращения/алиасы ('M.Fortune', 'Heimer', 'Trynda') приводим к
+// каноническому имени ('MissFortune', 'Heimerdinger', 'Tryndamere'), чтобы заголовок
+// был человекочитаемым, иконка ddragon не давала 404, а винрейт находился.
+// URL при этом остаётся прежним (slug строится из сырого имени) — без миграции ссылок.
+// Если сырое имя уже резолвится в русское — не трогаем (совместимость с рабочими).
+function canonEn(en) {
+  if (EN2RU[en]) return en;
+  return CHAMP_ALIAS[en] || en;
+}
 
 // EN ключ из таблицы -> id в ddragon, если отличается
 const DD_ID = { Wukong: 'MonkeyKing' };
 
-function ruName(en) { return EN2RU[en] || DISP[en] || en; }
-function prettyEn(en) { return DISP[en] || en; }
+function ruName(en) { en = canonEn(en); return EN2RU[en] || DISP[en] || en; }
+function prettyEn(en) { en = canonEn(en); return DISP[en] || en; }
 
 function champIcon(en) {
+  en = canonEn(en);
   const sp = SPECIAL_ICON[en];
   if (sp) return sp.startsWith('http') ? sp : (SITE + '/' + sp.replace(/^\//, ''));
   const id = DD_ID[en] || en;
@@ -205,8 +252,26 @@ const NAV = [
   ['/', 'Инструменты'],
 ].map(([h, t]) => `<a href="${h}">${t}</a>`).join('');
 
-function htmlDoc({ title, desc, canonical, body, ogImage, jsonld, crumbs }) {
+const absUrl = (h) => (String(h).startsWith('http') ? h : SITE + h);
+
+function htmlDoc({ title, desc, canonical, body, ogImage, jsonld, crumbTrail }) {
   const og = ogImage || (SITE + '/preview.jpg');
+
+  // JSON-LD: основной блок(и) страницы + BreadcrumbList из хлебных крошек
+  const blocks = jsonld ? (Array.isArray(jsonld) ? [...jsonld] : [jsonld]) : [];
+  let crumbsHtml = '';
+  if (crumbTrail && crumbTrail.length) {
+    crumbsHtml = crumbTrail.map((p, i) =>
+      i === crumbTrail.length - 1 ? esc(p[1]) : `<a href="${p[0]}">${esc(p[1])}</a>`).join(' › ');
+    blocks.push({
+      '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+      itemListElement: crumbTrail.map((p, i) => ({
+        '@type': 'ListItem', position: i + 1, name: p[1], item: absUrl(p[0]),
+      })),
+    });
+  }
+  const ld = blocks.map(b => `<script type="application/ld+json">${JSON.stringify(b)}</script>`).join('\n');
+
   return `<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -222,7 +287,7 @@ function htmlDoc({ title, desc, canonical, body, ogImage, jsonld, crumbs }) {
 <meta property="og:image" content="${og}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/icon.svg">
-${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ''}
+${ld}
 <style>${CSS}</style>
 </head>
 <body>
@@ -231,7 +296,7 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script
 <nav class="main">${NAV}</nav>
 </div></header>
 <main class="wrap">
-${crumbs ? `<div class="crumbs">${crumbs}</div>` : ''}
+${crumbsHtml ? `<div class="crumbs">${crumbsHtml}</div>` : ''}
 ${body}
 </main>
 <footer class="bot"><div class="wrap">
@@ -241,9 +306,6 @@ PRO WILDRIFT — статы чемпионов, винрейты, предмет
 </body>
 </html>`;
 }
-
-const crumb = (...parts) => parts.map((p, i) =>
-  i === parts.length - 1 ? esc(p[1]) : `<a href="${p[0]}">${esc(p[1])}</a>`).join(' › ');
 
 // ── champion page ──────────────────────────────────────────────────────────
 function champRows(stats) {
@@ -267,7 +329,7 @@ function championPage(c, wrIndex) {
   const resTxt = c.resource && c.resource.toLowerCase() !== 'mana' && c.resource !== 'Мана'
     ? ` Ресурс — ${esc(c.resource)}.` : (c.stats.mana[0] ? ' Использует ману.' : ' Не использует ману.');
 
-  const wr = (wrIndex[norm(c.en)] || []);
+  const wr = (wrIndex[norm(canonEn(c.en))] || []);
   let wrSection = '';
   if (wr.length) {
     const rankOrder = ['Челленджер', 'Грандмастер', 'Мастер', 'Алмаз', 'Суверен'];
@@ -309,7 +371,7 @@ ${wrSection}
 
   return htmlDoc({
     title, desc, canonical: url, ogImage: champIcon(c.en), jsonld,
-    crumbs: crumb(['/', 'Главная'], ['/champions/', 'Чемпионы'], [url, ru]),
+    crumbTrail: [['/', 'Главная'], ['/champions/', 'Чемпионы'], [url, ru]],
     body,
   });
 }
@@ -327,7 +389,7 @@ function championsIndex(champs) {
 <div class="grid">${cards}</div>`;
   return htmlDoc({
     title, desc, canonical: url,
-    crumbs: crumb(['/', 'Главная'], [url, 'Чемпионы']),
+    crumbTrail: [['/', 'Главная'], [url, 'Чемпионы']],
     body,
     jsonld: { '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, url, inLanguage: 'ru' },
   });
@@ -400,7 +462,7 @@ ${desc ? `<h2>Эффект</h2><div class="card"><p>${esc(desc).replace(/\n/g, '
 
   return htmlDoc({
     title, desc: metaDesc, canonical: url, ogImage: it.image || undefined,
-    crumbs: crumb(['/', 'Главная'], ['/items/', 'Предметы'], [url, name]),
+    crumbTrail: [['/', 'Главная'], ['/items/', 'Предметы'], [url, name]],
     body,
     jsonld: { '@context': 'https://schema.org', '@type': 'Product', name, image: it.image, category: catRu, inLanguage: 'ru' },
   });
@@ -423,7 +485,7 @@ function itemsIndex(items, slugs) {
   const desc = `Полный список предметов League of Legends: Wild Rift по категориям: защита, магия, физический урон, ботинки, зачарования и предметы поддержки. Характеристики и стоимость.`;
   return htmlDoc({
     title, desc, canonical: url,
-    crumbs: crumb(['/', 'Главная'], [url, 'Предметы']),
+    crumbTrail: [['/', 'Главная'], [url, 'Предметы']],
     body: `<h1>Предметы Wild Rift</h1><p class="lead">Все предметы Wild Rift с характеристиками и ценой, сгруппированные по категориям.</p>${sections}`,
     jsonld: { '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, url, inLanguage: 'ru' },
   });
@@ -447,7 +509,7 @@ ${desc ? `<h2>Эффект руны</h2><div class="card"><p>${esc(desc).replace
 <a class="cta" href="/">Открыть все руны и собрать набор →</a>`;
   return htmlDoc({
     title, desc: metaDesc, canonical: url, ogImage: r.image || undefined,
-    crumbs: crumb(['/', 'Главная'], ['/runes/', 'Руны'], [url, name]),
+    crumbTrail: [['/', 'Главная'], ['/runes/', 'Руны'], [url, name]],
     body,
     jsonld: { '@context': 'https://schema.org', '@type': 'Article', headline: title, image: r.image, inLanguage: 'ru' },
   });
@@ -470,7 +532,7 @@ function runesIndex(runes, slugs) {
   const desc = 'Руны League of Legends: Wild Rift по деревьям: ключевые руны, Точность, Доминирование, Стойкость, Вдохновение. Эффекты каждой руны.';
   return htmlDoc({
     title, desc, canonical: url,
-    crumbs: crumb(['/', 'Главная'], [url, 'Руны']),
+    crumbTrail: [['/', 'Главная'], [url, 'Руны']],
     body: `<h1>Руны Wild Rift</h1><p class="lead">Все руны Wild Rift, сгруппированные по деревьям.</p>${sections}`,
     jsonld: { '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, url, inLanguage: 'ru' },
   });
@@ -539,7 +601,7 @@ ${tierTable(list)}
 <a class="cta" href="/">Открыть драфтер и таблицу винрейтов →</a>`;
   return htmlDoc({
     title, desc, canonical: url,
-    crumbs: crumb(['/', 'Главная'], ['/tier-list/', 'Тир-лист'], [url, role.ru]),
+    crumbTrail: [['/', 'Главная'], ['/tier-list/', 'Тир-лист'], [url, role.ru]],
     body,
     jsonld: { '@context': 'https://schema.org', '@type': 'Article', headline: title, description: desc, inLanguage: 'ru' },
   });
@@ -557,7 +619,7 @@ function tierIndex(tierData) {
   const desc = 'Актуальный тир-лист чемпионов Wild Rift по всем линиям: топ, лес, мид, бот, поддержка. Рейтинг по винрейту, тиры S/A/B/C.';
   return htmlDoc({
     title, desc, canonical: url,
-    crumbs: crumb(['/', 'Главная'], [url, 'Тир-лист']),
+    crumbTrail: [['/', 'Главная'], [url, 'Тир-лист']],
     body: `<h1>Тир-лист Wild Rift</h1><p class="lead">Лучшие чемпионы Wild Rift по линиям, рейтинг по среднему винрейту на высоких рангах.</p>${sections}`,
     jsonld: { '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, url, inLanguage: 'ru' },
   });
@@ -574,7 +636,7 @@ ${faq && faq.length ? `<h2>Частые вопросы</h2>${faq.map(([q, a]) =>
     '@context': 'https://schema.org', '@type': 'FAQPage',
     mainEntity: faq.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
   } : { '@context': 'https://schema.org', '@type': 'WebPage', name: title, url, inLanguage: 'ru' };
-  return htmlDoc({ title, desc, canonical: url, crumbs: crumb(['/', 'Главная'], [url, h1]), body, jsonld });
+  return htmlDoc({ title, desc, canonical: url, crumbTrail: [['/', 'Главная'], [url, h1]], body, jsonld });
 }
 
 // ── main ───────────────────────────────────────────────────────────────────
@@ -582,6 +644,7 @@ const urls = []; // for sitemap: {loc, priority}
 
 async function main() {
   console.log('[seo] fetching data…');
+  await resolveDDV();
   const [champs, winrateDocs, items, runes] = await Promise.all([
     fetchChampions(),
     fetchCollection('winrates').catch(e => { console.warn('[seo]', e.message); return []; }),
@@ -598,7 +661,7 @@ async function main() {
   for (const c of champs) {
     writePage(`champions/${slug(c.en)}`, championPage(c, wrIndex));
     urls.push({ loc: `${SITE}/champions/${slug(c.en)}/`, priority: '0.8' });
-    if ((wrIndex[norm(c.en)] || []).length) wrHit++;
+    if ((wrIndex[norm(canonEn(c.en))] || []).length) wrHit++;
   }
   writePage('champions', championsIndex(champs));
   urls.push({ loc: `${SITE}/champions/`, priority: '0.9' });
