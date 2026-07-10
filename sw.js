@@ -13,7 +13,7 @@
  *
  * Старые caches удаляются в activate.
  */
-const VERSION = 'wrs-v2.20260619-182520';
+const VERSION = 'wrs-v2.20260710-215409';
 
 // Сколько ждём сеть, прежде чем отдать офлайн-резерв из кэша (мс).
 const NET_TIMEOUT = 3000;
@@ -120,7 +120,7 @@ function fetchWithTimeout(req, ms) {
   return new Promise((resolve, reject) => {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), ms);
-    fetch(req, { signal: ctrl.signal }).then((res) => {
+    fetch(req, { signal: ctrl.signal, cache: 'reload' }).then((res) => {
       clearTimeout(timer);
       resolve(res);
     }).catch((err) => {
