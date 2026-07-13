@@ -2,8 +2,8 @@
   "slug": "nidalee",
   "name": "Nidalee",
   "role": "Лес",
-  "tier": "A",
-  "patch": "7.1h",
+  "tier": "B",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Lich Bane",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
           "Boots of Mana",
@@ -308,10 +308,10 @@
         ],
         "finalBuild": [
           "Lich Bane",
-          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
+          "Infinity Orb",
+          "Void Staff",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -320,9 +320,9 @@
   "runes": [
     "Dark Harvest",
     "Sudden Impact",
-    "Tyrant",
+    "Hubris",
     "Eyeball Collector",
-    "Overgrowth"
+    "Transcendence"
   ],
   "spells": [
     {

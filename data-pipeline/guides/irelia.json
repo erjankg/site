@@ -3,7 +3,7 @@
   "name": "Irelia",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -364,24 +364,24 @@
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
-          "Trinity Force",
           "Blade of the Ruined King",
+          "Trinity Force",
           "Hullbreaker"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Plated Steelcaps",
           "Stasis"
         ],
         "finalBuild": [
-          "Trinity Force",
           "Blade of the Ruined King",
+          "Trinity Force",
           "Hullbreaker",
           "Death's Dance",
           "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Plated Steelcaps - Stasis"
         ]
       }
     },
@@ -391,24 +391,24 @@
       "default": false,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
-          "Trinity Force",
           "Blade of the Ruined King",
+          "Trinity Force",
           "Death's Dance"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Mercury's Treads",
           "Stasis"
         ],
         "finalBuild": [
-          "Trinity Force",
           "Blade of the Ruined King",
+          "Trinity Force",
           "Death's Dance",
           "Terminus",
           "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Mercury's Treads - Stasis"
         ]
       }
     }

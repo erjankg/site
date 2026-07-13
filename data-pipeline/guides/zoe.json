@@ -3,7 +3,7 @@
   "name": "Zoe",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,8 +298,8 @@
           "Amplifying Tome"
         ],
         "core": [
+          "Luden's Echo",
           "Lich Bane",
-          "Infinity Orb",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -307,11 +307,11 @@
           "Stasis"
         ],
         "finalBuild": [
+          "Luden's Echo",
           "Lich Bane",
-          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Crown of the Shattered Queen",
+          "Void Staff",
+          "Infinity Orb",
           "Boots of Mana - Stasis"
         ]
       }
@@ -319,10 +319,10 @@
   ],
   "runes": [
     "First Strike",
-    "Sudden Impact",
-    "Chain Assault",
-    "Eyeball Collector",
-    "Nimbus Cloak"
+    "Botanist",
+    "Absolute Focus",
+    "Nimbus Cloak",
+    "Sudden Impact"
   ],
   "spells": [
     {

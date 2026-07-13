@@ -1,9 +1,9 @@
 {
   "slug": "talon",
   "name": "Talon",
-  "role": "Мид",
-  "tier": "C",
-  "patch": "7.1h",
+  "role": "Лес",
+  "tier": "D",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,14 +284,14 @@
     }
   ],
   "counters": [
-    "Irelia",
-    "Renekton",
-    "Malphite"
+    "Rengar",
+    "Kindred",
+    "Lee Sin"
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "C",
+      "title": "Jungle Build",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -303,22 +303,22 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Boots of Dynamism",
           "Stasis"
         ],
         "finalBuild": [
           "Youmuu's Ghostblade",
           "Serpent's Fang",
           "Serylda's Grudge",
-          "Trinity Force",
+          "Edge of Night",
           "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Boots of Dynamism - Stasis"
         ]
       }
     },
     {
-      "title": "Jungle Build",
-      "tier": "A",
+      "title": "Mid Build",
+      "tier": "C",
       "default": false,
       "items": {
         "starting": [
@@ -330,26 +330,26 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Boots of Dynamism",
           "Stasis"
         ],
         "finalBuild": [
           "Youmuu's Ghostblade",
           "Serpent's Fang",
           "Serylda's Grudge",
-          "Trinity Force",
+          "Edge of Night",
           "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Boots of Dynamism - Stasis"
         ]
       }
     }
   ],
   "runes": [
-    "Electrocute",
+    "First Strike",
     "Sudden Impact",
-    "Chain Assault",
+    "Hubris",
     "Eyeball Collector",
-    "Bone Plating"
+    "Legend: Alacrity"
   ],
   "spells": [
     {
@@ -362,6 +362,15 @@
     {
       "ability": "Noxian Diplomacy",
       "levels": [
+        1,
+        3,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Rake",
+      "levels": [
         2,
         8,
         10,
@@ -369,18 +378,9 @@
       ]
     },
     {
-      "ability": "Rake",
-      "levels": [
-        1,
-        4,
-        6,
-        7
-      ]
-    },
-    {
       "ability": "Assassin's Path",
       "levels": [
-        3,
+        4,
         12,
         14,
         15

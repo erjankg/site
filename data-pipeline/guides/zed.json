@@ -3,7 +3,7 @@
   "name": "Zed",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -575,20 +575,20 @@
         ],
         "core": [
           "Eclipse",
-          "Serpent's Fang",
+          "Trinity Force",
           "Serylda's Grudge"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
+          "Gluttonous Greaves",
           "Stasis"
         ],
         "finalBuild": [
           "Eclipse",
-          "Serpent's Fang",
-          "Serylda's Grudge",
-          "Spear of Shojin",
           "Trinity Force",
-          "Ionian Boots of Lucidity - Stasis"
+          "Serylda's Grudge",
+          "Serpent's Fang",
+          "Guardian Angel",
+          "Gluttonous Greaves - Stasis"
         ]
       }
     },
@@ -606,7 +606,7 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
+          "Gluttonous Greaves",
           "Stasis"
         ],
         "finalBuild": [
@@ -614,8 +614,8 @@
           "Trinity Force",
           "Serylda's Grudge",
           "Serpent's Fang",
-          "Spear of Shojin",
-          "Ionian Boots of Lucidity - Stasis"
+          "Guardian Angel",
+          "Gluttonous Greaves - Stasis"
         ]
       }
     }
@@ -624,7 +624,7 @@
     "Conqueror",
     "Battle Zeal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Second Wind"
   ],
   "spells": [

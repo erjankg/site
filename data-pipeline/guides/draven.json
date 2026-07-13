@@ -2,8 +2,8 @@
   "slug": "draven",
   "name": "Draven",
   "role": "Дракон",
-  "tier": "B",
-  "patch": "7.1h",
+  "tier": "A",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,19 +298,19 @@
           "Long Sword"
         ],
         "core": [
+          "Galeforce",
           "Bloodthirster",
-          "Essence Reaver",
-          "Lord Dominik's Regard"
+          "Essence Reaver"
         ],
         "boots": [
           "Gluttonous Greaves",
           "Stasis"
         ],
         "finalBuild": [
+          "Galeforce",
           "Bloodthirster",
           "Essence Reaver",
           "Lord Dominik's Regard",
-          "Magnetic Blaster",
           "Infinity Edge",
           "Gluttonous Greaves - Stasis"
         ]

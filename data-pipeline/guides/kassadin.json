@@ -2,8 +2,8 @@
   "slug": "kassadin",
   "name": "Kassadin",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.1h",
+  "tier": "C",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -295,7 +295,7 @@
       "default": true,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Amplifying Tome"
         ],
         "core": [
           "Rod of Ages",
@@ -311,7 +311,7 @@
           "Seraph's Embrace",
           "Rabadon's Deathcap",
           "Malignance",
-          "Infinity Orb",
+          "Void Staff",
           "Boots of Mana - Stasis"
         ]
       }

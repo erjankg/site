@@ -3,7 +3,7 @@
   "name": "Mordekaiser",
   "role": "Барон",
   "tier": "S",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,7 +300,7 @@
         "core": [
           "Riftmaker",
           "Liandry's Torment",
-          "Psychic Projector"
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -309,8 +309,8 @@
         "finalBuild": [
           "Riftmaker",
           "Liandry's Torment",
-          "Psychic Projector",
           "Rabadon's Deathcap",
+          "Void Staff",
           "Amaranth's Twinguard",
           "Plated Steelcaps - Protobelt"
         ]
@@ -319,10 +319,10 @@
   ],
   "runes": [
     "Conqueror",
-    "Unshakeable",
+    "Demolish",
     "Second Wind",
     "Overgrowth",
-    "Transcendence"
+    "Last Stand"
   ],
   "spells": [
     {

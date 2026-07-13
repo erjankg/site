@@ -3,7 +3,7 @@
   "name": "Morgana",
   "role": "Саппорт",
   "tier": "S",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -575,7 +575,7 @@
         ],
         "core": [
           "Black Mist Scythe",
-          "Rylai's Crystal Scepter",
+          "Blackfire Torch",
           "Liandry's Torment"
         ],
         "boots": [
@@ -584,10 +584,10 @@
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Rylai's Crystal Scepter",
+          "Blackfire Torch",
           "Liandry's Torment",
-          "Oceanid's Trident",
-          "Rabadon's Deathcap",
+          "Rylai's Crystal Scepter",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -601,20 +601,20 @@
           "Amplifying Tome"
         ],
         "core": [
+          "Blackfire Torch",
           "Liandry's Torment",
-          "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap"
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
           "Boots of Mana",
           "Stasis"
         ],
         "finalBuild": [
+          "Blackfire Torch",
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
           "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Riftmaker",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -628,27 +628,27 @@
           "Amplifying Tome"
         ],
         "core": [
+          "Blackfire Torch",
           "Liandry's Torment",
-          "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap"
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
           "Boots of Mana",
           "Stasis"
         ],
         "finalBuild": [
+          "Blackfire Torch",
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
           "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Riftmaker",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
     }
   ],
   "runes": [
-    "Aery",
+    "Arcane Comet",
     "Manaflow Band",
     "Transcendence",
     "Scorch",

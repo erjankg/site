@@ -3,7 +3,7 @@
   "name": "Heimerdinger",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,8 +298,8 @@
           "Amplifying Tome"
         ],
         "core": [
+          "Blackfire Torch",
           "Infinity Orb",
-          "Awakened Soulstealer",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -307,11 +307,11 @@
           "Stasis"
         ],
         "finalBuild": [
+          "Blackfire Torch",
           "Infinity Orb",
-          "Awakened Soulstealer",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
+          "Void Staff",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -319,10 +319,10 @@
   ],
   "runes": [
     "First Strike",
-    "Cheap Shot",
-    "Tyrant",
-    "Eyeball Collector",
-    "Bone Plating"
+    "Botanist",
+    "Transcendence",
+    "Scorch",
+    "Battle Zeal"
   ],
   "spells": [
     {

@@ -3,7 +3,7 @@
   "name": "Thresh",
   "role": "Саппорт",
   "tier": "S+",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,27 +299,26 @@
         ],
         "core": [
           "Bulwark of the Mountain",
-          "Yordle Trap",
+          "Locket of the Iron Solari",
           "Warmog's Armor"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Yordle Trap",
+          "Locket of the Iron Solari",
           "Warmog's Armor",
+          "Frozen Heart",
           "Force of Nature",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
     "Ice Overlord",
-    "Unshakeable",
+    "Courage of the Colossus",
     "Bone Plating",
     "Overgrowth",
     "Hextech Flashtraption"

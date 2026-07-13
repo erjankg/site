@@ -3,7 +3,7 @@
   "name": "Jax",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -571,24 +571,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
           "Trinity Force",
-          "Riftmaker",
-          "Zeke's Convergence"
+          "Blade of the Ruined King",
+          "Hullbreaker"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Trinity Force",
-          "Riftmaker",
-          "Zeke's Convergence",
-          "Oceanid's Trident",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Blade of the Ruined King",
+          "Hullbreaker",
+          "Zhonya's Hourglass",
+          "Death's Dance",
+          "Plated Steelcaps"
         ]
       }
     }

@@ -3,7 +3,7 @@
   "name": "Ziggs",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Luden's Echo",
-          "Awakened Soulstealer",
+          "Infinity Orb",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -308,20 +308,20 @@
         ],
         "finalBuild": [
           "Luden's Echo",
-          "Awakened Soulstealer",
-          "Rabadon's Deathcap",
-          "Crown of the Shattered Queen",
           "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Void Staff",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
     }
   ],
   "runes": [
-    "Arcane Comet",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Bloodline",
+    "First Strike",
+    "Botanist",
+    "Transcendence",
+    "Scorch",
     "Bone Plating"
   ],
   "spells": [

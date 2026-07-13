@@ -3,7 +3,7 @@
   "name": "Lillia",
   "role": "Лес",
   "tier": "B",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,8 +298,8 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Rod of Ages",
-          "Psychic Projector",
+          "Liandry's Torment",
+          "Riftmaker",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -307,11 +307,11 @@
           "Stasis"
         ],
         "finalBuild": [
-          "Rod of Ages",
-          "Psychic Projector",
-          "Rabadon's Deathcap",
-          "Riftmaker",
           "Liandry's Torment",
+          "Riftmaker",
+          "Rabadon's Deathcap",
+          "Bloodletter's Curse",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -319,9 +319,9 @@
   ],
   "runes": [
     "Phase Rush",
-    "Unshakeable",
-    "Bone Plating",
-    "Overgrowth",
+    "Battle Zeal",
+    "Cut Down",
+    "Legend: Bloodline",
     "Transcendence"
   ],
   "spells": [

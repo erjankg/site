@@ -3,7 +3,7 @@
   "name": "Akali",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Infinity Orb",
-          "Rabadon's Deathcap",
-          "Riftmaker"
+          "Stormsurge",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana",
@@ -308,10 +308,10 @@
         ],
         "finalBuild": [
           "Infinity Orb",
+          "Stormsurge",
           "Rabadon's Deathcap",
-          "Riftmaker",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
+          "Void Staff",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -322,23 +322,23 @@
       "default": false,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Amplifying Tome"
         ],
         "core": [
-          "Rod of Ages",
-          "Rabadon's Deathcap",
-          "Psychic Projector"
+          "Infinity Orb",
+          "Stormsurge",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana",
           "Stasis"
         ],
         "finalBuild": [
-          "Rod of Ages",
+          "Infinity Orb",
+          "Stormsurge",
           "Rabadon's Deathcap",
-          "Psychic Projector",
-          "Riftmaker",
-          "Oceanid's Trident",
+          "Void Staff",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -346,10 +346,10 @@
   ],
   "runes": [
     "Electrocute",
-    "Unshakeable",
-    "Second Wind",
-    "Overgrowth",
-    "Sudden Impact"
+    "Sudden Impact",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Second Wind"
   ],
   "spells": [
     {

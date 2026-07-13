@@ -2,8 +2,8 @@
   "slug": "vayne",
   "name": "Vayne",
   "role": "Дракон",
-  "tier": "S",
-  "patch": "7.1h",
+  "tier": "A",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -458,8 +458,8 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Magnetic Blaster",
-          "Guinsoo's Rageblade"
+          "Guinsoo's Rageblade",
+          "Magnetic Blaster"
         ],
         "boots": [
           "Berserker's Greaves",
@@ -467,10 +467,10 @@
         ],
         "finalBuild": [
           "Blade of the Ruined King",
-          "Magnetic Blaster",
           "Guinsoo's Rageblade",
+          "Magnetic Blaster",
           "Terminus",
-          "Amaranth's Twinguard",
+          "Guardian Angel",
           "Berserker's Greaves - Stasis"
         ]
       }
@@ -480,7 +480,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

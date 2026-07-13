@@ -3,7 +3,7 @@
   "name": "Aatrox",
   "role": "Барон",
   "tier": "A",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -571,12 +571,12 @@
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
           "Eclipse",
-          "Trinity Force",
-          "Serylda's Grudge"
+          "Sundered Sky",
+          "Death's Dance"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -584,9 +584,9 @@
         ],
         "finalBuild": [
           "Eclipse",
-          "Trinity Force",
-          "Serylda's Grudge",
+          "Sundered Sky",
           "Death's Dance",
+          "Serylda's Grudge",
           "Spear of Shojin",
           "Plated Steelcaps - Stridebreaker"
         ]
@@ -613,7 +613,7 @@
           "Trinity Force",
           "Death's Dance",
           "Serylda's Grudge",
-          "Spear of Shojin",
+          "Serpent's Fang",
           "Guardian Angel",
           "Gluttonous Greaves - Goredrinker"
         ]
@@ -622,7 +622,7 @@
   ],
   "runes": [
     "Conqueror",
-    "Courage of the Colossus",
+    "Demolish",
     "Second Wind",
     "Overgrowth",
     "Sudden Impact"

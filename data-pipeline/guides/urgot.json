@@ -3,7 +3,7 @@
   "name": "Urgot",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Ruby Crystal"
         ],
         "core": [
-          "Heartsteel",
-          "Titanic Hydra",
-          "Black Cleaver"
+          "Black Cleaver",
+          "Sterak's Gage",
+          "Thornmail"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Heartsteel",
-          "Titanic Hydra",
           "Black Cleaver",
+          "Sterak's Gage",
           "Thornmail",
+          "Overlord's Bloodmail",
           "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }

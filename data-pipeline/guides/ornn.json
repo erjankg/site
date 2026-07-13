@@ -3,7 +3,7 @@
   "name": "Ornn",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -510,16 +510,15 @@
           "Thornmail"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Heartsteel",
           "Sunfire Aegis",
           "Thornmail",
-          "Kaenic Rookern",
+          "Gargoyle Stoneplate",
           "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     },
@@ -533,20 +532,19 @@
         ],
         "core": [
           "Bulwark of the Mountain",
-          "Warmog's Armor",
-          "Radiant Virtue"
+          "Locket of the Iron Solari",
+          "Warmog's Armor"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Locket of the Iron Solari",
           "Warmog's Armor",
-          "Radiant Virtue",
           "Dawnshroud",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Force of Nature",
+          "Plated Steelcaps"
         ]
       }
     }
@@ -556,7 +554,7 @@
     "Demolish",
     "Second Wind",
     "Overgrowth",
-    "Transcendence"
+    "Nimbus Cloak"
   ],
   "spells": [
     {

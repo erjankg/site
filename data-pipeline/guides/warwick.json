@@ -2,8 +2,8 @@
   "slug": "warwick",
   "name": "Warwick",
   "role": "Лес",
-  "tier": "B",
-  "patch": "7.1h",
+  "tier": "A",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,19 +300,19 @@
         "core": [
           "Trinity Force",
           "Blade of the Ruined King",
-          "Awakened Soulstealer"
+          "Dusk and Dawn"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Berserker's Greaves",
           "Stasis"
         ],
         "finalBuild": [
           "Trinity Force",
           "Blade of the Ruined King",
-          "Awakened Soulstealer",
+          "Dusk and Dawn",
+          "Death's Dance",
           "Terminus",
-          "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Berserker's Greaves - Stasis"
         ]
       }
     },
@@ -322,12 +322,12 @@
       "default": false,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
           "Trinity Force",
           "Blade of the Ruined King",
-          "Death's Dance"
+          "Dusk and Dawn"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -336,9 +336,9 @@
         "finalBuild": [
           "Trinity Force",
           "Blade of the Ruined King",
+          "Dusk and Dawn",
           "Death's Dance",
           "Terminus",
-          "Guardian Angel",
           "Plated Steelcaps - Goredrinker"
         ]
       }
@@ -349,7 +349,7 @@
     "Brutal",
     "Cut Down",
     "Legend: Alacrity",
-    "Overgrowth"
+    "Sudden Impact"
   ],
   "spells": [
     {

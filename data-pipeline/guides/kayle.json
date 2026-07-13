@@ -3,7 +3,7 @@
   "name": "Kayle",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -368,8 +368,8 @@
         ],
         "core": [
           "Nashor's Tooth",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Dusk and Dawn",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana",
@@ -377,10 +377,10 @@
         ],
         "finalBuild": [
           "Nashor's Tooth",
+          "Dusk and Dawn",
           "Rabadon's Deathcap",
+          "Void Staff",
           "Infinity Orb",
-          "Riftmaker",
-          "Lich Bane",
           "Boots of Mana - Quicksilver"
         ]
       }
@@ -391,33 +391,33 @@
       "default": false,
       "items": {
         "starting": [
-          "Long Sword"
+          "Amplifying Tome"
         ],
         "core": [
-          "Blade of the Ruined King",
-          "Guinsoo's Rageblade",
-          "Terminus"
+          "Nashor's Tooth",
+          "Dusk and Dawn",
+          "Rabadon's Deathcap"
         ],
         "boots": [
-          "Berserker's Greaves",
+          "Boots of Mana",
           "Quicksilver"
         ],
         "finalBuild": [
-          "Blade of the Ruined King",
-          "Guinsoo's Rageblade",
-          "Terminus",
-          "Runaan's Hurricane",
-          "Amaranth's Twinguard",
-          "Berserker's Greaves - Quicksilver"
+          "Nashor's Tooth",
+          "Dusk and Dawn",
+          "Rabadon's Deathcap",
+          "Void Staff",
+          "Infinity Orb",
+          "Boots of Mana - Quicksilver"
         ]
       }
     }
   ],
   "runes": [
-    "Fleet Footwork",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Alacrity",
+    "Conqueror",
+    "Botanist",
+    "Absolute Focus",
+    "Gathering Storm",
     "Bone Plating"
   ],
   "spells": [

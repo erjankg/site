@@ -3,7 +3,7 @@
   "name": "Seraphine",
   "role": "Саппорт",
   "tier": "B",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -295,24 +295,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Relic Shield"
+          "Spectral Sickle"
         ],
         "core": [
-          "Bulwark of the Mountain",
-          "Harmonic Echo",
-          "Ardent Censer"
+          "Black Mist Scythe",
+          "Ardent Censer",
+          "Redemption"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Locket"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Bulwark of the Mountain",
-          "Harmonic Echo",
+          "Black Mist Scythe",
           "Ardent Censer",
           "Redemption",
+          "Harmonic Echo",
           "Staff of Flowing Water",
-          "Ionian Boots of Lucidity - Locket"
+          "Ionian Boots of Lucidity"
         ]
       }
     },
@@ -325,7 +324,7 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Luden's Echo",
+          "Blackfire Torch",
           "Infinity Orb",
           "Rabadon's Deathcap"
         ],
@@ -334,11 +333,11 @@
           "Stasis"
         ],
         "finalBuild": [
-          "Luden's Echo",
+          "Blackfire Torch",
           "Infinity Orb",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Lich Bane",
+          "Cryptbloom",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }

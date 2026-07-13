@@ -3,7 +3,7 @@
   "name": "Brand",
   "role": "Мид",
   "tier": "S",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -574,20 +574,20 @@
           "Amplifying Tome"
         ],
         "core": [
+          "Blackfire Torch",
           "Liandry's Torment",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Infinity Orb"
         ],
         "boots": [
           "Boots of Mana",
           "Stasis"
         ],
         "finalBuild": [
+          "Blackfire Torch",
           "Liandry's Torment",
           "Infinity Orb",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -613,8 +613,8 @@
           "Black Mist Scythe",
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
+          "Rabadon's Deathcap",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -622,10 +622,10 @@
   ],
   "runes": [
     "Electrocute",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Bloodline",
-    "Transcendence"
+    "Axiom Arcanist",
+    "Transcendence",
+    "Scorch",
+    "Bone Plating"
   ],
   "spells": [
     {

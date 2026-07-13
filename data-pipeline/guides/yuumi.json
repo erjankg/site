@@ -2,8 +2,8 @@
   "slug": "yuumi",
   "name": "Yuumi",
   "role": "Саппорт",
-  "tier": "S",
-  "patch": "7.1h",
+  "tier": "A",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,30 +299,29 @@
         ],
         "core": [
           "Black Mist Scythe",
-          "Harmonic Echo",
-          "Ardent Censer"
+          "Ardent Censer",
+          "Harmonic Echo"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Veil"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Harmonic Echo",
           "Ardent Censer",
+          "Harmonic Echo",
+          "Redemption",
           "Staff of Flowing Water",
-          "Knight's Vow",
-          "Ionian Boots of Lucidity - Veil"
+          "Ionian Boots of Lucidity"
         ]
       }
     }
   ],
   "runes": [
     "Aery",
-    "Font of Life",
-    "Bone Plating",
-    "Revitalize",
-    "Transcendence"
+    "Manaflow Band",
+    "Transcendence",
+    "Gathering Storm",
+    "Revitalize"
   ],
   "spells": [
     {

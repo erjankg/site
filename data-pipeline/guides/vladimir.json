@@ -3,7 +3,7 @@
   "name": "Vladimir",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,16 +290,16 @@
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
+          "Stormsurge",
           "Infinity Orb",
-          "Awakened Soulstealer",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -307,38 +307,11 @@
           "Protobelt"
         ],
         "finalBuild": [
+          "Stormsurge",
           "Infinity Orb",
-          "Awakened Soulstealer",
           "Rabadon's Deathcap",
-          "Cosmic Drive",
-          "Riftmaker",
-          "Boots of Mana - Protobelt"
-        ]
-      }
-    },
-    {
-      "title": "Solo Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Rod of Ages",
-          "Rabadon's Deathcap",
-          "Psychic Projector"
-        ],
-        "boots": [
-          "Boots of Mana",
-          "Protobelt"
-        ],
-        "finalBuild": [
-          "Rod of Ages",
-          "Rabadon's Deathcap",
-          "Psychic Projector",
-          "Awakened Soulstealer",
-          "Infinity Orb",
+          "Void Staff",
+          "Zhonya's Hourglass",
           "Boots of Mana - Protobelt"
         ]
       }
@@ -349,7 +322,7 @@
     "Botanist",
     "Transcendence",
     "Gathering Storm",
-    "Bone Plating"
+    "Battle Zeal"
   ],
   "spells": [
     {

@@ -3,7 +3,7 @@
   "name": "Volibear",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -574,21 +574,20 @@
           "Long Sword"
         ],
         "core": [
-          "Trinity Force",
-          "Rod of Ages",
-          "Psychic Projector"
+          "Dusk and Dawn",
+          "Navori Quickblades",
+          "Unending Despair"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Trinity Force",
-          "Rod of Ages",
-          "Psychic Projector",
+          "Dusk and Dawn",
+          "Navori Quickblades",
+          "Unending Despair",
+          "Thornmail",
           "Amaranth's Twinguard",
-          "Riftmaker",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     },
@@ -603,29 +602,28 @@
         "core": [
           "Heartsteel",
           "Trinity Force",
-          "Thornmail"
+          "Unending Despair"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Heartsteel",
           "Trinity Force",
+          "Unending Despair",
           "Thornmail",
-          "Force of Nature",
           "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
+    "Lethal Tempo",
     "Battle Zeal",
-    "Cut Down",
+    "Last Stand",
     "Legend: Alacrity",
-    "Overgrowth"
+    "Perseverance"
   ],
   "spells": [
     {

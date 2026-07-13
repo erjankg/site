@@ -3,7 +3,7 @@
   "name": "Graves",
   "role": "Лес",
   "tier": "B",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,19 +298,19 @@
           "Long Sword"
         ],
         "core": [
-          "The Collector",
+          "Essence Reaver",
           "Bloodthirster",
-          "Lord Dominik's Regard"
+          "Galeforce"
         ],
         "boots": [
           "Gluttonous Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "The Collector",
-          "Bloodthirster",
-          "Lord Dominik's Regard",
           "Essence Reaver",
+          "Bloodthirster",
+          "Galeforce",
+          "Lord Dominik's Regard",
           "Infinity Edge",
           "Gluttonous Greaves - Galeforce"
         ]
@@ -322,7 +322,7 @@
     "Sudden Impact",
     "Hubris",
     "Eyeball Collector",
-    "Overgrowth"
+    "Legend: Alacrity"
   ],
   "spells": [
     {

@@ -3,7 +3,7 @@
   "name": "Ambessa",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -571,24 +571,24 @@
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
           "Eclipse",
           "Spear of Shojin",
-          "Serylda's Grudge"
+          "Goredrinker"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Plated Steelcaps",
           "Goredrinker"
         ],
         "finalBuild": [
           "Eclipse",
           "Spear of Shojin",
+          "Goredrinker",
           "Serylda's Grudge",
-          "Death's Dance",
           "Guardian Angel",
-          "Gluttonous Greaves - Goredrinker"
+          "Plated Steelcaps - Goredrinker"
         ]
       }
     },
@@ -622,7 +622,7 @@
   ],
   "runes": [
     "Conqueror",
-    "Unshakeable",
+    "Demolish",
     "Second Wind",
     "Overgrowth",
     "Sudden Impact"

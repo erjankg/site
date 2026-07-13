@@ -3,7 +3,7 @@
   "name": "Ryze",
   "role": "Мид",
   "tier": "S+",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -571,11 +571,11 @@
       "default": true,
       "items": {
         "starting": [
-          "Sapphire Crystal"
+          "Tear of the Goddess"
         ],
         "core": [
-          "Archangel's Staff",
           "Rod of Ages",
+          "Archangel's Staff",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -583,11 +583,11 @@
           "Stasis"
         ],
         "finalBuild": [
-          "Seraph's Embrace",
           "Rod of Ages",
+          "Seraph's Embrace",
           "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Crown of the Shattered Queen",
+          "Void Staff",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -598,11 +598,11 @@
       "default": false,
       "items": {
         "starting": [
-          "Sapphire Crystal"
+          "Tear of the Goddess"
         ],
         "core": [
-          "Archangel's Staff",
           "Rod of Ages",
+          "Archangel's Staff",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -610,11 +610,11 @@
           "Stasis"
         ],
         "finalBuild": [
-          "Seraph's Embrace",
           "Rod of Ages",
+          "Seraph's Embrace",
           "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Crown of the Shattered Queen",
+          "Void Staff",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -625,7 +625,7 @@
     "Manaflow Band",
     "Transcendence",
     "Nimbus Cloak",
-    "Bone Plating"
+    "Battle Zeal"
   ],
   "spells": [
     {

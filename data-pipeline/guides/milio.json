@@ -3,7 +3,7 @@
   "name": "Milio",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -295,24 +295,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Spectral Sickle"
+          "Relic Shield"
         ],
         "core": [
-          "Black Mist Scythe",
+          "Bulwark of the Mountain",
           "Ardent Censer",
-          "Harmonic Echo"
+          "Redemption"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Veil"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Black Mist Scythe",
+          "Bulwark of the Mountain",
           "Ardent Censer",
+          "Redemption",
           "Harmonic Echo",
-          "Staff of Flowing Water",
-          "Crown of the Shattered Queen",
-          "Ionian Boots of Lucidity - Veil"
+          "Knight's Vow",
+          "Ionian Boots of Lucidity"
         ]
       }
     }
@@ -322,7 +321,7 @@
     "Font of Life",
     "Bone Plating",
     "Revitalize",
-    "Transcendence"
+    "Ingenious Hunter"
   ],
   "spells": [
     {

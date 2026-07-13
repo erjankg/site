@@ -1,9 +1,9 @@
 {
   "slug": "pantheon",
   "name": "Pantheon",
-  "role": "Барон",
-  "tier": "C",
-  "patch": "7.1h",
+  "role": "Лес",
+  "tier": "A",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,72 +284,45 @@
     }
   ],
   "counters": [
-    "Fiora",
-    "Renekton",
-    "Malphite"
+    "Tryndamere",
+    "Rammus",
+    "Amumu"
   ],
   "builds": [
     {
-      "title": "Solo Build",
-      "tier": "C",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Duskblade of Draktharr",
-          "Serpent's Fang",
-          "Serylda's Grudge"
-        ],
-        "boots": [
-          "Boots of Dynamism",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Duskblade of Draktharr",
           "Serpent's Fang",
           "Serylda's Grudge",
-          "Blade of the Ruined King",
-          "Edge of Night",
-          "Boots of Dynamism - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
-          "Duskblade of Draktharr",
-          "Serpent's Fang",
-          "Serylda's Grudge"
+          "Blade of the Ruined King"
         ],
         "boots": [
           "Boots of Dynamism",
           "Galeforce"
         ],
         "finalBuild": [
-          "Duskblade of Draktharr",
           "Serpent's Fang",
           "Serylda's Grudge",
           "Blade of the Ruined King",
           "Edge of Night",
+          "Guardian Angel",
           "Boots of Dynamism - Galeforce"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Alacrity",
-    "Sudden Impact"
+    "First Strike",
+    "Sudden Impact",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Hextech Flashtraption"
   ],
   "spells": [
     {
@@ -362,8 +335,8 @@
     {
       "ability": "Comet Spear",
       "levels": [
-        2,
-        4,
+        1,
+        3,
         6,
         7
       ]
@@ -371,19 +344,19 @@
     {
       "ability": "Shield Vault",
       "levels": [
-        1,
-        12,
-        14,
-        15
+        2,
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Aegis Assault",
       "levels": [
-        3,
-        8,
-        10,
-        11
+        4,
+        12,
+        14,
+        15
       ]
     },
     {

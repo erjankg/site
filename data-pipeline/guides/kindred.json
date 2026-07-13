@@ -3,7 +3,7 @@
   "name": "Kindred",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,8 +298,8 @@
           "Long Sword"
         ],
         "core": [
-          "Essence Reaver",
           "The Collector",
+          "Magnetic Blaster",
           "Lord Dominik's Regard"
         ],
         "boots": [
@@ -307,11 +307,11 @@
           "Stasis"
         ],
         "finalBuild": [
-          "Essence Reaver",
           "The Collector",
-          "Lord Dominik's Regard",
           "Magnetic Blaster",
-          "Guardian Angel",
+          "Lord Dominik's Regard",
+          "Infinity Edge",
+          "Bloodthirster",
           "Gluttonous Greaves - Stasis"
         ]
       }

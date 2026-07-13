@@ -3,7 +3,7 @@
   "name": "K'Sante",
   "role": "Барон",
   "tier": "S+",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": null,
   "matchups": [],
   "counters": [
@@ -22,27 +22,26 @@
         ],
         "core": [
           "Iceborn Gauntlet",
-          "Thornmail",
-          "Unending Despair"
+          "Unending Despair",
+          "Thornmail"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Iceborn Gauntlet",
-          "Thornmail",
           "Unending Despair",
-          "Mantle of the Twelfth Hour",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Thornmail",
+          "Gargoyle Stoneplate",
+          "Force of Nature",
+          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
     "Grasp of the Undying",
-    "Unshakeable",
+    "Demolish",
     "Second Wind",
     "Overgrowth",
     "Last Stand"

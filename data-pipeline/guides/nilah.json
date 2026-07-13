@@ -1,9 +1,9 @@
 {
   "slug": "nilah",
   "name": "Nilah",
-  "role": "Дракон",
+  "role": "Лес",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,47 +284,20 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Xayah",
-    "Smolder"
+    "Rammus",
+    "Amumu",
+    "Kha'Zix"
   ],
   "builds": [
     {
-      "title": "Duo Build",
-      "tier": "D",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Bloodthirster",
-          "The Collector",
-          "Lord Dominik's Regard"
-        ],
-        "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Bloodthirster",
-          "The Collector",
-          "Lord Dominik's Regard",
-          "Essence Reaver",
-          "Infinity Edge",
-          "Gluttonous Greaves - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "B",
-      "default": false,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
           "Essence Reaver",
           "The Collector",
           "Lord Dominik's Regard"
@@ -337,8 +310,8 @@
           "Essence Reaver",
           "The Collector",
           "Lord Dominik's Regard",
-          "Bloodthirster",
           "Infinity Edge",
+          "Bloodthirster",
           "Gluttonous Greaves - Stasis"
         ]
       }
@@ -346,10 +319,10 @@
   ],
   "runes": [
     "Fleet Footwork",
-    "Brutal",
-    "Cut Down",
-    "Legend: Alacrity",
-    "Second Wind"
+    "Sudden Impact",
+    "Hubris",
+    "Eyeball Collector",
+    "Legend: Alacrity"
   ],
   "spells": [
     {
@@ -362,8 +335,8 @@
     {
       "ability": "Formless Blade",
       "levels": [
-        1,
-        4,
+        2,
+        3,
         6,
         7
       ]
@@ -371,7 +344,7 @@
     {
       "ability": "Jubilant Veil",
       "levels": [
-        3,
+        4,
         12,
         14,
         15
@@ -380,7 +353,7 @@
     {
       "ability": "Slipstream",
       "levels": [
-        2,
+        1,
         8,
         10,
         11

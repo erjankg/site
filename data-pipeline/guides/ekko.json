@@ -3,7 +3,7 @@
   "name": "Ekko",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -574,8 +574,8 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Lich Bane",
-          "Infinity Orb",
+          "Dusk and Dawn",
+          "Protobelt",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -583,11 +583,11 @@
           "Protobelt"
         ],
         "finalBuild": [
-          "Lich Bane",
-          "Infinity Orb",
+          "Dusk and Dawn",
+          "Protobelt",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Riftmaker",
+          "Void Staff",
+          "Infinity Orb",
           "Boots of Mana - Protobelt"
         ]
       }
@@ -601,20 +601,20 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Lich Bane",
-          "Nashor's Tooth",
-          "Rabadon's Deathcap"
+          "Dusk and Dawn",
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
           "Boots of Mana",
           "Protobelt"
         ],
         "finalBuild": [
-          "Lich Bane",
-          "Nashor's Tooth",
+          "Dusk and Dawn",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Riftmaker",
+          "Infinity Orb",
+          "Void Staff",
+          "Zhonya's Hourglass",
           "Boots of Mana - Protobelt"
         ]
       }
@@ -622,9 +622,9 @@
   ],
   "runes": [
     "Fleet Footwork",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Alacrity",
+    "Sudden Impact",
+    "Hubris",
+    "Eyeball Collector",
     "Transcendence"
   ],
   "spells": [

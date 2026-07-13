@@ -3,7 +3,7 @@
   "name": "Swain",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -586,8 +586,8 @@
           "Malignance",
           "Infinity Orb",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Crown of the Shattered Queen",
+          "Cryptbloom",
+          "Zhonya's Hourglass",
           "Boots of Mana - Stasis"
         ]
       }
@@ -603,26 +603,25 @@
         "core": [
           "Bulwark of the Mountain",
           "Rylai's Crystal Scepter",
-          "Psychic Projector"
+          "Malignance"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
           "Rylai's Crystal Scepter",
-          "Psychic Projector",
-          "Rabadon's Deathcap",
+          "Malignance",
+          "Cryptbloom",
           "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
-    "Phase Rush",
-    "Hextech Flashtraption",
+    "Conqueror",
+    "Axiom Arcanist",
     "Transcendence",
     "Nimbus Cloak",
     "Bone Plating"

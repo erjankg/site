@@ -3,7 +3,7 @@
   "name": "Galio",
   "role": "Мид",
   "tier": "S",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -579,16 +579,16 @@
           "Thornmail"
         ],
         "boots": [
-          "Boots of Mana",
+          "Mercury's Treads",
           "Protobelt"
         ],
         "finalBuild": [
           "Riftmaker",
           "Hollow Radiance",
           "Thornmail",
+          "Unending Despair",
           "Dawnshroud",
-          "Amaranth's Twinguard",
-          "Boots of Mana - Protobelt"
+          "Mercury's Treads - Protobelt"
         ]
       }
     },
@@ -602,20 +602,19 @@
         ],
         "core": [
           "Bulwark of the Mountain",
-          "Yordle Trap",
+          "Locket of the Iron Solari",
           "Warmog's Armor"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Yordle Trap",
+          "Locket of the Iron Solari",
           "Warmog's Armor",
           "Frozen Heart",
-          "Kaenic Rookern",
-          "Plated Steelcaps - Gargoyle"
+          "Force of Nature",
+          "Plated Steelcaps"
         ]
       }
     }

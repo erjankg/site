@@ -3,7 +3,7 @@
   "name": "Tryndamere",
   "role": "Лес",
   "tier": "S",
-  "patch": "7.1h",
+  "patch": "7.2",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -574,19 +574,19 @@
           "Long Sword"
         ],
         "core": [
-          "Magnetic Blaster",
           "Blade of the Ruined King",
-          "Mortal Reminder"
+          "Magnetic Blaster",
+          "Infinity Edge"
         ],
         "boots": [
           "Berserker's Greaves",
           "Quicksilver"
         ],
         "finalBuild": [
-          "Magnetic Blaster",
           "Blade of the Ruined King",
-          "Mortal Reminder",
+          "Magnetic Blaster",
           "Infinity Edge",
+          "Mortal Reminder",
           "Guardian Angel",
           "Berserker's Greaves - Quicksilver"
         ]
@@ -603,7 +603,7 @@
         "core": [
           "Blade of the Ruined King",
           "Magnetic Blaster",
-          "Mortal Reminder"
+          "Infinity Edge"
         ],
         "boots": [
           "Berserker's Greaves",
@@ -612,8 +612,8 @@
         "finalBuild": [
           "Blade of the Ruined King",
           "Magnetic Blaster",
-          "Mortal Reminder",
           "Infinity Edge",
+          "Mortal Reminder",
           "Guardian Angel",
           "Berserker's Greaves - Quicksilver"
         ]
@@ -625,7 +625,7 @@
     "Brutal",
     "Last Stand",
     "Legend: Alacrity",
-    "Nimbus Cloak"
+    "Sudden Impact"
   ],
   "spells": [
     {
