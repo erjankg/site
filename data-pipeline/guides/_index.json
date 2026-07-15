@@ -1,12 +1,12 @@
 {
-  "updated": "2026-07-14T05:42:36.447Z",
-  "count": 139,
+  "updated": "2026-07-15T05:44:08.101Z",
+  "count": 140,
   "champions": [
     {
       "slug": "aatrox",
       "name": "Aatrox",
       "role": "Барон",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "slug": "ahri",
@@ -36,7 +36,7 @@
       "slug": "ambessa",
       "name": "Ambessa",
       "role": "Барон",
-      "tier": "B"
+      "tier": "C"
     },
     {
       "slug": "amumu",
@@ -102,7 +102,7 @@
       "slug": "camille",
       "name": "Camille",
       "role": "Барон",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "corki",
@@ -198,19 +198,19 @@
       "slug": "graves",
       "name": "Graves",
       "role": "Лес",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "gwen",
       "name": "Gwen",
       "role": "Барон",
-      "tier": "D"
+      "tier": "C"
     },
     {
       "slug": "hecarim",
       "name": "Hecarim",
       "role": "Лес",
-      "tier": "S"
+      "tier": "A"
     },
     {
       "slug": "heimerdinger",
@@ -222,7 +222,7 @@
       "slug": "irelia",
       "name": "Irelia",
       "role": "Барон",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "janna",
@@ -372,7 +372,7 @@
       "slug": "malphite",
       "name": "Malphite",
       "role": "Барон",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "maokai",
@@ -408,7 +408,7 @@
       "slug": "mordekaiser",
       "name": "Mordekaiser",
       "role": "Барон",
-      "tier": "A"
+      "tier": "S"
     },
     {
       "slug": "morgana",
@@ -450,7 +450,7 @@
       "slug": "nocturne",
       "name": "Nocturne",
       "role": "Лес",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "slug": "norra",
@@ -558,7 +558,7 @@
       "slug": "senna",
       "name": "Senna",
       "role": "Саппорт",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "seraphine",
@@ -600,7 +600,7 @@
       "slug": "sion",
       "name": "Sion",
       "role": "Барон",
-      "tier": "S"
+      "tier": "A"
     },
     {
       "slug": "sivir",
@@ -732,7 +732,7 @@
       "slug": "vi",
       "name": "Vi",
       "role": "Лес",
-      "tier": "A"
+      "tier": "S"
     },
     {
       "slug": "viego",
@@ -795,10 +795,16 @@
       "tier": "A"
     },
     {
+      "slug": "yunara",
+      "name": "Yunara",
+      "role": "Дракон",
+      "tier": "S+"
+    },
+    {
       "slug": "yuumi",
       "name": "Yuumi",
       "role": "Саппорт",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "slug": "zed",

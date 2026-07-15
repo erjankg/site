@@ -1,0 +1,83 @@
+{
+  "slug": "yunara",
+  "name": "Yunara",
+  "role": "Дракон",
+  "tier": "S+",
+  "patch": "7.2",
+  "dataDate": null,
+  "matchups": [],
+  "counters": [],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Galeforce",
+          "Magnetic Blaster",
+          "Infinity Edge"
+        ],
+        "boots": [
+          "Berserker's Greaves"
+        ],
+        "finalBuild": [
+          "Galeforce",
+          "Magnetic Blaster",
+          "Infinity Edge",
+          "Lord Dominik's Regard",
+          "Bloodthirster",
+          "Berserker's Greaves"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Lethal Tempo",
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Bone Plating"
+  ],
+  "spells": [],
+  "skillOrder": [
+    {
+      "ability": "Cultivation of Spirit",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Arc of Judgment / Arc of Ruin",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Kanmei's Steps / Untouchable Shadow",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Transcend One's Self",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}
