@@ -3,7 +3,7 @@
   "name": "Gwen",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,8 +290,8 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -310,18 +310,44 @@
           "Riftmaker",
           "Rabadon's Deathcap",
           "Void Staff",
-          "Zhonya's Hourglass",
+          "Infinity Orb",
           "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "A",
+      "default": false,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Nashor's Tooth",
+          "Dusk and Dawn",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Nashor's Tooth",
+          "Dusk and Dawn",
+          "Rabadon's Deathcap",
+          "Void Staff",
+          "Infinity Orb",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
     "Conqueror",
-    "Demolish",
-    "Second Wind",
-    "Overgrowth",
-    "Sudden Impact"
+    "Battle Zeal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Second Wind"
   ],
   "spells": [
     {

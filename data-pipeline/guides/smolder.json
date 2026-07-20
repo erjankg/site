@@ -3,7 +3,7 @@
   "name": "Smolder",
   "role": "Дракон",
   "tier": "S",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -623,8 +623,8 @@
   ],
   "builds": [
     {
-      "title": "Duo Build",
-      "tier": "S+",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -636,8 +636,7 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
           "Muramana",
@@ -645,44 +644,17 @@
           "Serylda's Grudge",
           "Magnetic Blaster",
           "Spear of Shojin",
-          "Gluttonous Greaves - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "B",
-      "default": false,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
-          "Manamune",
-          "Trinity Force",
-          "Serylda's Grudge"
-        ],
-        "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Muramana",
-          "Trinity Force",
-          "Serylda's Grudge",
-          "Magnetic Blaster",
-          "Spear of Shojin",
-          "Gluttonous Greaves - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
+    "Fleet Footwork",
     "Battle Zeal",
     "Cut Down",
     "Legend: Bloodline",
-    "Bone Plating"
+    "Transcendence"
   ],
   "spells": [
     {

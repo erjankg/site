@@ -3,7 +3,7 @@
   "name": "Veigar",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -566,29 +566,54 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Mid Build",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Luden's Echo",
           "Stormsurge",
+          "Rabadon's Deathcap",
+          "Infinity Orb"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Stormsurge",
+          "Rabadon's Deathcap",
+          "Infinity Orb",
+          "Void Staff",
+          "Zhonya's Hourglass",
+          "Boots of Mana"
+        ]
+      }
+    },
+    {
+      "title": "Support Build",
+      "tier": "C",
+      "default": false,
+      "items": {
+        "starting": [
+          "Spectral Sickle"
+        ],
+        "core": [
+          "Black Mist Scythe",
+          "Rod of Ages",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Luden's Echo",
-          "Stormsurge",
+          "Black Mist Scythe",
+          "Rod of Ages",
           "Rabadon's Deathcap",
-          "Void Staff",
-          "Infinity Orb",
-          "Boots of Mana - Stasis"
+          "Cryptbloom",
+          "Zhonya's Hourglass",
+          "Boots of Mana"
         ]
       }
     }
@@ -598,7 +623,7 @@
     "Botanist",
     "Transcendence",
     "Gathering Storm",
-    "Bone Plating"
+    "Cut Down"
   ],
   "spells": [
     {

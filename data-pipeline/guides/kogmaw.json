@@ -3,7 +3,7 @@
   "name": "Kog'Maw",
   "role": "Дракон",
   "tier": "B",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -290,29 +290,54 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Duo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Dagger"
         ],
         "core": [
-          "Blade of the Ruined King",
           "Guinsoo's Rageblade",
-          "Navori Quickblades"
+          "Navori Quickblades",
+          "Runaan's Hurricane"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Quicksilver"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Blade of the Ruined King",
           "Guinsoo's Rageblade",
           "Navori Quickblades",
           "Runaan's Hurricane",
+          "Blade of the Ruined King",
           "Terminus",
-          "Berserker's Greaves - Quicksilver"
+          "Berserker's Greaves"
+        ]
+      }
+    },
+    {
+      "title": "Mid Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Archangel's Staff",
+          "Malignance",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Seraph's Embrace",
+          "Malignance",
+          "Rabadon's Deathcap",
+          "Void Staff",
+          "Zhonya's Hourglass",
+          "Boots of Mana"
         ]
       }
     }

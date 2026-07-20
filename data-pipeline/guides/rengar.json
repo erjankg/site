@@ -3,7 +3,7 @@
   "name": "Rengar",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,20 +299,19 @@
         ],
         "core": [
           "Essence Reaver",
-          "Bloodthirster",
+          "Blade of the Ruined King",
           "Lord Dominik's Regard"
         ],
         "boots": [
-          "Boots of Dynamism",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
           "Essence Reaver",
-          "Bloodthirster",
+          "Blade of the Ruined King",
           "Lord Dominik's Regard",
-          "Infinity Edge",
+          "Death's Dance",
           "Guardian Angel",
-          "Boots of Dynamism - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -320,7 +319,7 @@
   "runes": [
     "First Strike",
     "Sudden Impact",
-    "Chain Assault",
+    "Tyrant",
     "Eyeball Collector",
     "Transcendence"
   ],

@@ -3,7 +3,7 @@
   "name": "Kha'Zix",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,20 +299,19 @@
         ],
         "core": [
           "Youmuu's Ghostblade",
-          "Serpent's Fang",
+          "Duskblade of Draktharr",
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
           "Youmuu's Ghostblade",
-          "Serpent's Fang",
-          "Serylda's Grudge",
           "Duskblade of Draktharr",
+          "Serylda's Grudge",
+          "Serpent's Fang",
           "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -322,7 +321,7 @@
     "Battle Zeal",
     "Cut Down",
     "Legend: Bloodline",
-    "Sudden Impact"
+    "Transcendence"
   ],
   "spells": [
     {

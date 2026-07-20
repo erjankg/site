@@ -2,8 +2,8 @@
   "slug": "rumble",
   "name": "Rumble",
   "role": "Барон",
-  "tier": "B",
-  "patch": "7.2",
+  "tier": "C",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,30 +299,29 @@
         ],
         "core": [
           "Liandry's Torment",
-          "Bloodletter's Curse",
-          "Zhonya's Hourglass"
+          "Hextech Rocketbelt",
+          "Bloodletter's Curse"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Liandry's Torment",
+          "Hextech Rocketbelt",
           "Bloodletter's Curse",
-          "Zhonya's Hourglass",
-          "Rabadon's Deathcap",
+          "Infinity Orb",
           "Riftmaker",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Phase Rush",
+    "Arcane Comet",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
-    "Nimbus Cloak"
+    "Perseverance",
+    "Last Stand"
   ],
   "spells": [
     {

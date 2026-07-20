@@ -3,7 +3,7 @@
   "name": "Renekton",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Goredrinker",
+          "Hullbreaker",
           "Mortal Reminder"
         ],
         "boots": [
@@ -308,9 +308,9 @@
         ],
         "finalBuild": [
           "Blade of the Ruined King",
-          "Goredrinker",
-          "Mortal Reminder",
           "Hullbreaker",
+          "Mortal Reminder",
+          "Sterak's Gage",
           "Guardian Angel",
           "Plated Steelcaps - Goredrinker"
         ]
@@ -321,8 +321,8 @@
     "Conqueror",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
-    "Brutal"
+    "Perseverance",
+    "Empowered Attack"
   ],
   "spells": [
     {

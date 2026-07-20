@@ -3,7 +3,7 @@
   "name": "Akshan",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-12",
   "matchups": [
     {
@@ -125,14 +125,14 @@
           "pr": 2.8
         },
         {
-          "name": "ВИКТОР",
-          "slug": "viktor",
+          "name": "КАТАРИНА",
+          "slug": "katarina",
           "wr": 30,
           "pr": 1.3
         },
         {
-          "name": "КАТАРИНА",
-          "slug": "katarina",
+          "name": "ВИКТОР",
+          "slug": "viktor",
           "wr": 30,
           "pr": 1.3
         },
@@ -298,19 +298,19 @@
           "Long Sword"
         ],
         "core": [
-          "The Collector",
+          "Galeforce",
           "Magnetic Blaster",
-          "Infinity Edge"
+          "Mortal Reminder"
         ],
         "boots": [
           "Gluttonous Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "The Collector",
+          "Galeforce",
           "Magnetic Blaster",
+          "Mortal Reminder",
           "Infinity Edge",
-          "Lord Dominik's Regard",
           "Bloodthirster",
           "Gluttonous Greaves - Galeforce"
         ]
@@ -321,7 +321,7 @@
     "Empowerment",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Sudden Impact"
   ],
   "spells": [

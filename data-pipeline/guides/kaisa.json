@@ -3,7 +3,7 @@
   "name": "Kai'Sa",
   "role": "Дракон",
   "tier": "S",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,19 +300,18 @@
         "core": [
           "Kraken Slayer",
           "Guinsoo's Rageblade",
-          "Blade of the Ruined King"
+          "Terminus"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Kraken Slayer",
           "Guinsoo's Rageblade",
-          "Blade of the Ruined King",
           "Terminus",
           "Runaan's Hurricane",
-          "Berserker's Greaves - Stasis"
+          "Blade of the Ruined King",
+          "Berserker's Greaves"
         ]
       }
     }

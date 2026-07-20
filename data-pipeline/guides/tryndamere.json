@@ -3,7 +3,7 @@
   "name": "Tryndamere",
   "role": "Лес",
   "tier": "S+",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -579,8 +579,7 @@
           "Infinity Edge"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Quicksilver"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Blade of the Ruined King",
@@ -588,7 +587,7 @@
           "Infinity Edge",
           "Mortal Reminder",
           "Guardian Angel",
-          "Berserker's Greaves - Quicksilver"
+          "Berserker's Greaves"
         ]
       }
     },
@@ -606,8 +605,7 @@
           "Infinity Edge"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Quicksilver"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Blade of the Ruined King",
@@ -615,7 +613,7 @@
           "Infinity Edge",
           "Mortal Reminder",
           "Guardian Angel",
-          "Berserker's Greaves - Quicksilver"
+          "Berserker's Greaves"
         ]
       }
     }

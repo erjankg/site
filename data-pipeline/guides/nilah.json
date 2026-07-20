@@ -3,7 +3,7 @@
   "name": "Nilah",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,29 +299,28 @@
         ],
         "core": [
           "Essence Reaver",
-          "The Collector",
+          "Bloodthirster",
           "Lord Dominik's Regard"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
           "Essence Reaver",
-          "The Collector",
+          "Bloodthirster",
           "Lord Dominik's Regard",
           "Infinity Edge",
-          "Bloodthirster",
-          "Gluttonous Greaves - Stasis"
+          "Galeforce",
+          "Gluttonous Greaves"
         ]
       }
     }
   ],
   "runes": [
     "Fleet Footwork",
-    "Sudden Impact",
-    "Hubris",
-    "Eyeball Collector",
+    "Botanist",
+    "Absolute Focus",
+    "Gathering Storm",
     "Legend: Alacrity"
   ],
   "spells": [

@@ -3,7 +3,7 @@
   "name": "Pantheon",
   "role": "Лес",
   "tier": "A",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Serpent's Fang",
-          "Serylda's Grudge",
-          "Blade of the Ruined King"
+          "Blade of the Ruined King",
+          "Serylda's Grudge"
         ],
         "boots": [
           "Boots of Dynamism",
@@ -308,8 +308,8 @@
         ],
         "finalBuild": [
           "Serpent's Fang",
-          "Serylda's Grudge",
           "Blade of the Ruined King",
+          "Serylda's Grudge",
           "Edge of Night",
           "Guardian Angel",
           "Boots of Dynamism - Galeforce"
@@ -318,7 +318,7 @@
     }
   ],
   "runes": [
-    "First Strike",
+    "Empowerment",
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",

@@ -3,7 +3,7 @@
   "name": "Aurelion Sol",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,27 +300,26 @@
         "core": [
           "Rylai's Crystal Scepter",
           "Liandry's Torment",
-          "Blackfire Torch"
+          "Infinity Orb"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Rylai's Crystal Scepter",
           "Liandry's Torment",
-          "Blackfire Torch",
-          "Void Staff",
+          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Boots of Mana - Stasis"
+          "Zhonya's Hourglass",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
     "Dark Harvest",
-    "Botanist",
-    "Absolute Focus",
+    "Manaflow Band",
+    "Transcendence",
     "Gathering Storm",
     "Bone Plating"
   ],

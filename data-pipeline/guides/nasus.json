@@ -3,7 +3,7 @@
   "name": "Nasus",
   "role": "Барон",
   "tier": "A",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -482,9 +482,35 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "A",
       "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Sundered Sky",
+          "Serylda's Grudge"
+        ],
+        "boots": [
+          "Ionian Boots of Lucidity"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Sundered Sky",
+          "Serylda's Grudge",
+          "Amaranth's Twinguard",
+          "Frozen Heart",
+          "Ionian Boots of Lucidity"
+        ]
+      }
+    },
+    {
+      "title": "Mid Build",
+      "tier": "B",
+      "default": false,
       "items": {
         "starting": [
           "Long Sword"
@@ -512,7 +538,7 @@
     "Fleet Footwork",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Transcendence"
   ],
   "spells": [

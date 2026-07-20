@@ -3,7 +3,7 @@
   "name": "Darius",
   "role": "Барон",
   "tier": "S+",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -566,12 +566,38 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
           "Ruby Crystal"
+        ],
+        "core": [
+          "Stridebreaker",
+          "Trinity Force",
+          "Sterak's Gage"
+        ],
+        "boots": [
+          "Plated Steelcaps"
+        ],
+        "finalBuild": [
+          "Stridebreaker",
+          "Trinity Force",
+          "Sterak's Gage",
+          "Amaranth's Twinguard",
+          "Force of Nature",
+          "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
         ],
         "core": [
           "Trinity Force",
@@ -579,16 +605,15 @@
           "Sterak's Gage"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Protobelt"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Trinity Force",
           "Stridebreaker",
           "Sterak's Gage",
+          "Death's Dance",
           "Amaranth's Twinguard",
-          "Force of Nature",
-          "Plated Steelcaps - Protobelt"
+          "Plated Steelcaps"
         ]
       }
     }
@@ -597,7 +622,7 @@
     "Conqueror",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Nimbus Cloak"
   ],
   "spells": [

@@ -3,7 +3,7 @@
   "name": "Kayle",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -360,7 +360,7 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -372,8 +372,7 @@
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Quicksilver"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Nashor's Tooth",
@@ -381,13 +380,13 @@
           "Rabadon's Deathcap",
           "Void Staff",
           "Infinity Orb",
-          "Boots of Mana - Quicksilver"
+          "Boots of Mana"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -399,8 +398,7 @@
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Quicksilver"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Nashor's Tooth",
@@ -408,7 +406,7 @@
           "Rabadon's Deathcap",
           "Void Staff",
           "Infinity Orb",
-          "Boots of Mana - Quicksilver"
+          "Boots of Mana"
         ]
       }
     }

@@ -3,7 +3,7 @@
   "name": "Morgana",
   "role": "Саппорт",
   "tier": "S",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Support Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -579,8 +579,7 @@
           "Liandry's Torment"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Black Mist Scythe",
@@ -588,13 +587,13 @@
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
           "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     },
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -606,8 +605,7 @@
           "Rylai's Crystal Scepter"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Blackfire Torch",
@@ -615,34 +613,7 @@
           "Rylai's Crystal Scepter",
           "Rabadon's Deathcap",
           "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Blackfire Torch",
-          "Liandry's Torment",
-          "Rylai's Crystal Scepter"
-        ],
-        "boots": [
-          "Boots of Mana",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Blackfire Torch",
-          "Liandry's Torment",
-          "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap",
-          "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }

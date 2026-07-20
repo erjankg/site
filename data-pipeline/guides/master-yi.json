@@ -3,7 +3,7 @@
   "name": "Master Yi",
   "role": "Лес",
   "tier": "S+",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,29 +300,28 @@
         "core": [
           "Blade of the Ruined King",
           "Guinsoo's Rageblade",
-          "Terminus"
+          "Black Cleaver"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Quicksilver"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Blade of the Ruined King",
           "Guinsoo's Rageblade",
-          "Terminus",
+          "Black Cleaver",
           "Death's Dance",
           "Guardian Angel",
-          "Berserker's Greaves - Quicksilver"
+          "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
     "Lethal Tempo",
-    "Triumph",
+    "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
-    "Perseverance"
+    "Legend: Bloodline",
+    "Bone Plating"
   ],
   "spells": [
     {

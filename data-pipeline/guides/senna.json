@@ -3,7 +3,7 @@
   "name": "Senna",
   "role": "Саппорт",
   "tier": "B",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,30 +299,30 @@
         ],
         "core": [
           "Black Mist Scythe",
-          "Serpent's Fang",
-          "Magnetic Blaster"
+          "Magnetic Blaster",
+          "Mortal Reminder"
         ],
         "boots": [
-          "Plated Steelcaps",
+          "Boots of Dynamism",
           "Galeforce"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Serpent's Fang",
           "Magnetic Blaster",
           "Mortal Reminder",
+          "Serpent's Fang",
           "Guardian Angel",
-          "Plated Steelcaps - Galeforce"
+          "Boots of Dynamism - Galeforce"
         ]
       }
     }
   ],
   "runes": [
     "Fleet Footwork",
-    "Font of Life",
-    "Bone Plating",
-    "Overgrowth",
-    "Brutal"
+    "Empowered Attack",
+    "Chain Assault",
+    "Zombie Ward",
+    "Bone Plating"
   ],
   "spells": [
     {

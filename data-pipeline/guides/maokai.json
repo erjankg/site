@@ -3,7 +3,7 @@
   "name": "Maokai",
   "role": "Саппорт",
   "tier": "B",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,8 +290,8 @@
   ],
   "builds": [
     {
-      "title": "Support Build",
-      "tier": "S",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -299,44 +299,18 @@
         ],
         "core": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
-          "Warmog's Armor"
+          "Warmog's Armor",
+          "Frozen Heart"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
           "Warmog's Armor",
           "Frozen Heart",
           "Force of Nature",
-          "Plated Steelcaps"
-        ]
-      }
-    },
-    {
-      "title": "Solo Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Ruby Crystal"
-        ],
-        "core": [
-          "Heartsteel",
-          "Sunfire Aegis",
-          "Thornmail"
-        ],
-        "boots": [
-          "Plated Steelcaps"
-        ],
-        "finalBuild": [
-          "Heartsteel",
-          "Sunfire Aegis",
-          "Thornmail",
-          "Gargoyle Stoneplate",
-          "Force of Nature",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
@@ -346,7 +320,7 @@
     "Ice Overlord",
     "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Hextech Flashtraption"
   ],
   "spells": [

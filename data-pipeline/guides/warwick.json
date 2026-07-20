@@ -3,7 +3,7 @@
   "name": "Warwick",
   "role": "Лес",
   "tier": "B",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,56 +290,28 @@
   ],
   "builds": [
     {
-      "title": "Jungle Build",
-      "tier": "S",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Trinity Force",
+          "Kraken Slayer",
           "Blade of the Ruined King",
           "Dusk and Dawn"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Trinity Force",
+          "Kraken Slayer",
           "Blade of the Ruined King",
           "Dusk and Dawn",
-          "Death's Dance",
           "Terminus",
-          "Berserker's Greaves - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Solo Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Ruby Crystal"
-        ],
-        "core": [
-          "Trinity Force",
-          "Blade of the Ruined King",
-          "Dusk and Dawn"
-        ],
-        "boots": [
-          "Plated Steelcaps",
-          "Goredrinker"
-        ],
-        "finalBuild": [
-          "Trinity Force",
-          "Blade of the Ruined King",
-          "Dusk and Dawn",
-          "Death's Dance",
-          "Terminus",
-          "Plated Steelcaps - Goredrinker"
+          "Guardian Angel",
+          "Berserker's Greaves"
         ]
       }
     }

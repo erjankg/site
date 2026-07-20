@@ -3,7 +3,7 @@
   "name": "Vayne",
   "role": "Дракон",
   "tier": "A",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -449,9 +449,35 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Duo Build",
+      "tier": "S",
       "default": true,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Magnetic Blaster",
+          "Guinsoo's Rageblade",
+          "Blade of the Ruined King"
+        ],
+        "boots": [
+          "Berserker's Greaves"
+        ],
+        "finalBuild": [
+          "Magnetic Blaster",
+          "Guinsoo's Rageblade",
+          "Blade of the Ruined King",
+          "Terminus",
+          "Guardian Angel",
+          "Berserker's Greaves"
+        ]
+      }
+    },
+    {
+      "title": "Solo Build",
+      "tier": "A",
+      "default": false,
       "items": {
         "starting": [
           "Long Sword"
@@ -462,8 +488,7 @@
           "Magnetic Blaster"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Blade of the Ruined King",
@@ -471,7 +496,7 @@
           "Magnetic Blaster",
           "Terminus",
           "Guardian Angel",
-          "Berserker's Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     }

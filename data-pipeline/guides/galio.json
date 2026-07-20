@@ -3,7 +3,7 @@
   "name": "Galio",
   "role": "Мид",
   "tier": "S",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,34 +567,33 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "A",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
           "Ruby Crystal"
         ],
         "core": [
-          "Riftmaker",
-          "Hollow Radiance",
-          "Thornmail"
-        ],
-        "boots": [
-          "Mercury's Treads",
-          "Protobelt"
-        ],
-        "finalBuild": [
-          "Riftmaker",
           "Hollow Radiance",
           "Thornmail",
+          "Riftmaker"
+        ],
+        "boots": [
+          "Mercury's Treads"
+        ],
+        "finalBuild": [
+          "Hollow Radiance",
+          "Thornmail",
+          "Riftmaker",
           "Unending Despair",
           "Dawnshroud",
-          "Mercury's Treads - Protobelt"
+          "Mercury's Treads"
         ]
       }
     },
     {
       "title": "Support Build",
-      "tier": "S",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -602,17 +601,17 @@
         ],
         "core": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
-          "Warmog's Armor"
+          "Warmog's Armor",
+          "Frozen Heart"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
           "Warmog's Armor",
           "Frozen Heart",
+          "Thornmail",
           "Force of Nature",
           "Plated Steelcaps"
         ]

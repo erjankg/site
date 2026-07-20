@@ -3,7 +3,7 @@
   "name": "Alistar",
   "role": "Саппорт",
   "tier": "C",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,20 +299,19 @@
         ],
         "core": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
-          "Zeke's Convergence"
+          "Zeke's Convergence",
+          "Radiant Virtue"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Protobelt"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
           "Zeke's Convergence",
           "Radiant Virtue",
+          "Force of Nature",
           "Amaranth's Twinguard",
-          "Plated Steelcaps - Protobelt"
+          "Plated Steelcaps"
         ]
       }
     }
@@ -321,7 +320,7 @@
     "Ice Overlord",
     "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Hextech Flashtraption"
   ],
   "spells": [

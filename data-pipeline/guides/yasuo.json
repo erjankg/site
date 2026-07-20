@@ -3,7 +3,7 @@
   "name": "Yasuo",
   "role": "Мид",
   "tier": "S",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -705,25 +705,25 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "A",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Galeforce",
-          "Bloodthirster",
-          "Lord Dominik's Regard"
+          "Blade of the Ruined King",
+          "Essence Reaver",
+          "Mortal Reminder"
         ],
         "boots": [
           "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "Galeforce",
-          "Bloodthirster",
-          "Lord Dominik's Regard",
+          "Blade of the Ruined King",
+          "Essence Reaver",
+          "Mortal Reminder",
           "Infinity Edge",
           "Guardian Angel",
           "Berserker's Greaves - Galeforce"
@@ -740,8 +740,8 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Galeforce",
-          "Lord Dominik's Regard"
+          "Essence Reaver",
+          "Mortal Reminder"
         ],
         "boots": [
           "Berserker's Greaves",
@@ -749,8 +749,8 @@
         ],
         "finalBuild": [
           "Blade of the Ruined King",
-          "Galeforce",
-          "Lord Dominik's Regard",
+          "Essence Reaver",
+          "Mortal Reminder",
           "Infinity Edge",
           "Guardian Angel",
           "Berserker's Greaves - Galeforce"

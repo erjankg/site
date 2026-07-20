@@ -3,7 +3,7 @@
   "name": "Nautilus",
   "role": "Саппорт",
   "tier": "A",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -842,8 +842,8 @@
   ],
   "builds": [
     {
-      "title": "Support Build",
-      "tier": "S",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -851,70 +851,17 @@
         ],
         "core": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
-          "Warmog's Armor"
+          "Warmog's Armor",
+          "Frozen Heart"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
           "Warmog's Armor",
           "Frozen Heart",
           "Force of Nature",
-          "Plated Steelcaps"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "B",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Lich Bane",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
-        ],
-        "boots": [
-          "Boots of Mana",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Lich Bane",
-          "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Void Staff",
-          "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Solo Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Ruby Crystal"
-        ],
-        "core": [
-          "Sunfire Aegis",
-          "Frozen Heart",
-          "Force of Nature"
-        ],
-        "boots": [
-          "Plated Steelcaps"
-        ],
-        "finalBuild": [
-          "Sunfire Aegis",
-          "Frozen Heart",
-          "Force of Nature",
-          "Thornmail",
           "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
@@ -925,7 +872,7 @@
     "Ice Overlord",
     "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Hextech Flashtraption"
   ],
   "spells": [

@@ -3,7 +3,7 @@
   "name": "Talon",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,8 +290,8 @@
   ],
   "builds": [
     {
-      "title": "Jungle Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -303,43 +303,15 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Boots of Dynamism",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
           "Youmuu's Ghostblade",
           "Serpent's Fang",
           "Serylda's Grudge",
-          "Edge of Night",
+          "Trinity Force",
           "Guardian Angel",
-          "Boots of Dynamism - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
-          "Youmuu's Ghostblade",
-          "Serpent's Fang",
-          "Serylda's Grudge"
-        ],
-        "boots": [
-          "Boots of Dynamism",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Youmuu's Ghostblade",
-          "Serpent's Fang",
-          "Serylda's Grudge",
-          "Edge of Night",
-          "Guardian Angel",
-          "Boots of Dynamism - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -349,7 +321,7 @@
     "Sudden Impact",
     "Hubris",
     "Eyeball Collector",
-    "Legend: Alacrity"
+    "Legend: Bloodline"
   ],
   "spells": [
     {

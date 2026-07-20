@@ -3,7 +3,7 @@
   "name": "Zoe",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,29 +298,28 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Luden's Echo",
-          "Lich Bane",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Boots of Mana",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Luden's Echo",
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Void Staff",
+          "Infinity Orb"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Lich Bane",
+          "Rabadon's Deathcap",
           "Infinity Orb",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Zhonya's Hourglass",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "First Strike",
+    "Fleet Footwork",
     "Botanist",
-    "Absolute Focus",
+    "Transcendence",
     "Nimbus Cloak",
     "Sudden Impact"
   ],

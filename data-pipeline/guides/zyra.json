@@ -3,7 +3,7 @@
   "name": "Zyra",
   "role": "Саппорт",
   "tier": "S+",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -575,20 +575,19 @@
         ],
         "core": [
           "Black Mist Scythe",
-          "Blackfire Torch",
-          "Liandry's Torment"
+          "Liandry's Torment",
+          "Blackfire Torch"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Blackfire Torch",
           "Liandry's Torment",
+          "Blackfire Torch",
           "Rylai's Crystal Scepter",
           "Rabadon's Deathcap",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     },
@@ -603,28 +602,27 @@
         "core": [
           "Blackfire Torch",
           "Liandry's Torment",
-          "Rabadon's Deathcap"
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Blackfire Torch",
           "Liandry's Torment",
+          "Rylai's Crystal Scepter",
           "Rabadon's Deathcap",
-          "Void Staff",
           "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
     "Arcane Comet",
-    "Cheap Shot",
-    "Tyrant",
-    "Zombie Ward",
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
     "Bone Plating"
   ],
   "spells": [

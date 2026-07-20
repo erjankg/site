@@ -3,7 +3,7 @@
   "name": "Fiora",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Trinity Force",
-          "Goredrinker",
-          "Death's Dance"
+          "Blade of the Ruined King",
+          "Hullbreaker"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -308,10 +308,10 @@
         ],
         "finalBuild": [
           "Trinity Force",
-          "Goredrinker",
-          "Death's Dance",
+          "Blade of the Ruined King",
           "Hullbreaker",
-          "Spear of Shojin",
+          "Death's Dance",
+          "Guardian Angel",
           "Plated Steelcaps - Goredrinker"
         ]
       }
@@ -321,7 +321,7 @@
     "Conqueror",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

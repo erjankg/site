@@ -2,8 +2,8 @@
   "slug": "seraphine",
   "name": "Seraphine",
   "role": "Саппорт",
-  "tier": "B",
-  "patch": "7.2",
+  "tier": "A",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,8 +290,8 @@
   ],
   "builds": [
     {
-      "title": "Support Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -299,46 +299,19 @@
         ],
         "core": [
           "Black Mist Scythe",
-          "Ardent Censer",
-          "Redemption"
+          "Harmonic Echo",
+          "Ardent Censer"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
           "Black Mist Scythe",
+          "Harmonic Echo",
           "Ardent Censer",
           "Redemption",
-          "Harmonic Echo",
           "Staff of Flowing Water",
           "Ionian Boots of Lucidity"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Blackfire Torch",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Boots of Mana",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Blackfire Torch",
-          "Infinity Orb",
-          "Rabadon's Deathcap",
-          "Cryptbloom",
-          "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
         ]
       }
     }

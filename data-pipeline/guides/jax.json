@@ -3,7 +3,7 @@
   "name": "Jax",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -566,15 +566,15 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
           "Ruby Crystal"
         ],
         "core": [
-          "Trinity Force",
+          "Dusk and Dawn",
           "Blade of the Ruined King",
           "Hullbreaker"
         ],
@@ -582,12 +582,38 @@
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Trinity Force",
+          "Dusk and Dawn",
           "Blade of the Ruined King",
           "Hullbreaker",
           "Zhonya's Hourglass",
-          "Death's Dance",
+          "Riftmaker",
           "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Blade of the Ruined King",
+          "Dusk and Dawn",
+          "Riftmaker"
+        ],
+        "boots": [
+          "Gluttonous Greaves"
+        ],
+        "finalBuild": [
+          "Blade of the Ruined King",
+          "Dusk and Dawn",
+          "Riftmaker",
+          "Zhonya's Hourglass",
+          "Guardian Angel",
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -596,7 +622,7 @@
     "Grasp of the Undying",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

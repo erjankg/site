@@ -3,7 +3,7 @@
   "name": "Samira",
   "role": "Дракон",
   "tier": "A",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,20 +299,19 @@
         ],
         "core": [
           "The Collector",
-          "Bloodthirster",
-          "Infinity Edge"
+          "Infinity Edge",
+          "Lord Dominik's Regard"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
           "The Collector",
-          "Bloodthirster",
           "Infinity Edge",
           "Lord Dominik's Regard",
+          "Bloodthirster",
           "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }

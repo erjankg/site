@@ -3,7 +3,7 @@
   "name": "Vel'Koz",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -566,8 +566,8 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Mid Build",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -579,16 +579,41 @@
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Blackfire Torch",
           "Infinity Orb",
           "Rabadon's Deathcap",
           "Void Staff",
-          "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Horizon Focus",
+          "Boots of Mana"
+        ]
+      }
+    },
+    {
+      "title": "Support Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Spectral Sickle"
+        ],
+        "core": [
+          "Black Mist Scythe",
+          "Infinity Orb",
+          "Horizon Focus"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Black Mist Scythe",
+          "Infinity Orb",
+          "Horizon Focus",
+          "Cryptbloom",
+          "Rabadon's Deathcap",
+          "Boots of Mana"
         ]
       }
     }

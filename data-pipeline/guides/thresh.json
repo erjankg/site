@@ -3,7 +3,7 @@
   "name": "Thresh",
   "role": "Саппорт",
   "tier": "S+",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,18 +299,18 @@
         ],
         "core": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
-          "Warmog's Armor"
+          "Warmog's Armor",
+          "Knight's Vow"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Locket of the Iron Solari",
           "Warmog's Armor",
-          "Frozen Heart",
+          "Knight's Vow",
           "Force of Nature",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
@@ -320,7 +320,7 @@
     "Ice Overlord",
     "Courage of the Colossus",
     "Bone Plating",
-    "Overgrowth",
+    "Perseverance",
     "Hextech Flashtraption"
   ],
   "spells": [

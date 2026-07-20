@@ -3,7 +3,7 @@
   "name": "Diana",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -498,34 +498,33 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "C",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Stormsurge",
+          "Lich Bane",
           "Infinity Orb",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Stormsurge",
+          "Lich Bane",
           "Infinity Orb",
           "Rabadon's Deathcap",
           "Void Staff",
           "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -537,8 +536,7 @@
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Dusk and Dawn",
@@ -546,7 +544,7 @@
           "Rabadon's Deathcap",
           "Void Staff",
           "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }
@@ -556,7 +554,7 @@
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",
-    "Second Wind"
+    "Bone Plating"
   ],
   "spells": [
     {

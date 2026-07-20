@@ -3,7 +3,7 @@
   "name": "Jayce",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -505,21 +505,20 @@
           "Long Sword"
         ],
         "core": [
+          "Youmuu's Ghostblade",
           "Manamune",
-          "Serpent's Fang",
           "Serylda's Grudge"
         ],
         "boots": [
-          "Boots of Dynamism",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Youmuu's Ghostblade",
           "Muramana",
-          "Serpent's Fang",
           "Serylda's Grudge",
           "Edge of Night",
           "Guardian Angel",
-          "Boots of Dynamism - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     },
@@ -537,8 +536,7 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
           "Eclipse",
@@ -546,7 +544,7 @@
           "Serylda's Grudge",
           "Spear of Shojin",
           "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -554,7 +552,7 @@
   "runes": [
     "First Strike",
     "Sudden Impact",
-    "Chain Assault",
+    "Tyrant",
     "Eyeball Collector",
     "Bone Plating"
   ],

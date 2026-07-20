@@ -3,7 +3,7 @@
   "name": "Volibear",
   "role": "Лес",
   "tier": "C",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -575,55 +575,55 @@
         ],
         "core": [
           "Dusk and Dawn",
-          "Navori Quickblades",
-          "Unending Despair"
+          "Nashor's Tooth",
+          "Riftmaker"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Dusk and Dawn",
-          "Navori Quickblades",
-          "Unending Despair",
-          "Thornmail",
-          "Amaranth's Twinguard",
+          "Nashor's Tooth",
+          "Riftmaker",
+          "Rabadon's Deathcap",
+          "Zhonya's Hourglass",
           "Plated Steelcaps"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
           "Ruby Crystal"
         ],
         "core": [
-          "Heartsteel",
-          "Trinity Force",
-          "Unending Despair"
+          "Dusk and Dawn",
+          "Riftmaker",
+          "Mantle of the Twelfth Hour"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Heartsteel",
-          "Trinity Force",
+          "Dusk and Dawn",
+          "Riftmaker",
+          "Mantle of the Twelfth Hour",
           "Unending Despair",
-          "Thornmail",
-          "Amaranth's Twinguard",
+          "Force of Nature",
           "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
-    "Lethal Tempo",
+    "Conqueror",
     "Battle Zeal",
-    "Last Stand",
+    "Cut Down",
     "Legend: Alacrity",
-    "Perseverance"
+    "Overgrowth"
   ],
   "spells": [
     {

@@ -3,7 +3,7 @@
   "name": "Kindred",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Long Sword"
         ],
         "core": [
+          "Kraken Slayer",
           "The Collector",
-          "Magnetic Blaster",
-          "Lord Dominik's Regard"
+          "Mortal Reminder"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Kraken Slayer",
           "The Collector",
+          "Mortal Reminder",
           "Magnetic Blaster",
-          "Lord Dominik's Regard",
-          "Infinity Edge",
           "Bloodthirster",
-          "Gluttonous Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     }

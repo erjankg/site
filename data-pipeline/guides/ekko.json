@@ -3,7 +3,7 @@
   "name": "Ekko",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -575,20 +575,19 @@
         ],
         "core": [
           "Dusk and Dawn",
-          "Protobelt",
-          "Rabadon's Deathcap"
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Dusk and Dawn",
-          "Protobelt",
           "Rabadon's Deathcap",
-          "Void Staff",
           "Infinity Orb",
-          "Boots of Mana - Protobelt"
+          "Void Staff",
+          "Zhonya's Hourglass",
+          "Boots of Mana"
         ]
       }
     },
@@ -602,20 +601,19 @@
         ],
         "core": [
           "Dusk and Dawn",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Nashor's Tooth",
+          "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Dusk and Dawn",
+          "Nashor's Tooth",
           "Rabadon's Deathcap",
-          "Infinity Orb",
           "Void Staff",
-          "Zhonya's Hourglass",
-          "Boots of Mana - Protobelt"
+          "Infinity Orb",
+          "Boots of Mana"
         ]
       }
     }
@@ -623,7 +621,7 @@
   "runes": [
     "Fleet Footwork",
     "Sudden Impact",
-    "Hubris",
+    "Chain Assault",
     "Eyeball Collector",
     "Transcendence"
   ],

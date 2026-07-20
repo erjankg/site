@@ -3,7 +3,7 @@
   "name": "Wukong",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -575,20 +575,20 @@
         ],
         "core": [
           "Trinity Force",
-          "Sundered Sky",
-          "Serylda's Grudge"
+          "Black Cleaver",
+          "Goredrinker"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Plated Steelcaps",
           "Stridebreaker"
         ],
         "finalBuild": [
           "Trinity Force",
-          "Sundered Sky",
-          "Serylda's Grudge",
-          "Serpent's Fang",
-          "Guardian Angel",
-          "Gluttonous Greaves - Stridebreaker"
+          "Black Cleaver",
+          "Goredrinker",
+          "Thornmail",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps - Stridebreaker"
         ]
       }
     },
@@ -602,8 +602,8 @@
         ],
         "core": [
           "Sunfire Aegis",
-          "Divine Sunderer",
-          "Unending Despair"
+          "Thornmail",
+          "Divine Sunderer"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -611,9 +611,9 @@
         ],
         "finalBuild": [
           "Sunfire Aegis",
-          "Divine Sunderer",
-          "Unending Despair",
           "Thornmail",
+          "Divine Sunderer",
+          "Gargoyle Stoneplate",
           "Amaranth's Twinguard",
           "Plated Steelcaps - Goredrinker"
         ]
@@ -622,9 +622,9 @@
   ],
   "runes": [
     "Conqueror",
-    "Brutal",
-    "Cut Down",
-    "Legend: Alacrity",
+    "Unshakeable",
+    "Bone Plating",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

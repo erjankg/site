@@ -3,7 +3,7 @@
   "name": "Sivir",
   "role": "Дракон",
   "tier": "C",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Long Sword"
         ],
         "core": [
-          "Galeforce",
           "Bloodthirster",
-          "Navori Quickblades"
+          "Magnetic Blaster",
+          "Lord Dominik's Regard"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Galeforce",
           "Bloodthirster",
-          "Navori Quickblades",
+          "Magnetic Blaster",
           "Lord Dominik's Regard",
+          "Navori Quickblades",
           "Infinity Edge",
-          "Gluttonous Greaves - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -321,7 +320,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

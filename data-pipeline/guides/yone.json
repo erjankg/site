@@ -3,7 +3,7 @@
   "name": "Yone",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -843,7 +843,7 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -852,25 +852,24 @@
         "core": [
           "Blade of the Ruined King",
           "Bloodthirster",
-          "Lord Dominik's Regard"
+          "Mortal Reminder"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Blade of the Ruined King",
           "Bloodthirster",
-          "Lord Dominik's Regard",
+          "Mortal Reminder",
           "Infinity Edge",
           "Guardian Angel",
-          "Berserker's Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -878,26 +877,25 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Bloodthirster",
-          "Lord Dominik's Regard"
+          "Essence Reaver",
+          "Mortal Reminder"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Blade of the Ruined King",
-          "Bloodthirster",
-          "Lord Dominik's Regard",
+          "Essence Reaver",
+          "Mortal Reminder",
           "Infinity Edge",
           "Guardian Angel",
-          "Berserker's Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "S+",
       "default": false,
       "items": {
         "starting": [
@@ -906,29 +904,28 @@
         "core": [
           "Blade of the Ruined King",
           "Essence Reaver",
-          "Lord Dominik's Regard"
+          "Mortal Reminder"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Blade of the Ruined King",
           "Essence Reaver",
-          "Lord Dominik's Regard",
+          "Mortal Reminder",
           "Infinity Edge",
           "Guardian Angel",
-          "Berserker's Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
-    "Courage of the Colossus",
-    "Second Wind",
-    "Overgrowth",
-    "Legend: Alacrity"
+    "Grasp of the Undying",
+    "Brutal",
+    "Last Stand",
+    "Legend: Alacrity",
+    "Second Wind"
   ],
   "spells": [
     {

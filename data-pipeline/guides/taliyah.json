@@ -3,7 +3,7 @@
   "name": "Taliyah",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": null,
   "matchups": [],
   "counters": [
@@ -14,34 +14,33 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "S+",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Blackfire Torch",
+          "Luden's Echo",
           "Infinity Orb",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Blackfire Torch",
+          "Luden's Echo",
           "Infinity Orb",
           "Rabadon's Deathcap",
           "Void Staff",
           "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "S+",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -53,8 +52,7 @@
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Blackfire Torch",
@@ -62,17 +60,17 @@
           "Rabadon's Deathcap",
           "Void Staff",
           "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Electrocute",
-    "Botanist",
-    "Absolute Focus",
-    "Nimbus Cloak",
-    "Bone Plating"
+    "Dark Harvest",
+    "Cheap Shot",
+    "Tyrant",
+    "Eyeball Collector",
+    "Transcendence"
   ],
   "spells": [],
   "skillOrder": [

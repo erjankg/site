@@ -3,7 +3,7 @@
   "name": "Twitch",
   "role": "Дракон",
   "tier": "C",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Long Sword"
         ],
         "core": [
-          "The Collector",
+          "Blade of the Ruined King",
           "Runaan's Hurricane",
-          "Lord Dominik's Regard"
+          "Terminus"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Quicksilver"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
-          "The Collector",
-          "Runaan's Hurricane",
-          "Lord Dominik's Regard",
-          "Phantom Dancer",
           "Blade of the Ruined King",
-          "Berserker's Greaves - Quicksilver"
+          "Runaan's Hurricane",
+          "Terminus",
+          "Guinsoo's Rageblade",
+          "Phantom Dancer",
+          "Berserker's Greaves"
         ]
       }
     }

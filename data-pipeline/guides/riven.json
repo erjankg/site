@@ -3,7 +3,7 @@
   "name": "Riven",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -576,7 +576,7 @@
         "core": [
           "Eclipse",
           "Sundered Sky",
-          "Goredrinker"
+          "Death's Dance"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -585,7 +585,7 @@
         "finalBuild": [
           "Eclipse",
           "Sundered Sky",
-          "Goredrinker",
+          "Death's Dance",
           "Serylda's Grudge",
           "Guardian Angel",
           "Plated Steelcaps - Goredrinker"
@@ -606,8 +606,7 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
           "Trinity Force",
@@ -615,7 +614,7 @@
           "Serylda's Grudge",
           "Serpent's Fang",
           "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -624,7 +623,7 @@
     "Conqueror",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

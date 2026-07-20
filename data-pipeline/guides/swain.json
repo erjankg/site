@@ -3,7 +3,7 @@
   "name": "Swain",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -579,8 +579,7 @@
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Malignance",
@@ -588,7 +587,7 @@
           "Rabadon's Deathcap",
           "Cryptbloom",
           "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     },
@@ -602,19 +601,45 @@
         ],
         "core": [
           "Bulwark of the Mountain",
-          "Rylai's Crystal Scepter",
-          "Malignance"
+          "Malignance",
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Rylai's Crystal Scepter",
           "Malignance",
+          "Rylai's Crystal Scepter",
           "Cryptbloom",
           "Amaranth's Twinguard",
           "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Solo Build",
+      "tier": "C",
+      "default": false,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Malignance",
+          "Abyssal Mask",
+          "Rylai's Crystal Scepter"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Malignance",
+          "Abyssal Mask",
+          "Rylai's Crystal Scepter",
+          "Zhonya's Hourglass",
+          "Bloodletter's Curse",
+          "Boots of Mana"
         ]
       }
     }

@@ -3,7 +3,7 @@
   "name": "Irelia",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -367,48 +367,46 @@
           "Ruby Crystal"
         ],
         "core": [
-          "Blade of the Ruined King",
           "Trinity Force",
+          "Blade of the Ruined King",
           "Hullbreaker"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Stasis"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Blade of the Ruined King",
           "Trinity Force",
+          "Blade of the Ruined King",
           "Hullbreaker",
           "Death's Dance",
           "Guardian Angel",
-          "Plated Steelcaps - Stasis"
+          "Plated Steelcaps"
         ]
       }
     },
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Ruby Crystal"
         ],
         "core": [
-          "Blade of the Ruined King",
           "Trinity Force",
+          "Blade of the Ruined King",
           "Death's Dance"
         ],
         "boots": [
-          "Mercury's Treads",
-          "Stasis"
+          "Mercury's Treads"
         ],
         "finalBuild": [
-          "Blade of the Ruined King",
           "Trinity Force",
+          "Blade of the Ruined King",
           "Death's Dance",
           "Terminus",
           "Guardian Angel",
-          "Mercury's Treads - Stasis"
+          "Mercury's Treads"
         ]
       }
     }
@@ -417,8 +415,8 @@
     "Conqueror",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
-    "Sudden Impact"
+    "Perseverance",
+    "Last Stand"
   ],
   "spells": [
     {

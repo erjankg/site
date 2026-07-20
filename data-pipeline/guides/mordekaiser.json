@@ -3,7 +3,7 @@
   "name": "Mordekaiser",
   "role": "Барон",
   "tier": "S",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,20 +299,19 @@
         ],
         "core": [
           "Riftmaker",
-          "Liandry's Torment",
-          "Rabadon's Deathcap"
+          "Hextech Rocketbelt",
+          "Liandry's Torment"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Protobelt"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Riftmaker",
+          "Hextech Rocketbelt",
           "Liandry's Torment",
           "Rabadon's Deathcap",
-          "Void Staff",
           "Amaranth's Twinguard",
-          "Plated Steelcaps - Protobelt"
+          "Plated Steelcaps"
         ]
       }
     }
@@ -321,7 +320,7 @@
     "Conqueror",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Last Stand"
   ],
   "spells": [

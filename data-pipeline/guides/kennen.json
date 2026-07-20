@@ -3,7 +3,7 @@
   "name": "Kennen",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,28 +567,27 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
+          "Hextech Rocketbelt",
           "Infinity Orb",
-          "Stormsurge",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Hextech Rocketbelt",
           "Infinity Orb",
-          "Stormsurge",
           "Rabadon's Deathcap",
           "Void Staff",
-          "Zhonya's Hourglass",
-          "Boots of Mana - Protobelt"
+          "Stormsurge",
+          "Boots of Mana"
         ]
       }
     },
@@ -601,21 +600,20 @@
           "Amplifying Tome"
         ],
         "core": [
+          "Hextech Rocketbelt",
           "Infinity Orb",
-          "Stormsurge",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Hextech Rocketbelt",
           "Infinity Orb",
-          "Stormsurge",
           "Rabadon's Deathcap",
           "Void Staff",
-          "Zhonya's Hourglass",
-          "Boots of Mana - Protobelt"
+          "Stormsurge",
+          "Boots of Mana"
         ]
       }
     }

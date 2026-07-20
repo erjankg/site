@@ -3,7 +3,7 @@
   "name": "Amumu",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,18 +299,18 @@
         ],
         "core": [
           "Searing Crown",
-          "Thornmail",
-          "Force of Nature"
+          "Liandry's Torment",
+          "Amaranth's Twinguard"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Searing Crown",
-          "Thornmail",
-          "Force of Nature",
-          "Frozen Heart",
+          "Liandry's Torment",
           "Amaranth's Twinguard",
+          "Abyssal Mask",
+          "Thornmail",
           "Plated Steelcaps"
         ]
       }
@@ -320,8 +320,8 @@
     "Ice Overlord",
     "Unshakeable",
     "Bone Plating",
-    "Overgrowth",
-    "Sudden Impact"
+    "Perseverance",
+    "Transcendence"
   ],
   "spells": [
     {

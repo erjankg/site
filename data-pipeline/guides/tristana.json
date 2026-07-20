@@ -3,7 +3,7 @@
   "name": "Tristana",
   "role": "Дракон",
   "tier": "B",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -438,19 +438,18 @@
         "core": [
           "Bloodthirster",
           "Magnetic Blaster",
-          "Navori Quickblades"
+          "Mortal Reminder"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Bloodthirster",
           "Magnetic Blaster",
+          "Mortal Reminder",
           "Navori Quickblades",
-          "Lord Dominik's Regard",
           "Infinity Edge",
-          "Gluttonous Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     }
@@ -459,7 +458,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [
