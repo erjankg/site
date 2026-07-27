@@ -3,7 +3,7 @@
   "name": "Viktor",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.2",
+  "patch": "7.2a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Blackfire Torch",
-          "Lich Bane",
-          "Rabadon's Deathcap"
+          "Luden's Echo",
+          "Rabadon's Deathcap",
+          "Lich Bane"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Blackfire Torch",
-          "Lich Bane",
+          "Luden's Echo",
           "Rabadon's Deathcap",
+          "Lich Bane",
+          "Infinity Orb",
           "Void Staff",
-          "Zhonya's Hourglass",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }
@@ -320,9 +319,9 @@
   "runes": [
     "First Strike",
     "Botanist",
-    "Transcendence",
+    "Absolute Focus",
     "Gathering Storm",
-    "Bone Plating"
+    "Cut Down"
   ],
   "spells": [
     {
