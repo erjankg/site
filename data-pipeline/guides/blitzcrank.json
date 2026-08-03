@@ -3,7 +3,7 @@
   "name": "Blitzcrank",
   "role": "Саппорт",
   "tier": "B",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,9 +298,9 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
           "Yordle Trap",
-          "Warmog's Armor"
+          "Warmog's Armor",
+          "Frozen Heart"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Bulwark of the Mountain",
           "Yordle Trap",
+          "Plated Steelcaps",
           "Warmog's Armor",
           "Frozen Heart",
-          "Force of Nature",
           "Plated Steelcaps"
         ]
       }

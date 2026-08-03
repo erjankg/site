@@ -3,7 +3,7 @@
   "name": "Maokai",
   "role": "Саппорт",
   "tier": "B",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,8 +298,8 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
           "Warmog's Armor",
+          "Force of Nature",
           "Frozen Heart"
         ],
         "boots": [
@@ -307,10 +307,10 @@
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Plated Steelcaps",
           "Warmog's Armor",
-          "Frozen Heart",
           "Force of Nature",
-          "Amaranth's Twinguard",
+          "Frozen Heart",
           "Plated Steelcaps"
         ]
       }
@@ -321,7 +321,7 @@
     "Courage of the Colossus",
     "Second Wind",
     "Perseverance",
-    "Hextech Flashtraption"
+    "Transcendence"
   ],
   "spells": [
     {

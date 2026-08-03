@@ -3,7 +3,7 @@
   "name": "Evelynn",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,17 +300,17 @@
         "core": [
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Void Staff"
+          "Infinity Orb"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Void Staff",
-          "Hextech Rocketbelt",
           "Infinity Orb",
+          "Void Staff",
           "Boots of Mana"
         ]
       }
@@ -321,7 +321,7 @@
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",
-    "Absolute Focus"
+    "Transcendence"
   ],
   "spells": [
     {

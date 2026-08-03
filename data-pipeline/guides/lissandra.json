@@ -3,7 +3,7 @@
   "name": "Lissandra",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,17 +300,17 @@
         "core": [
           "Malignance",
           "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Hextech Rocketbelt"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Malignance",
           "Infinity Orb",
+          "Hextech Rocketbelt",
           "Rabadon's Deathcap",
-          "Void Staff",
-          "Zhonya's Hourglass",
           "Boots of Mana"
         ]
       }
@@ -319,9 +319,9 @@
   "runes": [
     "Electrocute",
     "Cheap Shot",
-    "Tyrant",
+    "Chain Assault",
     "Eyeball Collector",
-    "Bone Plating"
+    "Axiom Arcanist"
   ],
   "spells": [
     {

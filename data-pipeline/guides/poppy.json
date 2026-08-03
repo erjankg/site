@@ -3,7 +3,7 @@
   "name": "Poppy",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,19 +298,19 @@
           "Ruby Crystal"
         ],
         "core": [
+          "Heartsteel",
           "Sunfire Aegis",
-          "Thornmail",
-          "Force of Nature"
+          "Thornmail"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
+          "Heartsteel",
           "Sunfire Aegis",
           "Thornmail",
           "Force of Nature",
-          "Randuin's Omen",
-          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }

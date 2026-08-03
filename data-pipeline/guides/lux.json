@@ -3,7 +3,7 @@
   "name": "Lux",
   "role": "Саппорт",
   "tier": "S",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -574,19 +574,19 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
           "Infinity Orb",
-          "Horizon Focus"
+          "Luden's Echo",
+          "Void Staff"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Black Mist Scythe",
+          "Boots of Mana",
           "Infinity Orb",
-          "Horizon Focus",
+          "Luden's Echo",
           "Void Staff",
-          "Rabadon's Deathcap",
           "Boots of Mana"
         ]
       }
@@ -601,18 +601,18 @@
         ],
         "core": [
           "Luden's Echo",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Luden's Echo",
-          "Infinity Orb",
           "Rabadon's Deathcap",
+          "Infinity Orb",
           "Void Staff",
-          "Zhonya's Hourglass",
           "Boots of Mana"
         ]
       }

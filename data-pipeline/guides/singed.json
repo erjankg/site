@@ -3,7 +3,7 @@
   "name": "Singed",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -62,14 +62,14 @@
           "pr": 1.2
         },
         {
-          "name": "КЕЙТЛИН",
-          "slug": "caitlyn",
+          "name": "ИРЕЛИЯ",
+          "slug": "irelia",
           "wr": 40,
           "pr": 1.1
         },
         {
-          "name": "ИРЕЛИЯ",
-          "slug": "irelia",
+          "name": "КЕЙТЛИН",
+          "slug": "caitlyn",
           "wr": 40,
           "pr": 1.1
         }
@@ -437,18 +437,18 @@
         ],
         "core": [
           "Liandry's Torment",
-          "Rylai's Crystal Scepter",
-          "Dead Man's Plate"
+          "Dead Man's Plate",
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Liandry's Torment",
-          "Rylai's Crystal Scepter",
           "Dead Man's Plate",
-          "Infinity Orb",
-          "Amaranth's Twinguard",
+          "Rylai's Crystal Scepter",
+          "Riftmaker",
           "Boots of Mana"
         ]
       }

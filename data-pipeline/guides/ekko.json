@@ -3,7 +3,7 @@
   "name": "Ekko",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -575,18 +575,18 @@
         ],
         "core": [
           "Dusk and Dawn",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Dusk and Dawn",
-          "Rabadon's Deathcap",
           "Infinity Orb",
+          "Rabadon's Deathcap",
           "Void Staff",
-          "Zhonya's Hourglass",
           "Boots of Mana"
         ]
       }
@@ -608,11 +608,11 @@
           "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Dusk and Dawn",
           "Nashor's Tooth",
           "Rabadon's Deathcap",
           "Void Staff",
-          "Infinity Orb",
           "Boots of Mana"
         ]
       }
@@ -621,9 +621,9 @@
   "runes": [
     "Fleet Footwork",
     "Sudden Impact",
-    "Chain Assault",
+    "Hubris",
     "Eyeball Collector",
-    "Transcendence"
+    "Legend: Bloodline"
   ],
   "spells": [
     {

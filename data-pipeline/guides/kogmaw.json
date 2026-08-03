@@ -3,7 +3,7 @@
   "name": "Kog'Maw",
   "role": "Дракон",
   "tier": "A",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -306,18 +306,18 @@
           "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Berserker's Greaves",
           "Guinsoo's Rageblade",
           "Navori Quickblades",
           "Runaan's Hurricane",
           "Blade of the Ruined King",
-          "Terminus",
           "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -326,17 +326,17 @@
         "core": [
           "Archangel's Staff",
           "Malignance",
-          "Rabadon's Deathcap"
+          "Blackfire Torch"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Seraph's Embrace",
+          "Boots of Mana",
           "Malignance",
+          "Blackfire Torch",
           "Rabadon's Deathcap",
-          "Void Staff",
-          "Zhonya's Hourglass",
           "Boots of Mana"
         ]
       }

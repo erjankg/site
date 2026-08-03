@@ -1,9 +1,9 @@
 {
   "slug": "gragas",
   "name": "Gragas",
-  "role": "Мид",
-  "tier": "B",
-  "patch": "7.2a",
+  "role": "Лес",
+  "tier": "A",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -422,14 +422,14 @@
     }
   ],
   "counters": [
-    "Galio",
-    "Vex",
-    "Kassadin"
+    "Amumu",
+    "Nocturne",
+    "Lillia"
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "B",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -444,37 +444,11 @@
           "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Lich Bane",
           "Rabadon's Deathcap",
           "Infinity Orb",
           "Void Staff",
-          "Zhonya's Hourglass",
-          "Boots of Mana"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Lich Bane",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Lich Bane",
-          "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Void Staff",
-          "Zhonya's Hourglass",
           "Boots of Mana"
         ]
       }
@@ -482,10 +456,10 @@
   ],
   "runes": [
     "Phase Rush",
-    "Hextech Flashtraption",
-    "Transcendence",
-    "Nimbus Cloak",
-    "Sudden Impact"
+    "Sudden Impact",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Transcendence"
   ],
   "spells": [
     {
@@ -498,8 +472,8 @@
     {
       "ability": "Barrel Roll",
       "levels": [
-        1,
-        4,
+        2,
+        3,
         6,
         7
       ]
@@ -507,7 +481,7 @@
     {
       "ability": "Drunken Rage",
       "levels": [
-        2,
+        1,
         12,
         14,
         15
@@ -516,7 +490,7 @@
     {
       "ability": "Body Slam",
       "levels": [
-        3,
+        4,
         8,
         10,
         11

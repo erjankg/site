@@ -3,7 +3,7 @@
   "name": "Olaf",
   "role": "Лес",
   "tier": "C",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,18 +299,18 @@
         ],
         "core": [
           "Trinity Force",
-          "Death's Dance",
-          "Sterak's Gage"
+          "Zeke's Convergence",
+          "Death's Dance"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Trinity Force",
+          "Plated Steelcaps",
+          "Zeke's Convergence",
           "Death's Dance",
-          "Sterak's Gage",
           "Force of Nature",
-          "Mortal Reminder",
           "Plated Steelcaps"
         ]
       }
@@ -325,18 +325,18 @@
         ],
         "core": [
           "Trinity Force",
-          "Death's Dance",
-          "Sterak's Gage"
+          "Zeke's Convergence",
+          "Death's Dance"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Trinity Force",
+          "Zeke's Convergence",
           "Death's Dance",
-          "Sterak's Gage",
           "Force of Nature",
-          "Sundered Sky",
           "Plated Steelcaps"
         ]
       }

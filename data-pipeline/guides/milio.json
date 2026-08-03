@@ -3,7 +3,7 @@
   "name": "Milio",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -298,9 +298,9 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
           "Ardent Censer",
-          "Harmonic Echo"
+          "Harmonic Echo",
+          "Redemption"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Bulwark of the Mountain",
           "Ardent Censer",
+          "Ionian Boots of Lucidity",
           "Harmonic Echo",
           "Redemption",
-          "Knight's Vow",
           "Ionian Boots of Lucidity"
         ]
       }

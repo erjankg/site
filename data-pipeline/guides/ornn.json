@@ -3,7 +3,7 @@
   "name": "Ornn",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -513,37 +513,37 @@
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Heartsteel",
           "Sunfire Aegis",
           "Thornmail",
           "Kaenic Rookern",
-          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
     },
     {
       "title": "Support Build",
-      "tier": "S",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
           "Warmog's Armor",
-          "Radiant Virtue"
+          "Radiant Virtue",
+          "Dawnshroud"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Plated Steelcaps",
           "Warmog's Armor",
           "Radiant Virtue",
           "Dawnshroud",
-          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }

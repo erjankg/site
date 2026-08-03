@@ -3,7 +3,7 @@
   "name": "Darius",
   "role": "Барон",
   "tier": "S+",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -575,18 +575,18 @@
         ],
         "core": [
           "Stridebreaker",
-          "Trinity Force",
-          "Sterak's Gage"
+          "Sterak's Gage",
+          "Amaranth's Twinguard"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Stridebreaker",
-          "Trinity Force",
           "Sterak's Gage",
           "Amaranth's Twinguard",
-          "Force of Nature",
+          "Dead Man's Plate",
           "Plated Steelcaps"
         ]
       }
@@ -609,10 +609,10 @@
         ],
         "finalBuild": [
           "Trinity Force",
+          "Plated Steelcaps",
           "Stridebreaker",
           "Sterak's Gage",
           "Death's Dance",
-          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }

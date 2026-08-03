@@ -3,7 +3,7 @@
   "name": "Galio",
   "role": "Мид",
   "tier": "S",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -582,11 +582,11 @@
           "Mercury's Treads"
         ],
         "finalBuild": [
+          "Mercury's Treads",
           "Hollow Radiance",
           "Thornmail",
           "Riftmaker",
-          "Unending Despair",
-          "Dawnshroud",
+          "Hextech Rocketbelt",
           "Mercury's Treads"
         ]
       }
@@ -600,7 +600,7 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
+          "Yordle Trap",
           "Warmog's Armor",
           "Frozen Heart"
         ],
@@ -609,10 +609,10 @@
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Yordle Trap",
+          "Plated Steelcaps",
           "Warmog's Armor",
           "Frozen Heart",
-          "Thornmail",
-          "Force of Nature",
           "Plated Steelcaps"
         ]
       }
@@ -622,7 +622,7 @@
     "Ice Overlord",
     "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

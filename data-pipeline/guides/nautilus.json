@@ -3,7 +3,7 @@
   "name": "Nautilus",
   "role": "Саппорт",
   "tier": "A",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -850,8 +850,8 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
           "Warmog's Armor",
+          "Force of Nature",
           "Frozen Heart"
         ],
         "boots": [
@@ -859,10 +859,10 @@
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Plated Steelcaps",
           "Warmog's Armor",
-          "Frozen Heart",
           "Force of Nature",
-          "Amaranth's Twinguard",
+          "Frozen Heart",
           "Plated Steelcaps"
         ]
       }

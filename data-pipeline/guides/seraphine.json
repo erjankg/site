@@ -3,7 +3,7 @@
   "name": "Seraphine",
   "role": "Саппорт",
   "tier": "B",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,28 +290,54 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Support Build",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
+          "Ardent Censer",
           "Harmonic Echo",
-          "Ardent Censer"
+          "Redemption"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Harmonic Echo",
+          "Ionian Boots of Lucidity",
           "Ardent Censer",
+          "Harmonic Echo",
           "Redemption",
-          "Staff of Flowing Water",
           "Ionian Boots of Lucidity"
+        ]
+      }
+    },
+    {
+      "title": "Mid Build",
+      "tier": "C",
+      "default": false,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Luden's Echo",
+          "Cryptbloom",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Boots of Mana",
+          "Luden's Echo",
+          "Cryptbloom",
+          "Rabadon's Deathcap",
+          "Infinity Orb",
+          "Boots of Mana"
         ]
       }
     }

@@ -3,7 +3,7 @@
   "name": "Jarvan IV",
   "role": "Лес",
   "tier": "B",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,7 +300,7 @@
         "core": [
           "Trinity Force",
           "Radiant Virtue",
-          "Zeke's Convergence"
+          "Force of Nature"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -308,10 +308,10 @@
         ],
         "finalBuild": [
           "Trinity Force",
+          "Plated Steelcaps",
           "Radiant Virtue",
-          "Zeke's Convergence",
-          "Amaranth's Twinguard",
           "Force of Nature",
+          "Amaranth's Twinguard",
           "Plated Steelcaps - Goredrinker"
         ]
       }

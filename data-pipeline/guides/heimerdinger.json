@@ -3,7 +3,7 @@
   "name": "Heimerdinger",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,7 +298,7 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Blackfire Torch",
+          "Malignance",
           "Stormsurge",
           "Rabadon's Deathcap"
         ],
@@ -306,11 +306,11 @@
           "Boots of Mana"
         ],
         "finalBuild": [
-          "Blackfire Torch",
+          "Boots of Mana",
+          "Malignance",
           "Stormsurge",
           "Rabadon's Deathcap",
           "Void Staff",
-          "Infinity Orb",
           "Boots of Mana"
         ]
       }
@@ -319,8 +319,8 @@
   "runes": [
     "First Strike",
     "Botanist",
-    "Transcendence",
-    "Scorch",
+    "Absolute Focus",
+    "Nimbus Cloak",
     "Battle Zeal"
   ],
   "spells": [

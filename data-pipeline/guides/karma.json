@@ -3,7 +3,7 @@
   "name": "Karma",
   "role": "Саппорт",
   "tier": "C",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -295,33 +295,33 @@
       "default": true,
       "items": {
         "starting": [
-          "Relic Shield"
+          "Spectral Sickle"
         ],
         "core": [
-          "Bulwark of the Mountain",
+          "Imperial Mandate",
           "Ardent Censer",
-          "Harmonic Echo"
+          "Redemption"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Bulwark of the Mountain",
+          "Black Mist Scythe",
+          "Ionian Boots of Lucidity",
+          "Imperial Mandate",
           "Ardent Censer",
-          "Harmonic Echo",
           "Redemption",
-          "Staff of Flowing Water",
           "Ionian Boots of Lucidity"
         ]
       }
     }
   ],
   "runes": [
-    "Aery",
-    "Font of Life",
-    "Bone Plating",
-    "Revitalize",
-    "Transcendence"
+    "Arcane Comet",
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
+    "Bone Plating"
   ],
   "spells": [
     {

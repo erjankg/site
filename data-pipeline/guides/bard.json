@@ -3,7 +3,7 @@
   "name": "Bard",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,19 +298,19 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
           "Lich Bane",
-          "Stormsurge"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Black Mist Scythe",
+          "Boots of Mana",
           "Lich Bane",
-          "Stormsurge",
+          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
           "Boots of Mana"
         ]
       }
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "Electrocute",
-    "Empowered Attack",
+    "Cheap Shot",
     "Chain Assault",
     "Zombie Ward",
     "Bone Plating"

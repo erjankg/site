@@ -3,7 +3,7 @@
   "name": "Jhin",
   "role": "Дракон",
   "tier": "S",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,7 +299,7 @@
         ],
         "core": [
           "The Collector",
-          "Galeforce",
+          "Magnetic Blaster",
           "Lord Dominik's Regard"
         ],
         "boots": [
@@ -307,11 +307,11 @@
           "Galeforce"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "The Collector",
-          "Galeforce",
-          "Lord Dominik's Regard",
           "Magnetic Blaster",
-          "Infinity Edge",
+          "Lord Dominik's Regard",
+          "Galeforce",
           "Gluttonous Greaves - Galeforce"
         ]
       }
@@ -321,7 +321,7 @@
     "Dark Harvest",
     "Battle Zeal",
     "Cut Down",
-    "Legend: Bloodline",
+    "Legend: Alacrity",
     "Celerity"
   ],
   "spells": [

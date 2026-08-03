@@ -3,7 +3,7 @@
   "name": "Sett",
   "role": "Барон",
   "tier": "S",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -576,18 +576,18 @@
         "core": [
           "Stridebreaker",
           "Overlord's Bloodmail",
-          "Black Cleaver"
+          "Hullbreaker"
         ],
         "boots": [
           "Plated Steelcaps",
           "Galeforce"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Stridebreaker",
           "Overlord's Bloodmail",
+          "Hullbreaker",
           "Black Cleaver",
-          "Spear of Shojin",
-          "Sterak's Gage",
           "Plated Steelcaps - Galeforce"
         ]
       }
@@ -595,10 +595,10 @@
   ],
   "runes": [
     "Conqueror",
-    "Brutal",
-    "Last Stand",
-    "Legend: Alacrity",
-    "Second Wind"
+    "Demolish",
+    "Second Wind",
+    "Overgrowth",
+    "Battle Zeal"
   ],
   "spells": [
     {

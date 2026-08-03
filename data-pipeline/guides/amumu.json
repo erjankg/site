@@ -3,7 +3,7 @@
   "name": "Amumu",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,18 +299,18 @@
         ],
         "core": [
           "Searing Crown",
-          "Liandry's Torment",
-          "Amaranth's Twinguard"
+          "Thornmail",
+          "Liandry's Torment"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Searing Crown",
+          "Thornmail",
           "Liandry's Torment",
           "Amaranth's Twinguard",
-          "Abyssal Mask",
-          "Thornmail",
           "Plated Steelcaps"
         ]
       }
@@ -321,7 +321,7 @@
     "Unshakeable",
     "Bone Plating",
     "Perseverance",
-    "Transcendence"
+    "Legend: Bloodline"
   ],
   "spells": [
     {

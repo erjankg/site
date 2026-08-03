@@ -3,7 +3,7 @@
   "name": "Jax",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -582,11 +582,11 @@
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Dusk and Dawn",
           "Blade of the Ruined King",
           "Hullbreaker",
           "Zhonya's Hourglass",
-          "Riftmaker",
           "Plated Steelcaps"
         ]
       }
@@ -600,19 +600,19 @@
           "Long Sword"
         ],
         "core": [
-          "Blade of the Ruined King",
           "Dusk and Dawn",
+          "Blade of the Ruined King",
           "Riftmaker"
         ],
         "boots": [
           "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Blade of the Ruined King",
+          "Gluttonous Greaves",
           "Dusk and Dawn",
+          "Blade of the Ruined King",
           "Riftmaker",
           "Zhonya's Hourglass",
-          "Guardian Angel",
           "Gluttonous Greaves"
         ]
       }
@@ -622,8 +622,8 @@
     "Grasp of the Undying",
     "Demolish",
     "Second Wind",
-    "Perseverance",
-    "Sudden Impact"
+    "Overgrowth",
+    "Last Stand"
   ],
   "spells": [
     {

@@ -3,7 +3,7 @@
   "name": "Nami",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.2a",
+  "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,19 +298,19 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
+          "Ardent Censer",
           "Harmonic Echo",
-          "Ardent Censer"
+          "Redemption"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Harmonic Echo",
           "Ardent Censer",
+          "Ionian Boots of Lucidity",
+          "Harmonic Echo",
           "Redemption",
-          "Staff of Flowing Water",
           "Ionian Boots of Lucidity"
         ]
       }
@@ -318,10 +318,10 @@
   ],
   "runes": [
     "Aery",
-    "Font of Life",
-    "Bone Plating",
-    "Revitalize",
-    "Transcendence"
+    "Empowered Attack",
+    "Chain Assault",
+    "Zombie Ward",
+    "Bone Plating"
   ],
   "spells": [
     {
