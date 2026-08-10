@@ -2,7 +2,7 @@
   "slug": "zed",
   "name": "Zed",
   "role": "Мид",
-  "tier": "D",
+  "tier": "C",
   "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
@@ -582,11 +582,11 @@
           "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Eclipse",
           "Serpent's Fang",
           "Serylda's Grudge",
           "Spear of Shojin",
-          "Guardian Angel",
           "Gluttonous Greaves"
         ]
       }
@@ -600,18 +600,18 @@
           "Long Sword"
         ],
         "core": [
+          "Youmuu's Ghostblade",
           "Trinity Force",
-          "Serpent's Fang",
           "Serylda's Grudge"
         ],
         "boots": [
           "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
+          "Youmuu's Ghostblade",
           "Trinity Force",
-          "Serpent's Fang",
           "Serylda's Grudge",
-          "Eclipse",
           "Spear of Shojin",
           "Gluttonous Greaves"
         ]
@@ -623,7 +623,7 @@
     "Battle Zeal",
     "Cut Down",
     "Legend: Alacrity",
-    "Transcendence"
+    "Second Wind"
   ],
   "spells": [
     {

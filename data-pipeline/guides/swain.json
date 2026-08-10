@@ -2,7 +2,7 @@
   "slug": "swain",
   "name": "Swain",
   "role": "Мид",
-  "tier": "A",
+  "tier": "B",
   "patch": "7.2b",
   "dataDate": "2026-04-20",
   "matchups": [
@@ -582,11 +582,11 @@
           "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Malignance",
           "Infinity Orb",
           "Rabadon's Deathcap",
           "Cryptbloom",
-          "Zhonya's Hourglass",
           "Boots of Mana"
         ]
       }
@@ -600,19 +600,19 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
           "Malignance",
-          "Rylai's Crystal Scepter"
+          "Rylai's Crystal Scepter",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Plated Steelcaps",
           "Malignance",
           "Rylai's Crystal Scepter",
-          "Cryptbloom",
-          "Amaranth's Twinguard",
+          "Rabadon's Deathcap",
           "Plated Steelcaps"
         ]
       }
@@ -627,25 +627,25 @@
         ],
         "core": [
           "Malignance",
-          "Abyssal Mask",
-          "Rylai's Crystal Scepter"
+          "Rylai's Crystal Scepter",
+          "Abyssal Mask"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Malignance",
-          "Abyssal Mask",
           "Rylai's Crystal Scepter",
+          "Abyssal Mask",
           "Zhonya's Hourglass",
-          "Bloodletter's Curse",
           "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
+    "Phase Rush",
     "Axiom Arcanist",
     "Transcendence",
     "Nimbus Cloak",
