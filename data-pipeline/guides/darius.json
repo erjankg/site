@@ -3,7 +3,7 @@
   "name": "Darius",
   "role": "Барон",
   "tier": "S+",
-  "patch": "7.2b",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -593,7 +593,7 @@
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [

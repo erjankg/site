@@ -3,7 +3,7 @@
   "name": "Swain",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.2b",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -614,32 +614,6 @@
           "Rylai's Crystal Scepter",
           "Rabadon's Deathcap",
           "Plated Steelcaps"
-        ]
-      }
-    },
-    {
-      "title": "Solo Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Malignance",
-          "Rylai's Crystal Scepter",
-          "Abyssal Mask"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Boots of Mana",
-          "Malignance",
-          "Rylai's Crystal Scepter",
-          "Abyssal Mask",
-          "Zhonya's Hourglass",
-          "Boots of Mana"
         ]
       }
     }

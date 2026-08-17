@@ -1,9 +1,9 @@
 {
   "slug": "chogath",
   "name": "Cho'Gath",
-  "role": null,
-  "tier": "TBD",
-  "patch": "7.2b",
+  "role": "Барон",
+  "tier": "S+",
+  "patch": "7.2c",
   "dataDate": null,
   "matchups": [],
   "counters": [],
@@ -13,14 +13,71 @@
       "tier": null,
       "default": true,
       "items": {
-        "starting": [],
-        "core": [],
-        "boots": [],
-        "finalBuild": []
+        "starting": [
+          "Ruby Crystal"
+        ],
+        "core": [
+          "Heartsteel",
+          "Sunfire Aegis",
+          "Thornmail"
+        ],
+        "boots": [
+          "Plated Steelcaps"
+        ],
+        "finalBuild": [
+          "Heartsteel",
+          "Sunfire Aegis",
+          "Thornmail",
+          "Gargoyle Stoneplate",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps"
+        ]
       }
     }
   ],
-  "runes": [],
+  "runes": [
+    "Grasp of the Undying",
+    "Demolish",
+    "Second Wind",
+    "Perseverance",
+    "Transcendence"
+  ],
   "spells": [],
-  "skillOrder": []
+  "skillOrder": [
+    {
+      "ability": "Rupture",
+      "levels": [
+        1,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Feral Scream",
+      "levels": [
+        3,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Vorpal Spikes",
+      "levels": [
+        2,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Feast",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
 }
