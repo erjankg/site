@@ -1,0 +1,98 @@
+name: Update matchups (weekly)
+
+# Матчапы обновляются РАЗ В НЕДЕЛЮ, а не каждый день, потому что:
+#  • статистика у трекера обновляется примерно раз в патч (поле dataDate в guides/*.json);
+#  • редакционные страницы-контры живут месяцами (часть вообще годовой давности);
+#  • полный обход скрейпа — ~6 минут и ~280 запросов к чужим серверам, каждый день это невежливо.
+# Вышел патч раньше срока — жми Run workflow вручную.
+#
+# Три слоя (см. DRAFT-AI.md и data-pipeline/README.md):
+#   1. guides/*.json     — статистика (winrate по рангам), fetch-all.mjs
+#   2. counters.json     — редакционные пары, fetch-counters.mjs
+#   3. champion-tags.json — теги умений для «почему», build-champion-tags.mjs
+#   → build-matchups.mjs сшивает в matchups.json + matchups/<slug>.json
+#
+# FAIL-SAFE. Ни один шаг не имеет права затереть хорошие данные плохими:
+#   • fetch-guide.writeGuide  — гайд с 0 матчапов НЕ перезаписывает файл, где они были;
+#   • fetch-all.mjs           — >30% сбоев → оглавление не трогается;
+#   • fetch-counters.mjs      — чемпион без ответа сохраняет прежние данные;
+#                               суммарно <500 пар или <60% от прошлого → файл НЕ пишется, exit 1;
+#   • build-matchups.mjs      — <60% пар от прошлого → matchups/ НЕ трогается, exit 1.
+# Поэтому сборочные шаги идут с continue-on-error: упавший слой оставляет вчерашние данные,
+# а коммит всё равно заберёт то, что реально обновилось. Провал виден в логе шага.
+
+on:
+  schedule:
+    - cron: '17 4 * * 1'   # понедельник, 04:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-matchups
+  cancel-in-progress: false
+
+jobs:
+  matchups:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # СЛОЙ 1 — статистика (winrate/pickrate по рангам)
+      - name: Слой 1 · статистика матчапов (wildriftallstats)
+        id: guides
+        continue-on-error: true
+        run: node data-pipeline/fetch-all.mjs
+
+      # СЛОЙ 3 — теги умений. Локальный, сети не требует, поэтому падать тут нечему.
+      - name: Слой 3 · теги механик из умений
+        run: node data-pipeline/build-champion-tags.mjs
+
+      # СЛОЙ 2 — редакционные пары. Самый долгий шаг, чужие сайты.
+      - name: Слой 2 · редакционные контры (скрейп)
+        id: counters
+        continue-on-error: true
+        run: node data-pipeline/fetch-counters.mjs
+
+      - name: Сшивка трёх слоёв
+        id: build
+        continue-on-error: true
+        run: node data-pipeline/build-matchups.mjs
+
+      - name: Итог по шагам
+        run: |
+          echo "статистика (слой 1): ${{ steps.guides.outcome }}"
+          echo "скрейп (слой 2):     ${{ steps.counters.outcome }}"
+          echo "сшивка:              ${{ steps.build.outcome }}"
+          if [ "${{ steps.build.outcome }}" != "success" ]; then
+            echo "::warning::Сшивка не прошла — сработал fail-safe, matchups остались прежними. Смотри лог шага."
+          fi
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data-pipeline/guides data-pipeline/counters.json \
+                  data-pipeline/champion-tags.json data-pipeline/matchups.json data-pipeline/matchups
+          if git diff --cached --quiet; then
+            echo "Нет изменений в матчапах."
+          else
+            git commit -m "chore(data): weekly matchups refresh [skip ci]"
+            git push
+          fi
+
+      # Если ВСЕ сетевые слои легли — валим задачу, чтобы это не прошло незамеченным.
+      # Данные при этом целы: их защитили fail-safe выше.
+      - name: Провалить задачу, если легли оба источника
+        if: steps.guides.outcome != 'success' && steps.counters.outcome != 'success'
+        run: |
+          echo "::error::Оба источника матчапов недоступны. Данные НЕ перезаписаны, но обновления не было."
+          exit 1

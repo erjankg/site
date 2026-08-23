@@ -8,7 +8,7 @@
 //   Выход:   data-pipeline/guides/<slug>.json
 // ───────────────────────────────────────────────────────────────────────────
 
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -109,10 +109,26 @@ export async function fetchGuide(slug, tries = 3) {
 }
 
 // Записать гайд в data-pipeline/guides/<slug>.json
+// FAIL-SAFE: гайд — ИСТОЧНИК СТАТИСТИКИ матчапов (winrate по рангам, слой 1 в build-matchups.mjs).
+// Проверка «пусто ВСЁ» выше не ловит частичную поломку: если источник отдал сборки и руны,
+// но матчапы потерял, файл молча перезапишется и winrate пропадёт. Поэтому здесь отдельно:
+// были матчапы → пустыми их не затираем, оставляем прежний файл и говорим об этом вслух.
 export function writeGuide(out) {
   const __dirname = dirname(fileURLToPath(import.meta.url));
   mkdirSync(`${__dirname}/guides`, { recursive: true });
   const outPath = `${__dirname}/guides/${out.slug}.json`;
+
+  if (!out.matchups?.length && existsSync(outPath)) {
+    try {
+      const prev = JSON.parse(readFileSync(outPath, 'utf8'));
+      if (prev.matchups?.length) {
+        console.warn(`⚠ ${out.slug}: источник вернул 0 матчапов, а в файле их ${prev.matchups.length}`
+          + ` — НЕ перезаписываю, оставляю прежние (данные от ${prev.dataDate}).`);
+        return null;
+      }
+    } catch { /* прежний файл битый — пишем новый, хуже не будет */ }
+  }
+
   writeFileSync(outPath, JSON.stringify(out, null, 2), 'utf8');
   return outPath;
 }
@@ -124,7 +140,7 @@ if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith
   fetchGuide(slug).then((out) => {
     const p = writeGuide(out);
     console.log(`✓ ${out.name} · роль ${out.role} · тир ${out.tier} · патч ${out.patch} · данные ${out.dataDate}`);
-    console.log(`✓ Записано: ${p}`);
+    console.log(p ? `✓ Записано: ${p}` : `↷ Запись пропущена (fail-safe) — прежний файл сохранён`);
     const m0 = out.matchups[0];
     if (m0) {
       console.log(`\nМатчапы (${m0.rank}/${m0.lane}):`);

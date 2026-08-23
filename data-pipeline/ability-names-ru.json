@@ -1,0 +1,4391 @@
+{
+ "source": "ddragon ru_RU",
+ "version": "16.14.1",
+ "built": "2026-07-25",
+ "champions": {
+  "Aatrox": {
+   "passive": {
+    "ru": "Стойка разрушителя",
+    "en": "Deathbringer Stance",
+    "wrEn": "DEATHBRINGER STANCE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Клинок даркинов",
+    "en": "The Darkin Blade",
+    "wrEn": "THE DARKIN BLADE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Проклятые цепи",
+    "en": "Infernal Chains",
+    "wrEn": "INFERNAL CHAINS",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Темный рывок",
+    "en": "Umbral Dash",
+    "wrEn": "UMBRAL DASH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Губитель мира",
+    "en": "World Ender",
+    "wrEn": "WORLD ENDER",
+    "match": "exact"
+   }
+  },
+  "Ahri": {
+   "passive": {
+    "ru": "Похищение сущности",
+    "en": "Essence Theft",
+    "wrEn": "Essence Theft",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сфера обмана",
+    "en": "Orb of Deception",
+    "wrEn": "Orb of Deception",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Лисий огонь",
+    "en": "Fox-Fire",
+    "wrEn": "Fox-Fire",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Очарование",
+    "en": "Charm",
+    "wrEn": "Charm",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Призрачный рывок",
+    "en": "Spirit Rush",
+    "wrEn": "Spirit Rush",
+    "match": "exact"
+   }
+  },
+  "Akali": {
+   "passive": {
+    "ru": "Метка убийцы",
+    "en": "Assassin's Mark",
+    "wrEn": "ASSASSIN'S MARK",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Пятиточечный удар",
+    "en": "Five Point Strike",
+    "wrEn": "FIVE POINT STRIKE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Покров сумерек",
+    "en": "Twilight Shroud",
+    "wrEn": "TWILIGHT SHROUD",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Сюрикен убийцы",
+    "en": "Shuriken Flip",
+    "wrEn": "SHURIKEN FLIP",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Идеальное убийство",
+    "en": "Perfect Execution",
+    "wrEn": "PERFECT EXECUTION",
+    "match": "exact"
+   }
+  },
+  "Akshan": {
+   "passive": {
+    "ru": "Бой без правил",
+    "en": "Dirty Fighting",
+    "wrEn": "DIRTY FIGHTING",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Бумеранг мстителя",
+    "en": "Avengerang",
+    "wrEn": "AVENGERANG",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Опасная игра",
+    "en": "Going Rogue",
+    "wrEn": "GOING ROGUE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Зацепной пистолет",
+    "en": "Heroic Swing",
+    "wrEn": "HEROIC SWING",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Расплата",
+    "en": "Comeuppance",
+    "wrEn": "COMEUPPANCE",
+    "match": "exact"
+   }
+  },
+  "Alistar": {
+   "passive": {
+    "ru": "Торжествующий рев",
+    "en": "Triumphant Roar",
+    "wrEn": "Triumphant Roar",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сокрушение",
+    "en": "Pulverize",
+    "wrEn": "Pulverize",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Удар головой",
+    "en": "Headbutt",
+    "wrEn": "Headbutt",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Топот",
+    "en": "Trample",
+    "wrEn": "Trample",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Несокрушимая воля",
+    "en": "Unbreakable Will",
+    "wrEn": "Unbreakable Will",
+    "match": "exact"
+   }
+  },
+  "Ambessa": {
+   "passive": {
+    "ru": "Поступь драконьей гончей",
+    "en": "Drakehound's Step",
+    "wrEn": "DRAKEHOUND'S STEP",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Коварный взмах / Раскалывающий удар",
+    "en": "Cunning Sweep / Sundering Slam",
+    "wrEn": "CUNNING SWEEP / SUNDERING SLAM",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Отречение",
+    "en": "Repudiation",
+    "wrEn": "REPUDIATION",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Истязание",
+    "en": "Lacerate",
+    "wrEn": "LACERATE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Показательная расправа",
+    "en": "Public Execution",
+    "wrEn": "PUBLIC EXECUTION",
+    "match": "exact"
+   }
+  },
+  "Amumu": {
+   "passive": {
+    "ru": "Прикосновение мумии",
+    "en": "Cursed Touch",
+    "wrEn": "Cursed Touch",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Бросок бинта",
+    "en": "Bandage Toss",
+    "wrEn": "Bandage Toss",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Отчаяние",
+    "en": "Despair",
+    "wrEn": "Despair",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Вспышка гнева",
+    "en": "Tantrum",
+    "wrEn": "Tantrum",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Проклятие печальной мумии",
+    "en": "Curse of the Sad Mummy",
+    "wrEn": "Curse of the Sad Mummy",
+    "match": "exact"
+   }
+  },
+  "Annie": {
+   "passive": {
+    "ru": "Пиромания",
+    "en": "Pyromania",
+    "wrEn": "Pyromania",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Расщепление",
+    "en": "Disintegrate",
+    "wrEn": "Disintegrate",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Испепеление",
+    "en": "Incinerate",
+    "wrEn": "Incinerate",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Пылающий щит",
+    "en": "Molten Shield",
+    "wrEn": "Molten Shield",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Призыв Тибберса",
+    "en": "Summon: Tibbers",
+    "wrEn": "Summon: Tibbers",
+    "match": "exact"
+   }
+  },
+  "Ashe": {
+   "passive": {
+    "ru": "Морозный выстрел",
+    "en": "Frost Shot",
+    "wrEn": "Frost Shot",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сосредоточенность стрелка",
+    "en": "Ranger's Focus",
+    "wrEn": "Ranger's Focus",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Залп",
+    "en": "Volley",
+    "wrEn": "Volley",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Ястребиная разведка",
+    "en": "Hawkshot",
+    "wrEn": "Hawkshot",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Зачарованная ледяная стрела",
+    "en": "Enchanted Crystal Arrow",
+    "wrEn": "Enchanted Crystal Arrow",
+    "match": "exact"
+   }
+  },
+  "AurelionSol": {
+   "passive": {
+    "ru": "Вселенский творец",
+    "en": "Cosmic Creator",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Дыхание солнца",
+    "en": "Breath of Light",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Космический полет",
+    "en": "Astral Flight",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Сингулярность",
+    "en": "Singularity",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Падающая звезда / Обрушение небес",
+    "en": "Falling Star / The Skies Descend",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Aurora": {
+   "passive": {
+    "ru": "Изгнание духа",
+    "en": "Spirit Abjuration",
+    "wrEn": "SPIRIT ABJURATION",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Двойное проклятие",
+    "en": "Twofold Hex",
+    "wrEn": "TWOFOLD HEX",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "За завесой",
+    "en": "Across the Veil",
+    "wrEn": "ACROSS THE VEIL",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Чудовство",
+    "en": "The Weirding",
+    "wrEn": "THE WEIRDING",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Междумирье",
+    "en": "Between Worlds",
+    "wrEn": "BETWEEN WORLDS",
+    "match": "exact"
+   }
+  },
+  "Bard": {
+   "passive": {
+    "ru": "Зов скитальца",
+    "en": "Traveler's Call",
+    "wrEn": "TRAVELER’S CALL",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Оковы Вселенной",
+    "en": "Cosmic Binding",
+    "wrEn": "COSMIC BINDING",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Алтарь Хранителя",
+    "en": "Caretaker's Shrine",
+    "wrEn": "CARETAKER’S SHRINE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Волшебное путешествие",
+    "en": "Magical Journey",
+    "wrEn": "MAGICAL JOURNEY",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Отсрочка неизбежного",
+    "en": "Tempered Fate",
+    "wrEn": "TEMPERED FATE",
+    "match": "exact"
+   }
+  },
+  "Blitzcrank": {
+   "passive": {
+    "ru": "Щит маны",
+    "en": "Mana Barrier",
+    "wrEn": "Mana Barrier",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Ракетный захват",
+    "en": "Rocket Grab",
+    "wrEn": "Rocket Grab",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Ускорение",
+    "en": "Overdrive",
+    "wrEn": "Overdrive",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Силовой кулак",
+    "en": "Power Fist",
+    "wrEn": "Power Fist",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Статическое поле",
+    "en": "Static Field",
+    "wrEn": "Static Field",
+    "match": "exact"
+   }
+  },
+  "Brand": {
+   "passive": {
+    "ru": "Поджог",
+    "en": "Blaze",
+    "wrEn": "BLAZE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Выгорание",
+    "en": "Sear",
+    "wrEn": "SEAR",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Столб пламени",
+    "en": "Pillar of Flame",
+    "wrEn": "PILLAR OF FLAME",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Воспламенение",
+    "en": "Conflagration",
+    "wrEn": "CONFLAGRATION",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Очищение огнем",
+    "en": "Pyroclasm",
+    "wrEn": "PYROCLASM",
+    "match": "exact"
+   }
+  },
+  "Braum": {
+   "passive": {
+    "ru": "Оглушающие удары",
+    "en": "Concussive Blows",
+    "wrEn": "Concussive Blows",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Укус зимы",
+    "en": "Winter's Bite",
+    "wrEn": "Winter's Bite",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Прячься за меня",
+    "en": "Stand Behind Me",
+    "wrEn": "Stand Behind Me",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Неуязвимый",
+    "en": "Unbreakable",
+    "wrEn": "Unbreakable",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Ледниковый разлом",
+    "en": "Glacial Fissure",
+    "wrEn": "Glacial Fissure",
+    "match": "exact"
+   }
+  },
+  "Caitlyn": {
+   "passive": {
+    "ru": "Выстрел в голову",
+    "en": "Headshot",
+    "wrEn": "HEADSHOT",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Пилтоверский миротворец",
+    "en": "Piltover Peacemaker",
+    "wrEn": "PILTOVER PEACEMAKER",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Ловушка на йордлов",
+    "en": "Yordle Snap Trap",
+    "wrEn": "YORDLE SNAP TRAP",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Сеть 90 калибра",
+    "en": "90 Caliber Net",
+    "wrEn": "90 CALIBER NET",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Главный козырь",
+    "en": "Ace in the Hole",
+    "wrEn": "ACE IN THE HOLE",
+    "match": "exact"
+   }
+  },
+  "Camille": {
+   "passive": {
+    "ru": "Адаптивная защита",
+    "en": "Adaptive Defenses",
+    "wrEn": "Adaptive Defenses",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Протокол точности",
+    "en": "Precision Protocol",
+    "wrEn": "Precision Protocol",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Тактический взмах",
+    "en": "Tactical Sweep",
+    "wrEn": "Tactical Sweep",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Выстрел крюком",
+    "en": "Hookshot",
+    "wrEn": "Hookshot",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Хекстековый ультиматум",
+    "en": "The Hextech Ultimatum",
+    "wrEn": "The Hextech Ultimatum",
+    "match": "exact"
+   }
+  },
+  "Corki": {
+   "passive": {
+    "ru": "Хекстековые боеприпасы",
+    "en": "Hextech Munitions",
+    "wrEn": "HEXTECH MUNITIONS",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Фосфорная бомба",
+    "en": "Phosphorus Bomb",
+    "wrEn": "PHOSPHORUS BOMB",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Валькирия",
+    "en": "Valkyrie",
+    "wrEn": "VALKYRIE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Пулемет",
+    "en": "Gatling Gun",
+    "wrEn": "GATLING GUN",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Ракетный обстрел",
+    "en": "Missile Barrage",
+    "wrEn": "MISSILE BARRAGE",
+    "match": "exact"
+   }
+  },
+  "Darius": {
+   "passive": {
+    "ru": "Кровотечение",
+    "en": "Hemorrhage",
+    "wrEn": "HEMORRHAGE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Истребление",
+    "en": "Decimate",
+    "wrEn": "DECIMATE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Калечащий удар",
+    "en": "Crippling Strike",
+    "wrEn": "CRIPPLING STRIKE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Задержание",
+    "en": "Apprehend",
+    "wrEn": "APPREHEND",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Ноксианская гильотина",
+    "en": "Noxian Guillotine",
+    "wrEn": "NOXIAN GUILLOTINE",
+    "match": "exact"
+   }
+  },
+  "Diana": {
+   "passive": {
+    "ru": "Клинок лунного сияния",
+    "en": "Moonsilver Blade",
+    "wrEn": "MOONSILVER BLADE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Удар полумесяца",
+    "en": "Crescent Strike",
+    "wrEn": "CRESCENT STRIKE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Бледный каскад",
+    "en": "Pale Cascade",
+    "wrEn": "PALE CASCADE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Лунный рывок",
+    "en": "Lunar Rush",
+    "wrEn": "LUNAR RUSH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Притяжение Луны",
+    "en": "Moonfall",
+    "wrEn": "MOONFALL",
+    "match": "exact"
+   }
+  },
+  "Draven": {
+   "passive": {
+    "ru": "Лига Дрейвена",
+    "en": "League of Draven",
+    "wrEn": "LEAGUE OF DRAVEN",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Вращающийся топор",
+    "en": "Spinning Axe",
+    "wrEn": "SPINNING AXE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Прилив крови",
+    "en": "Blood Rush",
+    "wrEn": "BLOOD RUSH",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Расходимся!",
+    "en": "Stand Aside",
+    "wrEn": "STAND ASIDE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Кружащаяся смерть",
+    "en": "Whirling Death",
+    "wrEn": "WHIRLING DEATH",
+    "match": "exact"
+   }
+  },
+  "Ekko": {
+   "passive": {
+    "ru": "Резонанс Z-привода",
+    "en": "Z-Drive Resonance",
+    "wrEn": "Z-DRIVE RESONANCE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Временной ключ",
+    "en": "Timewinder",
+    "wrEn": "TIMEWINDER",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Параллельная конвергенция",
+    "en": "Parallel Convergence",
+    "wrEn": "PARALLEL CONVERGENCE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Фазовый скачок",
+    "en": "Phase Dive",
+    "wrEn": "PHASE DIVE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Управление временем",
+    "en": "Chronobreak",
+    "wrEn": "CHRONOBREAK",
+    "match": "exact"
+   }
+  },
+  "Evelynn": {
+   "passive": {
+    "ru": "Демоническая тень",
+    "en": "Demon Shade",
+    "wrEn": "DEMON SHADE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Всплеск ненависти",
+    "en": "Hate Spike",
+    "wrEn": "HATE SPIKE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Обольщение",
+    "en": "Allure",
+    "wrEn": "ALLURE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Удар хлыста",
+    "en": "Whiplash",
+    "wrEn": "WHIPLASH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Последний поцелуй",
+    "en": "Last Caress",
+    "wrEn": "LAST CARESS",
+    "match": "exact"
+   }
+  },
+  "Ezreal": {
+   "passive": {
+    "ru": "Переполняющая магия",
+    "en": "Rising Spell Force",
+    "wrEn": "Rising Spell Force",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Мистический выстрел",
+    "en": "Mystic Shot",
+    "wrEn": "Mystic Shot",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Искажение сущности",
+    "en": "Essence Flux",
+    "wrEn": "Essence Flux",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Магический сдвиг",
+    "en": "Arcane Shift",
+    "wrEn": "Arcane Shift",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Прицельный залп",
+    "en": "Trueshot Barrage",
+    "wrEn": "Trueshot Barrage",
+    "match": "exact"
+   }
+  },
+  "Fiddlesticks": {
+   "passive": {
+    "ru": "Безобидное пугало",
+    "en": "A Harmless Scarecrow",
+    "wrEn": "A HARMLESS SCARECROW",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Ужас",
+    "en": "Terrify",
+    "wrEn": "TERRIFY",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Обильный урожай",
+    "en": "Bountiful Harvest",
+    "wrEn": "BOUNTIFUL HARVEST",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Жатва",
+    "en": "Reap",
+    "wrEn": "REAP",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Нашествие воронов",
+    "en": "Crowstorm",
+    "wrEn": "CROWSTORM",
+    "match": "exact"
+   }
+  },
+  "Fiora": {
+   "passive": {
+    "ru": "Танец дуэлянта",
+    "en": "Duelist's Dance",
+    "wrEn": "Duelist's Dance",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Выпад",
+    "en": "Lunge",
+    "wrEn": "Lunge",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Парирование",
+    "en": "Riposte",
+    "wrEn": "Riposte",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Мастер клинка",
+    "en": "Bladework",
+    "wrEn": "Bladework",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Дерзкий вызов",
+    "en": "Grand Challenge",
+    "wrEn": "Grand Challenge",
+    "match": "exact"
+   }
+  },
+  "Fizz": {
+   "passive": {
+    "ru": "Проворный боец",
+    "en": "Nimble Fighter",
+    "wrEn": "SEASTONE TRIDENT",
+    "match": "approx"
+   },
+   "q": {
+    "ru": "Удар сорванца",
+    "en": "Urchin Strike",
+    "wrEn": "Urchin Strike",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Морской трезубец",
+    "en": "Seastone Trident",
+    "wrEn": "RENDING WAVE",
+    "match": "approx"
+   },
+   "e": {
+    "ru": "Баловство / Обман",
+    "en": "Playful / Trickster",
+    "wrEn": "Playful / Trickster",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Ловля на живца",
+    "en": "Chum the Waters",
+    "wrEn": "Chum the Waters",
+    "match": "exact"
+   }
+  },
+  "Galio": {
+   "passive": {
+    "ru": "Колоссальный удар",
+    "en": "Colossal Smash",
+    "wrEn": "COLOSSAL SMASH",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Ветра войны",
+    "en": "Winds of War",
+    "wrEn": "WINDS OF WAR",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Щит Дюрана",
+    "en": "Shield of Durand",
+    "wrEn": "SHIELD OF DURAND",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Кулак правосудия",
+    "en": "Justice Punch",
+    "wrEn": "JUSTICE PUNCH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Появление героя",
+    "en": "Hero's Entrance",
+    "wrEn": "HERO'S ENTRANCE",
+    "match": "exact"
+   }
+  },
+  "Garen": {
+   "passive": {
+    "ru": "Упорство",
+    "en": "Perseverance",
+    "wrEn": "Perseverance",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Решающий удар",
+    "en": "Decisive Strike",
+    "wrEn": "Decisive Strike",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Храбрость",
+    "en": "Courage",
+    "wrEn": "Courage",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Вердикт",
+    "en": "Judgment",
+    "wrEn": "Judgment",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Правосудие Демасии",
+    "en": "Demacian Justice",
+    "wrEn": "Demacian Justice",
+    "match": "exact"
+   }
+  },
+  "Gnar": {
+   "passive": {
+    "ru": "Ген ярости",
+    "en": "Rage Gene",
+    "wrEn": "RAGE GENE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Бросок бумеранга / Бросок валуна",
+    "en": "Boomerang Throw / Boulder Toss",
+    "wrEn": "BOOMERANG THROW / BOULDER TOSS",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Торопыжка / Бум",
+    "en": "Hyper / Wallop",
+    "wrEn": "HYPER / WALLOP",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Прыг / Хрясь",
+    "en": "Hop / Crunch",
+    "wrEn": "HOP / CRUNCH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "ГНА-А-А-Р!",
+    "en": "GNAR!",
+    "wrEn": "GNAR!",
+    "match": "exact"
+   }
+  },
+  "Gragas": {
+   "passive": {
+    "ru": "Пойло со скидкой",
+    "en": "Happy Hour",
+    "wrEn": "Happy Hour",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Бочка",
+    "en": "Barrel Roll",
+    "wrEn": "Barrel Roll",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Пьяный угар",
+    "en": "Drunken Rage",
+    "wrEn": "Drunken Rage",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Таран",
+    "en": "Body Slam",
+    "wrEn": "Body Slam",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Взрывной бочонок",
+    "en": "Explosive Cask",
+    "wrEn": "Explosive Cask",
+    "match": "exact"
+   }
+  },
+  "Graves": {
+   "passive": {
+    "ru": "Новая Судьба",
+    "en": "New Destiny",
+    "wrEn": "New Destiny",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Финита ля комедия",
+    "en": "End of the Line",
+    "wrEn": "End of the Line",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Дымовая завеса",
+    "en": "Smoke Screen",
+    "wrEn": "Smoke Screen",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "На изготовку",
+    "en": "Quickdraw",
+    "wrEn": "Quickdraw",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Сопутствующий ущерб",
+    "en": "Collateral Damage",
+    "wrEn": "Collateral Damage",
+    "match": "exact"
+   }
+  },
+  "Gwen": {
+   "passive": {
+    "ru": "Тысяча порезов",
+    "en": "A Thousand Cuts",
+    "wrEn": "THOUSAND CUTS",
+    "match": "approx"
+   },
+   "q": {
+    "ru": "Чик-чик!",
+    "en": "Snip Snip!",
+    "wrEn": "SNIP SNIP!",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Священный туман",
+    "en": "Hallowed Mist",
+    "wrEn": "HALLOWED MIST",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Свободный крой",
+    "en": "Skip 'n Slash",
+    "wrEn": "SKIP 'N SLASH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Вышивание",
+    "en": "Needlework",
+    "wrEn": "NEEDLEWORK",
+    "match": "exact"
+   }
+  },
+  "Hecarim": {
+   "passive": {
+    "ru": "Тропа войны",
+    "en": "Warpath",
+    "wrEn": "WARPATH",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Буйство",
+    "en": "Rampage",
+    "wrEn": "RAMPAGE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Аура ужаса",
+    "en": "Spirit of Dread",
+    "wrEn": "SPIRIT OF DREAD",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Разрушительный рывок",
+    "en": "Devastating Charge",
+    "wrEn": "DEVASTATING CHARGE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Натиск теней",
+    "en": "Onslaught of Shadows",
+    "wrEn": "ONSLAUGHT OF SHADOWS",
+    "match": "exact"
+   }
+  },
+  "Heimerdinger": {
+   "passive": {
+    "ru": "Тяга к хекстеку",
+    "en": "Hextech Affinity",
+    "wrEn": "HEXTECH AFFINITY",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Эволюционирующая турель H-28G",
+    "en": "H-28 G Evolution Turret",
+    "wrEn": "H-28 G EVOLUTION TURRET",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Хекстек-микроракеты",
+    "en": "Hextech Micro-Rockets",
+    "wrEn": "HEXTECH MICRO-ROCKETS",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Оглушающая граната CH-2",
+    "en": "CH-2 Electron Storm Grenade",
+    "wrEn": "CH-2 ELECTRON STORM GRENADE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "МОДЕРНИЗАЦИЯ!!!",
+    "en": "UPGRADE!!!",
+    "wrEn": "UPGRADE!!!",
+    "match": "exact"
+   }
+  },
+  "Irelia": {
+   "passive": {
+    "ru": "Ионийский пыл",
+    "en": "Ionian Fervor",
+    "wrEn": "IONIAN FERVOR",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Пульсирующий клинок",
+    "en": "Bladesurge",
+    "wrEn": "BLADESURGE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Дерзкий танец",
+    "en": "Defiant Dance",
+    "wrEn": "DEFIANT DANCE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Безупречный дуэт",
+    "en": "Flawless Duet",
+    "wrEn": "FLAWLESS DUET",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Острие авангарда",
+    "en": "Vanguard's Edge",
+    "wrEn": "VANGUARD'S EDGE",
+    "match": "exact"
+   }
+  },
+  "Janna": {
+   "passive": {
+    "ru": "Попутный ветер",
+    "en": "Tailwind",
+    "wrEn": "Tailwind",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Воющий вихрь",
+    "en": "Howling Gale",
+    "wrEn": "Howling Gale",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Западный ветер",
+    "en": "Zephyr",
+    "wrEn": "Zephyr",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Око бури",
+    "en": "Eye Of The Storm",
+    "wrEn": "Eye Of The Storm",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Муссон",
+    "en": "Monsoon",
+    "wrEn": "Monsoon",
+    "match": "exact"
+   }
+  },
+  "JarvanIV": {
+   "passive": {
+    "ru": "Поступь войны",
+    "en": "Martial Cadence",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Удар дракона",
+    "en": "Dragon Strike",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Золотая эгида",
+    "en": "Golden Aegis",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Штандарт Демасии",
+    "en": "Demacian Standard",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Катаклизм",
+    "en": "Cataclysm",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Jax": {
+   "passive": {
+    "ru": "Град ударов",
+    "en": "Relentless Assault",
+    "wrEn": "Relentless Assault",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Удар в прыжке",
+    "en": "Leap Strike",
+    "wrEn": "Leap Strike",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Усиление",
+    "en": "Empower",
+    "wrEn": "Empower",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Встречный удар",
+    "en": "Counter Strike",
+    "wrEn": "Counter Strike",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Мастер оружия",
+    "en": "Grandmaster-at-Arms",
+    "wrEn": "Grandmaster's Might",
+    "match": "approx"
+   }
+  },
+  "Jayce": {
+   "passive": {
+    "ru": "Хекстек-конденсатор",
+    "en": "Hextech Capacitor",
+    "wrEn": "HEXTECH CAPACITOR",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "В небо! / Шоковый заряд",
+    "en": "To the Skies! / Shock Blast",
+    "wrEn": "TO THE SKIES! / SHOCK BLAST",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Электрическое поле / Гиперзаряд",
+    "en": "Lightning Field / Hyper Charge",
+    "wrEn": "LIGHTNING FIELD / HYPER CHARGE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Грохочущий удар / Врата ускорения",
+    "en": "Thundering Blow / Acceleration Gate",
+    "wrEn": "THUNDERING BLOW / ACCELERATION GATE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Ртутная пушка / Ртутный молот",
+    "en": "Mercury Cannon / Mercury Hammer",
+    "wrEn": "MERCURY CANNON / MERCURY HAMMER",
+    "match": "exact"
+   }
+  },
+  "Jhin": {
+   "passive": {
+    "ru": "Шепот",
+    "en": "Whisper",
+    "wrEn": "Whisper",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Танцующая граната",
+    "en": "Dancing Grenade",
+    "wrEn": "Dancing Grenade",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Смертельное действо",
+    "en": "Deadly Flourish",
+    "wrEn": "Deadly Flourish",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Закрытый показ",
+    "en": "Captive Audience",
+    "wrEn": "Captive Audience",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Выход на поклон",
+    "en": "Curtain Call",
+    "wrEn": "Curtain Call",
+    "match": "exact"
+   }
+  },
+  "Jinx": {
+   "passive": {
+    "ru": "Бодрячком!",
+    "en": "Get Excited!",
+    "wrEn": "Get Excited!",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Кручу-верчу!",
+    "en": "Switcheroo!",
+    "wrEn": "Switcheroo!",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Пиу-пиу!",
+    "en": "Zap!",
+    "wrEn": "Zap!",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Огненные кусаки!",
+    "en": "Flame Chompers!",
+    "wrEn": "Flame Chompers!",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Супер-мега-ракета смерти!",
+    "en": "Super Mega Death Rocket!",
+    "wrEn": "Super Mega Death Rocket!",
+    "match": "exact"
+   }
+  },
+  "Kaisa": {
+   "passive": {
+    "ru": "Вторая кожа",
+    "en": "Second Skin",
+    "wrEn": "SECOND SKIN",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Дождь Икатии",
+    "en": "Icathian Rain",
+    "wrEn": "ICATHIAN RAIN",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Ловчая из Бездны",
+    "en": "Void Seeker",
+    "wrEn": "VOID SEEKER",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Сверхзаряд",
+    "en": "Supercharge",
+    "wrEn": "SUPERCHARGE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Охотничий инстинкт",
+    "en": "Killer Instinct",
+    "wrEn": "KILLER INSTINCT",
+    "match": "exact"
+   }
+  },
+  "Kalista": {
+   "passive": {
+    "ru": "Боевая готовность",
+    "en": "Martial Poise",
+    "wrEn": "MARTIAL POISE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Пронзающее копье",
+    "en": "Pierce",
+    "wrEn": "PIERCE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Дух-хранитель",
+    "en": "Sentinel",
+    "wrEn": "SENTINEL",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Раздирание",
+    "en": "Rend",
+    "wrEn": "REND",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Зов судьбы",
+    "en": "Fate's Call",
+    "wrEn": "FATE'S CALL",
+    "match": "exact"
+   }
+  },
+  "Karma": {
+   "passive": {
+    "ru": "Разгорающийся огонь",
+    "en": "Gathering Fire",
+    "wrEn": "MANTRA",
+    "match": "approx"
+   },
+   "q": {
+    "ru": "Внутреннее пламя",
+    "en": "Inner Flame",
+    "wrEn": "INNER FLAME",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Решимость",
+    "en": "Focused Resolve",
+    "wrEn": "FOCUSED RESOLVE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Воодушевление",
+    "en": "Inspire",
+    "wrEn": "INSPIRE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Мантра",
+    "en": "Mantra",
+    "wrEn": "TRANSCENDENT EMBRACE",
+    "match": "approx"
+   }
+  },
+  "Kassadin": {
+   "passive": {
+    "ru": "Камень Бездны",
+    "en": "Void Stone",
+    "wrEn": "VOID STONE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сфера пустоты",
+    "en": "Null Sphere",
+    "wrEn": "NULL SPHERE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Клинок пустоты",
+    "en": "Nether Blade",
+    "wrEn": "NETHER BLADE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Выброс силы",
+    "en": "Force Pulse",
+    "wrEn": "FORCE PULSE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Шаг в Бездну",
+    "en": "Riftwalk",
+    "wrEn": "RIFTWALK",
+    "match": "exact"
+   }
+  },
+  "Katarina": {
+   "passive": {
+    "ru": "Ненасытность",
+    "en": "Voracity",
+    "wrEn": "VORACITY",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Танцующий клинок",
+    "en": "Bouncing Blade",
+    "wrEn": "BOUNCING BLADE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Подготовка",
+    "en": "Preparation",
+    "wrEn": "PREPARATION",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Шунпо",
+    "en": "Shunpo",
+    "wrEn": "SHUNPO",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Цветок смерти",
+    "en": "Death Lotus",
+    "wrEn": "DEATH LOTUS",
+    "match": "exact"
+   }
+  },
+  "Kayle": {
+   "passive": {
+    "ru": "Божественное восхождение",
+    "en": "Divine Ascent",
+    "wrEn": "DIVINE ASCENT",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Лучезарный взрыв",
+    "en": "Radiant Blast",
+    "wrEn": "RADIANT BLAST",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Благословение небес",
+    "en": "Celestial Blessing",
+    "wrEn": "CELESTIAL BLESSING",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Клинок звездного огня",
+    "en": "Starfire Spellblade",
+    "wrEn": "STARFIRE SPELLBLADE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Божественный приговор",
+    "en": "Divine Judgment",
+    "wrEn": "DIVINE JUDGMENT",
+    "match": "exact"
+   }
+  },
+  "Kayn": {
+   "passive": {
+    "ru": "Коса даркинов",
+    "en": "The Darkin Scythe",
+    "wrEn": "THE DARKIN SCYTHE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Смертельный росчерк",
+    "en": "Reaping Slash",
+    "wrEn": "REAPING SLASH",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Широкий размах",
+    "en": "Blade's Reach",
+    "wrEn": "BLADE'S REACH",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Шаг в сумерки",
+    "en": "Shadow Step",
+    "wrEn": "SHADOW STEP",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Теневая интервенция",
+    "en": "Umbral Trespass",
+    "wrEn": "UMBRAL TRESPASS",
+    "match": "exact"
+   }
+  },
+  "Kennen": {
+   "passive": {
+    "ru": "Знак бури",
+    "en": "Mark of the Storm",
+    "wrEn": "MARK OF THE STORM",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Грохочущий сюрикен",
+    "en": "Thundering Shuriken",
+    "wrEn": "THUNDERING SHURIKEN",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Скачок напряжения",
+    "en": "Electrical Surge",
+    "wrEn": "ELECTRICAL SURGE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Молниеносный рывок",
+    "en": "Lightning Rush",
+    "wrEn": "LIGHTNING RUSH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Убийственный шторм",
+    "en": "Slicing Maelstrom",
+    "wrEn": "SLICING MAELSTROM",
+    "match": "exact"
+   }
+  },
+  "Khazix": {
+   "passive": {
+    "ru": "Невидимая угроза",
+    "en": "Unseen Threat",
+    "wrEn": "UNSEEN THREAT",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Вкус страха",
+    "en": "Taste Their Fear",
+    "wrEn": "TASTE THEIR FEAR",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Шипы Бездны",
+    "en": "Void Spike",
+    "wrEn": "VOID SPIKE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Прыжок",
+    "en": "Leap",
+    "wrEn": "LEAP",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Атака из Бездны",
+    "en": "Void Assault",
+    "wrEn": "VOID ASSAULT",
+    "match": "exact"
+   }
+  },
+  "Kindred": {
+   "passive": {
+    "ru": "Знак Киндред",
+    "en": "Mark of the Kindred",
+    "wrEn": "MARK OF THE KINDRED",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Танец стрел",
+    "en": "Dance of Arrows",
+    "wrEn": "DANCE OF ARROWS",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Волчье бешенство",
+    "en": "Wolf's Frenzy",
+    "wrEn": "WOLF'S FRENZY",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Всепоглощающий ужас",
+    "en": "Mounting Dread",
+    "wrEn": "MOUNTING DREAD",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Милость Овечки",
+    "en": "Lamb's Respite",
+    "wrEn": "LAMB'S RESPITE",
+    "match": "exact"
+   }
+  },
+  "Kogmaw": {
+   "passive": {
+    "ru": "Привет из Икатии",
+    "en": "Icathian Surprise",
+    "wrEn": "ICATHIAN SURPRISE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Едкий плевок",
+    "en": "Caustic Spittle",
+    "wrEn": "CAUSTIC SPITTLE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Биомагический обстрел",
+    "en": "Bio-Arcane Barrage",
+    "wrEn": "BIO-ARCANE BARRAGE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Слизь Бездны",
+    "en": "Void Ooze",
+    "wrEn": "VOID OOZE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Живая артиллерия",
+    "en": "Living Artillery",
+    "wrEn": "LIVING ARTILLERY",
+    "match": "exact"
+   }
+  },
+  "Ksante": {
+   "passive": {
+    "ru": "Бесстрашие",
+    "en": "Dauntless Instinct",
+    "wrEn": "DAUNTLESS INSTINCT",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Удары нтофо",
+    "en": "Ntofo Strikes",
+    "wrEn": "NTOFO STRIKES",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Напролом",
+    "en": "Path Maker",
+    "wrEn": "PATH MAKER",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Удаль",
+    "en": "Footwork",
+    "wrEn": "FOOTWORK",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Высвобождение",
+    "en": "All Out",
+    "wrEn": "ALL OUT",
+    "match": "exact"
+   }
+  },
+  "LeeSin": {
+   "passive": {
+    "ru": "Шквал",
+    "en": "Flurry",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Звуковая волна / Резонирующий удар",
+    "en": "Sonic Wave / Resonating Strike",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Защитник / Железная воля",
+    "en": "Safeguard / Iron Will",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Натиск / Увечье",
+    "en": "Tempest / Cripple",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Ярость дракона",
+    "en": "Dragon's Rage",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Leona": {
+   "passive": {
+    "ru": "Сияние солнца",
+    "en": "Sunlight",
+    "wrEn": "SUNLIGHT",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Щит рассвета",
+    "en": "Shield of Daybreak",
+    "wrEn": "SHIELD OF DAYBREAK",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Затмение",
+    "en": "Eclipse",
+    "wrEn": "ECLIPSE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Клинок зенита",
+    "en": "Zenith Blade",
+    "wrEn": "ZENITH BLADE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Солнечная вспышка",
+    "en": "Solar Flare",
+    "wrEn": "SOLAR FLARE",
+    "match": "exact"
+   }
+  },
+  "Lillia": {
+   "passive": {
+    "ru": "Посох снов",
+    "en": "Dream-Laden Bough",
+    "wrEn": "DREAM-LADEN BOUGH",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Удар природы",
+    "en": "Blooming Blows",
+    "wrEn": "BLOOMING BLOWS",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Ой, осторожно!",
+    "en": "Watch Out! Eep!",
+    "wrEn": "WATCH OUT! EEP!",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Вихревое семя",
+    "en": "Swirlseed",
+    "wrEn": "SWIRLSEED",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Чарующая колыбельная",
+    "en": "Lilting Lullaby",
+    "wrEn": "LILTING LULLABY",
+    "match": "exact"
+   }
+  },
+  "Lissandra": {
+   "passive": {
+    "ru": "Порабощение Хладорожденной",
+    "en": "Iceborn Subjugation",
+    "wrEn": "ICEBORN SUBJUGATION",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Ледяной осколок",
+    "en": "Ice Shard",
+    "wrEn": "ICE SHARD",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Кольцо мороза",
+    "en": "Ring of Frost",
+    "wrEn": "RING OF FROST",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Ледяная тропа",
+    "en": "Glacial Path",
+    "wrEn": "GLACIAL PATH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Ледяная гробница",
+    "en": "Frozen Tomb",
+    "wrEn": "FROZEN TOMB",
+    "match": "exact"
+   }
+  },
+  "Lucian": {
+   "passive": {
+    "ru": "Стрелок света",
+    "en": "Lightslinger",
+    "wrEn": "LIGHTSLINGER",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Пронзающий свет",
+    "en": "Piercing Light",
+    "wrEn": "PIERCING LIGHT",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Обжигающее пламя",
+    "en": "Ardent Blaze",
+    "wrEn": "ARDENT BLAZE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Нескончаемая погоня",
+    "en": "Relentless Pursuit",
+    "wrEn": "RELENTLESS PURSUIT",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Отстрел",
+    "en": "The Culling",
+    "wrEn": "THE CULLING",
+    "match": "exact"
+   }
+  },
+  "Lulu": {
+   "passive": {
+    "ru": "Пикс, волшебный спутник",
+    "en": "Pix, Faerie Companion",
+    "wrEn": "PIX, FAERIE COMPANION",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сияющая стрела",
+    "en": "Glitterlance",
+    "wrEn": "GLITTERLANCE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Причуда",
+    "en": "Whimsy",
+    "wrEn": "WHIMSY",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Помоги, Пикс!",
+    "en": "Help, Pix!",
+    "wrEn": "HELP, PIX!",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Буйный рост",
+    "en": "Wild Growth",
+    "wrEn": "WILD GROWTH",
+    "match": "exact"
+   }
+  },
+  "Lux": {
+   "passive": {
+    "ru": "Иллюминация",
+    "en": "Illumination",
+    "wrEn": "Illumination",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сковывание света",
+    "en": "Light Binding",
+    "wrEn": "Light Binding",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Призматический барьер",
+    "en": "Prismatic Barrier",
+    "wrEn": "Prismatic Barrier",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Светящаяся сингулярность",
+    "en": "Lucent Singularity",
+    "wrEn": "Lucent Singularity",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Последняя искра",
+    "en": "Final Spark",
+    "wrEn": "Final Spark",
+    "match": "exact"
+   }
+  },
+  "MissFortune": {
+   "passive": {
+    "ru": "Приветственный выстрел",
+    "en": "Love Tap",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Два по цене одного",
+    "en": "Double Up",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Походочка",
+    "en": "Strut",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Свинцовый дождь",
+    "en": "Make It Rain",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Время умирать",
+    "en": "Bullet Time",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Malphite": {
+   "passive": {
+    "ru": "Гранитный щит",
+    "en": "Granite Shield",
+    "wrEn": "Granite Shield",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сейсмический осколок",
+    "en": "Seismic Shard",
+    "wrEn": "Seismic Shard",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Удар грома",
+    "en": "Thunderclap",
+    "wrEn": "Thunderclap",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Удар по земле",
+    "en": "Ground Slam",
+    "wrEn": "Ground Slam",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Безудержная сила",
+    "en": "Unstoppable Force",
+    "wrEn": "Unstoppable Force",
+    "match": "exact"
+   }
+  },
+  "Maokai": {
+   "passive": {
+    "ru": "Вытягивание магии",
+    "en": "Sap Magic",
+    "wrEn": "SAP MAGIC",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Терновый удар",
+    "en": "Bramble Smash",
+    "wrEn": "BRAMBLE SMASH",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Неестественное наступление",
+    "en": "Twisted Advance",
+    "wrEn": "TWISTED ADVANCE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Бросок саженца",
+    "en": "Sapling Toss",
+    "wrEn": "SAPLING TOSS",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Объятья природы",
+    "en": "Nature's Grasp",
+    "wrEn": "NATURE'S GRASP",
+    "match": "exact"
+   }
+  },
+  "MasterYi": {
+   "passive": {
+    "ru": "Двойной удар",
+    "en": "Double Strike",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Первый удар",
+    "en": "Alpha Strike",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Медитация",
+    "en": "Meditate",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Стиль вуджу",
+    "en": "Wuju Style",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Горец",
+    "en": "Highlander",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Mel": {
+   "passive": {
+    "ru": "Обжигающий свет",
+    "en": "Searing Brilliance",
+    "wrEn": "SEARING BRILLIANCE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Лучезарный залп",
+    "en": "Radiant Volley",
+    "wrEn": "RADIANT VOLLEY",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Зеркальный щит",
+    "en": "Rebuttal",
+    "wrEn": "REBUTTAL",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Солнечная ловушка",
+    "en": "Solar Snare",
+    "wrEn": "SOLAR SNARE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Золотое затмение",
+    "en": "Golden Eclipse",
+    "wrEn": "GOLDEN ECLIPSE",
+    "match": "exact"
+   }
+  },
+  "Milio": {
+   "passive": {
+    "ru": "Запал",
+    "en": "Fired Up!",
+    "wrEn": "FIRED UP!",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Огненный мяч",
+    "en": "Ultra Mega Fire Kick",
+    "wrEn": "ULTRA MEGA FIRE KICK",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Посиделки у костра",
+    "en": "Cozy Campfire",
+    "wrEn": "COZY CAMPFIRE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Теплые объятия",
+    "en": "Warm Hugs",
+    "wrEn": "WARM HUGS",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Дыхание жизни",
+    "en": "Breath of Life",
+    "wrEn": "BREATH OF LIFE",
+    "match": "exact"
+   }
+  },
+  "Mordekaiser": {
+   "passive": {
+    "ru": "Восхождение тьмы",
+    "en": "Darkness Rise",
+    "wrEn": "DARKNESS RISE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Уничтожение",
+    "en": "Obliterate",
+    "wrEn": "OBLITERATE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Несокрушимый",
+    "en": "Indestructible",
+    "wrEn": "INDESTRUCTIBLE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Смертельная хватка",
+    "en": "Death's Grasp",
+    "wrEn": "DEATH'S GRASP",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Царство смерти",
+    "en": "Realm of Death",
+    "wrEn": "REALM OF DEATH",
+    "match": "exact"
+   }
+  },
+  "Morgana": {
+   "passive": {
+    "ru": "Вытягивание души",
+    "en": "Soul Siphon",
+    "wrEn": "SOUL SIPHON",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Темные узы",
+    "en": "Dark Binding",
+    "wrEn": "DARK BINDING",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Измученная тень",
+    "en": "Tormented Shadow",
+    "wrEn": "TORMENTED SHADOW",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Черный щит",
+    "en": "Black Shield",
+    "wrEn": "BLACK SHIELD",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Оковы души",
+    "en": "Soul Shackles",
+    "wrEn": "SOUL SHACKLES",
+    "match": "exact"
+   }
+  },
+  "DrMundo": {
+   "passive": {
+    "ru": "Ходить куда хотеть",
+    "en": "Goes Where He Pleases",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Зараженная пила",
+    "en": "Infected Bonesaw",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Шоковая терапия",
+    "en": "Heart Zapper",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Тупая травма",
+    "en": "Blunt Force Trauma",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Максимальная доза",
+    "en": "Maximum Dosage",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Nami": {
+   "passive": {
+    "ru": "Бурные волны",
+    "en": "Surging Tides",
+    "wrEn": "Surging Tides",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Водяная тюрьма",
+    "en": "Aqua Prison",
+    "wrEn": "Aqua Prison",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Прилив и отлив",
+    "en": "Ebb and Flow",
+    "wrEn": "Ebb and Flow",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Благословение Повелительницы морей",
+    "en": "Tidecaller's Blessing",
+    "wrEn": "Tidecaller's Blessing",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Приливная волна",
+    "en": "Tidal Wave",
+    "wrEn": "Tidal Wave",
+    "match": "exact"
+   }
+  },
+  "Nasus": {
+   "passive": {
+    "ru": "Пожиратель душ",
+    "en": "Soul Eater",
+    "wrEn": "Soul Eater",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Вытягивающий удар",
+    "en": "Siphoning Strike",
+    "wrEn": "Siphoning Strike",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Иссушение",
+    "en": "Wither",
+    "wrEn": "Wither",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Призрачный огонь",
+    "en": "Spirit Fire",
+    "wrEn": "Spirit Fire",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Ярость песков",
+    "en": "Fury of the Sands",
+    "wrEn": "Fury of the Sands",
+    "match": "exact"
+   }
+  },
+  "Nautilus": {
+   "passive": {
+    "ru": "Ошеломляющий удар",
+    "en": "Staggering Blow",
+    "wrEn": "STAGGERING BLOW",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Якорная цепь",
+    "en": "Dredge Line",
+    "wrEn": "DREDGE LINE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Гнев титана",
+    "en": "Titan's Wrath",
+    "wrEn": "TITAN'S WRATH",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Сейсмическая волна",
+    "en": "Riptide",
+    "wrEn": "RIPTIDE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Глубинный заряд",
+    "en": "Depth Charge",
+    "wrEn": "DEPTH CHARGE",
+    "match": "exact"
+   }
+  },
+  "Nidalee": {
+   "passive": {
+    "ru": "Крадущийся зверь",
+    "en": "Prowl",
+    "wrEn": "PROWL",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Бросок копья / Добивание",
+    "en": "Javelin Toss / Takedown",
+    "wrEn": "JAVELIN TOSS / TAKEDOWN",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Ловушка / Прыжок",
+    "en": "Bushwhack / Pounce",
+    "wrEn": "BUSHWHACK / POUNCE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Зов предков / Размах",
+    "en": "Primal Surge / Swipe",
+    "wrEn": "PRIMAL SURGE / SWIPE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Форма пумы",
+    "en": "Aspect Of The Cougar",
+    "wrEn": "ASPECT OF THE COUGAR",
+    "match": "exact"
+   }
+  },
+  "Nilah": {
+   "passive": {
+    "ru": "Бесконечный восторг",
+    "en": "Joy Unending",
+    "wrEn": "JOY UNENDING",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Хлесткий клинок",
+    "en": "Formless Blade",
+    "wrEn": "FORMLESS BLADE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Покров радости",
+    "en": "Jubilant Veil",
+    "wrEn": "JUBILANT VEIL",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Нырок",
+    "en": "Slipstream",
+    "wrEn": "SLIPSTREAM",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Апофеоз",
+    "en": "Apotheosis",
+    "wrEn": "APOTHEOSIS",
+    "match": "exact"
+   }
+  },
+  "Nocturne": {
+   "passive": {
+    "ru": "Клинки чернейшей тени",
+    "en": "Umbra Blades",
+    "wrEn": "UMBRA BLADES",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Вестник заката",
+    "en": "Duskbringer",
+    "wrEn": "DUSKBRINGER",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Покров тьмы",
+    "en": "Shroud of Darkness",
+    "wrEn": "SHROUD OF DARKNESS",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Невыразимый ужас",
+    "en": "Unspeakable Horror",
+    "wrEn": "UNSPEAKABLE HORROR",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Паранойя",
+    "en": "Paranoia",
+    "wrEn": "PARANOIA",
+    "match": "exact"
+   }
+  },
+  "Nunu": {
+   "passive": {
+    "ru": "Зов Фрельйорда",
+    "en": "Call of the Freljord",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Поглощение",
+    "en": "Consume",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Огромный снежный ком",
+    "en": "Biggest Snowball Ever!",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Снежковый обстрел",
+    "en": "Snowball Barrage",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Абсолютный ноль",
+    "en": "Absolute Zero",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Olaf": {
+   "passive": {
+    "ru": "Ярость берсерка",
+    "en": "Berserker Rage",
+    "wrEn": "Berserker Rage",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Мощный бросок",
+    "en": "Undertow",
+    "wrEn": "Undertow",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Превозмогание",
+    "en": "Tough It Out",
+    "wrEn": "Vicious Strikes",
+    "match": "approx"
+   },
+   "e": {
+    "ru": "Безрассудный замах",
+    "en": "Reckless Swing",
+    "wrEn": "Reckless Swing",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Рагнарек",
+    "en": "Ragnarok",
+    "wrEn": "Ragnarok",
+    "match": "exact"
+   }
+  },
+  "Orianna": {
+   "passive": {
+    "ru": "Пружинный механизм",
+    "en": "Clockwork Windup",
+    "wrEn": "Clockwork Windup",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Приказ: Атака",
+    "en": "Command: Attack",
+    "wrEn": "Command: Attack",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Приказ: Диссонанс",
+    "en": "Command: Dissonance",
+    "wrEn": "Command: Dissonance",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Приказ: Защита",
+    "en": "Command: Protect",
+    "wrEn": "Command: Protect",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Приказ: Ударная волна",
+    "en": "Command: Shockwave",
+    "wrEn": "Command: Shockwave",
+    "match": "exact"
+   }
+  },
+  "Ornn": {
+   "passive": {
+    "ru": "Живая кузница",
+    "en": "Living Forge",
+    "wrEn": "LIVING FORGE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Вулканический разлом",
+    "en": "Volcanic Rupture",
+    "wrEn": "VOLCANIC RUPTURE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Дыхание вулкана",
+    "en": "Bellows Breath",
+    "wrEn": "BELLOWS BREATH",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Обжигающий рывок",
+    "en": "Searing Charge",
+    "wrEn": "SEARING CHARGE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Зов бога-кузнеца",
+    "en": "Call of the Forge God",
+    "wrEn": "CALL OF THE FORGE GOD",
+    "match": "exact"
+   }
+  },
+  "Pantheon": {
+   "passive": {
+    "ru": "Воля смертного",
+    "en": "Mortal Will",
+    "wrEn": "MORTAL WILL",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Копье воина",
+    "en": "Comet Spear",
+    "wrEn": "COMET SPEAR",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Щит воина",
+    "en": "Shield Vault",
+    "wrEn": "SHIELD VAULT",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Агрессивная защита",
+    "en": "Aegis Assault",
+    "wrEn": "AEGIS ASSAULT",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Великий звездопад",
+    "en": "Grand Starfall",
+    "wrEn": "GRAND STARFALL",
+    "match": "exact"
+   }
+  },
+  "Poppy": {
+   "passive": {
+    "ru": "Железный посол",
+    "en": "Iron Ambassador",
+    "wrEn": "IRON AMBASSADOR",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сотрясающий удар",
+    "en": "Hammer Shock",
+    "wrEn": "HAMMER SHOCK",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Неколебимая мощь",
+    "en": "Steadfast Presence",
+    "wrEn": "STEADFAST PRESENCE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Героический рывок",
+    "en": "Heroic Charge",
+    "wrEn": "HEROIC CHARGE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Вердикт Хранительницы",
+    "en": "Keeper's Verdict",
+    "wrEn": "KEEPER'S VERDICT",
+    "match": "exact"
+   }
+  },
+  "Pyke": {
+   "passive": {
+    "ru": "Дар утопленников",
+    "en": "Gift of the Drowned Ones",
+    "wrEn": "GIFT OF THE DROWNED ONES",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Костяной гарпун",
+    "en": "Bone Skewer",
+    "wrEn": "BONE SKEWER",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Кошмарное погружение",
+    "en": "Ghostwater Dive",
+    "wrEn": "GHOSTWATER DIVE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Призрачный прилив",
+    "en": "Phantom Undertow",
+    "wrEn": "PHANTOM UNDERTOW",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Смерть из глубин",
+    "en": "Death From Below",
+    "wrEn": "DEATH FROM BELOW",
+    "match": "exact"
+   }
+  },
+  "Rakan": {
+   "passive": {
+    "ru": "Шальные перья",
+    "en": "Fey Feathers",
+    "wrEn": "FEY FEATHERS",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Блестящее перо",
+    "en": "Gleaming Quill",
+    "wrEn": "GLEAMING QUILL",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Великолепное появление",
+    "en": "Grand Entrance",
+    "wrEn": "GRAND ENTRANCE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Боевой танец",
+    "en": "Battle Dance",
+    "wrEn": "BATTLE DANCE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Стремительность",
+    "en": "The Quickness",
+    "wrEn": "THE QUICKNESS",
+    "match": "exact"
+   }
+  },
+  "Rammus": {
+   "passive": {
+    "ru": "Шипастый панцирь",
+    "en": "Spiked Shell",
+    "wrEn": "ROLLING ARMORDILLO",
+    "match": "approx"
+   },
+   "q": {
+    "ru": "Катящийся шар",
+    "en": "Powerball",
+    "wrEn": "POWERBALL",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Защитная поза",
+    "en": "Defensive Ball Curl",
+    "wrEn": "DEFENSIVE BALL CURL",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Неистовая колкость",
+    "en": "Frenzying Taunt",
+    "wrEn": "FRENZYING TAUNT",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Мощное приземление",
+    "en": "Soaring Slam",
+    "wrEn": "SOARING SLAM",
+    "match": "exact"
+   }
+  },
+  "Rell": {
+   "passive": {
+    "ru": "Безжалостный напор",
+    "en": "Break the Mold",
+    "wrEn": "BREAK THE MOLD",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Пробивающий удар",
+    "en": "Shattering Strike",
+    "wrEn": "SHATTERING STRIKE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Ферромантия: жесткая посадка",
+    "en": "Ferromancy: Crash Down",
+    "wrEn": "FERROMANCY: CRASHDOWN",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Полный ход",
+    "en": "Full Tilt",
+    "wrEn": "FULL TILT",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Магнитная буря",
+    "en": "Magnet Storm",
+    "wrEn": "MAGNET STORM",
+    "match": "exact"
+   }
+  },
+  "Renekton": {
+   "passive": {
+    "ru": "Всепоглощающий гнев",
+    "en": "Reign of Anger",
+    "wrEn": "REIGN OF ANGER",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Смерть слабым",
+    "en": "Cull the Meek",
+    "wrEn": "CULL THE MEEK",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Беспощадный хищник",
+    "en": "Ruthless Predator",
+    "wrEn": "RUTHLESS PREDATOR",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Режь и руби",
+    "en": "Slice and Dice",
+    "wrEn": "SLICE AND DICE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Тиран",
+    "en": "Dominus",
+    "wrEn": "DOMINUS",
+    "match": "exact"
+   }
+  },
+  "Rengar": {
+   "passive": {
+    "ru": "Невидимый хищник",
+    "en": "Unseen Predator",
+    "wrEn": "UNSEEN PREDATOR",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Дикость",
+    "en": "Savagery",
+    "wrEn": "SAVAGERY",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Боевой рык",
+    "en": "Battle Roar",
+    "wrEn": "BATTLE ROAR",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Бросок боласа",
+    "en": "Bola Strike",
+    "wrEn": "BOLA STRIKE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Охотничий азарт",
+    "en": "Thrill of the Hunt",
+    "wrEn": "THRILL OF THE HUNT",
+    "match": "exact"
+   }
+  },
+  "Riven": {
+   "passive": {
+    "ru": "Рунический клинок",
+    "en": "Runic Blade",
+    "wrEn": "RUNIC BLADE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сломанные крылья",
+    "en": "Broken Wings",
+    "wrEn": "BROKEN WINGS",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Всплеск Ци",
+    "en": "Ki Burst",
+    "wrEn": "KI BURST",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Доблесть",
+    "en": "Valor",
+    "wrEn": "VALOR",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Клинок Изгнанницы",
+    "en": "Blade of the Exile",
+    "wrEn": "BLADE OF THE EXILE",
+    "match": "exact"
+   }
+  },
+  "Rumble": {
+   "passive": {
+    "ru": "Титан со свалки",
+    "en": "Junkyard Titan",
+    "wrEn": "JUNKYARD TITAN",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Огнемет",
+    "en": "Flamespitter",
+    "wrEn": "FLAMESPITTER",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Кустарный щит",
+    "en": "Scrap Shield",
+    "wrEn": "SCRAP SHIELD",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Электрогарпун",
+    "en": "Electro Harpoon",
+    "wrEn": "ELECTRO HARPOON",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Уравнитель",
+    "en": "The Equalizer",
+    "wrEn": "THE EQUALIZER",
+    "match": "exact"
+   }
+  },
+  "Ryze": {
+   "passive": {
+    "ru": "Тайное знание",
+    "en": "Arcane Mastery",
+    "wrEn": "ARCANE MASTERY",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Перегрузка",
+    "en": "Overload",
+    "wrEn": "OVERLOAD",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Руническая тюрьма",
+    "en": "Rune Prison",
+    "wrEn": "RUNE PRISON",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Волшебный поток",
+    "en": "Spell Flux",
+    "wrEn": "SPELL FLUX",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Искривление пространства",
+    "en": "Realm Warp",
+    "wrEn": "REALM WARP",
+    "match": "exact"
+   }
+  },
+  "Samira": {
+   "passive": {
+    "ru": "Безрассудный порыв",
+    "en": "Daredevil Impulse",
+    "wrEn": "DAREDEVIL IMPULSE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Эпатаж",
+    "en": "Flair",
+    "wrEn": "FLAIR",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Взмах клинка",
+    "en": "Blade Whirl",
+    "wrEn": "BLADE WHIRL",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Неистовый рывок",
+    "en": "Wild Rush",
+    "wrEn": "WILD RUSH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Адское пекло",
+    "en": "Inferno Trigger",
+    "wrEn": "INFERNO TRIGGER",
+    "match": "exact"
+   }
+  },
+  "Senna": {
+   "passive": {
+    "ru": "Освобождение",
+    "en": "Absolution",
+    "wrEn": "ABSOLUTION",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Пронзающая тьма",
+    "en": "Piercing Darkness",
+    "wrEn": "PIERCING DARKNESS",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Прощальные объятия",
+    "en": "Last Embrace",
+    "wrEn": "LAST EMBRACE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Проклятие черного тумана",
+    "en": "Curse of the Black Mist",
+    "wrEn": "CURSE OF THE BLACK MIST",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Тенесвет",
+    "en": "Dawning Shadow",
+    "wrEn": "DAWNING SHADOW",
+    "match": "exact"
+   }
+  },
+  "Seraphine": {
+   "passive": {
+    "ru": "Сценическое обаяние",
+    "en": "Stage Presence",
+    "wrEn": "STAGE PRESENCE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Высокая нота",
+    "en": "High Note",
+    "wrEn": "HIGH NOTE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Объемный звук",
+    "en": "Surround Sound",
+    "wrEn": "SURROUND SOUND",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Ударный ритм",
+    "en": "Beat Drop",
+    "wrEn": "BEAT DROP",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Исполнение на бис",
+    "en": "Encore",
+    "wrEn": "ENCORE",
+    "match": "exact"
+   }
+  },
+  "Sett": {
+   "passive": {
+    "ru": "Бойцовская выдержка",
+    "en": "Pit Grit",
+    "wrEn": "PIT GRIT",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сила кулака",
+    "en": "Knuckle Down",
+    "wrEn": "KNUCKLE DOWN",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Головоломка",
+    "en": "Haymaker",
+    "wrEn": "HAYMAKER",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Мордобой",
+    "en": "Facebreaker",
+    "wrEn": "FACEBREAKER",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Коронный прием",
+    "en": "The Show Stopper",
+    "wrEn": "THE SHOW STOPPER",
+    "match": "exact"
+   }
+  },
+  "Shen": {
+   "passive": {
+    "ru": "Барьер Ци",
+    "en": "Ki Barrier",
+    "wrEn": "KI BARRIER",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сумеречная атака",
+    "en": "Twilight Assault",
+    "wrEn": "TWILIGHT ASSAULT",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Пристанище духа",
+    "en": "Spirit's Refuge",
+    "wrEn": "SPIRIT'S REFUGE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Теневой рывок",
+    "en": "Shadow Dash",
+    "wrEn": "SHADOW DASH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Плечом к плечу",
+    "en": "Stand United",
+    "wrEn": "STAND UNITED",
+    "match": "exact"
+   }
+  },
+  "Shyvana": {
+   "passive": {
+    "ru": "Крепкая чешуя",
+    "en": "Scalemail",
+    "wrEn": "Fury of the Dragonborn",
+    "match": "approx"
+   },
+   "q": {
+    "ru": "Пламенный удар",
+    "en": "Emberstrike",
+    "wrEn": "Twin Bite",
+    "match": "approx"
+   },
+   "w": {
+    "ru": "Эгида огня",
+    "en": "Inferno Aegis",
+    "wrEn": "Burnout",
+    "match": "approx"
+   },
+   "e": {
+    "ru": "Жидкий огонь",
+    "en": "Molten Burst",
+    "wrEn": "Flame Breath",
+    "match": "approx"
+   },
+   "r": {
+    "ru": "Приземление дракона",
+    "en": "Dragon's Descent",
+    "wrEn": "Dragon's Descent",
+    "match": "exact"
+   }
+  },
+  "Singed": {
+   "passive": {
+    "ru": "Ядовитый слипстрим",
+    "en": "Noxious Slipstream",
+    "wrEn": "Noxious Slipstream",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Ядовитый след",
+    "en": "Poison Trail",
+    "wrEn": "Poison Trail",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Мегаклей",
+    "en": "Mega Adhesive",
+    "wrEn": "Mega Adhesive",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Бросок",
+    "en": "Fling",
+    "wrEn": "Fling",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Зелье безумия",
+    "en": "Insanity Potion",
+    "wrEn": "Insanity Potion",
+    "match": "exact"
+   }
+  },
+  "Sion": {
+   "passive": {
+    "ru": "Посмертный триумф",
+    "en": "Glory in Death",
+    "wrEn": "GLORY IN DEATH",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Опустошающий удар",
+    "en": "Decimating Smash",
+    "wrEn": "DECIMATING SMASH",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Горнило душ",
+    "en": "Soul Furnace",
+    "wrEn": "SOUL FURNACE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Рев мясника",
+    "en": "Roar of the Slayer",
+    "wrEn": "ROAR OF THE SLAYER",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Неудержимое наступление",
+    "en": "Unstoppable Onslaught",
+    "wrEn": "UNSTOPPABLE ONSLAUGHT",
+    "match": "exact"
+   }
+  },
+  "Sivir": {
+   "passive": {
+    "ru": "Быстроногая",
+    "en": "Fleet of Foot",
+    "wrEn": "FLEET OF FOOT",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Клинок-бумеранг",
+    "en": "Boomerang Blade",
+    "wrEn": "BOOMERANG BLADE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Рикошет",
+    "en": "Ricochet",
+    "wrEn": "RICOCHET",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Щит от магии",
+    "en": "Spell Shield",
+    "wrEn": "SPELL SHIELD",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "На охоту",
+    "en": "On The Hunt",
+    "wrEn": "ON THE HUNT",
+    "match": "exact"
+   }
+  },
+  "Smolder": {
+   "passive": {
+    "ru": "Драконья тренировка",
+    "en": "Dragon Practice",
+    "wrEn": "DRAGON PRACTICE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Супержаркое дыхание",
+    "en": "Super Scorcher Breath",
+    "wrEn": "SUPER SCORCHER BREATH",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Апчхи!",
+    "en": "Achooo!",
+    "wrEn": "ACHOOO!",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Хлоп-хлоп-хлоп",
+    "en": "Flap, Flap, Flap",
+    "wrEn": "FLAP, FLAP, FLAP",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "МА-А-АМ!",
+    "en": "MMOOOMMMM!",
+    "wrEn": "MMOOOMMMM!",
+    "match": "exact"
+   }
+  },
+  "Sona": {
+   "passive": {
+    "ru": "Мощный аккорд",
+    "en": "Power Chord",
+    "wrEn": "Power Chord",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Гимн доблести",
+    "en": "Hymn of Valor",
+    "wrEn": "Hymn of Valor",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Ария стойкости",
+    "en": "Aria of Perseverance",
+    "wrEn": "Aria of Perseverance",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Песнь стремительности",
+    "en": "Song of Celerity",
+    "wrEn": "Song of Celerity",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Крещендо",
+    "en": "Crescendo",
+    "wrEn": "Crescendo",
+    "match": "exact"
+   }
+  },
+  "Soraka": {
+   "passive": {
+    "ru": "Спасение",
+    "en": "Salvation",
+    "wrEn": "Salvation",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Звездопад",
+    "en": "Starcall",
+    "wrEn": "Starcall",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Звездная пыль",
+    "en": "Astral Infusion",
+    "wrEn": "Astral Infusion",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Равноденствие",
+    "en": "Equinox",
+    "wrEn": "Equinox",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Желание",
+    "en": "Wish",
+    "wrEn": "Wish",
+    "match": "exact"
+   }
+  },
+  "Swain": {
+   "passive": {
+    "ru": "Ненасытная стая",
+    "en": "Ravenous Flock",
+    "wrEn": "Ravenous Flock",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Рука смерти",
+    "en": "Death's Hand",
+    "wrEn": "Death's Hand",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Око империи",
+    "en": "Vision of Empire",
+    "wrEn": "Vision of Empire",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Недвижность",
+    "en": "Nevermove",
+    "wrEn": "Nevermove",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Демоническое возвышение",
+    "en": "Demonic Ascension",
+    "wrEn": "Demonic Ascension",
+    "match": "exact"
+   }
+  },
+  "Syndra": {
+   "passive": {
+    "ru": "Трансцендентальность",
+    "en": "Transcendent",
+    "wrEn": "TRANSCENDENT",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Темная сфера",
+    "en": "Dark Sphere",
+    "wrEn": "DARK SPHERE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Сила воли",
+    "en": "Force of Will",
+    "wrEn": "FORCE OF WILL",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Изгнание слабых",
+    "en": "Scatter the Weak",
+    "wrEn": "SCATTER THE WEAK",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Высвобожденная сила",
+    "en": "Unleashed Power",
+    "wrEn": "UNLEASHED POWER",
+    "match": "exact"
+   }
+  },
+  "Taliyah": {
+   "passive": {
+    "ru": "Катание на камнях",
+    "en": "Rock Surfing",
+    "wrEn": "ROCK SURFING",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Плетеный залп",
+    "en": "Threaded Volley",
+    "wrEn": "THREADED VOLLEY",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Подземный толчок",
+    "en": "Seismic Shove",
+    "wrEn": "SEISMIC SHOVE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Вздыбленная земля",
+    "en": "Unraveled Earth",
+    "wrEn": "UNRAVELED EARTH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Стена Пряхи",
+    "en": "Weaver's Wall",
+    "wrEn": "WEAVER'S WALL",
+    "match": "exact"
+   }
+  },
+  "Talon": {
+   "passive": {
+    "ru": "Острие клинка",
+    "en": "Blade's End",
+    "wrEn": "BLADE'S END",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Ноксианская дипломатия",
+    "en": "Noxian Diplomacy",
+    "wrEn": "NOXIAN DIPLOMACY",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Раздирание",
+    "en": "Rake",
+    "wrEn": "RAKE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Путь убийцы",
+    "en": "Assassin's Path",
+    "wrEn": "ASSASSIN'S PATH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Атака из тени",
+    "en": "Shadow Assault",
+    "wrEn": "SHADOW ASSAULT",
+    "match": "exact"
+   }
+  },
+  "Teemo": {
+   "passive": {
+    "ru": "Партизанская война",
+    "en": "Guerrilla Warfare",
+    "wrEn": "TOXIC SHOT",
+    "match": "approx"
+   },
+   "q": {
+    "ru": "Слепящий дротик",
+    "en": "Blinding Dart",
+    "wrEn": "BLINDING DART",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Быстрый бег",
+    "en": "Move Quick",
+    "wrEn": "MOVE QUICK",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Отравленный выстрел",
+    "en": "Toxic Shot",
+    "wrEn": "GUERILLA WARFARE",
+    "match": "approx"
+   },
+   "r": {
+    "ru": "Ядовитая ловушка",
+    "en": "Noxious Trap",
+    "wrEn": "NOXIOUS TRAP",
+    "match": "exact"
+   }
+  },
+  "Thresh": {
+   "passive": {
+    "ru": "Проклятие",
+    "en": "Damnation",
+    "wrEn": "DAMNATION",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Смертный приговор",
+    "en": "Death Sentence",
+    "wrEn": "DEATH SENTENCE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Темный путь",
+    "en": "Dark Passage",
+    "wrEn": "DARK PASSAGE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Замах",
+    "en": "Flay",
+    "wrEn": "FLAY",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Короб",
+    "en": "The Box",
+    "wrEn": "THE BOX",
+    "match": "exact"
+   }
+  },
+  "Tristana": {
+   "passive": {
+    "ru": "Прицеливание",
+    "en": "Draw a Bead",
+    "wrEn": "DRAW A BEAD",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Беглый огонь",
+    "en": "Rapid Fire",
+    "wrEn": "RAPID FIRE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Ракетный прыжок",
+    "en": "Rocket Jump",
+    "wrEn": "ROCKET JUMP",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Разрывной снаряд",
+    "en": "Explosive Charge",
+    "wrEn": "EXPLOSIVE CHARGE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Вышибной заряд",
+    "en": "Buster Shot",
+    "wrEn": "BUSTER SHOT",
+    "match": "exact"
+   }
+  },
+  "Tryndamere": {
+   "passive": {
+    "ru": "Боевой раж",
+    "en": "Battle Fury",
+    "wrEn": "Battle Fury",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Жажда крови",
+    "en": "Bloodlust",
+    "wrEn": "Bloodlust",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Вызывающий крик",
+    "en": "Mocking Shout",
+    "wrEn": "Mocking Shout",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Удар вихря",
+    "en": "Spinning Slash",
+    "wrEn": "Spinning Slash",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Неугасающая ярость",
+    "en": "Undying Rage",
+    "wrEn": "Undying Rage",
+    "match": "exact"
+   }
+  },
+  "TwistedFate": {
+   "passive": {
+    "ru": "Шулерские кости",
+    "en": "Loaded Dice",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Дикие карты",
+    "en": "Wild Cards",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Выбор карты",
+    "en": "Pick a Card",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Сложенная колода",
+    "en": "Stacked Deck",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Судьба",
+    "en": "Destiny",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Twitch": {
+   "passive": {
+    "ru": "Смертельный яд",
+    "en": "Deadly Venom",
+    "wrEn": "DEADLY VENOM",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Засада",
+    "en": "Ambush",
+    "wrEn": "AMBUSH",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Склянка с ядом",
+    "en": "Venom Cask",
+    "wrEn": "VENOM CASK",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Зараза",
+    "en": "Contaminate",
+    "wrEn": "CONTAMINATE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Стрельба наугад",
+    "en": "Spray and Pray",
+    "wrEn": "SPRAY AND PRAY",
+    "match": "exact"
+   }
+  },
+  "Urgot": {
+   "passive": {
+    "ru": "Огненное эхо",
+    "en": "Echoing Flames",
+    "wrEn": "ECHOING FLAMES",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Коррозийный заряд",
+    "en": "Corrosive Charge",
+    "wrEn": "CORROSIVE CHARGE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Зачистка",
+    "en": "Purge",
+    "wrEn": "PURGE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Презрение",
+    "en": "Disdain",
+    "wrEn": "DISDAIN",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Сильнее страха смерти",
+    "en": "Fear Beyond Death",
+    "wrEn": "FEAR BEYOND DEATH",
+    "match": "exact"
+   }
+  },
+  "Varus": {
+   "passive": {
+    "ru": "Само возмездие",
+    "en": "Living Vengeance",
+    "wrEn": "Living Vengeance",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Пробивающая стрела",
+    "en": "Piercing Arrow",
+    "wrEn": "Piercing Arrow",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Оскверненный колчан",
+    "en": "Blighted Quiver",
+    "wrEn": "Blighted Quiver",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Град стрел",
+    "en": "Hail of Arrows",
+    "wrEn": "Hail of Arrows",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Цепь порчи",
+    "en": "Chain of Corruption",
+    "wrEn": "Chain of Corruption",
+    "match": "exact"
+   }
+  },
+  "Vayne": {
+   "passive": {
+    "ru": "Ночная охотница",
+    "en": "Night Hunter",
+    "wrEn": "Night Hunter",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Кувырок",
+    "en": "Tumble",
+    "wrEn": "Tumble",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Серебряные стрелы",
+    "en": "Silver Bolts",
+    "wrEn": "Silver Bolts",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Приговор",
+    "en": "Condemn",
+    "wrEn": "Condemn",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Последняя битва",
+    "en": "Final Hour",
+    "wrEn": "Final Hour",
+    "match": "exact"
+   }
+  },
+  "Veigar": {
+   "passive": {
+    "ru": "Невероятная сила зла",
+    "en": "Phenomenal Evil Power",
+    "wrEn": "PHENOMENAL EVIL POWER",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Злобный удар",
+    "en": "Baleful Strike",
+    "wrEn": "BALEFUL STRIKE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Темная материя",
+    "en": "Dark Matter",
+    "wrEn": "DARK MATTER",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Горизонт событий",
+    "en": "Event Horizon",
+    "wrEn": "EVENT HORIZON",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Большой взрыв",
+    "en": "Primordial Burst",
+    "wrEn": "PRIMORDIAL BURST",
+    "match": "exact"
+   }
+  },
+  "Velkoz": {
+   "passive": {
+    "ru": "Органический распад",
+    "en": "Organic Deconstruction",
+    "wrEn": "ORGANIC DECONSTRUCTION",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Плазменное деление",
+    "en": "Plasma Fission",
+    "wrEn": "PLASMA FISSION",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Пролом в Бездну",
+    "en": "Void Rift",
+    "wrEn": "VOID RIFT",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Тектонический сдвиг",
+    "en": "Tectonic Disruption",
+    "wrEn": "TECTONIC DISRUPTION",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Луч дезинтеграции форм жизни",
+    "en": "Life Form Disintegration Ray",
+    "wrEn": "LIFE FORM DISINTEGRATION RAY",
+    "match": "exact"
+   }
+  },
+  "Vex": {
+   "passive": {
+    "ru": "Тлен и безысходность",
+    "en": "Doom 'n Gloom",
+    "wrEn": "DOOM 'N GLOOM",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Черная полоса",
+    "en": "Mistral Bolt",
+    "wrEn": "MISTRAL BOLT",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Личное пространство",
+    "en": "Personal Space",
+    "wrEn": "PERSONAL SPACE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Неизбежная тьма",
+    "en": "Looming Darkness",
+    "wrEn": "LOOMING DARKNESS",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Стремительная тень",
+    "en": "Shadow Surge",
+    "wrEn": "SHADOW SURGE",
+    "match": "exact"
+   }
+  },
+  "Vi": {
+   "passive": {
+    "ru": "Пламеотражатель",
+    "en": "Blast Shield",
+    "wrEn": "DENTING BLOWS",
+    "match": "approx"
+   },
+   "q": {
+    "ru": "Вскрыватель хранилищ",
+    "en": "Vault Breaker",
+    "wrEn": "Vault Breaker",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Сминающие удары",
+    "en": "Denting Blows",
+    "wrEn": "BLAST SHIELD",
+    "match": "approx"
+   },
+   "e": {
+    "ru": "Грубая сила",
+    "en": "Relentless Force",
+    "wrEn": "Excessive Force",
+    "match": "approx"
+   },
+   "r": {
+    "ru": "Крайние меры",
+    "en": "Cease and Desist",
+    "wrEn": "Assault and Battery",
+    "match": "approx"
+   }
+  },
+  "Viego": {
+   "passive": {
+    "ru": "Право сильного",
+    "en": "Sovereign's Domination",
+    "wrEn": "SOVEREIGN'S DOMINATION",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Клинок Падшего короля",
+    "en": "Blade of the Ruined King",
+    "wrEn": "BLADE OF THE RUINED KING",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Призрачная пасть",
+    "en": "Spectral Maw",
+    "wrEn": "SPECTRAL MAW",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Путь страха",
+    "en": "Harrowed Path",
+    "wrEn": "HARROWED PATH",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Разбитое сердце",
+    "en": "Heartbreaker",
+    "wrEn": "HEARTBREAKER",
+    "match": "exact"
+   }
+  },
+  "Viktor": {
+   "passive": {
+    "ru": "Великая эволюция",
+    "en": "Glorious Evolution",
+    "wrEn": "GLORIOUS EVOLUTION",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Отвод энергии",
+    "en": "Siphon Power",
+    "wrEn": "SIPHON POWER",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Гравитационное поле",
+    "en": "Gravity Field",
+    "wrEn": "GRAVITY FIELD",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Хекстековый луч",
+    "en": "Hextech Ray",
+    "wrEn": "HEXTECH RAY",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Вихрь аркейна",
+    "en": "Arcane Storm",
+    "wrEn": "ARCANE STORM",
+    "match": "exact"
+   }
+  },
+  "Vladimir": {
+   "passive": {
+    "ru": "Багряный пакт",
+    "en": "Crimson Pact",
+    "wrEn": "CRIMSON PACT",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Переливание",
+    "en": "Transfusion",
+    "wrEn": "TRANSFUSION",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Алый омут",
+    "en": "Sanguine Pool",
+    "wrEn": "SANGUINE POOL",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Потоки крови",
+    "en": "Tides of Blood",
+    "wrEn": "TIDES OF BLOOD",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Заражение крови",
+    "en": "Hemoplague",
+    "wrEn": "HEMOPLAGUE",
+    "match": "exact"
+   }
+  },
+  "Volibear": {
+   "passive": {
+    "ru": "Неутихающая буря",
+    "en": "The Relentless Storm",
+    "wrEn": "THE RELENTLESS STORM",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Грозовой удар",
+    "en": "Thundering Smash",
+    "wrEn": "THUNDERING SMASH",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Растерзание",
+    "en": "Frenzied Maul",
+    "wrEn": "FRENZIED MAUL",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Громовержец",
+    "en": "Sky Splitter",
+    "wrEn": "SKY SPLITTER",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Вестник бури",
+    "en": "Stormbringer",
+    "wrEn": "STORMBRINGER",
+    "match": "exact"
+   }
+  },
+  "Warwick": {
+   "passive": {
+    "ru": "Вечная жажда",
+    "en": "Eternal Hunger",
+    "wrEn": "ETERNAL HUNGER",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Челюсти зверя",
+    "en": "Jaws of the Beast",
+    "wrEn": "JAWS OF THE BEAST",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Кровавая охота",
+    "en": "Blood Hunt",
+    "wrEn": "BLOODHUNT",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Первобытный вой",
+    "en": "Primal Howl",
+    "wrEn": "PRIMAL HOWL",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Бесконечная жестокость",
+    "en": "Infinite Duress",
+    "wrEn": "INFINITE DURESS",
+    "match": "exact"
+   }
+  },
+  "MonkeyKing": {
+   "passive": {
+    "ru": "Каменная кожа",
+    "en": "Stone Skin",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Сокрушительный удар",
+    "en": "Crushing Blow",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Воин-обманщик",
+    "en": "Warrior Trickster",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Верхом на облаке",
+    "en": "Nimbus Strike",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Циклон",
+    "en": "Cyclone",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Xayah": {
+   "passive": {
+    "ru": "Чистые порезы",
+    "en": "Clean Cuts",
+    "wrEn": "CLEAN CUTS",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Парные кинжалы",
+    "en": "Double Daggers",
+    "wrEn": "DOUBLE DAGGERS",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Смертоносные перья",
+    "en": "Deadly Plumage",
+    "wrEn": "DEADLY PLUMAGE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Зов клинков",
+    "en": "Bladecaller",
+    "wrEn": "BLADECALLER",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Перьевая буря",
+    "en": "Featherstorm",
+    "wrEn": "FEATHERSTORM",
+    "match": "exact"
+   }
+  },
+  "XinZhao": {
+   "passive": {
+    "ru": "Решительность",
+    "en": "Determination",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "q": {
+    "ru": "Удар трех когтей",
+    "en": "Three Talon Strike",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "w": {
+    "ru": "Ветер и молния",
+    "en": "Wind Becomes Lightning",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "e": {
+    "ru": "Смелый рывок",
+    "en": "Audacious Charge",
+    "wrEn": "",
+    "match": "noWrName"
+   },
+   "r": {
+    "ru": "Броня полумесяца",
+    "en": "Crescent Guard",
+    "wrEn": "",
+    "match": "noWrName"
+   }
+  },
+  "Yasuo": {
+   "passive": {
+    "ru": "Путь скитальца",
+    "en": "Way of the Wanderer",
+    "wrEn": "Way of the Wanderer",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Стальная буря",
+    "en": "Steel Tempest",
+    "wrEn": "Steel Tempest",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Стена ветра",
+    "en": "Wind Wall",
+    "wrEn": "Wind Wall",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Стремительный клинок",
+    "en": "Sweeping Blade",
+    "wrEn": "Sweeping Blade",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Последний вздох",
+    "en": "Last Breath",
+    "wrEn": "Last Breath",
+    "match": "exact"
+   }
+  },
+  "Yone": {
+   "passive": {
+    "ru": "Путь охотника",
+    "en": "Way of the Hunter",
+    "wrEn": "WAY OF THE HUNTER",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Сталь смертного",
+    "en": "Mortal Steel",
+    "wrEn": "MORTAL STEEL",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Рассечение духа",
+    "en": "Spirit Cleave",
+    "wrEn": "SPIRIT CLEAVE",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Освобожденная душа",
+    "en": "Soul Unbound",
+    "wrEn": "SOUL UNBOUND",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Решение судьбы",
+    "en": "Fate Sealed",
+    "wrEn": "FATE SEALED",
+    "match": "exact"
+   }
+  },
+  "Yuumi": {
+   "passive": {
+    "ru": "Кошачья дружба",
+    "en": "Feline Friendship",
+    "wrEn": "Feline Friendship",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Кошки-мышки",
+    "en": "Prowling Projectile",
+    "wrEn": "PROWLING PROJECTILE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Ты и я!",
+    "en": "You and Me!",
+    "wrEn": "YOU AND ME!",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Догонялки",
+    "en": "Zoomies",
+    "wrEn": "ZOOMIES",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Последняя глава",
+    "en": "Final Chapter",
+    "wrEn": "FINAL CHAPTER",
+    "match": "exact"
+   }
+  },
+  "Zed": {
+   "passive": {
+    "ru": "Презрение к слабости",
+    "en": "Contempt for the Weak",
+    "wrEn": "Contempt for the Weak",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Бросок сюрикена",
+    "en": "Razor Shuriken",
+    "wrEn": "Razor Shuriken",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Живая тень",
+    "en": "Living Shadow",
+    "wrEn": "Living Shadow",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Теневой разрез",
+    "en": "Shadow Slash",
+    "wrEn": "Shadow Slash",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Клеймо смерти",
+    "en": "Death Mark",
+    "wrEn": "Death Mark",
+    "match": "exact"
+   }
+  },
+  "Zeri": {
+   "passive": {
+    "ru": "Ходячая батарейка",
+    "en": "Living Battery",
+    "wrEn": "LIVING BATTERY",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Стрельба очередью",
+    "en": "Burst Fire",
+    "wrEn": "BURST FIRE",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Импульсный разряд",
+    "en": "Ultrashock Laser",
+    "wrEn": "ULTRASHOCK LASER",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Шальная искра",
+    "en": "Spark Surge",
+    "wrEn": "SPARK SURGE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Короткое замыкание",
+    "en": "Lightning Crash",
+    "wrEn": "LIGHTNING CRASH",
+    "match": "exact"
+   }
+  },
+  "Ziggs": {
+   "passive": {
+    "ru": "Вспыльчивость",
+    "en": "Short Fuse",
+    "wrEn": "Short Fuse",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Прыгающая бомба",
+    "en": "Bouncing Bomb",
+    "wrEn": "Bouncing Bomb",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Взрывпакет",
+    "en": "Satchel Charge",
+    "wrEn": "Satchel Charge",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Минное поле",
+    "en": "Hexplosive Minefield",
+    "wrEn": "Hexplosive Minefield",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Страшно большая бомба",
+    "en": "Mega Inferno Bomb",
+    "wrEn": "Mega Inferno Bomb",
+    "match": "exact"
+   }
+  },
+  "Zilean": {
+   "passive": {
+    "ru": "Время в бутылке",
+    "en": "Time In A Bottle",
+    "wrEn": "TIME IN A BOTTLE",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Бомба замедленного действия",
+    "en": "Time Bomb",
+    "wrEn": "TIME BOMB",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Перемотка",
+    "en": "Rewind",
+    "wrEn": "TWISTED TIMEFLOW",
+    "match": "approx"
+   },
+   "e": {
+    "ru": "Искривление времени",
+    "en": "Time Warp",
+    "wrEn": "TEMPORAL MIRAGE",
+    "match": "approx"
+   },
+   "r": {
+    "ru": "Временной сдвиг",
+    "en": "Chronoshift",
+    "wrEn": "CHRONOSHIFT",
+    "match": "exact"
+   }
+  },
+  "Zoe": {
+   "passive": {
+    "ru": "Искорки!",
+    "en": "More Sparkles!",
+    "wrEn": "MORE SPARKLES!",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Лови звезду",
+    "en": "Paddle Star!",
+    "wrEn": "PADDLE STAR!",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Маленькая хитрюга",
+    "en": "Spell Thief",
+    "wrEn": "SPELL THIEF",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Тихий час",
+    "en": "Sleepy Trouble Bubble",
+    "wrEn": "SLEEPY TROUBLE BUBBLE",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Прыг-скок",
+    "en": "Portal Jump",
+    "wrEn": "PORTAL JUMP",
+    "match": "exact"
+   }
+  },
+  "Zyra": {
+   "passive": {
+    "ru": "Терновый сад",
+    "en": "Garden of Thorns",
+    "wrEn": "GARDEN OF THORNS",
+    "match": "exact"
+   },
+   "q": {
+    "ru": "Смертоносные колючки",
+    "en": "Deadly Spines",
+    "wrEn": "DEADLY SPINES",
+    "match": "exact"
+   },
+   "w": {
+    "ru": "Безудержный рост",
+    "en": "Rampant Growth",
+    "wrEn": "RAMPANT GROWTH",
+    "match": "exact"
+   },
+   "e": {
+    "ru": "Цепкие корни",
+    "en": "Grasping Roots",
+    "wrEn": "GRASPING ROOTS",
+    "match": "exact"
+   },
+   "r": {
+    "ru": "Душащие терния",
+    "en": "Stranglethorns",
+    "wrEn": "STRANGLETHORNS",
+    "match": "exact"
+   }
+  }
+ }
+}

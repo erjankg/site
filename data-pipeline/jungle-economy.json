@@ -1,0 +1,498 @@
+{
+ "_meta": {
+  "title": "Wild Rift — экономика карты (кэмпы / миньоны / объекты / скейл)",
+  "purpose": "Данные для интерактивной Карты (MASTERPLAN Э2/Э5): ползунок «минута игры» → золото/дез-таймер/спаун объектов.",
+  "patch": "7.2c",
+  "patchNote": "Точная per-патчевая настройка экономики 7.x Riot публично НЕ выкладывает поштучно. Большинство чисел (баффы, золото кэмпов, таймеры объектов) стабильны много патчей и взяты из источников ниже. Где источники расходятся по патчам (спаун дракона/Барона/Герольда) — указано оба значения в поле *_byPatch. Всё непроверяемое помечено \"demo\": true.",
+  "generated": "2026-07-05",
+  "generatedBy": "субагент-исполнитель данных (ручной ресёрч, без fetch-скрипта: у WR нет открытого API экономики)",
+  "legend": {
+   "sourced": "число подтверждено источником из sources[]",
+   "demo": "ПЛЕЙСХОЛДЕР — точного числа для актуального патча найти не удалось (часто Fandom блокирует бота 402). НЕ показывать как факт, пометить в UI как демо/≈, свериться вручную.",
+   "gold": "золото за убийство (individual = одному игроку, team = делится/на команду)",
+   "xp": "опыт за убийство",
+   "spawn_s / respawn_s / duration_s": "секунды игрового времени"
+  },
+  "unresolved": [
+   "Точное золото/опыт per-type миньонов для 7.x (Fandom Gold(Wild Rift) недоступен боту).",
+   "Точное золото Raptors и Scuttle XP.",
+   "Формула дез-таймера чемпиона в WR (Riot не публикует; max lvl = 15, отличается от ПК lvl 18).",
+   "Cloud Dragon бафф-число (в офиц. Elemental Rift Overview не расписан)."
+  ],
+  "patchVerified": null
+ },
+ "jungleCamps": {
+  "_notes": "Wild Rift-джангл: Blue Sentinel, Red Brambleback, Gromp, Murk Wolves, Raptors, Scuttle Crab. Krugs в WR НЕТ (это ПК-LoL). Малые кэмпы спаун ~0:22, респаун 1:30. Баффы спаун 0:20, длительность 2:00, респаун 2:30.",
+  "blueSentinel": {
+   "ru": "Синий страж",
+   "buff": {
+    "name": "Crest of Insight (Синий бафф)",
+    "effect": "восстановление маны/энергии и здоровья вне боя, доп. ускорение способностей",
+    "duration_s": 120,
+    "sourced": true
+   },
+   "gold": {
+    "value": 140,
+    "scaling": [
+     {
+      "atMinute": 0,
+      "gold": 140
+     },
+     {
+      "atMinute": 8,
+      "gold": 215
+     },
+     {
+      "atMinute": 10,
+      "gold": 220
+     }
+    ],
+    "sourced": true
+   },
+   "xp": {
+    "value": null,
+    "demo": true,
+    "note": "точное XP не подтверждено"
+   },
+   "spawn_s": 20,
+   "respawn_s": 150,
+   "sourced": true
+  },
+  "redBrambleback": {
+   "ru": "Красный шипоспин",
+   "buff": {
+    "name": "Crest of Cinders (Красный бафф)",
+    "effect": "автоатаки жгут (истинный урон со временем) и замедляют цель",
+    "duration_s": 120,
+    "sourced": true
+   },
+   "gold": {
+    "value": 140,
+    "scaling": [
+     {
+      "atMinute": 0,
+      "gold": 140
+     },
+     {
+      "atMinute": 8,
+      "gold": 215
+     },
+     {
+      "atMinute": 10,
+      "gold": 220
+     }
+    ],
+    "sourced": true
+   },
+   "xp": {
+    "value": null,
+    "demo": true
+   },
+   "spawn_s": 20,
+   "respawn_s": 150,
+   "sourced": true
+  },
+  "gromp": {
+   "ru": "Громп",
+   "buff": null,
+   "gold": {
+    "value": 140,
+    "sourced": true,
+    "note": "самый ценный одиночный монстр"
+   },
+   "xp": {
+    "value": null,
+    "demo": true
+   },
+   "hp": 2500,
+   "spawn_s": 22,
+   "respawn_s": 90,
+   "sourced": true
+  },
+  "murkWolves": {
+   "ru": "Волки",
+   "buff": null,
+   "units": [
+    {
+     "name": "Greater Murk Wolf (большой)",
+     "gold": 100
+    },
+    {
+     "name": "Murk Wolf (малый)",
+     "gold": 20
+    },
+    {
+     "name": "Murk Wolf (малый)",
+     "gold": 20
+    }
+   ],
+   "gold": {
+    "total": 140,
+    "sourced": true
+   },
+   "xp": {
+    "value": null,
+    "demo": true
+   },
+   "hp_leader": 1830,
+   "spawn_s": 22,
+   "respawn_s": 90,
+   "sourced": true
+  },
+  "raptors": {
+   "ru": "Крылатые (Raptors)",
+   "buff": null,
+   "units": {
+    "count": 4,
+    "note": "1 крупный + 3 малых; поштучное золото не подтверждено"
+   },
+   "gold": {
+    "total": 120,
+    "demo": true,
+    "note": "ДЕМО ≈120; точное золото за камп не подтверждено источником"
+   },
+   "xp": {
+    "value": null,
+    "demo": true
+   },
+   "hp_leader": 1520,
+   "spawn_s": 22,
+   "respawn_s": 90,
+   "sourced_timers": true
+  },
+  "scuttleCrab": {
+   "ru": "Скатл-краб (речной краб)",
+   "buff": {
+    "effect": "даёт обзор в реке ~1:30 и оставляет зону-ускорение (speed shrine) после смерти",
+    "sourced": true
+   },
+   "gold": {
+    "value": 120,
+    "sourced": true
+   },
+   "xp": {
+    "value": null,
+    "demo": true
+   },
+   "location": "река",
+   "spawn_s": 85,
+   "respawn_s": 120,
+   "sourced": true
+  }
+ },
+ "minions": {
+  "_notes": "Волна миньонов ~каждые 30 сек. Состав базовой волны: 3 melee + 3 caster; осадный (cannon/siege) добавляется по каденции. WR отличается от ПК — per-type золото/опыт ниже помечены demo, требуют ручной сверки с патчем 7.x.",
+  "wave": {
+   "firstSpawn_s": {
+    "value": 65,
+    "demo": true,
+    "note": "1:05 — значение ПК-LoL, для WR не подтверждено"
+   },
+   "interval_s": 30,
+   "baseComposition": {
+    "melee": 3,
+    "caster": 3,
+    "siege": 0
+   },
+   "sourced": false,
+   "demo": true
+  },
+  "types": {
+   "melee": {
+    "ru": "ближний (воин)",
+    "gold": {
+     "value": 20,
+     "demo": true,
+     "note": "ПЛЕЙСХОЛДЕР по ПК-LoL (~21); WR-число не подтверждено"
+    },
+    "xp": {
+     "value": null,
+     "demo": true
+    },
+    "countPerWave": 3
+   },
+   "caster": {
+    "ru": "дальний (маг/стрелок)",
+    "gold": {
+     "value": 14,
+     "demo": true,
+     "note": "ПЛЕЙСХОЛДЕР по ПК-LoL; WR не подтверждено"
+    },
+    "xp": {
+     "value": null,
+     "demo": true
+    },
+    "countPerWave": 3
+   },
+   "siege": {
+    "ru": "осадный (пушка/cannon)",
+    "gold": {
+     "value": 60,
+     "demo": true,
+     "note": "ПЛЕЙСХОЛДЕР ~60, растёт со временем; WR не подтверждено"
+    },
+    "xp": {
+     "value": null,
+     "demo": true
+    },
+    "note": "золото осадного растёт с минутой игры"
+   },
+   "super": {
+    "ru": "супер-миньон",
+    "gold": {
+     "value": 60,
+     "demo": true,
+     "note": "ПЛЕЙСХОЛДЕР; появляется после падения ингибитора/каннона базы"
+    },
+    "xp": {
+     "value": null,
+     "demo": true
+    }
+   }
+  },
+  "siegeCadence": {
+   "demo": true,
+   "note": "Каденция осадного (по ПК-LoL, для WR не подтверждена): 1-й на 3-й волне; до ~14 мин — каждые 3 волны; после ~14 мин — каждые 2 волны; после ~25 мин — каждую волну.",
+   "phases": [
+    {
+     "untilMinute": 14,
+     "everyNWaves": 3
+    },
+    {
+     "untilMinute": 25,
+     "everyNWaves": 2
+    },
+    {
+     "untilMinute": 999,
+     "everyNWaves": 1
+    }
+   ]
+  }
+ },
+ "epicMonsters": {
+  "_notes": "Спаун/респаун объектов менялся по патчам — где источники расходятся, даю *_byPatch (older = 2020-2021, p6 = патч 6.0 2025-2026).",
+  "elementalDragons": {
+   "ru": "Стихийные драконы",
+   "spawn_s_byPatch": {
+    "older": 240,
+    "p6": 300,
+    "note": "первый спаун: 4:00 (старые патчи) → 5:00 (6.0)"
+   },
+   "respawn_s_byPatch": {
+    "older": 240,
+    "note": "≈4:00 после смерти; в 6.0 с падением плит спаун связан"
+   },
+   "gold": {
+    "individual": 100,
+    "sourced": true,
+    "note": "≈100 золота убийце/локально"
+   },
+   "xp": {
+    "value": null,
+    "demo": true
+   },
+   "buffPermanent": true,
+   "types": {
+    "infernal": {
+     "ru": "Огненный",
+     "buff": "+Сила умений и +Сила атаки",
+     "sourced": true,
+     "rift": "кусты выгорают, часть стен исчезает"
+    },
+    "mountain": {
+     "ru": "Горный",
+     "buff": "+Броня и +Сопротивление магии",
+     "sourced": true,
+     "rift": "новая местность/укрытия в лесу"
+    },
+    "ocean": {
+     "ru": "Океанский",
+     "buff": "+Реген здоровья",
+     "sourced": true,
+     "rift": "новые кусты и доп. медовые фрукты"
+    },
+    "cloud": {
+     "ru": "Облачный",
+     "buff": "+Скорость передвижения",
+     "demo": true,
+     "note": "число/точная формулировка не расписаны в офиц. Elemental Rift Overview"
+    }
+   },
+   "dragonSlayer": {
+    "note": "Аналог Dragon Soul в WR = Dragon Slayer: со 2-го дракона усиливает (умножает) все набранные стихийные баффы; растёт с каждым драконом.",
+    "sourced": true
+   }
+  },
+  "elderDragon": {
+   "ru": "Старший дракон",
+   "spawn_s": 1140,
+   "spawnNote": "спаун на 19:00",
+   "buff": "истинный урон + эффект казни (execute) по цели",
+   "gold": {
+    "value": null,
+    "demo": true
+   },
+   "sourced": true
+  },
+  "riftHerald": {
+   "ru": "Предвестник Рифта (Герольд)",
+   "spawn_s_byPatch": {
+    "older": 360,
+    "p6": 300,
+    "note": "6:00 (старые) → 5:00 (6.0, «Enchanted Ensemble» из 3 монстров собирается в Герольда)"
+   },
+   "gold_byPatch": {
+    "older": 300,
+    "p6": 125,
+    "note": "300 (старый Game Haus) vs 125 локально (Fandom, актуальнее)"
+   },
+   "gold": {
+    "individual": 125,
+    "sourced": true
+   },
+   "xp": {
+    "value": null,
+    "demo": true
+   },
+   "effect": "после убийства призывается на стороне команды, таранит башни/структуры; в 6.0 можно убить дважды",
+   "sourced": true
+  },
+  "baronNashor": {
+   "ru": "Барон Нашор",
+   "spawn_s_byPatch": {
+    "older": 600,
+    "p6": 720,
+    "note": "10:00 (старые) → 12:00 (6.0, чтобы меньше решал лейт)"
+   },
+   "respawn_s_byPatch": {
+    "older": 180,
+    "p6": 210,
+    "note": "3:00 (старые) → 3.5:00 (6.0)"
+   },
+   "gold": {
+    "individual": 200,
+    "team": 1000,
+    "sourced": true
+   },
+   "xp": {
+    "value": null,
+    "demo": true
+   },
+   "buff": {
+    "name": "Hand of Baron (Рука Барона)",
+    "effect": "усиливает ближних миньонов, сокращает время возврата (recall), даёт команде +Сила атаки и +Сила умений на время",
+    "sourced": true
+   },
+   "sourced": true
+  }
+ },
+ "scaling": {
+  "_notes": "Ядро ползунка «минута игры»: как золото и дез-таймер растут со временем.",
+  "goldOverTime": {
+   "buffCamps": {
+    "points": [
+     {
+      "atMinute": 0,
+      "gold": 140
+     },
+     {
+      "atMinute": 8,
+      "gold": 215
+     },
+     {
+      "atMinute": 10,
+      "gold": 220
+     }
+    ],
+    "sourced": true,
+    "note": "Синий/Красный бафф растут ступенями"
+   },
+   "siegeMinion": {
+    "demo": true,
+    "note": "осадный миньон дорожает с минутой; точные ступени для WR не подтверждены"
+   },
+   "passiveGoldPerSec": {
+    "value": null,
+    "demo": true,
+    "note": "пассивный доход золота/сек в WR не подтверждён"
+   }
+  },
+  "deathTimer": {
+   "demo": true,
+   "maxLevel": 15,
+   "note": "Riot НЕ публикует формулу дез-таймера WR (max lvl 15, отличается от ПК lvl 18). Таблица ниже — ДЕМО-приближение, обязательно свериться в игре/патче перед показом как факт.",
+   "approxTableDemo": [
+    {
+     "level": 1,
+     "baseRespawn_s": 6
+    },
+    {
+     "level": 3,
+     "baseRespawn_s": 8
+    },
+    {
+     "level": 5,
+     "baseRespawn_s": 12
+    },
+    {
+     "level": 7,
+     "baseRespawn_s": 18
+    },
+    {
+     "level": 9,
+     "baseRespawn_s": 26
+    },
+    {
+     "level": 11,
+     "baseRespawn_s": 34
+    },
+    {
+     "level": 13,
+     "baseRespawn_s": 42
+    },
+    {
+     "level": 15,
+     "baseRespawn_s": 50
+    }
+   ],
+   "timeIncreaseNote": "В ПК-LoL к базовому таймеру добавляется множитель, растущий с минутой игры (поздняя игра = дольше лежишь). WR-коэффициенты не подтверждены — demo."
+  }
+ },
+ "sources": [
+  {
+   "name": "The Game Haus — Wild Rift Jungle & Honey Fruit Timers",
+   "url": "https://thegamehaus.com/wild-rift/wild-rift-jungle-and-honey-fruit-timers/2020/11/29/",
+   "used": "таймеры кэмпов/баффов, золото Gromp/Wolves, скатл, спауны объектов (старые патчи)"
+  },
+  {
+   "name": "Elemental Rift Overview — офиц. Wild Rift",
+   "url": "https://wildrift.leagueoflegends.com/en-us/news/game-updates/elemental-rift-overview/",
+   "used": "типы драконов и их баффы, Dragon Slayer, Elder 19:00"
+  },
+  {
+   "name": "Monster (Wild Rift) — Fandom (частично, бот 402)",
+   "url": "https://leagueoflegends.fandom.com/wiki/Monster_(Wild_Rift)",
+   "used": "перекрёстная сверка золота баффов/Барона/Герольда"
+  },
+  {
+   "name": "Gold (Wild Rift) — Fandom (недоступен боту, 402)",
+   "url": "https://leagueoflegends.fandom.com/wiki/Gold_(Wild_Rift)",
+   "used": "ЦЕЛЕВОЙ источник per-type золота миньонов — НЕ считан, требует ручной сверки"
+  },
+  {
+   "name": "Wild Rift Patch Notes 6.0 — офиц.",
+   "url": "https://wildrift.leagueoflegends.com/en-us/news/game-updates/wild-rift-patch-notes-6-0/",
+   "used": "спаун дракона/Герольда 5:00, Барон раньше, Enchanted Ensemble"
+  },
+  {
+   "name": "Wild Rift 7.0g Minion & Map Tempo Guide — ManaBuy",
+   "url": "https://manabuy.com/blog/league-of-legends-wild-rift/wild-rift-7-0g-minion-and-map-tempo-guide",
+   "used": "подтверждение что 7.0g трогал miньонов (числа не приведены)"
+  },
+  {
+   "name": "Experience (champion) — Liquipedia Wild Rift",
+   "url": "https://liquipedia.net/wildrift/Experience_(champion)",
+   "used": "max level = 15, механика опыта (без точных чисел)"
+  }
+ ]
+}

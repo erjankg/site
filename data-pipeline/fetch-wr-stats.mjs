@@ -8,7 +8,12 @@
 //   (это те же источники, что у wildriftallstats.ru / wildriftcore — см. lolm.qq.com)
 //
 //   Запуск:  node data-pipeline/fetch-wr-stats.mjs     (нужен Node 18+, там встроенный fetch)
-//   Выход:   data-pipeline/wr-stats.json  — готовая стата по чемпионам и линиям.
+//   Выход:   data-pipeline/wr-stats.json          — готовая стата по чемпионам и линиям (формат НЕ меняется,
+//                                                    его читают калькулятор, метахаб и build-calc-data).
+//            data-pipeline/wr-stats/ГГГГММДД.json — АРХИВНЫЙ СНИМОК того же прогона (только цифры, без имён
+//                                                    в каждой строке). Нужен, чтобы была ИСТОРИЯ: спарклайны
+//                                                    и tier-movers считаются как дельта двух снимков
+//                                                    (см. data-pipeline/wr-stats/history.mjs).
 //
 //   Дальше: эту же логику кладём в Firebase Cloud Function со scheduled-триггером (раз в день).
 // ───────────────────────────────────────────────────────────────────────────
@@ -16,12 +21,16 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+// формат архивного снимка описан в одном месте — там же его читает history.mjs
+import { writeSnapshot, snapshotDayId } from './wr-stats/snapshot.mjs';
 
 const RANK_URL = 'https://mlol.qt.qq.com/go/lgame_battle_info/hero_rank_list_v2';
 const HERO_URL = 'https://game.gtimg.cn/images/lgamem/act/lrlib/js/heroList/hero_list.js';
 
-// позиция (lane) из API → роль Wild Rift
-const POS = { 1: 'Baron', 2: 'Mid', 3: 'Jungle', 4: 'Support', 5: 'Dragon' };
+// позиция (lane) из API → роль Wild Rift.
+// Проверено по реальным ролям чемпов (Гарен=топ, Ари=мид, Кейтлин=адк, Амуму=лес):
+// pos1=Мид, pos2=Топ(Baron), pos3=АДК(Dragon), pos4=Сап, pos5=Лес(Jungle).
+const POS = { 1: 'Mid', 2: 'Baron', 3: 'Dragon', 4: 'Support', 5: 'Jungle' };
 // тир из strength_level (0..5) Tencent → буква
 const TIER = { 5: 'S+', 4: 'S', 3: 'A', 2: 'B', 1: 'C', 0: 'D' };
 
@@ -145,6 +154,16 @@ async function main() {
 
   console.log(`✓ Готово. Чемпионов-строк: ${out.length}, снимок: ${snapshotDate}`);
   console.log(`✓ Записано: ${outPath}`);
+
+  // архив пишем ПОСЛЕ боевого файла и в try — падение архива не должно ронять основной прогон
+  try {
+    const dayId = snapshotDayId(snapshotDate);
+    const snapPath = writeSnapshot(dayId, out, { dir: `${__dirname}/wr-stats`, ranks: RANK, sourceDate: snapshotDate });
+    console.log(`✓ Снимок в архив: ${snapPath}`);
+  } catch (e) {
+    console.warn(`⚠ Архивный снимок НЕ записан (боевой wr-stats.json в порядке): ${e.message}`);
+  }
+
   const noRU = [...new Set(out.filter(c => c.nameEN && !RU[c.nameEN]).map(c => c.nameEN))];
   console.log(`Топ-10 по WR (бракет Diamond+):`);
   for (const c of out.filter(c => c.rankSlice === '0').slice(0, 10)) console.log(`   ${c.wr}%  ${c.name}  · ${c.role} · тир ${c.tier} · PR ${c.pr}% BR ${c.br}%`);

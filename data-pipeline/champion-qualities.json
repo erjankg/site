@@ -1,0 +1,1129 @@
+{
+  "_source": "https://ry2x.github.io/WildRift-Merged-Champion-Data/data_en_US.json",
+  "_sourceRepo": "https://github.com/ry2x/WildRift-Merged-Champion-Data",
+  "_fetchedAt": "2026-08-23T14:20:55.458Z",
+  "_note": "Оси радара Мета-хаба (шкала 1-3). Обновлять раз в патч: node data-pipeline/fetch-champion-qualities.mjs",
+  "count": 140,
+  "champions": [
+    {
+      "name": "Aatrox",
+      "id": "Aatrox",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 2
+    },
+    {
+      "name": "Ahri",
+      "id": "Ahri",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Akali",
+      "id": "Akali",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Akshan",
+      "id": "Akshan",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Alistar",
+      "id": "Alistar",
+      "damage": 1,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 2
+    },
+    {
+      "name": "Ambessa",
+      "id": "Ambessa",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Amumu",
+      "id": "Amumu",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Annie",
+      "id": "Annie",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Ashe",
+      "id": "Ashe",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Aurelion Sol",
+      "id": "AurelionSol",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Aurora",
+      "id": "Aurora",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Bard",
+      "id": "Bard",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Blitzcrank",
+      "id": "Blitzcrank",
+      "damage": 1,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 2
+    },
+    {
+      "name": "Brand",
+      "id": "Brand",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Braum",
+      "id": "Braum",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 2
+    },
+    {
+      "name": "Caitlyn",
+      "id": "Caitlyn",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Camille",
+      "id": "Camille",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Cho'Gath",
+      "id": "Chogath",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Corki",
+      "id": "Corki",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Darius",
+      "id": "Darius",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Diana",
+      "id": "Diana",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Dr. Mundo",
+      "id": "DrMundo",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Draven",
+      "id": "Draven",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Ekko",
+      "id": "Ekko",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Evelynn",
+      "id": "Evelynn",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 2
+    },
+    {
+      "name": "Ezreal",
+      "id": "Ezreal",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Fiddlesticks",
+      "id": "Fiddlesticks",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Fiora",
+      "id": "Fiora",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 2,
+      "utility": 2
+    },
+    {
+      "name": "Fizz",
+      "id": "Fizz",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Galio",
+      "id": "Galio",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Garen",
+      "id": "Garen",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Gnar",
+      "id": "Gnar",
+      "damage": 2,
+      "difficult": 3,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Gragas",
+      "id": "Gragas",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Graves",
+      "id": "Graves",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Gwen",
+      "id": "Gwen",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Hecarim",
+      "id": "Hecarim",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Heimerdinger",
+      "id": "Heimerdinger",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Irelia",
+      "id": "Irelia",
+      "damage": 2,
+      "difficult": 3,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Janna",
+      "id": "Janna",
+      "damage": 1,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Jarvan IV",
+      "id": "JarvanIV",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 2
+    },
+    {
+      "name": "Jax",
+      "id": "Jax",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Jayce",
+      "id": "Jayce",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Jhin",
+      "id": "Jhin",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Jinx",
+      "id": "Jinx",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "K'Sante",
+      "id": "KSante",
+      "damage": 2,
+      "difficult": 3,
+      "survive": 3,
+      "utility": 2
+    },
+    {
+      "name": "Kai'Sa",
+      "id": "Kaisa",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Kalista",
+      "id": "Kalista",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Karma",
+      "id": "Karma",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Kassadin",
+      "id": "Kassadin",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Katarina",
+      "id": "Katarina",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Kayle",
+      "id": "Kayle",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Kayn",
+      "id": "Kayn",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Kennen",
+      "id": "Kennen",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Kha'Zix",
+      "id": "Khazix",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Kindred",
+      "id": "Kindred",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Kog'Maw",
+      "id": "KogMaw",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Lee Sin",
+      "id": "LeeSin",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Leona",
+      "id": "Leona",
+      "damage": 1,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Lillia",
+      "id": "Lillia",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Lissandra",
+      "id": "Lissandra",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Lucian",
+      "id": "Lucian",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Lulu",
+      "id": "Lulu",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Lux",
+      "id": "Lux",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Malphite",
+      "id": "Malphite",
+      "damage": 1,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Maokai",
+      "id": "Maokai",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 2
+    },
+    {
+      "name": "Master Yi",
+      "id": "MasterYi",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Mel",
+      "id": "Mel",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 2
+    },
+    {
+      "name": "Milio",
+      "id": "Milio",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Miss Fortune",
+      "id": "MissFortune",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Mordekaiser",
+      "id": "Mordekaiser",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 2
+    },
+    {
+      "name": "Morgana",
+      "id": "Morgana",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Nami",
+      "id": "Nami",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Nasus",
+      "id": "Nasus",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Nautilus",
+      "id": "Nautilus",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 2
+    },
+    {
+      "name": "Nidalee",
+      "id": "Nidalee",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Nilah",
+      "id": "Nilah",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Nocturne",
+      "id": "Nocturne",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Nunu & Willump",
+      "id": "Nunu",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 2
+    },
+    {
+      "name": "Olaf",
+      "id": "Olaf",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Orianna",
+      "id": "Orianna",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Ornn",
+      "id": "Ornn",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 2
+    },
+    {
+      "name": "Pantheon",
+      "id": "Pantheon",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Poppy",
+      "id": "Poppy",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Pyke",
+      "id": "Pyke",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Rakan",
+      "id": "Rakan",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 3
+    },
+    {
+      "name": "Rammus",
+      "id": "Rammus",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Rell",
+      "id": "Rell",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 2
+    },
+    {
+      "name": "Renekton",
+      "id": "Renekton",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Rengar",
+      "id": "Rengar",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Riven",
+      "id": "Riven",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Rumble",
+      "id": "Rumble",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Ryze",
+      "id": "Ryze",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Samira",
+      "id": "Samira",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Senna",
+      "id": "Senna",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Seraphine",
+      "id": "Seraphine",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Sett",
+      "id": "Sett",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Shen",
+      "id": "Shen",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 3
+    },
+    {
+      "name": "Shyvana",
+      "id": "Shyvana",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Singed",
+      "id": "Singed",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Sion",
+      "id": "Sion",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Sivir",
+      "id": "Sivir",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Skarner",
+      "id": "Skarner",
+      "damage": 1,
+      "difficult": 2,
+      "survive": 3,
+      "utility": 2
+    },
+    {
+      "name": "Smolder",
+      "id": "Smolder",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Sona",
+      "id": "Sona",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Soraka",
+      "id": "Soraka",
+      "damage": 1,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Swain",
+      "id": "Swain",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Syndra",
+      "id": "Syndra",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Taliyah",
+      "id": "Taliyah",
+      "damage": 2,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Talon",
+      "id": "Talon",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Teemo",
+      "id": "Teemo",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Thresh",
+      "id": "Thresh",
+      "damage": 1,
+      "difficult": 3,
+      "survive": 2,
+      "utility": 3
+    },
+    {
+      "name": "Tristana",
+      "id": "Tristana",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Tryndamere",
+      "id": "Tryndamere",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Twisted Fate",
+      "id": "TwistedFate",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Twitch",
+      "id": "Twitch",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Urgot",
+      "id": "Urgot",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Varus",
+      "id": "Varus",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Vayne",
+      "id": "Vayne",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Veigar",
+      "id": "Veigar",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Vel'Koz",
+      "id": "Velkoz",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Vex",
+      "id": "Vex",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 2
+    },
+    {
+      "name": "Vi",
+      "id": "Vi",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Viego",
+      "id": "Viego",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Viktor",
+      "id": "Viktor",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Vladimir",
+      "id": "Vladimir",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Volibear",
+      "id": "Volibear",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 3,
+      "utility": 1
+    },
+    {
+      "name": "Warwick",
+      "id": "Warwick",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Wukong",
+      "id": "MonkeyKing",
+      "damage": 3,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Xayah",
+      "id": "Xayah",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Xin Zhao",
+      "id": "XinZhao",
+      "damage": 2,
+      "difficult": 1,
+      "survive": 2,
+      "utility": 1
+    },
+    {
+      "name": "Yasuo",
+      "id": "Yasuo",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Yone",
+      "id": "Yone",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Yunara",
+      "id": "Yunara",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 2
+    },
+    {
+      "name": "Yuumi",
+      "id": "Yuumi",
+      "damage": 1,
+      "difficult": 1,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Zed",
+      "id": "Zed",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Zeri",
+      "id": "Zeri",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Ziggs",
+      "id": "Ziggs",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Zilean",
+      "id": "Zilean",
+      "damage": 2,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 3
+    },
+    {
+      "name": "Zoe",
+      "id": "Zoe",
+      "damage": 3,
+      "difficult": 3,
+      "survive": 1,
+      "utility": 1
+    },
+    {
+      "name": "Zyra",
+      "id": "Zyra",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
+    }
+  ]
+}
