@@ -1,5 +1,5 @@
 {
- "built": "2026-08-23",
+ "built": "2026-08-24",
  "note": "ПАРЫ «кто кого контрит», собраны роботом. Данные РЕДАКЦИОННЫЕ — это мнение авторов сайтов-источников, не статистика матчей. Показывать вместе с источником и sourceDate: часть страниц отстаёт на несколько патчей. Winrate-проценты этих сайтов НЕ забираем — источник чисел там не указан. Текст «почему» берётся из champion-tags.json.",
  "sources": {
   "wildriftcounter": {
@@ -5059,12 +5059,12 @@
       },
       "Mid": {
        "counteredBy": [
-        "brand",
-        "diana",
         "yasuo",
         "vex",
-        "ekko",
-        "annie"
+        "diana",
+        "brand",
+        "annie",
+        "ekko"
        ],
        "strongAgainst": [
         "katarina",
@@ -6736,12 +6736,12 @@
       },
       "Support": {
        "counteredBy": [
-        "brand",
         "maokai",
         "rakan",
+        "brand",
         "nami",
-        "sona",
-        "pyke"
+        "pyke",
+        "sona"
        ],
        "strongAgainst": [
         "alistar",
@@ -6754,12 +6754,12 @@
       },
       "Adc": {
        "counteredBy": [
+        "kaisa",
         "vayne",
         "tristana",
+        "aphelios",
         "kalista",
-        "ashe",
-        "kaisa",
-        "aphelios"
+        "ashe"
        ],
        "strongAgainst": [
         "caitlyn",
@@ -9061,10 +9061,10 @@
         "seraphine"
        ],
        "strongAgainst": [
-        "soraka",
-        "morgana",
         "janna",
+        "morgana",
         "brand",
+        "soraka",
         "sona"
        ]
       },
@@ -9535,12 +9535,12 @@
         "rammus"
        ],
        "strongAgainst": [
-        "fiddlesticks",
-        "evelynn",
-        "wukong",
         "amumu",
+        "ekko",
+        "fiddlesticks",
+        "wukong",
         "dr-mundo",
-        "ekko"
+        "evelynn"
        ]
       },
       "Top": {
@@ -9553,12 +9553,12 @@
         "malphite"
        ],
        "strongAgainst": [
-        "volibear",
-        "dr-mundo",
-        "olaf",
-        "teemo",
         "darius",
-        "gwen"
+        "teemo",
+        "volibear",
+        "olaf",
+        "gwen",
+        "dr-mundo"
        ]
       }
      }
