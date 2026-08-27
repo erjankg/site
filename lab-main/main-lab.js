@@ -1,806 +1,1721 @@
-/* ══════════════════════════════════════════════════════════
-   MAIN-LAB · песочница главного экрана (v3)
-   ══════════════════════════════════════════════════════════ */
-(function(){
+/* ============================================================
+   lab-main — главный экран по КАНОНУ (DESIGN.md)
+   Пересобран из эталона lab-design-system. Стекло/анимации ТОЛЬКО через токены.
+   GOTCHA: стекло видно всё время; fade только opacity на самих .glass;
+   никакого transform/will-change на стекле.
+   ============================================================ */
+(function () {
   'use strict';
 
-  /* ── Темы (все с тонким рельсом слева + вкладками + карточкой справа) ── */
-  const LAYOUTS = [
-    {id:'base', n:'Базовый', d:'Тонкий рельс + вкладки + карточка чемпа справа', pic:'base'},
-  ];
+  var root = document.documentElement;
+  var app = document.getElementById('app');
+  var $ = function (s, c) { return (c || document).querySelector(s); };
 
-  /* ── Виды (вкладки в шапке) ── */
-  const VIEWS = [
-    {v:'stats',   t:'Статы',        ic:'📊'},
-    {v:'wrpr',    t:'WinRate',      ic:'🏆'},
-    {v:'hub',     t:'Мета-хаб',     ic:'🧩'},
-    {v:'tier',    t:'Тир-лист',     ic:'🎖'},
-    {v:'patch',   t:'Патч',         ic:'📰'},
-    {v:'tactics', t:'Тактич. доска',ic:'🗺'},
-  ];
-
-  /* ── Категории-сегменты ── */
-  const HLITE=[
-    {v:'white', t:'Бело-стекло'},
-    {v:'accent',t:'Акцент'},
-    {v:'gold',  t:'Золото'},
-    {v:'grad',  t:'Градиент'},
-    {v:'edge',  t:'Неон-кант'},
-    {v:'frost', t:'Заморозка'},
-  ];
-  const OPTS = {
-    menufx:{label:'Открытие меню (профиль/админ)', val:'dim', items:[
-      {v:'none', t:'Нет'},
-      {v:'dim',  t:'Затемнение'},
-      {v:'blur', t:'Блюр фона'},
-    ]},
-    menuanim:{label:'Анимация меню (из кнопки)', val:'genie', items:[
-      {v:'genie',  t:'Джинн (плавно)'},
-      {v:'pop',    t:'Пружина'},
-      {v:'unfold', t:'Разворот'},
-      {v:'zoom',   t:'Зум (быстро)'},
-      {v:'drop',   t:'Падение'},
-      {v:'flip',   t:'Флип 3D'},
-      {v:'fade',   t:'Фейд'},
-    ]},
-    srowh:{label:'Статы · ховер строки',     val:'white',  items:HLITE},
-    srows:{label:'Статы · выбранная строка', val:'accent', items:HLITE},
-    scolh:{label:'Статы · ховер столбца',    val:'white',  items:HLITE},
-    scols:{label:'Статы · выбранный столбец',val:'accent', items:HLITE},
-    wrowh:{label:'WinRate · ховер строки',     val:'white',  items:HLITE},
-    wrows:{label:'WinRate · выбранная строка', val:'accent', items:HLITE},
-    splashart:{label:'Арт фона (сплэш)', val:'lux', items:[
-      {v:'lux',    t:'Lux'},
-      {v:'thresh', t:'Thresh'},
-      {v:'ahri',   t:'Ahri'},
-      {v:'yasuo',  t:'Yasuo'},
-      {v:'jinx',   t:'Jinx'},
-      {v:'brand',  t:'Бренд'},
-    ]},
-    glasstint:{label:'СТЕКЛО — оттенок', val:'neutral', items:[
-      {v:'neutral', t:'Нейтр.'},
-      {v:'accent',  t:'Акцент'},
-      {v:'warm',    t:'Тёплое'},
-      {v:'cool',    t:'Холодное'},
-    ]},
-    // ── Уникальные настройки видео-блока (перенос из lab-youtube) — в пульте хозяина ──
-    ytTitle:{label:'🎬 Видео · название', val:'on', items:[{v:'on',t:'Показывать'},{v:'off',t:'Скрыть'}]},
-    ytMarkOld:{label:'🎬 Видео · старые патчи', val:'on', items:[{v:'on',t:'Глушить'},{v:'off',t:'Норм'}]},
-    ytSort:{label:'🎬 Видео · сортировка', val:'on', items:[{v:'on',t:'Свежие сверху'},{v:'off',t:'Как есть'}]},
-  };
-
-  /* Пользовательские настройки — ВНУТРИ «Мой профиль → Настройки» (на боевом — настройка юзера) */
-  const PROFOPTS = {
-    glasspow:{label:'Сила стекла', items:[{v:'light',t:'Лёгкое'},{v:'mid',t:'Среднее'},{v:'strong',t:'Сильное'},{v:'ultra',t:'Экстрим'}]},
-    density:{label:'Плотность таблиц', items:[{v:'cozy',t:'Просторно'},{v:'normal',t:'Средне'},{v:'dense',t:'Плотно'}]},
-    tblfont:{label:'Шрифт таблиц', items:[{v:'small',t:'Мелкий'},{v:'medium',t:'Средний'},{v:'large',t:'Крупный'}]},
-    glow:{label:'Сила свечения', items:[{v:'off',t:'Выкл'},{v:'soft',t:'Лёгкое'},{v:'strong',t:'Сочное'}]},
-    radius:{label:'Скругление углов', items:[{v:'sharp',t:'Острые'},{v:'medium',t:'Средние'},{v:'round',t:'Круглые'}]},
-  };
-
-  /* Параметры тир-листа — ВНУТРИ вида (не в верхней панели) */
-  const TIEROPTS = {
-    tlayout:{label:'Раскладка', items:[{v:'rows',t:'Ряды'},{v:'cols',t:'Колонки'}]},
-    tpool:{label:'Пул', items:[{v:'bottom',t:'Снизу'},{v:'side',t:'Сбоку'}]},
-    tsize:{label:'Размер в тирах', items:[{v:'s',t:'S'},{v:'m',t:'M'},{v:'l',t:'L'}]},
-    psize:{label:'Размер в пуле', items:[{v:'s',t:'S'},{v:'m',t:'M'},{v:'l',t:'L'}]},
-  };
-
-  const SPLASHES = {
-    lux:   "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg')",
-    thresh:"url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_0.jpg')",
-    ahri:  "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg')",
-    yasuo: "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg')",
-    jinx:  "url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg')",
-    brand: "radial-gradient(ellipse at 28% 18%,rgba(11,196,227,.38),transparent 55%),radial-gradient(ellipse at 78% 82%,rgba(200,155,60,.30),transparent 55%),linear-gradient(135deg,#02121f,#0a0617)",
-  };
-  const BG_COLORS = [
-    {hex:'#01070e', t:'Почти чёрный'},
-    {hex:'#04121f', t:'Тёмно-синий'},
-    {hex:'#0a0617', t:'Тёмно-фиолет'},
-    {hex:'#06140f', t:'Тёмно-зелёный'},
-    {hex:'#16060b', t:'Тёмно-красный'},
-    {hex:'#0d0d12', t:'Графит'},
-  ];
-  const ACCENTS = [
-    {rgb:'11,196,227',  hex:'#0BC4E3', t:'Циан (сайт)'},
-    {rgb:'200,155,60',  hex:'#C89B3C', t:'Золото'},
-    {rgb:'180,140,255', hex:'#B48CFF', t:'Фиолет'},
-    {rgb:'46,204,113',  hex:'#2ECC71', t:'Зелёный'},
-    {rgb:'231,76,60',   hex:'#E74C3C', t:'Красный'},
-    {rgb:'255,99,164',  hex:'#FF63A4', t:'Розовый'},
-  ];
-
-  /* ── Мок-данные ── */
-  const SIDE = [
-    {ic:'👥', t:'Чемпионы', active:true},{ic:'⚔', t:'Калькулятор урона'},
-    {ic:'📦', t:'Предметы'},{ic:'💎', t:'Руны'},{ic:'📋', t:'Драфтер'},
-    {ic:'💬', t:'Чат'},{ic:'🏆', t:'Киберспорт'},
-  ];
-  const COLS = [
-    {k:'ad',t:'AD',ic:'🗡',sorted:true},{k:'hp',t:'HP',ic:'➕'},{k:'mana',t:'Mana',ic:'💧'},
-    {k:'ar',t:'AR',ic:'🛡'},{k:'mr',t:'MR',ic:'✦'},{k:'rng',t:'RNG',ic:'⊘'},
-  ];
-  const CH = [
-    {n:'Garen',   g:'linear-gradient(135deg,#4aa3ff,#103a6e)', i:'G', ad:108,hp:1920,mana:'0',  ar:95,mr:58,rng:1, wr:54.8,pr:16,br:9, tier:'s', role:'Соло'},
-    {n:'Camille', g:'linear-gradient(135deg,#c0c0c0,#5a5a6e)', i:'C', ad:103,hp:1842,mana:687,  ar:88,mr:56,rng:1, wr:49.1,pr:9, br:38,tier:'s', role:'Соло'},
-    {n:'Aatrox',  g:'linear-gradient(135deg,#e74c3c,#7a1d12)', i:'A', ad:112,hp:1854,mana:'0',  ar:91,mr:61,rng:1, wr:52.4,pr:14,br:22,tier:'a', role:'Соло'},
-    {n:'Ambessa', g:'linear-gradient(135deg,#d4760a,#7a3d05)', i:'Am',ad:99, hp:1740,mana:'NRG',ar:84,mr:54,rng:1, wr:47.8,pr:18,br:12,tier:'a', role:'Лес'},
-    {n:'Akali',   g:'linear-gradient(135deg,#27c4a8,#0a4a40)', i:'Ak',ad:97, hp:1701,mana:'NRG',ar:79,mr:52,rng:1, wr:50.2,pr:13,br:16,tier:'a', role:'Мид'},
-    {n:'Amumu',   g:'linear-gradient(135deg,#2ecc71,#145a32)', i:'Am',ad:85, hp:1626,mana:975,  ar:82,mr:56,rng:1, wr:53.6,pr:11,br:5, tier:'b', role:'Лес'},
-    {n:'Ahri',    g:'linear-gradient(135deg,#ff63a4,#7a1d4a)', i:'Ah',ad:74, hp:1588,mana:892,  ar:68,mr:50,rng:2, wr:51.0,pr:12,br:7, tier:'b', role:'Мид'},
-    {n:'Lux',     g:'linear-gradient(135deg,#ffe06b,#7a6010)', i:'L', ad:71, hp:1540,mana:1015, ar:64,mr:48,rng:2, wr:48.3,pr:10,br:4, tier:'c', role:'Мид'},
-  ];
-  const ch = name => CH.find(c=>c.n===name);
-  /* тренд WR vs прошлый патч + генератор мини-спарклайна (новая фича) */
-  const TREND = {Garen:1.4, Camille:-0.9, Aatrox:0.5, Ambessa:-1.7, Akali:0.3, Amumu:1.0, Ahri:-0.4, Lux:-0.7};
-  function sparkPts(wr,tr){
-    const base=wr-tr, vals=[base-1.1,base+0.5,base-0.7,base+0.9,base-0.2,wr];
-    const mn=Math.min(...vals),mx=Math.max(...vals),rg=(mx-mn)||1;
-    return vals.map((v,i)=>`${i*12},${(17-((v-mn)/rg)*14).toFixed(1)}`).join(' ');
+  /* ── анимация входа (fade на .glass) ── */
+  function animMs() {
+    var v = getComputedStyle(root).getPropertyValue('--anim-dur').trim();
+    var n = parseFloat(v); if (v.indexOf('ms') > -1) return n || 300; return (n || .3) * 1000;
   }
-  const PATCH = [
-    {n:'Garen',type:'buff',t:'Базовый урон Q +8%, восстановление HP усилено'},
-    {n:'Camille',type:'nerf',t:'Щит пассивки −10%, перезарядка W +2с'},
-    {n:'Ambessa',type:'new',t:'Новый чемпион добавлен в Wild Rift'},
-    {n:'Ahri',type:'adjust',t:'Дальность E увеличена, урон ульты снижен'},
-    {n:'Amumu',type:'buff',t:'Базовое HP +40, броня за уровень +1.5'},
-    {n:'Lux',type:'nerf',t:'Радиус E уменьшен на 5%'},
-  ];
-  const PBADGE={buff:{t:'▲ БАФ',c:'buff'},nerf:{t:'▼ НЕРФ',c:'nerf'},new:{t:'✦ НОВЫЙ',c:'new'},adjust:{t:'⚙ ПРАВКА',c:'adjust'}};
+  function playIn(el) {
+    if (!el) return;
+    el.classList.remove('anim-in'); void el.offsetWidth; el.classList.add('anim-in');
+    setTimeout(function () { el.classList.remove('anim-in'); }, animMs() + 80);
+  }
 
-  /* ── Тир-мейкер: чемпы для пула (перенос из tier-layout-lab) ── */
-  const TIERKEYS=['S+','S','A','B','C','D'];
-  const TIERCOLORS={'S+':'#FF3A3A','S':'#C43A3A','A':'#C46A1C','B':'#BC9800','C':'#1E8848','D':'#555566'};
-  const TIERCH=[
-    {n:'Aatrox',i:'A', g:'linear-gradient(135deg,#e74c3c,#7a1d12)'},
-    {n:'Ahri',  i:'Ah',g:'linear-gradient(135deg,#ff63a4,#7a1d4a)'},
-    {n:'Akali', i:'Ak',g:'linear-gradient(135deg,#27c4a8,#0a4a40)'},
-    {n:'Ashe',  i:'As',g:'linear-gradient(135deg,#7ec8e3,#1a4a66)'},
-    {n:'Camille',i:'C',g:'linear-gradient(135deg,#c0c0c0,#5a5a6e)'},
-    {n:'Darius',i:'D', g:'linear-gradient(135deg,#b03030,#3a0a0a)'},
-    {n:'Ezreal',i:'E', g:'linear-gradient(135deg,#f3d65a,#7a5a10)'},
-    {n:'Garen', i:'G', g:'linear-gradient(135deg,#4aa3ff,#103a6e)'},
-    {n:'Jhin',  i:'J', g:'linear-gradient(135deg,#d44a6a,#3a0a1a)'},
-    {n:'Jinx',  i:'Jx',g:'linear-gradient(135deg,#ff7ac0,#5a1a6e)'},
-    {n:'Katarina',i:'K',g:'linear-gradient(135deg,#e0506a,#5a0a1a)'},
-    {n:'Leona', i:'L', g:'linear-gradient(135deg,#f0b84a,#7a4a10)'},
-    {n:'Lux',   i:'Lx',g:'linear-gradient(135deg,#ffe06b,#7a6010)'},
-    {n:'Malphite',i:'M',g:'linear-gradient(135deg,#7ac0a0,#1a4a3a)'},
-    {n:'Nasus', i:'N', g:'linear-gradient(135deg,#d4a050,#5a3a10)'},
-    {n:'Riven', i:'R', g:'linear-gradient(135deg,#7ab0d0,#2a4a6e)'},
-    {n:'Sett',  i:'S', g:'linear-gradient(135deg,#e06a6a,#5a1a1a)'},
-    {n:'Yasuo', i:'Y', g:'linear-gradient(135deg,#6ab0c0,#1a3a4a)'},
+  /* ============================================================
+     ДАННЫЕ (демо) — перенос из старого lab-main
+     ============================================================ */
+  var CH = [
+    { n: 'Garen',   g: 'linear-gradient(135deg,#4aa3ff,#103a6e)', i: 'G',  ad: 108, hp: 1920, mana: '0',   ar: 95, mr: 58, rng: 1, wr: 54.8, pr: 16, br: 9,  tier: 's',  role: 'Соло', tr: 1.4 },
+    { n: 'Camille', g: 'linear-gradient(135deg,#c0c0c0,#5a5a6e)', i: 'C',  ad: 103, hp: 1842, mana: 687,  ar: 88, mr: 56, rng: 1, wr: 49.1, pr: 9,  br: 38, tier: 's',  role: 'Соло', tr: -0.9 },
+    { n: 'Aatrox',  g: 'linear-gradient(135deg,#e74c3c,#7a1d12)', i: 'A',  ad: 112, hp: 1854, mana: '0',   ar: 91, mr: 61, rng: 1, wr: 52.4, pr: 14, br: 22, tier: 'a',  role: 'Соло', tr: 0.5 },
+    { n: 'Ambessa', g: 'linear-gradient(135deg,#d4760a,#7a3d05)', i: 'Am', ad: 99,  hp: 1740, mana: 'NRG', ar: 84, mr: 54, rng: 1, wr: 47.8, pr: 18, br: 12, tier: 'a',  role: 'Лес',  tr: -1.7 },
+    { n: 'Akali',   g: 'linear-gradient(135deg,#27c4a8,#0a4a40)', i: 'Ak', ad: 97,  hp: 1701, mana: 'NRG', ar: 79, mr: 52, rng: 1, wr: 50.2, pr: 13, br: 16, tier: 'a',  role: 'Мид',  tr: 0.3 },
+    { n: 'Amumu',   g: 'linear-gradient(135deg,#2ecc71,#145a32)', i: 'Am', ad: 85,  hp: 1626, mana: 975,  ar: 82, mr: 56, rng: 1, wr: 53.6, pr: 11, br: 5,  tier: 'b',  role: 'Лес',  tr: 1.0 },
+    { n: 'Ahri',    g: 'linear-gradient(135deg,#ff63a4,#7a1d4a)', i: 'Ah', ad: 74,  hp: 1588, mana: 892,  ar: 68, mr: 50, rng: 2, wr: 51.0, pr: 12, br: 7,  tier: 'b',  role: 'Мид',  tr: -0.4 },
+    { n: 'Lux',     g: 'linear-gradient(135deg,#ffe06b,#7a6010)', i: 'L',  ad: 71,  hp: 1540, mana: 1015, ar: 64, mr: 48, rng: 2, wr: 48.3, pr: 10, br: 4,  tier: 'c',  role: 'Мид',  tr: -0.7 }
   ];
-  const TIERMAP=Object.fromEntries(TIERCH.map(c=>[c.n,c]));
-  let tierPlacement=null;
-  function tierInit(){ tierPlacement={pool:TIERCH.map(c=>c.n)}; TIERKEYS.forEach(k=>tierPlacement[k]=[]); }
+  /* добор чемпов — чтобы пикер выглядел как настоящий (демо-цифры) */
+  [['Darius', 'Соло', 's', 53.1, 15, 28], ['Jinx', 'Дракон', 'a', 51.7, 17, 8],
+   ['Ezreal', 'Дракон', 'b', 49.6, 19, 6], ['Leona', 'Саппорт', 'a', 52.2, 12, 11],
+   ['Malphite', 'Соло', 'b', 50.8, 8, 6], ['Nasus', 'Соло', 'c', 48.9, 7, 3],
+   ['Riven', 'Соло', 'a', 51.3, 10, 14], ['Sett', 'Соло', 'b', 50.1, 11, 9],
+   ['Yasuo', 'Мид', 'c', 47.9, 21, 19], ['Ashe', 'Дракон', 'b', 50.4, 13, 5],
+   ['Jhin', 'Дракон', 'a', 52.0, 16, 7], ['Katarina', 'Мид', 'b', 49.4, 9, 12]
+  ].forEach(function (r, i) {
+    CH.push({
+      n: r[0], g: 'linear-gradient(135deg,#4aa3ff,#103a6e)', i: r[0].slice(0, 2),
+      ad: 70 + (i * 4) % 45, hp: 1520 + (i * 37) % 400, mana: 600 + (i * 53) % 420,
+      ar: 60 + (i * 5) % 38, mr: 46 + (i * 3) % 18, rng: r[1] === 'Дракон' ? 2 : 1,
+      wr: r[3], pr: r[4], br: r[5], tier: r[2], role: r[1], tr: ((i % 5) - 2) * 0.6
+    });
+  });
 
-  /* ── Состояние ── */
-  const S = {
-    layout:'base', view:'hub', selRow:0,
-    switcher:'glass', level:'chipdrag', tbl:'cards', anim:'slide', density:'normal', bg:'splash',
-    srowh:'white', srows:'accent', scolh:'white', scols:'accent', wrowh:'white', wrows:'accent', menufx:'dim', menuanim:'genie',
-    rail:'float', railanim:'fade', railbtn:'minimal', railact:'border',
-    radius:'medium', glow:'soft', tblfont:'medium', island:true, thstyle:'glass',
-    tlayout:'rows', tpool:'bottom', tsize:'m', psize:'m', tierOpen:false,
-    speed:1.5, accent:ACCENTS[0].rgb, accent2:'200,155,60', gpos:62, gang:135,
-    bg1:'#04121f', bg2:'#01070e', bgpos:60, bgang:160,
-    wrpull:80, rightpanel:true, winloss:true, wrtrend:false,
-    glass:true, glasspow:'mid', glasstint:'neutral', glasssat:'norm', glassborder:'thin', glassnoise:false, parallax:false, splashart:'lux',
-    ytTitle:'on', ytMarkOld:'on', ytSort:'on',   // уникальные настройки видео-блока (перенос из lab-youtube) — в пульте хозяина
+  var ch = function (n) { return CH.find(function (c) { return c.n === n; }); };
+  /* ИКОНКА 120×120 (как app.js:348 DD_URL) — НЕ ужатый сплэш */
+  var ICON = 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/';
+  function icon(c) { return ICON + c.n + '.png'; }
+  /* Ассет подбираем ПОД РАЗМЕР ПОКАЗА: иконка 128px мылится, если растянуть её на 180px
+     (вид «Крупные карточки»). Квадратный тайл — ПРОВЕРЕНО замером 3 чемпов: 380×380.
+     Больше квадрата нет: CommunityDragon square = 128×128, а loading = 308×560 (кривой
+     формат, из-за него и было «качество говно»). Потолок источника = 380px, ячейка
+     ограничена им в CSS — апскейлу неоткуда взяться ни на одном виде/размере. */
+  var TILE = 'https://ddragon.leagueoflegends.com/cdn/img/champion/tiles/';
+  function iconSet(c) { return icon(c) + ' 128w, ' + TILE + c.n + '_0.jpg 380w'; }
+
+  /* ============================================================
+     РЕЕСТР ИКОНОК СТАТОВ — снят с ЖИВОГО боевого (window._siteIcons, 2026-07-20).
+     В боевом реестр приходит из Firestore; в лабе Firebase нет, поэтому держим
+     снимок и всё равно СНАЧАЛА пробуем настоящий реестр, если он вдруг есть.
+     Свои SVG не рисуем, emoji не используем (запрет владельца).
+     ============================================================ */
+  var ICONS_SNAPSHOT = {
+    ad:   'https://assets.riftgg.app/icons/stats/attack-damage.svg',
+    ap:   'https://assets.riftgg.app/icons/stats/ability-damage.svg',
+    hp:   'https://assets.riftgg.app/icons/stats/health.svg',
+    mana: 'https://assets.riftgg.app/icons/stats/mana.svg',
+    arm:  'https://assets.riftgg.app/icons/stats/armor.svg',
+    mrez: 'https://assets.riftgg.app/icons/stats/magic-resist.svg',
+    as:   'https://assets.riftgg.app/icons/stats/attack-speed.svg',
+    krit: 'https://assets.riftgg.app/icons/stats/crit-change.svg',
+    usk:  'https://assets.riftgg.app/icons/stats/ability-haste.webp',
+    mpen: 'https://assets.riftgg.app/icons/stats/magic-pen.webp',
+    sh:   'https://assets.riftgg.app/icons/stats/heal-and-shield-power.webp',
+    gold: 'https://www.svgrepo.com/show/234310/money-coin.svg'
+  };
+  function statIcon(name) {
+    var reg = (window._siteIcons && window._siteIcons[name]) || ICONS_SNAPSHOT[name];
+    return reg || '';
+  }
+
+  /* ============================================================
+     КОЛОНКИ ТАБЛИЦЫ (порт STATS_COL_DEFS, app.js:371).
+     ico  — ключ в реестре иконок ('' = иконки в реестре пока НЕТ)
+     col  — цвет стата (палитра на утверждение)
+     hi   — «выше значение = лучше» (для заливки по рейтингу)
+     ============================================================ */
+  var COL_DEFS = [
+    { key:'ad',   label:'AD',   ico:'ad',   col:'#E5484D', hi:true },
+    { key:'hp',   label:'HP',   ico:'hp',   col:'#3DD68C', hi:true },
+    { key:'mana', label:'Mana', ico:'mana', col:'#4A9EFF', hi:true },
+    { key:'ar',   label:'AR',   ico:'arm',  col:'#F5A524', hi:true },
+    { key:'mr',   label:'MR',   ico:'mrez', col:'#A97BFF', hi:true },
+    { key:'rng',  label:'RNG',  ico:'',     col:'#ffffff', hi:true },
+    { key:'as',   label:'AS',   ico:'as',   col:'#F5D90A', hi:true,  off:true },
+    { key:'ms',   label:'MS',   ico:'',     col:'#2DD4BF', hi:true,  off:true },
+    { key:'hpreg',label:'HP5',  ico:'',     col:'#7BE0A8', hi:true,  off:true },
+    { key:'mpreg',label:'MP5',  ico:'',     col:'#8FC4FF', hi:true,  off:true }
+  ];
+  /* видимые колонки — юзер правит в ⚙ вкладки (порт getStatsCols) */
+  var colHidden = {};
+  COL_DEFS.forEach(function (c) { if (c.off) colHidden[c.key] = true; });
+  function visibleCols() { return COL_DEFS.filter(function (c) { return !colHidden[c.key]; }); }
+
+  /* ============================================================
+     РОСТ ЗА УРОВЕНЬ — для тултипа «+N за уровень» (демо-модель:
+     доля от базы, одинаковая для всех чемпов; в боевом это реальные *_Growth).
+     ============================================================ */
+  var GROWTH_FR = { ad:.055, hp:.075, mana:.05, ar:.05, mr:.035, rng:0, as:.02, ms:0, hpreg:.06, mpreg:.05 };
+  function growthOf(c, key) {
+    var base = +c[key];
+    if (isNaN(base)) return 0;
+    return Math.round(base * (GROWTH_FR[key] || 0) * 10) / 10;
+  }
+  /* значение стата на текущем уровне: база + рост*(ур-1) */
+  function statAt(c, key) {
+    var base = c[key];
+    if (isNaN(+base)) return base;            /* 'NRG' / '0' оставляем как есть */
+    return Math.round(+base + growthOf(c, key) * (level - 1));
+  }
+
+  /* ============================================================
+     ПАТЧ-ИЗМЕНЕНИЯ по чемпам (порт patchMap, app.js:368) — демо.
+     ============================================================ */
+  var PATCH_MAP = {
+    Garen:   { type:'buff',   patch:'7.0f', stat:'ad', delta:'+8',  change:'Базовый урон Q +8%' },
+    Camille: { type:'nerf',   patch:'7.0f', stat:'hp', delta:'-40', change:'Щит пассивки −10%' },
+    Ahri:    { type:'adjust', patch:'7.0f', stat:'mana',delta:'+25',change:'Дальность E увеличена' },
+    Amumu:   { type:'buff',   patch:'7.0f', stat:'ar', delta:'+1.5',change:'Броня за уровень +1.5' },
+    Lux:     { type:'nerf',   patch:'7.0f', stat:'rng',delta:'-5',  change:'Радиус E уменьшен на 5%' }
   };
 
-  const $ = s => document.querySelector(s);
-  const frame = $('#mlFrame');
-  const toast = $('#mlToast');
-  let toastT;
-  const root = document.documentElement;
-  let selChamp = CH[0];
+  var COLS = [
+    { k: 'ad', t: 'AD' }, { k: 'hp', t: 'HP' }, { k: 'mana', t: 'Mana' },
+    { k: 'ar', t: 'AR' }, { k: 'mr', t: 'MR' }, { k: 'rng', t: 'RNG' }
+  ];
+  var PATCH = [
+    { n: 'Garen',   type: 'buff',   t: 'Базовый урон Q +8%, восстановление HP усилено' },
+    { n: 'Camille', type: 'nerf',   t: 'Щит пассивки −10%, перезарядка W +2с' },
+    { n: 'Ambessa', type: 'new',    t: 'Новый чемпион добавлен в Wild Rift' },
+    { n: 'Ahri',    type: 'adjust', t: 'Дальность E увеличена, урон ульты снижен' },
+    { n: 'Amumu',   type: 'buff',   t: 'Базовое HP +40, броня за уровень +1.5' },
+    { n: 'Lux',     type: 'nerf',   t: 'Радиус E уменьшен на 5%' }
+  ];
+  var PBADGE = { buff: '▲ БАФ', nerf: '▼ НЕРФ', new: '✦ НОВЫЙ', adjust: '⚙ ПРАВКА' };
+  var ROLES = ['Все', 'Соло', 'Лес', 'Мид'];
+  var MAP_OBJ = [
+    { x: 22, y: 20, l: 'B', t: 'Барон' }, { x: 74, y: 78, l: 'D', t: 'Дракон' },
+    { x: 30, y: 62, l: '🐺', t: 'Волки' }, { x: 68, y: 34, l: '🦎', t: 'Ящеры' },
+    { x: 50, y: 50, l: '⚔', t: 'Мид' }
+  ];
 
-  /* ══════════════ CONTROLS ══════════════ */
-  function buildControls(){
-    const c = $('#mlControls');
-    let h = '';
-    for(const key of Object.keys(OPTS)){
-      const o = OPTS[key]; const nu=o.neu;
-      h += `<div class="ml-group${nu?' ml-group--new':''}"><span class="ml-glabel${nu?' ml-glabel--new':''}">${nu?'🆕 ':''}${o.label}</span><div class="ml-seg" data-opt="${key}">`;
-      h += o.items.map(it=>`<button data-v="${it.v}" class="${it.v===S[key]?'on':''}">${it.t}</button>`).join('');
-      h += `</div></div>`;
+  var TIER_ORD = { s: 5, a: 4, b: 3, c: 2, d: 1 };
+  var wrCls = function (v) { return v >= 50 ? 'wr-g' : 'wr-b'; };
+  var ava = function (c, cls) { return '<span class="' + (cls || 'ch-ava') + '" style="background:' + c.g + '">' + c.i + '</span>'; };
+  function sparkPts(wr, tr) {
+    var base = wr - tr, vals = [base - 1.1, base + 0.5, base - 0.7, base + 0.9, base - 0.2, wr];
+    var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals), rg = (mx - mn) || 1;
+    return vals.map(function (v, i) { return (i * 12) + ',' + (17 - ((v - mn) / rg) * 14).toFixed(1); }).join(' ');
+  }
+
+  /* ── состояние (только то, что не покрыто утв. дефолтами) ── */
+  var selName = 'Garen';
+  var roleFilter = 'Все';
+  var level = 10;                                   /* уровень для таблицы Статс */
+  var picked = {};                                  /* мультивыбор чемпов в таблицу */
+  CH.slice(0, 8).forEach(function (c) { picked[c.n] = true; });
+  var pkSearch = '', pkRole = 'Все';
+  var _lastView = null;                             /* чтобы анимировать только смену вида */
+  var rightMode = 'swap';                           /* swap | card | off */
+  var tipMode = 'cursor';                           /* cursor | cell | row */
+  var patchMode = 'dot';                            /* dot | cellhl | arrow */
+  var fillOn = true, fillStrength = 'mid', fillShape = 'cell';
+  var fillScheme = 'rg', fillInvert = false;        /* rg | cb */
+  var iconMode = 'color';                           /* color | mono */
+  var roleView = 'icons';                           /* icons | both | compact */
+  var tblW = 1050;                                  /* ширина таблиц, px (⚙ юзера) */
+
+  /* ============================================================
+     ЗАЛИВКА ПО РЕЙТИНГУ — шкала считается ВНУТРИ СВОЕЙ КОЛОНКИ
+     (мин/макс по видимым чемпам этой колонки), как в тирмейкере.
+     ============================================================ */
+  var STRENGTH = { none:0, weak:.12, mid:.24, bright:.40 };
+  function colRange(list, key) {
+    var mn = Infinity, mx = -Infinity;
+    list.forEach(function (c) {
+      var v = +statAt(c, key);
+      if (isNaN(v)) return;
+      if (v < mn) mn = v; if (v > mx) mx = v;
+    });
+    return (mn === Infinity) ? null : { mn: mn, mx: mx };
+  }
+  /* t: 0 = низ колонки, 1 = верх колонки */
+  function fillColor(t) {
+    var a = STRENGTH[fillStrength] || 0;
+    if (!fillOn || !a) return '';
+    if (fillInvert) t = 1 - t;
+    if (fillScheme === 'cb') {
+      /* Схема 2 — «Янтарь↔Лазурь»: безопасна для дальтоников (протан/дейтеран),
+         красный/зелёный им сливаются, а синий↔жёлтый различимы всегда.
+         Плюс работает и по ЯРКОСТИ, то есть читается даже в ч/б. */
+      var hi = [245, 165, 36], lo = [74, 158, 255];
+      var r = Math.round(lo[0] + (hi[0] - lo[0]) * t);
+      var g = Math.round(lo[1] + (hi[1] - lo[1]) * t);
+      var b = Math.round(lo[2] + (hi[2] - lo[2]) * t);
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + (a * (0.35 + 0.65 * Math.abs(t - .5) * 2)).toFixed(3) + ')';
     }
-    // тумблеры
-    h += `<div class="ml-group"><span class="ml-glabel">Доп.</span><div style="display:flex;gap:14px;align-items:center;height:34px;">
-      <label class="ml-check"><input type="checkbox" id="mlRP" checked> Правая панель</label>
-      <label class="ml-check"><input type="checkbox" id="mlWL" checked> Цвет побед/пораж.</label>
-      <label class="ml-check"><input type="checkbox" id="mlISL" ${S.island?'checked':''}> Островной стиль</label></div></div>`;
-    h += `<div class="ml-group"><span class="ml-glabel">СТЕКЛО (glassmorphism)</span><div style="display:flex;gap:14px;align-items:center;height:34px;">
-      <label class="ml-check"><input type="checkbox" id="mlGlass" ${S.glass?'checked':''}> Стекло вкл</label>
-      <label class="ml-check"><input type="checkbox" id="mlGlassNoise"> Зерно/шум</label>
-      <label class="ml-check"><input type="checkbox" id="mlParallax"> Параллакс фона</label></div></div>`;
-    h += `<div class="ml-group ml-group--new"><span class="ml-glabel ml-glabel--new">🆕 НОВЫЕ ФИЧИ (по ресёрчу)</span><div style="display:flex;gap:14px;align-items:center;height:34px;">
-      <label class="ml-check"><input type="checkbox" id="mlWrTrend"> WR-тренд + спарклайн</label></div></div>`;
-    // ползунки
-    h += `<div class="ml-group"><span class="ml-glabel">Скорость</span><div class="ml-speed"><input id="mlSpeed" type="range" min="0.3" max="2" step="0.1" value="${S.speed}"><span id="mlSpeedVal">${S.speed.toFixed(1)}×</span></div></div>`;
-    h += `<div class="ml-group"><span class="ml-glabel">Баланс градиента</span><div class="ml-speed"><input id="mlGpos" type="range" min="5" max="95" step="1" value="${S.gpos}"><span id="mlGposVal">${S.gpos}%</span></div></div>`;
-    h += `<div class="ml-group"><span class="ml-glabel">Угол градиента</span><div class="ml-speed"><input id="mlGang" type="range" min="0" max="360" step="5" value="${S.gang}"><span id="mlGangVal">${S.gang}°</span></div></div>`;
-    h += `<div class="ml-group"><span class="ml-glabel">Приближение WR</span><div class="ml-speed"><input id="mlWR" type="range" min="0" max="100" step="1" value="${S.wrpull}"><span id="mlWRVal">${S.wrpull}</span></div></div>`;
-    // цвета
-    h += `<div class="ml-group"><span class="ml-glabel">Акцент (1-й)</span><div class="ml-swatches" id="mlSw">`;
-    h += ACCENTS.map(a=>`<span class="ml-sw ${a.rgb===S.accent?'on':''}" data-rgb="${a.rgb}" style="background:${a.hex}" title="${a.t}"></span>`).join('');
-    h += `<label class="ml-custom"><input type="color" id="mlCustom" value="#0bc4e3"></label></div></div>`;
-    h += `<div class="ml-group"><span class="ml-glabel">Градиент (2-й)</span><div class="ml-swatches" id="mlSw2">`;
-    h += ACCENTS.map(a=>`<span class="ml-sw ${a.rgb===S.accent2?'on':''}" data-rgb="${a.rgb}" style="background:${a.hex}" title="${a.t}"></span>`).join('');
-    h += `<label class="ml-custom"><input type="color" id="mlCustom2" value="#c89b3c"></label></div></div>`;
-    h += `<div class="ml-group"><span class="ml-glabel">Фон (1-й)</span><div class="ml-swatches" id="mlBg1">`;
-    h += BG_COLORS.map(c=>`<span class="ml-sw ${c.hex===S.bg1?'on':''}" data-hex="${c.hex}" style="background:${c.hex}" title="${c.t}"></span>`).join('');
-    h += `<label class="ml-custom"><input type="color" id="mlBg1c" value="${S.bg1}"></label></div></div>`;
-    h += `<div class="ml-group"><span class="ml-glabel">Фон (2-й)</span><div class="ml-swatches" id="mlBg2">`;
-    h += BG_COLORS.map(c=>`<span class="ml-sw ${c.hex===S.bg2?'on':''}" data-hex="${c.hex}" style="background:${c.hex}" title="${c.t}"></span>`).join('');
-    h += `<label class="ml-custom"><input type="color" id="mlBg2c" value="${S.bg2}"></label></div></div>`;
-    h += `<div class="ml-group"><span class="ml-glabel">Баланс фона</span><div class="ml-speed"><input id="mlBgPos" type="range" min="5" max="95" step="1" value="${S.bgpos}"><span id="mlBgPosVal">${S.bgpos}%</span></div></div>`;
-    h += `<div class="ml-group"><span class="ml-glabel">Угол фона</span><div class="ml-speed"><input id="mlBgAng" type="range" min="0" max="360" step="5" value="${S.bgang}"><span id="mlBgAngVal">${S.bgang}°</span></div></div>`;
-    // действия
-    h += `<div class="ml-group"><span class="ml-glabel">&nbsp;</span><div style="display:flex;gap:10px;">
-      <button class="ml-copy" id="mlReplay">↻ Проиграть</button><button class="ml-copy" id="mlCopy">⧉ Конфиг</button></div></div>`;
-    c.innerHTML = h;
+    /* Схема 1 — конвенция тирмейкеров: ВЫШЕ = краснее и темнее, НИЖЕ = зеленее */
+    var R = [229, 72, 77], G = [61, 214, 140];
+    var rr = Math.round(G[0] + (R[0] - G[0]) * t);
+    var gg = Math.round(G[1] + (R[1] - G[1]) * t);
+    var bb = Math.round(G[2] + (R[2] - G[2]) * t);
+    return 'rgba(' + rr + ',' + gg + ',' + bb + ',' + (a * (0.35 + 0.65 * Math.abs(t - .5) * 2)).toFixed(3) + ')';
+  }
 
-    c.querySelectorAll('.ml-seg').forEach(seg=>{
-      const key = seg.dataset.opt;
-      seg.querySelectorAll('button').forEach(b=>{
-        b.onclick = ()=>{
-          S[key] = b.dataset.v;
-          seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
-          applyAttrs();
-          if(['level','ytTitle','ytMarkOld','ytSort'].includes(key)) renderCentral();
-          if(['anim','hover','tbl','density'].includes(key)) replay();
-        };
+  /* уровень масштабирует статы (демо-формула: на 15-м = база) */
+  function atLvl(v) {
+    if (isNaN(+v)) return v;                         /* 'NRG' / '0' оставляем как есть */
+    return Math.round(+v * (0.5 + level / 30));
+  }
+  var sort = { k: 'wr', d: -1 };   /* winrate по умолчанию */
+  var statSort = { k: 'ad', d: -1 };
+
+  /* ============================================================
+     ВИДЫ HOME
+     ============================================================ */
+  function filtered() {
+    return roleFilter === 'Все' ? CH.slice() : CH.filter(function (c) { return c.role === roleFilter; });
+  }
+  /* Таблица Статс показывает ТОЛЬКО выбранных в пикере.
+     Роль фильтрует ПИКЕР (как в боевом), а не таблицу — фильтр теперь ОДИН. */
+  function pickedList() {
+    return CH.filter(function (c) { return picked[c.n]; });
+  }
+
+  /* ============================================================
+     БЛОК УРОВНЯ — отдельный, СВЕРХУ над таблицей (как .lvl-container боевого)
+     ============================================================ */
+  var lvlView = 'pills';
+  function lvlBlock() {
+    var body;
+    if (lvlView === 'slider') {
+      body = '<div class="lvl-slider"><span>1</span><input type="range" id="lvlRange" min="1" max="15" value="' + level + '"><span>15</span></div>';
+    } else if (lvlView === 'steps') {
+      body = '<div class="lvl-steps">' + [1, 5, 9, 12, 15].map(function (i) {
+        return '<button class="lvl-pill ' + (i === level ? 'on' : '') + '" data-lvl="' + i + '">ур. ' + i + '</button>';
+      }).join('') + '<span class="lvl-hint">вехи прокачки</span></div>';
+    } else {
+      var pills = '';
+      for (var i = 1; i <= 15; i++) pills += '<button class="lvl-pill ' + (i === level ? 'on' : '') + '" data-lvl="' + i + '">' + i + '</button>';
+      body = '<div class="ruler" id="ruler">' + pills + '<span class="lvl-hint">зажми и тяни →</span></div>';
+    }
+    return '<div class="lvl-block glass ' + (lvlView === 'compact' ? 'lvl-compact' : '') + '">' +
+      '<div class="lvl-info"><span class="lvl-label">УРОВЕНЬ</span><span class="lvl-num">' + level + '</span>' +
+      '<span class="lvl-patch">Patch 7.0f</span></div>' + body + '</div>';
+  }
+
+  /* ============================================================
+     ПИКЕР ЧЕМПИОНОВ — правая панель вида «Статс» (порт #statsChampPanel)
+     Ховер БЕЗ МЫЛА: источник 120px, покой scale(.88) → ховер scale(1) (только downscale).
+     ============================================================ */
+  /* Ячейка пикера максимум ~185px (вид «Крупные карточки», размер L) — просим 200px,
+     чтобы браузер взял тайл 380w там, где иконки 128w не хватит. */
+  var PK_SIZES = '200px';   /* просим 200px → браузер берёт тайл 380w, запас есть */
+  var pickView = 'tile', shadeMode = 'wr';
+  function shadeHtml(c) {
+    if (shadeMode === 'wrpr') {
+      return '<div class="sh-row"><span>WR</span><b class="' + wrCls(c.wr) + '">' + c.wr.toFixed(1) + '%</b></div>' +
+             '<div class="sh-row"><span>PR</span><b>' + c.pr + '%</b></div>';
+    }
+    if (shadeMode === 'roles') {
+      return '<div class="sh-row"><span>' + c.role + '</span><b class="' + wrCls(c.wr) + '">' + c.wr.toFixed(1) + '%</b></div>' +
+             '<div class="sh-row"><span>прочие</span><b>' + (c.wr - 2.1).toFixed(1) + '%</b></div>';
+    }
+    return '<b class="' + wrCls(c.wr) + '">' + c.wr.toFixed(1) + '% WR</b>';
+  }
+  /* чемпы роли ('Все' = вся база) — для тумблера «выбрать всех этой роли» */
+  function champsOfRole(role) {
+    return role === 'Все' ? CH.slice() : CH.filter(function (c) { return c.role === role; });
+  }
+  /* состояние тумблера роли: all (все выбраны) · some (часть) · none (никого) */
+  function roleAddState(role) {
+    var list = champsOfRole(role);
+    if (!list.length) return 'none';
+    var on = list.filter(function (c) { return picked[c.n]; }).length;
+    return on === 0 ? 'none' : (on === list.length ? 'all' : 'some');
+  }
+
+  function pickerHtml() {
+    var list = CH.filter(function (c) {
+      if (pkRole !== 'Все' && c.role !== pkRole) return false;
+      return !pkSearch || c.n.toLowerCase().indexOf(pkSearch.toLowerCase()) === 0;
+    });
+    /* ЕДИНСТВЕННЫЙ фильтр ролей (дубль в шапке убран). Иконки — локальные файлы
+       боевого image/role_*.webp, не emoji и не свои SVG. */
+    var ROLE_ICO = { 'Соло':'top', 'Лес':'jungle', 'Мид':'mid', 'Дракон':'adc', 'Саппорт':'support' };
+    var roles = ['Все', 'Соло', 'Лес', 'Мид', 'Дракон', 'Саппорт'];
+    var cells = list.map(function (c) {
+      return '<div class="pk-cell ' + (picked[c.n] ? 'on' : '') + '" data-pick="' + c.n + '" title="' + c.n + '">' +
+        '<div class="pk-lift">' +
+          '<img class="pk-img" src="' + icon(c) + '" srcset="' + iconSet(c) + '" sizes="' + PK_SIZES + '" alt="' + c.n + '" loading="lazy" ' +
+            'onerror="this.style.background=\'' + c.g + '\';this.removeAttribute(\'src\')">' +
+          '<div class="pk-shade">' + shadeHtml(c) + '</div>' +
+          /* бейдж WR поверх аватарки — в DOM всегда, показывается только в виде «Бейдж» (чистый CSS) */
+          '<span class="pk-badge ' + wrCls(c.wr) + '">' + c.wr.toFixed(0) + '</span>' +
+        '</div>' +
+        '<span class="pk-name">' + c.n + '</span>' +
+        '<span class="pk-wr ' + wrCls(c.wr) + '">' + c.wr.toFixed(1) + '%</span>' +
+      '</div>';
+    }).join('');
+    var count = Object.keys(picked).filter(function (k) { return picked[k]; }).length;
+    return '<aside class="picker panel glass">' +
+      '<div class="pk-bar"><span><b class="pk-count">' + count + '</b> чемп. в таблице</span><button class="pk-clear" id="pkClear">Очистить</button></div>' +
+      '<div class="pk-search"><input type="text" id="pkSearch" placeholder="Поиск..." value="' + pkSearch + '"></div>' +
+      /* Две РАЗНЫЕ функции на одной строке роли:
+         .pk-rf = ФИЛЬТР (что видно в пикере) · .rf-add = ВЫБОР (кого добавить в таблицу). */
+      '<div class="pk-roles" data-roleview="' + roleView + '">' + roles.map(function (r) {
+        var k = ROLE_ICO[r];
+        var ic = k ? '<img class="rf-ico" src="../image/role_' + k + '.webp" alt="' + r + '" loading="lazy">' : '';
+        /* текст ВСЕГДА в DOM — переключение вида прячет его, а не пересобирает кнопки */
+        var hide = (roleView === 'icons' && k) ? ' style="display:none"' : '';
+        return '<span class="pk-rf-wrap">' +
+          '<button class="pk-rf ' + (r === pkRole ? 'on' : '') + '" data-pkrole="' + r + '" title="Фильтр: показать ' + r + '">' +
+            ic + '<span class="rf-t"' + hide + '>' + r + '</span></button>' +
+          '<button class="rf-add ' + roleAddState(r) + '" data-addrole="' + r + '" title="Выбрать всех: ' + r + '" aria-label="Выбрать всех ' + r + '"></button>' +
+        '</span>';
+      }).join('') + '</div>' +
+      '<div class="pk-scroll"><div class="pk-grid">' + cells + '</div>' +
+        '<div class="pk-empty lead"' + (cells ? ' style="display:none"' : '') + '>Ничего не найдено</div></div>' +
+      '<span class="demo" style="align-self:flex-start">цифры демо</span>' +
+    '</aside>';
+  }
+  function sortBy(list, s) {
+    var val = function (c) { return s.k === 'tier' ? (TIER_ORD[c.tier] || 0) : (isNaN(+c[s.k]) ? -1 : +c[s.k]); };
+    return list.slice().sort(function (a, b) { return (val(a) - val(b)) * s.d; });
+  }
+
+  /* — Статы — */
+  function viewStats() {
+    var cols = visibleCols();
+    var list = sortBy(pickedList(), statSort);
+
+    /* диапазоны для заливки — по КАЖДОЙ колонке отдельно */
+    var ranges = {};
+    cols.forEach(function (col) { ranges[col.key] = colRange(list, col.key); });
+
+    var head = '<th>Чемпион</th>' + cols.map(function (col) {
+      var on = statSort.k === col.key;
+      var url = statIcon(col.ico);
+      var ic = url
+        ? '<img class="st-ico" src="' + url + '" alt="" loading="lazy"' +
+          (iconMode === 'color' ? ' style="--ic:' + col.col + '"' : '') + '>'
+        : '';
+      return '<th data-sort="' + col.key + '" class="' + (on ? 'sorted' : '') + '" ' +
+        (iconMode === 'color' ? 'style="--ic:' + col.col + '"' : '') + '>' +
+        ic + '<span class="st-lbl">' + col.label + '</span>' +
+        '<span class="arr">' + (on ? (statSort.d < 0 ? '▼' : '▲') : '⇅') + '</span></th>';
+    }).join('');
+
+    var rows = list.map(function (c) { return statRowHtml(c, cols, ranges); }).join('');
+
+    var empty = '<tr><td colspan="' + (cols.length + 1) + '" style="text-align:center;height:80px">Выбери чемпионов в панели справа →</td></tr>';
+    var rowTip = (tipMode === 'row') ? '<div class="row-tip" id="rowTip">Наведи на цифру — покажу рост за уровень</div>' : '';
+    return lvlBlock() +
+      '<div class="panel glass tbl-panel" style="padding:8px 12px"><table class="tbl" data-tbl="stats"><thead><tr>' + head + '</tr></thead>' +
+      '<tbody>' + (rows || empty) + '</tbody></table>' + rowTip + '</div>';
+  }
+
+  /* Сборка ОДНОЙ строки — вынесена, чтобы добавление/удаление чемпа вставляло
+     одну <tr>, а не пересобирало таблицу (приёмка счётчиком узлов). */
+  function statRowHtml(c, cols, ranges) {
+    {
+      var p = PATCH_MAP[c.n];
+      var patchDot = (p && patchMode === 'dot')
+        ? '<span class="patch-dot ' + p.type + '" data-patch="' + c.n + '"></span>' : '';
+      var cells = cols.map(function (col) {
+        var v = statAt(c, col.key);
+        var r = ranges[col.key];
+        var num = +v;
+        var t = (r && r.mx > r.mn && !isNaN(num)) ? (num - r.mn) / (r.mx - r.mn) : .5;
+        var bg = fillColor(col.hi ? t : 1 - t);
+        var touched = p && p.stat === col.key;
+        var cls = 'st-cell' + (touched && patchMode === 'cellhl' ? ' patch-hl ' + p.type : '');
+        var styleCell = (fillShape === 'cell' && bg) ? 'background:' + bg + ';' : '';
+        var inner;
+        if (fillShape === 'digit' && bg) inner = '<b class="st-v" style="color:' + bg.replace(/[\d.]+\)$/, '1)') + '">' + v + '</b>';
+        else inner = '<b class="st-v">' + v + '</b>';
+        if (fillShape === 'bar' && bg) inner += '<i class="st-bar" style="background:' + bg.replace(/[\d.]+\)$/, '1)') + ';width:' + Math.round(8 + t * 92) + '%"></i>';
+        var arrow = (touched && patchMode === 'arrow')
+          ? '<span class="p-arr ' + p.type + '" data-patch="' + c.n + '">' + (p.type === 'nerf' ? '▼' : '▲') + p.delta + '</span>' : '';
+        return '<td class="' + cls + '" style="' + styleCell + '" data-ch="' + c.n + '" data-key="' + col.key + '">' + inner + arrow + '</td>';
+      }).join('');
+      return '<tr data-ch="' + c.n + '" class="' + (c.n === selName ? 'sel' : '') + '">' +
+        '<td><div class="ch-cell">' + ava(c) + patchDot +
+        '<span><span class="ch-name">' + c.n + '</span> <span class="ch-role">· ' + c.role + '</span></span></div></td>' +
+        cells + '</tr>';
+    }
+  }
+
+  /* ТОЧЕЧНО: чемп добавлен/убран → вставляем или убираем ОДНУ <tr>,
+     затем перекрашиваем существующие ячейки (диапазон колонки сдвинулся) — БЕЗ пересоздания узлов. */
+  function applyChampRow(name) {
+    var tb = pane().querySelector('.tbl[data-tbl="stats"] tbody');
+    if (!tb) { refreshTable(); return; }
+    var existing = tb.querySelector('tr[data-ch="' + name + '"]');
+
+    if (!picked[name]) {
+      if (existing) existing.remove();
+      if (!tb.querySelector('tr[data-ch]')) { refreshTable(); return; }  /* опустело — вернуть заглушку */
+      refreshStatCells();
+      return;
+    }
+    if (existing) return;
+    if (!tb.querySelector('tr[data-ch]')) { refreshTable(); return; }    /* была заглушка — собрать заново */
+
+    var cols = visibleCols();
+    var list = sortBy(pickedList(), statSort);
+    var ranges = {};
+    cols.forEach(function (col) { ranges[col.key] = colRange(list, col.key); });
+    var idx = -1;
+    for (var i = 0; i < list.length; i++) { if (list[i].n === name) { idx = i; break; } }
+    if (idx < 0) { refreshTable(); return; }
+
+    var tmp = document.createElement('tbody');
+    tmp.innerHTML = statRowHtml(list[idx], cols, ranges);
+    var tr = tmp.firstElementChild;
+    var rows = tb.querySelectorAll('tr[data-ch]');
+    if (idx >= rows.length) tb.appendChild(tr); else tb.insertBefore(tr, rows[idx]);
+    refreshStatCells();
+    wireTable();
+  }
+
+  /* — WinRate — */
+  function viewWinrate() {
+    var list = sortBy(filtered(), sort);
+    var cols = [['tier', 'Тир'], ['wr', 'WR'], ['pr', 'PR'], ['br', 'BR'], ['trend', 'Тренд']];
+    var head = '<th>Чемпион</th>' + cols.map(function (c) {
+      var on = sort.k === c[0];
+      return '<th data-sort="' + c[0] + '" class="' + (on ? 'sorted' : '') + (c[0] === 'trend' ? ' col-spark' : '') + '">' + c[1] +
+        '<span class="arr">' + (on ? (sort.d < 0 ? '▼' : '▲') : '▼') + '</span></th>';
+    }).join('');
+    var rows = list.map(function (c, i) {
+      return '<tr data-ch="' + c.n + '" class="' + (c.n === selName ? 'sel' : '') + '">' +
+        '<td><div class="ch-cell"><span class="ch-role">' + (i + 1) + '</span>' + ava(c) + '<span class="ch-name">' + c.n + '</span></div></td>' +
+        '<td><span class="tier-badge t-' + c.tier + '">' + c.tier.toUpperCase() + '</span></td>' +
+        '<td><span class="wr-cell"><span class="wr-track"><span class="wr-fill" style="width:' + Math.min(100, (c.wr - 40) * 5) + '%"></span></span><b class="' + wrCls(c.wr) + '">' + c.wr.toFixed(1) + '%</b></span></td>' +
+        '<td>' + c.pr + '%</td><td>' + c.br + '%</td>' +
+        '<td class="col-spark"><span class="wr-cell"><span class="trend ' + (c.tr >= 0 ? 'up' : 'dn') + '">' + (c.tr >= 0 ? '▲' : '▼') + Math.abs(c.tr).toFixed(1) + '</span>' +
+        '<svg class="spark" viewBox="0 0 60 18" preserveAspectRatio="none"><polyline points="' + sparkPts(c.wr, c.tr) + '"/></svg></span></td></tr>';
+    }).join('');
+    return '<div class="head-right" style="margin:0 0 12px"><span class="upd">обновлено 04.04.2026 · демо</span></div>' +
+      '<div class="panel glass tbl-panel" style="padding:8px 12px"><table class="tbl" data-tbl="wr"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  /* — Мета-хаб (бенто) — */
+  function viewHub() {
+    var hero = ch('Garen');
+    var top5 = sortBy(CH, { k: 'wr', d: -1 }).slice(0, 5);
+    var movers = sortBy(CH, { k: 'wr', d: -1 }).slice(0).sort(function (a, b) { return b.tr - a.tr; });
+    var sTier = CH.filter(function (c) { return c.tier === 's'; });
+    var avgWr = (CH.reduce(function (s, c) { return s + c.wr; }, 0) / CH.length).toFixed(1);
+    /* STRONG-полоса ключевых цифр: самостоятельная .glass-панель, тёмность 2-го уровня */
+    var kpiStrip = '<div class="panel glass glass--strong b-wide kpi-strip" style="grid-column:1/-1">' +
+      '<span class="kpi-i"><b>128</b><small>чемпионов</small></span>' +
+      '<span class="kpi-i"><b>' + avgWr + '%</b><small>средний WR</small></span>' +
+      '<span class="kpi-i"><b>7.0f</b><small>патч</small></span>' +
+      '<span class="kpi-i"><b>Garen</b><small>чемпион дня</small></span>' +
+      '<span class="kpi-i"><b>Camille</b><small>топ-бан 38%</small></span>' +
+      '<span class="demo">strong · демо</span></div>';
+    return '<div class="bento">' + kpiStrip +
+      '<div class="panel glass b-wide"><div class="hero">' + ava(hero, 'cc-ava') +
+        '<div><span class="lead">★ Чемпион дня · Patch 7.0f <span class="demo">демо</span></span>' +
+        '<h2>' + hero.n + '</h2><div class="tags"><span class="tag">🎖 Тир ' + hero.tier.toUpperCase() + '</span><span class="tag">📈 ' + hero.wr + '% WR</span><span class="tag">🗺 ' + hero.role + '</span></div>' +
+        '<button class="cta" data-ch="' + hero.n + '">Открыть в таблице →</button></div></div></div>' +
+      '<div class="panel glass"><h2>📈 Топ-5 по WR</h2>' + top5.map(function (c) {
+        return '<div class="mv" data-ch="' + c.n + '">' + ava(c) + '<span class="grow">' + c.n + '</span><b class="' + wrCls(c.wr) + '">' + c.wr.toFixed(1) + '%</b></div>';
+      }).join('') + '</div>' +
+      '<div class="panel glass"><h2>⇅ Движ. патча</h2>' + movers.slice(0, 5).map(function (c) {
+        return '<div class="mv" data-ch="' + c.n + '">' + ava(c) + '<span class="grow">' + c.n + '</span><b class="trend ' + (c.tr >= 0 ? 'up' : 'dn') + '">' + (c.tr >= 0 ? '▲' : '▼') + Math.abs(c.tr).toFixed(1) + '</b></div>';
+      }).join('') + '</div>' +
+      '<div class="panel glass"><h2>🎖 S-тир сейчас</h2><div class="tier-list">' + sTier.map(function (c) {
+        return '<span class="t-chip" data-ch="' + c.n + '">' + ava(c) + c.n + '</span>';
+      }).join('') + '</div></div>' +
+      '<div class="panel glass"><h2>🏆 Топ-бан</h2><div class="big-num">Camille</div><span class="lead">38% банов в патче</span></div>' +
+      '<div class="panel glass b-wide"><h2>📰 Что нового <span class="demo">Patch 7.0f</span></h2>' + PATCH.slice(0, 4).map(function (p) {
+        return '<div class="mv" data-ch="' + p.n + '">' + ava(ch(p.n)) + '<span class="grow">' + p.n + ' — ' + p.t + '</span></div>';
+      }).join('') + '</div>' +
+      '</div>';
+  }
+
+  /* — Тир-лист — */
+  /* ============================================================
+     ТИР-МЕЙКЕР (вид Тир-лист). Drag-drop как tiermaker.com.
+     ОБЩИЙ ТАЙЛ (.tile) — не Статс-пикер: у пикера своё поведение (тоггл строк),
+     тут тайл ПЕРЕТАСКИВАЕТСЯ как блок. Тайл = один компонент, поведение разное.
+     ============================================================ */
+  var RUNES = [
+    { id: 'electro', n: 'Электрокьют', tree: 'Доминирование', f: '30–184 +40%бонус.AD +25%AP' },
+    { id: 'conqueror', n: 'Завоеватель', tree: 'Точность', f: '6 стаков ·  на 6 → +8% омнивамп' },
+    { id: 'aery', n: 'Аэри', tree: 'Колдовство', f: 'урон 10–50 · щит 20–120' },
+    { id: 'comet', n: 'Комета', tree: 'Колдовство', f: '30–100 +35%бонус.AD +20%AP' },
+    { id: 'bladestorm', n: 'Град клинков', tree: 'Точность', f: '+110%/+80% скор.атаки 3 авто' },
+    { id: 'firststrike', n: 'Удар первым', tree: 'Вдохновение', f: '+9% чист.урона + золото' }
+  ];
+  var DRAGONS = [
+    { id: 'infernal', n: 'Огненный', soul: 'Душа: взрыв 35 AoE адаптивного — лучшая для урона', col: 'linear-gradient(135deg,#e0506a,#5a0a1a)' },
+    { id: 'mountain', n: 'Горный', soul: 'Душа: щит 150–350 после 5с без урона — лучшая для выживания', col: 'linear-gradient(135deg,#d4a050,#5a3a10)' },
+    { id: 'ocean', n: 'Океанский', soul: 'Душа: вост. HP+маны при уроне — устойчивость в бою', col: 'linear-gradient(135deg,#4aa3ff,#103a6e)' },
+    { id: 'cloud', n: 'Облачный', soul: 'Душа: доп. МС при ульте — мобильность/пики', col: 'linear-gradient(135deg,#7ab0d0,#2a4a6e)' }
+  ];
+  var ITEM_TYPE = { bork: 'ад', trin: 'ад', wits: 'ад', cleaver: 'танк', nash: 'ап', divine: 'танк', void: 'ап', steelcaps: 'ботинки', boots1: 'ботинки' };
+  var TM_TIERS = [['s+', 'S+'], ['s', 'S'], ['a', 'A'], ['b', 'B'], ['c', 'C'], ['d', 'D']];
+  var TM_TABS = [
+    { k: 'champ', t: 'Чемпионы', subs: ['Все', 'Топ', 'Лес', 'Мид', 'АДК', 'Сап'] },
+    { k: 'item', t: 'Предметы', subs: ['Все', 'АД', 'Танк', 'АП', 'Сап', 'Ботинки'] },
+    { k: 'rune', t: 'Руны', subs: [] },
+    { k: 'dragon', t: 'Объекты', subs: [] }
+  ];
+  var TM_SUBROLE = { 'Топ': 'Соло', 'Лес': 'Лес', 'Мид': 'Мид', 'АДК': 'Дракон', 'Сап': 'Саппорт' };
+  var TM_SUBITEM = { 'АД': 'ад', 'Танк': 'танк', 'АП': 'ап', 'Сап': 'сап', 'Ботинки': 'ботинки' };
+  var tmTab = 'champ', tmSub = 'Все', tmFull = false;
+  /* ★ ОТДЕЛЬНЫЙ тир-лист на КАЖДУЮ роль/тип (не фильтр): ключ = вид|под-вид.
+     champ|Все, champ|Топ, champ|Лес … item|АД … — у каждого своё размещение и сейв. */
+  var tmState = {};
+  function tmKey() { return tmTab + '|' + tmSub; }
+  /* набор сущностей ИМЕННО этого под-листа (роль/тип), не вся база */
+  function tmSubTids(kind, sub) {
+    if (kind === 'champ') {
+      return CH.filter(function (c) { return sub === 'Все' || c.role === TM_SUBROLE[sub]; }).map(function (c) { return 'champ:' + c.n; });
+    }
+    if (kind === 'item') {
+      return ITEMS.filter(function (i) { return sub === 'Все' || ITEM_TYPE[i.id] === TM_SUBITEM[sub]; }).map(function (i) { return 'item:' + i.id; });
+    }
+    if (kind === 'rune') return RUNES.map(function (r) { return 'rune:' + r.id; });
+    return DRAGONS.map(function (d) { return 'dragon:' + d.id; });
+  }
+  function tmInit() {
+    var key = tmKey();
+    if (tmState[key]) return;
+    var st = { pool: tmSubTids(tmTab, tmSub) };
+    TM_TIERS.forEach(function (t) { st[t[0]] = []; });
+    tmState[key] = st;
+  }
+  function tmData(tid) {
+    var p = tid.split(':'), k = p[0], id = p[1];
+    if (k === 'champ') return ch(id);
+    if (k === 'item') return ITEMS.find(function (x) { return x.id === id; });
+    if (k === 'rune') return RUNES.find(function (x) { return x.id === id; });
+    return DRAGONS.find(function (x) { return x.id === id; });
+  }
+  /* ── ОБЩИЙ ТАЙЛ: иконка + ховер-зум БЕЗ мыла (крупный источник, покой .88 → ховер 1.0) ── */
+  function tileHTML(tid, hidden) {
+    var p = tid.split(':'), k = p[0], d = tmData(tid);
+    if (!d) return '';
+    var h = hidden ? ' hidden' : '';
+    if (k === 'champ') {
+      return '<div class="tile tile-champ" draggable="true" data-tid="' + tid + '" data-ch="' + d.n + '" title="' + d.n + '"' + h + '>' +
+        '<span class="tile-lift"><img class="tile-img" src="' + icon(d) + '" srcset="' + iconSet(d) + '" sizes="120px" alt="' + d.n + '" loading="lazy" onerror="this.style.background=\'' + d.g + '\';this.removeAttribute(\'src\')">' +
+        '<span class="tile-shade"><b class="' + wrCls(d.wr) + '">' + d.wr.toFixed(1) + '%</b></span></span>' +
+        '<span class="tile-n">' + d.n + '</span></div>';
+    }
+    if (k === 'item') {
+      return '<div class="tile tile-item" draggable="true" data-tid="' + tid + '" data-item="' + d.id + '" title="' + d.n + '"' + h + '>' +
+        '<span class="tile-lift"><span class="tile-ic" style="background:' + d.g + '"></span></span><span class="tile-n">' + d.n + '</span></div>';
+    }
+    if (k === 'rune') {
+      return '<div class="tile tile-rune" draggable="true" data-tid="' + tid + '" data-rune="' + d.id + '" title="' + d.n + '"' + h + '>' +
+        '<span class="tile-lift"><span class="tile-ic tile-rune-ic"></span></span><span class="tile-n">' + d.n + '</span></div>';
+    }
+    return '<div class="tile tile-dragon" draggable="true" data-tid="' + tid + '" data-dragon="' + d.id + '" title="' + d.n + '"' + h + '>' +
+      '<span class="tile-lift"><span class="tile-ic" style="background:' + d.col + '"></span></span><span class="tile-n">' + d.n + '</span></div>';
+  }
+  function viewTier() {
+    tmInit();
+    var st = tmState[tmKey()];
+    var tab = TM_TABS.find(function (x) { return x.k === tmTab; });
+    var rows = TM_TIERS.map(function (t) {
+      return '<div class="tm-row"><span class="tm-badge" style="background:var(--tier-' + (t[0] === 's+' ? 's-plus' : t[0]) + ')">' + t[1] + '</span>' +
+        '<div class="tm-lane" data-zone="' + t[0] + '">' + st[t[0]].map(tileHTML).join('') + '</div></div>';
+    }).join('');
+    var subtabs = tab.subs.length ? '<div class="chips glass tm-subs">' + tab.subs.map(function (s) {
+      return '<button class="chip-btn ' + (s === tmSub ? 'active' : '') + '" data-tmsub="' + s + '">' + s + '</button>';
+    }).join('') + '</div>' : '';
+    var poolTiles = st.pool.map(function (tid) { return tileHTML(tid); }).join('');
+    return '<div class="tm-wrap' + (tmFull ? ' tm-full' : '') + '">' +
+      '<div class="tm-main">' +
+        '<div class="tm-bar"><div class="chips glass tm-tabs">' + TM_TABS.map(function (x) {
+          return '<button class="chip-btn ' + (x.k === tmTab ? 'active' : '') + '" data-tmtab="' + x.k + '">' + x.t + '</button>';
+        }).join('') + '</div>' +
+        '<div class="tm-actions"><button class="tm-btn" data-tmsave>Сохранить</button><button class="tm-btn" data-tmload>Загрузить</button>' +
+        '<button class="tm-btn" data-tmshare>Поделиться</button><button class="tm-btn" data-tmreset>Сброс</button>' +
+        '<button class="tm-btn" data-tmfull>' + (tmFull ? 'Свернуть' : 'Во весь экран') + '</button></div></div>' +
+        '<div class="panel glass tm-grid">' + rows + '</div>' +
+        subtabs +
+        '<div class="panel glass tm-pool"><div class="tm-pool-h">Палитра · тащи в тир <span class="demo">демо</span></div><div class="tm-pool-grid" data-zone="pool">' + poolTiles + '</div></div>' +
+      '</div>' +
+      '<aside class="tm-side panel glass" id="tmSide"><div class="tm-side-empty lead">Клик по любому — карточка тут. Свернёшь → тир на весь экран.</div></aside>' +
+    '</div>';
+  }
+  /* снимок размещения из DOM (после drag) — узлы живут, не пересобираем */
+  function tmSnapshot(host) {
+    var st = tmState[tmKey()];
+    host.querySelectorAll('.tm-lane[data-zone]').forEach(function (z) {
+      st[z.getAttribute('data-zone')] = [].map.call(z.querySelectorAll('.tile'), function (t) { return t.getAttribute('data-tid'); });
+    });
+    var poolGrid = host.querySelector('.tm-pool-grid');
+    st.pool = [].map.call(poolGrid.querySelectorAll('.tile'), function (t) { return t.getAttribute('data-tid'); });
+  }
+
+  /* ── провода тир-мейкера: DnD (точечно), вкладки, фильтры, действия, карточка ── */
+  var _tmDrag = null;
+  function wireTierMaker(host) {
+    /* DnD: тащим ОДИН .tile между зонами. Drop = переставить этот узел (1 перемещение). */
+    host.querySelectorAll('.tile[draggable]').forEach(function (t) {
+      t.addEventListener('dragstart', function () { _tmDrag = t; t.classList.add('tm-dragging'); });
+      t.addEventListener('dragend', function () { t.classList.remove('tm-dragging'); _tmDrag = null; host.querySelectorAll('.tm-over').forEach(function (z) { z.classList.remove('tm-over'); }); });
+    });
+    host.querySelectorAll('[data-zone]').forEach(function (z) {
+      z.addEventListener('dragover', function (e) { e.preventDefault(); z.classList.add('tm-over'); });
+      z.addEventListener('dragleave', function () { z.classList.remove('tm-over'); });
+      z.addEventListener('drop', function (e) {
+        e.preventDefault(); z.classList.remove('tm-over');
+        if (!_tmDrag) return;
+        z.appendChild(_tmDrag);          /* ← ПЕРЕМЕЩЕНИЕ ОДНОГО УЗЛА, не пересборка */
+        tmSnapshot(host);
       });
     });
-    const sl=(id,fn)=>{ $('#'+id).oninput=e=>fn(+e.target.value,e.target); };
-    sl('mlSpeed',v=>{S.speed=v;$('#mlSpeedVal').textContent=v.toFixed(1)+'×';root.style.setProperty('--spd',v);});
-    sl('mlGpos',v=>{S.gpos=v;$('#mlGposVal').textContent=v+'%';root.style.setProperty('--g-pos',v+'%');});
-    sl('mlGang',v=>{S.gang=v;$('#mlGangVal').textContent=v+'°';root.style.setProperty('--g-ang',v+'deg');});
-    sl('mlWR',v=>{S.wrpull=v;$('#mlWRVal').textContent=v;applyWR();});
-    $('#mlRP').onchange=e=>{S.rightpanel=e.target.checked;renderCentral();};
-    $('#mlWL').onchange=e=>{S.winloss=e.target.checked;applyAttrs();};
-    $('#mlISL').onchange=e=>{S.island=e.target.checked;applyAttrs();};
-    $('#mlGlass').onchange=e=>{S.glass=e.target.checked;applyAttrs();};
-    $('#mlGlassNoise').onchange=e=>{S.glassnoise=e.target.checked;applyAttrs();};
-    $('#mlParallax').onchange=e=>{S.parallax=e.target.checked;applyAttrs();};
-    $('#mlWrTrend').onchange=e=>{S.wrtrend=e.target.checked;applyAttrs();};
-    $('#mlBg1').querySelectorAll('.ml-sw').forEach(sw=>sw.onclick=()=>{setBg1(sw.dataset.hex);mark('#mlBg1',sw);});
-    $('#mlBg1c').oninput=e=>{setBg1(e.target.value);mark('#mlBg1',null);};
-    $('#mlBg2').querySelectorAll('.ml-sw').forEach(sw=>sw.onclick=()=>{setBg2(sw.dataset.hex);mark('#mlBg2',sw);});
-    $('#mlBg2c').oninput=e=>{setBg2(e.target.value);mark('#mlBg2',null);};
-    sl('mlBgPos',v=>{S.bgpos=v;$('#mlBgPosVal').textContent=v+'%';root.style.setProperty('--bg-pos',v+'%');});
-    sl('mlBgAng',v=>{S.bgang=v;$('#mlBgAngVal').textContent=v+'°';root.style.setProperty('--bg-ang',v+'deg');});
-    $('#mlSw').querySelectorAll('.ml-sw').forEach(sw=>sw.onclick=()=>{setAccent(sw.dataset.rgb);mark('#mlSw',sw);});
-    $('#mlCustom').oninput=e=>{setAccent(hexToRgb(e.target.value));mark('#mlSw',null);};
-    $('#mlSw2').querySelectorAll('.ml-sw').forEach(sw=>sw.onclick=()=>{setG2(sw.dataset.rgb);mark('#mlSw2',sw);});
-    $('#mlCustom2').oninput=e=>{setG2(hexToRgb(e.target.value));mark('#mlSw2',null);};
-    $('#mlReplay').onclick=replay;
-    $('#mlCopy').onclick=copyConfig;
-    // кнопка свернуть настройки
-    const headEl=document.querySelector('.ml-head');
-    headEl.insertAdjacentHTML('beforeend','<button class="ml-min-btn" id="mlMin">▲ Свернуть настройки</button>');
-    $('#mlMin').onclick=()=>{
-      const min=document.body.classList.toggle('ml-min');
-      $('#mlMin').textContent=min?'▼ Показать настройки':'▲ Свернуть настройки';
-      positionIndicator();
+
+    /* вкладки источника — смена kind = ПЕРЕСТРОИТЬ только тир-маркер (labMorph), не весь вид */
+    host.querySelectorAll('[data-tmtab]').forEach(function (b) {
+      b.onclick = function () { tmTab = b.getAttribute('data-tmtab'); tmSub = 'Все'; rebuildTier(host); };
+    });
+    /* под-вкладки = ОТДЕЛЬНЫЕ тир-листы (у каждой роли/типа своё размещение) → перестроить */
+    host.querySelectorAll('[data-tmsub]').forEach(function (b) {
+      b.onclick = function () { tmSub = b.getAttribute('data-tmsub'); rebuildTier(host); };
+    });
+
+    /* карточка справа + связи (клик по тайлу) */
+    host.querySelectorAll('.tile').forEach(function (t) {
+      t.addEventListener('click', function () { tmShowCard(host, t.getAttribute('data-tid')); });
+    });
+
+    /* действия */
+    var q = function (s) { return host.querySelector(s); };
+    if (q('[data-tmfull]')) q('[data-tmfull]').onclick = function () { tmFull = !tmFull; rebuildTier(host); };
+    if (q('[data-tmreset]')) q('[data-tmreset]').onclick = function () { delete tmState[tmKey()]; rebuildTier(host); };
+    if (q('[data-tmsave]')) q('[data-tmsave]').onclick = function () {
+      try { localStorage.setItem('tm-' + tmKey(), JSON.stringify(tmState[tmKey()])); toast('Тир сохранён: ' + tmSub); } catch (e) {}
+    };
+    if (q('[data-tmload]')) q('[data-tmload]').onclick = function () {
+      try { var s = localStorage.getItem('tm-' + tmKey()); if (s) { tmState[tmKey()] = JSON.parse(s); rebuildTier(host); toast('Тир загружен: ' + tmSub); } } catch (e) {}
+    };
+    if (q('[data-tmshare]')) q('[data-tmshare]').onclick = function () {
+      var st = tmState[tmKey()];
+      var lines = TM_TIERS.map(function (t) { return t[1] + ': ' + (st[t[0]] || []).map(function (tid) { var d = tmData(tid); return d ? (d.n) : ''; }).join(', '); });
+      var text = 'Тир-лист ' + tmTab + ' · ' + tmSub + ':\n' + lines.join('\n');
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { toast('Карточка-ссылка в буфере'); }, function () {});
+      else toast('Скопируй вручную');
     };
   }
-  function mark(sel,el){ $(sel).querySelectorAll('.ml-sw').forEach(x=>x.classList.toggle('on',x===el)); }
-
-  /* ══════════════ LAYOUT MAP ══════════════ */
-  function buildLayouts(){
-    const wrap = $('#mlLayouts');
-    if(LAYOUTS.length<2){ wrap.style.display='none'; return; }
-    wrap.innerHTML = LAYOUTS.map(l=>`
-      <div class="ml-lay ${l.id===S.layout?'on':''}" data-l="${l.id}">
-        <div class="ml-lay-pic">${picSchema(l.pic)}</div>
-        <div class="ml-lay-name"><b>${l.id.toUpperCase()}</b>${l.n}</div>
-        <div class="ml-lay-desc">${l.d}</div></div>`).join('');
-    wrap.querySelectorAll('.ml-lay').forEach(el=>el.onclick=()=>{
-      S.layout=el.dataset.l;
-      wrap.querySelectorAll('.ml-lay').forEach(x=>x.classList.toggle('on',x===el));
-      applyAttrs(); positionIndicator();
-    });
+  function rebuildTier(host) { labMorph(host, viewTier()); wireTierMaker(host); }
+  function toast(msg) {
+    var t = document.getElementById('tmToast');
+    if (!t) { t = document.createElement('div'); t.id = 'tmToast'; t.className = 'tm-toast glass'; document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add('on');
+    clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove('on'); }, 1600);
   }
-  function picSchema(t){
-    const rail = `<i class="bar" style="flex:0 0 7px"></i>`;
-    const m={
-      base:`${rail}<div class="col"><i class="top" style="flex:0 0 11px;background:var(--acc-border)"></i><div class="split"><i></i><i class="side"></i></div></div>`,
-      dash:`${rail}<div class="col"><i class="top" style="flex:0 0 11px;background:var(--acc-border)"></i><div class="cards"><i></i><i></i><i></i></div><div class="split"><i></i><i class="side"></i></div></div>`,
-      compact:`${rail}<div class="col"><i class="top" style="flex:0 0 6px;background:var(--acc-border)"></i><div class="split"><i></i><i class="side"></i></div></div>`,
-      neon:`<i class="bar" style="flex:0 0 7px;box-shadow:0 0 8px var(--acc-glow)"></i><div class="col"><i class="top" style="flex:0 0 11px;background:var(--acc-border)"></i><div class="split"><i style="box-shadow:0 0 8px var(--acc-glow)"></i><i class="side"></i></div></div>`,
-      glass:`${rail}<div class="col"><i class="top" style="flex:0 0 11px;background:rgba(255,255,255,.12)"></i><div class="split"><i style="background:rgba(255,255,255,.08)"></i><i class="side" style="background:rgba(255,255,255,.1)"></i></div></div>`,
-    };
-    return m[t]||'';
-  }
-
-  /* ══════════════ FRAME SHELL ══════════════ */
-  function buildFrame(){
-    const side = `<aside class="f-side">
-      <div class="f-brand"><div class="logo">🎮</div><div class="binfo"><b>pro-wildrift</b><span>справочник чемпионов</span></div></div>
-      <div class="f-cap">Инструменты</div>
-      ${SIDE.map((s,i)=>`<div class="side-btn ${s.active?'active':''}" style="--i:${i}" data-tip="${s.t}"><span class="ico">${s.ic}</span><span class="lbl">${s.t}</span>${s.beta?'<span class="beta">BETA</span>':''}</div>`).join('')}</aside>`;
-    const head = `<div class="f-head">
-      <span class="f-logo">PRO-WILDRIFT</span>
-      <div class="f-nav" id="fNav">
-        ${VIEWS.map(v=>`<button class="f-tab ${v.v===S.view?'on':''}" data-v="${v.v}" data-ic="${v.ic}">${v.t}</button>`).join('')}
-        <span class="f-ind"></span></div>
-      <div class="f-h-right">
-        <div class="f-menu"><button class="f-admin" id="fAdmin">⚙ Админ</button>
-          <div class="f-dd f-dd-r" id="fAdminDD"><b>Админ-инструменты</b><span>📋 История изменений</span><span>⚙ Настройки лейаута</span><span>🎚 Редактор позиций</span><span>🖼 Иконки</span><span>🔤 Шрифты</span><span>🏷 Категории</span><span>📰 Изменения</span><span>🧹 Очистить патч-ноты</span></div></div>
-        <button class="f-pill-btn">RU</button>
-        <div class="f-menu"><div class="f-ava" id="fAva"></div>
-          <div class="f-dd f-dd-r" id="fAvaDD"><b>satyndy…@gmail.com</b><span>👤 Мой профиль</span><span id="fSettingsBtn">⚙ Настройки</span><span>🔄 Синхронизировать</span><span>🚪 Выйти</span></div>
-          <div class="f-dd f-dd-r f-dd-wide" id="fSettingsDD"><b>Настройки отображения</b>
-            ${Object.keys(PROFOPTS).map(k=>{const o=PROFOPTS[k];return `<div class="tl-grp"><span class="tl-glabel">${o.label}</span><div class="tl-seg" data-popt="${k}">${o.items.map(it=>`<button data-v="${it.v}" class="${it.v===S[k]?'on':''}">${it.t}</button>`).join('')}</div></div>`;}).join('')}</div></div>
-      </div></div>`;
-    frame.innerHTML = side + `<div class="f-app">${head}<div class="f-central" id="fCentral"></div></div><div class="ml-dim"></div>`;
-    frame.querySelectorAll('.f-tab').forEach(b=>b.onclick=()=>{
-      S.view=b.dataset.v;
-      frame.querySelectorAll('.f-tab').forEach(x=>x.classList.toggle('on',x===b));
-      positionIndicator();                       // пилюля едет сразу (transform, плавно)
-      requestAnimationFrame(()=>renderCentral()); // тяжёлый контент рендерим следующим кадром — пилюля не дёргается
-    });
-    const adminBtn=$('#fAdmin'), avaBtn=$('#fAva'), setBtn=$('#fSettingsBtn');
-    const anyOpen=()=>['fAdminDD','fAvaDD','fSettingsDD'].some(id=>{const d=$('#'+id);return d&&d.classList.contains('open');});
-    const syncMenu=()=>{frame.dataset.menuopen=anyOpen()?'on':'off';};
-    const closeDD=()=>{['fAdminDD','fAvaDD','fSettingsDD'].forEach(id=>{const d=$('#'+id);if(d)d.classList.remove('open');});syncMenu();};
-    const openOne=(id,btn)=>{const dd=$('#'+id);if(!dd)return;const o=dd.classList.contains('open');closeDD();if(!o){originFrom(dd,btn);dd.classList.add('open');}syncMenu();};
-    if(adminBtn) adminBtn.onclick=e=>{e.stopPropagation();openOne('fAdminDD',adminBtn);};
-    if(avaBtn) avaBtn.onclick=e=>{e.stopPropagation();openOne('fAvaDD',avaBtn);};
-    if(setBtn) setBtn.onclick=e=>{e.stopPropagation();$('#fAvaDD').classList.remove('open');const dd=$('#fSettingsDD');const o=dd.classList.contains('open');if(!o){originFrom(dd,avaBtn);dd.classList.add('open');}else dd.classList.remove('open');syncMenu();};
-    frame.querySelectorAll('#fSettingsDD .tl-seg').forEach(seg=>{const key=seg.dataset.popt;seg.querySelectorAll('button').forEach(b=>b.onclick=ev=>{ev.stopPropagation();S[key]=b.dataset.v;seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));applyAttrs();});});
-    document.addEventListener('click',closeDD);
-    frame.querySelectorAll('.side-btn').forEach(b=>b.onclick=()=>{
-      frame.querySelectorAll('.side-btn').forEach(x=>x.classList.toggle('active',x===b));
-      openTool(b.dataset.tip);
-    });
-    frame.addEventListener('pointermove',e=>{ if(!S.parallax)return; const r=frame.getBoundingClientRect(); frame.style.setProperty('--px',((e.clientX-r.left)/r.width-0.5).toFixed(3)); frame.style.setProperty('--py',((e.clientY-r.top)/r.height-0.5).toFixed(3)); });
-    applyAttrs(); renderCentral();
-  }
-
-  /* ══════════════ CENTRAL ══════════════ */
-  function renderCentral(){
-    const box = $('#fCentral');
-    box.innerHTML = ({stats:statsView,wrpr:wrprView,hub:hubView,tier:tierView,patch:patchView,tactics:tacticsView}[S.view])();
-    if(['stats','wrpr'].includes(S.view)) wireRows();
-    if(S.view==='wrpr') wireWrSort();
-    if(S.view==='stats'){ if(S.level==='chipdrag') wireChipdrag(); wireHeaders(); }
-    if(S.view==='tier'){ initTierSortable(); wireTierControls(); }
-    if(S.view==='patch') wirePatch();
-    if(S.view==='hub') ytWire(box);
-    applyWR();
-    positionIndicator();
-    if(['stats','wrpr','patch'].includes(S.view)) replay(); else frame.classList.remove('anim-run');
-  }
-
-  const rpWrap = inner => S.rightpanel && ['stats','wrpr','tier','patch'].includes(S.view)
-    ? `<div class="f-rpwrap">${inner}${preview()}</div>` : inner;
-
-  function statsView(){
-    const lvl = `<div class="f-lvl"><div class="f-lvl-top">
-        <span class="f-lvl-lbl">УРОВЕНЬ</span><span class="f-lvl-num">10</span>
-        <span class="f-gear">⚙</span></div>${levelControl()}</div>`;
-    const table = `<div class="f-tbl-card"><table class="f-tbl">
-        <thead><tr><th class="th-num"></th><th class="chmp"><span class="f-chmp-th">⚔ Champions</span></th>
-        ${COLS.map((c,i)=>`<th class="th-col ${c.sorted?'sorted':''}" data-col="${i+3}"><span class="th-pill">${c.ic} ${c.t}<i class="arr">▼</i></span></th>`).join('')}</tr></thead>
-        <tbody>${CH.map((c,i)=>`<tr style="--i:${i}" class="${CH[i]===selChamp?'sel':''}" data-row="${i}">
-          <td class="f-num">${i+1}</td>
-          <td><div class="f-name-cell"><span class="f-x">✕</span><span class="f-port" style="background:${c.g}">${c.i}</span><span class="f-cname">${c.n}</span></div></td>
-          <td class="s-ad">${c.ad}</td><td class="s-hp">${c.hp}</td><td class="s-mana">${c.mana}</td>
-          <td class="s-ar">${c.ar}</td><td class="s-mr">${c.mr}</td><td class="s-rng">${c.rng}</td></tr>`).join('')}</tbody></table></div>`;
-    return rpWrap(`<div class="f-statcol">${lvl}${table}</div>`);
-  }
-  function wireHeaders(){
-    const ths=[...frame.querySelectorAll('.f-tbl th.th-col')];
-    const colCells=n=>[...frame.querySelectorAll('.f-tbl tbody tr')].map(tr=>tr.children[n-1]).filter(Boolean);
-    const clearHover=()=>frame.querySelectorAll('.f-tbl .colhover').forEach(x=>x.classList.remove('colhover'));
-    ths.forEach(th=>{
-      const n=+th.dataset.col;
-      th.addEventListener('mouseenter',()=>{ if(th.classList.contains('on'))return; th.classList.add('colhover'); colCells(n).forEach(c=>c.classList.add('colhover')); });
-      th.addEventListener('mouseleave',clearHover);
-      th.onclick=()=>{
-        const was=th.classList.contains('on');
-        ths.forEach(x=>x.classList.remove('on'));
-        frame.querySelectorAll('.f-tbl .colhl').forEach(x=>x.classList.remove('colhl'));
-        clearHover();
-        if(!was){ th.classList.add('on','colhl'); colCells(n).forEach(c=>c.classList.add('colhl')); }
-      };
-    });
-  }
-
-  let wrSort={k:'wr',d:-1};
-  function wireWrSort(){
-    const wl=frame.querySelector('.f-wrlist');
-    frame.querySelectorAll('.wr-head .wr-sortable').forEach(h=>{
-      h.onclick=()=>{
-        const k=h.dataset.sort;
-        if(wrSort.k===k) wrSort.d*=-1; else { wrSort.k=k; wrSort.d=-1; }
-        renderCentral();
-      };
-      h.onmouseenter=()=>{ if(wl) wl.dataset.hovcol=h.dataset.sort; };
-      h.onmouseleave=()=>{ if(wl) wl.removeAttribute('data-hovcol'); };
-    });
-  }
-  function wrprView(){
-    const ranks=['Все ранги','Бронза','Золото','Платина','Алмаз','Мастер+'];
-    const roles=['Все роли','Соло','Лес','Мид','Дракон','Саппорт'];
-    const TIER_ORD={'s+':6,s:5,a:4,b:3,c:2,d:1};
-    const val=(c,k)=> k==='tier' ? (TIER_ORD[String(c.tier).toLowerCase()]||0) : +c[k];
-    const sorted=[...CH].sort((a,b)=>(val(a,wrSort.k)-val(b,wrSort.k))*wrSort.d);
-    const arr=k=> wrSort.k===k ? (wrSort.d<0?' ▼':' ▲') : '';
-    const hc=(k,t)=>`<span class="wr-cell wr-sortable ${wrSort.k===k?'wr-srt on':''}" data-sort="${k}">${t}${arr(k)}</span>`;
-    const list = `<div class="f-card f-wrlist">
-      <div class="wr-head"><span class="wr-rank">#</span><span class="wr-name-h">Чемпион</span><span class="wr-sp"></span>${hc('tier','Тир')}${hc('wr','WR')}${hc('pr','PR')}${hc('br','BR')}</div>
-      ${sorted.map((c,i)=>`<div class="wr-row" data-row="${CH.indexOf(c)}" style="--i:${i}">
-        <span class="wr-rank">${i+1}</span>
-        <span class="wr-name"><span class="f-port" style="background:${c.g}">${c.i}</span><span class="f-cname">${c.n}</span></span>
-        <span class="wr-sp"></span>
-        <span class="wr-cell wr-c-tier"><span class="f-tierbadge tb-${c.tier}">${c.tier.toUpperCase()}</span></span>
-        <span class="wr-cell wr-val wr-c-wr ${wrCls(c.wr)}">${c.wr.toFixed(1)}%</span>
-        <span class="wr-cell wr-mut wr-c-pr">${c.pr}%</span><span class="wr-cell wr-mut wr-c-br">${c.br}%</span>
-        <span class="wr-extra"><span class="wr-trend ${(TREND[c.n]||0)>=0?'up':'down'}">${(TREND[c.n]||0)>=0?'▲':'▼'}${Math.abs(TREND[c.n]||0).toFixed(1)}</span><svg class="wr-spark" viewBox="0 0 60 18" preserveAspectRatio="none"><polyline points="${sparkPts(c.wr,TREND[c.n]||0)}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg></span></div>`).join('')}</div>`;
-    const body = `<div class="f-wrpr">
-      <div class="f-wrpr-head">📊<span class="ttl">WinRate &amp; PickRate</span><span class="upd">обновлено 04.04.2026</span></div>
-      <div class="f-filters">${ranks.map((r,i)=>`<span class="f-fchip ${i===0?'on':''}">${r}</span>`).join('')}</div>
-      <div class="f-filters">${roles.map((r,i)=>`<span class="f-fchip ${i===0?'on':''}">${r}</span>`).join('')}</div>
-      ${list}</div>`;
-    return rpWrap(body);
-  }
-  const wrCls = v => !S.winloss ? 'wr-n' : (v>=50?'wr-g':'wr-b');
-
-  /* ── Видео сильных игроков — ПОРТ из lab-youtube (раскладка feat). Демо-данные. ── */
-  const YT_VIDEOS=[
-    {uid:'v1',player:'KKM',role:'top',vs:'Гарен',patch:'5.2',lang:'cn',rank:'Rank 1',channel:'WR China Replays',reupload:true,originalUrl:'https://www.bilibili.com/',id:'yCm6Jk0Bcww',title:'Challenger катка — идеальное комбо',dur:'24:10',stamps:[{t:'2:15',label:'старт линии'},{t:'8:40',label:'тимфайт'}]},
-    {uid:'v2',player:'Long',role:'top',vs:'Дариус',patch:'5.2',lang:'cn',rank:'Challenger',channel:'Rift Highlights',reupload:true,originalUrl:'https://www.bilibili.com/',id:'yCm6Jk0Bcww',title:'Карри игра, разбор тимфайтов',dur:'31:48'},
-    {uid:'v3',player:'Shadow',role:'top',vs:'Гарен',patch:'5.2',lang:'en',rank:'Challenger',channel:'Challenger Plays',id:'yCm6Jk0Bcww',title:'Riven vs Garen — доминация на линии',dur:'17:22'},
-    {uid:'v4',player:'Нагибатор',role:'top',vs:'Камилла',patch:'5.2',lang:'ru',rank:'PRO',channel:'НагибаторWR',id:'yCm6Jk0Bcww',title:'Как карри на Ривен — гайд по комбо',dur:'22:05'},
-    {uid:'v5',player:'Yuuki',role:'top',vs:'Гарен',patch:'5.1',lang:'en',channel:'ProGuides',id:'yCm6Jk0Bcww',title:'Агрессивный старт против Гарена',dur:'19:02'},
-    {uid:'v6',player:'GerSe',role:'top',vs:'Дариус',patch:'5.0',lang:'ru',channel:'WR Гайды РУ',id:'yCm6Jk0Bcww',title:'Старая катка — для истории',dur:'27:33'}
-  ];
-  const YT_ROLE={top:'Топ',jng:'Лес',mid:'Мид',adc:'АДК',sup:'Сап'}, YT_LANG={ru:'RU',en:'EN',cn:'CN'}, YT_CUR='5.2';
-  let YT_SAVED=new Set(), YT_F={lang:'all',vs:'all',saved:false};
-  function ytPatchNum(p){const a=String(p).split('.').map(n=>parseInt(n,10)||0);return a[0]*100+(a[1]||0);}
-  function ytOld(p){return ytPatchNum(p)<ytPatchNum(YT_CUR);}
-  function ytThumb(id){return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;}
-  function ytInit(n){return (n||'?').trim().charAt(0).toUpperCase();}
-  function ytSec(t){const p=String(t).split(':').map(n=>parseInt(n,10)||0);return p.length===2?p[0]*60+p[1]:p[0];}
-  function ytCard(v,opts={}){
-    const old=(S.ytMarkOld==='on')&&ytOld(v.patch),saved=YT_SAVED.has(v.uid);
-    const roleB=`<span class="badge badge-role r-${v.role}">${YT_ROLE[v.role]||v.role}</span>`;
-    const langB=v.lang?`<span class="badge badge-lang">${YT_LANG[v.lang]||v.lang}</span>`:'';
-    const vsB=v.vs?`<span class="badge badge-vs">vs ${v.vs}</span>`:'';
-    const patchB=`<span class="badge badge-patch">патч ${v.patch}</span>`;
-    const oldB=old?`<span class="badge badge-old">старый патч</span>`:'';
-    const rankB=v.rank?`<span class="vrank ${v.rank==='PRO'?'is-pro':''}">${v.rank}</span>`:'';
-    const titleH=(S.ytTitle==='on'&&v.title&&!opts.noTitle)?`<div class="vtitle">${v.title}</div>`:'';
-    const sub=opts.bigName?`<small>${YT_ROLE[v.role]||''}</small>`:'';
-    const reup=v.reupload?` <span class="vreup">реупа</span>`:'';
-    const orig=v.originalUrl?` · <a class="vorig" href="${v.originalUrl}" target="_blank" rel="noopener">оригинал ↗</a>`:'';
-    const chan=v.channel?`<span class="vchan">залил: ${v.channel}${reup}${orig}</span>`:'';
-    const stamps=(v.stamps&&v.stamps.length)?`<div class="vstamps">${v.stamps.map(s=>`<button class="vstamp" data-vid="${v.id}" data-sec="${ytSec(s.t)}">▸ ${s.t} ${s.label}</button>`).join('')}</div>`:'';
-    return `<article class="vcard ${old?'is-old':''}" data-id="${v.id}" data-uid="${v.uid}">
-      <div class="vthumb"><img src="${ytThumb(v.id)}" alt="${v.player}" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${v.id}/0.jpg'">
-        <button class="vsave ${saved?'on':''}" data-save="${v.uid}" title="Сохранить">★</button>
-        <span class="vdur">${v.dur||''}</span><div class="vplay"><div class="pbtn"></div></div>
-        <div class="vhover"><div class="vhover-title">${v.title||v.player}</div><span class="vhover-cta">▶ Смотреть</span></div></div>
-      <div class="vmeta"><div class="vplayer"><span class="vavatar">${ytInit(v.player)}</span>
-        <span class="vname">${v.player}${rankB}${sub}${chan}</span></div>${titleH}
-        <div class="vbadges">${roleB}${langB}${vsB}${patchB}${oldB}</div>${stamps}</div></article>`;
-  }
-  function ytFiltered(){let l=YT_VIDEOS.slice();
-    if(YT_F.lang!=='all')l=l.filter(v=>v.lang===YT_F.lang);
-    if(YT_F.vs!=='all')l=l.filter(v=>v.vs===YT_F.vs);
-    if(YT_F.saved)l=l.filter(v=>YT_SAVED.has(v.uid));
-    if(S.ytSort==='on')l.sort((a,b)=>ytPatchNum(b.patch)-ytPatchNum(a.patch));
-    return l;}
-  function ytHtml(){
-    const list=ytFiltered();
-    const langChips=[{k:'all',t:'Все'},{k:'ru',t:'RU'},{k:'en',t:'EN'},{k:'cn',t:'CN'}];
-    const vsList=[...new Set(YT_VIDEOS.map(v=>v.vs).filter(Boolean))];
-    const head=`<div class="vb-head"><div><div class="vb-title"><span class="yt-mark">▶</span> Видео сильных игроков</div><div class="vb-sub">катки топ-игроков · гайды</div></div></div>`;
-    const filters=`<div class="vb-filters">${langChips.map(c=>`<button class="fchip ${YT_F.lang===c.k?'on':''}" data-flang="${c.k}">${c.t}</button>`).join('')}<span class="fchip-sep"></span><select class="fchip fchip-sel" id="ytVs"><option value="all">vs: все</option>${vsList.map(x=>`<option value="${x}" ${YT_F.vs===x?'selected':''}>vs ${x}</option>`).join('')}</select><span class="fchip-sep"></span><button class="fchip ${YT_F.saved?'on':''}" data-fsaved>★ Сохранённые</button></div>`;
-    let grid;
-    if(!list.length){grid=`<div class="yt-empty">Ничего не найдено по фильтрам.</div>`;}
-    else{const [first,...rest]=list;grid=`<div class="vb-grid"><div class="feat">${ytCard(first,{bigName:true})}</div><div class="vb-side">${rest.map(v=>ytCard(v,{noTitle:true})).join('')}</div></div>`;}
-    return `<div class="yt-block lay-feat">${head}${filters}${grid}</div>`;
-  }
-  function ytWire(root){
-    function play(card,id,sec){const t=card.querySelector('.vthumb');t.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0${sec?'&start='+sec:''}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;card.classList.add('playing');}
-    root.querySelectorAll('.yt-block .vcard').forEach(card=>card.addEventListener('click',e=>{if(e.target.closest('.vsave')||e.target.closest('.vstamp')||e.target.closest('.vorig'))return;if(card.classList.contains('playing'))return;play(card,card.dataset.id);}));
-    root.querySelectorAll('.yt-block .vstamp').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();play(b.closest('.vcard'),b.dataset.vid,b.dataset.sec);}));
-    root.querySelectorAll('.yt-block .vsave').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();const u=btn.dataset.save;if(YT_SAVED.has(u))YT_SAVED.delete(u);else YT_SAVED.add(u);btn.classList.toggle('on');if(YT_F.saved)ytRerender(root);}));
-    root.querySelectorAll('.yt-block [data-flang]').forEach(c=>c.addEventListener('click',()=>{YT_F.lang=c.dataset.flang;ytRerender(root);}));
-    const vs=root.querySelector('#ytVs');if(vs)vs.addEventListener('change',e=>{YT_F.vs=e.target.value;ytRerender(root);});
-    const fs=root.querySelector('[data-fsaved]');if(fs)fs.addEventListener('click',()=>{YT_F.saved=!YT_F.saved;ytRerender(root);});
-  }
-  function ytRerender(root){const wrap=root.querySelector('.yt-block');if(!wrap)return;const n=document.createElement('div');n.innerHTML=ytHtml();wrap.replaceWith(n.firstElementChild);ytWire(root);}
-
-  function hubView(){
-    const hero=ch('Garen');
-    const top5=[...CH].sort((a,b)=>b.wr-a.wr).slice(0,5);
-    const sTier=CH.filter(c=>c.tier==='s');
-    const counters=[{c:'Garen',vs:'Teemo, Vayne'},{c:'Camille',vs:'Jax'},{c:'Akali',vs:'Kassadin'}];
-    const tours=[['🔴','WR Masters','сегодня 18:00'],['🟡','Asia Cup','завтра 14:00'],['⚪','EU Open','12.06']];
-    const tools=[['👥','Чемпионы'],['⚔','Калькулятор'],['📦','Предметы'],['💎','Руны'],['📋','Драфтер'],['🗺','Тактич. доска']];
-    const port=c=>`<span class="f-port" style="background:${c.g}">${c.i}</span>`;
-    return `<div class="f-hub">
-      <div class="hub-hero"><div class="big" style="background:${hero.g}">${hero.i}</div>
-        <div class="info"><span class="lbl">★ Чемпион дня · Patch 7.0f</span><h2>${hero.n}</h2>
-          <div class="row"><span class="tag">🎖 Тир ${hero.tier.toUpperCase()}</span><span class="tag">📈 ${hero.wr}% WR</span><span class="tag">🗺 ${hero.role}</span></div>
-          <button class="cta">Открыть гайд →</button></div></div>
-      <div class="f-kpis" style="display:flex">${kpiCards()}</div>
-      <div class="hub-cards">
-        <div class="hub-card"><h4>📈 Топ-5 по винрейту</h4>${top5.map(c=>`<div class="hc-row">${port(c)}<span class="hc-n">${c.n}</span><span class="hc-v ${wrCls(c.wr)}">${c.wr.toFixed(1)}%</span></div>`).join('')}</div>
-        <div class="hub-card"><h4>🎖 S-тир сейчас</h4><div class="hc-pool">${sTier.map(c=>`<div class="hc-champ">${port(c)}<span>${c.n}</span></div>`).join('')}</div></div>
-        <div class="hub-card"><h4>⚔ Контрпики дня</h4>${counters.map(x=>`<div class="hc-cp">${port(ch(x.c))}<b>${x.c}</b><span class="hc-arr">бьёт</span><span class="hc-vs">${x.vs}</span></div>`).join('')}</div>
-        <div class="hub-card"><h4>🏆 Ближайшие турниры</h4>${tours.map(t=>`<div class="hc-tour"><span class="hc-dot">${t[0]}</span><b>${t[1]}</b><span class="hc-when">${t[2]}</span></div>`).join('')}</div>
-        <div class="hub-card"><h4>📰 Что нового <span class="pill">Patch 7.0f</span></h4><ul class="hc-news"><li>🟢 <b>Garen</b> усилен — Q +8%</li><li>🔴 <b>Camille</b> ослаблена — щит −10%</li><li>✦ Добавлен <b>Ambessa</b></li><li>⚙ Реворк «Кровожадника»</li></ul></div>
-        <div class="hub-card"><h4>🛠 Лучшие сборки патча</h4>${[ch('Garen'),ch('Ahri')].map(c=>`<div class="hc-build">${port(c)}<b>${c.n}</b><span class="hc-items">🗡 🛡 ⚔ 👢</span></div>`).join('')}</div>
-      </div>
-      <div class="hub-tools">${tools.map(t=>`<div class="hub-tool"><div class="ti">${t[0]}</div><div class="tn">${t[1]}</div></div>`).join('')}</div>
-      ${ytHtml()}</div>`;
-  }
-
-  function tchip(name){ const c=TIERMAP[name]; return `<div class="tl-chip" data-champ="${name}" title="${name}" style="background:${c.g}">${c.i}</div>`; }
-  function tierView(){
-    if(!tierPlacement) tierInit();
-    const tiers=`<div class="tl-tiers">${TIERKEYS.map(k=>`<div class="tl-tier"><div class="tl-badge" style="background:${TIERCOLORS[k]}">${k}</div><div class="tl-lane" data-zone="${k}">${(tierPlacement[k]||[]).map(tchip).join('')}</div></div>`).join('')}</div>`;
-    const pool=`<div class="tl-poolwrap"><div class="tl-plabel">Пул чемпионов</div><div class="tl-pool" data-zone="pool">${(tierPlacement.pool||[]).map(tchip).join('')}</div></div>`;
-    const settings=`<div class="tl-settings ${S.tierOpen?'open':''}" id="tlSettings">
-      ${Object.keys(TIEROPTS).map(k=>{const o=TIEROPTS[k];return `<div class="tl-grp"><span class="tl-glabel">${o.label}</span><div class="tl-seg" data-topt="${k}">${o.items.map(it=>`<button data-v="${it.v}" class="${it.v===S[k]?'on':''}">${it.t}</button>`).join('')}</div></div>`;}).join('')}
-      <button class="tl-reset" id="tlReset">↺ Сбросить расстановку</button></div>`;
-    const bar=`<div class="tl-bar"><span class="tl-title">🎖 Тир-лист</span><button class="tl-gear ${S.tierOpen?'on':''}" id="tlGear" title="Настройки">⚙</button></div>`;
-    return rpWrap(`<div class="f-tier">${bar}${settings}<div class="tl-board">${tiers}${pool}</div></div>`);
-  }
-  function tierSnapshot(){
-    const p={};
-    frame.querySelectorAll('.f-tier [data-zone]').forEach(z=>{ p[z.dataset.zone]=[...z.querySelectorAll('.tl-chip')].map(c=>c.dataset.champ); });
-    tierPlacement=p;
-  }
-  function initTierSortable(){
-    if(!window.Sortable) return;
-    frame.querySelectorAll('.f-tier [data-zone]').forEach(zone=>{
-      new Sortable(zone,{group:'tier',animation:90,ghostClass:'tl-ghost',chosenClass:'tl-chosen',dragClass:'tl-drag',forceFallback:true,fallbackOnBody:true,onEnd:tierSnapshot});
-    });
-  }
-  // origin = центр кнопки (панель растёт ИЗ кнопки) + клемп: не вылезать за фрейм
-  function originFrom(dd,btn){
-    if(!dd||!btn)return;
-    dd.style.left='';dd.style.right='';const pt=dd.style.transform;dd.style.transform='none';
-    // клемп по ГРАНИЦАМ ОКНА (не фрейма) — чтобы панель не уходила за экран
-    const vr={left:8,right:window.innerWidth-8};
-    let pr=dd.getBoundingClientRect();
-    let shift=0;
-    if(pr.right>vr.right) shift=vr.right-pr.right;
-    if(pr.left+shift<vr.left) shift=vr.left-pr.left;
-    if(shift){dd.style.left=(dd.offsetLeft+shift)+'px';dd.style.right='auto';pr=dd.getBoundingClientRect();}
-    dd.style.transform=pt;
-    const br=btn.getBoundingClientRect();
-    // X = центр кнопки внутри панели, Y = верхний край панели (она прямо под кнопкой) → растёт из-под кнопки
-    const ox=Math.max(0,Math.min(pr.width, br.left+br.width/2-pr.left));
-    dd.style.transformOrigin=`${ox.toFixed(1)}px 0px`;
-  }
-  function wireTierControls(){
-    const gear=$('#tlGear');
-    const setTier=(open)=>{S.tierOpen=open;const s=$('#tlSettings');if(s){if(open)originFrom(s,gear);s.classList.toggle('open',open);}if(gear)gear.classList.toggle('on',open);frame.dataset.menuopen=open?'on':'off';};
-    if(gear) gear.onclick=e=>{e.stopPropagation();setTier(!S.tierOpen);};
-    if(!frame._tlOutside){frame._tlOutside=true;document.addEventListener('click',e=>{if(S.tierOpen&&!e.target.closest('#tlSettings')&&!e.target.closest('#tlGear'))setTier(false);});}
-    frame.querySelectorAll('.tl-seg').forEach(seg=>{const key=seg.dataset.topt;seg.querySelectorAll('button').forEach(b=>b.onclick=()=>{S[key]=b.dataset.v;seg.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));applyAttrs();});});
-    const rb=$('#tlReset'); if(rb) rb.onclick=()=>{tierInit();renderCentral();};
-    frame.querySelectorAll('.tl-chip').forEach(c=>c.addEventListener('click',()=>{selChamp=TIERMAP[c.dataset.champ];updatePreview();}));
-  }
-  function wirePatch(){ frame.querySelectorAll('.patch-item').forEach(it=>it.onclick=()=>{selChamp=ch(it.dataset.champ);updatePreview();}); }
-
-  /* ── Мок-модалки инструментов рельса ── */
-  const TOOLIC={'Чемпионы':'👥','Калькулятор урона':'⚔','Предметы':'📦','Руны':'💎','Драфтер':'📋','Чат':'💬','Киберспорт':'🏆'};
-  const port=c=>`<span class="f-port" style="background:${c.g}">${c.i}</span>`;
-  function toolBody(name){
-    if(name==='Чемпионы') return `<div class="fm-search">🔍 Поиск чемпиона…</div>
-      <div class="fm-grid">${TIERCH.map(c=>`<div class="fm-cell">${port(c)}<span>${c.n}</span></div>`).join('')}</div>`;
-    if(name==='Калькулятор урона') return `<div class="fm-calc">
-      <div class="fm-card"><h4>⚔ Мой чемпион</h4><div class="fm-pick">${port(ch('Garen'))}<b>Garen</b> · ур.10</div><div class="fm-row"><span>AD</span><b>108</b></div><div class="fm-row"><span>Предметы</span><b>3</b></div></div>
-      <div class="fm-vs">→</div>
-      <div class="fm-card"><h4>🛡 Цель</h4><div class="fm-pick">${port(ch('Ahri'))}<b>Ahri</b> · ур.10</div><div class="fm-row"><span>Броня</span><b>68</b></div><div class="fm-row"><span>HP</span><b>1588</b></div></div>
-      <div class="fm-result">Итоговый урон с авто-атаки: <b>~187</b> · с комбо: <b>~1 240</b></div></div>`;
-    if(name==='Предметы'){const cols=['#e74c3c','#4aa3ff','#2ecc71','#C89B3C','#b48cff','#ff63a4'];
-      return `<div class="fm-tabs"><span class="on">Все</span><span>Атака</span><span>Защита</span><span>Магия</span><span>Ботинки</span></div>
-      <div class="fm-grid items">${Array.from({length:24}).map((_,i)=>`<div class="fm-item" style="background:linear-gradient(135deg,${cols[i%6]},#0a1420)">${['🗡','🛡','🔮','👢','💎','🏹'][i%6]}</div>`).join('')}</div>`;}
-    if(name==='Руны') return `<div class="fm-runes">${['Доминирование','Точность','Колдовство','Решимость'].map(t=>`<div class="fm-rune-tree"><div class="rt-h">${t}</div><div class="rt-keys">${Array.from({length:4}).map(()=>'<span class="rt-k"></span>').join('')}</div><div class="rt-rows">${Array.from({length:3}).map(()=>`<div class="rt-row">${Array.from({length:3}).map(()=>'<span class="rt-m"></span>').join('')}</div>`).join('')}</div></div>`).join('')}</div>`;
-    if(name==='Драфтер'){
-      const slot=(t,r)=>`<div class="dr-slot"><span class="dr-plus">+</span>${r}</div>`;
-      const roles=['Соло','Лес','Мид','АДК','Саппорт'];
-      const bans=n=>Array.from({length:5}).map(()=>`<span class="dr-ban">✕</span>`).join('');
-      return `<div class="fm-draft">
-        <div class="dr-bans"><span class="dr-bl blue">Баны</span>${bans()}<span class="dr-vs">5 баны на 5</span>${bans()}<span class="dr-bl red">Баны</span></div>
-        <div class="dr-main">
-          <div class="dr-team blue"><div class="dr-th">🔵 Синяя</div>${roles.map(r=>slot('b',r)).join('')}</div>
-          <div class="dr-center"><div class="dr-timer">0:27</div><div class="dr-turn">Ход синей · выбор</div><div class="dr-hint">Полноэкранный режим драфта (как на боевом)</div></div>
-          <div class="dr-team red"><div class="dr-th">🔴 Красная</div>${roles.map(r=>slot('r',r)).join('')}</div>
-        </div>
-        <div class="dr-pool"><div class="dr-pool-h">Пул чемпионов</div><div class="dr-pool-grid">${TIERCH.map(c=>`<span class="f-port" style="background:${c.g}">${c.i}</span>`).join('')}</div></div></div>`;
+  /* карточка справа: чемп/предмет/руна/дракон + связи (клик «Открыть» → страница/карточка) */
+  function tmShowCard(host, tid) {
+    var p = tid.split(':'), k = p[0], d = tmData(tid), side = host.querySelector('#tmSide');
+    if (!d || !side) return;
+    var html;
+    if (k === 'champ') {
+      /* та же богатая карточка, что в WinRate (WR/PR/BR/тренд/спарк + матчапы Клода-ИИ) */
+      labMorph(side, '<button class="tm-side-collapse" data-tmfull title="Свернуть карточку → тир на весь экран">›</button>' + champCardHTML(d));
+      wireChampCard(side, d);
+      var cl0 = side.querySelector('[data-tmfull]'); if (cl0) cl0.onclick = function () { tmFull = true; rebuildTier(host); };
+      return;
     }
-    if(name==='Чат') return `<div class="fm-chat"><div class="fm-msgs">
-      ${[['Aatrox_main','Кто на ранкеды?','me'],['ProMid','я го','x'],['SuppGod','через 5 мин','x'],['You','+','me']].map(m=>`<div class="fm-msg ${m[2]==='me'?'mine':''}"><b>${m[0]}</b><span>${m[1]}</span></div>`).join('')}
-      </div><div class="fm-input">💬 Написать сообщение…<span class="fm-send">➤</span></div></div>`;
-    if(name==='Киберспорт') return `<div class="fm-tabs"><span class="on">Активные</span><span>Предстоящие</span><span>Завершённые</span></div>
-      <div class="fm-tours">${[['🔴 LIVE','WR Masters 2026','Финал · BO5'],['Сегодня 18:00','Asia Cup','Полуфинал'],['12.06','EU Open','Групповой этап']].map(t=>`<div class="fm-tour"><div class="ft-when">${t[0]}</div><div class="ft-name">${t[1]}</div><div class="ft-stage">${t[2]}</div></div>`).join('')}</div>`;
-    return `<p style="color:var(--t3)">Здесь будет «${name}».</p>`;
-  }
-  function openTool(name){
-    closeTool();
-    const full = name==='Драфтер';
-    const m=document.createElement('div'); m.className='f-modal-mask'; m.id='fModal';
-    m.innerHTML=`<div class="f-modal-win ${full?'full':''}"><div class="fm-hdr"><span class="fm-ic">${TOOLIC[name]||'•'}</span><span class="fm-title">${name}</span>${full?'<span class="fm-tag">FULLSCREEN</span>':''}<button class="fm-x" id="fmX">✕</button></div><div class="fm-body">${toolBody(name)}</div></div>`;
-    frame.appendChild(m);
-    m.addEventListener('click',e=>{ if(e.target===m) closeTool(); });
-    m.querySelector('#fmX').onclick=closeTool;
-  }
-  function closeTool(){ const m=$('#fModal'); if(m) m.remove(); }
-
-  function patchView(){
-    return rpWrap(`<div class="f-patchfeed">
-      <div class="patch-banner"><span class="v">7.0f</span><span class="t"><b>Обновление меты</b>6 изменений чемпионов · 04.04.2026</span></div>
-      ${PATCH.map((p,i)=>{const c=ch(p.n),b=PBADGE[p.type];
-        return `<div class="patch-item" data-champ="${p.n}" style="--i:${i}"><span class="f-port" style="background:${c.g}">${c.i}</span>
-          <div class="pc"><div class="pn">${p.n}<span class="pbadge pb-${b.c}">${b.t}</span></div><div class="pt">${p.t}</div></div></div>`;}).join('')}</div>`);
+    if (k === 'item') {
+      html = '<div class="tmc"><span class="tmc-ic" style="background:' + d.g + '"></span><div class="tmc-name">' + d.n + '</div>' +
+        '<div class="tmc-sub">' + d.cat + ' · ' + d.cost + ' з</div><div class="tmc-pass">' + d.pass + '</div>' +
+        '<button class="tm-btn tmc-open" data-open-item="' + d.id + '">Открыть карточку предмета →</button></div>';
+    } else if (k === 'rune') {
+      html = '<div class="tmc"><span class="tmc-ic tile-rune-ic"></span><div class="tmc-name">' + d.n + '</div>' +
+        '<div class="tmc-sub">Дерево: ' + d.tree + '</div><div class="tmc-pass">' + d.f + ' <span class="demo">демо</span></div></div>';
+    } else {
+      html = '<div class="tmc"><span class="tmc-ic" style="background:' + d.col + '"></span><div class="tmc-name">' + d.n + ' дракон</div>' +
+        '<div class="tmc-pass">' + d.soul + ' <span class="demo">демо</span></div></div>';
+    }
+    labMorph(side, '<button class="tm-side-collapse" data-tmfull title="Свернуть карточку → тир на весь экран">›</button>' + html);
+    var oc = side.querySelector('[data-open-champ]'); if (oc) oc.onclick = function () { openChampPage(oc.getAttribute('data-open-champ')); };
+    var oi = side.querySelector('[data-open-item]'); if (oi) oi.onclick = function () { var sh = sectionHost(); itemsGrid(sh); openItemCard(sh, oi.getAttribute('data-open-item')); };
+    var cl = side.querySelector('[data-tmfull]'); if (cl) cl.onclick = function () { tmFull = true; rebuildTier(host); };
   }
 
-  function tacticsView(){
-    const dots=[['18%','26%','#3ca0e6'],['34%','52%','#3ca0e6'],['50%','46%','var(--gold)'],['66%','60%','#e64646'],['80%','30%','#e64646']];
-    const roles=['Топ','Лес','Мид','АДК','Саппорт'];
-    const slots=roles.map(r=>`<button class="tb-slot"><span class="tb-plus">+</span>${r}</button>`).join('');
-    const blue=`<div class="tb-col">
-      <div class="tb-team"><div class="tb-team-h"><span class="tb-tdot" style="background:#3ca0e6"></span>Синяя</div>${slots}</div>
-      <div class="tb-toolp"><div class="tt">Инструменты</div>
-        <div class="tb-tool"><span>↗</span>Стрелка</div><div class="tb-tool"><span>✏</span>Карандаш</div><div class="tb-tool"><span>📝</span>Заметка</div>
-        <div class="tb-colors"><span class="tb-color on" style="background:#FFD700"></span><span class="tb-color" style="background:#3ca0e6"></span><span class="tb-color" style="background:#e64646"></span></div>
-        <div class="tb-tool"><span>🟢</span>Свой вард</div><div class="tb-tool"><span>🔴</span>Враг вард</div></div></div>`;
-    const board=`<div class="tb-mapwrap"><div class="tb-board">
-      <div class="tb-lane tb-top"></div><div class="tb-lane tb-mid"></div><div class="tb-lane tb-bot"></div><div class="tb-river"></div>
-      ${dots.map(d=>`<span class="tb-dot" style="left:${d[0]};top:${d[1]};background:${d[2]}"></span>`).join('')}
-      <span class="tb-base tb-b1"></span><span class="tb-base tb-b2"></span>
-      <div class="tb-zoom"><button title="Приблизить">+</button><button title="Отдалить">−</button><button title="Вписать">⤢</button></div></div></div>`;
-    const red=`<div class="tb-col">
-      <div class="tb-team"><div class="tb-team-h"><span class="tb-tdot" style="background:#e64646"></span>Красная</div>${slots}</div>
-      <div class="tb-toolp"><div class="tt">Действия</div>
-        <div class="tb-tool"><span>🧹</span>Очистить</div><div class="tb-tool"><span>💾</span>Сохранить</div><div class="tb-tool"><span>📷</span>Поделиться</div><div class="tb-tool"><span>↺</span>Сброс</div></div></div>`;
-    return `<div class="f-tactics">${blue}${board}${red}</div>`;
+  /* — Патч — */
+  function viewPatch() {
+    return '<div class="panel glass">' + PATCH.map(function (p) {
+      return '<div class="patch-item" data-ch="' + p.n + '">' + ava(ch(p.n)) +
+        '<span class="pb ' + p.type + '">' + PBADGE[p.type] + '</span><span>' + p.t + '</span></div>';
+    }).join('') + '</div>';
   }
 
-  function kpiCards(){
-    return `<div class="f-kpi"><div class="k-lbl">Топ патча 7.0f</div><div class="k-val">Garen</div><div class="k-sub">▲ +4.2% WR</div></div>
-      <div class="f-kpi"><div class="k-lbl">Мета-роль</div><div class="k-val">Лес</div><div class="k-sub">52% пиков</div></div>
-      <div class="f-kpi"><div class="k-lbl">Самый банимый</div><div class="k-val">Camille</div><div class="k-sub">38% банов</div></div>
-      <div class="f-kpi"><div class="k-lbl">Чемпионов</div><div class="k-val">128</div><div class="k-sub">обновлено сегодня</div></div>`;
-  }
-  function preview(){
-    const c=selChamp||CH[0];
-    const tags=(c.ad!=null)?`<span class="tag">⚔ ${c.ad} AD</span><span class="tag">❤ ${c.hp} HP</span><span class="tag">🛡 ${c.ar} AR</span>`:`<span class="tag">🎖 ${c.role||'чемпион'}</span>`;
-    return `<aside class="f-preview"><div class="big" style="background:${c.g}">${c.i}</div>
-      <h3>${c.n}</h3><div class="meta">${tags}</div>
-      <p>Правая панель: превью выбранного. Кликни строку или чемпа — карточка обновится.</p></aside>`;
-  }
-  function updatePreview(){ const pv=frame.querySelector('.f-preview'); if(pv){const t=document.createElement('div');t.innerHTML=preview();pv.replaceWith(t.firstElementChild);} }
-
-  function levelControl(){
-    if(S.level==='slider') return `<div class="f-slider"><div class="track"><div class="fill"></div></div><div class="knob"></div></div>`;
-    if(S.level==='dots'){let d='';for(let i=1;i<=15;i++)d+=`<i class="${i<=10?'f':''}"></i>`;return `<div class="f-lvldots">${d}</div>`;}
-    // chips / chipdrag / chipsneon
-    const cls = S.level==='chipdrag'?'f-chips f-chipdrag':S.level==='chipsneon'?'f-chips f-chipsneon':'f-chips';
-    let h=`<div class="${cls}">`; for(let i=1;i<=15;i++)h+=`<div class="f-chip ${i===10?'on':''}" data-lvl="${i}">${i}</div>`;
-    return h + (S.level==='chipdrag'?'<span class="f-chiphint">зажми и тяни →</span>':'') + '</div>';
-  }
-  function wireChipdrag(){
-    const strip = frame.querySelector('.f-chipdrag'); if(!strip) return;
-    const chips=[...strip.querySelectorAll('.f-chip')], num=frame.querySelector('.f-lvl-num');
-    let drag=false;
-    const setAt = x=>{
-      let hit=chips[0];
-      chips.forEach(ch=>{const r=ch.getBoundingClientRect(); if(x>=r.left) hit=ch;});
-      chips.forEach(c=>c.classList.toggle('on',c===hit));
-      if(num) num.textContent=hit.dataset.lvl;
-    };
-    strip.addEventListener('pointerdown',e=>{drag=true;strip.setPointerCapture(e.pointerId);setAt(e.clientX);});
-    strip.addEventListener('pointermove',e=>{if(drag)setAt(e.clientX);});
-    strip.addEventListener('pointerup',()=>drag=false);
-    chips.forEach(c=>c.addEventListener('click',()=>{chips.forEach(x=>x.classList.toggle('on',x===c));if(num)num.textContent=c.dataset.lvl;}));
+  /* — Карта (инфо-заглушка с кликабельными объектами) — */
+  function viewMap() {
+    return '<div class="panel glass"><h2>🗺 Карта · экономика <span class="demo">демо</span></h2>' +
+      '<div class="map-wrap">' + MAP_OBJ.map(function (o) {
+        return '<span class="map-dot" style="left:' + o.x + '%;top:' + o.y + '%" title="' + o.t + '">' + o.l + '</span>';
+      }).join('') + '</div>' +
+      '<p class="lead" style="text-align:center;margin-top:12px">Кликабельные объекты джангла · тайминги · экономика (порт из lab-map позже)</p></div>';
   }
 
-  /* ══════════════ EVENTS / APPLY ══════════════ */
-  function wireRows(){
-    frame.querySelectorAll('.f-tbl tbody tr,.wr-row').forEach(r=>{
-      r.onclick=()=>{
-        selChamp=CH[+r.dataset.row];
-        frame.querySelectorAll('.f-tbl tbody tr,.wr-row').forEach(x=>x.classList.toggle('sel',x===r));
-        updatePreview();
+  var VIEWS = [
+    { v: 'stats', t: 'Статы',    ic: '📊', render: viewStats,   card: true },
+    { v: 'wr',    t: 'WinRate',  ic: '🏆', render: viewWinrate, card: true },
+    { v: 'hub',   t: 'Мета-хаб', ic: '🧩', render: viewHub,     card: false },
+    { v: 'tier',  t: 'Тир-лист', ic: '🎖', render: viewTier,    card: false },
+    { v: 'map',   t: 'Карта',    ic: '🗺', render: viewMap,     card: false },
+    { v: 'patch', t: 'Патч',     ic: '📰', render: viewPatch,   card: false }
+  ];
+  var curView = 'stats';
+
+  /* правая карточка чемпа */
+  /* ── ОБЩАЯ БОГАТАЯ КАРТОЧКА ЧЕМПА — те же данные, что в таблице WinRate и Метахабе:
+     тир, WR (цвет+полоса), PR, BR, тренд, спарклайн + матчап-тизер (данные Клода-ИИ, guides).
+     Кнопка свернуть/развернуть + связь на страницу чемпа. Используется в WinRate и тир-мейкере. ── */
+  function champCardHTML(c, opts) {
+    opts = opts || {};
+    var trend = '<span class="trend ' + (c.tr >= 0 ? 'up' : 'dn') + '">' + (c.tr >= 0 ? '▲' : '▼') + Math.abs(c.tr).toFixed(1) + '</span>';
+    var spark = '<svg class="spark" viewBox="0 0 60 18" preserveAspectRatio="none"><polyline points="' + sparkPts(c.wr, c.tr) + '"/></svg>';
+    var lvl = opts.level ? '<div class="lvl"><span>Ур.</span><input type="range" min="1" max="15" value="10" id="lvlR"><b id="lvlV">10</b></div>' : '';
+    return '<div class="cc-top">' + ava(c, 'cc-ava') +
+        '<div class="cc-idwrap"><div class="cc-name">' + c.n + '</div><div class="cc-sub">' + c.role +
+        ' · <span class="tier-badge t-' + c.tier + '">' + c.tier.toUpperCase() + '</span></div></div>' +
+        '<button class="cc-collapse" data-cc-collapse title="Свернуть карточку">▾</button></div>' +
+      '<div class="cc-body">' +
+        /* тот же набор, что строка WinRate: WR c полосой, PR, BR, тренд+спарклайн */
+        '<div class="cc-wr"><span class="wr-track"><span class="wr-fill" style="width:' + Math.min(100, (c.wr - 40) * 5) + '%"></span></span>' +
+          '<b class="' + wrCls(c.wr) + '">' + c.wr.toFixed(1) + '%</b><span class="cc-wrl">WinRate</span></div>' +
+        '<div class="kpi-row"><div class="kpi"><span class="kpi-n">' + c.pr + '%</span><span class="kpi-l">PickRate</span></div>' +
+          '<div class="kpi"><span class="kpi-n">' + c.br + '%</span><span class="kpi-l">BanRate</span></div>' +
+          '<div class="kpi"><span class="kpi-n">' + trend + '</span><span class="kpi-l">тренд ' + spark + '</span></div></div>' +
+        /* мини-статы (как метахаб-сводка) */
+        '<div class="mini-row"><span>Атака</span><span>' + c.ad + '</span></div>' +
+        '<div class="mini-row"><span>Здоровье</span><span>' + c.hp + '</span></div>' +
+        '<div class="mini-row"><span>Броня / MR</span><span>' + c.ar + ' / ' + c.mr + '</span></div>' +
+        lvl +
+        /* матчап-тизер: данные Клода-ИИ (guides). Заполняется async. */
+        '<div class="cc-mu" data-cc-mu="' + slugOf(c.n) + '"><div class="cc-mu-h">Матчапы <span class="demo">Клод-ИИ</span></div>' +
+          '<div class="cc-mu-body lead">загрузка…</div></div>' +
+        '<button class="tm-btn cc-open" data-open-champ="' + c.n + '">Открыть страницу чемпа →</button>' +
+      '</div>';
+  }
+  /* async-догрузка матчапов в карточку (топ «силён/слаб против» из guides Клода-ИИ) */
+  function fillCardMatchups(root, name) {
+    var box = root.querySelector('.cc-mu[data-cc-mu] .cc-mu-body');
+    if (!box) return;
+    guideFor(slugOf(name)).then(function (g) {
+      var m = g && g.matchups && g.matchups[0];
+      if (!m) { box.textContent = 'нет данных'; return; }
+      var row = function (x, cls, lbl) {
+        if (!x) return '';
+        var mc = ch(x.name) || ch(x.slug);
+        var av = mc ? '<img class="cc-mu-ic" src="' + icon(mc) + '" alt="" onerror="this.remove()">' : '';
+        return '<button class="cc-mu-row" data-open-champ="' + (mc ? mc.n : '') + '"><span class="' + cls + '">' + lbl + '</span>' + av +
+          '<span class="cc-mu-n">' + x.name + '</span><b class="' + wrCls(x.wr) + '">' + x.wr + '%</b></button>';
       };
-      if(S.hover==='spotlight') r.addEventListener('pointermove',e=>{
-        const b=r.getBoundingClientRect();
-        r.style.setProperty('--mx',(e.clientX-b.left)+'px');
-        r.style.setProperty('--my',(e.clientY-b.top)+'px');
+      box.innerHTML = row(m.best && m.best[0], 'mu-good', 'силён') + row(m.worst && m.worst[0], 'mu-bad', 'слаб') +
+        (g.counters && g.counters.length ? '<div class="cc-mu-cnt">Контрят: ' + g.counters.slice(0, 3).join(', ') + '</div>' : '');
+      box.querySelectorAll('.cc-mu-row[data-open-champ]').forEach(function (b) {
+        var n = b.getAttribute('data-open-champ'); if (n) b.onclick = function () { openChampPage(n); };
       });
     });
   }
-  function applyAttrs(){
-    frame.dataset.layout=S.layout; frame.dataset.view=S.view;
-    frame.dataset.switcher=S.switcher; frame.dataset.tbl=S.tbl;
-    frame.dataset.srowh=S.srowh; frame.dataset.srows=S.srows; frame.dataset.scolh=S.scolh; frame.dataset.scols=S.scols; frame.dataset.wrowh=S.wrowh; frame.dataset.wrows=S.wrows; frame.dataset.menufx=S.menufx; frame.dataset.menuanim=S.menuanim;
-    frame.dataset.anim=S.anim; frame.dataset.bg=S.bg; frame.dataset.density=S.density;
-    frame.dataset.rail=S.rail; frame.dataset.railanim=S.railanim; frame.dataset.railbtn=S.railbtn; frame.dataset.railact=S.railact;
-    frame.dataset.radius=S.radius; frame.dataset.glow=S.glow; frame.dataset.tblfont=S.tblfont; frame.dataset.island=S.island?'on':'off';
-    frame.dataset.thstyle=S.thstyle;
-    frame.dataset.tlayout=S.tlayout; frame.dataset.tpool=S.tpool; frame.dataset.tsize=S.tsize; frame.dataset.psize=S.psize;
-    frame.dataset.glass=S.glass?'on':'off'; frame.dataset.glasspow=S.glasspow; frame.dataset.glasstint=S.glasstint; frame.dataset.glasssat=S.glasssat; frame.dataset.glassborder=S.glassborder; frame.dataset.glassnoise=S.glassnoise?'on':'off'; frame.dataset.parallax=S.parallax?'on':'off';
-    frame.dataset.splashart=S.splashart; root.style.setProperty('--splash-img', SPLASHES[S.splashart]||SPLASHES.lux);
-    frame.dataset.wrtrend=S.wrtrend?'on':'off';
-    frame.dataset.winloss=S.winloss?'on':'off';
-  }
-  function applyWR(){
-    const gap = Math.round((100-S.wrpull)*3.4)+8;
-    root.style.setProperty('--wr-gap', gap+'px');
-  }
-  function positionIndicator(){
-    const nav=frame.querySelector('.f-nav'); if(!nav)return;
-    const ind=nav.querySelector('.f-ind'), on=nav.querySelector('.f-tab.on'); if(!ind||!on)return;
-    requestAnimationFrame(()=>{ind.style.width=on.offsetWidth+'px';ind.style.transform=`translateX(${on.offsetLeft}px)`;});
-  }
-  function replay(){
-    if(S.anim==='none'){frame.classList.remove('anim-run');return;}
-    frame.classList.remove('anim-run'); void frame.offsetWidth; frame.classList.add('anim-run');
-  }
-  function setAccent(rgb){S.accent=rgb;root.style.setProperty('--acc-rgb',rgb);}
-  function setG2(rgb){S.accent2=rgb;root.style.setProperty('--g2-rgb',rgb);}
-  function setBg1(hex){S.bg1=hex;root.style.setProperty('--bg1',hex);}
-  function setBg2(hex){S.bg2=hex;root.style.setProperty('--bg2',hex);}
-  function hexToRgb(hex){const n=parseInt(hex.slice(1),16);return `${(n>>16)&255},${(n>>8)&255},${n&255}`;}
 
-  /* ══════════════ COPY ══════════════ */
-  function copyConfig(){
-    const lay=LAYOUTS.find(l=>l.id===S.layout), view=VIEWS.find(v=>v.v===S.view);
-    const nm=k=>OPTS[k].items.find(i=>i.v===S[k]).t;
-    const acc=ACCENTS.find(a=>a.rgb===S.accent), acc2=ACCENTS.find(a=>a.rgb===S.accent2);
-    const txt=
-`Main-Lab — конфигурация главного экрана
-──────────────────────────────────────────────
-Раскладка:        ${lay.id.toUpperCase()} · ${lay.n}
-Главный вид:      ${view.ic} ${view.t}
-Зафиксировано:    Навигация=Обводка · Уровень=Чипы-драг · Карточки=Базовые · Hover=Неон-рамка · Анимация=Слайд
-                  Заголовки=Сегмент · Ховер статов=Заливка · Рельс=Плавающий · активный=Рамка · раскрытие=Проявление
-Фон:              Сплэш-арт (${S.splashart})
-Профиль-настройки:Шрифт=${S.tblfont} · Свечение=${S.glow} · Скругление=${S.radius}
-Правая панель:    ${S.rightpanel?'вкл':'выкл'}
-Цвет побед/пор.:  ${S.winloss?'вкл':'выкл'}
-Приближение WR:   ${S.wrpull}
-Баланс/угол град: ${S.gpos}% / ${S.gang}°
-Скорость:         ${S.speed.toFixed(1)}×
-Акцент 1:         ${acc?acc.hex+' ('+acc.t+')':'rgb('+S.accent+')'}
-Акцент 2:         ${acc2?acc2.hex+' ('+acc2.t+')':'rgb('+S.accent2+')'}
-Островной стиль:  ${S.island?'вкл':'выкл'}
-Фон-градиент:     ${S.bg1} → ${S.bg2} (${S.bgpos}% / ${S.bgang}°)
-──────────────────────────────────────────────
-data: layout="${S.layout}" view="${S.view}" switcher="${S.switcher}" level="${S.level}"
-      tbl="${S.tbl}" hover="${S.hover}" anim="${S.anim}" density="${S.density}" bg="${S.bg}"
-      rail="${S.rail}" railanim="${S.railanim}" railbtn="${S.railbtn}" railact="${S.railact}"`;
-    navigator.clipboard.writeText(txt).then(()=>showToast('Конфиг скопирован ✓')).catch(()=>showToast('Не удалось'));
+  function cardHtml() {
+    var c = ch(selName) || CH[0];
+    return '<div class="side-card panel glass" id="wrCard">' + champCardHTML(c, { level: true }) + '</div>';
   }
-  function showToast(m){toast.textContent=m;toast.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toast.classList.remove('show'),2000);}
 
-  /* ══════════════ INIT ══════════════ */
-  buildControls();
-  buildLayouts();
-  setAccent(S.accent); setG2(S.accent2); setBg1(S.bg1); setBg2(S.bg2); applyWR();
-  root.style.setProperty('--g-pos',S.gpos+'%'); root.style.setProperty('--g-ang',S.gang+'deg');
-  root.style.setProperty('--bg-pos',S.bgpos+'%'); root.style.setProperty('--bg-ang',S.bgang+'deg');
-  root.style.setProperty('--spd',S.speed);
-  buildFrame();
-  // пре-прогрев reflow-пути раздвигания рельса — первое наведение без рывка (синхронно, без промежуточной отрисовки)
-  try{ const _pc=frame.style.gridTemplateColumns; frame.style.gridTemplateColumns='252px 1fr'; void frame.offsetWidth; frame.style.gridTemplateColumns=_pc; }catch(e){}
-  window.addEventListener('resize', positionIndicator);
-  // видимый штамп сборки — если число свежее, значит грузится новый код (не кеш)
-  (function(){const b=document.createElement('div');b.textContent='build 18';b.style.cssText='position:fixed;bottom:8px;right:10px;z-index:99999;background:#0BC4E3;color:#001016;font:800 12px system-ui,sans-serif;padding:4px 10px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.4);';document.body.appendChild(b);})();
+  /* ============================================================
+     РЕНДЕР
+     ============================================================ */
+  var stage = document.getElementById('stage');
+  /* ── АКТИВНАЯ ПАНЕЛЬ вида: точечные хелперы работают ТОЛЬКО в ней,
+     спрятанные виды не трогаются (у stats и wr одинаковые .tbl — нельзя путать). ── */
+  var viewHost = null, headerBuilt = false;
+  function pane() {
+    return (viewHost && viewHost.querySelector('.view-pane[data-view="' + curView + '"]')) || stage;
+  }
+
+  /* правая колонка по виду (свап как в боевом, data-rightcol) */
+  function rightFor(name) {
+    var view = VIEWS.find(function (v) { return v.v === name; });
+    if (rightMode === 'off') return 'off';
+    if (rightMode === 'card') return view && view.card ? 'card' : 'off';
+    return name === 'stats' ? 'select' : (name === 'wr' ? 'card' : 'off');  /* swap */
+  }
+  function paneInner(name) {
+    var view = VIEWS.find(function (v) { return v.v === name; });
+    var body = view.render();
+    var right = rightFor(name);
+    var col = right === 'select' ? pickerHtml() : (right === 'card' ? cardHtml() : '');
+    return col ? '<div class="split"><div>' + body + '</div>' + col + '</div>' : body;
+  }
+
+  /* шапка + хост панелей строятся ОДИН раз; вкладки-виды wired один раз */
+  function buildShell() {
+    if (headerBuilt) return;
+    stage.innerHTML =
+      '<header class="sec-head"><h1>Home</h1>' +
+        '<div class="subtabs glass" role="tablist">' + VIEWS.map(function (v) {
+          return '<button class="subtab" data-view="' + v.v + '">' + v.ic + ' ' + v.t + '</button>';
+        }).join('') + '</div>' +
+        '<div class="head-right"><span class="upd">демо-данные</span></div>' +
+      '</header>' +
+      '<div class="view-host" id="viewHost"></div>';
+    viewHost = stage.querySelector('#viewHost');
+    stage.querySelectorAll('.subtab').forEach(function (b) {
+      b.onclick = function () { showView(b.getAttribute('data-view')); };
+    });
+    headerBuilt = true;
+  }
+
+  /* ЛЕНИВО + КЭШ: вид строится при ПЕРВОМ заходе (с появлением — реальное появление),
+     потом НЕ удаляется — прячется hidden. Возврат = показать спрятанный, 0 пересоздания. */
+  function showView(name) {
+    curView = name;
+    buildShell();
+    stage.querySelectorAll('.subtab').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-view') === name);
+    });
+    app.setAttribute('data-rightcol', rightFor(name));
+
+    var p = viewHost.querySelector('.view-pane[data-view="' + name + '"]');
+    if (!p) {                                   /* ПЕРВЫЙ заход — построить один раз */
+      p = document.createElement('section');
+      p.className = 'view-pane';
+      p.setAttribute('data-view', name);
+      p.innerHTML = paneInner(name);
+      viewHost.appendChild(p);
+      wirePane(p);
+      playIn(p);                                /* реальное появление — только при постройке */
+    }
+    /* показать целевую, спрятать прочие — БЕЗ пересборки */
+    viewHost.querySelectorAll('.view-pane').forEach(function (x) { x.hidden = (x !== p); });
+    _lastView = name;
+  }
+
+  /* Инструмент рельса = заглушка ПОВЕРХ, оболочка Home прячется (не затирается → кэш панелей цел) */
+  function enterTool(title) {
+    buildShell();
+    stage.querySelector('.sec-head').hidden = true;
+    if (viewHost) viewHost.hidden = true;
+    var stub = stage.querySelector('#toolStub');
+    if (!stub) {
+      stub = document.createElement('div');
+      stub.id = 'toolStub'; stub.className = 'tool-stub';
+      stage.appendChild(stub);
+    }
+    stub.innerHTML = '<div class="panel glass"><h2>' + title + ' <span class="demo">заглушка</span></h2>' +
+      '<p class="lead">Инструмент = отдельный раздел-страница (не модалка). Рельс остаётся, меняется контент. Порт из своего lab-* позже.</p></div>';
+    stub.hidden = false;
+    playIn(stub);
+  }
+  function exitTool() {
+    var stub = stage.querySelector('#toolStub');
+    if (stub) stub.hidden = true;
+    var sh = stage.querySelector('#labSection');
+    if (sh) sh.hidden = true;
+    if (stage.querySelector('.sec-head')) stage.querySelector('.sec-head').hidden = false;
+    if (viewHost) viewHost.hidden = false;
+    showView(curView);
+  }
+
+  /* ============================================================
+     РАЗДЕЛЫ РЕЛЬСА: Чемпионы + Предметы (строим из эталона lab-main —
+     то же стекло/токены/lab-morph/playIn, свои узлы не изобретаем).
+     Оболочка Home прячется (не затирается → её кэш панелей цел).
+     ============================================================ */
+  function sectionHost() {
+    buildShell();
+    if (stage.querySelector('.sec-head')) stage.querySelector('.sec-head').hidden = true;
+    if (viewHost) viewHost.hidden = true;
+    var stub = stage.querySelector('#toolStub'); if (stub) stub.hidden = true;
+    var sh = stage.querySelector('#labSection');
+    if (!sh) { sh = document.createElement('div'); sh.id = 'labSection'; sh.className = 'lab-section'; stage.appendChild(sh); }
+    sh.hidden = false;
+    return sh;
+  }
+  function enterSection(kind) {
+    var sh = sectionHost();
+    if (kind === 'champs') champsGrid(sh);
+    else if (kind === 'items') itemsGrid(sh);
+  }
+
+  /* совместимость: старые вызовы render() = показать текущий вид (перестроит только если его нет) */
+  function render() {
+    /* если вид уже построен — просто показать (0 узлов); если данные вида надо
+       обновить целиком (напр. переключили rightMode) — пересобрать его панель */
+    if (headerBuilt) { var p = viewHost.querySelector('.view-pane[data-view="' + curView + '"]'); if (p) { p.remove(); } }
+    showView(curView);
+  }
+
+  /* ── ТОЧЕЧНО: перерисовать ТОЛЬКО таблицу активного вида, не трогая пикер и шапку ── */
+  function refreshTable() {
+    var host = pane().querySelector('.split > div') || pane();
+    if (!host || curView !== 'stats') { render(); return; }
+    labMorph(host, viewStats());
+    wireTable();
+    wireLevel();
+  }
+
+  /* ── ТОЧЕЧНО: фильтр пикера показом/скрытием, БЕЗ пересборки ячеек ── */
+  function filterPickerCells() {
+    var grid = pane().querySelector('.pk-grid');
+    if (!grid) return;
+    var q = (pkSearch || '').trim().toLowerCase();
+    var shown = 0;
+    grid.querySelectorAll('.pk-cell[data-pick]').forEach(function (el) {
+      var n = el.getAttribute('data-pick');
+      var c = ch(n);
+      var hit = (pkRole === 'Все' || (c && c.role === pkRole)) && (!q || n.toLowerCase().indexOf(q) !== -1);
+      el.style.display = hit ? '' : 'none';
+      if (hit) shown++;
+    });
+    var note = pane().querySelector('.pk-empty');
+    if (note) note.style.display = shown ? 'none' : '';
+    pane().querySelectorAll('[data-pkrole]').forEach(function (b) {
+      b.classList.toggle('on', b.getAttribute('data-pkrole') === pkRole);
+    });
+  }
+
+  /* ── ТОЧЕЧНО: перекрасить одну ячейку пикера + счётчик ── */
+  function syncPickCell(name) {
+    var on = !!picked[name];
+    pane().querySelectorAll('.pk-cell[data-pick="' + name + '"]').forEach(function (el) {
+      el.classList.toggle('on', on);
+    });
+    var cnt = pane().querySelector('.pk-count');
+    if (cnt) cnt.textContent = Object.keys(picked).filter(function (k) { return picked[k]; }).length;
+  }
+
+  /* ── ТОЧЕЧНО: пересчитать состояние тумблеров ролей (all/some/none) по DOM-классу ── */
+  function refreshRoleToggles() {
+    pane().querySelectorAll('.rf-add[data-addrole]').forEach(function (b) {
+      var st = roleAddState(b.getAttribute('data-addrole'));
+      b.classList.remove('all', 'some', 'none');
+      b.classList.add(st);
+    });
+  }
+
+  /* ── ВЫБРАТЬ/СНЯТЬ всех чемпов роли — точечно (одна ячейка + одна строка на КАЖДОГО
+     изменившегося, НЕ пересборка таблицы и НЕ пересборка сетки пикера) ── */
+  function toggleRole(role) {
+    var list = champsOfRole(role);
+    var makeOn = roleAddState(role) !== 'all';   /* не все выбраны → добавляем; все → снимаем */
+    list.forEach(function (c) {
+      if (!!picked[c.n] === makeOn) return;      /* уже в нужном состоянии — не трогаем */
+      picked[c.n] = makeOn;
+      syncPickCell(c.n);                          /* одна ячейка */
+      applyChampRow(c.n);                         /* одна строка (вставка по сорт-позиции / удаление) */
+    });
+    refreshRoleToggles();
+  }
+
+  /* провода ОДНОЙ панели — вешаются при её постройке (subtab-провод живёт в buildShell) */
+  function wirePane(root) {
+    wireTable();
+    wireLevel();
+    if (curView === 'tier' && root.querySelector('.tm-wrap')) wireTierMaker(root);
+
+    /* ── ПИКЕР: мультивыбор, поиск, роли — БЕЗ пересборки сетки ── */
+    root.querySelectorAll('[data-pick]').forEach(function (el) {
+      el.onclick = function () {
+        var n = el.getAttribute('data-pick');
+        picked[n] = !picked[n];
+        selName = n;
+        syncPickCell(n);      /* одна ячейка пикера */
+        applyChampRow(n);     /* одна строка таблицы */
+        refreshRoleToggles(); /* состояние тумблеров ролей могло измениться */
+      };
+    });
+    var ps = root.querySelector('#pkSearch');
+    if (ps) ps.oninput = function () { pkSearch = ps.value; filterPickerCells(); };
+    /* ФИЛЬТР роли (что видно) — только показ/скрытие ячеек */
+    root.querySelectorAll('[data-pkrole]').forEach(function (b) {
+      b.onclick = function () { pkRole = b.getAttribute('data-pkrole'); filterPickerCells(); };
+    });
+    /* ВЫБОР роли (кого добавить в таблицу) — тумблер on/off */
+    root.querySelectorAll('[data-addrole]').forEach(function (b) {
+      b.onclick = function (e) { e.stopPropagation(); toggleRole(b.getAttribute('data-addrole')); };
+    });
+    var pc = root.querySelector('#pkClear');
+    if (pc) pc.onclick = function () {
+      Object.keys(picked).forEach(function (k) { picked[k] = false; });
+      pane().querySelectorAll('.pk-cell[data-pick]').forEach(function (el) { el.classList.remove('on'); });
+      syncPickCell('');
+      refreshRoleToggles();
+      refreshTable();
+    };
+  }
+
+  /* ── провода ТАБЛИЦЫ (пересоздаются вместе с ней) ── */
+  function wireTable() {
+    pane().querySelectorAll('.tbl thead th[data-sort]').forEach(function (th) {
+      th.onclick = function () {
+        var k = th.getAttribute('data-sort');
+        var s = curView === 'stats' ? statSort : sort;
+        if (s.k === k) s.d *= -1; else { s.k = k; s.d = -1; }
+        if (curView === 'stats') refreshTable(); else render();
+      };
+    });
+    pane().querySelectorAll('tr[data-ch]').forEach(function (el) {
+      el.onclick = function () {
+        selName = el.getAttribute('data-ch');
+        pane().querySelectorAll('tr[data-ch]').forEach(function (x) { x.classList.toggle('sel', x === el); });
+        var card = pane().querySelector('.side-card');
+        if (card) { card.innerHTML = champCardHTML(ch(selName), { level: true }); wireChampCard(card, ch(selName)); }
+      };
+    });
+    /* карточка WinRate живёт при построении вида — провод сразу */
+    var wc = pane().querySelector('#wrCard');
+    if (wc) wireChampCard(wc, ch(selName) || CH[0]);
+    wireTips();
+    wirePatch();
+  }
+
+  /* провод богатой карточки: свернуть/развернуть · матчапы · связь на страницу */
+  function wireChampCard(root, c) {
+    if (!c) return;
+    var col = root.querySelector('[data-cc-collapse]');
+    if (col) col.onclick = function () {
+      var on = root.classList.toggle('cc-collapsed');
+      col.textContent = on ? '▸' : '▾';
+      col.title = on ? 'Развернуть карточку' : 'Свернуть карточку';
+    };
+    root.querySelectorAll('[data-open-champ]').forEach(function (b) {
+      var n = b.getAttribute('data-open-champ'); if (n) b.onclick = function () { openChampPage(n); };
+    });
+    fillCardMatchups(root, c.n);
+  }
+
+  /* ── провода БЛОКА УРОВНЯ ── */
+  function wireLevel() {
+    pane().querySelectorAll('.lvl-pill[data-lvl]').forEach(function (p) {
+      p.onclick = function () {
+        level = +p.getAttribute('data-lvl');
+        pane().querySelectorAll('.lvl-pill').forEach(function (x) { x.classList.toggle('on', x === p); });
+        var num = pane().querySelector('.lvl-num'); if (num) num.textContent = level;
+        refreshStatCells();
+      };
+    });
+    var ruler = $('#ruler');
+    if (ruler && !ruler.__wired) {
+      ruler.__wired = 1;          // узел теперь переживает ре-рендер (labMorph) — не вешаем слушателя дважды
+      var drag = false;
+      var pick = function (e) {
+        var el = document.elementFromPoint(e.clientX, e.clientY);
+        var pill = el && el.closest ? el.closest('.lvl-pill[data-lvl]') : null;
+        if (!pill) return;
+        var v = +pill.getAttribute('data-lvl');
+        if (v === level) return;
+        level = v;
+        /* тянем БЕЗ полного ре-рендера — иначе рвётся жест */
+        ruler.querySelectorAll('.lvl-pill').forEach(function (x) { x.classList.toggle('on', x === pill); });
+        var num = pane().querySelector('.lvl-num'); if (num) num.textContent = level;
+        refreshStatCells();
+      };
+      ruler.addEventListener('pointerdown', function (e) {
+        drag = true; try { ruler.setPointerCapture(e.pointerId); } catch (_) {} pick(e);
+      });
+      ruler.addEventListener('pointermove', function (e) { if (drag) pick(e); });
+      ruler.addEventListener('pointerup', function () { drag = false; });
+      ruler.addEventListener('pointercancel', function () { drag = false; });
+    }
+    var lrange = $('#lvlRange');
+    if (lrange) lrange.oninput = function () {
+      level = +lrange.value;
+      var num = pane().querySelector('.lvl-num'); if (num) num.textContent = level;
+      refreshStatCells();
+    };
+  }
+
+  /* ============================================================
+     ТУЛТИП РОСТА СТАТА — порт showT/moveT/hideT (app.js:3125).
+     3 вида: у курсора · привязан к ячейке · строкой под таблицей.
+     ============================================================ */
+  function tipEl() {
+    var el = document.getElementById('uiTip');
+    if (!el) { el = document.createElement('div'); el.id = 'uiTip'; el.className = 'ui-tip glass'; document.body.appendChild(el); }
+    return el;
+  }
+  function wireTips() {
+    pane().querySelectorAll('td.st-cell[data-ch][data-key]').forEach(function (td) {
+      var c = ch(td.getAttribute('data-ch'));
+      var key = td.getAttribute('data-key');
+      if (!c) return;
+      var g = growthOf(c, key);
+      var txt = g ? '+' + g + ' за уровень' : 'не растёт с уровнем';
+      td.onmouseenter = function (ev) {
+        if (tipMode === 'row') { var r = $('#rowTip'); if (r) r.textContent = c.n + ' · ' + key.toUpperCase() + ': ' + txt + ' (демо)'; return; }
+        var el = tipEl();
+        el.textContent = txt + ' (демо)';
+        el.style.display = 'block';
+        if (tipMode === 'cell') {
+          var b = td.getBoundingClientRect();
+          el.style.left = (b.left + b.width / 2) + 'px';
+          el.style.top = (b.top - 8) + 'px';
+          el.setAttribute('data-anchor', 'cell');
+        } else {
+          el.setAttribute('data-anchor', 'cursor');
+          el.style.left = ev.clientX + 'px';
+          el.style.top = ev.clientY + 'px';
+        }
+      };
+      td.onmousemove = function (ev) {
+        if (tipMode !== 'cursor') return;
+        var el = tipEl();
+        el.style.left = ev.clientX + 'px';
+        el.style.top = (ev.clientY - 10) + 'px';
+      };
+      td.onmouseleave = function () {
+        var el = document.getElementById('uiTip'); if (el) el.style.display = 'none';
+        if (tipMode === 'row') { var r = $('#rowTip'); if (r) r.textContent = 'Наведи на цифру — покажу рост за уровень'; }
+      };
+    });
+  }
+
+  /* ── ПАТЧ-ТУЛТИП — порт showGlobalPatchTip (app.js:668) ── */
+  function wirePatch() {
+    pane().querySelectorAll('[data-patch]').forEach(function (el) {
+      el.onclick = function (e) {
+        e.stopPropagation();
+        var p = PATCH_MAP[el.getAttribute('data-patch')];
+        if (!p) return;
+        var old = document.getElementById('patchTip'); if (old) old.remove();
+        var tip = document.createElement('div');
+        tip.id = 'patchTip'; tip.className = 'patch-tip glass';
+        var lbl = p.type === 'buff' ? '🟢 БАФФ' : p.type === 'adjust' ? '🟡 КОРРЕКТИРОВКА' : '🔴 НЕРФ';
+        tip.innerHTML = '<b>' + lbl + ' <span class="pt-v">Patch ' + p.patch + '</span></b><div class="pt-c">' + p.change + '</div><span class="demo">демо</span>';
+        document.body.appendChild(tip);
+        var r = el.getBoundingClientRect(), tr = tip.getBoundingClientRect();
+        var left = Math.max(8, Math.min(r.left, window.innerWidth - tr.width - 8));
+        var top = r.bottom + 6;
+        if (top + tr.height > window.innerHeight - 8) top = Math.max(8, r.top - tr.height - 6);
+        tip.style.left = left + 'px'; tip.style.top = top + 'px';
+        setTimeout(function () {
+          document.addEventListener('click', function rm() { var t = document.getElementById('patchTip'); if (t) t.remove(); document.removeEventListener('click', rm); }, { once: true });
+        }, 50);
+      };
+    });
+  }
+
+  /* обновить только числа в таблице статов (без ре-рендера — без мигания) */
+  function refreshStatCells() {
+    var tb = pane().querySelector('.tbl[data-tbl="stats"] tbody');
+    if (!tb) return;
+    var list = sortBy(pickedList(), statSort);
+    var cols = visibleCols();
+    var ranges = {};
+    cols.forEach(function (col) { ranges[col.key] = colRange(list, col.key); });
+    tb.querySelectorAll('tr').forEach(function (tr, ri) {
+      var c = list[ri]; if (!c) return;
+      cols.forEach(function (col, ci) {
+        var td = tr.children[ci + 1];
+        if (!td) return;
+        var v = statAt(c, col.key);
+        var b = td.querySelector('.st-v'); if (b) b.textContent = v;
+        var r = ranges[col.key], num = +v;
+        var t = (r && r.mx > r.mn && !isNaN(num)) ? (num - r.mn) / (r.mx - r.mn) : .5;
+        var bg = fillColor(col.hi ? t : 1 - t);
+        if (fillShape === 'cell') td.style.background = bg || '';
+        var bar = td.querySelector('.st-bar');
+        if (bar && bg) { bar.style.background = bg.replace(/[\d.]+\)$/, '1)'); bar.style.width = Math.round(8 + t * 92) + '%'; }
+      });
+    });
+  }
+
+  /* ============================================================
+     РЕЛЬС — hover раскрытие + смена раздела
+     ============================================================ */
+  var rail = document.getElementById('rail');
+  rail.addEventListener('mouseenter', function () { if (!app.classList.contains('nav-top')) app.classList.add('rail-open'); });
+  rail.addEventListener('mouseleave', function () { app.classList.remove('rail-open'); });
+  rail.querySelectorAll('.rail-btn[data-section]').forEach(function (b) {
+    b.onclick = function () {
+      rail.querySelectorAll('.rail-btn[data-section]').forEach(function (x) { x.classList.toggle('active', x === b); });
+      var sec = b.getAttribute('data-section');
+      if (sec === 'home') { exitTool(); }
+      else if (sec === 'champs') { enterSection('champs'); }
+      else if (sec === 'items') { enterSection('items'); }
+      else { enterTool(b.textContent.trim()); }
+    };
+  });
+
+  /* ── данные для страницы чемпа (грузим один раз, кэш; демо при отсутствии) ── */
+  var _abil = null, _ru = null, _guideCache = {};
+  var slugOf = function (name) { return String(name).toLowerCase().replace(/[^a-z]/g, ''); };
+  function loadJSON(url) { return fetch(url).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); }
+  function ensureAbilities() {
+    if (_abil) return Promise.resolve();
+    return Promise.all([
+      loadJSON('../data-pipeline/abilities-en.json'),
+      loadJSON('../data-pipeline/ability-names-ru.json')
+    ]).then(function (r) { _abil = r[0] || { champions: [] }; _ru = r[1] || { champions: {} }; });
+  }
+  function guideFor(slug) {
+    if (_guideCache[slug] !== undefined) return Promise.resolve(_guideCache[slug]);
+    return loadJSON('../data-pipeline/guides/' + slug + '.json').then(function (g) { _guideCache[slug] = g; return g; });
+  }
+
+  /* ── СЕТКА ЧЕМПИОНОВ (переиспользуем стиль пикера из эталона) ── */
+  var champSearch = '';
+  function champsGrid(host) {
+    var list = CH.filter(function (c) { return !champSearch || c.n.toLowerCase().indexOf(champSearch.toLowerCase()) === 0; });
+    var cells = list.map(function (c) {
+      return '<button class="cg-cell" data-champ="' + c.n + '" title="' + c.n + '">' +
+        '<span class="cg-lift"><img class="cg-img" src="' + icon(c) + '" srcset="' + iconSet(c) + '" sizes="120px" alt="' + c.n + '" loading="lazy" ' +
+          'onerror="this.style.background=\'' + c.g + '\';this.removeAttribute(\'src\')"></span>' +
+        '<span class="cg-name">' + c.n + '</span>' +
+        '<span class="cg-role">' + c.role + '</span></button>';
+    }).join('');
+    labMorph(host,
+      '<header class="sec-head"><h1>Чемпионы</h1>' +
+        '<div class="head-right"><div class="pk-search cg-search"><input type="text" id="cgSearch" placeholder="Поиск чемпиона..." value="' + champSearch + '"></div></div></header>' +
+      '<div class="cg-grid">' + cells + '</div>');
+    var s = host.querySelector('#cgSearch');
+    if (s) s.oninput = function () { champSearch = s.value; champsGrid(host); var f = host.querySelector('#cgSearch'); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } };
+    host.querySelectorAll('[data-champ]').forEach(function (b) {
+      b.onclick = function () { openChampPage(b.getAttribute('data-champ')); };
+    });
+  }
+
+  /* ── СТРАНИЦА ЧЕМПА (полноэкранная, та же что SEO champions/<name>/) ── */
+  var champLevel = 10;
+  /* скейл по уровню — та же формула, что в таблице Статс (демо-рост); строки/'0'/'NRG' как есть */
+  function scaleStat(base) { return isNaN(+base) ? base : Math.round(+base * (0.5 + champLevel / 30)); }
+  function statRow(lbl, key, c) {
+    return '<div class="cs-row"><span class="cs-l">' + lbl + '</span><b class="cs-v">' + scaleStat(c[key]) + '</b></div>';
+  }
+  function openChampPage(name) {
+    var c = ch(name); if (!c) return;
+    var host = sectionHost();
+    var slug = slugOf(name);
+    /* каркас сразу (демо/скелет), данные догружаем и morph-им — без мигания */
+    labMorph(host, champPageHTML(c, null, null));
+    wireChampPage(host, c);
+    playIn(host.querySelector('.cp-page'));
+    Promise.all([ensureAbilities().then(function () { return _abil.champions.find(function (x) { return x.slug === slug; }); }), guideFor(slug)])
+      .then(function (r) {
+        labMorph(host, champPageHTML(c, r[0], r[1]));
+        wireChampPage(host, c);
+      });
+  }
+  function champPageHTML(c, abil, guide) {
+    var tierT = (guide && guide.tier) || c.tier.toUpperCase();
+    var patch = (guide && guide.patch) || '7.2a';
+    var trend = c.tr >= 0 ? 'up' : 'dn';
+    var badge = c.tr >= 0 ? 'БАФ' : 'НЕРФ';
+
+    /* умения */
+    var abilHTML;
+    if (abil && abil.abilities) {
+      var ruC = (_ru && _ru.champions && _ru.champions[c.n]) || {};
+      abilHTML = Object.keys(abil.abilities).map(function (k) {
+        var a = abil.abilities[k];
+        var ruName = (ruC[a.slot] && ruC[a.slot].ru) || a.name;
+        var scale = (a.scale || '').trim();
+        return '<div class="ab-row"><img class="ab-ic" src="' + a.icon + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+          '<div class="ab-body"><div class="ab-h"><b class="ab-slot">' + a.slot.toUpperCase() + '</b> <span class="ab-name">' + ruName + '</span>' +
+          (a.name !== ruName ? '<span class="ab-en">' + a.name + '</span>' : '') + '</div>' +
+          '<div class="ab-desc">' + (a.desc || '') + '</div>' +
+          (scale ? '<div class="ab-scale">Скейл: ' + scale + '</div>' : '') + '</div></div>';
+      }).join('');
+    } else {
+      abilHTML = '<div class="ab-row demo-skel">Умения загружаются… <span class="demo">демо</span></div>';
+    }
+
+    /* гайд: сборка / руны / заклы / прокачка */
+    var guideHTML;
+    if (guide) {
+      var b = (guide.builds && guide.builds[0]) || {};
+      var it = b.items || {};
+      var chip = function (x) { return '<span class="bi-chip">' + x + '</span>'; };
+      guideHTML =
+        '<div class="gd-col"><h4>Сборка <span class="bi-tier">' + (b.tier || guide.tier || '') + '</span></h4>' +
+          '<div class="bi-grp"><span class="bi-lbl">Старт</span>' + (it.starting || []).map(chip).join('') + '</div>' +
+          '<div class="bi-grp"><span class="bi-lbl">Ядро</span>' + (it.core || []).map(chip).join('') + '</div>' +
+          '<div class="bi-grp"><span class="bi-lbl">Ботинки</span>' + (it.boots || []).map(chip).join('') + '</div></div>' +
+        '<div class="gd-col"><h4>Руны</h4><div class="bi-grp">' + (guide.runes || []).map(chip).join('') + '</div>' +
+          '<h4>Заклинания</h4>' + (guide.spells || []).map(function (s) { return '<div class="sp-row"><span>' + s.combo + '</span><b class="wr-g">' + s.wr + '%</b></div>'; }).join('') + '</div>' +
+        '<div class="gd-col"><h4>Прокачка</h4>' + (guide.skillOrder || []).map(function (s) { return '<div class="sk-row"><span>' + s.ability + '</span><span class="sk-lv">' + (s.levels || []).join(' · ') + '</span></div>'; }).join('') + '</div>';
+    } else {
+      guideHTML = '<div class="gd-col"><span class="demo">гайд загружается…</span></div>';
+    }
+
+    /* матчапы 3 секции */
+    var mHTML;
+    if (guide && guide.matchups && guide.matchups[0]) {
+      var m = guide.matchups[0];
+      var sec = function (title, arr, cls) {
+        return '<div class="mu-sec"><h4 class="' + cls + '">' + title + '</h4>' +
+          (arr || []).slice(0, 4).map(function (x) {
+            var mc = ch(x.name) || ch(x.slug);
+            var av = mc ? '<img class="mu-ic" src="' + icon(mc) + '" alt="" onerror="this.remove()">' : '';
+            return '<button class="mu-row" data-champ="' + (mc ? mc.n : '') + '">' + av + '<span class="mu-n">' + x.name + '</span><b class="' + wrCls(x.wr) + '">' + x.wr + '%</b></button>';
+          }).join('') + '</div>';
+      };
+      mHTML = sec('Силён против', m.best, 'mu-good') + sec('Слаб против', m.worst, 'mu-bad') +
+        '<div class="mu-sec"><h4 class="mu-combo">Контрики</h4>' + (guide.counters || []).map(function (n) { return '<span class="bi-chip">' + n + '</span>'; }).join('') + '</div>';
+    } else {
+      mHTML = '<span class="demo">матчапы загружаются…</span>';
+    }
+
+    /* YouTube + стримы (демо-встраивания по чемпу) */
+    var q = encodeURIComponent(c.n + ' Wild Rift guide');
+    var ytHTML =
+      '<div class="yt-col"><h4>Видео по чемпу <span class="demo">демо</span></h4>' +
+        '<div class="yt-list">' +
+          ['гайд', 'комбо', 'матчапы'].map(function (t) {
+            return '<a class="yt-card" href="https://www.youtube.com/results?search_query=' + q + '+' + encodeURIComponent(t) + '" target="_blank" rel="noopener">' +
+              '<span class="yt-thumb" style="background:' + c.g + '"></span><span class="yt-t">' + c.n + ' — ' + t + '</span></a>';
+          }).join('') + '</div></div>' +
+      '<div class="yt-col"><h4>Live-стримы <span class="demo">демо</span></h4>' +
+        '<div class="yt-list">' +
+          ['Challenger', 'PRO'].map(function (t) {
+            return '<a class="yt-card live" href="https://www.twitch.tv/search?term=' + q + '" target="_blank" rel="noopener">' +
+              '<span class="yt-thumb" style="background:' + c.g + '"><span class="yt-live">LIVE</span></span><span class="yt-t">' + t + ' · ' + c.n + '</span></a>';
+          }).join('') + '</div></div>';
+
+    return '<div class="cp-page">' +
+      '<div class="cp-head panel glass glass--strong">' +
+        '<button class="cp-back" data-back="champs" title="Назад к чемпионам">‹ Чемпионы</button>' +
+        '<img class="cp-ava" src="' + icon(c) + '" srcset="' + iconSet(c) + '" sizes="88px" alt="' + c.n + '" onerror="this.style.background=\'' + c.g + '\';this.removeAttribute(\'src\')">' +
+        '<div class="cp-id"><div class="cp-name">' + c.n + '</div><div class="cp-sub">' + c.role + ' · Тир ' + tierT + '</div>' +
+          '<div class="cp-badges"><span class="cp-patch">Патч ' + patch + '</span><span class="cp-trend ' + trend + '">' + badge + ' ' + (c.tr >= 0 ? '+' : '') + c.tr.toFixed(1) + '</span></div></div>' +
+      '</div>' +
+      '<div class="cp-grid">' +
+        '<div class="panel glass cp-stats"><h3>Статы <span class="lvl-mini">ур. <b class="cp-lv">' + champLevel + '</b></span>' +
+          '<input type="range" class="cp-lvl" min="1" max="15" value="' + champLevel + '"></h3>' +
+          statRow('Атака', 'ad', c) + statRow('Здоровье', 'hp', c) + statRow('Мана', 'mana', c) +
+          statRow('Броня', 'ar', c) + statRow('Сопр. магии', 'mr', c) +
+          '<div class="cs-row"><span class="cs-l">WinRate</span><b class="cs-v ' + wrCls(c.wr) + '">' + c.wr.toFixed(1) + '%</b></div></div>' +
+        '<div class="panel glass cp-abil"><h3>Умения</h3>' + abilHTML + '</div>' +
+        '<div class="panel glass cp-guide"><h3>Сборка · Руны · Прокачка</h3><div class="gd-wrap">' + guideHTML + '</div></div>' +
+        '<div class="panel glass cp-mu"><h3>Матчапы</h3><div class="mu-wrap">' + mHTML + '</div></div>' +
+        '<div class="panel glass cp-yt"><h3>YouTube · Стримы</h3><div class="yt-wrap">' + ytHTML + '</div></div>' +
+      '</div></div>';
+  }
+  function wireChampPage(host, c) {
+    var back = host.querySelector('[data-back]');
+    if (back) back.onclick = function () { champsGrid(host); };
+    var lv = host.querySelector('.cp-lvl');
+    if (lv) lv.oninput = function () {
+      champLevel = +lv.value;
+      var num = host.querySelector('.cp-lv'); if (num) num.textContent = champLevel;
+      /* пересчёт ТОЛЬКО чисел статов (без пересборки страницы) */
+      var rows = host.querySelectorAll('.cp-stats .cs-row');
+      ['ad', 'hp', 'mana', 'ar', 'mr'].forEach(function (k, i) {
+        if (rows[i]) rows[i].querySelector('.cs-v').textContent = scaleStat(c[k]);
+      });
+    };
+    /* ЗАКОН СВЯЗЕЙ: клик по матчап-чемпу → его страница */
+    host.querySelectorAll('.mu-row[data-champ]').forEach(function (b) {
+      var n = b.getAttribute('data-champ');
+      if (n) b.onclick = function () { openChampPage(n); };
+    });
+  }
+
+  /* ============================================================
+     ПРЕДМЕТЫ — сетка (вид магазина WR) → карточка с 3 вкладками.
+     Числа/зачарования из wr-combat-data.md (7.x); где нет надёжно — демо.
+     ============================================================ */
+  var ITEMS = [
+    { id: 'bork', n: 'Клинок Раина', cat: 'Атака', cost: 3000, g: 'linear-gradient(135deg,#e0506a,#5a0a1a)', stats: [['Сила атаки', 40], ['Скор. атаки', '25%'], ['Вампиризм', '10%']], pass: 'Он-хит: 6% (ближ)/4% (даль) текущего HP цели физ. 3 атаки → −25% МС цели.', from: ['Меч сокрушителя', 'Кинжал'], into: [], who: ['Соло', 'АДК'], demoPass: false },
+    { id: 'trin', n: 'Тринити Форс', cat: 'Атака', cost: 3333, g: 'linear-gradient(135deg,#f0b84a,#7a4a10)', stats: [['Сила атаки', 30], ['Скор. атаки', '30%'], ['Здоровье', 200], ['МС', '5%']], pass: 'Spellblade: 200% базового AD физ после умения. +5% МС (до +15% стаки).', from: ['Меч Шеррида', 'Молот рассвета'], into: [], who: ['Соло', 'Лес'], demoPass: false },
+    { id: 'wits', n: 'Конец разума', cat: 'Атака', cost: 2800, g: 'linear-gradient(135deg,#6ab0c0,#1a3a4a)', stats: [['Скор. атаки', '40%'], ['Сопр. магии', 40], ['МС', '5%']], pass: 'Он-хит: 15–80 маг (по ур.). HP<50% → вампиризм от он-хита.', from: ['Клинок мечника', 'Плащ агилити'], into: [], who: ['АДК', 'Соло'], demoPass: false },
+    { id: 'nash', n: 'Зуб Нашора', cat: 'Магия', cost: 3000, g: 'linear-gradient(135deg,#9b6bff,#2a0a5a)', stats: [['Сила умений', 90], ['Скор. атаки', '50%']], pass: 'Он-хит: 15 + 15% AP маг.', from: ['Утерянная глава', 'Клинок мечника'], into: [], who: ['Мид'], demoPass: false },
+    { id: 'divine', n: 'Божественный раскол', cat: 'Атака', cost: 3300, g: 'linear-gradient(135deg,#e07a3a,#5a2a0a)', stats: [['Сила атаки', 40], ['Здоровье', 300], ['Ускор. умений', 20]], pass: 'Spellblade: 10%(ближ)/7%(даль) макс.HP цели физ (мин 100% базового AD). Вост. 7% макс.HP цели.', from: ['Меч сокрушителя', 'Кристалл рубина'], into: [], who: ['Соло', 'Лес'], demoPass: false },
+    { id: 'cleaver', n: 'Чёрный тесак', cat: 'Атака', cost: 3100, g: 'linear-gradient(135deg,#555566,#1a1a22)', stats: [['Сила атаки', 45], ['Здоровье', 350], ['Ускор. умений', 25]], pass: 'Атаки/умения режут броню цели до −24% (6 стаков).', from: ['Меч сокрушителя', 'Пояс великана'], into: [], who: ['Соло'], demoPass: true },
+    { id: 'void', n: 'Пустотный аметист', cat: 'Магия', cost: 1000, g: 'linear-gradient(135deg,#b48cff,#3a1a6e)', stats: [['Сила умений', 25], ['Маг. пробитие', '8%']], pass: '⚠ Название/числа 7.2 — сверить в клиенте.', from: [], into: [], who: ['Мид', 'Саппорт'], demoPass: true },
+    { id: 'steelcaps', n: 'Стальные набивки', cat: 'Ботинки', cost: 1350, g: 'linear-gradient(135deg,#7aa2c4,#2a3a4a)', stats: [['Броня', 20], ['МС', 45]], pass: 'Снижает урон от авто-атак на 12%. T3 (+1000g): активка на выбор.', from: ['Ботинки скорости'], into: [], who: ['Соло', 'Лес'], demoPass: false },
+    { id: 'boots1', n: 'Ботинки скорости', cat: 'Ботинки', cost: 500, g: 'linear-gradient(135deg,#8b8ba0,#3a3a44)', stats: [['МС', 20]], pass: 'База для T2/T3 ботинок.', from: [], into: ['Стальные набивки'], who: ['Все'], demoPass: false }
+  ];
+  var itemFilter = 'Все', itemSearch = '';
+  var GOLD = { 'Сила атаки': 35, 'Сила умений': 22, 'Здоровье': 2.7, 'Броня': 20, 'Сопр. магии': 18, 'Скор. атаки': 25, 'МС': 12, 'Ускор. умений': 34, 'Маг. пробитие': 0, 'Вампиризм': 0, 'Слоу-рез': 0 };
+  function goldEff(it) {
+    var raw = 0, known = true;
+    it.stats.forEach(function (s) {
+      var v = typeof s[1] === 'number' ? s[1] : parseFloat(s[1]);
+      var per = GOLD[s[0]];
+      if (per == null || isNaN(v)) { known = false; return; }
+      raw += v * per;
+    });
+    return { raw: Math.round(raw), pct: it.cost ? Math.round(raw / it.cost * 100) : 0, known: known };
+  }
+  function itemsGrid(host) {
+    var cats = ['Все', 'Атака', 'Магия', 'Ботинки'];
+    var list = ITEMS.filter(function (it) {
+      return (itemFilter === 'Все' || it.cat === itemFilter) && (!itemSearch || it.n.toLowerCase().indexOf(itemSearch.toLowerCase()) >= 0);
+    });
+    var cells = list.map(function (it) {
+      return '<button class="ig-cell" data-item="' + it.id + '" title="' + it.n + '">' +
+        '<span class="ig-ic" style="background:' + it.g + '"></span>' +
+        '<span class="ig-n">' + it.n + '</span><span class="ig-cost">' + it.cost + ' з</span></button>';
+    }).join('');
+    labMorph(host,
+      '<header class="sec-head"><h1>Предметы</h1>' +
+        '<div class="chips glass">' + cats.map(function (r) { return '<button class="chip-btn ' + (r === itemFilter ? 'active' : '') + '" data-icat="' + r + '">' + r + '</button>'; }).join('') + '</div>' +
+        '<div class="head-right"><div class="pk-search cg-search"><input type="text" id="itSearch" placeholder="Поиск предмета..." value="' + itemSearch + '"></div></div></header>' +
+      '<div class="ig-grid">' + cells + '</div>');
+    host.querySelectorAll('[data-icat]').forEach(function (b) { b.onclick = function () { itemFilter = b.getAttribute('data-icat'); itemsGrid(host); }; });
+    var s = host.querySelector('#itSearch');
+    if (s) s.oninput = function () { itemSearch = s.value; itemsGrid(host); var f = host.querySelector('#itSearch'); if (f) { f.focus(); f.setSelectionRange(f.value.length, f.value.length); } };
+    host.querySelectorAll('[data-item]').forEach(function (b) { b.onclick = function () { openItemCard(host, b.getAttribute('data-item')); }; });
+  }
+  var _itemTab = 'desc';
+  function openItemCard(host, id) {
+    var it = ITEMS.find(function (x) { return x.id === id; }); if (!it) return;
+    labMorph(host, itemCardHTML(it));
+    wireItemCard(host, it);
+    playIn(host.querySelector('.ic-card'));
+  }
+  function itemCardHTML(it) {
+    var ge = goldEff(it);
+    var tab = _itemTab;
+    var body;
+    if (tab === 'tree') {
+      body = '<div class="ic-tree"><div class="ic-grp"><span class="bi-lbl">Из чего</span>' +
+        (it.from.length ? it.from.map(function (x) { return '<span class="bi-chip">' + x + '</span>'; }).join('') : '<span class="demo">базовый</span>') + '</div>' +
+        '<div class="ic-grp"><span class="bi-lbl">Входит в</span>' +
+        (it.into.length ? it.into.map(function (x) { return '<span class="bi-chip">' + x + '</span>'; }).join('') : '<span class="demo">финальный</span>') + '</div></div>';
+    } else if (tab === 'gold') {
+      body = '<div class="ic-gold">' +
+        '<div class="ic-grow"><span>Статы стоят</span><b>' + ge.raw + ' з</b></div>' +
+        '<div class="ic-grow"><span>Цена</span><b>' + it.cost + ' з</b></div>' +
+        '<div class="ic-bar"><div class="ic-fill" style="width:' + Math.min(100, ge.pct) + '%"></div></div>' +
+        '<div class="ic-eff">Золото-эффективность: <b class="' + (ge.pct >= 100 ? 'wr-g' : 'wr-b') + '">' + ge.pct + '%</b>' + (ge.known ? '' : ' <span class="demo">пассив не учтён</span>') + '</div>' +
+        '<div class="ic-who"><span class="bi-lbl">Кому брать</span>' + it.who.map(function (r) { return '<span class="bi-chip">' + r + '</span>'; }).join('') + '</div>' +
+        '<div class="demo" style="margin-top:8px">золото-цены статов — экспертная оценка</div></div>';
+    } else {
+      body = '<div class="ic-desc"><div class="ic-stats">' +
+        it.stats.map(function (s) { return '<div class="cs-row"><span class="cs-l">' + s[0] + '</span><b class="cs-v">' + s[1] + '</b></div>'; }).join('') + '</div>' +
+        '<div class="ic-pass"><b>Пассив.</b> ' + it.pass + (it.demoPass ? ' <span class="demo">демо</span>' : '') + '</div></div>';
+    }
+    var tabs = [['desc', 'Описание'], ['tree', 'Дерево'], ['gold', 'Золото + кому']];
+    return '<div class="ic-card panel glass">' +
+      '<div class="ic-head"><button class="cp-back" data-back="items">‹ Предметы</button>' +
+        '<span class="ic-ic glass--strong" style="background:' + it.g + '"></span>' +
+        '<div class="ic-id"><div class="ic-name">' + it.n + '</div><div class="ic-sub">' + it.cat + ' · ' + it.cost + ' з</div></div></div>' +
+      '<div class="subtabs glass ic-tabs" role="tablist">' + tabs.map(function (t) {
+        return '<button class="subtab ' + (t[0] === tab ? 'active' : '') + '" data-itab="' + t[0] + '">' + t[1] + '</button>';
+      }).join('') + '</div>' +
+      '<div class="ic-body">' + body + '</div></div>';
+  }
+  function wireItemCard(host, it) {
+    var back = host.querySelector('[data-back="items"]');
+    if (back) back.onclick = function () { itemsGrid(host); };
+    host.querySelectorAll('[data-itab]').forEach(function (b) {
+      b.onclick = function () { _itemTab = b.getAttribute('data-itab'); openItemCard(host, it.id); };
+    });
+  }
+
+  /* ============================================================
+     ⚙ НАСТРОЙКИ ЮЗЕРА — арт фона + акцент (blur/dark/сила = утв. дефолты, тут НЕТ)
+     ============================================================ */
+  var DD = 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash';
+  var ARTS = [
+    { v: 'thresh', t: 'Thresh', key: 'Thresh', kind: 'dark' },
+    { v: 'yasuo',  t: 'Yasuo',  key: 'Yasuo',  kind: 'dark' },
+    { v: 'lux',    t: 'Lux',    key: 'Lux',    kind: 'light' },
+    { v: 'soraka', t: 'Soraka', key: 'Soraka', kind: 'light' },
+    { v: 'jinx',   t: 'Jinx',   key: 'Jinx',   kind: 'busy' },
+    { v: 'ahri',   t: 'Ahri',   key: 'Ahri',   kind: 'busy' }
+  ];
+  var KIND_LBL = { dark: 'Тёмные — легко читается', light: 'СВЕТЛЫЕ — худший случай (тут проверяй)', busy: 'Пёстрые' };
+  var SPLASH = { brand: 'radial-gradient(ellipse at 28% 18%,rgba(255, 255, 255,.38),transparent 55%),radial-gradient(ellipse at 78% 82%,rgba(200,155,60,.30),transparent 55%),linear-gradient(135deg,#02121f,#0a0617)' };
+  ARTS.forEach(function (a) { SPLASH[a.v] = "url('" + DD + '/' + a.key + "_0.jpg')"; });
+  var splashEl = $('.splash');
+  var curSplash = 'thresh';
+  function applySplash() {
+    splashEl.style.backgroundImage = SPLASH[curSplash] || SPLASH.thresh;
+  }
+
+  var pop = document.getElementById('settingsPop');
+  function buildSettings() {
+    function row(kind) {
+      return '<div class="ss-kind">' + KIND_LBL[kind] + '</div><div class="ss-splash">' +
+        ARTS.filter(function (a) { return a.kind === kind; }).map(function (a) {
+          return '<button class="ss-thumb' + (curSplash === a.v ? ' on' : '') + '" data-v="' + a.v + '" style="background-image:url(\'' + DD + '/' + a.key + '_0.jpg\')"><span>' + a.t + '</span></button>';
+        }).join('') + '</div>';
+    }
+    /* ⚙ юзера: колонки таблицы (порт getStatsCols) + цветовая схема заливки */
+    /* Ползунок ширины таблиц — настройка ЮЗЕРА, одна на Статс и WinRate.
+       660px = читаемая узкая колонка · 1500px = во всю доступную ширину. Дефолт 1050 (не максимум). */
+    var widthUI = '<div class="set-block"><label>Ширина таблиц <span class="val" id="twVal">' + tblW + 'px</span></label>' +
+      '<input type="range" id="twRange" min="660" max="1440" step="20" value="' + tblW + '">' +
+      '<span class="ss-hint">Одна на Статс и WinRate — чтобы не разъезжались.</span></div>' +
+      '<div class="set-block"><label class="set-toggle"><input type="checkbox" id="setChampShade"' +
+        (app.getAttribute('data-champshade') !== 'off' ? ' checked' : '') + '> Шторка винрейта при ховере чемпов</label>' +
+        '<span class="ss-hint">Выезжает WR снизу иконки чемпа (тир-мейкер, сетки).</span></div>';
+
+    var colsUI = '<div class="set-block"><label>Колонки таблицы Статс</label><div class="col-list">' +
+      COL_DEFS.map(function (c) {
+        var u = statIcon(c.ico);
+        return '<label class="col-row">' +
+          '<input type="checkbox" data-col="' + c.key + '"' + (colHidden[c.key] ? '' : ' checked') + '>' +
+          (u ? '<img class="st-ico" src="' + u + '" alt="">' : '<span style="width:14px"></span>') +
+          '<span>' + c.label + '</span></label>';
+      }).join('') + '</div></div>' +
+      '<div class="set-block"><label>Схема заливки по рейтингу</label>' +
+        '<div class="seg" id="setScheme">' +
+          '<button data-v="rg" class="' + (fillScheme === 'rg' ? 'active' : '') + '">Красный↔Зелёный</button>' +
+          '<button data-v="cb" class="' + (fillScheme === 'cb' ? 'active' : '') + '">Янтарь↔Лазурь</button>' +
+        '</div>' +
+        '<label style="margin-top:6px"><input type="checkbox" id="setInvert"' + (fillInvert ? ' checked' : '') + '> Инвертировать (выше = зелёный)</label>' +
+      '</div>';
+
+    $('#ssHost').innerHTML = widthUI + colsUI +
+      '<div class="set-block"><label>Арт фона за стеклом — ОДИН на весь сайт</label>' +
+      row('dark') + row('light') + row('busy') +
+      '<div class="ss-kind">Без арта</div><div class="ss-splash"><button class="ss-thumb ss-thumb-grad' + (curSplash === 'brand' ? ' on' : '') + '" data-v="brand"><span>Бренд</span></button></div></div>';
+    /* ширина таблиц — ТОЛЬКО CSS-переменная, таблица не пересобирается (0 узлов) */
+    var tw = $('#twRange'), twv = $('#twVal');
+    if (tw) tw.oninput = function () {
+      tblW = +tw.value;
+      /* верхний конец = БЕЗ ограничения: иначе на широком мониторе ползунок
+         упирается в доступное место и верхняя половина хода ничего не делает */
+      var atMax = tblW >= +tw.max;
+      root.style.setProperty('--tbl-w', atMax ? 'none' : tblW + 'px');
+      twv.textContent = atMax ? 'вся ширина' : tblW + 'px';
+      updateChoice();
+    };
+
+    /* колонки */
+    $('#ssHost').querySelectorAll('input[data-col]').forEach(function (cb) {
+      cb.onchange = function () {
+        colHidden[cb.getAttribute('data-col')] = !cb.checked;
+        refreshTable(); updateChoice();
+      };
+    });
+    /* тумблер «шторка винрейта при ховере чемпов» — атрибут на app, CSS гейтит .tile-shade (0 узлов) */
+    var cs = $('#setChampShade');
+    if (cs) cs.onchange = function () { app.setAttribute('data-champshade', cs.checked ? 'on' : 'off'); updateChoice(); };
+    /* схема заливки */
+    var sc = $('#setScheme');
+    if (sc) sc.querySelectorAll('button').forEach(function (b) {
+      b.onclick = function () {
+        fillScheme = b.getAttribute('data-v');
+        sc.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+        refreshTable(); updateChoice();
+      };
+    });
+    var inv = $('#setInvert');
+    if (inv) inv.onchange = function () { fillInvert = inv.checked; refreshTable(); updateChoice(); };
+
+    $('#ssHost').querySelectorAll('.ss-thumb').forEach(function (b) {
+      b.onclick = function () {
+        curSplash = b.getAttribute('data-v');
+        $('#ssHost').querySelectorAll('.ss-thumb').forEach(function (x) { x.classList.toggle('on', x === b); });
+        applySplash(); updateChoice();
+      };
+    });
+  }
+  $('#gearBtn').onclick = function (e) { e.stopPropagation(); var show = pop.hidden; pop.hidden = !pop.hidden; if (show) { buildSettings(); playIn(pop); } };
+  $('#setClose').onclick = function () { pop.hidden = true; };
+
+  function hexRgba(hex, a) {
+    var h = hex.replace('#', ''); if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    return 'rgba(' + parseInt(h.slice(0, 2), 16) + ',' + parseInt(h.slice(2, 4), 16) + ',' + parseInt(h.slice(4, 6), 16) + ',' + a + ')';
+  }
+  var curAccent = '#ffffff';
+  pop.querySelectorAll('.sw').forEach(function (sw) {
+    sw.onclick = function () {
+      curAccent = sw.getAttribute('data-accent');
+      pop.querySelectorAll('.sw').forEach(function (x) { x.classList.toggle('active', x === sw); });
+      root.style.setProperty('--accent', curAccent);
+      root.style.setProperty('--accent-glow', hexRgba(curAccent, .45));
+      updateChoice();
+    };
+  });
+
+  /* ============================================================
+     ДЕВ-ПОЛОСА — варианты раскладки/размеров + «мой выбор» + drag
+     ============================================================ */
+  var choiceText = $('#choiceText');
+  function segState(id) { var b = $('#' + id + ' button.active'); return b ? b.textContent.trim() : '?'; }
+  function updateChoice() {
+    var s = 'Навигация <b>' + segState('optNav') + '</b> · вкладки <b>' + segState('optTabs') + '</b> · плотность <b>' + segState('optDens') +
+      '</b> · ширина <b>' + segState('optWidth') +
+      '</b> · правая колонка <b>' + segState('optRight') + '</b> · пикер <b>' + segState('optPick') +
+      '</b> · шторка <b>' + segState('optShade') + '</b> · уровень <b>' + segState('optLvl') +
+      '</b> · форма вкладки <b>' + segState('optRailShape') + '</b> · ховер рельса <b>' + segState('optRailHover') +
+      '</b> · шапка <b>' + segState('optSticky') +
+      '</b> · ховер строки <b>' + segState('optHover') + '</b> · спарклайн <b>' + segState('optSpark') +
+      '</b> · арт <b>' + curSplash + '</b> · акцент <b>' + curAccent +
+      '</b> · тёмность STRONG <b>' + strongVal.textContent + '</b>';
+    choiceText.innerHTML = 'Ваш выбор: ' + s;
+    return choiceText.textContent;
+  }
+
+  /* сегменты дев-полосы: [id, применить(value)] */
+  var DENS = { cozy: ['52px', '14px'], normal: ['44px', '13px'], dense: ['36px', '12px'] };
+  var WIDTH = { full: 'none', wide: '1400px', narrow: '1100px' };
+  function bindSeg(id, apply) {
+    var box = $('#' + id);
+    if (!box) return;
+    box.querySelectorAll('button').forEach(function (b) {
+      b.onclick = function () {
+        box.querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === b); });
+        apply(b.getAttribute('data-v'));
+        updateChoice();
+      };
+    });
+  }
+  bindSeg('optNav', function (v) { app.classList.toggle('nav-top', v === 'top'); if (v === 'top') app.classList.remove('rail-open'); });
+  bindSeg('optTabs', function (v) { app.setAttribute('data-tabs', v); });
+  bindSeg('optDens', function (v) { root.style.setProperty('--row-h', DENS[v][0]); root.style.setProperty('--tbl-font', DENS[v][1]); });
+  bindSeg('optWidth', function (v) { root.style.setProperty('--content-max', WIDTH[v]); });
+  bindSeg('optRight', function (v) { rightMode = v; render(); });
+  /* ТОЛЬКО data-атрибут: все 6 видов пикера различаются ЧИСТО CSS, узлы не трогаем */
+  bindSeg('optPick', function (v) { pickView = v; app.setAttribute('data-pick', v); });
+  bindSeg('optPkSize', function (v) { app.setAttribute('data-pksize', v); });
+  /* содержимое шторки меняется — но перерисовываем ТОЛЬКО шторки, не пикер целиком */
+  bindSeg('optShade', function (v) {
+    shadeMode = v;
+    app.setAttribute('data-shade', v === 'off' ? 'off' : 'on');
+    pane().querySelectorAll('.pk-cell[data-pick]').forEach(function (el) {
+      var sh = el.querySelector('.pk-shade'); var c = ch(el.getAttribute('data-pick'));
+      if (sh && c) sh.innerHTML = shadeHtml(c);
+    });
+  });
+  /* меняем ТОЛЬКО блок уровня */
+  bindSeg('optLvl', function (v) {
+    lvlView = v;
+    var old = pane().querySelector('.lvl-block');
+    if (!old) { render(); return; }
+    var tmp = document.createElement('div'); tmp.innerHTML = lvlBlock();
+    old.replaceWith(tmp.firstElementChild);
+    wireLevel();
+  });
+  bindSeg('optTip', function (v) { tipMode = v; refreshTable(); });
+  bindSeg('optPatch', function (v) { patchMode = v; refreshTable(); });
+  bindSeg('optFill', function (v) { fillStrength = v; fillOn = (v !== 'none'); refreshTable(); });
+  bindSeg('optFillShape', function (v) { fillShape = v; refreshTable(); });
+  bindSeg('optIcons', function (v) { iconMode = v; app.setAttribute('data-icons', v); refreshTable(); });
+  /* меняем ТОЛЬКО полоску ролей */
+  bindSeg('optRoleView', function (v) {
+    roleView = v;
+    var box = pane().querySelector('.pk-roles');
+    if (!box) return;
+    box.setAttribute('data-roleview', v);
+    box.querySelectorAll('.pk-rf').forEach(function (b) {
+      var t = b.querySelector('.rf-t'), ic = b.querySelector('.rf-ico');
+      if (!ic) return;                       /* кнопка «Все» — текст оставляем всегда */
+      if (t) t.style.display = (v === 'icons') ? 'none' : '';
+    });
+  });
+  bindSeg('optRailShape', function (v) { app.setAttribute('data-railshape', v); });
+  bindSeg('optRailHover', function (v) { app.setAttribute('data-railhover', v); });
+  bindSeg('optSticky', function (v) { app.setAttribute('data-sticky', v); });
+  bindSeg('optHover', function (v) { app.setAttribute('data-hover', v); });
+  bindSeg('optSpark', function (v) { app.setAttribute('data-spark', v); });
+
+  /* ползунок «Тёмность STRONG» (--glass-dark-strong) — подбор на светлом арте Lux */
+  var strongRange = document.getElementById('strongRange');
+  var strongVal = document.getElementById('strongVal');
+  strongRange.oninput = function () {
+    var v = parseFloat(strongRange.value).toFixed(2);
+    root.style.setProperty('--glass-dark-strong', v);
+    strongVal.textContent = v;
+    updateChoice();
+  };
+
+  /* свернуть/развернуть */
+  var strip = document.getElementById('labStrip');
+  var minBtn = document.getElementById('stripMin');
+  minBtn.onclick = function () { var m = strip.classList.toggle('min'); minBtn.textContent = m ? 'Развернуть' : 'Свернуть'; };
+
+  /* копировать */
+  var COPY = '📋 Скопировать мой выбор';
+  var copyBtn = document.getElementById('stripCopy');
+  copyBtn.onclick = function () {
+    var s = updateChoice();
+    function ok() { copyBtn.textContent = 'Скопировано ✓'; setTimeout(function () { copyBtn.textContent = COPY; }, 1200); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(s).then(ok, ok); else ok();
+  };
+
+  /* перетаскивание за грип */
+  var head = document.getElementById('stripHead');
+  var drag = false, offX = 0, offY = 0;
+  head.addEventListener('mousedown', function (e) {
+    if (e.target.closest('.strip-min-btn')) return;
+    var r = strip.getBoundingClientRect();
+    strip.style.transform = 'none'; strip.style.left = r.left + 'px'; strip.style.top = r.top + 'px';
+    offX = e.clientX - r.left; offY = e.clientY - r.top; drag = true; e.preventDefault();
+  });
+  window.addEventListener('mousemove', function (e) {
+    if (!drag) return;
+    var x = Math.max(0, Math.min(e.clientX - offX, window.innerWidth - strip.offsetWidth));
+    var y = Math.max(0, Math.min(e.clientY - offY, window.innerHeight - strip.offsetHeight));
+    strip.style.left = x + 'px'; strip.style.top = y + 'px';
+  });
+  window.addEventListener('mouseup', function () { drag = false; });
+
+  /* ── старт ── */
+  applySplash();
+  render();
+  updateChoice();
 })();

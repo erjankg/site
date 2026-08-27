@@ -1567,7 +1567,7 @@
     var overlay = document.createElement('div');
     overlay.id = 'csMatchPopup';
     overlay.className = 'cs-popup-overlay';
-    overlay.innerHTML = h('div', { class: 'cs-popup' },
+    overlay.innerHTML = h('div', { class: 'cs-popup glass' },
       h('div', { class: 'cs-popup-title' },
         'Счёт матча ' + h('span', { class: 'cs-popup-bo' }, 'BO' + bo)) +
       h('div', { class: 'cs-me-row' },
@@ -1673,7 +1673,7 @@
     var overlay = document.createElement('div');
     overlay.id = 'csTeamPopup';
     overlay.className = 'cs-popup-overlay';
-    overlay.innerHTML = h('div', { class: 'cs-popup' },
+    overlay.innerHTML = h('div', { class: 'cs-popup glass' },
       h('div', { class: 'cs-tp-hdr' },
         _logoEl(team, 42) +
         h('div', { class: 'cs-tp-info' },
@@ -1737,7 +1737,7 @@
     var overlay = document.createElement('div');
     overlay.id = 'csTEditPopup';
     overlay.className = 'cs-popup-overlay';
-    overlay.innerHTML = h('div', { class: 'cs-popup' },
+    overlay.innerHTML = h('div', { class: 'cs-popup glass' },
       h('div', { class: 'cs-popup-title' }, 'Настройки турнира') +
       _field('Название',
         h('input', { class: 'cs-input', id: 'csTeName', value: t.name || '' }, '')) +
@@ -1822,7 +1822,7 @@
     var overlay = document.createElement('div');
     overlay.id = 'csSharePopup';
     overlay.className = 'cs-popup-overlay';
-    overlay.innerHTML = h('div', { class: 'cs-popup' },
+    overlay.innerHTML = h('div', { class: 'cs-popup glass' },
       h('div', { class: 'cs-popup-title' }, '🔗 Ссылка на турнир') +
       h('input', { class: 'cs-input', id: 'csShareUrl', value: url, readonly: 'readonly' }, '') +
       h('div', { class: 'cs-popup-note' }, 'Скопируйте и отправьте кому угодно — даже без аккаунта смогут смотреть сетку.') +

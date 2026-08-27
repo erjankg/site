@@ -57,7 +57,7 @@
     if (fb && img._fb < fb.length) {
       img.src = fb[img._fb++];
     } else {
-      img.style.cssText = 'width:100%;height:100%;background:#1a2a3a;display:flex;align-items:center;justify-content:center;color:#0BC4E3;font-weight:bold;font-size:18px;';
+      img.style.cssText = 'width:100%;height:100%;background:#1a2a3a;display:flex;align-items:center;justify-content:center;color:#ffffff;font-weight:bold;font-size:18px;';
     }
   }
 

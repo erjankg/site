@@ -1502,6 +1502,9 @@
   var _DL = window.DraftLogic || {};
   var WR_DRAFT_SEQUENCE = _DL.WR_DRAFT_SEQUENCE || [];
   var SEQ_LEN = _DL.SEQ_LEN || WR_DRAFT_SEQUENCE.length;
+  // Единый источник «чей ход» + права зрителя (реализация в draft-logic.js).
+  var currentTurn = _DL.currentTurn || function(){ return null; };
+  var viewerRole  = _DL.viewerRole  || function(){ return {}; };
 
   // ─── Champion gallery data ───
   function getAllChamps() {
@@ -1629,21 +1632,18 @@
     document.body.classList.add('dcoop-fullscreen');
 
     var uid = _uid();
-    var roles = sideRoles(lobby, game);
-    var mySide = null;
-    if (roles.blue.cap && roles.blue.cap.uid === uid) mySide = 'blue';
-    else if (roles.red.cap && roles.red.cap.uid === uid) mySide = 'red';
-    var iAmCaptain = !!mySide;
-    // myTeam — идентификатор моей команды (blueCaptain/redCaptain), НЕ позиция.
-    // Нужен отдельно от mySide потому что game.readyBlue/readyRed пишутся по КОМАНДЕ,
-    // а mySide после свапа сторон даёт позицию. Без myTeam Ready-кнопка читала чужой флаг.
-    var myTeam = null;
-    if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) myTeam = 'blue';
-    else if (lobby.redCaptain && lobby.redCaptain.uid === uid) myTeam = 'red';
-    var isCreator = lobby.createdBy === uid;
+    // ★ ЕДИНЫЙ источник прав/хода — тот же, что у ПРЕПИКА и ЛОКИНА (не расходится после свапа).
+    var vr = viewerRole(lobby, game, uid);
+    var turn = currentTurn(lobby, game);
+    var mySide = vr.mySide;             // позиция капитана в этой игре (с учётом свапа)
+    var iAmCaptain = vr.isCaptain;
+    // myTeam — команда (blueCaptain/redCaptain), НЕ позиция: readyBlue/readyRed пишутся по КОМАНДЕ.
+    var myTeam = vr.myTeam;
+    var isCreator = vr.isCreator;
 
-    var step = WR_DRAFT_SEQUENCE[game.turnIndex] || null;
-    var myTurn = iAmCaptain && step && step.side === mySide && game.phase !== 'done';
+    var step = (turn && turn.step) || null;
+    // Мой ход ⟺ я — капитан, чей uid совпадает с capUid текущего шага. ЕДИНСТВЕННЫЙ гейт.
+    var myTurn = !!(turn && !turn.isDone && turn.capUid && turn.capUid === uid);
     var fearlessLock = lobby.mode === 'fearless' ? (lobby.usedChampions || []) : [];
     var unavail = getUnavailable(game, fearlessLock, lobby.globalBans || []);
 
@@ -1906,12 +1906,17 @@
       && !isCreator
       && !(lobby.blueCaptain && lobby.blueCaptain.uid === _meUid)
       && !(lobby.redCaptain  && lobby.redCaptain.uid  === _meUid);
-    var closeBtn = isCreator
-      ? '<button class="dcoop-hdr-close" onclick="dcoopCloseLobbyConfirm()" title="Закрыть лобби">✕</button>'
-      : (iAmSpecHdr
-          ? '<button class="dcoop-hdr-close" onclick="dcoopLeaveLobby()" title="Покинуть лобби" style="font-size:16px;color:#e74c3c;">🚪</button>'
-          // Не-создатель и не-зритель (запасной кап без позиции): кнопка "назад"
-          : '<button class="dcoop-hdr-close" onclick="dcoopBackToList()" title="К списку" style="font-size:16px;">←</button>');
+    // 🟧 КЛЕТКА: во время активного драфта участникам (создатель/капитаны) выхода нет —
+    // прячем ✕/←. Зритель не в клетке — 🚪 «покинуть» остаётся всегда.
+    var activeDraft = lobby.status === 'drafting' || lobby.status === 'paused';
+    var closeBtn = iAmSpecHdr
+      ? '<button class="dcoop-hdr-close" onclick="dcoopLeaveLobby()" title="Покинуть лобби" style="font-size:16px;color:#e74c3c;">🚪</button>'
+      : (activeDraft
+          ? '' // клетка — кнопки выхода нет
+          : (isCreator
+              ? '<button class="dcoop-hdr-close" onclick="dcoopCloseLobbyConfirm()" title="Закрыть лобби">✕</button>'
+              // Не-создатель и не-зритель (запасной кап без позиции): кнопка "назад"
+              : '<button class="dcoop-hdr-close" onclick="dcoopBackToList()" title="К списку" style="font-size:16px;">←</button>'));
     var specCount = (lobby.invitedSpectators || []).length;
     var specBtn = '<button class="dcoop-hdr-spec" onclick="dcoopToggleSpectators()" title="Зрители">👁 '+specCount+'</button>';
     var assistBtn = '<button class="dcoop-hdr-assist" onclick="dcoopToggleAssist()" title="Драфт-помощник" data-on="'+(_draftAssistantOn?'1':'0')+'">🤖</button>';
@@ -1964,31 +1969,33 @@
     if (l.createdBy !== _uid()) { toast('Только создатель может ставить паузу'); return; }
     if (l.status !== 'drafting' && l.status !== 'paused') return;
     var dbInst = _db();
+    var serverTs = firebase.firestore.FieldValue.serverTimestamp();
+    var lobbyRef = dbInst.collection('draftLobbies').doc(l.id);
+    var gameRef = g ? lobbyRef.collection('games').doc(String(g.number)) : null;
+    var totalMs = (l.timerSeconds || 45) * 1000;
+
     if (l.status === 'drafting') {
-      // На паузу
-      dbInst.collection('draftLobbies').doc(l.id).update({
-        status: 'paused',
-        pausedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        pausedBy: _uid(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(function(){ toast('Драфт на паузе'); })
+      // 🟧 На паузу — СОХРАНЯЕМ остаток времени хода, чтобы при возобновлении
+      // не давать сопернику полный таймер заново (была бага: пауза = полный сброс).
+      var remaining = totalMs;
+      if (g && g.turnStartedAt && g.turnStartedAt.toMillis) {
+        remaining = Math.max(0, totalMs - (_serverNow() - g.turnStartedAt.toMillis()));
+      }
+      var batch = dbInst.batch();
+      batch.update(lobbyRef, { status: 'paused', pausedAt: serverTs, pausedBy: _uid(), updatedAt: serverTs });
+      if (gameRef) batch.update(gameRef, { pausedRemainingMs: remaining });
+      batch.commit().then(function(){ toast('Драфт на паузе'); })
         .catch(function(e){ toast('Ошибка: '+e.message); });
     } else {
-      // Возобновить — стартовать таймер заново
-      var patch = {
-        status: 'drafting',
-        pausedAt: null,
-        pausedBy: null,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-      var batch = dbInst.batch();
-      batch.update(dbInst.collection('draftLobbies').doc(l.id), patch);
-      if (g) {
-        var gameRef = dbInst.collection('draftLobbies').doc(l.id)
-          .collection('games').doc(String(g.number));
-        batch.update(gameRef, { turnStartedAt: firebase.firestore.FieldValue.serverTimestamp() });
-      }
-      batch.commit().then(function(){ toast('Драфт возобновлён'); })
+      // Возобновить — стартуем ход так, чтобы осталось ровно сохранённое время.
+      // turnStartedAt сдвигаем в прошлое на «истёкшую» часть (с учётом clock-skew через _serverNow).
+      var rem = (g && g.pausedRemainingMs != null) ? g.pausedRemainingMs : totalMs;
+      rem = Math.max(0, Math.min(totalMs, rem));
+      var newStart = new Date(_serverNow() - (totalMs - rem));
+      var batch2 = dbInst.batch();
+      batch2.update(lobbyRef, { status: 'drafting', pausedAt: null, pausedBy: null, updatedAt: serverTs });
+      if (gameRef) batch2.update(gameRef, { turnStartedAt: newStart, pausedRemainingMs: null });
+      batch2.commit().then(function(){ toast('Драфт возобновлён'); })
         .catch(function(e){ toast('Ошибка: '+e.message); });
     }
   }
@@ -2361,13 +2368,11 @@
     var l = _currentLobby, g = _currentGame;
     if (!l || !g) return;
     var uid = _uid();
-    var roles = sideRoles(l, g);
-    var mySide = null;
-    if (roles.blue.cap && roles.blue.cap.uid === uid) mySide = 'blue';
-    else if (roles.red.cap && roles.red.cap.uid === uid) mySide = 'red';
-    if (!mySide) return;
-    var step = WR_DRAFT_SEQUENCE[g.turnIndex];
-    if (!step || step.side !== mySide) return;
+    // ★ ТОТ ЖЕ единый гейт, что у ЛОКИНА и кнопки — препик разрешён ТОЛЬКО активному капитану.
+    var turn = currentTurn(l, g);
+    if (!turn || turn.isDone || turn.capUid !== uid) return;
+    var mySide = turn.side;
+    var step = turn.step;
 
     var fl = l.mode==='fearless' ? (l.usedChampions||[]) : [];
     var unavail = getUnavailable(g, fl, l.globalBans||[]);
@@ -2427,13 +2432,11 @@
     var l = _currentLobby, g = _currentGame;
     if (!l || !g || !_hoverLocal) return;
     var uid = _uid();
-    var roles = sideRoles(l, g);
-    var mySide = null;
-    if (roles.blue.cap && roles.blue.cap.uid === uid) mySide = 'blue';
-    else if (roles.red.cap && roles.red.cap.uid === uid) mySide = 'red';
-    if (!mySide) return;
-    var step = WR_DRAFT_SEQUENCE[g.turnIndex];
-    if (!step || step.side !== mySide) return;
+    // ★ ТОТ ЖЕ единый гейт, что у ПРЕПИКА и кнопки.
+    var turn = currentTurn(l, g);
+    if (!turn || turn.isDone || turn.capUid !== uid) return;
+    var mySide = turn.side;
+    var step = turn.step;
     var champ = _hoverLocal;
 
     var fl = l.mode==='fearless' ? (l.usedChampions||[]) : [];
@@ -2442,48 +2445,59 @@
     applyLockIn(l, g, step, champ, mySide);
   }
 
+  // 🔴 Транзакция: гонка с таймером (onTimerExpired) и двойной пик. Пишем ход ТОЛЬКО
+  // если turnIndex в базе всё ещё тот же (никто не походил) и чемп ещё доступен.
   function applyLockIn(lobby, game, step, champ, side) {
     var dbInst = _db();
-    var patch = { turnStartedAt: firebase.firestore.FieldValue.serverTimestamp() };
-    // Обновляем конкретный слот
-    if (step.action === 'ban') {
-      var bans = (game.bans[side] || []).slice();
-      bans[step.banIdx] = champ;
-      patch['bans.' + side] = bans;
-    } else {
-      var picks = (game.picks[side] || []).slice();
-      picks[step.pickIdx] = { champ: champ, lockedAt: Date.now() };
-      patch['picks.' + side] = picks;
-    }
-    // hover больше не пишется в Firestore — он чисто локальный, чтобы соперник
-    // не видел выбор до Lock In. Очищать в Firestore не нужно.
-    // Инкремент turnIndex
-    var nextIdx = game.turnIndex + 1;
-    patch.turnIndex = nextIdx;
-    if (nextIdx >= SEQ_LEN) {
-      patch.phase = 'done';
-      patch.finishedAt = firebase.firestore.FieldValue.serverTimestamp();
-    } else {
-      var nextStep = WR_DRAFT_SEQUENCE[nextIdx];
-      patch.phase = nextStep.phase;
-      patch.currentSide = nextStep.side;
-      patch.currentAction = nextStep.action;
-    }
-
+    var expectedIdx = game.turnIndex;
+    var lobbyRef = dbInst.collection('draftLobbies').doc(lobby.id);
+    var gameRef = lobbyRef.collection('games').doc(String(game.number));
     _hoverLocal = null;
-    dbInst.collection('draftLobbies').doc(lobby.id)
-      .collection('games').doc(String(game.number))
-      .update(patch)
-      .then(function(){
-        if (nextIdx >= SEQ_LEN) {
-          // Лобби → finished_game
-          dbInst.collection('draftLobbies').doc(lobby.id).update({
-            status: 'finished_game',
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
+
+    dbInst.runTransaction(function(tx){
+      return tx.get(gameRef).then(function(snap){
+        if (!snap.exists) return null;
+        var g = snap.data();
+        if (g.phase === 'done' || (g.turnIndex || 0) >= SEQ_LEN) return null; // уже завершён
+        if (g.turnIndex !== expectedIdx) return null;                          // ход уже ушёл (таймер/гонка)
+        var stp = WR_DRAFT_SEQUENCE[g.turnIndex];
+        if (!stp || stp.side !== side) return null;                            // не наша сторона
+        // Свежая проверка доступности — на случай, что тот же чемп забанили/пикнули параллельно
+        var fl = lobby.mode === 'fearless' ? (lobby.usedChampions || []) : [];
+        if (getUnavailable(g, fl, lobby.globalBans || [])[champ]) return 'unavail';
+
+        var patch = {
+          turnStartedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          pausedRemainingMs: null           // новый ход — свежий бюджет таймера
+        };
+        if (stp.action === 'ban') {
+          var bans = (g.bans[side] || []).slice();
+          bans[stp.banIdx] = champ;
+          patch['bans.' + side] = bans;
+        } else {
+          var picks = (g.picks[side] || []).slice();
+          picks[stp.pickIdx] = { champ: champ, lockedAt: Date.now() };
+          patch['picks.' + side] = picks;
         }
-      })
-      .catch(function(e){ toast('Ошибка: '+e.message); });
+        patch['hover.' + side] = null;
+        var nextIdx = g.turnIndex + 1;
+        patch.turnIndex = nextIdx;
+        if (nextIdx >= SEQ_LEN) {
+          patch.phase = 'done';
+          patch.finishedAt = firebase.firestore.FieldValue.serverTimestamp();
+        } else {
+          var ns = WR_DRAFT_SEQUENCE[nextIdx];
+          patch.phase = ns.phase; patch.currentSide = ns.side; patch.currentAction = ns.action;
+        }
+        tx.update(gameRef, patch);
+        return nextIdx;
+      });
+    }).then(function(res){
+      if (res === 'unavail') { toast('Недоступен'); return; }
+      if (res != null && res >= SEQ_LEN) {
+        lobbyRef.update({ status: 'finished_game', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      }
+    }).catch(function(e){ toast('Ошибка: '+e.message); });
   }
 
   // ─── TIMER ───
@@ -2633,6 +2647,12 @@
     // Небольшая задержка, чтобы дать активному капитану шанс нажать Lock In
     var delay = step.side === mySide ? 0 : (uid === lobby.createdBy ? 1200 : 2400);
 
+    // Наведённый выбор живёт ТОЛЬКО локально (в Firestore hover не пишем — иначе спойлер
+    // сопернику). Поэтому подставить его может лишь клиент САМОГО активного капитана —
+    // он же фаерит первым (delay 0). Иначе капитан, выбравший бан но не успевший Lock In,
+    // терял его молча (авто-бан уходил пустым).
+    var myHover = (step.side === mySide && _hoverLocal) ? _hoverLocal : null;
+
     // Визуальный индикатор: показываем что таймер истёк и сейчас применится auto-pick
     showAutoApplyHint(step);
 
@@ -2647,26 +2667,29 @@
           if (g.turnIndex !== game.turnIndex) return; // кто-то уже походил
           if (g.phase === 'done') return;
 
-          var patch = { turnStartedAt: firebase.firestore.FieldValue.serverTimestamp() };
+          var patch = { turnStartedAt: firebase.firestore.FieldValue.serverTimestamp(), pausedRemainingMs: null };
           var nextIdx = g.turnIndex + 1;
           patch.turnIndex = nextIdx;
           patch['hover.' + step.side] = null;
 
+          // Свежая проверка: наведённый чемп мог стать недоступен, пока крутилась задержка.
+          var flNow = lobby.mode==='fearless' ? (lobby.usedChampions||[]) : [];
+          var unNow = getUnavailable(g, flNow, lobby.globalBans||[]);
+          var hoverOk = (myHover && !unNow[myHover]) ? myHover : null;
+
           if (step.action === 'ban') {
             var bans = (g.bans[step.side] || []).slice();
-            // Если уже выбрал ховер — забанить его, иначе пустой слот
-            bans[step.banIdx] = g.hover && g.hover[step.side] ? g.hover[step.side] : null;
+            // Наведённый бан капитана НЕ теряем — баним его. Не выбрал ничего → пустой слот.
+            bans[step.banIdx] = hoverOk;
             patch['bans.' + step.side] = bans;
           } else {
-            var pick = g.hover && g.hover[step.side];
+            var pick = hoverOk;
             if (!pick) {
-              var fl = lobby.mode==='fearless' ? (lobby.usedChampions||[]) : [];
-              var un = getUnavailable(g, fl, lobby.globalBans||[]);
               // Пул в активной роли, иначе fallback на всех
               var role = step.pickIdx != null ? ['Top','Jungle','Mid','ADC','Support'][step.pickIdx] : null;
               var allC = getAllChamps();
-              var pool = allC.filter(function(c){ return !un[c.name] && (!role || c.roles[role]); }).map(function(c){return c.name;});
-              if (!pool.length) pool = allC.filter(function(c){ return !un[c.name]; }).map(function(c){return c.name;});
+              var pool = allC.filter(function(c){ return !unNow[c.name] && (!role || c.roles[role]); }).map(function(c){return c.name;});
+              if (!pool.length) pool = allC.filter(function(c){ return !unNow[c.name]; }).map(function(c){return c.name;});
               if (!pool.length) return;
               pick = deterministicPick(lobby.id + ':' + g.number + ':' + g.turnIndex, pool);
             }
@@ -2697,61 +2720,68 @@
     }, delay);
   }
 
+  // 🔴 Транзакция: если оба капитана (или капитан+создатель) кликнут победителя разом,
+  // простой update начислил бы очко ДВАЖДЫ. Читаем свежий game.winner в транзакции и,
+  // если он уже выставлен, ничего не делаем (идемпотентность). Счёт считаем от свежего.
   function setWinner(winningTeam) {
     // winningTeam = 'blue' | 'red' — ИДЕНТИФИКАТОР КОМАНДЫ в лобби, не позиция.
-    // Команда 'blue' = blueCaptain's team, 'red' = redCaptain's team — не меняется при свапах.
     var l = _currentLobby, g = _currentGame;
     if (!l || !g) return;
-    // Идемпотентность: не начислять повторно, если winner уже выставлен.
-    if (g.winner) return;
     var dbInst = _db();
-    // Вычисляем, на какой ПОЗИЦИИ сейчас стоит выигравшая КОМАНДА (для хранения в game.winner).
-    var roles = sideRoles(l, g);
-    var winningSide = (roles.blue.team === winningTeam) ? 'blue' : 'red';
-    var scoreField = 'seriesScore.' + winningTeam;
-    var incr = firebase.firestore.FieldValue.increment(1);
-    var patch = {}; patch[scoreField] = incr;
-    patch.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-
-    // В Fearless — добавляем пики+баны в usedChampions
-    if (l.mode === 'fearless') {
-      var used = (l.usedChampions || []).slice();
-      (g.picks.blue || []).forEach(function(p){ if(p && p.champ) used.push(p.champ); });
-      (g.picks.red  || []).forEach(function(p){ if(p && p.champ) used.push(p.champ); });
-      (g.bans.blue  || []).forEach(function(n){ if(n) used.push(n); });
-      (g.bans.red   || []).forEach(function(n){ if(n) used.push(n); });
-      patch.usedChampions = Array.from(new Set(used));
-    }
-
-    // Денормализация пиков прошлой игры для быстрого отображения в past games
-    var completedEntry = {
-      number: g.number,
-      winner: winningSide,  // позиция победителя (для отображения в past games / replay)
-      blueSide: g.blueSide || 'blue',
-      picksBlue: (g.picks.blue || []).map(function(p){ return p && p.champ ? p.champ : null; }),
-      picksRed:  (g.picks.red  || []).map(function(p){ return p && p.champ ? p.champ : null; }),
-      bansBlue:  (g.bans.blue  || []).slice(),
-      bansRed:   (g.bans.red   || []).slice()
-    };
-    var completedList = (l.completedGames || []).filter(function(e){ return e.number !== g.number; });
-    completedList.push(completedEntry);
-    completedList.sort(function(a,b){ return a.number - b.number; });
-    patch.completedGames = completedList;
-
-    // Проверяем — серия завершена?
-    var targetWins = { bo1:1, bo3:2, bo5:3, bo7:4, infinite:999 }[l.seriesType] || 1;
-    var newBlue = (l.seriesScore && l.seriesScore.blue || 0) + (winningTeam==='blue'?1:0);
-    var newRed  = (l.seriesScore && l.seriesScore.red  || 0) + (winningTeam==='red' ?1:0);
-    var seriesDone = (newBlue >= targetWins || newRed >= targetWins) && l.seriesType !== 'infinite';
-
-    if (seriesDone) patch.status = 'series_done';
-    else patch.status = 'finished_game';
-
     var lobbyRef = dbInst.collection('draftLobbies').doc(l.id);
-    Promise.all([
-      lobbyRef.collection('games').doc(String(g.number)).update({ winner: winningSide }),
-      lobbyRef.update(patch)
-    ]).catch(function(e){ toast('Ошибка: '+e.message); });
+    var gameRef = lobbyRef.collection('games').doc(String(g.number));
+    var targetWins = { bo1:1, bo3:2, bo5:3, bo7:4, infinite:999 }[l.seriesType] || 1;
+
+    dbInst.runTransaction(function(tx){
+      return Promise.all([tx.get(gameRef), tx.get(lobbyRef)]).then(function(res){
+        var gsnap = res[0], lsnap = res[1];
+        if (!gsnap.exists || !lsnap.exists) return;
+        var game = gsnap.data(), lobby = lsnap.data();
+        if (game.winner) return;                    // уже выставлен — не начислять повторно
+
+        var roles = sideRoles(lobby, game);
+        var winningSide = (roles.blue.team === winningTeam) ? 'blue' : 'red';
+
+        var score = lobby.seriesScore || {};
+        var newBlue = (score.blue || 0) + (winningTeam === 'blue' ? 1 : 0);
+        var newRed  = (score.red  || 0) + (winningTeam === 'red'  ? 1 : 0);
+        var seriesDone = (newBlue >= targetWins || newRed >= targetWins) && lobby.seriesType !== 'infinite';
+
+        var entry = {
+          number: game.number,
+          winner: winningSide,
+          blueSide: game.blueSide || 'blue',
+          picksBlue: (game.picks.blue || []).map(function(p){ return p && p.champ ? p.champ : null; }),
+          picksRed:  (game.picks.red  || []).map(function(p){ return p && p.champ ? p.champ : null; }),
+          bansBlue:  (game.bans.blue  || []).slice(),
+          bansRed:   (game.bans.red   || []).slice()
+        };
+        var list = (lobby.completedGames || []).filter(function(e){ return e.number !== game.number; });
+        list.push(entry);
+        list.sort(function(a,b){ return a.number - b.number; });
+
+        var patch = {
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+          completedGames: list,
+          status: seriesDone ? 'series_done' : 'finished_game'
+        };
+        // Явные значения (не increment) — двойной клик уже отсечён guard-ом на game.winner.
+        patch['seriesScore.blue'] = newBlue;
+        patch['seriesScore.red']  = newRed;
+
+        if (lobby.mode === 'fearless') {
+          var used = (lobby.usedChampions || []).slice();
+          (game.picks.blue || []).forEach(function(p){ if(p && p.champ) used.push(p.champ); });
+          (game.picks.red  || []).forEach(function(p){ if(p && p.champ) used.push(p.champ); });
+          (game.bans.blue  || []).forEach(function(n){ if(n) used.push(n); });
+          (game.bans.red   || []).forEach(function(n){ if(n) used.push(n); });
+          patch.usedChampions = Array.from(new Set(used));
+        }
+
+        tx.update(gameRef, { winner: winningSide });
+        tx.update(lobbyRef, patch);
+      });
+    }).catch(function(e){ toast('Ошибка: '+e.message); });
   }
 
   // ─── Toggles ───
@@ -2839,9 +2869,8 @@
 
     var lobby = _currentLobby, game = _currentGame;
     var uid = _uid();
-    var mySide = null;
-    if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) mySide = 'blue';
-    else if (lobby.redCaptain && lobby.redCaptain.uid === uid) mySide = 'red';
+    // ПОЗИЦИЯ капитана в этой игре (с учётом свапа) — иначе помощник читал бы пики чужой стороны.
+    var mySide = viewerRole(lobby, game, uid).mySide;
     if (!mySide) return; // зритель — помощник не показываем
 
     var result = computeAssist(lobby, game, mySide);
@@ -2882,7 +2911,7 @@
 
     var panel = document.createElement('div');
     panel.id = 'dcoopAssistPanel';
-    panel.className = 'dcoop-assist-panel';
+    panel.className = 'dcoop-assist-panel glass';
     panel.innerHTML = ''
       + '<div class="dcoop-assist-title">🤖 Драфт-помощник</div>'
       + '<div class="dcoop-assist-sub">Звёзды = контры (верх) · синергии (низ) · тир (низ)</div>'
@@ -2920,7 +2949,7 @@
 
     var drop = document.createElement('div');
     drop.id = 'dcoopSpecDrop';
-    drop.className = 'dcoop-spec-drop';
+    drop.className = 'dcoop-spec-drop glass';
     drop.innerHTML = '<div class="dcoop-spec-title">👁 Зрители ('+specs.length+'/'+MAX_SPECTATORS+')</div>' + rowsHtml + inviteBtn + linkBtn;
     drop.addEventListener('click', function(e){
       e.stopPropagation();
@@ -2967,52 +2996,51 @@
     });
   }
 
+  // 🟧 Транзакция: если проигравший кэп и создатель нажмут «след. игру» разом (или дабл-клик),
+  // простой set() мог бы пересоздать игру / сбросить уже начатый драфт. Создаём игру N ТОЛЬКО
+  // если её ещё нет и currentGame < N. swapSides передаётся из bottom-bar (сторона проигравшего).
   function nextGame(swapSides) {
     var l = _currentLobby;
     if (!l) return;
-    // Guard: если серия уже завершена, новых игр не создаём
-    var _target = { bo1:1, bo3:2, bo5:3, bo7:4, infinite:999 }[l.seriesType] || 1;
-    var _b = (l.seriesScore && l.seriesScore.blue) || 0;
-    var _r = (l.seriesScore && l.seriesScore.red)  || 0;
-    if (l.seriesType !== 'infinite' && (_b >= _target || _r >= _target)) {
-      toast('Серия уже завершена');
-      return;
-    }
-    if (l.status === 'series_done' || l.status === 'closed') {
-      toast('Серия закрыта');
-      return;
-    }
-    // Сброс кэша автодействий — чтобы не накапливать ключи прошлых игр
-    _autoActionFired = {};
-    var nextNum = (l.currentGame || 1) + 1;
+    var target = { bo1:1, bo3:2, bo5:3, bo7:4, infinite:999 }[l.seriesType] || 1;
     var dbInst = _db();
-    // Стороны игры: base blue/red, при swap меняем
-    // Храним в игре поле blueSide — кто играет на синей стороне в этой игре
-    var game = {
-      number: nextNum,
-      blueSide: swapSides ? (l.currentGameBlueSide === 'blue' ? 'red' : 'blue') : (l.currentGameBlueSide || 'blue'),
-      phase: 'ban1',
-      turnIndex: 0,
-      currentSide: 'blue',
-      currentAction: 'ban',
-      turnStartedAt: null, // запустится когда оба кэпа нажмут "Готов" в драфте
-      readyBlue: false,
-      readyRed: false,
-      bans: { blue: [null,null,null,null,null], red: [null,null,null,null,null] },
-      picks: { blue: [], red: [] },
-      hover: { blue: null, red: null },
-      winner: null,
-      finishedAt: null
-    };
+    var nextNum = (l.currentGame || 1) + 1;
     var lobbyRef = dbInst.collection('draftLobbies').doc(l.id);
-    lobbyRef.collection('games').doc(String(nextNum)).set(game).then(function(){
-      return lobbyRef.update({
-        status: 'drafting',
-        currentGame: nextNum,
-        currentGameBlueSide: game.blueSide,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    var gameRef = lobbyRef.collection('games').doc(String(nextNum));
+
+    dbInst.runTransaction(function(tx){
+      return Promise.all([tx.get(lobbyRef), tx.get(gameRef)]).then(function(res){
+        var lsnap = res[0], gsnap = res[1];
+        if (!lsnap.exists) return;
+        var lobby = lsnap.data();
+        if (lobby.status === 'series_done' || lobby.status === 'closed') throw new Error('Серия закрыта');
+        var sc = lobby.seriesScore || {};
+        if (lobby.seriesType !== 'infinite' && ((sc.blue||0) >= target || (sc.red||0) >= target)) {
+          throw new Error('Серия уже завершена');
+        }
+        // Гонка/дабл-клик: игра N уже создана или currentGame уже продвинут
+        if (gsnap.exists || (lobby.currentGame || 1) >= nextNum) throw new Error('Следующая игра уже создана');
+
+        var blueSide = swapSides
+          ? (lobby.currentGameBlueSide === 'blue' ? 'red' : 'blue')
+          : (lobby.currentGameBlueSide || 'blue');
+        var game = {
+          number: nextNum, blueSide: blueSide, phase: 'ban1', turnIndex: 0,
+          currentSide: 'blue', currentAction: 'ban',
+          turnStartedAt: null, pausedRemainingMs: null, readyBlue: false, readyRed: false,
+          bans: { blue: [null,null,null,null,null], red: [null,null,null,null,null] },
+          picks: { blue: [], red: [] }, hover: { blue: null, red: null },
+          winner: null, finishedAt: null
+        };
+        tx.set(gameRef, game);
+        tx.update(lobbyRef, {
+          status: 'drafting', currentGame: nextNum, currentGameBlueSide: blueSide,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
       });
-    }).catch(function(e){ toast('Ошибка: '+e.message); });
+    }).then(function(){
+      _autoActionFired = {}; // новый ключ-неймспейс авто-действий только после успеха
+    }).catch(function(e){ toast(e.message || ('Ошибка: '+e)); });
   }
 
   function finishSeries() {
@@ -3024,10 +3052,21 @@
     });
   }
 
+  // 🟧 КЛЕТКА: во время активного драфта (drafting/paused/finished_game) выхода нет —
+  // Esc не закрывает модалку. Снимаем только когда серия закончилась/закрыта.
+  function _applyCageState(l) {
+    var mask = document.getElementById('draftCoopMask');
+    if (!mask || !l) return;
+    var caged = l.status === 'drafting' || l.status === 'paused' || l.status === 'finished_game';
+    if (caged) mask.setAttribute('data-no-esc', '');
+    else mask.removeAttribute('data-no-esc');
+  }
+
   // ─── RENDER LOBBY (router по статусу) ───
   function renderLobby(l) {
     var pane = document.getElementById('dcoopPaneLobby');
     if (!pane) return;
+    _applyCageState(l);
     if (l.status === 'waiting' || l.status === 'ready_check') {
       stopGameListener();
       renderWaitingRoom(l, pane);

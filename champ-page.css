@@ -1,0 +1,472 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   champ-page.css — стили СТРАНИЦЫ ЧЕМПИОНА (Э1.9, порт из lab-hover-reveal).
+
+   Один файл на два мира: подключается и статической страницей
+   `champions/<slug>/`, и приложением (index.html). Всё через canon-tokens.css —
+   своих чисел, своих hex и своего стекла тут нет (стекло даёт класс .glass).
+
+   Блок .cp-rail нужен ТОЛЬКО статической странице: в приложении рельс сайта уже
+   на экране и живёт в styles.css. Это не дубль дизайна, а ссылочный двойник для
+   прямого захода из поиска — чтобы страница не была тупиком (ЗАКОН СВЯЗЕЙ).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── статическая страница: каркас + ОДНА общая подложка сайта ── */
+.cp-page {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--txt);
+  font: var(--fw-normal) var(--fs-base) / var(--lh-normal) var(--font-ui);
+}
+.cp-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--splash-img);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.cp-wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: var(--rail-gap);
+  padding: var(--sp-5);
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+.cp-main { flex: 1; min-width: 0; }
+
+.cp-rail { flex: 0 0 auto; width: var(--rail-w); align-self: flex-start; position: sticky; top: var(--sp-5); }
+.cp-rail-items { display: flex; flex-direction: column; gap: var(--sp-1); padding: var(--sp-3); }
+.cp-rail-btn {
+  display: block;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  color: var(--txt-mute);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semi);
+  text-decoration: none;
+  transition: background var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+.cp-rail-btn:hover { background: var(--sel-09); color: var(--txt); }
+.cp-rail-btn.is-on { background: var(--sel-12); color: var(--txt); }
+
+/* ── общая типографика страницы ── */
+.cp-crumbs { font-size: var(--fs-sm); color: var(--txt-faint); margin-bottom: var(--sp-3); }
+.cp-crumbs a { color: var(--txt-faint); text-decoration: none; }
+.cp-crumbs a:hover { color: var(--txt); }
+.cp-h1 {
+  font-size: var(--fs-3xl);
+  line-height: var(--lh-tight);
+  font-weight: var(--fw-black);
+  margin: 0 0 var(--sp-5);
+}
+.cp-num { font-variant-numeric: tabular-nums; font-weight: var(--fw-black); }
+.cp-num.is-good, .is-good { color: var(--data-good); }
+.cp-num.is-bad, .is-bad { color: var(--data-bad); }
+
+/* ── раскладка «сайдбар» (выбор Эржана: pageLayout sidebar) ── */
+.cp-shell { display: grid; grid-template-columns: var(--card-w) 1fr; gap: var(--sp-5); align-items: start; }
+.cp-side { position: sticky; top: var(--sp-5); }
+.cp-data { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); min-width: 0; }
+.cp-col { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
+
+/* ── герой ── */
+.cp-hero { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-4); }
+.cp-hero-top { display: flex; gap: var(--sp-4); align-items: center; }
+.cp-port { width: var(--ava-lg); height: var(--ava-lg); border-radius: var(--r-lg); object-fit: cover; border: 1px solid var(--sel-12); }
+.cp-hero-id { min-width: 0; }
+.cp-name-row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.cp-name { font-size: var(--fs-2xl); font-weight: var(--fw-black); }
+.cp-name-en { font-size: var(--fs-sm); color: var(--txt-faint); }
+.cp-roles { display: flex; flex-wrap: wrap; gap: var(--sp-1); margin-top: var(--sp-2); }
+.cp-role, .cp-tag {
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semi);
+  color: var(--txt-mute);
+  background: var(--sel-09);
+  border: 1px solid var(--sel-12);
+  border-radius: var(--r-pill);
+  padding: var(--sp-0) var(--sp-3);
+}
+.cp-tags { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+
+.cp-tier {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-black);
+  border-radius: var(--r-sm);
+  padding: var(--sp-0) var(--sp-3);
+  border: 1px solid currentColor;
+}
+.cp-t-s { color: var(--tier-s); }
+.cp-t-a { color: var(--tier-a); }
+.cp-t-b { color: var(--tier-b); }
+.cp-t-c { color: var(--tier-c); }
+.cp-t-d { color: var(--tier-d); }
+
+.cp-kpis { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+.cp-kpi { flex: 1; min-width: 0; background: var(--sel-05); border: 1px solid var(--sel-12); border-radius: var(--r-md); padding: var(--sp-3); text-align: center; }
+.cp-kpi b { display: block; font-size: var(--fs-xl); }
+.cp-kpi i { font-size: var(--fs-2xs); color: var(--txt-faint); font-style: normal; }
+
+/* радар качеств (данные champion-qualities.json) */
+.cp-radar { display: flex; justify-content: center; }
+.cp-radar svg { width: 100%; max-width: 100%; height: auto; }
+.cp-rd-grid, .cp-rd-ax { fill: none; stroke: var(--sel-12); stroke-width: 1; }
+.cp-rd-data { fill: var(--accent-dim); stroke: var(--accent); stroke-width: 2; }
+.cp-rd-lbl { fill: var(--txt-mute); font-size: var(--fs-2xs); font-weight: var(--fw-bold); text-anchor: middle; dominant-baseline: middle; }
+
+/* патч-бейдж (Firestore patchnotes) */
+.cp-patch { border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4); border: 1px solid currentColor; }
+.cp-p-buff { color: var(--data-good); }
+.cp-p-adjust { color: var(--data-mid); }
+.cp-p-nerf { color: var(--data-bad); }
+.cp-patch-h { display: flex; gap: var(--sp-3); align-items: baseline; font-size: var(--fs-xs); font-weight: var(--fw-black); }
+.cp-patch-h span { color: var(--txt-faint); font-weight: var(--fw-semi); }
+.cp-patch-txt { font-size: var(--fs-sm); color: var(--txt-mute); margin-top: var(--sp-1); }
+
+.cp-acts { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.cp-act {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  color: var(--txt);
+  background: var(--sel-09);
+  border: 1px solid var(--sel-18);
+  border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-4);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.cp-act:hover { background: var(--sel-18); }
+.cp-admin { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+
+/* ── секции ── */
+.cp-sec { padding: var(--sp-5); }
+.cp-sec-h {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-black);
+  margin: 0 0 var(--sp-4);
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+}
+.cp-sec-note { font-size: var(--fs-2xs); color: var(--txt-faint); font-weight: var(--fw-normal); }
+.cp-sub { font-size: var(--fs-2xs); font-weight: var(--fw-bold); color: var(--txt-faint); margin: var(--sp-3) 0 var(--sp-2); }
+.cp-sub.is-good { color: var(--data-good); }
+.cp-sub.is-bad { color: var(--data-bad); }
+.cp-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.cp-chip {
+  font-size: var(--fs-sm);
+  color: var(--txt);
+  background: var(--sel-09);
+  border: 1px solid var(--sel-12);
+  border-radius: var(--r-sm);
+  padding: var(--sp-1) var(--sp-3);
+}
+.cp-chip-wr { color: var(--txt-faint); font-style: normal; font-size: var(--fs-2xs); }
+
+/* ── умения ── */
+.cp-abil { display: flex; flex-direction: column; gap: var(--sp-4); }
+.cp-ab-rail { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.cp-ab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-px);
+  background: var(--sel-05);
+  border: 1px solid var(--sel-12);
+  border-radius: var(--r-md);
+  padding: var(--sp-1);
+  color: var(--txt-mute);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+}
+.cp-ab-btn img { width: var(--ic-md); height: var(--ic-md); border-radius: var(--r-xs); display: block; }
+.cp-ab-btn.is-on { background: var(--sel-18); color: var(--txt); border-color: var(--sel-bd); }
+.cp-ab-head { display: flex; gap: var(--sp-3); align-items: center; }
+.cp-ab-ic { width: var(--ic-lg); height: var(--ic-lg); border-radius: var(--r-sm); }
+.cp-ab-name { font-size: var(--fs-md); font-weight: var(--fw-bold); }
+.cp-ab-slot { font-size: var(--fs-2xs); color: var(--txt-faint); }
+.cp-ab-vars { display: flex; flex-direction: column; gap: var(--sp-1); margin-top: var(--sp-3); }
+.cp-ab-var { display: flex; justify-content: space-between; gap: var(--sp-3); font-size: var(--fs-sm); }
+.cp-ab-l { color: var(--txt-faint); }
+.cp-ab-v { color: var(--txt); font-variant-numeric: tabular-nums; }
+.cp-ab-v i { font-style: normal; }
+.cp-ab-v u { color: var(--txt-faint); text-decoration: none; padding: 0 var(--sp-px); }
+
+/* ── прокачка ── */
+.cp-sk-max { font-size: var(--fs-sm); color: var(--txt-mute); margin-bottom: var(--sp-3); }
+.cp-sk-row { display: flex; flex-wrap: wrap; gap: var(--sp-1); }
+.cp-sk-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: var(--ic-md);
+  border-radius: var(--r-xs);
+  background: var(--sel-05);
+  border: 1px solid var(--sel-09);
+  padding: var(--sp-0);
+}
+.cp-sk-dot.is-on { background: var(--sel-18); border-color: var(--sel-bd); }
+.cp-sk-dot b { font-size: var(--fs-2xs); font-weight: var(--fw-black); }
+.cp-sk-dot i { font-size: var(--fs-2xs); color: var(--txt-faint); font-style: normal; }
+
+/* ── статы ── */
+.cp-lvl { background: var(--sel-05); border: 1px solid var(--sel-12); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4); margin-bottom: var(--sp-4); }
+.cp-lvl-row { display: flex; justify-content: space-between; align-items: center; font-size: var(--fs-xs); color: var(--txt-faint); font-weight: var(--fw-bold); }
+.cp-lvl-row b { font-size: var(--fs-2xl); color: var(--txt); }
+.cp-lvl-inp { width: 100%; accent-color: var(--accent); }
+.cp-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: var(--sp-2); }
+.cp-stat { background: var(--sel-05); border: 1px solid var(--sel-12); border-radius: var(--r-md); padding: var(--sp-2) var(--sp-3); }
+.cp-stat-v { display: block; font-size: var(--fs-lg); }
+.cp-stat-l { font-size: var(--fs-2xs); color: var(--txt-faint); }
+.cp-stat[data-stat="ad"] .cp-stat-v { color: var(--stat-ad); }
+.cp-stat[data-stat="hp"] .cp-stat-v { color: var(--stat-hp); }
+.cp-stat[data-stat="mana"] .cp-stat-v { color: var(--stat-mana); }
+.cp-stat[data-stat="armor"] .cp-stat-v { color: var(--stat-armor); }
+.cp-stat[data-stat="mr"] .cp-stat-v { color: var(--stat-mr); }
+.cp-stat[data-stat="as"] .cp-stat-v { color: var(--stat-as); }
+.cp-stat[data-stat="ms"] .cp-stat-v { color: var(--stat-ms); }
+
+/* ── таблицы (статы по уровням, WR по рангам) ── */
+/* Колонка страницы узкая (рельс + герой слева), а в таблице статов 6 столбцов:
+   на просторных числах последний («За уровень») уезжал под обрез — поймано в
+   браузере. Таблица уплотнена, остаток при нужде уезжает тонким скроллом. */
+.cp-tbl-wrap { overflow-x: auto; margin-top: var(--sp-4); scrollbar-width: thin; }
+.cp-tbl-wrap::-webkit-scrollbar { height: var(--sp-2); }
+.cp-tbl-wrap::-webkit-scrollbar-thumb { background: var(--sel-18); border-radius: var(--r-pill); }
+.cp-tbl { width: 100%; border-collapse: collapse; font-size: var(--fs-2xs); }
+.cp-tbl th, .cp-tbl td { padding: var(--sp-1) var(--sp-2); text-align: right; border-bottom: 1px solid var(--sel-09); white-space: nowrap; }
+.cp-tbl th:first-child, .cp-tbl td:first-child { text-align: left; }
+.cp-tbl thead th { color: var(--txt-faint); font-weight: var(--fw-semi); }
+
+/* ── матчапы ── */
+.cp-mu { display: flex; flex-direction: column; gap: var(--sp-4); }
+.cp-mu-box { display: flex; flex-direction: column; gap: var(--sp-px); }
+.cp-mu-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-sm);
+  color: var(--txt);
+  text-decoration: none;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.cp-mu-row:hover { background: var(--sel-09); }
+.cp-mu-row img { width: var(--ic-md); height: var(--ic-md); border-radius: var(--r-xs); object-fit: cover; }
+.cp-mu-nm { flex: 1; min-width: 0; font-size: var(--fs-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-mu-wr { font-size: var(--fs-sm); font-weight: var(--fw-black); font-variant-numeric: tabular-nums; }
+.cp-mu-pr { font-size: var(--fs-2xs); color: var(--txt-faint); font-variant-numeric: tabular-nums; }
+.cp-mu-own { display: flex; flex-direction: column; gap: var(--sp-3); }
+.cp-own-box { display: flex; flex-wrap: wrap; gap: var(--sp-1); align-items: center; }
+.cp-own-chip { display: flex; align-items: center; gap: var(--sp-0); background: var(--sel-09); border: 1px solid var(--sel-12); border-radius: var(--r-xs); padding: var(--sp-px); }
+.cp-own-chip img { width: var(--ic-md); height: var(--ic-md); border-radius: var(--r-xs); object-fit: cover; cursor: pointer; }
+.cp-own-chip.is-auto { opacity: 0.8; }
+.cp-own-x { color: var(--txt-faint); cursor: pointer; font-size: var(--fs-sm); line-height: 1; padding: 0 var(--sp-px); }
+.cp-own-x:hover { color: var(--txt); }
+.cp-own-add {
+  background: var(--sel-05);
+  border: 1px dashed var(--sel-18);
+  border-radius: var(--r-xs);
+  color: var(--txt-mute);
+  cursor: pointer;
+  font-size: var(--fs-md);
+  padding: var(--sp-0) var(--sp-3);
+}
+
+/* ── мета ── */
+.cp-meta-row { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.cp-meta-wr { font-size: var(--fs-2xl); }
+.cp-meta-l { font-size: var(--fs-2xs); color: var(--txt-faint); }
+.cp-trend { font-size: var(--fs-sm); font-weight: var(--fw-bold); }
+
+/* ══ СРАВНЕНИЕ ЧЕМПОВ (порт lab-hover-reveal, канонизирован) ═══════════════
+   Числа лаба (104/50/130px, rgba руками, свои радиусы) заменены на токены и на
+   производные от них: высоты собраны из шкалы отступов, ширина колонки — от
+   --card-w. Своего стекла нет: стеклянная тут только обёртка .cc (class="glass"),
+   внутренние блоки живут на --sel-* — ровно как .cp-lvl / .cp-stat выше.        */
+.cc {
+  --cc-rowh: var(--sp-8);
+  --cc-headh: calc(var(--sp-8) * 2 + var(--sp-3));
+  --cc-colw: calc(var(--card-w) / 2);
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+/* дизайн-полоса (ВРЕМЕННО: Эржан выбирает место для таблицы, потом полоса уходит) */
+.cc-strip { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.cc-strip-l { font-size: var(--fs-2xs); font-weight: var(--fw-black); color: var(--txt-faint); letter-spacing: var(--sp-px); }
+.cc-strip-b, .cc-strip-min {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  color: var(--txt-mute);
+  background: var(--sel-05);
+  border: 1px solid var(--sel-12);
+  border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-4);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.cc-strip-b:hover, .cc-strip-min:hover { background: var(--sel-12); color: var(--txt); }
+.cc-strip-b.is-on { background: var(--sel-18); border-color: var(--sel-bd); color: var(--txt); }
+.cc-strip-min { margin-left: auto; }
+.cc-strip.is-min .cc-strip-b, .cc-strip.is-min .cc-strip-l { display: none; }
+
+/* шапка: назад · заголовок · ОБЩИЙ ползунок уровня (один на всех чемпов) */
+.cc-top { display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap; }
+.cc-title { flex: 1; min-width: 0; font-size: var(--fs-lg); font-weight: var(--fw-black); }
+.cc-back {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semi);
+  color: var(--txt);
+  background: var(--sel-09);
+  border: 1px solid var(--sel-18);
+  border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-4);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.cc-back:hover { background: var(--sel-18); }
+.cc-lvl {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-width: var(--card-w);
+  background: var(--sel-05);
+  border: 1px solid var(--sel-12);
+  border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-4);
+}
+.cc-lvl > span { font-size: var(--fs-xs); font-weight: var(--fw-bold); color: var(--txt-faint); }
+.cc-lvl b { min-width: var(--sp-6); text-align: center; font-size: var(--fs-xl); }
+.cc-lvl-inp { flex: 1; min-width: 0; accent-color: var(--accent); }
+
+/* таблица: подписи слева + колонка на чемпа. Влезет не всегда — уезжает тонким
+   скроллом, а не ломает раскладку (закон: без жирного ползунка). */
+.cc-table {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  overflow-x: auto;
+  padding-bottom: var(--sp-2);
+  scrollbar-width: thin;
+  font-variant-numeric: tabular-nums;
+}
+.cc-table::-webkit-scrollbar { height: var(--sp-2); }
+.cc-table::-webkit-scrollbar-thumb { background: var(--sel-18); border-radius: var(--r-pill); }
+
+.cc-labels { flex: 0 0 auto; width: var(--cc-colw); display: flex; flex-direction: column; gap: var(--sp-2); }
+.cc-corner { height: var(--cc-headh); display: flex; align-items: flex-end; padding-bottom: var(--sp-4); font-size: var(--fs-xs); font-weight: var(--fw-black); color: var(--txt-faint); letter-spacing: var(--sp-px); }
+.cc-lbl { height: var(--cc-rowh); display: flex; align-items: center; font-size: var(--fs-sm); font-weight: var(--fw-semi); white-space: nowrap; }
+
+.cc-col {
+  flex: 0 0 auto;
+  width: var(--cc-colw);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding-bottom: var(--sp-3);
+  background: var(--sel-05);
+  border: 1px solid var(--sel-12);
+  border-radius: var(--r-lg);
+}
+.cc-colh {
+  position: relative;
+  height: var(--cc-headh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-0);
+  padding: var(--sp-3);
+  border-bottom: 1px solid var(--sel-09);
+}
+.cc-port { width: var(--ic-xl); height: var(--ic-xl); border-radius: var(--r-md); object-fit: cover; cursor: pointer; }
+.cc-nm { font-size: var(--fs-md); font-weight: var(--fw-black); text-align: center; line-height: var(--lh-tight); }
+.cc-tier { font-size: var(--fs-2xs); font-weight: var(--fw-black); border: 1px solid currentColor; border-radius: var(--r-xs); padding: 0 var(--sp-2); }
+.cc-wr { font-size: var(--fs-2xs); color: var(--txt-faint); }
+.cc-rm {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  color: var(--txt-mute);
+  background: var(--sel-09);
+  border: 1px solid var(--sel-12);
+  border-radius: var(--r-xs);
+  font-size: var(--fs-sm);
+  line-height: 1;
+  padding: 0 var(--sp-2);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.cc-rm:hover { background: var(--sel-18); color: var(--txt); }
+
+.cc-cell {
+  height: var(--cc-rowh);
+  margin: 0 var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+}
+.cc-cell + .cc-cell { border-top: 1px solid var(--sel-09); }
+.cc-v { font-size: var(--fs-md); font-weight: var(--fw-bold); }
+.cc-v.is-hi { color: var(--data-good); }
+.cc-v.is-lo { color: var(--data-bad); }
+/* полоска = доля от максимума В СРАВНИВАЕМОЙ ГРУППЕ (потолков «на глаз» нет) */
+.cc-bar { display: block; width: 100%; height: var(--sp-1); border-radius: var(--r-pill); background: var(--sel-12); overflow: hidden; }
+.cc-bar i { display: block; height: 100%; border-radius: var(--r-pill); background: var(--sel-45); }
+.cc-cell[data-stat="ad"] .cc-bar i { background: var(--stat-ad); }
+.cc-cell[data-stat="hp"] .cc-bar i { background: var(--stat-hp); }
+.cc-cell[data-stat="mana"] .cc-bar i { background: var(--stat-mana); }
+.cc-cell[data-stat="armor"] .cc-bar i { background: var(--stat-armor); }
+.cc-cell[data-stat="mr"] .cc-bar i { background: var(--stat-mr); }
+.cc-cell[data-stat="as"] .cc-bar i { background: var(--stat-as); }
+.cc-cell[data-stat="ms"] .cc-bar i { background: var(--stat-ms); }
+
+.cc-add {
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: calc(var(--cc-colw) / 2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  background: var(--sel-05);
+  border: 1px dashed var(--sel-18);
+  border-radius: var(--r-lg);
+  color: var(--txt);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.cc-add:hover { background: var(--sel-12); border-color: var(--sel-bd); }
+.cc-add span { font-size: var(--fs-3xl); line-height: 1; }
+.cc-add i { font-size: var(--fs-2xs); font-style: normal; color: var(--txt-faint); }
+
+/* вариант «Б»: таблица во всю ширину под раскладкой страницы */
+.cp-cmp-slot { margin-top: var(--sp-5); }
+
+/* ── подвал статической страницы ── */
+.cp-foot { position: relative; z-index: 1; border-top: 1px solid var(--sel-12); margin-top: var(--sp-7); padding: var(--sp-6) var(--sp-5); color: var(--txt-faint); font-size: var(--fs-sm); }
+.cp-foot a { color: var(--txt-mute); }
+
+/* ── ПК-first, мобайл адаптируется при порте (закон) ── */
+@media (max-width: 1100px) {
+  .cp-shell { grid-template-columns: 1fr; }
+  .cp-side { position: static; }
+}
+@media (max-width: 760px) {
+  .cp-data { grid-template-columns: 1fr; }
+  .cp-rail { display: none; }
+  .cp-h1 { font-size: var(--fs-2xl); }
+}

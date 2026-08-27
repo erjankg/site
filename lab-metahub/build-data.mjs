@@ -22,6 +22,15 @@ const loadGuide = (nameEN) => {
 
 const clean = (c) => ({ name: c.name, nameEN: c.nameEN, heroId: c.heroId, role: c.role, tier: c.tier, wr: c.wr, pr: c.pr, br: c.br, trend: c.wrTrend ?? 0 });
 
+// сборка + контры конкретного героя (для «Сборка дня»/«Контрят <герой>» — как в боевом, из гайда)
+function heroKit(nameEN) {
+  const g = loadGuide(nameEN);
+  if (!g) return { build: null, counters: [] };
+  const b = (g.builds || []).find((x) => x.default) || (g.builds || [])[0];
+  const core = b ? (b.items?.core || []).concat((b.items?.boots || [])[0] ? [(b.items.boots || [])[0]] : []) : [];
+  return { build: core.length ? { tier: b.tier || null, core } : null, counters: (g.counters || []).slice(0, 8) };
+}
+
 const byRank = {};
 for (let s = 0; s <= 4; s++) {
   const rank = RANKS[s];
@@ -33,7 +42,15 @@ for (let s = 0; s <= 4; s++) {
   const topWR = list.filter((c) => c.pr >= 1).sort((a, b) => b.wr - a.wr).slice(0, 6).map(clean);
   const moversUp = list.filter((c) => c.pr >= 1.5).sort((a, b) => b.trend - a.trend).slice(0, 4).map(clean);
   const moversDown = list.filter((c) => c.pr >= 1.5).sort((a, b) => a.trend - b.trend).slice(0, 4).map(clean);
-  byRank[rank] = { label: RANK_RU[rank], featured: clean(featured), topWR, moversUp, moversDown };
+  // ПУЛ реальных играемых чемпов ранга (дедуп по имени: лучший вход по WR) — из него боевые блоки
+  // выводят Топ-WR / S-тир / Топ-PR / Топ-BR, как hubHTML из wrPool().
+  const byChamp = {};
+  list.filter((c) => c.pr >= 1).forEach((c) => { if (!byChamp[c.name] || c.wr > byChamp[c.name].wr) byChamp[c.name] = c; });
+  const pool = Object.values(byChamp).sort((a, b) => b.wr - a.wr).slice(0, 45).map(clean);
+  // герой дня ранга = топ WR; его сборка/контры из гайда (реальные)
+  const hero = pool[0];
+  const kit = hero ? heroKit(hero.nameEN) : { build: null, counters: [] };
+  byRank[rank] = { label: RANK_RU[rank], featured: clean(featured), topWR, moversUp, moversDown, pool, heroBuild: kit.build, heroCounters: kit.counters };
 }
 
 // плитки «дня» из гайдов: берём заметных играемых чемпионов Diamond+

@@ -1,0 +1,452 @@
+/* ============================================================
+   lab-tokens — МАСТЕР УТВЕРЖДЕНИЯ ТОКЕНОВ (пересобран 2026-08-02)
+   Один экран = один выбор. 3 крупных пресета + БОЛЬШОЕ живое превью.
+   Ползунки спрятаны под «Тонкая настройка». Никакого хлама на экране.
+   Дефолты ниже = текущий canon-tokens.css (то, что уже утверждено).
+   ============================================================ */
+
+html[data-glass="on"] {
+
+  /* ── 1 · ОТСТУПЫ ── */
+  --sp-px: 1px; --sp-0: 2px; --sp-1: 4px; --sp-2: 6px; --sp-3: 8px;
+  --sp-4: 12px; --sp-5: 16px; --sp-6: 24px; --sp-7: 32px; --sp-8: 48px; --sp-9: 64px;
+
+  /* ── 2 · ШРИФТЫ ── */
+  --fs-2xs: 10px; --fs-xs: 11px; --fs-sm: 12px; --fs-base: 13px; --fs-md: 14px;
+  --fs-lg: 15px; --fs-xl: 17px; --fs-2xl: 20px; --fs-3xl: 24px; --fs-4xl: 28px; --fs-5xl: 36px;
+  --fw-normal: 400; --fw-med: 500; --fw-semi: 600; --fw-bold: 700; --fw-black: 800;
+  --lh-tight: 1.15; --lh-snug: 1.35; --lh-normal: 1.5; --lh-relaxed: 1.6;
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* ── 3 · РАДИУСЫ ── */
+  --r-xs: 6px; --r-sm: 8px; --r-md: 11px; --r-lg: 15px; --r-xl: 20px; --r-2xl: 24px;
+  --r-pill: 999px; --r-full: 50%;
+
+  /* ── 4 · ШИРИНЫ ── */
+  --content-max: 1400px; --content-max-narrow: 920px;
+  --rail-w: 235px; --rail-min: 64px; --rail-inset: 14px; --rail-gap: 18px;
+  --shell-left: calc(var(--rail-min) + var(--rail-inset) + var(--rail-gap));
+  --header-h: 64px;
+  --tbl-w: 1050px; --card-w: 300px; --pick-w: 330px; --sidecard-reserve: 348px;
+  --modal-sm: 400px; --modal-md: 520px; --modal-lg: 760px;
+
+  /* ── 5 · ЦВЕТА ── */
+  --txt: #ffffff; --txt-dim: #cfe4f0;
+  --txt-mute: rgba(255, 255, 255, .72); --txt-faint: rgba(255, 255, 255, .42);
+  --txt-shadow: 0 2px 14px rgba(1, 10, 19, .8); --on-accent: #0a1016;
+  --sel-05: rgba(255, 255, 255, .06); --sel-09: rgba(255, 255, 255, .09);
+  --sel-12: rgba(255, 255, 255, .12); --sel-18: rgba(255, 255, 255, .18);
+  --sel-45: rgba(255, 255, 255, .45); --sel-bd: rgba(255, 255, 255, .5);
+  --accent: #ffffff; --accent-rgb: 255, 255, 255;
+  --accent-glow: rgba(255, 255, 255, .45); --accent-dim: rgba(255, 255, 255, .15);
+  --data-good: #4ade80; --data-good-soft: #7fdca4;
+  --data-bad: #ff5470;  --data-bad-soft: #ff8080;
+  --tier-s-plus: #ff3a3a; --tier-s: #ff5470; --tier-a: #ffb454;
+  --tier-b: #ffd700; --tier-c: #4ade80; --tier-d: #7aa2c4;
+  --dmg-phys: #f0a43c; --dmg-magic: #29b6f6; --dmg-true: #ffffff;
+  --dmg-onhit: #B48CFF; --dmg-mixed: #ffd66b;
+  --stat-ad: #8B5E3C; --stat-ap: #B48CFF; --stat-hp: #27AE60; --stat-mana: #5dade2;
+  --stat-armor: #D4AC00; --stat-mr: #7fb3d5; --stat-as: #f0a43c;
+  --stat-ms: #7fdca4; --stat-crit: #ff5470;
+  --role-top: #e8935a; --role-jungle: #4ade80; --role-mid: #5dade2;
+  --role-adc: #ff5470; --role-support: #c88bff;
+  --status-online: #4ade80; --status-ingame: #5dade2;
+  --status-away: #ffb454; --status-offline: #8b8ba0;
+  --gold: #C89B3C; --gold-glow: rgba(200, 155, 60, .45);
+  --bg-page: #05090d; --scrim-bg: rgba(2, 9, 15, .72);
+
+  /* ── 6 · СТЕКЛО (значения = утверждённые 2026-08-01) ── */
+  --glass-tint: 255, 255, 255; --glass-op: .06;
+  --glass-blur: 12px; --glass-sat: 1.55;
+  --glass-dark: .58; --glass-dark-strong: .66;
+  --glass-bd-c: var(--sel-12); --grain: 0; --sh-k: 1; --bg-blur: 0px;
+  --tint-c: #24292f; --tint-rgb: 36, 41, 47;
+  --tint-op: .58; --tint-sat: 1.35; --tint-blur: 3px;
+
+  /* ── 7 · ТЕНИ ── */
+  --sh-sm: 0 2px 8px rgba(0, 0, 0, .3);
+  --sh-md: 0 8px 24px rgba(0, 0, 0, .4);
+  --sh-lg: 0 16px 48px rgba(0, 0, 0, .5);
+  --sh-lift: 0 12px 32px rgba(0, 0, 0, .45), 0 0 0 1px var(--sel-12);
+  --sh-glow: 0 0 24px var(--accent-glow);
+  --sh-inset: inset 0 1px 0 rgba(255, 255, 255, .08);
+
+  /* ── 8 · Z-СЛОИ ── */
+  --z-base: 0; --z-raised: 1; --z-rail: 10; --z-sticky: 20; --z-dropdown: 30;
+  --z-scrim: 40; --z-modal: 50; --z-overlay-modal: 60; --z-toast: 70;
+  --z-tooltip: 80; --z-devstrip: 90;
+
+  /* ── 9 · ДВИЖЕНИЕ ── */
+  --dur-fast: 130ms; --dur-base: 200ms; --dur-slow: 280ms; --dur-slower: 500ms;
+  --stagger: 45ms;
+  --ease-out-expo: cubic-bezier(.16, 1, .3, 1);
+  --ease-standard: cubic-bezier(.4, 0, .2, 1);
+  --ease-overshoot: cubic-bezier(.34, 1.56, .64, 1);
+
+  /* ── 10 · ИКОНКИ ── */
+  --ic-xs: 17px; --ic-sm: 20px; --ic-md: 25px; --ic-lg: 32px; --ic-xl: 56px;
+  --ava-sm: 38px; --ava-md: 70px; --ava-lg: 112px;
+
+  /* алиасы */
+  --ds-r: var(--r-lg); --anim-dur: var(--dur-base); --anim-ease: var(--ease-standard);
+}
+
+/* ── СТИЛЬ СТЕКЛА (наследуется по близости → образец со своим data-gstyle перебивает) ── */
+[data-gstyle="matte"] {
+  --g-rgb: 2, 9, 15; --g-op: var(--glass-dark);
+  --g-blur: var(--glass-blur); --g-sat: var(--glass-sat);
+  --g-inner: var(--sel-05); --g-inner-2: var(--sel-09);
+}
+[data-gstyle="dark"] {
+  --g-rgb: 2, 9, 15; --g-op: var(--glass-dark);
+  --g-blur: var(--glass-blur); --g-sat: var(--glass-sat);
+  --g-inner: rgba(2, 9, 15, var(--glass-dark));
+  --g-inner-2: rgba(2, 9, 15, var(--glass-dark-strong));
+}
+[data-gstyle="tint"] {
+  --g-rgb: var(--tint-rgb); --g-op: var(--tint-op);
+  --g-blur: var(--tint-blur); --g-sat: var(--tint-sat);
+  --g-inner: rgba(var(--tint-rgb), .30); --g-inner-2: rgba(var(--tint-rgb), .50);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+/* без !important hidden проигрывает display:inline-flex/grid у кнопок и блоков */
+[hidden] { display: none !important; }
+body {
+  font-family: var(--font-ui); font-size: var(--fs-base); line-height: var(--lh-normal);
+  color: var(--txt); text-shadow: var(--txt-shadow);
+  background: var(--bg-page); min-height: 100vh;
+}
+html { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, .18) transparent; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-thumb { background: var(--sel-18); border-radius: var(--r-sm); }
+::-webkit-scrollbar-track { background: transparent; }
+
+.splash {
+  position: fixed; inset: 0; z-index: var(--z-base);
+  background-position: center; background-size: cover; background-repeat: no-repeat;
+}
+
+.glass {
+  background:
+    linear-gradient(rgba(var(--g-rgb), var(--g-op)), rgba(var(--g-rgb), var(--g-op))),
+    rgba(var(--glass-tint), var(--glass-op));
+  -webkit-backdrop-filter: blur(var(--g-blur)) saturate(var(--g-sat));
+  backdrop-filter: blur(var(--g-blur)) saturate(var(--g-sat));
+  border: 1px solid var(--glass-bd-c);
+  border-radius: var(--ds-r);
+  box-shadow: var(--sh-inset), var(--sh-md);
+}
+.glass--strong { --g-op: var(--glass-dark-strong); }
+
+/* ============================================================
+   ДЕВ-ПОЛОСА — плавающая, перетаскиваемая, сворачиваемая. НЕ UI сайта.
+   ============================================================ */
+/* внизу СЛЕВА: сверху справа она перекрывала кнопки «Назад/Дальше» */
+.lab-strip {
+  position: fixed; bottom: 14px; left: 14px; z-index: var(--z-devstrip);
+  background: rgba(10, 14, 20, .96);
+  border: 1px solid var(--sel-12); border-radius: var(--r-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  display: flex; flex-direction: column; max-width: 420px; text-shadow: none;
+}
+.strip-head {
+  display: flex; align-items: center; gap: 12px; padding: 8px 14px;
+  cursor: grab; user-select: none; border-bottom: 1px solid var(--sel-09);
+}
+.strip-head:active { cursor: grabbing; }
+.strip-title { font-size: 11px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--txt-dim); }
+.strip-body { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; align-items: center; }
+.lab-strip.min .strip-body { display: none; }
+.lab-strip.min .strip-head { border-bottom: none; }
+.strip-note { flex-basis: 100%; font-size: 10.5px; color: var(--txt-faint); font-variant-numeric: tabular-nums; }
+.art-row { display: flex; gap: 6px; }
+.art-thumb {
+  width: 40px; height: 26px; border-radius: 6px; cursor: pointer;
+  border: 1.5px solid transparent; background-size: cover; background-position: center 22%;
+  background-color: #0b1620;
+}
+.art-thumb.on { border-color: var(--sel-bd); }
+
+.sbtn {
+  border: 1px solid var(--sel-12); border-radius: var(--r-sm);
+  background: var(--sel-09); color: var(--txt);
+  padding: 6px 12px; font: inherit; font-size: 12px; cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.sbtn:hover { background: var(--sel-18); }
+.sbtn--pri { background: var(--accent); color: var(--on-accent); border-color: transparent; font-weight: 600; }
+.sbtn--pri:hover { filter: brightness(1.08); }
+
+/* ============================================================
+   МАСТЕР: шапка шага → 3 пресета → большое превью
+   ============================================================ */
+.wiz { position: relative; z-index: var(--z-raised); max-width: 1560px; margin: 0 auto; padding: 24px 28px 80px; }
+
+/* шапка и колонка пресетов — на стекле, иначе текст тонет в арте.
+   Три СИБЛИНГА (шапка / пресеты / превью), стекло-в-стекле не возникает. */
+.wiz-top { padding: 20px 24px; margin-bottom: 18px; }
+.wiz-head { display: flex; align-items: center; gap: 20px; margin-bottom: 8px; }
+.wiz-step {
+  font-size: 12px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase;
+  color: var(--txt-faint); white-space: nowrap;
+}
+.wiz-title { font-size: 30px; font-weight: 800; letter-spacing: -.6px; line-height: 1.1; }
+.wiz-nav { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+.wiz-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 20px; border-radius: 12px; cursor: pointer;
+  border: 1px solid var(--sel-18); background: var(--sel-09); color: var(--txt);
+  font: inherit; font-size: 14px; font-weight: 600; text-shadow: var(--txt-shadow);
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.wiz-btn:hover { background: var(--sel-18); }
+.wiz-btn:disabled { opacity: .35; cursor: default; }
+.wiz-btn--next { background: var(--accent); color: var(--on-accent); border-color: transparent; text-shadow: none; }
+.wiz-btn--next:hover { background: var(--accent); filter: brightness(1.08); }
+.wiz-sub { font-size: 14px; color: var(--txt-mute); line-height: 1.5; max-width: 92ch; margin-bottom: 14px; }
+
+/* точки прогресса — по одной на шаг, кликабельные */
+.wiz-dots { display: flex; gap: 5px; }
+.wiz-dots i {
+  height: 6px; flex: 1; border-radius: 3px; background: var(--sel-12);
+  transition: background var(--dur-base) var(--ease-standard);
+  cursor: pointer;
+}
+.wiz-dots i:hover { background: var(--sel-45); }
+.wiz-dots i.done { background: var(--sel-45); }
+.wiz-dots i.now { background: var(--accent); }
+
+/* ── раскладка шага: пресеты слева, превью справа ── */
+.wiz-body { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); gap: 22px; align-items: start; }
+.wiz-left { padding: 18px; }
+
+/* ── 3 БОЛЬШИХ ПРЕСЕТА ── */
+.psets { display: flex; flex-direction: column; gap: 12px; }
+.pset {
+  display: block; width: 100%; text-align: left; cursor: pointer; font: inherit;
+  color: var(--txt); text-shadow: var(--txt-shadow);
+  padding: 18px 20px; border-radius: var(--r-lg);
+  background: var(--sel-05); border: 2px solid transparent;
+  transition: background var(--dur-fast) var(--ease-standard),
+              border-color var(--dur-fast) var(--ease-standard);
+}
+.pset:hover { background: var(--sel-12); }
+.pset.on { background: var(--sel-18); border-color: var(--sel-bd); }
+.pset-t { font-size: 19px; font-weight: 700; letter-spacing: -.3px; display: flex; align-items: center; gap: 10px; }
+.pset-t .tick {
+  margin-left: auto; width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--sel-18); display: grid; place-items: center; flex: 0 0 auto;
+}
+.pset.on .tick { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+.pset.on .tick svg { display: block; }
+.pset .tick svg { display: none; width: 13px; height: 13px; }
+.pset-w { display: block; margin-top: 6px; font-size: 14px; color: var(--txt-mute); line-height: 1.45; }
+.pset-hint { display: block; margin-top: 10px; font-size: 12px; color: var(--txt-faint); font-variant-numeric: tabular-nums; }
+
+/* «Тонкая настройка» — свёрнута по умолчанию */
+.adv-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 6px;
+  padding: 12px 16px; border: 1px dashed var(--sel-18); border-radius: var(--r-md);
+  background: transparent; color: var(--txt-faint); font: inherit; font-size: 13px;
+  cursor: pointer; text-shadow: var(--txt-shadow);
+  transition: background var(--dur-fast) var(--ease-standard), color var(--dur-fast);
+}
+.adv-btn:hover { background: var(--sel-05); color: var(--txt); }
+.adv-btn .caret { margin-left: auto; transition: transform var(--dur-base) var(--ease-standard); }
+.adv-btn.open .caret { transform: rotate(180deg); }
+.adv { margin-top: 10px; padding: 16px; border-radius: var(--r-md); background: var(--sel-05); }
+.adv[hidden] { display: none; }
+
+.tok { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 7px 0; }
+.tok + .tok { border-top: 1px solid var(--sel-05); }
+.tok-name { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--txt-dim); }
+.tok-val { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; text-align: right; font-variant-numeric: tabular-nums; }
+.tok-ctl { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; }
+.tok input[type="range"] { flex: 1; accent-color: var(--accent); min-width: 0; }
+.tok input[type="color"] { width: 34px; height: 24px; padding: 0; border: 1px solid var(--sel-18); border-radius: 6px; background: transparent; cursor: pointer; }
+.tok input[type="text"] {
+  flex: 1; min-width: 0; font-family: ui-monospace, Consolas, monospace; font-size: 11.5px;
+  color: var(--txt); background: var(--sel-09); border: 1px solid var(--sel-12);
+  border-radius: 6px; padding: 5px 8px; outline: none; text-shadow: none;
+}
+.tok-note { grid-column: 1 / -1; font-size: 10.5px; color: var(--txt-faint); }
+.tok-swatch { width: 20px; height: 20px; border-radius: 5px; border: 1px solid var(--sel-18); flex: 0 0 auto; }
+
+/* ============================================================
+   ★ БОЛЬШОЕ ЖИВОЕ ПРЕВЬЮ — реальные элементы.
+   ВСЁ внутри имеет transition, чтобы глаз ПОЙМАЛ изменение при тыке пресета.
+   ============================================================ */
+.pv-wrap { position: sticky; top: 20px; }
+.pv-cap {
+  display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px;
+  font-size: 11px; letter-spacing: .5px; text-transform: uppercase; color: var(--txt-faint);
+}
+.pv-cap b { color: var(--accent); font-size: 12px; letter-spacing: 0; text-transform: none; }
+
+.stage { padding: var(--sp-6); }
+.stage, .stage * {
+  transition:
+    padding var(--dur-slow) var(--ease-standard),
+    gap var(--dur-slow) var(--ease-standard),
+    margin var(--dur-slow) var(--ease-standard),
+    font-size var(--dur-slow) var(--ease-standard),
+    border-radius var(--dur-slow) var(--ease-standard),
+    width var(--dur-slow) var(--ease-standard),
+    height var(--dur-slow) var(--ease-standard),
+    background-color var(--dur-slow) var(--ease-standard),
+    max-width var(--dur-slow) var(--ease-standard);
+}
+
+.st-head { display: flex; align-items: center; gap: var(--sp-5); margin-bottom: var(--sp-6); }
+.st-h1 { font-size: var(--fs-3xl); font-weight: var(--fw-black); letter-spacing: -.5px; line-height: var(--lh-tight); }
+.st-sub { font-size: var(--fs-sm); color: var(--txt-mute); }
+.st-actions { margin-left: auto; display: flex; gap: var(--sp-3); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-5); border-radius: var(--r-md);
+  border: 1px solid var(--sel-18); background: var(--sel-09); color: var(--txt);
+  font: inherit; font-size: var(--fs-md); font-weight: var(--fw-med); cursor: pointer;
+  text-shadow: var(--txt-shadow);
+}
+.btn:hover { background: var(--sel-18); }
+.btn--primary { background: var(--accent); color: var(--on-accent); border-color: transparent; font-weight: var(--fw-semi); text-shadow: none; }
+.btn svg { width: var(--ic-sm); height: var(--ic-sm); }
+
+.st-cols { display: grid; grid-template-columns: minmax(0, 1fr) var(--card-w); gap: var(--sp-6); align-items: start; }
+
+/* таблица */
+.tbl { width: 100%; border-collapse: collapse; font-size: var(--fs-base); }
+.tbl th {
+  text-align: left; padding: var(--sp-3) var(--sp-4);
+  font-size: var(--fs-xs); font-weight: var(--fw-semi); color: var(--txt-mute);
+  text-transform: uppercase; letter-spacing: .3px; border-bottom: 1px solid var(--sel-12);
+}
+.tbl td { padding: var(--sp-4); border-bottom: 1px solid var(--sel-05); }
+.tbl tbody tr:hover { background: var(--sel-09); }
+.tbl .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: var(--fw-semi); }
+.tbl .up { color: var(--data-good); } .tbl .dn { color: var(--data-bad); }
+.tbl .who { display: flex; align-items: center; gap: var(--sp-4); }
+.tbl .who img { width: var(--ic-lg); height: var(--ic-lg); border-radius: var(--r-xs); }
+.tier {
+  display: inline-grid; place-items: center; min-width: 30px; padding: 2px var(--sp-3);
+  border-radius: var(--r-xs); font-size: var(--fs-sm); font-weight: var(--fw-black);
+  color: var(--on-accent); text-shadow: none;
+}
+
+/* карточка чемпа */
+.card { padding: var(--sp-5); border-radius: var(--ds-r); background: var(--g-inner); border: 1px solid var(--sel-12); }
+.card-top { display: flex; align-items: center; gap: var(--sp-4); }
+.card-ava { width: var(--ava-md); height: var(--ava-md); border-radius: calc(var(--r-md) + 2px); object-fit: cover; }
+.card-name { font-size: var(--fs-xl); font-weight: var(--fw-bold); line-height: var(--lh-tight); }
+.card-role { font-size: var(--fs-sm); color: var(--txt-mute); }
+.card-kpi { display: flex; gap: var(--sp-5); margin-top: var(--sp-5); }
+.card-kpi div { font-size: var(--fs-2xs); color: var(--txt-faint); text-transform: uppercase; letter-spacing: .3px; }
+.card-kpi b { display: block; font-size: var(--fs-2xl); font-weight: var(--fw-bold); font-variant-numeric: tabular-nums; letter-spacing: -.5px; }
+.bar { display: flex; align-items: center; gap: var(--sp-3); margin-top: var(--sp-3); font-size: var(--fs-sm); }
+.bar span { width: 62px; color: var(--txt-mute); flex: 0 0 auto; }
+.bar i { height: var(--sp-3); border-radius: var(--r-pill); display: block; }
+.bar b { font-variant-numeric: tabular-nums; margin-left: auto; }
+
+/* чипы */
+.chips { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-5); }
+.chip {
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4); border-radius: var(--r-pill);
+  border: 1px solid var(--sel-12); background: var(--sel-05); font-size: var(--fs-sm);
+}
+.chip.on { background: var(--sel-18); border-color: var(--sel-45); }
+.chip i { width: var(--sp-3); height: var(--sp-3); border-radius: 50%; }
+
+/* вложенная панель — показывает уровень стекла */
+.st-panel { margin-top: var(--sp-5); padding: var(--sp-5); border-radius: var(--ds-r); background: var(--g-inner-2); border: 1px solid var(--sel-12); }
+.st-panel h4 { font-size: var(--fs-md); font-weight: var(--fw-semi); margin-bottom: var(--sp-3); }
+.st-panel p { font-size: var(--fs-sm); color: var(--txt-mute); line-height: var(--lh-relaxed); }
+
+/* фокус-блок шага (линейка отступов, шкала шрифтов, демо ширины…) */
+.focus { margin-bottom: var(--sp-6); padding-bottom: var(--sp-5); border-bottom: 1px solid var(--sel-09); }
+.focus-h { font-size: var(--fs-2xs); text-transform: uppercase; letter-spacing: .5px; color: var(--txt-faint); margin-bottom: var(--sp-4); }
+.ruler { display: flex; align-items: flex-end; gap: var(--sp-4); }
+.ruler div { text-align: center; }
+.ruler i { display: block; background: var(--accent); height: 30px; border-radius: 3px; }
+.ruler span { display: block; font-size: var(--fs-2xs); color: var(--txt-faint); margin-top: 4px; }
+.tscale div { display: flex; align-items: baseline; gap: var(--sp-5); margin-bottom: var(--sp-2); }
+.tscale b { font-family: ui-monospace, Consolas, monospace; font-size: var(--fs-2xs); color: var(--txt-faint); width: 54px; flex: 0 0 auto; }
+.rshapes { display: flex; gap: var(--sp-4); }
+.rshapes i { display: grid; place-items: center; width: 74px; height: 58px; background: var(--sel-12); border: 1px solid var(--sel-18); font-style: normal; font-size: var(--fs-2xs); color: var(--txt-dim); }
+.mover { height: 40px; border-radius: var(--r-sm); background: var(--sel-05); position: relative; overflow: hidden; }
+.mover i { position: absolute; top: 6px; left: 6px; width: 28px; height: 28px; border-radius: var(--r-xs); background: var(--accent); }
+.icrow { display: flex; align-items: flex-end; gap: var(--sp-6); }
+.icrow figure { text-align: center; }
+.icrow svg { display: block; margin: 0 auto var(--sp-2); color: var(--txt); }
+.icrow img { display: block; border-radius: var(--r-md); margin: 0 auto var(--sp-2); }
+.icrow figcaption { font-size: var(--fs-2xs); color: var(--txt-faint); }
+
+/* демо ширины */
+.wd-side { border-radius: var(--r-md); background: repeating-linear-gradient(45deg, var(--sel-05) 0 8px, transparent 8px 16px); }
+.wd-wrap { max-width: var(--content-max); margin: 0 auto; padding: var(--sp-5); background: rgba(2, 9, 15, .35); border-radius: var(--r-md); }
+.wd-btn {
+  display: block; width: 100%; padding: var(--sp-4); border-radius: var(--r-md);
+  border: 1px solid var(--sel-18); background: var(--sel-12); color: var(--txt);
+  font: inherit; font-size: var(--fs-md); font-weight: var(--fw-semi); text-shadow: var(--txt-shadow);
+}
+.wd-read { margin-top: var(--sp-4); font-family: ui-monospace, Consolas, monospace; font-size: var(--fs-sm); color: var(--txt-dim); }
+.wd-read b { color: var(--txt); }
+
+/* рампа тиров в пресете */
+.ramp { display: flex; gap: 4px; margin-top: 10px; }
+.ramp i {
+  flex: 1; height: 30px; border-radius: 5px; display: grid; place-items: center;
+  font-style: normal; font-size: 11px; font-weight: 800; color: #0a1016; text-shadow: none;
+}
+/* образец стекла в пресете */
+.gsample {
+  margin-top: 12px; padding: 12px; border-radius: 10px;
+  font-size: 12px; color: var(--txt);
+}
+.gsample .inner { margin-top: 8px; padding: 8px 10px; border-radius: 7px; background: var(--g-inner); font-size: 11px; }
+/* образец акцента */
+.asample { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.asample i { width: 26px; height: 26px; border-radius: 7px; }
+.asample b { font-size: 17px; font-variant-numeric: tabular-nums; }
+
+/* ── ФИНАЛЬНЫЙ ШАГ ── */
+.final-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+.final-row {
+  display: flex; align-items: center; gap: 14px; padding: 13px 16px;
+  border-radius: var(--r-md); background: var(--sel-05); font-size: 14px;
+}
+.final-row span { color: var(--txt-mute); min-width: 150px; }
+.final-row b { font-weight: 600; }
+.final-row .go { margin-left: auto; font-size: 12px; color: var(--txt-faint); cursor: pointer; text-decoration: underline; }
+.final-row.warn { background: rgba(255, 180, 84, .12); }
+
+/* экспорт-модалка */
+.ex-ov { position: fixed; inset: 0; z-index: var(--z-modal); display: grid; place-items: center; background: var(--scrim-bg); padding: 30px; }
+.ex-modal { width: min(900px, 94vw); max-height: 86vh; display: flex; flex-direction: column; padding: 20px; }
+.ex-h { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.ex-h b { font-size: 18px; }
+.ex-h .sp { margin-left: auto; display: flex; gap: 8px; }
+.ex-ta {
+  flex: 1; min-height: 340px; resize: none; text-shadow: none;
+  font-family: ui-monospace, Consolas, monospace; font-size: 12px; line-height: 1.4;
+  color: var(--txt-dim); background: rgba(0, 0, 0, .35);
+  border: 1px solid var(--sel-12); border-radius: var(--r-md); padding: 14px;
+}
+
+.toast {
+  position: fixed; right: 24px; bottom: 24px; z-index: var(--z-toast);
+  padding: 14px 18px; border-radius: var(--r-md);
+  background: rgba(12, 26, 38, .96); border: 1px solid var(--accent);
+  font-size: 14px; font-weight: 600;
+  opacity: 0; transform: translateY(8px); pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-standard), transform var(--dur-base) var(--ease-standard);
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 1200px) {
+  .wiz-body { grid-template-columns: 1fr; }
+  .pv-wrap { position: static; }
+  .st-cols { grid-template-columns: 1fr; }
+}

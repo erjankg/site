@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on" data-gstyle="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>lab-tokens — мастер утверждения токенов</title>
+  <link rel="stylesheet" href="tokens-lab.css?v=9">
+</head>
+<body>
+  <!-- ГЛОБАЛЬНЫЙ СПЛЭШ-АРТ: один на весь лаб, за всем стеклом -->
+  <div class="splash" aria-hidden="true"></div>
+
+  <!-- ДЕВ-ПОЛОСА: плавающая (тащится за шапку), сворачиваемая. НЕ UI сайта. -->
+  <div class="lab-strip min" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ lab-tokens</span>
+      <span style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <span id="labTools"></span>
+        <button class="sbtn" id="stripMin">Развернуть</button>
+      </span>
+    </div>
+    <div class="strip-body">
+      <div class="art-row" id="artRow"></div>
+      <button class="sbtn" id="btnAudit">Счётчик узлов</button>
+      <button class="sbtn" id="btnReset">Сброс</button>
+      <span class="strip-note" id="nodeCount">Арт: проверяй на СВЕТЛОМ (Lux) — худший случай читабельности.</span>
+    </div>
+  </div>
+
+  <!-- МАСТЕР: один экран = один выбор -->
+  <main class="wiz">
+    <div class="wiz-top glass">
+    <div class="wiz-head">
+      <div>
+        <div class="wiz-step"></div>
+        <h1 class="wiz-title"></h1>
+      </div>
+      <div class="wiz-nav">
+        <button class="wiz-btn" id="btnPrev">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19 8 12l7-7"/></svg>
+          Назад
+        </button>
+        <button class="wiz-btn wiz-btn--next" id="btnNext">
+          Дальше
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+    <p class="wiz-sub"></p>
+    <div class="wiz-dots"></div>
+    </div>
+
+    <div class="wiz-body">
+      <!-- слева: 3 крупных пресета + «Тонкая настройка» -->
+      <div class="wiz-left glass" id="wizLeft"></div>
+
+      <!-- справа: БОЛЬШОЕ живое превью на реальных элементах -->
+      <div class="pv-wrap">
+        <div class="pv-cap"></div>
+        <div class="stage glass">
+          <div id="focusHost"></div>
+          <div id="stageBody"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../lab-settings.js?v=1"></script>
+  <script src="tokens-lab.js?v=14"></script>
+</body>
+</html>

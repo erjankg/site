@@ -94,20 +94,56 @@ const CHAMPS = [
       {k:'R',name:'Пожрать',           dt:'true', lo:300,hi:1000,adR:0, apR:0,  hits:1},
     ]},
 ];
-/* generic-умения для авто-добавленных чемпов (реальные базовые статы, демо-скейлы умений) */
+/* generic-умения — фолбэк, если у чемпа не распарсилась НИ ОДНА формула (сейчас 0 таких) */
 const GENERIC_ABILS=[
-  {k:'Q',name:'Q',dt:'phys', lo:40, hi:160, adR:.6, apR:.3, hits:1},
-  {k:'W',name:'W',dt:'magic',lo:50, hi:180, adR:.2, apR:.5, hits:1},
-  {k:'R',name:'R',dt:'phys', lo:120,hi:350, adR:1.0,apR:.4, hits:1},
+  {k:'Q',name:'Q',dt:'phys', lo:40, hi:160, adR:.6, apR:.3, hits:1, demo:true},
+  {k:'W',name:'W',dt:'magic',lo:50, hi:180, adR:.2, apR:.5, hits:1, demo:true},
+  {k:'R',name:'R',dt:'phys', lo:120,hi:350, adR:1.0,apR:.4, hits:1, demo:true},
 ];
-/* подмешать ВСЕХ чемпов WR из champ-base.js (реальные база+рост), не дублируя 13 проработанных */
+
+/* ── РЕАЛЬНЫЕ ДАННЫЕ WR (calc-app/wr-data.js, генератор data-pipeline/build-calc-data.mjs) ──
+   Реальный ранг умения → форма абилки приложения. Легаси-поля lo/hi/adR/apR заполняются из
+   реальных рангов (весь старый код цел), а точный поранговый расчёт+разбивка идут через .ranks. */
+function realToAbil(ra){
+  const rk=ra.ranks, last=rk[rk.length-1];
+  return {
+    k:ra.k, name:ra.name, dt:ra.dt, hits:1, cd:ra.cd||[], ranks:rk, real:true,
+    lo:rk[0].base, hi:last.base,          // легаси-диапазон базы
+    adR:last.ad, badR:last.bad, apR:last.ap, thpR:last.thp, ohpR:last.ohp,   // репрезент. скейлы (макс.ранг)
+  };
+}
+/* ранг умения от уровня чемпа 1..15 (Q/W/E = 4 ранга, R = 3) */
+function abilRankIdx(n,lvl){ return Math.max(0, Math.min(n-1, Math.floor((lvl-1)*n/15))); }
+
+/* сохранить кураторские РУ-имена умений + стаки 13 проработанных чемпов, потом всё пересобрать из реальных */
 (function(){
-  const list=(typeof window!=='undefined'&&window.WR_BASE_STATS)||[];
-  const have=new Set(CHAMPS.map(c=>c.dd.toLowerCase()));
-  list.forEach(c=>{ const dd=(c.dd||'').replace(/[^A-Za-z]/g,''); if(!dd||have.has(dd.toLowerCase())) return;
-    CHAMPS.push({ name:c.n||dd, dd, ranged:(c.rng||175)>=300, generic:true,
-      ad_b:c.adb, ad_g:c.adg, hp_b:c.hb, hp_g:c.hg, ar_b:c.arb, ar_g:c.arg, mr_b:c.mrb, mr_g:c.mrg, abils:GENERIC_ABILS });
-    have.add(dd.toLowerCase()); });
+  const WR=(typeof window!=='undefined'&&window.WR_DATA&&window.WR_DATA.champs)||[];
+  if(!WR.length) return;                    // нет реальных данных → остаёмся на демо CHAMPS
+  const demoByDd=new Map(CHAMPS.map(c=>[c.dd.toLowerCase(),c]));
+  const ruName=new Map();                   // dd → {Q:'Сломанные крылья',…} кураторские РУ-имена
+  demoByDd.forEach((c,dd)=>{ const m={}; c.abils.forEach(a=>m[a.k]=a.name); ruName.set(dd,m); });
+
+  const rebuilt = WR.map(rc=>{
+    const dd=rc.dd, demo=demoByDd.get(dd.toLowerCase());
+    const ruMap=ruName.get(dd.toLowerCase())||{};
+    const abils = rc.abils.length ? rc.abils.map(ra=>{
+      const a=realToAbil(ra);
+      if(ruMap[a.k]) a.name=ruMap[a.k];     // вернуть красивое РУ-имя, если было
+      return a;
+    }) : GENERIC_ABILS;
+    return {
+      name: rc.ru || rc.en || dd, dd, en: rc.en,
+      ranged: (rc.rng||175) >= 300, rng: rc.rng,
+      ad_b: rc.ad_b, ad_g: rc.ad_g, hp_b: rc.hp_b, hp_g: rc.hp_g,
+      ar_b: rc.ar_b, ar_g: rc.ar_g, mr_b: rc.mr_b, mr_g: rc.mr_g,
+      as_b: rc.as_b, as_g: rc.as_g, ms: rc.ms,
+      roles: rc.roles||[], meta: rc.meta||null,
+      stack: demo && demo.stack || null,    // стаки (Вейгар/Сион/Сенна/Треш/Чо'Гат) — только у кураторских
+      abils,
+      partial: rc.src==='partial',
+    };
+  });
+  CHAMPS.length=0; rebuilt.forEach(c=>CHAMPS.push(c));
   CHAMPS.sort((a,b)=>(a.name||'').localeCompare(b.name||'','ru'));
 })();
 
@@ -227,23 +263,45 @@ const GEAR = {
   force:{name:'Сила природы',     img:'force-of-nature',   cat:'Защита', mr:60, ms:25},
   kaenic:{name:'Каэник Рукерн',   img:'kaenic-rookern',    cat:'Защита', mr:65, hp:350},
   steraks:{name:'Мощь Стерака',   img:'steraks-gage',      cat:'Защита', hp:400},
+  // ── Патч 7.2: новый компонент (демо-числа до реальных) ──
+  voidAmethyst:{name:'Пустотный аметист', img:'void-amethyst', cat:'AP', ap:20, mrPenFlat:10, patch72:true, demoStat:true},
 };
 const BOOTS = {
-  plated:{name:'Стальные набойки', img:'plated-steelcaps',          boot:true, armor:20},
-  merc:{name:'Ртутные ступни',     img:'mercurys-treads',           boot:true, mr:25},
-  swift:{name:'Сапоги проворности', img:'boots-of-swiftness',        boot:true, ms:45},
-  ionian:{name:'Ионийские сапоги',  img:'ionian-boots-of-lucidity',  boot:true, ah:20},
-  sorc:{name:'Магнитный бластер',   img:'magnetic-blaster',          boot:true, mrPenFlat:12},
-  glutton:{name:'Прожорливые поножи', img:'gluttonous-greaves',      boot:true, ls:8},
+  plated:{name:'Стальные набойки', img:'plated-steelcaps',          boot:true, tier:2, armor:20},
+  merc:{name:'Ртутные ступни',     img:'mercurys-treads',           boot:true, tier:2, mr:25},
+  swift:{name:'Сапоги проворности', img:'boots-of-swiftness',        boot:true, tier:2, ms:45},
+  ionian:{name:'Ионийские сапоги',  img:'ionian-boots-of-lucidity',  boot:true, tier:2, ah:20},
+  sorc:{name:'Магнитный бластер',   img:'magnetic-blaster',          boot:true, tier:2, mrPenFlat:12},
+  glutton:{name:'Прожорливые поножи', img:'gluttonous-greaves',      boot:true, tier:2, ls:8},
+  // ── Патч 7.2: ботинки T3 (2000–2200 зол, после 10:00) — усиленная база + пассивка (демо-числа) ──
+  plated3:{name:'Стальные набойки III',  img:'plated-steelcaps',         boot:true, tier:3, armor:40, hp:150, patch72:true, demoStat:true},
+  merc3:{name:'Ртутные ступни III',      img:'mercurys-treads',          boot:true, tier:3, mr:45, hp:150, patch72:true, demoStat:true},
+  sorc3:{name:'Магнитный бластер III',   img:'magnetic-blaster',         boot:true, tier:3, mrPenFlat:18, ap:25, patch72:true, demoStat:true},
+  ionian3:{name:'Ионийские сапоги III',  img:'ionian-boots-of-lucidity', boot:true, tier:3, ah:35, ms:15, patch72:true, demoStat:true},
 };
+/* ── Патч 7.2: ЗАЧАРОВАНИЯ = отдельные ACTIVE, максимум 1 в сборке. Активка + мелкие статы (демо) ── */
+const ENCHANTS = {
+  none:       {name:'Без зачарования', active:'—'},
+  stasis:     {name:'Стазис',      img:'stasis-enchant',      active:'неуязвимость 2.5с', demoStat:true},
+  gargoyle:   {name:'Горгулья',    img:'gargoyle-enchant',    hp:150, active:'щит по числу врагов', demoStat:true},
+  glorious:   {name:'Славная',     img:'glorious-enchant',    active:'рывок к союзнику + ускор.', demoStat:true},
+  redeeming:  {name:'Искупление',  img:'redeeming-enchant',   active:'лечит союзников по AoE', demoStat:true},
+  protobelt:  {name:'Пробойник',   img:'protobelt-enchant',   ap:15, active:'рывок + залп магии', demoStat:true},
+  quicksilver:{name:'Ртутная',     img:'quicksilver-enchant', active:'снять контроль (очищение)', demoStat:true},
+};
+const ENCHANT_ORDER = ['none','stasis','gargoyle','glorious','redeeming','protobelt','quicksilver'];
 /* цена предметов (золото, ~как в WR) — для стоимости билда и урон/золото */
 const GOLD = {
   ie:3400, bt:3200, collector:3000, youmuu:3000, serylda:3000, mortal:3000, bc:3000, tri:3333, navori:3000,
   luden:3200, liandryItem:3000, lich:3000, nashor:3000, botrk:3000, wits:2800, iorb:2900, rylai:2900,
   thornmail:2700, sunfire:2700, deadmans:2900, frozen:2700, heartsteel:3000, hollow:2700, force:2900, kaenic:2800, steraks:3000,
+  voidAmethyst:1000,   // Патч 7.2: компонент
   plated:1100, merc:1100, swift:1000, ionian:1000, sorc:1100, glutton:1100,
+  plated3:2000, merc3:2000, sorc3:2200, ionian3:2100,   // Патч 7.2: T3 ботинки
 };
-function gearGold(items,boots){ let g=0; (items||[]).forEach(k=>g+=GOLD[k]||3000); if(boots)g+=GOLD[boots]||1100; return g; }
+/* цена зачарования (Патч 7.2) — идёт поверх ботинок */
+const ENCHANT_GOLD = { stasis:800, gargoyle:800, glorious:600, redeeming:600, protobelt:900, quicksilver:800 };
+function gearGold(items,boots,enchant){ let g=0; (items||[]).forEach(k=>g+=GOLD[k]||3000); if(boots)g+=GOLD[boots]||1100; if(enchant&&enchant!=='none')g+=ENCHANT_GOLD[enchant]||700; return g; }
 function itemImg(slug){
   return `<img class="dc-ico" src="https://www.wildriftfire.com/images/items/${slug}.png" alt="" loading="lazy"
     onerror="this.classList.add('miss');this.removeAttribute('src')">`;
@@ -296,7 +354,7 @@ function runeSlot(side){
 }
 
 /* сложить статы списка снаряги (% пробивания множатся, флат складывается) */
-function aggregateList(items, boots){
+function aggregateList(items, boots, enchant){
   const a={ad:0,ap:0,hp:0,armor:0,mr:0,crit:0,as:0,ms:0,ah:0,ls:0,apAmp:0,arPenFrac:1,arPenFlat:0,mrPenFrac:1,mrPenFlat:0};
   const add=g=>{ if(!g)return;
     a.ad+=g.ad||0; a.ap+=g.ap||0; a.hp+=g.hp||0; a.armor+=g.armor||0; a.mr+=g.mr||0;
@@ -305,15 +363,95 @@ function aggregateList(items, boots){
     if(g.mrPenPct)a.mrPenFrac*=(1-g.mrPenPct/100); a.mrPenFlat+=g.mrPenFlat||0; };
   (items||[]).forEach(k=>add(GEAR[k]));
   add(BOOTS[boots]);
+  if(enchant && enchant!=='none') add(ENCHANTS[enchant]);   // Патч 7.2: зачарование даёт свои статы
   return a;
 }
 /* хелперы стороны: my (атакующий) / tgt (цель) / build (сборка) */
 function gearArr(side){ return side==='my'?state.myItems : side==='build'?state.myItems : state.tgtItems; }
 function getBoots(side){ return side==='my'?state.myBoots : side==='build'?state.myBoots : state.tgtBoots; }
 function setBoots(side,v){ if(side==='my')state.myBoots=v; else if(side==='build')state.myBoots=v; else state.tgtBoots=v; }
-function aggregateGear(side){ return aggregateList(gearArr(side), getBoots(side)); }
+/* зачарование — только у атакующего/сборки (единый билд), у цели нет */
+function getEnchant(side){ return (side==='my'||side==='build') ? state.myEnchant : null; }
+function aggregateGear(side){ return aggregateList(gearArr(side), getBoots(side), getEnchant(side)); }
 /* мититация по уже-эффективной защите (отриц. защита усиливает урон) */
 function mitFromEff(eff){ return eff>=0 ? 100/(100+eff) : 2 - 100/(100-eff); }
+
+/* ── РОЛИ И ГОТОВЫЕ СБОРКИ ПО РОЛИ ─────────────────────────────────────
+   Роль чемпа (dd→роль). Для незаданных — эвристика по дальнобойности+типу урона.
+   Пресеты используют ТОЛЬКО ключи из GEAR/BOOTS/KEYSTONES/SHARDS (один источник
+   правды — [[feedback_design_system]]). Тип урона (ad/ap) берётся из champDmgType. */
+const ROLE_LIST = [
+  {id:'Top',     name:'Топ',  ic:'🛡'},
+  {id:'Jungle',  name:'Лес',  ic:'🌳'},
+  {id:'Mid',     name:'Мид',  ic:'✨'},
+  {id:'ADC',     name:'АДК',  ic:'🏹'},
+  {id:'Support', name:'Сапп', ic:'💚'},
+];
+const ROLES = {
+  aatrox:'Top',garen:'Top',darius:'Top',fiora:'Top',camille:'Top',renekton:'Top',sett:'Top',mordekaiser:'Top',
+  jax:'Top',irelia:'Top',gnar:'Top',riven:'Top',nasus:'Top',shen:'Top',malphite:'Top',ornn:'Top',ksante:'Top',
+  gwen:'Top',yone:'Top',ambessa:'Top',singed:'Top',jayce:'Top',poppy:'Top',sion:'Top',urgot:'Top',volibear:'Top',
+  leesin:'Jungle',khazix:'Jungle',kayn:'Jungle',graves:'Jungle',viego:'Jungle',evelynn:'Jungle',hecarim:'Jungle',
+  jarvaniv:'Jungle',vi:'Jungle',xinzhao:'Jungle',masteryi:'Jungle',warwick:'Jungle',amumu:'Jungle',rammus:'Jungle',
+  nunu:'Jungle',shyvana:'Jungle',lillia:'Jungle',nidalee:'Jungle',rengar:'Jungle',kindred:'Jungle',nocturne:'Jungle',
+  olaf:'Jungle',fiddlesticks:'Jungle',gragas:'Jungle',wukong:'Jungle',monkeyking:'Jungle',
+  ahri:'Mid',lux:'Mid',zed:'Mid',yasuo:'Mid',veigar:'Mid',orianna:'Mid',syndra:'Mid',katarina:'Mid',
+  fizz:'Mid',akali:'Mid',talon:'Mid',diana:'Mid',annie:'Mid',twistedfate:'Mid',viktor:'Mid',vladimir:'Mid',
+  aurelionsol:'Mid',kassadin:'Mid',ekko:'Mid',galio:'Mid',lissandra:'Mid',swain:'Mid',vex:'Mid',
+  ryze:'Mid',taliyah:'Mid',zoe:'Mid',mel:'Mid',aurora:'Mid',ziggs:'Mid',heimerdinger:'Mid',velkoz:'Mid',
+  corki:'Mid',norra:'Mid',kennen:'Mid',pantheon:'Mid',
+  jinx:'ADC',caitlyn:'ADC',ezreal:'ADC',kaisa:'ADC',jhin:'ADC',ashe:'ADC',missfortune:'ADC',vayne:'ADC',
+  tristana:'ADC',draven:'ADC',lucian:'ADC',xayah:'ADC',samira:'ADC',varus:'ADC',sivir:'ADC',twitch:'ADC',
+  kalista:'ADC',zeri:'ADC',nilah:'ADC',smolder:'ADC',kogmaw:'ADC',akshan:'ADC',
+  thresh:'Support',leona:'Support',nautilus:'Support',blitzcrank:'Support',pyke:'Support',rakan:'Support',
+  alistar:'Support',braum:'Support',morgana:'Support',lulu:'Support',janna:'Support',nami:'Support',
+  soraka:'Support',sona:'Support',senna:'Support',karma:'Support',seraphine:'Support',yuumi:'Support',
+  milio:'Support',bard:'Support',zilean:'Support',zyra:'Support',maokai:'Support',rell:'Support',brand:'Support',
+};
+function roleOf(c){
+  if(!c) return 'Mid';
+  const k=(c.dd||'').toLowerCase();
+  if(ROLES[k]) return ROLES[k];
+  const dt=champDmgType(c);                 // эвристика для незаданных чемпов
+  if(c.ranged) return dt==='ad' ? 'ADC' : 'Mid';
+  return dt==='ap' ? 'Mid' : 'Top';
+}
+/* пресет = роль × тип урона. Ключи только из каталогов снаряги/рун (валидируем при применении). */
+const ROLE_BUILDS = {
+  Top: {
+    ad:{items:['tri','bc','steraks'],          boots:'plated', ks:'conqueror',   sh:{0:'brutal',       1:'sudden-impact', 2:'bone-plating'}},
+    ap:{items:['liandryItem','rylai','hollow'], boots:'sorc',  ks:'comet',       sh:{0:'giant-slayer', 1:'axiom-arcanist',2:'bone-plating'}},
+  },
+  Jungle: {
+    ad:{items:['tri','bc','deadmans'],         boots:'plated', ks:'conqueror',   sh:{0:'brutal',       1:'sudden-impact', 2:'bone-plating'}},
+    ap:{items:['luden','lich','rylai'],         boots:'sorc',  ks:'electrocute', sh:{0:'giant-slayer', 1:'axiom-arcanist',2:'bone-plating'}},
+  },
+  Mid: {
+    ad:{items:['collector','youmuu','serylda'], boots:'ionian',ks:'electrocute', sh:{0:'brutal',       1:'sudden-impact', 2:'bone-plating'}},
+    ap:{items:['luden','iorb','rylai'],         boots:'sorc',  ks:'comet',       sh:{0:'giant-slayer', 1:'axiom-arcanist',2:'bone-plating'}},
+  },
+  ADC: {
+    ad:{items:['ie','navori','collector'],      boots:'swift', ks:'lethaltempo', sh:{0:'brutal',       1:'sudden-impact', 2:'last-stand'}},
+    ap:{items:['nashor','lich','luden'],        boots:'sorc',  ks:'lethaltempo', sh:{0:'giant-slayer', 1:'axiom-arcanist',2:'last-stand'}},
+  },
+  Support: {
+    ad:{items:['frozen','kaenic','force'],      boots:'ionian',ks:'comet',       sh:{0:'coup-de-grace',1:'sudden-impact', 2:'bone-plating'}},
+    ap:{items:['rylai','kaenic','force'],       boots:'ionian',ks:'comet',       sh:{0:'giant-slayer', 1:'axiom-arcanist',2:'bone-plating'}},
+  },
+};
+/* применить готовую сборку роли к ЕДИНОМУ билду атакующего (предметы+ботинки+руна+осколки) */
+function applyRoleBuild(role){
+  const c=champByName(state.myChamp);
+  const dt=c?champDmgType(c):'ad';
+  const byRole=ROLE_BUILDS[role]||ROLE_BUILDS.Mid;
+  const preset=byRole[dt]||byRole.ad;
+  if(!preset) return;
+  state.myRole=role;
+  state.myItems=preset.items.filter(k=>GEAR[k]).slice(0,6);
+  state.myBoots=BOOTS[preset.boots]?preset.boots:null;
+  if(KEYSTONES[preset.ks]) state.myKeystone=preset.ks;
+  state.myShards=Object.assign({},preset.sh);
+}
 
 /* ── стандартный набор настроек лаба ── */
 const DD = 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash';
@@ -330,7 +468,7 @@ const GLASS_BORDER=[{key:'thin',label:'Тонкая'},{key:'glow',label:'Све�
 const BG_DIMS=[{key:'none',label:'Нет',v:0.14},{key:'light',label:'Слабо',v:0.38},{key:'mid',label:'Средне',v:0.60},{key:'strong',label:'Сильно',v:0.82}];
 
 /* акцент + градиент */
-const ACCENTS=[{key:'cyan',label:'Циан',c:'#0BC4E3',rgb:'11,196,227'},{key:'gold',label:'Золото',c:'#C89B3C',rgb:'200,155,60'},
+const ACCENTS=[{key:'cyan',label:'Циан',c:'#ffffff',rgb:'255, 255, 255'},{key:'gold',label:'Золото',c:'#C89B3C',rgb:'200,155,60'},
   {key:'violet',label:'Фиолет',c:'#8b5cf6',rgb:'139,92,246'},{key:'green',label:'Зелёный',c:'#2ecc71',rgb:'46,204,113'},
   {key:'red',label:'Красный',c:'#e74c3c',rgb:'231,76,60'},{key:'pink',label:'Розовый',c:'#ff5fa2',rgb:'255,95,162'}];
 
@@ -356,10 +494,12 @@ const TAB_SIZE   = [{id:'compact',name:'Компактный'},{id:'norm',name:'
 const TAB_DESIGN = [{id:'cards',name:'Плитки (раздельно)'},{id:'sheet',name:'Слитно (один лист)'},{id:'soft',name:'Мягкие (без рамок)'}];
 const TAB_BTNPOS = [{id:'top',name:'Сверху'},{id:'bottom',name:'Снизу'}];
 const CMP_ORIENT = [{id:'side',name:'Бок о бок (2 колонки)'},{id:'stack',name:'Друг под другом'}];
+/* разбивка урона умений «база + скейл» (игровой информативный вид) */
+const DMG_BREAK = [{id:'formula',name:'Формула (база + скейл)'},{id:'off',name:'Только итог'}];
 const TAB_NAMES  = { dmg:'⚔ Урон', items:'📦 Предметы', build:'🛠 Сборка', cmp:'⚖ Сравнение', auto:'🗡 Авто-атаки', arena:'🎮 Арена' };
 /* какие доп.контролы (помимо size+design) показывать у вкладки */
 const TAB_EXTRAS = {
-  dmg:   ['lay','resview','actionpos'],   // богатые контролы dmg (single source, top-level state)
+  dmg:   ['lay','resview','actionpos','break'],   // богатые контролы dmg (single source, top-level state)
   items: [],
   build: ['btn'],                          // расположение кнопок действий
   cmp:   ['orient'],                       // колонки бок-о-бок / стопкой
@@ -374,11 +514,11 @@ const DEFAULTS = {
   accent:'cyan', grad2:'#6D3FF5', angle:160,
   glasspow:'mid', tint:'accent', glasssat:'norm', glassborder:'thin', glassnoise:false,
   radius:16, gap:14,
-  showFormula:true, animNum:true,
+  showFormula:true, animNum:true, dmgBreak:'formula',
   // ЕДИНЫЙ билд атакующего (его правят и Урон-панель, и Сборка; руны/осколки/стаки влияют на урон ВЕЗДЕ)
   myChamp:'Ривен', myLvl:11, myBaseAD:100, myBonusAD:0, myAP:0, myCrit:0, myArPen:0, myArPenFlat:0, myMrPen:0, myMrPenFlat:0,
-  myItems:['ie','serylda'], myBoots:'plated', myKeystone:'electrocute',
-  myShards:{0:'brutal',1:'sudden-impact',2:'bone-plating'}, myStacks:0,
+  myItems:['ie','serylda'], myBoots:'plated', myEnchant:'none', myKeystone:'electrocute',
+  myShards:{0:'brutal',1:'sudden-impact',2:'bone-plating'}, myStacks:0, myRole:null,
   tgtChamp:'Гарен', tgtLvl:11, tgtArmor:100, tgtMR:40, tgtHpMax:2000, tgtArBonus:0, tgtMrBonus:0, tgtHpBonus:0, tgtHpCurPct:100,
   tgtItems:['thornmail','heartsteel'], tgtBoots:'merc',
   cmpB:null,   // снимок билда для вкладки «Сравнение» (B)
@@ -463,18 +603,34 @@ function compute(){
   const multPhys = mitFromEff(effArmor), multMag = mitFromEff(effMR);
   const multOf = dt => dt==='phys'?multPhys : dt==='magic'?multMag : 1;
 
+  // мой максимальный HP (для умений, скейлящихся от своего HP, напр. Владимир/Ситtravel)
+  const myHp = c ? statAt(c.hp_b,c.hp_g,state.myLvl) + myG.hp : myG.hp;
+
   const rows = [];
   if(state.aaOn){
     const rawHit = totalAD * (1 + crit/100);             // крит ≈ +100% при 100%
     const hits = Math.max(1, state.aaHits|0);
-    rows.push({ key:'AA', name:'Авто-атака', dt:'phys', raw:rawHit*hits, mit:rawHit*hits*multPhys, hits });
+    rows.push({ key:'AA', name:'Авто-атака', dt:'phys', raw:rawHit*hits, mit:rawHit*hits*multPhys, hits,
+      parts:{ base:0, ad:totalAD, ap:0, hp:0, crit:crit>0?totalAD*crit/100:0 }, demo:false });
   }
   if(c) c.abils.forEach(a=>{
     const st = state.abilState[a.k]; if(!st || !st.on) return;
-    const base = abilLerp(a.lo,a.hi,state.myLvl);
-    const rawHit = base + a.adR*totalAD + a.apR*ap;
+    let base, fromAD, fromAP, fromHP;
+    if(a.ranks){                                          // реальный поранговый расчёт: база + скейл
+      const rk = a.ranks[abilRankIdx(a.ranks.length, state.myLvl)];
+      base   = rk.base;
+      fromAD = rk.ad*totalAD + rk.bad*(totalAD-baseAD);   // bad = от БОНУСНОГО AD (снаряга/руны)
+      fromAP = rk.ap*ap;
+      fromHP = rk.thp*hpMax + rk.ohp*myHp;
+    } else {                                              // фолбэк-демо (нет распарсенных формул)
+      base   = abilLerp(a.lo,a.hi,state.myLvl);
+      fromAD = a.adR*totalAD; fromAP = a.apR*ap; fromHP = 0;
+    }
+    const rawHit = base + fromAD + fromAP + fromHP;
     const hits = Math.max(1, st.hits|0);
-    rows.push({ key:a.k, name:a.name, dt:a.dt, raw:rawHit*hits, mit:rawHit*hits*multOf(a.dt), hits });
+    rows.push({ key:a.k, name:a.name, dt:a.dt, raw:rawHit*hits, mit:rawHit*hits*multOf(a.dt), hits,
+      parts:{ base, ad:fromAD, ap:fromAP, hp:fromHP }, rank:a.ranks?abilRankIdx(a.ranks.length,state.myLvl)+1:null,
+      demo:!a.ranks });
   });
 
   // ключевая руна: прок (доп. строка) + множитель «Первого удара»
@@ -490,7 +646,7 @@ function compute(){
   const mitPct = totalRaw>0 ? (totalRaw-totalMit)/totalRaw*100 : 0;
 
   // 🪙 золото + эффективность
-  const cost = gearGold(state.myItems, state.myBoots);
+  const cost = gearGold(state.myItems, state.myBoots, state.myEnchant);
   const dmgPerK = cost>0 ? Math.round(totalMit/cost*1000) : 0;
 
   // 🛡 брейкпоинт выживания: сколько ДОП. сопротивления цели нужно, чтобы пережить комбо
@@ -537,14 +693,21 @@ function gearBlock(side){
   const items = gearArr(side);
   const boots = getBoots(side);
   const chip=(k,boot)=>{ const it=boot?BOOTS[k]:GEAR[k]; if(!it)return'';
-    return `<span class="dc-gchip ic ${boot?'boot':''}" data-rem="${side}:${boot?'boots':'items'}:${k}" title="${it.name}">${itemImg(it.img)}<i>✕</i></span>`; };
+    const t3=boot&&it.tier===3?' t3':'';
+    return `<span class="dc-gchip ic ${boot?'boot':''}${t3}" data-rem="${side}:${boot?'boots':'items'}:${k}" title="${it.name}${it.tier===3?' · T3 (после 10:00)':''}">${itemImg(it.img)}${boot&&it.tier===3?'<b class="dc-t3">T3</b>':''}<i>✕</i></span>`; };
   const itemChips = items.map(k=>chip(k,false)).join('');
   const bootChip = boots?chip(boots,true):'';
-  return `<div class="dc-loadout">
+  // Патч 7.2: слот зачарования (ACTIVE, макс 1) — только у атакующего/сборки
+  const ench = getEnchant(side), enchOn = ench && ench!=='none';
+  const enchSlot = (side==='my'||side==='build') ? `
+    <button class="dc-gbtn ench ${enchOn?'on':''}" data-pick="${side}:ench" title="${enchOn?ENCHANTS[ench].active:'Зачарование (Патч 7.2, макс 1)'}">
+      ${enchOn?`✨ ${ENCHANTS[ench].name}`:'✨ зачарование'}</button>` : '';
+  return `<div class="dc-loadout" data-gearside="${side}">
     <div class="dc-gear-row">${itemChips||'<span class="dc-gmuted">нет предметов</span>'}${bootChip}</div>
     <div class="dc-gear-btns">
       <button class="dc-gbtn" data-pick="${side}:items" ${items.length>=6?'disabled':''}>＋ предмет</button>
       <button class="dc-gbtn boot" data-pick="${side}:boots">${boots?'⤿ сменить ботинки':'＋ ботинки'}</button>
+      ${enchSlot}
     </div>
     ${gearReadout(side, aggregateGear(side))}
   </div>`;
@@ -563,20 +726,28 @@ function gearPickerHTML(){
   if(!gearPick) return '';
   const [side,mode]=gearPick.split(':');
   let entries;
-  if(mode==='boots') entries=Object.entries(BOOTS);
+  if(mode==='ench') entries=ENCHANT_ORDER.map(k=>[k,ENCHANTS[k]]);   // Патч 7.2: зачарования (макс 1)
+  else if(mode==='boots') entries=Object.entries(BOOTS);
   else if(side==='build') entries=Object.entries(GEAR);   // в сборке — все предметы
   else entries=Object.entries(GEAR).filter(([k,v])=>{
     const off=v.ad||v.ap||v.crit||v.arPenPct||v.arPenFlat||v.mrPenPct||v.mrPenFlat||v.apAmp;
     const def=v.armor||v.mr||v.hp;
     return side==='my'?off:def; });
-  const cur = mode==='boots'?[getBoots(side)]:gearArr(side);
+  const cur = mode==='boots'?[getBoots(side)] : mode==='ench'?[getEnchant(side)] : gearArr(side);
   const sideLabel = side==='my'?'атакующий':side==='build'?'сборка':'цель';
-  // только иконки; название+статы — в подсказке (title) при наведении
-  const cards=entries.map(([k,v])=>`<div class="dc-pcard ic ${cur.includes(k)?'on':''}" data-gear="${side}:${mode}:${k}" title="${v.name}${gearStatLine(v)?' — '+gearStatLine(v):''}">${itemImg(v.img)}</div>`).join('');
+  const heading = mode==='ench'?'✨ Зачарование (макс 1)' : mode==='boots'?'🥾 Ботинки':'📦 Предметы';
+  // только иконки; название+статы+активка — в подсказке (title) при наведении
+  const cards=entries.map(([k,v])=>{
+    const tip = mode==='ench' ? `${v.name}${v.active&&v.active!=='—'?' — '+v.active:''}${gearStatLine(v)?' · '+gearStatLine(v):''}`
+      : `${v.name}${gearStatLine(v)?' — '+gearStatLine(v):''}`;
+    const t3 = mode==='boots'&&v.tier===3?' t3':'';
+    const icon = (mode==='ench'&&k==='none') ? '<span class="dc-rune-none">⛌</span>' : itemImg(v.img);
+    return `<div class="dc-pcard ic ${cur.includes(k)?'on':''}${t3}" data-gear="${side}:${mode}:${k}" title="${tip}">${icon}${t3?'<b class="dc-t3">T3</b>':''}</div>`;
+  }).join('');
   const sz=state.pickIco||56;
   return `<div class="dc-gpick-ov" data-gclose>
     <div class="dc-gpick glassy">
-      <div class="dc-gpick-h">${mode==='boots'?'🥾 Ботинки':'📦 Предметы'} — ${sideLabel}
+      <div class="dc-gpick-h">${heading} — ${sideLabel}
         <span class="dc-pick-size">размер <input type="range" id="pickIco" min="40" max="96" value="${sz}"></span>
         <button class="dc-close" data-gclose>✕</button></div>
       <div class="dc-pgrid ico" id="dcPgrid" style="--pcico:${sz}px">${cards}</div>
@@ -585,6 +756,22 @@ function gearPickerHTML(){
 
 /* ════════════ РЕНДЕР: панели атакующего/цели ════════════ */
 function dtLabel(dt){ return dt==='phys'?'Физ.':dt==='magic'?'Маг.':'Чистый'; }
+
+/* цвет тира (реальные данные WR-снимка) */
+function tierColor(t){ return {S:'#ffffff',A:'#4ade80',B:'#facc15',C:'#fb923c',D:'#f87171'}[t]||'#88a'; }
+/* бейдж реальной меты WR: тир / винрейт / пикрейт / роль. Постоянный блок — без анимации появления. */
+function metaBadge(c){
+  if(!c || !c.meta) return '';
+  const m=c.meta, wd=(window.WR_DATA&&window.WR_DATA.wrDate)||'';
+  const date = wd ? `${wd.slice(6,8)}.${wd.slice(4,6)}.${wd.slice(0,4)}` : '';
+  return `<div class="dc-meta" title="Реальные данные Wild Rift · снимок ${date}">
+    <span class="dc-tier" style="--tc:${tierColor(m.tier)}">${m.tier||'?'}</span>
+    <span class="dc-mchip">WR <b>${m.wr}%</b></span>
+    ${m.pr?`<span class="dc-mchip">PR <b>${m.pr}%</b></span>`:''}
+    ${m.role?`<span class="dc-mchip role">${m.role}</span>`:''}
+    <span class="dc-mchip real" title="статы и умения из реальных данных WR">★ реал</span>
+  </div>`;
+}
 
 function panelAttacker(){
   const c = champByName(state.myChamp);
@@ -601,6 +788,7 @@ function panelAttacker(){
           <option value="">🪆 Манекен (свои числа)</option>
           ${CHAMPS.map(x=>`<option value="${x.name}" ${x.name===state.myChamp?'selected':''}>${x.name}</option>`).join('')}
         </select>
+        ${metaBadge(c)}
       </div>
     </div>
     <div class="dc-lvl">
@@ -673,32 +861,57 @@ function panelTarget(){
   </div>`;
 }
 
+/* ── ИНФОРМАТИВНЫЙ СКЕЙЛ (DESIGN.md): «база 130 + 70 от AD = 200» — откуда урон и от какого стата ──
+   parts = {base, ad, ap, hp, crit?}. Возвращает {segs:'…', sum} в СЫРОМ уроне (до защиты). */
+function partsBreakdown(parts, hits){
+  if(!parts) return null;
+  const h = Math.max(1, hits||1);
+  const seg=[];
+  const add=(v,label,cls)=>{ if(v>0.5) seg.push(`<span class="dc-seg ${cls}"><b>${Math.round(v)}</b> ${label}</span>`); };
+  add(parts.base,'база','s-base');
+  add(parts.ad,'от AD','s-ad');
+  add(parts.crit,'крит','s-crit');
+  add(parts.ap,'от AP','s-ap');
+  add(parts.hp,'от HP','s-hp');
+  const one=(parts.base||0)+(parts.ad||0)+(parts.ap||0)+(parts.hp||0)+(parts.crit||0);
+  if(!seg.length) return null;
+  const hitTxt = h>1 ? ` <span class="dc-seg-x">×${h}</span>` : '';
+  return `<div class="dc-break">${seg.join('<i>+</i>')}<span class="dc-seg-eq">= ${Math.round(one)}${hitTxt}</span></div>`;
+}
+
 function comboPanel(d){
   const c = champByName(state.myChamp);
-  const abilRow = (key,name,dt,mit,hits,on) => `
-    <div class="dc-abil ${on?'on':''}" data-abil="${key}">
-      <span class="dc-abil-key">${key}</span>
-      <div class="dc-abil-info">
-        <div class="dc-abil-name">${name}<span class="dt ${dt}">${dtLabel(dt)}</span></div>
-        <div class="dc-abil-meta">${on?'в комбо':'выкл'}</div>
+  const showBreak = state.dmgBreak!=='off';
+  const abilRow = (key,name,dt,r,hits,on) => {
+    const mit = r?r.mit:0;
+    const brk = (showBreak && on && r && r.parts) ? partsBreakdown(r.parts, r.hits) : '';
+    const rankBadge = (on && r && r.rank) ? `<span class="dc-rank" title="ранг умения на этом уровне">R${r.rank}</span>` : '';
+    return `
+    <div class="dc-abil ${on?'on':''} ${brk?'has-break':''}" data-abil="${key}">
+      <div class="dc-abil-main">
+        <span class="dc-abil-key">${key}</span>
+        <div class="dc-abil-info">
+          <div class="dc-abil-name">${name}${rankBadge}<span class="dt ${dt}">${dtLabel(dt)}</span></div>
+          <div class="dc-abil-meta">${on?'в комбо':'выкл'}</div>
+        </div>
+        <div class="dc-hits" data-hits="${key}">
+          <button data-d="-1">−</button><span class="n">${hits}</span><button data-d="1">+</button>
+        </div>
+        <div class="dc-abil-dmg">${on?Math.round(mit):'—'}<small>после защ.</small></div>
       </div>
-      <div class="dc-hits" data-hits="${key}">
-        <button data-d="-1">−</button><span class="n">${hits}</span><button data-d="1">+</button>
-      </div>
-      <div class="dc-abil-dmg">${on?Math.round(mit):'—'}<small>после защ.</small></div>
+      ${brk}
     </div>`;
+  };
   const byKey = {}; d.rows.forEach(r=>byKey[r.key]=r);
   let html = '';
-  // AA
-  const aa = byKey['AA'];
-  html += abilRow('AA','Авто-атака','phys', aa?aa.mit:0, state.aaHits, state.aaOn);
+  html += abilRow('AA','Авто-атака','phys', byKey['AA'], state.aaHits, state.aaOn);
   if(c) c.abils.forEach(a=>{
     const st = state.abilState[a.k]||{on:false,hits:a.hits};
-    const r = byKey[a.k];
-    html += abilRow(a.k, a.name, a.dt, r?r.mit:0, st.hits, st.on);
+    html += abilRow(a.k, a.name, a.dt, byKey[a.k], st.hits, st.on);
   });
+  const demoNote = (c && c.abils.some(a=>a.demo)) ? `<span class="dc-demo-tag">демо-скейл</span>` : '';
   return `<div class="dc-combo glassy">
-    <div class="dc-combo-head">⚔ Комбо — нажми чтобы вкл/выкл, ± меняет число ударов</div>
+    <div class="dc-combo-head">⚔ Комбо — нажми чтобы вкл/выкл, ± меняет число ударов ${demoNote}</div>
     <div class="dc-abils">${html}</div>
   </div>`;
 }
@@ -937,6 +1150,11 @@ function buildBlock(){
       <select class="dc-sel" id="bChamp">${CHAMPS.map(x=>`<option value="${x.name}" ${x.name===state.myChamp?'selected':''}>${x.name}${x.stack?' ★':''}</option>`).join('')}</select>
       <div class="dc-lvl" style="flex:1;min-width:160px"><input type="range" id="bLvl" min="1" max="15" value="${state.myLvl}"><span class="dc-lvl-badge">Ур. ${state.myLvl}</span></div>
     </div>
+    <div class="dc-rolebar glassy">
+      <span class="dc-bcol-t">🎭 Роль</span>
+      <div class="dc-rolechips">${ROLE_LIST.map(r=>`<button class="dc-rolechip ${r.id===(state.myRole||roleOf(c))?'on':''}" data-role="${r.id}" title="Собрать «${r.name}»: предметы, ботинки и руны под роль">${r.ic} ${r.name}</button>`).join('')}</div>
+      <button class="dc-rolefill" data-rolefill title="Подставить типовые предметы и руны под выбранную роль">🛠 Собрать по роли</button>
+    </div>
     <div class="dc-build-rune"><span class="dc-bcol-t">🔮 Ключевая руна</span>${runeSlot('build')}</div>
     <div class="dc-build-grid">
       <div class="dc-bcol glassy"><div class="dc-bcol-t">📦 Предметы и ботинки</div>${gearBlock('build')}</div>
@@ -954,7 +1172,7 @@ function buildBlock(){
 }
 /* билд → компактный код (юникод-safe base64) и обратно */
 function serializeBuild(){
-  const b={ c:state.myChamp, l:state.myLvl, i:state.myItems, bo:state.myBoots, k:state.myKeystone, sh:state.myShards, st:state.myStacks };
+  const b={ c:state.myChamp, l:state.myLvl, i:state.myItems, bo:state.myBoots, en:state.myEnchant, k:state.myKeystone, sh:state.myShards, st:state.myStacks };
   return btoa(unescape(encodeURIComponent(JSON.stringify(b))));
 }
 function applyBuildCode(code){
@@ -965,6 +1183,7 @@ function applyBuildCode(code){
     if(b.l) state.myLvl=Math.max(1,Math.min(15,b.l|0));
     if(Array.isArray(b.i)) state.myItems=b.i.filter(k=>GEAR[k]).slice(0,6);
     state.myBoots = (b.bo && BOOTS[b.bo]) ? b.bo : null;
+    state.myEnchant = (b.en && ENCHANTS[b.en]) ? b.en : 'none';
     if(b.k && KEYSTONES[b.k]) state.myKeystone=b.k;
     if(b.sh && typeof b.sh==='object') state.myShards=b.sh;
     if(b.st!=null) state.myStacks=b.st|0;
@@ -1511,17 +1730,19 @@ function userQuizzes(){ try{ return JSON.parse(localStorage.getItem('dc-user-qui
 function saveUserQuizzes(arr){ try{ localStorage.setItem('dc-user-quizzes',JSON.stringify(arr)); }catch(e){} }
 function newDraft(){ return { id:'uq'+Date.now().toString(36), name:'', author:'', status:'draft', questions:[], date:Date.now() }; }
 
-function playUserQuiz(id){
-  const qz=userQuizzes().find(q=>q.id===id); if(!qz||!qz.questions.length) return;
+/* запустить квизз из объекта (не зависит от localStorage — играем из памяти) */
+function startUserQuiz(qz){
+  if(!qz||!qz.questions||!qz.questions.length) return;
   const qs=qz.questions.map(Q=>{
     const opts=Q.opts.map((o,i)=>({label:o.label,_c:i===Q.correct}));
     for(let i=opts.length-1;i>0;i--){ const j=rint(0,i); [opts[i],opts[j]]=[opts[j],opts[i]]; }
     return { kind:'fact', q:Q.q, opts, correct:opts.findIndex(o=>o._c), hint:Q.hint||'' };
   });
   quiz={ qs, n:qs.length, i:0, score:0, correct:0, picked:null, qStart:performance.now(),
-    deadline:performance.now()+QUIZ_SEC*1000, done:false, saved:false, custom:qz.name, customId:id };
+    deadline:performance.now()+QUIZ_SEC*1000, done:false, saved:false, custom:qz.name, customId:qz.id };
   state.arena='guess'; renderStage();
 }
+function playUserQuiz(id){ startUserQuiz(userQuizzes().find(q=>q.id===id)); }
 
 /* собрать вопрос из формы добавления; вернуть {ok,err} */
 function draftAddQuestion(box){
@@ -1618,7 +1839,7 @@ function handleMake(v,box){
     if(!userQuizDraft.questions.length) return;
     const all=userQuizzes(); const i=all.findIndex(q=>q.id===userQuizDraft.id);
     if(i>=0) all[i]=userQuizDraft; else { all.push(userQuizDraft); }
-    saveUserQuizzes(all); playUserQuiz(userQuizDraft.id); return;
+    saveUserQuizzes(all); startUserQuiz(userQuizDraft); return;   // играем из памяти, не зависит от localStorage
   }
   if(v.startsWith('play:')){ playUserQuiz(v.slice(5)); return; }
   if(v.startsWith('edit:')){ const qz=userQuizzes().find(q=>q.id===v.slice(5)); if(qz){ userQuizDraft=JSON.parse(JSON.stringify(qz)); makeView='edit'; } renderStage(); return; }
@@ -1826,7 +2047,7 @@ function modalHTML(){
       ${resultPanel(d)}
     </div>`;
 
-  const tabs = `<div class="dc-tabs">
+  const tabs = `<div class="dc-tabs glassy">
       <button class="dc-tab ${state.tab==='dmg'?'on':''}" data-tab="dmg">⚔ Калькулятор урона</button>
       <button class="dc-tab ${state.tab==='items'?'on':''}" data-tab="items">📦 Калькулятор предметов</button>
       <button class="dc-tab ${state.tab==='build'?'on':''}" data-tab="build">🛠 Сборка</button>
@@ -1852,8 +2073,8 @@ function modalHTML(){
   const headActions = (state.actionpos==='head' && onDmg) ? actionsHTML() : '';
 
   const tc=tcfg();
-  return `<div class="dc-modal glassy lay-${state.lay}" data-tab="${state.tab}" data-tabpos="${state.tabpos}" data-actionpos="${state.actionpos}" data-tsize="${tc.size||'norm'}" data-tdesign="${tc.design||'cards'}" data-tbtn="${tc.btn||'top'}" data-orient="${tc.orient||'side'}">
-    <div class="dc-head">
+  return `<div class="dc-modal lay-${state.lay}" data-tab="${state.tab}" data-tabpos="${state.tabpos}" data-actionpos="${state.actionpos}" data-tsize="${tc.size||'norm'}" data-tdesign="${tc.design||'cards'}" data-tbtn="${tc.btn||'top'}" data-orient="${tc.orient||'side'}">
+    <div class="dc-head glassy">
       <div class="dc-title"><span class="dc-mark">⚔</span>
         <div>Калькулятор урона<div class="dc-sub">Сколько урона ты наносишь по цели с учётом брони, МС и пробивания</div></div>
       </div>
@@ -1888,7 +2109,9 @@ function applyLook(){
   b.dataset.glass='on'; b.dataset.glasspow=state.glasspow; b.dataset.glasstint=state.tint;
   b.dataset.glasssat=state.glasssat; b.dataset.glassborder=state.glassborder;
   b.dataset.glassnoise=state.glassnoise?'on':'off';
-  document.getElementById('labBg').style.backgroundImage = SPLASH_IMG[state.bg]||SPLASH_IMG.lux;
+  if(!document.documentElement.classList.contains('embed')){
+    document.getElementById('labBg').style.backgroundImage = SPLASH_IMG[state.bg]||SPLASH_IMG.lux;
+  }
   const dim=BG_DIMS.find(d=>d.key===state.bgdim)||BG_DIMS[2];
   const r=document.documentElement.style;
   r.setProperty('--dim',dim.v);
@@ -1924,14 +2147,42 @@ function recompute(){
   if(res){ res.outerHTML=resultPanel(d); }
   bindActions();
   animNum(d.totalMit);
-  // обновить числа в комбо
+  // обновить числа + разбивку в комбо (точечно: только текст/один узел на строку, не весь список)
   const byKey={}; d.rows.forEach(r=>byKey[r.key]=r);
+  const showBreak=state.dmgBreak!=='off';
   document.querySelectorAll('.dc-abil').forEach(el=>{
     const k=el.dataset.abil, r=byKey[k];
-    const dmg=el.querySelector('.dc-abil-dmg');
     const on=el.classList.contains('on');
+    const dmg=el.querySelector('.dc-abil-dmg');
     if(dmg) dmg.innerHTML=(on&&r?Math.round(r.mit):'—')+'<small>после защ.</small>';
+    const brk=el.querySelector('.dc-break');
+    const html=(showBreak&&on&&r&&r.parts)?partsBreakdown(r.parts,r.hits):'';
+    if(brk){ if(html) brk.outerHTML=html; else brk.remove(); el.classList.toggle('has-break',!!html); }
+    else if(html){ el.insertAdjacentHTML('beforeend',html); el.classList.add('has-break'); }
+    const rb=el.querySelector('.dc-rank'); if(rb && r && r.rank) rb.textContent='R'+r.rank;   // ранг умения от уровня
   });
+}
+
+/* привязать кнопки одной снаряги (пикер-открытие + удаление чипа) в пределах scope — можно перевесить после точечного апдейта */
+function bindLoadout(scope){
+  scope.querySelectorAll('[data-pick]').forEach(b=>b.onclick=()=>{ gearPick=b.dataset.pick; renderStage(); });
+  scope.querySelectorAll('[data-rem]').forEach(b=>b.onclick=()=>{
+    const [side,mode,key]=b.dataset.rem.split(':');
+    if(mode==='boots') setBoots(side,null);
+    else if(mode==='ench') state.myEnchant='none';
+    else { const arr=gearArr(side); const i=arr.indexOf(key); if(i>=0)arr.splice(i,1); }
+    rerenderGear(side);
+  });
+}
+/* точечно перерисовать снаряжение стороны: на вкладке Урон меняем ТОЛЬКО блок снаряги + пересчёт
+   (единицы узлов, не весь экран). На Сборке — полный рендер (там завязан лист статов/руны). */
+function rerenderGear(side){
+  if(state.tab!=='dmg'){ renderStage(); return; }
+  const el=document.querySelector('.dc-loadout[data-gearside="'+side+'"]');
+  if(!el){ renderStage(); return; }
+  el.outerHTML=gearBlock(side);
+  bindLoadout(document.querySelector('.dc-loadout[data-gearside="'+side+'"]'));
+  recompute();
 }
 
 /* ════════════ СОБЫТИЯ ════════════ */
@@ -1944,11 +2195,18 @@ function wireModal(){
   const tgC=inner.querySelector('#tgtChamp');
   if(tgC) tgC.onchange=e=>{ state.tgtChamp=e.target.value; syncAutoStats(); renderStage(); };
 
-  // уровни (перерисовка — меняются авто-статы)
+  // уровни: точечное обновление (слайдер тянут — НЕ пересобираем весь экран, меняем ЕДИНИЦЫ узлов)
+  const setInput=(id,v)=>{ const el=inner.querySelector('#'+id); if(el)el.value=v; };
   const myL=inner.querySelector('#myLvl');
-  if(myL) myL.oninput=e=>{ state.myLvl=+e.target.value; syncAutoStats(); renderStage(); };
+  if(myL) myL.oninput=e=>{ state.myLvl=+e.target.value; syncAutoStats();
+    setInput('myBaseAD',state.myBaseAD);
+    const b=myL.parentNode.querySelector('.dc-lvl-badge'); if(b)b.textContent='Ур. '+state.myLvl;
+    recompute(); };
   const tgL=inner.querySelector('#tgtLvl');
-  if(tgL) tgL.oninput=e=>{ state.tgtLvl=+e.target.value; syncAutoStats(); renderStage(); };
+  if(tgL) tgL.oninput=e=>{ state.tgtLvl=+e.target.value; syncAutoStats();
+    setInput('tgtArmor',state.tgtArmor); setInput('tgtMR',state.tgtMR); setInput('tgtHpMax',state.tgtHpMax);
+    const b=tgL.parentNode.querySelector('.dc-lvl-badge'); if(b)b.textContent='Ур. '+state.tgtLvl;
+    fightReset(); recompute(); };
 
   // числовые поля → живой пересчёт (базовые статы редактируемы только для манекена)
   const bind=id=>{ const el=inner.querySelector('#'+id); if(el && !el.readOnly) el.oninput=e=>{ state[id]=+e.target.value||0; recompute(); }; };
@@ -1989,7 +2247,9 @@ function wireModal(){
 
   // вкладка «Сборка»
   const bChamp=inner.querySelector('#bChamp');
-  if(bChamp) bChamp.onchange=e=>{ state.myChamp=e.target.value; const c=champByName(state.myChamp); if(c&&c.stack)state.myStacks=c.stack.def; syncAutoStats(); ensureAbilState(); renderStage(); };
+  if(bChamp) bChamp.onchange=e=>{ state.myChamp=e.target.value; const c=champByName(state.myChamp); if(c&&c.stack)state.myStacks=c.stack.def; state.myRole=null; syncAutoStats(); ensureAbilState(); renderStage(); };
+  inner.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>{ applyRoleBuild(b.dataset.role); renderStage(); }));
+  const rfill=inner.querySelector('[data-rolefill]'); if(rfill) rfill.onclick=()=>{ applyRoleBuild(state.myRole||roleOf(champByName(state.myChamp))); renderStage(); };
   const bLvl=inner.querySelector('#bLvl');
   if(bLvl) bLvl.oninput=e=>{ state.myLvl=+e.target.value; syncAutoStats(); const lab=inner.querySelector('.dc-build-head .dc-lvl-badge'); if(lab)lab.textContent='Ур. '+state.myLvl;
     const sheet=inner.querySelector('#dcStatSheet'); if(sheet)sheet.innerHTML=statSheetHTML(buildStats()); };
@@ -2037,18 +2297,13 @@ function wireModal(){
   }
 
   // снаряга: открыть пикер / убрать чип / выбрать в пикере / закрыть
-  inner.querySelectorAll('[data-pick]').forEach(b=>b.addEventListener('click',()=>{ gearPick=b.dataset.pick; renderStage(); }));
+  bindLoadout(inner);
   const pico=inner.querySelector('#pickIco');
   if(pico) pico.oninput=e=>{ state.pickIco=+e.target.value; const g=inner.querySelector('#dcPgrid'); if(g)g.style.setProperty('--pcico',state.pickIco+'px'); };
-  inner.querySelectorAll('[data-rem]').forEach(b=>b.addEventListener('click',()=>{
-    const [side,mode,key]=b.dataset.rem.split(':');
-    if(mode==='boots') setBoots(side,null);
-    else { const arr=gearArr(side); const i=arr.indexOf(key); if(i>=0)arr.splice(i,1); }
-    renderStage();
-  }));
   inner.querySelectorAll('[data-gear]').forEach(c=>c.addEventListener('click',()=>{
     const [side,mode,key]=c.dataset.gear.split(':');
     if(mode==='boots'){ setBoots(side, getBoots(side)===key?null:key); }
+    else if(mode==='ench'){ state.myEnchant = (getEnchant(side)===key)?'none':key; gearPick=null; }   // единичный выбор
     else { const arr=gearArr(side); const i=arr.indexOf(key); if(i>=0)arr.splice(i,1); else if(arr.length<6)arr.push(key); }
     renderStage();
   }));
@@ -2167,6 +2422,7 @@ function renderTabSettings(){
   if(extras.includes('lay'))       html+=selCtrl('t_lay','Раскладка',LAYOUTS,state.lay);
   if(extras.includes('resview'))   html+=selCtrl('t_resview','Вид результата',RESVIEWS,state.resview);
   if(extras.includes('actionpos')) html+=selCtrl('t_actionpos','Кнопки боя где',ACTIONPOS,state.actionpos);
+  if(extras.includes('break'))     html+=selCtrl('t_break','Разбивка урона',DMG_BREAK,state.dmgBreak);
   if(extras.includes('btn'))       html+=selCtrl('t_btn','Кнопки/режимы где',TAB_BTNPOS,tc.btn||'top');
   if(extras.includes('orient'))    html+=selCtrl('t_orient','Колонки',CMP_ORIENT,tc.orient||'side');
   box.innerHTML=html;
@@ -2178,6 +2434,7 @@ function renderTabSettings(){
   if(get('t_lay'))       get('t_lay').onchange=e=>{ state.lay=e.target.value; renderStage(); };
   if(get('t_resview'))   get('t_resview').onchange=e=>{ state.resview=e.target.value; renderStage(); };
   if(get('t_actionpos')) get('t_actionpos').onchange=e=>{ state.actionpos=e.target.value; renderStage(); };
+  if(get('t_break'))     get('t_break').onchange=e=>{ state.dmgBreak=e.target.value; renderStage(); };
   if(get('t_btn'))       get('t_btn').onchange=e=>{ tc.btn=e.target.value; const m=document.querySelector('.dc-modal'); if(m)m.dataset.tbtn=tc.btn; };
   if(get('t_orient'))    get('t_orient').onchange=e=>{ tc.orient=e.target.value; const m=document.querySelector('.dc-modal'); if(m)m.dataset.orient=tc.orient; };
 }

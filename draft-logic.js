@@ -75,6 +75,62 @@
     };
   }
 
+  // ★ ЕДИНЫЙ ИСТОЧНИК «ЧЕЙ СЕЙЧАС ХОД» — pure, детерминирован от turnIndex.
+  // turnIndex → шаг последовательности → сторона (позиция) → команда НА этой стороне
+  // В ЭТОЙ игре (с учётом side-swap) → uid её капитана.
+  // И ПРЕПИК, и ЛОКИН, и подсветка, и авто-пик гейтятся ТОЛЬКО этим (capUid).
+  // Раньше это считалось копипастой в нескольких местах и расходилось после свапа.
+  function currentTurn(lobby, game) {
+    if (!game) return null;
+    var idx = game.turnIndex || 0;
+    if (idx >= SEQ_LEN || game.phase === 'done') {
+      return { turnIndex: idx, step: null, side: null, action: null,
+               team: null, capUid: null, teamName: null, isDone: true };
+    }
+    var step = WR_DRAFT_SEQUENCE[idx];
+    var roles = sideRoles(lobby, game);
+    var r = roles[step.side] || {};
+    return {
+      turnIndex: idx,
+      step: step,
+      side: step.side,                 // ПОЗИЦИЯ (blue/red на экране), чей ход
+      action: step.action,
+      team: r.team || null,            // КОМАНДА на этой позиции в этой игре
+      capUid: (r.cap && r.cap.uid) || null,
+      teamName: r.teamName || null,
+      isDone: false
+    };
+  }
+
+  // Роль зрителя относительно лобби/игры. Единая точка вычисления прав.
+  // mySide = позиция капитана В ЭТОЙ игре (с учётом свапа) — по ней гейтятся ход/пул.
+  // myTeam = команда (не зависит от позиции) — по ней читаются readyBlue/readyRed, счёт.
+  // isJudge = создатель, который НЕ капитан: управляет (винер/пауза/след.игра), но НЕ пикает.
+  function viewerRole(lobby, game, uid) {
+    lobby = lobby || {};
+    var roles = sideRoles(lobby, game);
+    var mySide = null;
+    if (roles.blue.cap && roles.blue.cap.uid === uid) mySide = 'blue';
+    else if (roles.red.cap && roles.red.cap.uid === uid) mySide = 'red';
+    var myTeam = null;
+    if (lobby.blueCaptain && lobby.blueCaptain.uid === uid) myTeam = 'blue';
+    else if (lobby.redCaptain && lobby.redCaptain.uid === uid) myTeam = 'red';
+    var isCreator = !!(uid && lobby.createdBy === uid);
+    var isCaptain = !!mySide;
+    var isInvitedSpec = (lobby.invitedSpectators || []).indexOf(uid) !== -1;
+    return {
+      isCreator: isCreator,
+      isCaptain: isCaptain,
+      mySide: mySide,                          // позиция (с учётом свапа) или null
+      myTeam: myTeam,                          // команда или null
+      isJudge: isCreator && !isCaptain,        // создатель-судья: не пикает
+      isSpectator: isInvitedSpec && !isCaptain && !isCreator,
+      // может ли пикать/банить прямо сейчас — ТОЛЬКО активный капитан
+      canActNow: isCaptain && !!game && game.phase !== 'done'
+                 && (WR_DRAFT_SEQUENCE[game.turnIndex || 0] || {}).side === mySide
+    };
+  }
+
   // Детерминированный выбор из пула по строке-сиду (FNV-1a hash).
   // Все клиенты с одинаковым seed+pool получат одного чемпиона —
   // используется для авто-пика при истечении таймера, чтобы не было рассинхрона.
@@ -94,6 +150,8 @@
     SEQ_LEN: SEQ_LEN,
     getUnavailable: getUnavailable,
     sideRoles: sideRoles,
+    currentTurn: currentTurn,
+    viewerRole: viewerRole,
     deterministicPick: deterministicPick
   };
 });

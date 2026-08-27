@@ -16,9 +16,21 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
+
+// Разметку страницы чемпиона печатает ТОТ ЖЕ модуль, что и приложение
+// (решение владельца Р1='D': страница чемпа и SEO-страница — одна вещь).
+const require_ = createRequire(import.meta.url);
+const ChampPage = require_(path.join(ROOT, 'champ-page.js'));
+
+// Локальные данные робота: читаем как файлы, без сети.
+function loadJSON(rel) {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, rel), 'utf8')); }
+  catch (e) { console.warn('[seo] нет файла ' + rel + ' —', e.message); return null; }
+}
 
 const SITE = 'https://pro-wildrift.com';
 const PROJECT = 'wildrift-stats-600c0';
@@ -110,7 +122,15 @@ function canonEn(en) {
 // EN ключ из таблицы -> id в ddragon, если отличается
 const DD_ID = { Wukong: 'MonkeyKing' };
 
-function ruName(en) { en = canonEn(en); return EN2RU[en] || DISP[en] || en; }
+// Русское имя чемпа: сначала официальное из ddragon ru_RU (лежит в
+// champion-abilities.json), потом наша карта. Приложение берёт оттуда же —
+// иначе на статике «Эзреал», а в приложении «Эзреаль».
+let RU_DD = {};
+function ruName(en) {
+  en = canonEn(en);
+  const dd = DD_ID[en] || en;
+  return RU_DD[gnorm(dd)] || EN2RU[en] || DISP[en] || en;
+}
 function prettyEn(en) { en = canonEn(en); return DISP[en] || en; }
 
 function champIcon(en) {
@@ -149,8 +169,40 @@ async function fetchCollection(name) {
   return docs;
 }
 
-// ── champions from published Google Sheet ──────────────────────────────────
+// ── champions: base-stats.json робота (тот же источник, что у приложения),
+//    при сбое — опубликованная Google-таблица ─────────────────────────────────
+function mapChampRow(o) {
+  const n = (x) => { const v = parseFloat(x); return isNaN(v) ? 0 : v; };
+  const roles = [];
+  if (+o.Is_Top) roles.push('Топ');
+  if (+o.Is_Jungle) roles.push('Лес');
+  if (+o.Is_Mid) roles.push('Мид');
+  if (+o.Is_Adc) roles.push('Бот (стрелок)');
+  if (+o.Is_Support) roles.push('Поддержка');
+  return {
+    en: o.Champion,
+    stats: {
+      ad: [n(o.AD_Base), n(o.AD_Growth)],
+      hp: [n(o.HP_Base), n(o.HP_Growth)],
+      mana: [n(o.Mana_Base), n(o.Mana_Growth)],
+      armor: [n(o.Armor_Base), n(o.Armor_Growth)],
+      mr: [n(o.MR_Base), n(o.MR_Growth)],
+      as: [n(o.AS_Base), n(o.AS_Growth)],
+      rng: [n(o.Range_Base), n(o.Range_Growth)],
+      ms: [n(o.MS_Base), 0],
+      hpreg: [n(o.HPRegen_Base), n(o.HPRegen_Growth)],
+      mpreg: [n(o.MPRegen_Base), n(o.MPRegen_Growth)],
+    },
+    resource: o.Resource || '',
+    roles,
+  };
+}
 async function fetchChampions() {
+  const local = loadJSON('data-pipeline/base-stats.json');
+  if (local && Array.isArray(local.champions) && local.champions.length > 100) {
+    console.log('[seo] чемпионы из base-stats.json:', local.champions.length);
+    return local.champions.map(mapChampRow).filter(x => x.en);
+  }
   const tsv = await fetch(G_URL).then(r => r.text());
   if (tsv.trim().startsWith('<')) throw new Error('Sheet вернул HTML вместо TSV (лист не опубликован)');
   const lines = tsv.trim().split('\n');
@@ -158,26 +210,7 @@ async function fetchChampions() {
   return lines.slice(1).map(l => {
     const c = l.split('\t');
     const o = {}; heads.forEach((h, i) => o[h] = (c[i] || '').trim());
-    const num = (x) => { const n = parseFloat(x); return isNaN(n) ? 0 : n; };
-    const roles = [];
-    if (+o.Is_Top) roles.push('Топ');
-    if (+o.Is_Jungle) roles.push('Лес');
-    if (+o.Is_Mid) roles.push('Мид');
-    if (+o.Is_Adc) roles.push('Бот (стрелок)');
-    if (+o.Is_Support) roles.push('Поддержка');
-    return {
-      en: o.Champion,
-      stats: {
-        ad: [num(o.AD_Base), num(o.AD_Growth)],
-        hp: [num(o.HP_Base), num(o.HP_Growth)],
-        mana: [num(o.Mana_Base), num(o.Mana_Growth)],
-        armor: [num(o.Armor_Base), num(o.Armor_Growth)],
-        mr: [num(o.MR_Base), num(o.MR_Growth)],
-        as: [num(o.AS_Base), num(o.AS_Growth)],
-      },
-      resource: o.Resource || '',
-      roles,
-    };
+    return mapChampRow(o);
   }).filter(x => x.en);
 }
 
@@ -203,11 +236,11 @@ function buildWinrateIndex(winrateDocs) {
 
 // ── shared HTML shell ──────────────────────────────────────────────────────
 const CSS = `
-:root{--bg:#010A13;--bg2:#011520;--card:rgba(1,15,32,.6);--accent:#0BC4E3;--gold:#C89B3C;
---tx:#fff;--tx2:rgba(255,255,255,.72);--tx3:rgba(255,255,255,.42);--bd:rgba(11,196,227,.2)}
+:root{--bg:#010A13;--bg2:#011520;--card:rgba(1,15,32,.6);--accent:#ffffff;--gold:#C89B3C;
+--tx:#fff;--tx2:rgba(255,255,255,.72);--tx3:rgba(255,255,255,.42);--bd:rgba(255, 255, 255,.2)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.6 system-ui,'Segoe UI',Roboto,sans-serif;
-background-image:radial-gradient(ellipse at 20% 0%,rgba(11,196,227,.07),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(40,20,80,.25),transparent 55%)}
+background-image:radial-gradient(ellipse at 20% 0%,rgba(255, 255, 255,.07),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(40,20,80,.25),transparent 55%)}
 a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .wrap{max-width:1080px;margin:0 auto;padding:0 18px}
 header.top{border-bottom:1px solid var(--bd);background:rgba(1,10,19,.85);position:sticky;top:0;z-index:5;backdrop-filter:blur(8px)}
@@ -229,7 +262,7 @@ table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
 th,td{padding:7px 10px;text-align:right;border-bottom:1px solid rgba(255,255,255,.07)}
 th:first-child,td:first-child{text-align:left}
 thead th{color:var(--accent);font-weight:600;border-bottom:1px solid var(--bd)}
-tbody tr:hover{background:rgba(11,196,227,.05)}
+tbody tr:hover{background:rgba(255, 255, 255,.05)}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;margin:14px 0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}
 .gcard{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center}
@@ -308,72 +341,188 @@ PRO WILDRIFT — статы чемпионов, винрейты, предмет
 }
 
 // ── champion page ──────────────────────────────────────────────────────────
-function champRows(stats) {
-  const order = [['hp', 'Здоровье'], ['ad', 'Атака (AD)'], ['armor', 'Броня'], ['mr', 'Сопр. магии'], ['mana', 'Мана'], ['as', 'Скор. атаки']];
-  const lvls = [1, 5, 10, 15];
-  let head = '<tr><th>Параметр</th>' + lvls.map(l => `<th>Ур. ${l}</th>`).join('') + '<th>За уровень</th></tr>';
-  let rows = '';
-  for (const [key, label] of order) {
-    const [b, g] = stats[key];
-    if (!b && !g) continue;
-    const at = (l) => { const v = b + (l - 1) * g; return Math.round(v * 100) / 100; };
-    rows += `<tr><td>${label}</td>` + lvls.map(l => `<td>${at(l)}</td>`).join('') + `<td>${g ? '+' + (Math.round(g * 100) / 100) : '—'}</td></tr>`;
-  }
-  return `<table><thead>${head}</thead><tbody>${rows}</tbody></table>`;
+// Э1.9: страница чемпа = SEO-страница. Разметку печатает champ-page.js (тот же
+// модуль, что и в приложении), здесь — только СБОРКА данных из файлов робота и
+// Firestore + документная обвязка (мета, JSON-LD, рельс, подвал).
+
+const DATA = {
+  abils: loadJSON('data-pipeline/champion-abilities.json'),
+  qual: loadJSON('data-pipeline/champion-qualities.json'),
+  wrStats: loadJSON('data-pipeline/wr-stats.json'),
+  counters: loadJSON('data-pipeline/counters.json'),
+  guideIndex: loadJSON('data-pipeline/guides/_index.json'),
+};
+
+// Ключ соединения всех датасетов — ddragon-id. У каждого источника свои имена
+// («Kogmaw» / «Kog'Maw» / «КОГ'МАО»), поэтому сводим их одним ключом.
+const gnorm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+function ddKey(en) { const c = canonEn(en); return gnorm(DD_ID[c] || c); }
+
+const byKey = (map, en) => map.get(ddKey(en)) || null;
+
+const abilsMap = new Map();
+for (const c of (DATA.abils?.champions || [])) {
+  abilsMap.set(gnorm(c.dd || c.en), c.abilities || []);
+  if (c.ru) RU_DD[gnorm(c.dd || c.en)] = c.ru;
 }
 
-function championPage(c, wrIndex) {
+const qualMap = new Map();
+for (const q of (DATA.qual?.champions || [])) {
+  qualMap.set(gnorm(q.id || q.name), { damage: q.damage, difficult: q.difficult, survive: q.survive, utility: q.utility });
+}
+
+// wr-stats: снимок робота. Берём срез «все ранги», иначе ближайший доступный.
+const RANK_PREF = ['all', 'diamond_plus', 'master_plus', 'challenger', 'apex'];
+const wrMetaMap = new Map();
+for (const e of (DATA.wrStats?.champions || [])) {
+  const k = gnorm(DD_ID[canonEn(e.nameEN || e.name)] || canonEn(e.nameEN || e.name));
+  const cur = wrMetaMap.get(k);
+  const rank = RANK_PREF.indexOf(e.rank);
+  if (rank < 0) continue;
+  if (!cur || rank < cur._r) {
+    wrMetaMap.set(k, { _r: rank, tier: e.tier, wr: e.wr, pr: e.pr, br: e.br, trend: e.wrTrend, role: e.role });
+  }
+}
+
+const countersRaw = new Map();
+for (const [name, v] of Object.entries(DATA.counters?.champions || {})) countersRaw.set(ddKey(name), v);
+
+// Винрейт по рангам — из того же снимка робота, что показывает вид WinRate в
+// приложении. Firestore-коллекция winrates осталась за тир-листом: если брать её
+// сюда, страница и приложение показывали бы РАЗНЫЕ проценты одному человеку.
+const WR_RANK_RU = { diamond_plus: 'Алмаз+', master_plus: 'Мастер+', challenger: 'Челленджер', apex: 'Суверен', all: 'Все ранги' };
+const WR_ROLE_RU = { baron: 'Топ', jungle: 'Лес', mid: 'Мид', dragon: 'Бот', support: 'Поддержка' };
+const wrRanksMap = new Map();
+for (const e of (DATA.wrStats?.champions || [])) {
+  const rank = WR_RANK_RU[e.rank], role = WR_ROLE_RU[String(e.role || '').toLowerCase()];
+  if (!rank || !role) continue;
+  const k = gnorm(DD_ID[canonEn(e.nameEN || e.name)] || canonEn(e.nameEN || e.name));
+  const arr = wrRanksMap.get(k) || [];
+  arr.push({ rank, role, wr: e.wr, pr: e.pr });
+  wrRanksMap.set(k, arr);
+}
+
+const guideSlugMap = new Map();
+for (const g of (DATA.guideIndex?.champions || [])) guideSlugMap.set(ddKey(g.name), g.slug);
+function loadGuide(en) {
+  const s = guideSlugMap.get(ddKey(en));
+  return s ? loadJSON(`data-pipeline/guides/${s}.json`) : null;
+}
+
+// slug из гайда → наше имя чемпа (в гайдах имена набраны КАПСОМ по-русски)
+let slugToEn = new Map();
+function muNameOf(m) {
+  const en = slugToEn.get(m.slug);
+  return en ? { name: ruName(en), en } : { name: ChampPage.prettyCaps(m.name), en: '' };
+}
+function counterNameOf(s) {
+  const en = slugToEn.get(s);
+  return en ? ruName(en) : ChampPage.unslug(s);
+}
+
+const patchMap = new Map(); // заполняется в main() из Firestore
+
+function champData(c) {
+  const guide = loadGuide(c.en);
+  return ChampPage.buildData({
+    name: c.en,
+    ru: ruName(c.en),
+    en: prettyEn(c.en),
+    slug: slug(c.en),
+    icon: champIcon(c.en),
+    roles: c.roles,
+    res: c.resource,
+    stats: {
+      ad: c.stats.ad, hp: c.stats.hp, mana: c.stats.mana, armor: c.stats.armor,
+      mr: c.stats.mr, rng: c.stats.rng, as: c.stats.as, ms: c.stats.ms,
+      hpreg: c.stats.hpreg, mpreg: c.stats.mpreg,
+    },
+    meta: wrMetaMap.get(ddKey(c.en)) || null,
+    qual: byKey(qualMap, c.en),
+    abils: abilsMap.get(ddKey(c.en)) || [],
+    guide,
+    mu: ChampPage.pickMatchups(guide, muNameOf),
+    counters: ChampPage.mergeCounters(countersRaw.get(ddKey(c.en)), counterNameOf),
+    patch: patchMap.get(ddKey(c.en)) || null,
+  });
+}
+
+// Оболочка документа страницы чемпа: канон-токены + champ-page.css + рельс.
+// Отдельная от htmlDoc намеренно — у остальных SEO-страниц свой лёгкий шаблон,
+// а тут должен быть ТОТ ЖЕ вид, что в приложении.
+function champDoc({ title, desc, canonical, ogImage, jsonld, body }) {
+  const ld = jsonld.map(b => `<script type="application/ld+json">${JSON.stringify(b)}</script>`).join('\n');
+  return `<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}">
+<link rel="canonical" href="${canonical}">
+<meta property="og:type" content="article">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(desc)}">
+<meta property="og:url" content="${canonical}">
+<meta property="og:image" content="${ogImage}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/icon.svg">
+<link rel="stylesheet" href="/canon-tokens.css?v=2">
+<link rel="stylesheet" href="/champ-page.css?v=1">
+${ld}
+</head>
+<body class="cp-page">
+<div class="cp-bg"></div>
+<div class="cp-wrap">
+${ChampPage.railHTML('/champions/')}
+<main class="cp-main">
+${body}
+</main>
+</div>
+<footer class="cp-foot">
+PRO WILDRIFT — статы чемпионов, винрейты, предметы, руны и инструменты для League of Legends: Wild Rift.
+Данные обновляются вместе с патчами. <a href="/">Открыть приложение →</a>
+</footer>
+<script src="/champ-page.js?v=1" defer></script>
+</body>
+</html>`;
+}
+
+function championPage(c) {
   const ru = ruName(c.en);
   const url = `${SITE}/champions/${slug(c.en)}/`;
   const rolesTxt = c.roles.length ? c.roles.join(', ') : 'разные линии';
-  const resTxt = c.resource && c.resource.toLowerCase() !== 'mana' && c.resource !== 'Мана'
-    ? ` Ресурс — ${esc(c.resource)}.` : (c.stats.mana[0] ? ' Использует ману.' : ' Не использует ману.');
 
-  const wr = (wrIndex[norm(canonEn(c.en))] || []);
-  let wrSection = '';
-  if (wr.length) {
-    const rankOrder = ['Челленджер', 'Грандмастер', 'Мастер', 'Алмаз', 'Суверен'];
-    wr.sort((a, b) => rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank));
-    let rows = wr.map(e => `<tr><td>${esc(e.rank)}</td><td>${esc(e.role)}</td><td>${e.wr != null ? e.wr + '%' : '—'}</td><td>${e.pr != null ? e.pr + '%' : '—'}</td></tr>`).join('');
-    wrSection = `<h2>Винрейт ${esc(ru)} по рангам</h2>
-<p class="lead">Актуальный процент побед и популярность ${esc(ru)} в Wild Rift на текущем патче.</p>
-<div class="card"><table><thead><tr><th>Ранг</th><th>Линия</th><th>Винрейт</th><th>Пикрейт</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  }
+  const d = champData(c);
+  // Винрейт по рангам — таблица живёт в секции «Мета»
+  const rankOrder = ['Алмаз+', 'Мастер+', 'Челленджер', 'Суверен', 'Все ранги'];
+  d.wrRanks = (wrRanksMap.get(ddKey(c.en)) || [])
+    .slice()
+    .sort((a, b) => rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank));
 
-  const title = `${ru} Wild Rift — статы по уровням, винрейт и сборка`;
-  const desc = `${ru} в Wild Rift: базовые характеристики на уровнях 1–15 (здоровье, атака, броня), линии (${rolesTxt}) и актуальный винрейт по рангам.`;
+  const iconOf = (m) => (m.en ? champIcon(m.en) : champIcon(m.name));
+  const body = ChampPage.renderHTML(d, { mode: 'static', level: 10, iconOf });
 
-  const body = `
-<div class="hero">
-  <img src="${champIcon(c.en)}" alt="${esc(ru)} Wild Rift" width="84" height="84" loading="eager">
-  <div>
-    <h1>${esc(ru)} — Wild Rift</h1>
-    <div class="tags">${c.roles.map(r => `<span class="tag">${esc(r)}</span>`).join('')}</div>
-  </div>
-</div>
-<p class="lead">${esc(ru)} (${esc(prettyEn(c.en))}) — чемпион League of Legends: Wild Rift. Играется на позициях: ${esc(rolesTxt)}.${resTxt} Ниже — базовые характеристики по уровням и винрейт по рангам.</p>
+  const wrTxt = d.meta && d.meta.wr != null ? ` Винрейт сейчас — ${d.meta.wr}%.` : '';
+  const title = `${ru} Wild Rift — гайд: билд, руны, статы и матчапы`;
+  const desc = `${ru} в Wild Rift: рекомендуемая сборка и руны, характеристики на уровнях 1–15, умения, матчапы и винрейт по рангам. Линии: ${rolesTxt}.${wrTxt}`;
 
-<h2>Характеристики ${esc(ru)} по уровням</h2>
-<div class="card">${champRows(c.stats)}</div>
-<p class="muted">Значения посчитаны как «база + прирост за уровень». Полную таблицу всех чемпионов с сортировкой смотрите в <a href="/">интерактивном справочнике</a>.</p>
+  const jsonld = [
+    {
+      '@context': 'https://schema.org', '@type': 'Article',
+      headline: title, description: desc, mainEntityOfPage: url,
+      image: champIcon(c.en), inLanguage: 'ru',
+      publisher: { '@type': 'Organization', name: 'PRO WILDRIFT', url: SITE },
+    },
+    {
+      '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+      itemListElement: [['/', 'Главная'], ['/champions/', 'Чемпионы'], [url, ru]].map((p, i) => ({
+        '@type': 'ListItem', position: i + 1, name: p[1], item: absUrl(p[0]),
+      })),
+    },
+  ];
 
-${wrSection}
-
-<a class="cta" href="/">Открыть ${esc(ru)} в калькуляторе урона и драфтере →</a>
-`;
-
-  const jsonld = {
-    '@context': 'https://schema.org', '@type': 'Article',
-    headline: title, description: desc, mainEntityOfPage: url,
-    image: champIcon(c.en), inLanguage: 'ru',
-    publisher: { '@type': 'Organization', name: 'PRO WILDRIFT', url: SITE },
-  };
-
-  return htmlDoc({
-    title, desc, canonical: url, ogImage: champIcon(c.en), jsonld,
-    crumbTrail: [['/', 'Главная'], ['/champions/', 'Чемпионы'], [url, ru]],
-    body,
-  });
+  return champDoc({ title, desc, canonical: url, ogImage: champIcon(c.en), jsonld, body });
 }
 
 function championsIndex(champs) {
@@ -645,21 +794,30 @@ const urls = []; // for sitemap: {loc, priority}
 async function main() {
   console.log('[seo] fetching data…');
   await resolveDDV();
-  const [champs, winrateDocs, items, runes] = await Promise.all([
+  const [champs, winrateDocs, items, runes, patchnotes] = await Promise.all([
     fetchChampions(),
     fetchCollection('winrates').catch(e => { console.warn('[seo]', e.message); return []; }),
     fetchCollection('items').catch(e => { console.warn('[seo]', e.message); return []; }),
     fetchCollection('runes').catch(e => { console.warn('[seo]', e.message); return []; }),
+    fetchCollection('patchnotes').catch(e => { console.warn('[seo]', e.message); return []; }),
   ]);
-  console.log(`[seo] champions: ${champs.length}, winrate ranks: ${winrateDocs.length}, items: ${items.length}, runes: ${runes.length}`);
+  console.log(`[seo] champions: ${champs.length}, winrate ranks: ${winrateDocs.length}, items: ${items.length}, runes: ${runes.length}, patchnotes: ${patchnotes.length}`);
   console.log(`[seo] name map RU->EN: ${Object.keys(RU2EN).length} entries`);
+
+  // slug → EN: нужен, чтобы имена матчапов из гайдов (набраны КАПСОМ) показывались
+  // по-человечески и вели на существующие страницы.
+  slugToEn = new Map(champs.map(c => [slug(c.en), c.en]));
+  for (const p of patchnotes) {
+    if (!p || !p.champion) continue;
+    patchMap.set(ddKey(p.champion), { type: p.type, patch: p.patch, change: p.change });
+  }
 
   const wrIndex = buildWinrateIndex(winrateDocs);
 
   // Phase A: champions
   let wrHit = 0;
   for (const c of champs) {
-    writePage(`champions/${slug(c.en)}`, championPage(c, wrIndex));
+    writePage(`champions/${slug(c.en)}`, championPage(c));
     urls.push({ loc: `${SITE}/champions/${slug(c.en)}/`, priority: '0.8' });
     if ((wrIndex[norm(canonEn(c.en))] || []).length) wrHit++;
   }

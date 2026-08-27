@@ -1,36 +1,127 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-glass="on">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Main-Lab · песочница главного экрана</title>
-  <link rel="stylesheet" href="main-lab.css?v=21">
+  <title>lab-main — главный экран (канон)</title>
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="main-lab.css?v=39">
 </head>
 <body>
+  <!-- ГЛОБАЛЬНЫЙ СПЛЭШ-АРТ: один на весь лаб, fixed, за всем стеклом -->
+  <div class="splash" aria-hidden="true"></div>
 
-  <header class="ml-head">
-    <h1 class="ml-title">
-      ✦ Main-Lab
-      <small>песочница раскладок и анимаций главного экрана · не индексируется, не на сайте</small>
-    </h1>
-
-    <div class="ml-controls" id="mlControls"></div>
-  </header>
-
-  <main class="ml-stage" id="mlStage">
-    <!-- Мини-карта раскладок -->
-    <div class="ml-layouts" id="mlLayouts"></div>
-
-    <!-- Сам макет главной -->
-    <div class="ml-frame-wrap">
-      <div class="ml-frame" id="mlFrame"></div>
+  <!-- ДЕВ-ПОЛОСА (инструмент для НАС): тёмный солид, плавающая, перетаскиваемая, НЕ стекло -->
+  <div class="lab-strip" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ Дизайн-полоса · главный экран</span>
+      <button class="strip-min-btn" id="stripMin">Свернуть</button>
     </div>
-  </main>
+    <div class="strip-body">
+      <div class="strip-group"><label>Навигация</label>
+        <div class="seg" id="optNav"><button data-v="rail" class="active">Рельс</button><button data-v="top">Верхн. панель</button></div>
+      </div>
+      <div class="strip-group"><label>Вкладки-виды</label>
+        <div class="seg" id="optTabs"><button data-v="pill" class="active">Пилюли</button><button data-v="line">Подчёрк.</button><button data-v="min">Минимал</button></div>
+      </div>
+      <div class="strip-group"><label>Плотность таблиц</label>
+        <div class="seg" id="optDens"><button data-v="cozy">Просторно</button><button data-v="normal" class="active">Средне</button><button data-v="dense">Плотно</button></div>
+      </div>
+      <div class="strip-group"><label>Ширина контента</label>
+        <div class="seg" id="optWidth"><button data-v="full">Полная (болезнь)</button><button data-v="wide" class="active">Канон 1400</button><button data-v="narrow">Узко</button></div>
+      </div>
+      <div class="strip-group"><label>Правая колонка</label>
+        <div class="seg" id="optRight"><button data-v="swap" class="active">Свап (как боевой)</button><button data-v="card">Карточка на обоих</button><button data-v="off">Выкл</button></div>
+      </div>
+      <div class="strip-group"><label>Вид пикера</label>
+        <div class="seg" id="optPick"><button data-v="tile" class="active">Плитка</button><button data-v="dense">Плотная сетка</button><button data-v="card">Крупные карточки</button><button data-v="list">Список + WR</button><button data-v="chip">Чипы</button><button data-v="badge">Бейдж WR</button></div>
+      </div>
+      <div class="strip-group"><label>Размер аватарок</label>
+        <div class="seg" id="optPkSize"><button data-v="s">Мелкий</button><button data-v="m" class="active">Средний</button><button data-v="l">Крупный</button></div>
+      </div>
+      <div class="strip-group"><label>Шторка на ховере</label>
+        <div class="seg" id="optShade"><button data-v="wr" class="active">WR</button><button data-v="wrpr">WR + Pick</button><button data-v="roles">WR по ролям</button><button data-v="off">Выкл</button></div>
+      </div>
+      <div class="strip-group"><label>Блок уровня</label>
+        <div class="seg" id="optLvl"><button data-v="pills" class="active">Пилюли 1-15</button><button data-v="slider">Ползунок</button><button data-v="steps">Вехи</button><button data-v="compact">Компакт</button></div>
+      </div>
+      <div class="strip-group"><label>Тултип роста стата</label>
+        <div class="seg" id="optTip"><button data-v="cursor" class="active">У курсора</button><button data-v="cell">У ячейки</button><button data-v="row">Строкой снизу</button></div>
+      </div>
+      <div class="strip-group"><label>Патч-изменения</label>
+        <div class="seg" id="optPatch"><button data-v="dot" class="active">Точка</button><button data-v="cellhl">Подсветка ячейки</button><button data-v="arrow">Стрелка с дельтой</button></div>
+      </div>
+      <div class="strip-group"><label>Заливка по рейтингу</label>
+        <div class="seg" id="optFill"><button data-v="none">Нет</button><button data-v="weak">Слабо</button><button data-v="mid" class="active">Средне</button><button data-v="bright">Ярко</button></div>
+      </div>
+      <div class="strip-group"><label>Форма заливки</label>
+        <div class="seg" id="optFillShape"><button data-v="cell" class="active">Вся ячейка</button><button data-v="digit">Только цифра</button><button data-v="bar">Полоска</button></div>
+      </div>
+      <div class="strip-group"><label>Иконки статов</label>
+        <div class="seg" id="optIcons"><button data-v="color" class="active">Цветные</button><button data-v="mono">Монохром</button></div>
+      </div>
+      <div class="strip-group"><label>Фильтр ролей</label>
+        <div class="seg" id="optRoleView"><button data-v="icons" class="active">Только иконки</button><button data-v="both">Иконка+текст</button><button data-v="compact">Компакт</button></div>
+      </div>
+      <div class="strip-group"><label>Форма вкладки (рельс свёрнут)</label>
+        <div class="seg" id="optRailShape"><button data-v="circle" class="active">Круглый островок</button><button data-v="squircle">Squircle</button><button data-v="bar">Полоска сбоку</button><button data-v="glow">Свечение</button></div>
+      </div>
+      <div class="strip-group"><label>Ховер рельса</label>
+        <div class="seg" id="optRailHover"><button data-v="plate" class="active">Плашка</button><button data-v="icon">Только иконка</button></div>
+      </div>
+      <div class="strip-group"><label>Шапка таблицы</label>
+        <div class="seg" id="optSticky"><button data-v="off" class="active">Обычная</button><button data-v="on">Липкая</button></div>
+      </div>
+      <div class="strip-group"><label>Ховер строки</label>
+        <div class="seg" id="optHover"><button data-v="white" class="active">Бело-стекло</button><button data-v="accent">Акцент</button><button data-v="edge">Кант</button></div>
+      </div>
+      <div class="strip-group"><label>Спарклайн (WR)</label>
+        <div class="seg" id="optSpark"><button data-v="on" class="active">Показ</button><button data-v="off">Скрыть</button></div>
+      </div>
+      <div class="strip-group"><label>Тёмность STRONG <span id="strongVal">0.60</span></label>
+        <input type="range" class="strip-range" id="strongRange" min="0.46" max="0.75" step="0.01" value="0.60">
+      </div>
+      <div class="strip-choice" id="choiceText">Ваш выбор: …</div>
+      <button class="strip-copy" id="stripCopy">📋 Скопировать мой выбор</button>
+    </div>
+  </div>
 
-  <div class="ml-toast" id="mlToast"></div>
+  <div class="app rail-overlay" id="app" data-tabs="pill" data-sticky="off" data-hover="white" data-spark="on"
+       data-rightcol="select" data-pick="tile" data-pksize="m" data-shade="on" data-railshape="circle" data-icons="color" data-railhover="plate" data-champshade="on">
+    <!-- РЕЛЬС Suno: ОДИН стеклянный элемент, раскрытие по hover -->
+    <nav class="rail glass" id="rail" aria-label="Навигация">
+      <div class="rail-items">
+        <button class="rail-btn active" data-section="home"><span class="ico">◎</span><span class="lbl">Home</span></button>
+        <button class="rail-btn" data-section="champs"><span class="ico">👥</span><span class="lbl">Чемпионы</span></button>
+        <button class="rail-btn" data-section="calc"><span class="ico">⚔</span><span class="lbl">Калькулятор</span></button>
+        <button class="rail-btn" data-section="items"><span class="ico">📦</span><span class="lbl">Предметы</span></button>
+        <button class="rail-btn" data-section="runes"><span class="ico">💎</span><span class="lbl">Руны</span></button>
+        <button class="rail-btn" data-section="draft"><span class="ico">📋</span><span class="lbl">Драфтер</span></button>
+      </div>
+      <button class="rail-btn rail-gear" id="gearBtn"><span class="ico">⚙</span><span class="lbl">Настройки</span></button>
+    </nav>
 
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
-  <script src="main-lab.js?v=21"></script>
+    <!-- ГЛАВНАЯ ОБЛАСТЬ: контент рендерит JS -->
+    <main class="stage" id="stage"></main>
+  </div>
+
+  <!-- ⚙ ПОПАП НАСТРОЕК ЮЗЕРА: стекло. Только арт + акцент (blur/тёмность/сила = утв. дефолты) -->
+  <div class="settings-pop glass" id="settingsPop" hidden>
+    <div class="set-head"><b>⚙ Настройки</b><button class="set-close" id="setClose" aria-label="Закрыть">✕</button></div>
+    <div id="ssHost"></div>
+    <div class="set-block">
+      <label>Акцент</label>
+      <div class="swatches">
+        <button class="sw active" data-accent="#ffffff" style="--sw:#ffffff" title="Циан"></button>
+        <button class="sw" data-accent="#C89B3C" style="--sw:#C89B3C" title="Золото"></button>
+        <button class="sw" data-accent="#9B6BFF" style="--sw:#9B6BFF" title="Фиолет"></button>
+        <button class="sw" data-accent="#4ADE80" style="--sw:#4ADE80" title="Зелёный"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="main-lab.js?v=39"></script>
 </body>
 </html>

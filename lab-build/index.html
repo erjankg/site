@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on" data-inner="on" data-edge="on" data-edge2="on" data-vignette="on">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>lab-build — билд-симулятор «Сборка»</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="preconnect" href="https://www.wildriftfire.com">
+<link rel="stylesheet" href="../canon-tokens.css?v=1">
+<link rel="stylesheet" href="build-lab.css?v=5">
+</head>
+<body>
+  <div class="splash" id="splash" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- ДЕВ-ПОЛОСА (для НАС): тёмный солид, плавающая, драг за грип, оверлеем -->
+  <div class="lab-strip" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ Дизайн-полоса — Сборка</span>
+      <button class="strip-min" id="stripMin">Свернуть</button>
+    </div>
+    <div class="strip-body">
+      <div class="strip-group"><label>Раскладка</label><div class="seg" data-k="layout">
+        <button data-v="side" class="on">Я | Цель рядом</button><button data-v="stack">Стек</button></div></div>
+      <div class="strip-group"><label>Пикеры</label><div class="seg" data-k="pick">
+        <button data-v="grid" class="on">Сетка</button><button data-v="list">Список</button></div></div>
+      <div class="strip-group"><label>Панель цели</label><div class="seg" data-k="tgt">
+        <button data-v="preset" class="on">Пресеты</button><button data-v="slider">Ползунки</button></div></div>
+      <div class="strip-group"><label>Результат</label><div class="seg" data-k="res">
+        <button data-v="tabs" class="on">Вкладки</button><button data-v="all">Всё сразу</button></div></div>
+      <div class="strip-group"><label>Спайки</label><div class="seg" data-k="spike">
+        <button data-v="bars" class="on">Бары</button><button data-v="line">Линия</button></div></div>
+      <div class="strip-group"><label>Плотность</label><div class="seg" data-k="density">
+        <button data-v="air">Просторно</button><button data-v="normal" class="on">Средне</button><button data-v="dense">Плотно</button></div></div>
+      <button class="strip-copy" id="stripCopy">📋 Скопировать мой выбор</button>
+      <div class="strip-choice">Ваш выбор: <b id="choiceText">…</b></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="lab-h">
+      <h1>Сборка — симулятор урона <span class="demo">демо-данные</span></h1>
+      <p>Собери «Я», задай «Цель», добавь условия — пересчёт мгновенный. Пассивы в gold-эфф не входят.</p>
+    </div>
+
+    <!-- ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ -->
+    <div class="modes glass" data-depth="2" id="modes">
+      <button class="mode-btn on" data-mode="loadout">🎒 Сборка</button>
+      <button class="mode-btn" data-mode="sim">📊 Симулятор</button>
+    </div>
+
+    <!-- РЕЖИМ 1: СБОРКА / LOADOUTS (игровой экран) -->
+    <div id="secLoadout">
+      <section class="loadout glass" id="loadout"></section>
+    </div>
+
+    <!-- РЕЖИМ 2: СИМУЛЯТОР -->
+    <div id="secSim" hidden>
+      <section class="cond glass" id="cond"></section>
+
+      <div class="board lay-side" id="board">
+        <section class="side side-me glass" id="sideMe"></section>
+        <section class="side side-tgt glass" id="sideTgt"></section>
+      </div>
+
+      <section class="result glass" id="result"></section>
+    </div>
+  </div>
+
+  <div id="pickHost"></div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="../calc-app/champ-base.js"></script>
+  <script src="build-lab.js?v=5"></script>
+</body>
+</html>

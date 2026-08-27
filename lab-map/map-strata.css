@@ -1,0 +1,294 @@
+/* ============================================================
+   lab-map → под-вкладка «СТРАТА» (тактич-доска, полный порт board.js)
+   Логика доски = 1-в-1 из tactics-board. Презентация ПЕРЕСОБРАНА по DESIGN.md:
+   — своё стекло/градиент-заголовок/акцент-глоу СНЕСЕНЫ (не «переодеты»);
+   — панели = .glass + токены; выделение БЕЛОЕ, не акцент;
+   — цвет остался ТОЛЬКО функциональный: синяя/красная команда, варды.
+   ГОЧА: layout-editor вешает transform → transform живёт на .tb-panel (НЕ стекло),
+   стекло на статичном .tb-panel-in. Иначе backdrop-filter умирает.
+   ============================================================ */
+
+.strata-layout.active { display: flex; flex-direction: column; min-height: 0; }
+
+.tb-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 250px 1fr 250px;
+  gap: var(--sp-5);
+  min-height: 0;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* боковая колонка: команда + панели, тонкий скролл если не влезает */
+.tb-side { display: flex; flex-direction: column; gap: var(--sp-3); min-height: 0; overflow-y: auto; overflow-x: hidden; }
+
+.tb-side::-webkit-scrollbar { width: 8px; }
+.tb-side::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .18); border-radius: 8px; }
+.tb-side::-webkit-scrollbar-track { background: transparent; }
+
+/* ВНЕШНЯЯ обёртка = цель layout-editor (transform сюда). Стекла тут НЕТ. */
+.tb-panel { flex: none; }
+/* ВНУТРЕННИЙ слой = стекло, НЕ трансформируется */
+.tb-panel-in { padding: 12px; display: flex; flex-direction: column; gap: 7px; }
+
+.tb-panel-title {
+  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+  color: var(--txt-dim); margin-bottom: 2px;
+}
+.tb-status { font-size: 11px; color: var(--txt-dim); margin-top: 2px; }
+
+/* ── кнопки-инструменты: выделение ЯРЧЕ БЕЛОГО (канон), без цветного кольца/глоу ── */
+.tb-tool, .tb-mirror-btn, .tb-mp-btn, .tb-edit-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  width: 100%; justify-content: flex-start;
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid var(--sel-09);
+  border-radius: 10px;
+  color: var(--txt); font-size: 13px; font-weight: 600; font-family: inherit;
+  cursor: pointer; white-space: nowrap; text-shadow: var(--txt-shadow);
+  transition: background var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-overshoot);
+}
+.tb-tool:hover, .tb-mirror-btn:hover, .tb-mp-btn:hover, .tb-edit-toggle:hover {
+  background: var(--sel-12); transform: translateY(-1px);
+}
+.tb-tool:active, .tb-mirror-btn:active, .tb-mp-btn:active { transform: translateY(0); }
+.tb-tool-active { background: var(--sel-18); border-color: rgba(255, 255, 255, .3); }
+.tb-tool-icon { font-size: 14px; }
+
+/* варды: чип = функциональный цвет */
+.tb-ward-chip { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 2px solid rgba(0, 0, 0, .4); }
+.tb-ward-chip-ally  { background: rgb(var(--tb-ward-ally-rgb)); }
+.tb-ward-chip-enemy { background: rgb(var(--tb-ward-enemy-rgb)); }
+
+.tb-clear-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.tb-clear-btn {
+  padding: 6px 11px; background: transparent; border: 1px solid var(--sel-09);
+  border-radius: 9px; color: var(--txt-dim); font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit; text-align: center;
+  transition: background var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+.tb-clear-btn:hover { background: var(--sel-12); color: var(--txt); }
+/* «Всё» — единственная деструктивная, цвет функциональный (предупреждение) */
+.tb-clear-all { color: var(--team-red); border-color: rgba(230, 70, 70, .35); }
+.tb-clear-all:hover { background: rgba(230, 70, 70, .18); color: #fff; }
+
+.tb-edit-toggle { margin-top: 2px; }
+.tb-edit-toggle.tb-edit-on { background: var(--sel-18); border-color: rgba(255, 255, 255, .3); }
+
+/* ── команды ── */
+.tb-side-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--sel-09);
+}
+.tb-side-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.tb-side-dot-blue { background: var(--team-blue); }
+.tb-side-dot-red  { background: var(--team-red); }
+.tb-side-title { font-weight: 800; font-size: 13px; letter-spacing: .5px; text-transform: uppercase; }
+
+.tb-team-slots { display: grid; gap: 8px; }
+.tb-slot {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--sel-09);
+  border-radius: 10px; color: var(--txt); cursor: pointer;
+  font-family: inherit; text-align: left; width: 100%;
+  text-shadow: var(--txt-shadow);
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.tb-slot:hover { background: var(--sel-12); }
+.tb-slot-plus {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  background: rgba(255, 255, 255, .08); color: var(--txt-dim);
+  font-size: 20px; font-weight: 300; flex-shrink: 0; overflow: hidden; text-shadow: none;
+}
+.tb-slot-label { color: var(--txt-dim); font-size: 12px; font-weight: 600; }
+.tb-slot.tb-slot-filled .tb-slot-plus { background: none; padding: 0; }
+.tb-slot.tb-slot-filled .tb-slot-plus img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.tb-slot.tb-slot-filled .tb-slot-label { color: var(--txt); font-weight: 700; }
+/* принадлежность к стороне = функциональная полоска, не покраска всей кнопки */
+.tb-blue-side .tb-slot { border-left: 2px solid rgba(60, 160, 230, .55); }
+.tb-red-side  .tb-slot { border-left: 2px solid rgba(230, 70, 70, .55); }
+
+/* ── ДОСКА (карта). Стекло тут НЕ нужно: карта — это арт, её не размывают ── */
+.tb-board-wrap { display: flex; justify-content: center; align-items: center; min-height: 0; }
+.tb-board {
+  position: relative;
+  aspect-ratio: 1 / 1; height: 100%; max-height: 100%; max-width: 100%;
+  border-radius: var(--ds-r); overflow: hidden;
+  background: #040a11;
+  border: 1px solid var(--glass-bd-c);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, calc(.5 * var(--sh-k)));
+  user-select: none; touch-action: none;
+  container-type: inline-size;   /* для cqw-радиуса вардов (containment без paint) */
+}
+.tb-map-bg, .tb-arrows-layer { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.tb-map-bg {
+  object-fit: cover; object-position: center;
+  pointer-events: none; user-select: none; -webkit-user-drag: none;
+  transition: transform var(--dur-slow) var(--ease-standard);
+}
+.tb-map-bg.tb-mirrored { transform: scale(-1, -1); }
+.tb-arrows-layer { pointer-events: auto; z-index: 2; }
+.tb-arrows-layer .tb-arrow-vis { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.tb-arrows-layer .tb-arrow-hit { fill: none; stroke: transparent; stroke-width: 22; stroke-linecap: round; stroke-linejoin: round; pointer-events: stroke; cursor: grab; }
+.tb-arrows-layer .tb-pen { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; pointer-events: stroke; cursor: grab; }
+.tb-tokens-layer { position: absolute; inset: 0; z-index: 3; }
+
+/* ── токены чемпов: цвет стороны = функциональный ── */
+.tb-token {
+  position: absolute; width: 34px; height: 34px; border-radius: 50%; overflow: hidden;
+  border: 2px solid var(--team-blue);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .55);
+  cursor: grab; transform: translate(-50%, -50%);
+  background: #040a11; z-index: 5;
+  transition: box-shadow var(--dur-fast) var(--ease-standard);
+}
+.tb-token.tb-token-red { border-color: var(--team-red); }
+.tb-token img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.tb-token:hover { box-shadow: 0 6px 18px rgba(0, 0, 0, .7); }
+.tb-token-dragging { cursor: grabbing !important; z-index: 999; transform: translate(-50%, -50%) scale(1.08); }
+
+/* ── варды (точка + радиус обзора) ── */
+.tb-ward-on-map { position: absolute; width: 0; height: 0; transform: translate(-50%, -50%); z-index: 3; pointer-events: none; }
+.tb-ward-on-map .tb-ward-radius {
+  position: absolute; width: 8cqw; height: 8cqw; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none;
+}
+.tb-ward-on-map .tb-ward-dot {
+  position: absolute; width: 11px; height: 11px; top: 50%; left: 50%;
+  transform: translate(-50%, -50%); border-radius: 50%;
+  border: 2.5px solid rgba(0, 0, 0, .7); pointer-events: auto; cursor: grab;
+}
+.tb-ward-on-map.tb-w-ally  .tb-ward-radius { background: radial-gradient(circle, rgba(var(--tb-ward-ally-rgb), .30) 0%, rgba(var(--tb-ward-ally-rgb), .16) 55%, rgba(var(--tb-ward-ally-rgb), .04) 100%); border: 1.5px solid rgba(var(--tb-ward-ally-rgb), .5); }
+.tb-ward-on-map.tb-w-ally  .tb-ward-dot    { background: rgb(var(--tb-ward-ally-rgb)); }
+.tb-ward-on-map.tb-w-enemy .tb-ward-radius { background: radial-gradient(circle, rgba(var(--tb-ward-enemy-rgb), .30) 0%, rgba(var(--tb-ward-enemy-rgb), .16) 55%, rgba(var(--tb-ward-enemy-rgb), .04) 100%); border: 1.5px solid rgba(var(--tb-ward-enemy-rgb), .5); }
+.tb-ward-on-map.tb-w-enemy .tb-ward-dot    { background: rgb(var(--tb-ward-enemy-rgb)); }
+.tb-ward-on-map.tb-token-dragging { z-index: 999; }
+.tb-ward-on-map.tb-token-dragging .tb-ward-dot { cursor: grabbing !important; transform: translate(-50%, -50%) scale(1.15); }
+
+html[data-glass="on"] { --tb-ward-ally-rgb: 60, 160, 230; --tb-ward-enemy-rgb: 230, 70, 70; }
+
+/* курсоры по активному инструменту */
+.tb-board[data-tool="arrow"] { cursor: crosshair; }
+.tb-board[data-tool="ward-ally"], .tb-board[data-tool="ward-enemy"] { cursor: copy; }
+
+/* «вард слишком близко» — ЕДИНИЧНАЯ реакция на действие (0.3s), не infinite. Разрешено. */
+.tb-ward-too-close { animation: tbShake .3s var(--ease-standard); }
+@keyframes tbShake {
+  0%, 100% { transform: translate(-50%, -50%); }
+  25% { transform: translate(calc(-50% - 4px), -50%); }
+  75% { transform: translate(calc(-50% + 4px), -50%); }
+}
+
+/* режим калибровки карты */
+.tb-board.tb-calib { cursor: move; }
+.tb-board.tb-calib .tb-map-bg { transition: none; }
+.tb-board.tb-calib .tb-tokens-layer, .tb-board.tb-calib .tb-arrows-layer { pointer-events: none; }
+
+/* ── панель карты: поля/ползунок ── */
+.tb-mp-urlrow { display: flex; gap: 6px; }
+.tb-mp-urlrow .tb-mp-url { flex: 1; min-width: 0; }
+.tb-mp-urlrow .tb-mp-btn { width: auto; flex: none; }
+.tb-mp-url {
+  font-size: 12px; padding: 7px 10px; border-radius: 9px;
+  background: rgba(255, 255, 255, .06); border: 1px solid var(--sel-09);
+  color: var(--txt); outline: none; font-family: inherit;
+}
+.tb-mp-url:focus { border-color: rgba(255, 255, 255, .35); background: var(--sel-12); }
+.tb-mp-toggle.tb-mp-on { background: var(--sel-18); border-color: rgba(255, 255, 255, .3); }
+.tb-mp-reset { color: var(--txt-dim); }
+.tb-mp-scale { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--txt-dim); width: 100%; }
+.tb-mp-scale input[type=range] { flex: 1; width: auto; accent-color: #fff; }
+.tb-map-panel-hint { font-size: 11px; color: var(--txt-dim); line-height: 1.4; }
+
+.tb-colors { display: inline-flex; gap: 8px; align-items: center; padding: 4px 2px; }
+.tb-color { width: 18px; height: 18px; border-radius: 50%; padding: 0; cursor: pointer; border: 2px solid rgba(255, 255, 255, .25); }
+.tb-color.tb-color-active { border-color: #fff; box-shadow: 0 0 0 2px rgba(255, 255, 255, .35); }
+
+/* ── заметки на карте ── */
+.tb-note {
+  position: absolute; transform: translate(-50%, -50%); z-index: 6;
+  min-width: 40px; max-width: 220px; display: flex; align-items: stretch;
+  background: rgba(2, 9, 15, .9); border: 1px solid var(--glass-bd-c);
+  border-radius: 10px; box-shadow: 0 4px 14px rgba(0, 0, 0, .5); overflow: hidden;
+}
+.tb-note-grip {
+  flex: none; width: 16px; cursor: grab; background: rgba(255, 255, 255, .1);
+  display: flex; align-items: center; justify-content: center; color: var(--txt-dim);
+  font-size: 11px; user-select: none; touch-action: none;
+}
+.tb-note-text {
+  flex: 1; padding: 6px 9px; font-size: 13px; font-weight: 600; color: #fff;
+  outline: none; min-height: 1em; white-space: pre-wrap; word-break: break-word;
+}
+.tb-note-text:empty::before { content: 'текст…'; color: var(--txt-dim); }
+
+/* ══ ПИКЕР ЧЕМПОВ — инлайн-оверлей раздела. ОДИН scrim-токен, второго blur НЕТ ══ */
+.tb-picker { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.tb-picker[hidden] { display: none; }
+.tb-picker-backdrop { position: absolute; inset: 0; background: var(--scrim-bg); }
+.tb-picker-box {
+  position: relative; width: 100%; max-width: 900px; max-height: 85vh;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.tb-picker-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--sel-09); }
+.tb-picker-title { font-size: 15px; font-weight: 800; letter-spacing: .5px; color: var(--txt); }
+.tb-picker-search {
+  flex: 1; background: rgba(255, 255, 255, .07); border: 1px solid var(--sel-09);
+  border-radius: 10px; padding: 7px 12px; color: var(--txt); font-size: 14px;
+  font-family: inherit; outline: none;
+}
+.tb-picker-search:focus { border-color: rgba(255, 255, 255, .35); background: var(--sel-12); }
+.tb-picker-close {
+  background: transparent; border: none; color: var(--txt-dim); font-size: 26px;
+  cursor: pointer; width: 32px; height: 32px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-overshoot);
+}
+.tb-picker-close:hover { background: var(--sel-12); color: var(--txt); transform: rotate(90deg); }
+
+.tb-picker-roles { display: flex; gap: 6px; padding: 12px 18px 0; flex-wrap: wrap; }
+.tb-prole {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700;
+  padding: 6px 11px; border-radius: 10px; cursor: pointer; color: var(--txt-dim);
+  background: rgba(255, 255, 255, .05); border: 1px solid var(--sel-09);
+  font-family: inherit;
+  transition: background var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+.tb-prole img { width: 15px; height: 15px; object-fit: contain; }
+.tb-prole:hover { color: var(--txt); background: var(--sel-12); }
+.tb-prole.tb-prole-active { background: var(--sel-18); border-color: rgba(255, 255, 255, .3); color: var(--txt); }
+
+.tb-picker-grid {
+  flex: 1; overflow-y: auto; padding: 14px 18px 18px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px; align-content: start;
+}
+.tb-picker-grid::-webkit-scrollbar { width: 8px; }
+.tb-picker-grid::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .18); border-radius: 8px; }
+.tb-picker-loading { grid-column: 1 / -1; text-align: center; padding: 40px 0; color: var(--txt-dim); font-size: 14px; }
+.tb-pick {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 6px 4px; background: rgba(255, 255, 255, .05);
+  border: 1px solid transparent; border-radius: 10px; cursor: pointer;
+  font-family: inherit; color: var(--txt); text-shadow: var(--txt-shadow);
+  transition: background var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-overshoot);
+}
+.tb-pick:hover { background: var(--sel-18); transform: translateY(-2px); }
+.tb-pick img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; }
+.tb-pick-name { font-size: 11px; font-weight: 600; text-align: center; color: var(--txt-dim); white-space: nowrap; max-width: 66px; overflow: hidden; text-overflow: ellipsis; }
+.tb-pick:hover .tb-pick-name { color: var(--txt); }
+.tb-pick.tb-pick-taken { opacity: .3; filter: grayscale(.7); pointer-events: none; }
+/* фильтр поиска/роли прячет узел, НЕ пересоздаёт (закон «не innerHTML на каждую букву») */
+.tb-pick[hidden] { display: none; }
+
+@media (max-width: 1100px) {
+  .tb-layout { grid-template-columns: 1fr; }
+  .tb-side { overflow: visible; }
+  .tb-board { height: auto; width: 100%; max-width: 700px; }
+  .tb-team-slots { grid-template-columns: repeat(5, 1fr); }
+  .tb-slot { flex-direction: column; padding: 6px 4px; gap: 4px; }
+}

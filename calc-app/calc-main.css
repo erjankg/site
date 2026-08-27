@@ -1,0 +1,476 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   calc-main.css — ГЛАВНЫЙ калькулятор урона. Материал = ФИНАЛ-КАНОН DESIGN.md.
+   Законы, вшитые в этот файл:
+   · стекло ТОЛЬКО через .glass + токены --glass-* (своего backdrop-filter нет);
+   · backdrop-filter только на КОНТЕЙНЕРАХ — строки/ячейки/слоты без него;
+   · ВЕСЬ chrome (кнопки/рамки/вкладки/ховер/выбранный слот) = белая шкала --sel-*;
+     свой rgba под выделение писать НЕЛЬЗЯ — иначе «белое» опять станет на глаз;
+   · акцент #ffffff и цветные значения — ТОЛЬКО на ДАННЫХ (урон по типу, тир, WR, прибавки);
+   · градиента нет нигде, кроме фона за стеклом (виньетка) и самого материала .glass;
+   · анимации появления — только тому, что реально появляется (пикер, тултип, тост);
+     постоянные блоки (шапка, панели, сборка, манекен) не анимируются;
+   · вечных infinite-анимаций нет вообще;
+   · transform/filter/contain НЕ на стеклянном слое (иначе стекло гаснет).
+   ══════════════════════════════════════════════════════════════════════════ */
+
+html[data-glass="on"] {
+  /* ФИНАЛ-КАНОН DESIGN.md — числа один в один, ничего своего */
+  --glass-tint: 255, 255, 255; --glass-op: 0.00; --glass-blur: 8px; --glass-sat: 1.6; --glass-dark: .46;
+  --grain: 0; --bg-blur: 0px;
+  --glass-bd-c: var(--sel-brd); --ds-r: 15px; --sh-k: 1.00;
+
+  /* ★★ БЕЛАЯ ШКАЛА ВЫДЕЛЕНИЯ (DESIGN.md, канон 2026-07-28).
+     Chrome (кнопки, рамки, вкладки, ховер, выбранный слот) берёт ТОЛЬКО отсюда.
+     Свой rgba под выделение писать ЗАПРЕЩЕНО — иначе «белое» опять станет на глаз. */
+  --sel-surf:    rgba(255, 255, 255, 0.06);
+  --sel-surf-2:  rgba(255, 255, 255, 0.09);
+  --sel-hover:   rgba(255, 255, 255, 0.12);
+  --sel-active:  rgba(255, 255, 255, 0.18);
+  --sel-brd:     rgba(255, 255, 255, 0.12);
+  --sel-brd-2:   rgba(255, 255, 255, 0.18);
+  --sel-brd-act: rgba(255, 255, 255, 0.45);
+  --sel-line:    rgba(255, 255, 255, 0.06);
+
+  /* текст — чистый белый; приглушённый = ТОТ ЖЕ белый прозрачнее (без синевы) */
+  --accent: #ffffff; --txt: #fff; --txt-dim: rgba(255, 255, 255, .72); --txt-mute: rgba(255, 255, 255, .55);
+  --txt-shadow: 0 2px 14px rgba(1, 10, 19, .8);
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 16px; --sp-4: 24px; --r-btn: calc(var(--ds-r) * .7);
+  --ease-out-expo: cubic-bezier(.16, 1, .3, 1); --ease-standard: cubic-bezier(.4, 0, .2, 1); --ease-overshoot: cubic-bezier(.34, 1.56, .64, 1);
+  --dur-fast: .13s; --dur-base: .2s; --dur-slow: .28s;
+  /* ДАННЫЕ: цвета типов урона (легенда внизу экрана) */
+  --d-phys: #ff9f43; --d-magic: #56b6ff; --d-true: #ffffff; --d-onhit: #b98dff; --d-heal: #4ade80;
+  --tier-s: #ff5470; --tier-a: #ffb454; --tier-b: #4ade80; --tier-c: #7aa2c4;
+  --gain: #4ade80; --demo: #ffd479; --res-energy: #f5c451;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--txt); text-shadow: var(--txt-shadow); background: var(--bg-page);
+  overflow: hidden;                       /* фуллскрин-раздел: страница не скролится */
+}
+/* ★ В IFRAME БОЕВОГО (?embed=1) тела ПРОЗРАЧНЫ. Раньше body был залит непрозрачным
+   #05090d, и подложка сайта физически не могла просветить сквозь iframe — именно
+   поэтому калькулятору «пришлось» рисовать свой сплэш. Убрали заливку → своя
+   подложка стала не нужна, наследование глобальной работает само. */
+html.embed, html.embed body { background: transparent; }
+img { max-width: 100%; }
+
+/* ── фон: ОДИН глобальный сплэш за всем стеклом.
+   Картинку берём ИСКЛЮЧИТЕЛЬНО из --splash-img (её пишет wr-prefs.js из ⚙).
+   Своего background-image тут нет и быть не должно — ловится линтером. ── */
+.splash {
+  position: fixed; inset: 0; z-index: 0;
+  background-image: var(--splash-img);
+  background-color: var(--splash-color);
+  background-position: center; background-size: cover; background-repeat: no-repeat;
+}
+.vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 45%, rgba(0, 4, 9, .78) 100%); }
+
+/* ── стекло: ОДИН материал, одни числа на весь экран ────────────────────── */
+.glass {
+  position: relative; isolation: isolate;
+  background: linear-gradient(rgba(2, 9, 15, var(--glass-dark)), rgba(2, 9, 15, var(--glass-dark))), rgba(var(--glass-tint), var(--glass-op));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  border: 1px solid var(--glass-bd-c); border-radius: var(--ds-r);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, calc(var(--sh-k) * .35)), inset 0 0 42px rgba(1, 8, 14, .30), inset 0 1px 0 rgba(255, 255, 255, .30);
+}
+/* стекло над стеклом = ярче + сильнее тень (режим C), blur ТОТ ЖЕ */
+.glass--up { background: linear-gradient(rgba(2, 9, 15, calc(var(--glass-dark) - .10)), rgba(2, 9, 15, calc(var(--glass-dark) - .10))), var(--sel-surf);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, calc(var(--sh-k) * .5)), inset 0 1px 0 rgba(255, 255, 255, .32); }
+
+/* ══════════════════ ДЕВ-ПОЛОСА — ПЛАВАЮЩАЯ (канон-стандарт, механизм из lab-patch)
+   Не прибита сверху: не двигает и не режет контент, таскается за шапку,
+   сворачивается в одну строку. Живёт ТОЛЬКО в лабе (в ?embed=1 её нет). ══════ */
+.lab-strip { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); z-index: 40;
+  width: min(1180px, calc(100% - 28px)); max-height: calc(100vh - 28px); display: flex; flex-direction: column;
+  background: rgba(10, 14, 20, .94); border: 1px solid var(--sel-brd); border-radius: var(--ds-r);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, .5); }
+.strip-head { display: flex; align-items: center; gap: 12px; padding: 8px 14px; cursor: grab;
+  border-bottom: 1px solid var(--sel-line); }
+.strip-head:active { cursor: grabbing; }
+.strip-title { font-size: 12px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
+  color: var(--txt-dim); user-select: none; }
+.strip-sub { font-size: 11px; color: var(--txt-mute); user-select: none; }
+.strip-btns { margin-left: auto; display: flex; gap: 6px; }
+.strip-body { display: flex; flex-wrap: wrap; gap: 10px 20px; padding: 12px 14px; overflow-y: auto;
+  scrollbar-width: thin; scrollbar-color: var(--sel-brd-act) transparent; }
+.lab-strip.min .strip-body, .lab-strip.min .strip-choice { display: none; }
+.lab-strip.min .strip-head { border-bottom: none; }
+/* свёрнутая = компактная плашка в углу, контент не перекрывает */
+.lab-strip.min { width: auto; left: auto; right: 14px; transform: none; }
+.lab-strip.min .strip-sub { display: none; }
+.strip-group { display: flex; align-items: center; gap: 8px; }
+.strip-group > label { font-size: 10.5px; letter-spacing: .5px; text-transform: uppercase;
+  color: var(--txt-mute); white-space: nowrap; }
+.strip-choice { padding: 0 14px 12px; font-size: 11px; line-height: 1.6; color: var(--txt-mute); }
+.strip-choice b { color: var(--txt-dim); font-weight: 400; }
+
+/* сегмент-пилюля (UI-KIT: табы = pill, выделение белым) */
+.seg { display: inline-flex; gap: 3px; padding: 3px; border-radius: 11px; background: var(--sel-surf); }
+.seg button { border: 0; background: transparent; color: var(--txt-dim); font: inherit; font-size: 12px; cursor: pointer;
+  padding: 5px 11px; border-radius: 8px; white-space: nowrap; transition: background var(--dur-base), color var(--dur-base); }
+.seg button:hover { background: var(--sel-surf-2); color: #fff; }
+.seg button.on { background: var(--sel-active); color: #fff; }
+
+.btn { border: 0; cursor: pointer; font: inherit; font-size: 13px; color: var(--txt); text-shadow: var(--txt-shadow);
+  background: var(--sel-surf-2); border: 1px solid var(--sel-brd); border-radius: var(--r-btn);
+  padding: 7px 14px; transition: background var(--dur-base), box-shadow var(--dur-base), transform var(--dur-fast); }
+.btn:hover { background: var(--sel-active); box-shadow: 0 10px 24px -6px rgba(0, 0, 0, .6); }
+.btn:active { transform: translateY(1px); }
+.btn--wide { width: 100%; padding: 11px 14px; font-size: 15px; font-weight: 600; }
+
+/* ══════════════════ КАРКАС ЭКРАНА ══════════════════════════════════════ */
+.calc {
+  position: relative; z-index: 2; height: calc(100vh - 8px); padding: 8px 10px 10px;
+  display: grid; gap: 10px; justify-content: center;
+  /* ПК: место используем РАЗУМНО — колонки не растягиваем бесконечно,
+     на широком экране по бокам остаётся сплэш (пустые бока = норма). */
+  grid-template-columns: 340px minmax(360px, 820px) 360px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "top top top" "left center right" "bot bot bot";
+  contain: layout;                          /* изолируем reflow (paint НЕЛЬЗЯ — гасит стекло) */
+}
+/* полоса ПЛАВАЕТ — высоту у экрана больше не отнимаем */
+.c-top { grid-area: top; } .c-left { grid-area: left; } .c-center { grid-area: center; }
+.c-right { grid-area: right; } .c-bot { grid-area: bot; }
+/* Колонки: если экран низкий — тонкий скролл ВНУТРИ колонки, контент не режется.
+   (Запрет внутреннего скролла из DESIGN.md касается ТАБЛИЦ, тут таблиц нет.) */
+.c-left, .c-center, .c-right { min-height: 0; display: flex; flex-direction: column; gap: 10px;
+  overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--sel-brd-act) transparent; }
+.c-left::-webkit-scrollbar, .c-center::-webkit-scrollbar, .c-right::-webkit-scrollbar { width: 6px; }
+.c-left::-webkit-scrollbar-thumb, .c-center::-webkit-scrollbar-thumb, .c-right::-webkit-scrollbar-thumb { background: var(--sel-active); border-radius: 4px; }
+/* колонки заполняют высоту: пустых провалов между панелями не остаётся */
+.c-left > .ab-card, .c-center > #buildInfo, .c-right > #resBox { flex: 1 0 auto; min-height: 0; }
+.c-left > .ab-tabs, .c-center > #buildBox, .c-right > #dummyBox { flex: 0 0 auto; }
+
+/* тонкий скролл только там, где контент реально не влезает (таблиц тут нет) */
+.scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--sel-brd-act) transparent; }
+.scroll::-webkit-scrollbar { width: 6px; }
+.scroll::-webkit-scrollbar-thumb { background: var(--sel-active); border-radius: 4px; }
+.scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* ══════════════════ ВЕРХ: чемпион + уровень + тир ══════════════════════ */
+.hero { display: flex; align-items: center; gap: 14px; padding: 10px 14px; }
+.hero-por { width: 62px; height: 62px; border-radius: 34%; flex: 0 0 auto; overflow: hidden;
+  background: var(--sel-surf); border: 1px solid var(--sel-brd-2); cursor: pointer; }
+.hero-por img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-id { min-width: 168px; }
+.hero-name { font-size: 21px; font-weight: 700; line-height: 1.1; }
+.hero-sub { font-size: 12px; color: var(--txt-dim); margin-top: 3px; display: flex; gap: 8px; align-items: center; }
+.hero-lvl { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 5px; }
+.lvl-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--txt-dim); }
+.lvl-head b { color: var(--txt); font-variant-numeric: tabular-nums; }
+.hero-badges { display: flex; gap: 8px; align-items: center; }
+.badge { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--sel-hover);
+  border: 1px solid var(--sel-brd-2); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.badge b { font-variant-numeric: tabular-nums; }
+.badge--tier b { font-weight: 700; }
+.tier-S { color: var(--tier-s); } .tier-A { color: var(--tier-a); } .tier-B { color: var(--tier-b); } .tier-C { color: var(--tier-c); }
+
+/* ползунок (UI-KIT: трек fill + ticks) */
+/* Ползунок: БЕЗ градиента (закон — градиент только в фоне за стеклом).
+   Трек и заливка = два сплошных белых слоя из шкалы --sel-*. */
+.rng-wrap { position: relative; display: flex; align-items: center; width: 100%; min-width: 0; }
+.rng-wrap::before, .rng-wrap > .rng-fill { content: ''; position: absolute; left: 0; height: 6px; border-radius: 999px; pointer-events: none; }
+.rng-wrap::before { right: 0; background: var(--sel-hover); }
+.rng-wrap > .rng-fill { width: var(--fill, 50%); background: var(--sel-brd-act); }
+input[type="range"].rng { position: relative; z-index: 1; -webkit-appearance: none; appearance: none; width: 100%;
+  height: 6px; border-radius: 999px; cursor: pointer; background: transparent; outline: none; accent-color: #fff; }
+input[type="range"].rng::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .55); transition: transform var(--dur-fast) var(--ease-overshoot); }
+input[type="range"].rng:active::-webkit-slider-thumb { transform: scale(1.22); }
+
+/* ══════════════════ ЛЕВО: умения ══════════════════════════════════════ */
+.ab-tabs { display: flex; gap: 4px; padding: 5px; flex: 0 0 auto; }
+.ab-tab { position: relative; flex: 1; border: 0; cursor: pointer; font: inherit; background: transparent; padding: 6px 0 5px;
+  border-radius: 10px; color: var(--txt-dim); display: flex; flex-direction: column; align-items: center; gap: 3px;
+  transition: background var(--dur-base), color var(--dur-base); }
+.ab-tab img { width: 34px; height: 34px; border-radius: 9px; display: block; background: var(--sel-surf); }
+.ab-tab span { font-size: 11px; font-weight: 700; letter-spacing: .4px; }
+.ab-tab:hover { background: var(--sel-surf-2); color: #fff; }
+.ab-tab.on { background: var(--sel-active); color: #fff; }
+.ab-tab.locked { opacity: .45; }
+.ab-tab .rk { position: absolute; top: 2px; right: 6px; font-size: 9.5px; color: var(--accent); font-weight: 700; }
+
+.ab-card { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 0; }
+.ab-head { display: flex; align-items: flex-start; gap: 10px; }
+.ab-head img { width: 44px; height: 44px; border-radius: 11px; flex: 0 0 auto; background: var(--sel-surf); }
+.ab-name { font-size: 15px; font-weight: 700; line-height: 1.2; }
+.ab-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.tag { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; background: var(--sel-surf-2);
+  border: 1px solid var(--sel-brd); }
+.tag--phys { color: var(--d-phys); } .tag--magic { color: var(--d-magic); } .tag--true { color: var(--d-true); }
+.tag--demo { color: var(--demo); }
+.rank-pick { display: inline-flex; gap: 2px; padding: 2px; border-radius: 8px; background: var(--sel-surf); }
+.rank-pick button { border: 0; background: transparent; color: var(--txt-dim); font: inherit; font-size: 11px; cursor: pointer;
+  min-width: 20px; padding: 2px 5px; border-radius: 6px; }
+.rank-pick button.on { background: var(--sel-active); color: #fff; }
+
+/* разбивка «130 + 70 = 200» */
+.brk { font-size: 13px; line-height: 1.6; }
+.brk-row { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.brk-num { font-variant-numeric: tabular-nums; }
+.brk-gain { color: var(--gain); font-weight: 600; }
+.brk-total { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.brk-sub { font-size: 11.5px; color: var(--txt-dim); }
+
+.kv { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 10px; font-size: 12.5px; }
+.kv div { display: flex; justify-content: space-between; gap: 8px; padding: 4px 8px; border-radius: 8px; background: var(--sel-surf); }
+.kv b { font-variant-numeric: tabular-nums; color: var(--accent); }
+
+/* полоса ресурса (мана/энергия) + лимит комбо */
+.bar { height: 9px; border-radius: 999px; background: var(--sel-hover); overflow: hidden; position: relative; }
+.bar > i { display: block; height: 100%; border-radius: inherit; background: var(--bar-c, var(--accent)); transition: width var(--dur-base) var(--ease-standard); }
+.bar-lbl { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--txt-dim); margin-bottom: 4px; }
+.bar-lbl b { color: var(--txt); font-variant-numeric: tabular-nums; }
+
+/* контроль/эффекты умения — данные, поэтому акцентом */
+.ab-fx { font-size: 11.5px; color: var(--accent); line-height: 1.5; }
+
+.buffs { display: flex; flex-wrap: wrap; gap: 6px; }
+.buff { border: 1px solid var(--sel-brd-2); background: var(--sel-surf); color: var(--txt);
+  font: inherit; font-size: 11.5px; padding: 4px 10px; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  transition: background var(--dur-base), border-color var(--dur-base); }
+.buff:hover { background: var(--sel-hover); }
+.buff.on { background: var(--sel-active); border-color: var(--sel-brd-act); }
+.buff img { width: 15px; height: 15px; border-radius: 4px; }
+
+/* ══════════════════ ЦЕНТР: сборка + руны ══════════════════════════════ */
+.build { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.sect-h { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--txt-dim); letter-spacing: .4px; text-transform: uppercase; }
+.sect-h .sp { margin-left: auto; text-transform: none; letter-spacing: 0; font-size: 12px; }
+.sect-h .sp b { color: var(--accent); font-variant-numeric: tabular-nums; }
+
+/* слоты и руны — фиксированный потолок размера, чтобы иконки не раздувало на 4K */
+.slots { display: grid; grid-template-columns: repeat(6, minmax(0, 92px)); gap: 8px; }
+.slot { position: relative; aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--sel-brd);
+  background: var(--sel-surf); cursor: pointer; display: grid; place-items: center; overflow: hidden;
+  transition: background var(--dur-base), border-color var(--dur-base); }
+.slot:hover { background: var(--sel-hover); border-color: var(--sel-brd-act); }
+.slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.slot .ph { font-size: 20px; color: var(--sel-brd-act); }
+.slot .boot-mark { position: absolute; bottom: 2px; right: 4px; font-size: 9px; color: var(--txt-dim); }
+.slot .dm { position: absolute; top: 2px; left: 3px; font-size: 8.5px; color: var(--demo); }
+
+.runes { display: grid; grid-template-columns: minmax(0, 110px) repeat(4, minmax(0, 84px)); gap: 8px; align-items: center; }
+.rune { position: relative; aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--sel-brd);
+  background: var(--sel-surf); cursor: pointer; display: grid; place-items: center; overflow: hidden;
+  transition: background var(--dur-base), border-color var(--dur-base); }
+.rune:hover { background: var(--sel-hover); border-color: var(--sel-brd-act); }
+.rune img { width: 82%; height: 82%; object-fit: contain; }
+.rune.key { border-radius: 18px; }
+.rune .ph { font-size: 17px; color: var(--sel-brd-act); }
+
+/* конструктор комбо */
+.combo-add { display: flex; gap: 6px; flex-wrap: wrap; }
+.combo-btn { padding: 5px 12px; font-weight: 700; font-size: 12.5px; min-width: 44px; }
+.combo-list { display: flex; gap: 6px; flex-wrap: wrap; min-height: 26px; align-items: center; }
+.combo-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; cursor: pointer;
+  background: var(--sel-surf-2); border: 1px solid var(--sel-brd-2); font-size: 12px;
+  transition: background var(--dur-base); }
+.combo-chip:hover { background: var(--sel-active); }
+.combo-chip b { color: var(--txt); opacity: .85; }
+.combo-chip u { text-decoration: none; opacity: .55; font-size: 11px; }
+
+/* итог сборки: золото + чем полезно */
+.build-foot { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--txt-dim); flex-wrap: wrap; }
+.build-foot b { color: var(--txt); font-variant-numeric: tabular-nums; }
+
+/* ══════════════════ ПРАВО: манекен + результат ════════════════════════ */
+.dummy { padding: 12px 14px; display: flex; flex-direction: column; gap: 9px; }
+.dummy-presets { display: flex; gap: 6px; }
+.dummy-presets .btn { flex: 1; padding: 6px 4px; font-size: 12px; }
+.field { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.field label { width: 84px; color: var(--txt-dim); flex: 0 0 auto; }
+.field input[type="number"] { flex: 1; min-width: 0; background: var(--sel-surf); border: 1px solid var(--sel-brd-2);
+  border-radius: 8px; color: var(--txt); font: inherit; font-size: 13px; padding: 5px 8px; text-shadow: none; font-variant-numeric: tabular-nums; }
+.field input:focus { outline: none; border-color: var(--sel-brd-act); background: var(--sel-hover); }
+.hp-bar { height: 14px; border-radius: 999px; background: var(--sel-surf-2); overflow: hidden; position: relative; }
+/* HP — ДАННЫЕ, поэтому зелёный, но СПЛОШНОЙ (градиента в chrome нет) */
+.hp-bar > i { display: block; height: 100%; background: var(--d-heal); transition: width var(--dur-slow) var(--ease-standard); }
+.hp-bar > u { position: absolute; inset: 0; display: grid; place-items: center; font-size: 10.5px; font-style: normal;
+  font-variant-numeric: tabular-nums; text-shadow: 0 1px 4px rgba(0, 0, 0, .9); }
+
+.res { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.res-num { font-size: 44px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -1px; }
+.res-num.t-phys { color: var(--d-phys); } .res-num.t-magic { color: var(--d-magic); }
+.res-num.t-true { color: var(--d-true); } .res-num.t-mix { color: var(--txt); }
+.res-sub { font-size: 12px; color: var(--txt-dim); }
+.res-sub b { color: var(--txt); font-variant-numeric: tabular-nums; }
+/* ряд иконок «что сколько добавило» — появляется по ховеру результата */
+.res-icons { display: flex; flex-wrap: wrap; gap: 5px; }
+.res-ico { display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px; border-radius: 999px;
+  background: var(--sel-surf); border: 1px solid var(--sel-brd); font-size: 11px; font-variant-numeric: tabular-nums; }
+.res-ico img { width: 14px; height: 14px; border-radius: 4px; }
+.res-ico i { font-style: normal; width: 8px; height: 8px; border-radius: 50%; background: var(--c, #fff); display: inline-block; }
+.res-bars { display: flex; height: 7px; border-radius: 999px; overflow: hidden; background: var(--sel-surf-2); }
+.res-bars > i { height: 100%; display: block; }
+
+/* тултип-разбивка (появляется — анимация РАЗРЕШЕНА, это не постоянный блок) */
+.tip { position: fixed; z-index: 40; min-width: 240px; max-width: 330px; padding: 10px 12px; pointer-events: none;
+  animation: tip-in var(--dur-fast) var(--ease-out-expo); }
+@keyframes tip-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.tip h4 { font-size: 12.5px; margin-bottom: 6px; font-weight: 700; }
+.tip-row { display: flex; align-items: center; gap: 7px; font-size: 12px; padding: 2px 0; }
+.tip-row .nm { flex: 1; color: var(--txt-dim); }
+.tip-row b { font-variant-numeric: tabular-nums; }
+.tip-row i { font-style: normal; width: 8px; height: 8px; border-radius: 50%; background: var(--c, #fff); flex: 0 0 auto; }
+.tip-foot { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--sel-brd); font-size: 11px; color: var(--txt-dim); }
+
+/* ══════════════════ НИЗ: итоги сборки + легенда ═══════════════════════ */
+.totals { display: flex; align-items: center; gap: 8px 16px; padding: 8px 14px; flex-wrap: wrap; }
+.tot { display: inline-flex; align-items: baseline; gap: 5px; font-size: 12px; color: var(--txt-dim); }
+.tot b { font-size: 14px; color: var(--txt); font-variant-numeric: tabular-nums; }
+.tot.up b { color: var(--accent); }
+.legend { margin-left: auto; display: flex; gap: 10px; font-size: 11px; color: var(--txt-dim); flex-wrap: wrap; }
+.legend span { display: inline-flex; align-items: center; gap: 4px; }
+.legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+/* ══════════════════ ПИКЕР (появляется → анимация уместна) ═════════════ */
+.pick { position: fixed; z-index: 30; inset: 0; display: grid; place-items: center; background: rgba(2, 8, 14, .45); }
+.pick-box { width: min(820px, 92vw); max-height: 78vh; display: flex; flex-direction: column; padding: 14px 16px; gap: 10px;
+  animation: pick-in var(--dur-base) var(--ease-out-expo); }
+@keyframes pick-in { from { opacity: 0; } to { opacity: 1; } }
+.pick-head { display: flex; align-items: center; gap: 10px; }
+.pick-head h3 { font-size: 15px; font-weight: 700; }
+.pick-head .sp { margin-left: auto; }
+.pick-search { flex: 1; max-width: 260px; background: var(--sel-surf); border: 1px solid var(--sel-brd-2);
+  border-radius: 9px; color: var(--txt); font: inherit; font-size: 13px; padding: 6px 10px; text-shadow: none; }
+.pick-search:focus { outline: none; border-color: var(--sel-brd-act); }
+.pick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 8px; overflow-y: auto; padding-right: 4px; }
+.pick-grid.champs { grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); }
+.pick-it { display: flex; align-items: center; gap: 7px; padding: 6px; border-radius: 10px; cursor: pointer;
+  background: var(--sel-surf); border: 1px solid var(--sel-brd); text-align: left;
+  color: var(--txt); font: inherit; font-size: 11.5px; transition: background var(--dur-base); }
+.pick-it:hover { background: var(--sel-hover); }
+.pick-it img { width: 32px; height: 32px; border-radius: 8px; flex: 0 0 auto; }
+.pick-it.champ { flex-direction: column; gap: 4px; text-align: center; }
+.pick-it.champ img { width: 46px; height: 46px; border-radius: 30%; }
+.pick-it .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pick-it .st { font-size: 10px; color: var(--txt-dim); }
+
+/* ══════════════════ ТОСТ (появляется, без infinite) ══════════════════ */
+.toasts { position: fixed; right: 14px; bottom: 14px; z-index: 50; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.toast { padding: 9px 14px; font-size: 13px; animation: toast-in var(--dur-base) var(--ease-out-expo); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ВАРИАНТЫ ВИДА (дев-полоса). Всё через data-* на #calc и <html> —
+   переключение варианта НЕ пересоздаёт узлы (счётчик: 0 пересозданных).
+   ══════════════════════════════════════════════════════════════════════════ */
+.dummy-figure { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 34px; line-height: 1; }
+
+/* ── 1. РАСКЛАДКА ЭКРАНА ───────────────────────────────────────────────── */
+/* «Манекен снизу»: цель во всю ширину под сборкой, поля в строку */
+.calc[data-layout="bottom"] { grid-template-columns: 340px minmax(420px, 1fr);
+  grid-template-areas: "top top" "left center" "right right" "bot bot";
+  grid-template-rows: auto minmax(0, 1fr) auto auto; }
+.calc[data-layout="bottom"] .c-right { flex-direction: row; align-items: stretch; overflow: visible; }
+.calc[data-layout="bottom"] #dummyBox { flex: 1 1 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 14px; align-content: start; }
+.calc[data-layout="bottom"] #dummyBox .sect-h, .calc[data-layout="bottom"] #dummyBox .hp-bar { grid-column: 1 / -1; }
+.calc[data-layout="bottom"] #resBox { flex: 0 0 350px; }
+.calc[data-layout="bottom"] .dummy-figure { display: none; }
+
+/* «2 колонки»: умения слева на всю высоту, справа сборка над манекеном */
+.calc[data-layout="wide"] { grid-template-columns: 360px minmax(420px, 900px);
+  grid-template-areas: "top top" "left center" "left right" "bot bot";
+  grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr) auto; }
+.calc[data-layout="wide"] .field input[type="number"] { max-width: 200px; }
+.calc[data-layout="wide"] .dummy-presets .btn { max-width: 180px; }
+
+/* «Фокус на уроне»: манекен+результат В ЦЕНТРЕ и крупно, сборка справа */
+.calc[data-layout="focus"] { grid-template-columns: 320px minmax(380px, 620px) 380px; }
+.calc[data-layout="focus"] .c-right { grid-area: center; }
+.calc[data-layout="focus"] .c-center { grid-area: right; }
+.calc[data-layout="focus"] .res-num { font-size: 68px; }
+.calc[data-layout="focus"] .slots { grid-template-columns: repeat(3, minmax(0, 100px)); }
+
+/* ── 2. ПОЗИЦИЯ МАНЕКЕНА (зеркало колонок) ─────────────────────────────── */
+.calc[data-dummypos="left"][data-layout="three"] .c-right { grid-area: left; }
+.calc[data-dummypos="left"][data-layout="three"] .c-left { grid-area: right; }
+
+/* ── 3. РАЗМЕР МАНЕКЕНА ────────────────────────────────────────────────── */
+.calc[data-dummysize="s"] .dummy { gap: 6px; padding: 9px 11px; }
+.calc[data-dummysize="s"] .dummy-figure { font-size: 22px; }
+.calc[data-dummysize="s"] .field { font-size: 11.5px; }
+.calc[data-dummysize="s"] .field input[type="number"] { padding: 3px 7px; font-size: 12px; }
+.calc[data-dummysize="l"] .dummy { gap: 13px; padding: 16px 18px; }
+.calc[data-dummysize="l"] .dummy-figure { font-size: 58px; }
+.calc[data-dummysize="l"] .field { font-size: 14px; }
+.calc[data-dummysize="l"] .field input[type="number"] { padding: 8px 10px; font-size: 15px; }
+.calc[data-dummysize="l"] .hp-bar { height: 20px; }
+
+/* ── 4. РАЗБИВКА УРОНА ─────────────────────────────────────────────────── */
+.calc[data-brk="total"] .brk-formula,
+.calc[data-brk="bars"] .brk-formula,
+.calc[data-brk="ring"] .brk-formula { display: none; }
+.calc[data-brk="total"] .res-icons, .calc[data-brk="total"] .res-bars,
+.calc[data-brk="ring"] .res-bars, .calc[data-brk="ring"] .res-icons { display: none; }
+.calc[data-brk="bars"] .res-bars { height: 14px; }
+.res-ring { display: none; }
+.calc[data-brk="ring"] .res-ring { display: flex; align-items: center; gap: 14px; }
+.res-ring svg { width: 116px; height: 116px; flex: 0 0 auto; transform: rotate(-90deg); }
+.res-ring .rr-legend { display: flex; flex-direction: column; gap: 3px; font-size: 11.5px; min-width: 0; flex: 1; }
+.res-ring .rr-legend span { display: flex; align-items: center; gap: 6px; }
+.res-ring .rr-legend i { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+.res-ring .rr-legend b { font-variant-numeric: tabular-nums; margin-left: auto; }
+.res-ring .rr-legend em { font-style: normal; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── 5. ВИД СБОРКИ ─────────────────────────────────────────────────────── */
+.slot-cap { display: none; position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 3px;
+  font-size: 9.5px; line-height: 1.25; text-align: center; color: var(--txt);
+  background: rgba(4, 10, 16, .88); border-radius: 0 0 8px 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calc[data-build="grid"] .slots { grid-template-columns: repeat(3, minmax(0, 118px)); }
+/* «Как в игре» (WR LOADOUTS): крупные слоты с подписью предмета */
+.calc[data-build="shop"] .slots { grid-template-columns: repeat(6, minmax(0, 108px)); gap: 10px; }
+.calc[data-build="shop"] .slot { border-radius: 10px; }
+.calc[data-build="shop"] .slot-cap { display: block; }
+.calc[data-build="shop"] .runes { grid-template-columns: minmax(0, 124px) repeat(4, minmax(0, 96px)); }
+
+/* ── 6. ВИД ВКЛАДОК УМЕНИЙ ─────────────────────────────────────────────── */
+.ab-tab .ab-nm { display: none; font-size: 9.5px; opacity: .8; max-width: 100%; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap; padding: 0 2px; }
+.calc[data-tabs="text"] .ab-tab .ab-nm { display: block; }
+.calc[data-tabs="icon"] .ab-tab > span:not(.rk):not(.ab-nm) { display: none; }
+.calc[data-tabs="compact"] .ab-tab img, .calc[data-tabs="compact"] .ab-noico { width: 24px; height: 24px; border-radius: 7px; }
+.calc[data-tabs="compact"] .ab-tab { padding: 4px 0 3px; }
+.calc[data-tabs="compact"] .ab-tab > span:not(.rk):not(.ab-nm) { font-size: 10px; }
+
+/* ── 7. ПЛОТНОСТЬ ──────────────────────────────────────────────────────── */
+html[data-density="air"] .ab-card, html[data-density="air"] .build,
+html[data-density="air"] .dummy, html[data-density="air"] .res { padding: 16px 18px; gap: 13px; }
+html[data-density="air"] .calc { gap: 14px; }
+html[data-density="dense"] .ab-card, html[data-density="dense"] .build,
+html[data-density="dense"] .dummy, html[data-density="dense"] .res { padding: 8px 10px; gap: 6px; }
+html[data-density="dense"] .calc { gap: 7px; }
+html[data-density="dense"] .kv div { padding: 2px 6px; }
+
+/* ── 8. УГЛЫ (канон 15px — дефолт) ─────────────────────────────────────── */
+html[data-corners="soft"] { --ds-r: 22px; }
+html[data-corners="sharp"] { --ds-r: 6px; }
+
+/* ── 9. ВИД ТУЛТИПА РАЗБИВКИ ───────────────────────────────────────────── */
+.tip-row img { width: 15px; height: 15px; border-radius: 4px; display: none; }
+html[data-tip="icons"] .tip-row img { display: block; }
+html[data-tip="icons"] .tip-row i { display: none; }
+html[data-tip="compact"] .tip { min-width: 190px; }
+html[data-tip="compact"] .tip-row { font-size: 11px; padding: 0; }
+html[data-tip="compact"] .tip-row i { width: 6px; height: 6px; }
+html[data-tip="compact"] .tip h4 { font-size: 11.5px; margin-bottom: 3px; }
+html[data-tip="compact"] .tip-foot { font-size: 10px; }
+
+@media (max-width: 1180px) {
+  .calc { grid-template-columns: 300px minmax(300px, 1fr) 300px; }
+}
+
+/* пустой результат поиска в пикере — без пересборки сетки */
+.pick-grid[data-empty]:not([data-empty=""])::after { content: attr(data-empty); color: var(--txt-dim); font-size: 13px; padding: 18px 4px; }
+
+/* пометки демо и подписи полей */
+.demo-note { color: var(--demo); }
+.fld-v { width: 22px; text-align: right; font-variant-numeric: tabular-nums; }

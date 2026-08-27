@@ -1,39 +1,39 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-glass="on" data-density="cozy">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Песочница Hover-раскрытие</title>
+<meta name="robots" content="noindex, nofollow">
+<title>lab-hover-reveal — страница чемпиона (SEO)</title>
 <link rel="preconnect" href="https://ddragon.leagueoflegends.com">
-<link rel="stylesheet" href="hover-reveal-lab.css?v=34">
+<link rel="stylesheet" href="../canon-tokens.css?v=1">
+<link rel="stylesheet" href="hover-reveal-lab.css?v=39">
 </head>
 <body>
-  <header class="lab-top">
-    <div class="lab-top-title">
-      <span class="lab-logo">🃏</span>
-      <div>
-        <div class="lab-h1">Пикер чемпионов — песочница</div>
-        <div class="lab-sub">Поиск + фильтр по роли сверху. Клик по чемпиону → открывается стеклянная карточка с инфой. Боевой сайт не трогается.</div>
-      </div>
-    </div>
-    <div id="labTools"></div>
-    <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
-  </header>
+  <div class="splash" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
 
-  <nav id="variantBar" class="variant-bar"></nav>
+  <!-- ДЕВ-ПОЛОСА (для НАС): тёмный солид, плавающая, драг, оверлей, сворачивается. -->
+  <div class="lab-strip" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ Дизайн-полоса</span>
+      <button class="strip-reset" id="stripReset" type="button">↺ Сброс</button>
+      <button class="strip-min-btn" id="stripMin" type="button">Свернуть</button>
+    </div>
+    <div class="strip-body" id="stripBody"></div>
+  </div>
 
   <main class="lab-main">
-    <section class="stage">
-      <div id="hrHint" class="hint"></div>
-      <div id="hrStage" class="hr-stage"></div>
-    </section>
-    <aside class="panel" id="panel"></aside>
+    <div id="hrStage" class="hr-stage"></div>
   </main>
 
   <div id="hrOverlay" class="hr-overlay" hidden></div>
 
-  <script src="../lab-settings.js?v=4"></script>
+  <button class="gear-btn glass" id="gearBtn" type="button" title="Настройки">⚙</button>
+  <div class="settings-pop glass thin-scroll" id="settingsPop" hidden></div>
+
+  <script src="../lab-morph.js?v=2"></script>
   <script src="hover-reveal-abilities.js?v=1"></script>
-  <script src="hover-reveal-lab.js?v=33"></script>
+  <script src="hover-reveal-lab.js?v=39"></script>
 </body>
 </html>

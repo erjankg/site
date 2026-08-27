@@ -1,40 +1,66 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-glass="on">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex">
-<title>Песочница — Чат</title>
-<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
-<link rel="stylesheet" href="chat-lab.css?v=5">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>lab-chat — Чат-панель (Discord/Twitch-стиль)</title>
+  <link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="chat-lab.css?v=13">
 </head>
 <body>
-  <header class="lab-top">
-    <div class="lab-top-title">
-      <span class="lab-logo">💬</span>
-      <div>
-        <div class="lab-h1">Чат — песочница</div>
-        <div class="lab-sub">По каждому пункту сверху — несколько вариантов. Рабочее: пиши/отправляй (Enter); наведи на сообщение → 😊 реакция и ↩ ответить (реакции-чипы кликаются, ответ цепляется цитатой); клик по юзеру → профиль (роль/ранг/ссылка) + «Упомянуть» (засветит 💬 в рельсе слева); 📎 — кинуть «кнопку-ссылку» (чемп/матчапы/тир-лист/сборка/предмет/фото). Сплэш-арт и силу стекла на боевом задаёт ГЛОБАЛЬНАЯ юзер-панель главного окна — тут для превью.</div>
+  <!-- ГЛОБАЛЬНЫЙ СПЛЭШ-АРТ: один на весь лаб, fixed, за всем стеклом -->
+  <div class="splash" aria-hidden="true"></div>
+
+  <!-- ДЕВ-ПОЛОСА (инструмент для НАС): тёмный солид, плавающая, драг за грип,
+       оверлеем, сворачивается в пилюлю. НЕ едет в боевой. -->
+  <div class="lab-strip" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ Дизайн-полоса · Чат-панель</span>
+      <button class="strip-min-btn" id="stripMin">▲ Свернуть</button>
+    </div>
+    <div class="strip-body thin" id="stripBody"><!-- варианты + тумблеры генерит JS --></div>
+  </div>
+
+  <!-- КАРКАС: рельс + сцена = фон, чтобы видеть чат ОВЕРЛЕЕМ -->
+  <div class="app mode-overlay" id="app">
+    <nav class="rail glass" id="rail" aria-label="Навигация">
+      <div class="rail-items">
+        <button class="rail-btn active" data-section="home" title="Home"><span class="ico">◎</span><span class="lbl">Home</span></button>
+        <button class="rail-btn" data-section="stats" title="Статс"><span class="ico">📊</span><span class="lbl">Статс</span></button>
+        <button class="rail-btn" data-section="draft" title="Драфтер"><span class="ico">🛠</span><span class="lbl">Драфтер</span></button>
       </div>
-    </div>
-    <div class="lab-top-btns">
-      <div id="labTools"></div>
-      <button id="toggleBtn" class="lab-toggle">▲ Свернуть настройки</button>
-      <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
-    </div>
-  </header>
+    </nav>
+    <main class="stage" id="stage"><!-- сцена (home / фуллскрин-драфтер) рендерится сюда --></main>
+  </div>
 
-  <section class="settings" id="settings"><!-- дизайн-полоса генерится в JS --></section>
+  <!-- КНОПКА ВЫЗОВА: всегда fixed, поверх всего (в т.ч. над фуллскрин-драфтером) -->
+  <button class="chat-tab" id="chatTab" title="Чат">
+    <span class="tico">💬</span><span class="tlabel">Чат</span><span class="tbadge">0</span>
+  </button>
 
-  <main class="lab-main">
-    <div class="chat-stage" id="stage"><!-- чат рендерится сюда --></div>
-  </main>
+  <!-- ПАНЕЛЬ ЧАТА: стеклянный контейнер, fixed справа, слайдит по right -->
+  <aside class="chat-panel glass" id="chatPanel" aria-label="Чат"><!-- рендерит JS --></aside>
 
-  <footer class="lab-foot">
-    Выбери по каждому пункту вариант → потом скажешь <b>«этот»</b>, и я зафиксирую (/finalize) и перенесу в боевой.
-  </footer>
+  <!-- ПОПАПЫ: живут в body (стекло не вкладываем в стекло) -->
+  <div class="attach-menu glass" id="attachMenu" hidden>
+    <div class="am-h">Скинуть кнопку-ссылку</div>
+    <button data-card="champion"><span class="ai">🧙</span> Карточка чемпиона</button>
+    <button data-card="matchup"><span class="ai">⚔️</span> Матчапы чемпа</button>
+    <button data-card="tier"><span class="ai">🏆</span> Тир-лист (патч)</button>
+    <button data-card="build"><span class="ai">🛠️</span> Сборка чемпа</button>
+    <button data-card="item"><span class="ai">📦</span> Предмет</button>
+    <button data-card="poll" class="poll-item"><span class="ai">📊</span> Опрос / голосование</button>
+    <div class="am-h">Вложение</div>
+    <button data-card="photo"><span class="ai">📷</span> Фото / скриншот</button>
+  </div>
 
-  <script src="../lab-settings.js"></script>
-  <script src="chat-lab.js?v=5"></script>
+  <div class="react-pop glass" id="reactPop" hidden></div>
+  <div class="pf-scrim" id="pfScrim" hidden></div>
+  <div class="toast glass" id="toast"></div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="chat-lab.js?v=13"></script>
 </body>
 </html>

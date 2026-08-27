@@ -45,11 +45,11 @@
     // Любое открытие/закрытие — ТОЛЬКО через openModal/closeModal.
     // =========================================
     const MODAL_IDS = ['mMask','calcMask','itemsMask','runesMask',
-        'tierlistMask','sideChampsMask','champDetailMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','draftCoopMask','champPickerModal','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask',
-        'socialPickerMask','socialLinkConfirmMask','changesMask','cybersportMask'];
+        'tierlistMask','sideChampsMask','itemSubModal','itemDetailModal','runeDetailModal','itemCalcMenuMask','draftMask','draftCoopMask','champPickerModal','influencerMask','chatSystemMask','tierlistMenuMask','profileSetupMask','userCardMask',
+        'socialPickerMask','socialLinkConfirmMask','changesMask','cybersportMask','drafterHubMask'];
 
     // Модалки которые открываются ПОВЕРХ родителя (стек, родитель видим)
-    var OVERLAY_MODALS = ['champDetailMask','itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask','profileSetupMask','userCardMask',
+    var OVERLAY_MODALS = ['itemDetailModal','runeDetailModal','itemSubModal','champPickerModal','influencerMask','tierlistMask','profileSetupMask','userCardMask',
         'socialPickerMask','socialLinkConfirmMask'];
 
     var _modalStack = [];          // верх = последний элемент
@@ -83,12 +83,29 @@
         }, 180);
     }
 
+    // Мгновенное скрытие (в этом же тике, до перерисовки) — без .closing-фейда.
+    function _instantHideEl(el) {
+        if (!el) return;
+        if (el._closeTimer) { clearTimeout(el._closeTimer); el._closeTimer = null; }
+        el.classList.remove('closing');
+        el.classList.remove('active');
+        el.style.display = '';
+        el.style.zIndex = '';
+        if (window._resetModalVV) window._resetModalVV(el);
+    }
+
     function _applyStackVisuals() {
-        // Закрываем всё что НЕ в стеке
+        // КОРЕНЬ вспышки при A→B: _smoothCloseEl держит dim-слой уходящей модалки 180мс
+        // поверх входящей → ДВА затемнения (~0.92), потом одно спадает (0.72) = фон
+        // «вспыхивает». Если что-то показываем (switching) — гасим уходящие МГНОВЕННО в
+        // этом же тике (их окно и так за новым backdrop, не видно). Закрытие В ПУСТОТУ
+        // (стек пуст) — оставляем плавный fade.
+        var switching = _modalStack.length > 0;
         MODAL_IDS.forEach(function(id) {
             if (_modalStack.indexOf(id) !== -1) return;
             var el = document.getElementById(id);
-            if (el) _smoothCloseEl(el);
+            if (!el) return;
+            if (switching) _instantHideEl(el); else _smoothCloseEl(el);
         });
         // Показываем то что в стеке (z-index по порядку)
         _modalStack.forEach(function(id, idx) {
@@ -109,6 +126,8 @@
         document.body.classList.remove('pc-chat-mode');
         _sidebarModalId = null;
         _sidebarClearActive();
+        // Инструмент закрыт → рельс снова тонкий, контент назад
+        _setToolOpen(false);
         if (_pcSideMode) {
             _pcSideMode = false;
         } else {
@@ -267,6 +286,20 @@
         }
     });
 
+    // ПК: Esc закрывает ТОЛЬКО верхнюю модалку стопки (закон матрёшки).
+    // Не трогаем поля ввода и события, уже обработанные своим хендлером.
+    // data-no-esc на модалке = «клетка» (выхода нет, напр. активный кооп-драфт).
+    window.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape' || e.defaultPrevented) return;
+        if (_modalStack.length === 0) return;
+        var t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+        var topId = _modalStack[_modalStack.length - 1];
+        var topEl = document.getElementById(topId);
+        if (topEl && topEl.hasAttribute('data-no-esc')) return;
+        closeModal(topId);
+    });
+
     // ── Global fullscreen spinner ──
     function showGlobalSpinner() {
         var el = document.getElementById('globalLoadingOverlay');
@@ -305,7 +338,7 @@
             "K'Sante":'KSante',"Rek'Sai":'RekSai','Tahm Kench':'TahmKench','Wukong':'MonkeyKing',
             // Shortened WR names
             'M.Fortune':'MissFortune','Tw. Fate':'TwistedFate','Au. Sol':'AurelionSol',
-            'Jarvan':'JarvanIV','XinZhao':'XinZhao','KhaZix':'Khazix','KogMaw':'KogMaw','Ksante':'KSante',
+            'Jarvan':'JarvanIV','XinZhao':'XinZhao','KhaZix':'Khazix','KogMaw':'KogMaw','Kogmaw':'KogMaw','Ksante':'KSante',
             'KaiSa':'Kaisa','Morde':'Mordekaiser','Seraph':'Seraphine',
             'Fiddle':'Fiddlesticks','Fiddles':'Fiddlesticks','FiddleSticks':'Fiddlesticks','Fiddlesticks':'Fiddlesticks','Trynda':'Tryndamere','Trynd':'Tryndamere','Trinda':'Tryndamere','Heimer':'Heimerdinger',
             'Mundo':'DrMundo','Nunu':'Nunu',
@@ -320,6 +353,9 @@
         'Norra':['https://www.wildriftfire.com/images/champions/norra.png','https://cdn.communitydragon.org/latest/champion/norra/square','https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/Norra.png'],
         'Mel':['https://www.wildriftfire.com/images/champions/mel.png']
     };
+    /* Э1.3: экспонирован — строка таблицы теперь HTML, и onerror в атрибуте
+       ищет обработчик в window, локальную функцию коробки он не видит. */
+    window._champImgError = function(img, name) { champImgError(img, name); };
     function champImgError(img, name) {
         if(!img._fallbackIdx) img._fallbackIdx = 0;
         var fb = _spFallback[name];
@@ -354,26 +390,45 @@
             .map(function(k){ return STATS_COL_DEFS.find(function(d){ return d.key === k; }); })
             .filter(function(d){ return d && !hiddenSet.has(d.key); });
     }
+    /* ★ Э1.3 · ШАПКА СТАТС — РАЗМЕТКА ЭТАЛОНА lab-main (viewStats).
+       Было: инлайн `onclick="doSort('key')"` в каждом <th> и отдельный <span id="ar-KEY">,
+       который потом искали по id и красили инлайн-стилем (см. renderFull).
+       Стало, как в эталоне: <th data-sort="key" class="sorted"> + <span class="arr">.
+       Стрелка живёт в разметке шапки, отдельные id-шки на неё больше не нужны;
+       клик — один делегированный слушатель (см. wireStatsSort), инлайн-обработчиков нет. */
     function buildStatsHeader(){
         var thead = document.getElementById('statThead');
         if(!thead) return;
         var cols = getStatsCols();
-        var html = '<tr><th><button class="btn-champ-cfg" onclick="openM()">Champions</button></th>';
+        var html = '<tr><th><span class="th-champ-label">Champions</span></th>';
         cols.forEach(function(c){
             var label = c.key === 'mana'
                 ? '<span class="mana-label-full">Mana</span><span class="mana-label-short">MN</span>'
                 : c.label;
-            var cls = c.desktopOnly ? 'col-range' : '';
-            html += '<th data-short="' + c.label + '" class="' + cls + '" onclick="doSort(\'' + c.key + '\')">' +
+            var cls = (c.desktopOnly ? 'col-range' : '') + (c.key === sK ? ' sorted' : '');
+            html += '<th data-sort="' + c.key + '" data-short="' + c.label + '" class="' + cls.trim() + '">' +
                 '<span class="stat-icon ' + c.iconClass + '">' + c.icon + '</span>' +
                 label +
-                '<span id="ar-' + c.key + '"></span>' +
+                '<span class="arr">' + (c.key === sK ? (sD === 'desc' ? '▼' : '▲') : '⇅') + '</span>' +
                 '</th>';
         });
         html += '</tr>';
-        thead.innerHTML = html;
+        labMorph(thead, html);      /* точечно: меняется класс и стрелка, не вся шапка */
+        wireStatsSort();
         // Много столбцов (юзер включил доп-статы) → таблица растёт, правая карточка убирается чтоб не мешать
         try { document.body.setAttribute('data-widestats', cols.length > 6 ? 'on' : 'off'); } catch(e){}
+    }
+    /* Клик по шапке — ОДИН делегированный слушатель на весь <thead>.
+       Так шапку можно свободно пересобирать: слушатель живёт выше и не теряется
+       (ГОЧА lab-morph — узлы переживают ре-рендер, вешаем под флагом). */
+    function wireStatsSort(){
+        var thead = document.getElementById('statThead');
+        if (!thead || thead.__wired) return;
+        thead.__wired = 1;
+        thead.addEventListener('click', function(e){
+            var th = e.target.closest('th[data-sort]');
+            if (th) doSort(th.getAttribute('data-sort'));
+        });
     }
     window.openStatsColSettings = function(){
         window._colSettings.open('stats', STATS_COL_DEFS, 'Настройка столбцов STATS', function(){
@@ -534,6 +589,7 @@
         initApp();
         createRuler();
         render();
+        try { drawM(); } catch(e){}
         // Hide skeleton, show real table
         const skEl2 = document.getElementById('skeletonOverlay');
         if(skEl2) skEl2.style.display = 'none';
@@ -638,7 +694,7 @@
         if(old) old.remove();
         var tip = document.createElement('div');
         tip.id = 'patchTip';
-        tip.className = 'patch-tooltip';
+        tip.className = 'patch-tooltip glass';
         var typeLabel = pInfo.type === 'buff' ? t('🟢 БАФФ') : pInfo.type === 'adjust' ? t('🟡 КОРРЕКТИРОВКА') : t('🔴 НЕРФ');
         tip.innerHTML = '<div style="font-weight:900;margin-bottom:4px;">' + typeLabel + ' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Patch ' + pInfo.patch + '</span></div><div style="font-size:11px;line-height:1.4;color:rgba(255,255,255,0.8);">' + pInfo.change + '</div>';
         var rect = el.getBoundingClientRect();
@@ -664,12 +720,7 @@
         const table = document.getElementById('statTable');
         table.classList.toggle('focus-mode', colFocus);
         const cols = getStatsCols();
-        cols.forEach(c => {
-            var el = document.getElementById('ar-'+c.key);
-            if(!el) return;
-            el.innerText = (c.key===sK) ? (sD==='desc'?'▼':'▲') : '';
-            el.style.color = (c.key===sK) ? '#e74c3c' : '';
-        });
+        buildStatsHeader();   /* Э1.3: стрелки/активная колонка — в разметке шапки, не по id */
         const { data } = computeData();
         const rows = document.querySelectorAll('#statBody tr');
         // If row count changed (e.g. champion removed) — fall back to full render
@@ -697,91 +748,136 @@
         const table = document.getElementById('statTable');
         table.classList.toggle('focus-mode', colFocus);
         const colsH = getStatsCols();
-        colsH.forEach(c => {
-            var el = document.getElementById('ar-'+c.key);
-            if(!el) return;
-            el.innerText = (c.key===sK) ? (sD==='desc'?'▼':'▲') : '';
-            el.style.color = (c.key===sK) ? '#e74c3c' : '';
-        });
+        /* ★ Э1.3: покраска стрелок по id (#ar-KEY + инлайн color:#e74c3c) УБРАНА.
+           Стрелка и активная колонка живут прямо в разметке шапки эталона
+           (<th class="sorted"><span class="arr">), цвет — из канона в CSS.
+           Пересобираем шапку — labMorph тронет только стрелку и класс. */
+        buildStatsHeader();
         const { data } = computeData();
-        body.innerHTML = '';
-        data.forEach((item, idx) => {
-            const tr = document.createElement('tr');
-            tr.style.cursor = 'pointer';
-            // Клик по строке → показать чемпа в правой карточке (модалку НЕ открываем;
-            // правую карточку обновляет делегированный слушатель #statBody, полная карточка — кнопка «Подробнее →»)
-            tr.addEventListener('click', () => {
-                tr.classList.add('row-flash');
-                setTimeout(() => tr.classList.remove('row-flash'), 400);
-            });
-            // ── ЛАБОВАЯ разметка строки (.f-name-cell > f-num + f-x + f-port + f-cname) ──
-            const tdChamp = document.createElement('td');
-            const nameCell = document.createElement('div');
-            nameCell.className = 'f-name-cell';
-            const numSpan = document.createElement('span');
-            numSpan.className = 'f-num';
-            numSpan.textContent = idx + 1;
-            const btnX = document.createElement('button');
-            btnX.className = 'f-x'; btnX.type = 'button'; btnX.textContent = '✕';
-            btnX.title = t('Убрать из таблицы');
-            btnX.addEventListener('click', (ev) => { ev.stopPropagation(); removeC(item.name); });
-            const champImg = document.createElement('img');
-            champImg.alt = ''; champImg.className = 'f-port';
-            champImg.src = champIcon(item.name);
-            champImg.onerror = function(){ champImgError(this, item.name); };
+        /* ★★ Э1.3 шаг 2 · ТОЧЕЧНЫЙ РЕ-РЕНДЕР (механика эталона lab-main).
+           БЫЛО: body.innerHTML = '' и пересборка КАЖДОЙ строки через createElement
+           с пятью addEventListener на строку. Счётчик ловил это как 0/308 —
+           сортировка и смена уровня пересоздавали таблицу целиком.
+           СТАЛО: строки собираются в HTML и отдаются labMorph — он трогает только
+           изменившееся. data-key на <tr> = имя чемпа (якорь: при смене порядка узлы
+           переиспользуются, а не рубятся сдвигом соседей). */
+        labMorph(body, data.map((item, idx) => statRowHtml(item, idx, colsH)).join(''));
+        wireStatsRows();
+    }
 
-            // Patch indicator (обёртка вокруг портрета)
-            const pInfo = patchMap[item.name];
-            const champWrap = document.createElement('div');
-            champWrap.style.cssText = 'position:relative;display:inline-flex;flex-shrink:0;';
-            champWrap.appendChild(champImg);
-            if(pInfo) {
-                const dot = document.createElement('div');
-                dot.className = 'patch-dot ' + pInfo.type;
-                dot.dataset.patch = pInfo.patch;
-                dot.dataset.change = pInfo.change;
-                dot.dataset.type = pInfo.type;
-                champWrap.appendChild(dot);
-                champWrap.addEventListener('mouseenter', function(e){ showGlobalPatchTip(e, pInfo, champWrap); });
-                champWrap.addEventListener('mouseleave', function(){ var t=document.getElementById('patchTip'); if(t) t.remove(); });
-                dot.addEventListener('click', function(e){ e.stopPropagation(); showGlobalPatchTip(e, pInfo, champWrap); });
+    /* Слушатели строк — ОДИН делегированный набор на #statBody, вешается один раз.
+       ГОЧА lab-morph: узлы теперь переживают ре-рендер, поэтому addEventListener
+       на каждую строку копился бы при каждом рендере. mouseover/mouseout, а не
+       mouseenter/mouseleave — последние не всплывают и делегировать их нельзя. */
+    function wireStatsRows() {
+        const body = document.getElementById('statBody');
+        if (!body || body.__wired) return;
+        body.__wired = 1;
+
+        body.addEventListener('click', (e) => {
+            const x = e.target.closest('.f-x');
+            if (x) {                                   /* ✕ — убрать чемпа из таблицы */
+                e.stopPropagation();
+                const row = x.closest('tr[data-name]');
+                if (row) removeC(row.getAttribute('data-name'));
+                return;
             }
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'f-cname';
-            nameSpan.textContent = item.name;
-            nameCell.appendChild(numSpan); nameCell.appendChild(btnX); nameCell.appendChild(champWrap); nameCell.appendChild(nameSpan);
-            tdChamp.appendChild(nameCell);
-            tr.appendChild(tdChamp);
-            colsH.forEach(c => {
-                const k = c.key;
-                const v = item[k];
-                const td = document.createElement('td');
-                td.className = (k===sK ? 'active-col ' : '') + 's-' + k;   // цвет по СТОЛБЦУ (как lab-main)
-                td.textContent = fmtStatVal(k, v, item);
-                td.addEventListener('mouseenter', (ev) => showT(ev, item.g[k]));
-                td.addEventListener('mousemove', moveT);
-                td.addEventListener('mouseleave', hideT);
-                tr.appendChild(td);
-            });
-            body.appendChild(tr);
+            const dot = e.target.closest('.patch-dot');
+            if (dot) {
+                e.stopPropagation();
+                const row = dot.closest('tr[data-name]');
+                const pi = row && patchMap[row.getAttribute('data-name')];
+                if (pi) showGlobalPatchTip(e, pi, dot);
+                return;
+            }
+            const tr = e.target.closest('tr[data-name]');
+            if (!tr) return;
+            tr.classList.add('row-flash');
+            setTimeout(() => tr.classList.remove('row-flash'), 400);
         });
 
-        // GSAP: staggered entrance — только при первом рендере, не при сортировке
-        if (!window._statTableAnimated && window.gsap) {
-            window._statTableAnimated = true;
-            var rows = body.querySelectorAll('tr');
-            if (rows.length) {
-                window.gsap.from(rows, {
-                    opacity: 0,
-                    y: 8,
-                    duration: 0.35,
-                    stagger: 0.025,
-                    ease: 'power2.out',
-                    clearProps: 'transform,opacity'
-                });
+        body.addEventListener('mouseover', (e) => {
+            const dot = e.target.closest('.patch-dot');
+            if (dot) {
+                const row = dot.closest('tr[data-name]');
+                const pi = row && patchMap[row.getAttribute('data-name')];
+                if (pi) showGlobalPatchTip(e, pi, dot);
+                return;
             }
+            /* тултип роста «+N за уровень»: значение лежит на самой ячейке (data-g) */
+            const td = e.target.closest('td[data-g]');
+            if (td && td.getAttribute('data-g') !== '') showT(e, +td.getAttribute('data-g'));
+        });
+        body.addEventListener('mousemove', (e) => {
+            if (e.target.closest('td[data-g]')) moveT(e);
+        });
+        body.addEventListener('mouseout', (e) => {
+            if (e.target.closest('.patch-dot')) {
+                const tip = document.getElementById('patchTip'); if (tip) tip.remove();
+            }
+            if (e.target.closest('td[data-g]')) hideT();
+        });
+    }
+
+    // Сборка ОДНОЙ строки таблицы. Вынесена из renderFull, чтобы добавление/удаление
+    // чемпа могло вставить/убрать одну <tr> вместо пересборки всего tbody.
+    /* ★ Э1.3 шаг 2 · СТРОКА ТАБЛИЦЫ — СОБРАНА КАК В ЭТАЛОНЕ lab-main (statRowHtml).
+       Было: 60 строк document.createElement + 5 addEventListener НА КАЖДУЮ строку
+       (клик по строке, ✕, ховер патч-точки, клик патч-точки, тултип роста ×N ячеек).
+       При 137 чемпах это сотни живых слушателей, и все они умирали и создавались
+       заново на каждый рендер.
+       Стало: функция возвращает СТРОКУ HTML (как в эталоне), слушатели — одни
+       делегированные на #statBody (см. wireStatsRows).
+       Данные для тултипа роста едут на самой ячейке в data-g — иначе
+       делегированный обработчик не знал бы, чей рост показывать. */
+    /* Свой esc в ЭТОЙ коробке: app.js = несколько изолированных IIFE, esc из соседней
+       тут не виден (корень cross-scope ReferenceError, память project_appjs_iife_scopes). */
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function statRowHtml(item, idx, colsH) {
+        const pInfo = patchMap[item.name];
+        const cells = colsH.map(c => {
+            const k = c.key;
+            const g = (item.g && item.g[k] != null) ? item.g[k] : '';
+            return '<td class="' + (k === sK ? 'active-col ' : '') + 's-' + k + '"' +
+                ' data-g="' + esc(String(g)) + '">' + esc(fmtStatVal(k, item[k], item)) + '</td>';
+        }).join('');
+
+        return '<tr data-key="' + esc(item.name) + '" data-name="' + esc(item.name) + '">' +
+            '<td><div class="f-name-cell">' +
+                '<span class="f-num">' + (idx + 1) + '</span>' +
+                '<button class="f-x" type="button" title="' + esc(t('Убрать из таблицы')) + '">✕</button>' +
+                '<div class="f-portwrap">' +
+                    '<img class="f-port" alt="" loading="lazy" decoding="async" src="' + esc(champIcon(item.name)) + '"' +
+                    ' onerror="window._champImgError && window._champImgError(this, this.dataset.ch)" data-ch="' + esc(item.name) + '">' +
+                    (pInfo
+                        ? '<div class="patch-dot ' + esc(pInfo.type) + '" data-patch="' + esc(pInfo.patch) +
+                          '" data-change="' + esc(pInfo.change) + '" data-type="' + esc(pInfo.type) + '"></div>'
+                        : '') +
+                '</div>' +
+                '<span class="f-cname">' + esc(item.name) + '</span>' +
+            '</div></td>' + cells + '</tr>';
+    }
+
+    // Перенумеровать колонку «#» после вставки/удаления строки.
+    function renumberStatRows() {
+        var rows = document.querySelectorAll('#statBody tr');
+        for (var i = 0; i < rows.length; i++) {
+            var n = rows[i].querySelector('.f-num');
+            if (n) n.textContent = i + 1;
         }
     }
+
+    // ТОЧЕЧНО: чемп добавлен/убран → вставляем или убираем ОДНУ <tr>,
+    // вместо renderFull(), который пересобирал весь tbody со всеми слушателями.
+    /* ★ Э1.3 шаг 2: своя вставка/удаление одной <tr> больше НЕ НУЖНА.
+       Раньше тут вручную искали строку, создавали её через buildStatRow и вставляли
+       по индексу — потому что renderFull пересобирал весь tbody и был слишком дорог.
+       Теперь renderFull идёт через labMorph: он сам увидит, что изменилась одна
+       строка, и тронет только её. Отдельный путь = второй источник правды. */
+    function applyChampRow(name) { renderFull(); }
 
     // render() = full rebuild (used everywhere except level slider)
     function render() { renderFull(); }
@@ -802,14 +898,18 @@
         } catch(e){ return null; }
     }
 
+    // Фильтр по роли для inline-панели выборки (null = все роли)
+    let _statsRoleFilter = null;
+
     // Remove champion from table (only from selection, NOT from data)
-    function drawM() {
-        const grid = document.getElementById('mGrid');
-        const qRaw = (document.getElementById('mSearch').value || '');
-        const q = qRaw.trim().toLowerCase();
+    // Рендерит грид выборки в указанный контейнер. Одна логика для модалки (#mGrid)
+    // и для inline-панели Статов (#statsChampGrid) — без дублирования.
+    function drawMInto(grid, q, roleFilter) {
+        if (!grid) return;
         grid.innerHTML = "";
 
-        const roles = ["Top","Jungle","Mid","ADC","Support"];
+        const roles = ["Top","Jungle","Mid","ADC","Support"]
+            .filter(r => !roleFilter || r === roleFilter);
 
         roles.forEach(role => {
             const allChampsInRole = raw.filter(x => x.is[role]);
@@ -822,6 +922,7 @@
 
             const container = document.createElement('div');
             container.className = 'm-role-container';
+            container.dataset.role = role;   // якорь для фильтрации без пересборки
 
             const _onCnt = allChampsInRole.filter(x => selected.has(x.name)).length;
             const isAll = allChampsInRole.length > 0 && _onCnt === allChampsInRole.length;
@@ -839,6 +940,7 @@
                 const btn = document.createElement('div');
                 const isOn = selected.has(c.name);
                 btn.className = 'm-item ' + (isOn ? 'on' : '');
+                btn.dataset.name = c.name;   // якорь для точечного обновления (без пересборки сетки)
 
                 const wrap = document.createElement('div');
                 wrap.className = 'cp-iconwrap';
@@ -878,8 +980,10 @@
                     if(selected.has(c.name)) selected.delete(c.name);
                     else selected.add(c.name);
                     try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e) {}
-                    drawM();
-                    render();
+                    // ТОЧЕЧНО: раньше тут был drawM() — пересборка ВСЕЙ сетки (~130 чемпов,
+                    // с картинками, в двух гридах) ради одной галочки. Теперь красим одну ячейку.
+                    syncChampCell(c.name);
+                    applyChampRow(c.name);   // одна <tr>, а не пересборка tbody
                 };
                 champGrid.appendChild(btn);
             });
@@ -902,13 +1006,129 @@
             grid.appendChild(empty);
         }
     }
+
+    // ФИЛЬТР БЕЗ ПЕРЕСБОРКИ: поиск и роли только показывают/прячут уже построенные узлы.
+    // Раньше каждая буква в поиске и каждый клик по роли звали drawM() —
+    // полную пересборку сетки со всеми картинками.
+    function applyPickerFilter(grid, q, roleFilter) {
+        if (!grid) return;
+        q = (q || '').trim().toLowerCase();
+        var conts = grid.querySelectorAll('.m-role-container');
+        var anyVisible = false;
+        Array.prototype.forEach.call(conts, function(cont) {
+            var roleOk = !roleFilter || cont.dataset.role === roleFilter;
+            var shown = 0;
+            var items = cont.querySelectorAll('.m-item[data-name]');
+            Array.prototype.forEach.call(items, function(el) {
+                var hit = roleOk && (!q || el.dataset.name.toLowerCase().indexOf(q) !== -1);
+                el.style.display = hit ? '' : 'none';
+                if (hit) shown++;
+            });
+            cont.style.display = (roleOk && shown > 0) ? '' : 'none';
+            if (roleOk && shown > 0) anyVisible = true;
+        });
+        var empty = grid.querySelector('.m-empty-note');
+        if (!anyVisible) {
+            if (!empty) {
+                empty = document.createElement('div');
+                empty.className = 'm-empty-note';
+                empty.style.cssText = 'grid-column:1/-1;opacity:0.8;font-size:14px;text-align:center;padding:20px;color:rgba(255,255,255,0.4);';
+                empty.innerText = t('Ничего не найдено');
+                grid.appendChild(empty);
+            }
+            empty.style.display = '';
+        } else if (empty) { empty.style.display = 'none'; }
+    }
+    // Фильтрация обеих сеток по текущему поиску/роли — без пересборки.
+    function refilterPickers() {
+        var mg = document.getElementById('mGrid');
+        if (mg) applyPickerFilter(mg, ((document.getElementById('mSearch') || {}).value || ''), null);
+        var ig = document.getElementById('statsChampGrid');
+        if (ig) applyPickerFilter(ig, ((document.getElementById('statsChampSearch') || {}).value || ''), _statsRoleFilter);
+        updateStatsPanelChrome();
+    }
+    window.refilterPickers = refilterPickers;
+
+    // Полный перерисов выборки: и модалка (#mGrid), и inline-панель Статов (#statsChampGrid).
+    // Строим ВСЕ роли без фильтра, затем фильтруем показом/скрытием.
+    function drawM() {
+        var modalGrid = document.getElementById('mGrid');
+        if (modalGrid) {
+            drawMInto(modalGrid, '', null);
+        }
+        var inGrid = document.getElementById('statsChampGrid');
+        if (inGrid) {
+            drawMInto(inGrid, '', null);
+        }
+        refilterPickers();
+    }
+
+    // ТОЧЕЧНОЕ обновление выбора чемпа — вместо пересборки всей сетки (drawM).
+    // Один чемп может стоять в НЕСКОЛЬКИХ ролях, поэтому красим все его ячейки
+    // в обоих гридах (модалка + инлайн-панель) и пересчитываем счётчики ролей по DOM.
+    function syncChampCell(name) {
+        var on = selected.has(name);
+        var cells = document.querySelectorAll('.m-item[data-name="' + (window.CSS && CSS.escape ? CSS.escape(name) : name) + '"]');
+        Array.prototype.forEach.call(cells, function(el) { el.classList.toggle('on', on); });
+
+        // счётчики «N/M» и подсветка роли — считаем из DOM, это дёшево
+        var conts = document.querySelectorAll('.m-role-container');
+        Array.prototype.forEach.call(conts, function(cont) {
+            var items = cont.querySelectorAll('.m-item');
+            var onCnt = cont.querySelectorAll('.m-item.on').length;
+            var lbl = cont.querySelector('.m-role-count');
+            if (lbl) lbl.textContent = onCnt + '/' + items.length;
+            var roleDiv = cont.querySelector('.m-role');
+            if (roleDiv) roleDiv.classList.toggle('on', items.length > 0 && onCnt === items.length);
+        });
+
+        updateStatsPanelChrome();
+    }
+
+    // Счётчик «N чемпов» + подсветка активного фильтра ролей в inline-панели.
+    function updateStatsPanelChrome() {
+        var cnt = document.getElementById('statsChampCount');
+        if (cnt) cnt.textContent = selected.size;
+        var fr = document.getElementById('statsChampRoleFilter');
+        if (fr) {
+            var btns = fr.querySelectorAll('[data-role]');
+            for (var i = 0; i < btns.length; i++) {
+                var r = btns[i].getAttribute('data-role');
+                btns[i].classList.toggle('on', (r === '' ? _statsRoleFilter === null : r === _statsRoleFilter));
+            }
+        }
+    }
+    window.statsSetRoleFilter = function(role) {
+        _statsRoleFilter = role || null;
+        refilterPickers();   // без пересборки сетки
+    };
+    // Клик по иконке роли = 3 состояния: 1) фильтр на роль → 2) выбрать ВСЕХ чемпов роли
+    // в таблицу → 3) убрать ВСЕХ чемпов роли (и снять фильтр). Дальше цикл повторяется.
+    window.statsRoleCycle = function(role) {
+        if (_statsRoleFilter !== role) {
+            _statsRoleFilter = role;
+            drawM();
+            return;
+        }
+        var champsOfRole = raw.filter(function(x){ return x.is && x.is[role]; });
+        var allSel = champsOfRole.length > 0 && champsOfRole.every(function(x){ return selected.has(x.name); });
+        if (!allSel) {
+            champsOfRole.forEach(function(x){ selected.add(x.name); });
+        } else {
+            champsOfRole.forEach(function(x){ selected.delete(x.name); });
+            _statsRoleFilter = null;
+        }
+        try { localStorage.setItem('sel', JSON.stringify([...selected])); } catch(e) {}
+        drawM();
+        render();
+    };
     // v26: expose drawM for inline handlers & mobile IME
     window.drawM = drawM;
 
 
     function roleT(r, isAll) {
         raw.filter(x => x.is[r]).forEach(x => isAll ? selected.delete(x.name) : selected.add(x.name));
-        drawM(); 
+        drawM();
         render();
     }
 
@@ -937,71 +1157,353 @@
 
 
 
+    /* ════════════════════════════════════════════════════════════════
+       КАРТОЧКА ПРЕДМЕТА/РУНЫ — порт из lab-item-card (3 вкладки).
+       Стекло даёт хост .m-win (#itemDetailModal). Каталог = демо-данные
+       лаба; реальные сборки/чемпионы/золото добавятся позже.
+       ════════════════════════════════════════════════════════════════ */
+    function ICD_compImg(id){ return 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/item/'+id+'.png'; }
+    function ICD_champIcon(key){ return 'https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/'+key+'.png'; }
+    var ICD_STAT={ ad:['⚔','AD'], ap:['🔮','Сила умений'], hp:['❤','Здоровье'], armor:['🛡','Броня'], mr:['✦','Сопр. магии'],
+      crit:['💥','Крит'], as:['⚡','Скор. атаки'], ah:['⏩','Ускор. умений'], ms:['👟','Скор. бега'],
+      ls:['🩸','Вампиризм'], arPenFlat:['🗡↯','Проб. брони'], arPenPct:['🗡↯','Проб. брони'],
+      mrPenFlat:['🔮↯','Проб. сопр.'], mrPenPct:['🔮↯','Проб. сопр.'] };
+    var ICD_PCT={crit:1,as:1,ls:1,arPenPct:1,mrPenPct:1};
+    function ICD_statStr(k,v){ return '+'+v+(ICD_PCT[k]?'%':''); }
+    var ICD_GOLD={ ad:41.7, ap:20, hp:3.33, armor:25, mr:25, crit:33.3, as:33.3, ah:30, ms:12, ls:70,
+      mrPenFlat:0, arPenFlat:0, arPenPct:0, mrPenPct:0 };
+    function ICD_goldValue(it){ var g=0; (it.stats||[]).forEach(function(s){ g+=(ICD_GOLD[s[0]]||0)*s[1]; }); return Math.round(g); }
+    function ICD_efficiency(it){ if(!it.cost) return 0; return Math.round(ICD_goldValue(it)/it.cost*100); }
+    var ICD_CAT_COLOR={ 'AD':'#e8820a', 'AP':'#8b5cf6', 'Защита':'#2ecc71', 'Ботинки':'#5dade2' };
+    function ICD_wf(slug){ return 'https://www.wildriftfire.com/images/items/'+slug+'.png'; }
+    function C(id,name){ return {id:id,name:name}; }
+    var ICD_ITEMS={
+      ie:{name:'Грань Бесконечности',slug:'infinity-edge',cat:'AD',cost:3400,stats:[['ad',65],['crit',20]],
+        passive:'При крит. шансе ≥60% критические удары наносят на 35% больше урона.',
+        comp:[C(1038,'B.F. Меч'),C(1037,'Кирка'),C(1018,'Плащ ловкости')],
+        champs:['Jhin','Caitlyn','Tristana'],spike:'3-й предмет (крит-спайк)',tip:'Нужен крит-шанс рядом, иначе пассив спит.',pg:600},
+      collector:{name:'Коллекционер',slug:'the-collector',cat:'AD',cost:3000,stats:[['ad',50],['crit',20],['arPenFlat',12]],
+        passive:'Добивает врагов с HP <5%, за убийство даёт бонусное золото.',
+        comp:[C(3133,'Молот Колфилда'),C(1018,'Плащ ловкости'),C(1037,'Кирка')],
+        champs:['Zed','Talon','Jhin'],spike:'1-2 предмет (бурст)',tip:'Для убийц на пробивание и добивание.',pg:500},
+      bt:{name:'Жажда крови',slug:'bloodthirster',cat:'AD',cost:3400,stats:[['ad',55],['ls',18]],
+        passive:'Избыток вампиризма копится в щит (до 50–350 HP).',
+        comp:[C(1038,'B.F. Меч'),C(1053,'Скипетр вампира'),C(1036,'Длинный меч')],
+        champs:['Yasuo','Yone','Vayne'],spike:'2-3 предмет (устойчивость)',tip:'Топ против поке — щит держит хп.',pg:550},
+      youmuu:{name:'Призрачный клинок Йоумуу',slug:'youmuus-ghostblade',cat:'AD',cost:2900,stats:[['ad',55],['arPenFlat',18],['ms',20]],
+        passive:'Актив: всплеск скорости бега. Стаки скорости вне боя.',
+        comp:[C(3133,'Молот Колфилда'),C(1036,'Длинный меч'),C(1018,'Плащ ловкости')],
+        champs:['Zed','Talon','Qiyana'],spike:'1-й предмет (роуминг)',tip:'Мобильность + пробивание для убийц.',pg:450},
+      bc:{name:'Чёрный разделитель',slug:'black-cleaver',cat:'AD',cost:3100,stats:[['ad',40],['hp',300],['arPenPct',24]],
+        passive:'Удары срезают броню цели стаками. Даёт скорость бега при попадании.',
+        comp:[C(3133,'Молот Колфилда'),C(1011,'Пояс великана'),C(1029,'Тканевая броня')],
+        champs:['Garen','Darius','Renekton'],spike:'2 предмет (бруизер)',tip:'Хорош в команду с физ-уроном (срез брони общий).',pg:700},
+      serylda:{name:'Обида Серильды',slug:'seryldas-grudge',cat:'AD',cost:3200,stats:[['ad',45],['arPenPct',30],['ah',15]],
+        passive:'Замедляет целей с HP ниже 50%.',
+        comp:[C(3133,'Молот Колфилда'),C(1037,'Кирка'),C(1036,'Длинный меч')],
+        champs:['Jhin','Kaisa','Lucian'],spike:'3-4 предмет (против танков)',tip:'Берётся против бронированной команды.',pg:500},
+      luden:{name:'Эхо Людена',slug:'ludens-echo',cat:'AP',cost:3200,stats:[['ap',100],['ah',20]],
+        passive:'Умения наносят доп. урон по области и дают всплеск скорости.',
+        comp:[C(1058,'Большой жезл'),C(1026,'Жезл усиления'),C(3067,'Камень очага')],
+        champs:['Lux','Veigar','Brand'],spike:'1-й предмет (волна+бурст)',tip:'Топ первый предмет на бурст-магов.',pg:650},
+      nashor:{name:'Зуб Нашора',slug:'nashors-tooth',cat:'AP',cost:3000,stats:[['ap',85],['as',50],['ah',15]],
+        passive:'Автоатаки наносят доп. магический урон (15 + 20% от силы умений).',
+        comp:[C(1043,'Перевёрнутый лук'),C(1026,'Жезл усиления'),C(1052,'Том усиления')],
+        champs:['Teemo','Kennen','Diana'],spike:'2 предмет (он-хит)',tip:'Для магов на автоатаках.',pg:700},
+      liandryItem:{name:'Мучения Лиандри',slug:'liandrys-torment',cat:'AP',cost:3200,stats:[['ap',95],['hp',300]],
+        passive:'Урон умениями поджигает: жжёт % макс. HP во времени.',
+        comp:[C(1058,'Большой жезл'),C(1028,'Рубиновый кристалл'),C(1052,'Том усиления')],
+        champs:['Brand','Cassiopeia','Teemo'],spike:'2-3 предмет (против танков)',tip:'Топ против HP-команд (жжёт %HP).',pg:800},
+      iorb:{name:'Сфера бесконечности',slug:'infinity-orb',cat:'AP',cost:3200,stats:[['ap',110],['hp',200]],
+        passive:'Доп. магический урон по целям с HP <35%, гарант. крит умений.',
+        comp:[C(1058,'Большой жезл'),C(1026,'Жезл усиления'),C(1028,'Рубиновый кристалл')],
+        champs:['Lux','Syndra','Veigar'],spike:'2 предмет (добивание)',tip:'Усиливает добивание умениями.',pg:650},
+      rylai:{name:'Скипетр Рилай',slug:'rylais-crystal-scepter',cat:'AP',cost:2600,stats:[['ap',75],['hp',400]],
+        passive:'Урон умениями замедляет цель на 30%.',
+        comp:[C(1026,'Жезл усиления'),C(1028,'Рубиновый кристалл'),C(1052,'Том усиления')],
+        champs:['Brand','Morgana','Vladimir'],spike:'3 предмет (контроль)',tip:'Кайт и склейка комбо замедлением.',pg:600},
+      lich:{name:'Лезвие лича',slug:'lich-bane',cat:'AP',cost:3000,stats:[['ap',80],['ah',15],['ms',8]],
+        passive:'После умения следующая автоатака бьёт всплеском магического урона.',
+        comp:[C(1026,'Жезл усиления'),C(3057,'Камень очага'),C(1052,'Том усиления')],
+        champs:['Diana','Ekko','Akali'],spike:'2 предмет (спелл-блейд)',tip:'Для магов с быстрым каст→автоатака.',pg:750},
+      thornmail:{name:'Шипованный доспех',slug:'thornmail',cat:'Защита',cost:2700,stats:[['armor',55],['hp',300]],
+        passive:'Получив автоатаку — магический урон + анти-хил по атакующему.',
+        comp:[C(1031,'Кольчуга'),C(1029,'Тканевая броня'),C(1028,'Рубиновый кристалл')],
+        champs:['Malphite','Leona','Rammus'],spike:'2 предмет (против АД-кэрри)',tip:'Берётся против вампиризма и автоатак.',pg:650},
+      sunfire:{name:'Эгида Солнечного огня',slug:'sunfire-aegis',cat:'Защита',cost:2800,stats:[['armor',50],['hp',400]],
+        passive:'Поджигает врагов вокруг, урон растёт в бою.',
+        comp:[C(1031,'Кольчуга'),C(3067,'Камень очага'),C(1028,'Рубиновый кристалл')],
+        champs:['Malphite','Sett','Ornn'],spike:'1-2 предмет (вейвклир)',tip:'Танк-фронтлайн с аурой урона.',pg:700},
+      force:{name:'Сила природы',slug:'force-of-nature',cat:'Защита',cost:2900,stats:[['mr',60],['ms',25]],
+        passive:'Стаки от магического урона дают сопр. магии и скорость бега.',
+        comp:[C(1057,'Плащ негатрона'),C(1033,'Мантия нуля'),C(1006,'Свиток реген.')],
+        champs:['Malphite','Ornn','Sion'],spike:'3 предмет (против магов)',tip:'Топ против тяжёлой АП-команды.',pg:650},
+      hollow:{name:'Пустотное сияние',slug:'hollow-radiance',cat:'Защита',cost:2700,stats:[['mr',45],['hp',350]],
+        passive:'Аура жжёт врагов вокруг магическим уроном.',
+        comp:[C(1057,'Плащ негатрона'),C(1028,'Рубиновый кристалл'),C(3067,'Камень очага')],
+        champs:['Amumu','Sion','Malphite'],spike:'2 предмет (МС+аура)',tip:'Сопр. магии + вейвклир танкам.',pg:600},
+      frozen:{name:'Ледяное сердце',slug:'frozen-heart',cat:'Защита',cost:2700,stats:[['armor',70],['ah',20]],
+        passive:'Аура замедляет скор. атаки врагов вокруг.',
+        comp:[C(1031,'Кольчуга'),C(1029,'Тканевая броня'),C(3067,'Камень очага')],
+        champs:['Malphite','Nautilus','Sion'],spike:'3 предмет (против автоатак)',tip:'Душит АД-кэрри замедлением атаки.',pg:600},
+      steraks:{name:'Мощь Стерака',slug:'steraks-gage',cat:'Защита',cost:2900,stats:[['ad',45],['hp',400]],
+        passive:'При большом уроне даёт щит от макс. HP.',
+        comp:[C(1011,'Пояс великана'),C(3052,'Топор'),C(1028,'Рубиновый кристалл')],
+        champs:['Sett','Renekton','Camille'],spike:'3 предмет (выживание)',tip:'Бруизерам — щит спасает в замесе.',pg:750}
+    };
+    var ICD_BY_NAME={};
+    Object.keys(ICD_ITEMS).forEach(function(k){ ICD_BY_NAME[ICD_ITEMS[k].name]=k; });
+
+    function ICD_compMap(comp){ return comp.map(function(c){ return {icon:ICD_compImg(c.id),name:c.name}; }); }
+    function ICD_entOfItem(it){
+      return { kind:'item', name:it.name, icon:ICD_wf(it.slug), catLabel:it.cat, catColor:ICD_CAT_COLOR[it.cat]||'#5dade2',
+        cost:it.cost, stats:it.stats, passive:it.passive, comps:ICD_compMap(it.comp||[]), champs:it.champs||[],
+        spike:it.spike, tip:it.tip, eff:ICD_efficiency(it), gold:ICD_goldValue(it), pg:it.pg||0, rich:true };
+    }
+    // запасная сущность из боевых данных (имя/цена/строка статов/описание/иконка)
+    function ICD_entOfRaw(name, cost, statsStr, desc, imgSrc){
+      var rt = window.parseRichText || function(s){ return s; };
+      var rows=(statsStr||'').split('  |  ').map(function(s){return s.trim();}).filter(Boolean);
+      return { kind:'item', name:name||'', icon:imgSrc||'', catLabel:'', catColor:'#5dade2',
+        costRaw:cost, rawStats:rows.map(rt), passiveRaw:desc||'', comps:[], champs:[], rich:false };
+    }
+
+    var ICD_BY_SLUG={};
+    Object.keys(ICD_ITEMS).forEach(function(k){ ICD_BY_SLUG[ICD_ITEMS[k].slug]=k; });
+    function ICD_slugOf(url){ return (url||'').split('?')[0].split('/').pop().replace(/\.(png|jpe?g|webp)$/i,''); }
+
+    /* ── РУНЫ (кейстоуны) — порт каталога лаба, ключи = боевые slug иконок ── */
+    var ICD_PERK='https://ddragon.leagueoflegends.com/cdn/img/perk-images/Styles/';
+    function ICD_R(url,name){ return {icon:ICD_PERK+url,name:name}; }
+    var ICD_RUNES={
+      electro:{name:'Электрокьют',cat:'Доминирование',color:'#d44242',
+        desc:'3 отдельные атаки или умения по чемпиону за 3 сек наносят всплеск адаптивного урона.',
+        slots:[ICD_R('Domination/CheapShot/CheapShot.png','Дешёвый выстрел'),ICD_R('Domination/EyeballCollection/EyeballCollection.png','Коллекция глаз'),ICD_R('Domination/UltimateHunter/UltimateHunter.png','Охотник за ультой')],
+        champs:['Zed','Lux','Ahri'],spike:'С 1 уровня (бурст-комбо)',tip:'Для бурст-чемпов с 3 быстрыми тычками.'},
+      conqueror:{name:'Завоеватель',cat:'Точность',color:'#c8aa6e',
+        desc:'Атаки и умения по чемпионам копят адаптивную силу; на макс. стаках лечит от нанесённого урона.',
+        slots:[ICD_R('Precision/Triumph/Triumph.png','Триумф'),ICD_R('Precision/LegendAlacrity/LegendAlacrity.png','Проворность'),ICD_R('Precision/LastStand/LastStand.png','Последний рубеж')],
+        champs:['Garen','Yasuo','Jax'],spike:'Затяжной бой (бруизеры)',tip:'Топ для долгих разменов и бруизеров.'},
+      aery:{name:'Стремительная Аэри',cat:'Колдовство',color:'#9faafc',
+        desc:'Атаки и умения шлют Аэри: по врагу — урон, по союзнику — щит.',
+        slots:[ICD_R('Sorcery/ManaflowBand/ManaflowBand.png','Лента маны'),ICD_R('Sorcery/Transcendence/Transcendence.png','Превосходство'),ICD_R('Sorcery/Scorch/Scorch.png','Опаление')],
+        champs:['Lux','Morgana','Sona'],spike:'Лейн-поке/щиты',tip:'Для поке-магов и энчантеров.'},
+      comet:{name:'Чародейская комета',cat:'Колдовство',color:'#9faafc',
+        desc:'Урон умением призывает комету в цель; кулдаун снижается уроном умений.',
+        slots:[ICD_R('Sorcery/ManaflowBand/ManaflowBand.png','Лента маны'),ICD_R('Sorcery/Transcendence/Transcendence.png','Превосходство'),ICD_R('Sorcery/GatheringStorm/GatheringStorm.png','Шторм')],
+        champs:['Veigar','Xerath','Syndra'],spike:'Поке на дистанции',tip:'Для дальнобойных магов на скилл-шотах.'},
+      grasp:{name:'Хватка бессмертных',cat:'Доблесть',color:'#a1d586',
+        desc:'Раз в ~4 сек в бою следующая атака бьёт по % макс. HP, лечит и даёт перм. HP.',
+        slots:[ICD_R('Resolve/Demolish/Demolish.png','Снос'),ICD_R('Resolve/SecondWind/SecondWind.png','Второе дыхание'),ICD_R('Resolve/Overgrowth/Overgrowth.png','Разрастание')],
+        champs:['Malphite','Sett','Ornn'],spike:'Топлейн-танки',tip:'Для танков-топов с автоатаками в лейне.'},
+      darkharvest:{name:'Жатва тьмы',cat:'Доминирование',color:'#d44242',
+        desc:'Поражение чемпиона с HP <50% наносит доп. урон и копит стаки навсегда.',
+        slots:[ICD_R('Domination/SuddenImpact/SuddenImpact.png','Внезапный удар'),ICD_R('Domination/ZombieWard/ZombieWard.png','Вард-зомби'),ICD_R('Domination/UltimateHunter/UltimateHunter.png','Охотник за ультой')],
+        champs:['Veigar','Thresh','Senna'],spike:'Скейл (стаки в лейте)',tip:'Для скейл-чемпов: чем дольше игра, тем больнее.'}
+    };
+    var ICD_RUNE_BY_SLUG={ electrocute:'electro', conqueror:'conqueror', aery:'aery',
+      'arcane-comet':'comet', 'grasp-of-the-undying':'grasp', 'dark-harvest':'darkharvest' };
+
+    function ICD_entOfRune(r, iconOverride){
+      return { kind:'rune', name:r.name, icon:iconOverride||'', catLabel:r.cat, catColor:r.color||'#9faafc',
+        passive:r.desc, comps:r.slots.map(function(s){ return {icon:s.icon,name:s.name}; }), champs:r.champs||[],
+        spike:r.spike, tip:r.tip, rich:true, round:true };
+    }
+    function ICD_entOfRuneRaw(name, type, desc, imgSrc){
+      return { kind:'rune', name:name||'', icon:imgSrc||'', catLabel:type||'', catColor:'#9faafc',
+        passiveRaw:desc||'', comps:[], champs:[], rich:false, round:true };
+    }
+
+    var ICD_cur=null, ICD_tab='stats', ICD_box='itemDetailContent';
+
+    function ICD_catTag(e){ return e.catLabel?'<span class="icd-cat">'+e.catLabel+'</span>':''; }
+    function ICD_costTag(e){ var c=e.cost||e.costRaw; return c?'<span class="icd-cost">🪙 '+c+'</span>':''; }
+    function ICD_statsHTML(e){
+      if(e.kind==='rune') return '';
+      if(e.rich){
+        if(!e.stats) return '';
+        return '<div class="icd-stats">'+e.stats.map(function(s){
+          return '<div class="icd-stat"><span class="sl">'+ICD_STAT[s[0]][0]+' '+ICD_STAT[s[0]][1]+'</span><span class="sv">'+ICD_statStr(s[0],s[1])+'</span></div>';
+        }).join('')+'</div>';
+      }
+      if(!e.rawStats||!e.rawStats.length) return '';
+      return '<div class="icd-stats">'+e.rawStats.map(function(s){
+        return '<div class="icd-stat"><span class="sl">'+s+'</span></div>';
+      }).join('')+'</div>';
+    }
+    function ICD_passiveHTML(e){
+      var rt = window.parseRichText || function(s){ return s; };
+      var tag = e.kind==='rune' ? 'Эффект' : 'Пассив';
+      if(e.rich){
+        if(!e.passive) return '';
+        return '<div class="icd-passive"><span class="icd-ptag">'+tag+'</span>'+e.passive+'</div>';
+      }
+      if(!e.passiveRaw) return '';
+      if(e.kind==='rune') return '<div class="icd-passive"><span class="icd-ptag">'+tag+'</span>'+rt(e.passiveRaw)+'</div>';
+      var html=e.passiveRaw.split('\n').filter(Boolean).map(function(line){
+        var m=line.match(/^([^:]+?):\s*(.+)/s);
+        if(m) return '<div style="margin-bottom:8px;"><span class="icd-ptag">'+m[1]+'</span>'+rt(m[2])+'</div>';
+        return '<div style="margin-bottom:6px;color:rgba(230,243,251,.75);">'+rt(line)+'</div>';
+      }).join('');
+      return '<div class="icd-passive">'+html+'</div>';
+    }
+    function ICD_buildPane(e){
+      if(e.kind==='rune'){
+        if(!e.rich) return '<div class="icd-soon">🌳 Дерево руны добавим позже — слот-руны этой ветки.</div>';
+        if(!e.comps||!e.comps.length) return '<div class="icd-empty">нет данных</div>';
+        return '<div class="icd-runetree"><div class="icd-rt-h" style="color:'+e.catColor+'">'+e.catLabel+'</div>'+
+          e.comps.map(function(c){return '<div class="icd-rt-row"><img src="'+c.icon+'" onerror="this.style.visibility=\'hidden\'"><span>'+c.name+'</span></div>';}).join('')+'</div>';
+      }
+      if(!e.rich) return '<div class="icd-soon">🔧 Дерево сборки добавим позже — соберём <b>из чего</b> состоит предмет.</div>';
+      if(!e.comps||!e.comps.length) return '<div class="icd-empty">нет данных о сборке</div>';
+      var parts=e.comps.map(function(c,i){
+        return (i?'<div class="icd-bt-plus">+</div>':'')+
+          '<div class="icd-bt-comp"><img src="'+c.icon+'" onerror="this.style.visibility=\'hidden\'"><span>'+c.name+'</span></div>';
+      }).join('');
+      return '<div class="icd-buildtree">'+parts+'<div class="icd-bt-eq">=</div>'+
+        '<div class="icd-bt-comp result"><img src="'+e.icon+'" onerror="this.style.opacity=.2"><span>'+e.name+'</span></div></div>'+
+        '<div class="icd-bt-cost">💰 Полная стоимость: <b>'+(e.cost||0)+'</b> зол.</div>';
+    }
+    function ICD_champsPane(e){
+      if(!e.rich) return e.kind==='rune'
+        ? '<div class="icd-soon">👤 Кому брать добавим позже — чемпионы под эту руну.</div>'
+        : '<div class="icd-soon">👤 Кому брать и <b>золотоэффективность</b> добавим позже — нужны данные по чемпионам и цене статов.</div>';
+      var champs = (e.champs&&e.champs.length)
+        ? '<div class="icd-rblock"><span class="icd-rlbl">👤 Кому брать</span><div class="icd-champs">'+
+            e.champs.map(function(k){return '<img src="'+ICD_champIcon(k)+'" alt="'+k+'" title="'+k+'" onerror="this.style.opacity=.2">';}).join('')+'</div></div>'
+        : '';
+      var spike = e.spike?'<div class="icd-rblock"><span class="icd-rlbl">🔥 Спайк</span><span class="icd-rtext">'+e.spike+'</span></div>':'';
+      var tip   = e.tip?'<div class="icd-rblock"><span class="icd-rlbl">💡 Когда брать</span><span class="icd-rtext">'+e.tip+'</span></div>':'';
+      var eff='';
+      if(e.cost){
+        var rows=e.stats.map(function(s){ var g=Math.round((ICD_GOLD[s[0]]||0)*s[1]);
+          return '<div class="icd-effrow"><span>'+ICD_STAT[s[0]][0]+' '+ICD_statStr(s[0],s[1])+' '+ICD_STAT[s[0]][1]+'</span><b>'+(g?g+' зол':'—')+'</b></div>';
+        }).join('');
+        if(e.pg) rows+='<div class="icd-effrow passive"><span>✨ Пассив / эффект <i>(оценка)</i></span><b>'+e.pg+' зол</b></div>';
+        var totalGold=e.gold+(e.pg||0), effTot=Math.round(totalGold/e.cost*100);
+        var pct=Math.min(140,effTot), col=effTot>=100?'#2ecc71':effTot>=85?'#f1c40f':'#e8820a';
+        eff='<div class="icd-rblock"><span class="icd-rlbl">💰 Золотоэффективность</span>'+
+          '<div class="icd-effchips"><span class="icd-effchip">по статам <b>'+e.eff+'%</b></span>'+
+            '<span class="icd-effchip total" style="border-color:'+col+'">с пассивом <b style="color:'+col+'">'+effTot+'%</b></span></div>'+
+          '<div class="icd-effrows">'+rows+'</div>'+
+          '<div class="icd-effbar"><i style="width:'+(pct/140*100)+'%;background:'+col+'"></i></div>'+
+          '<div class="icd-effsub">статы '+e.gold+' + пассив '+(e.pg||0)+' = '+totalGold+' зол · предмет '+e.cost+' зол'+
+            '<br>золото по базовым предметам Wild Rift (500 зол) · цена пассива = экспертная оценка</div></div>';
+      }
+      var body=champs+eff+spike+tip;
+      return '<div class="icd-rich">'+(body||'<div class="icd-empty">нет данных</div>')+'</div>';
+    }
+    function ICD_tabPane(e){
+      if(ICD_tab==='build')  return ICD_buildPane(e);
+      if(ICD_tab==='champs') return ICD_champsPane(e);
+      return ICD_statsHTML(e)+ICD_passiveHTML(e);
+    }
+    function ICD_render(){
+      var box=document.getElementById(ICD_box||'itemDetailContent');
+      if(!box||!ICD_cur) return;
+      var e=ICD_cur;
+      var tabs = e.kind==='rune'
+        ? [['stats','Эффект'],['build','Дерево руны'],['champs','Кому брать']]
+        : [['stats','Характеристики'],['build','Из чего'],['champs','Кому брать + золото']];
+      if(!tabs.some(function(t){return t[0]===ICD_tab;})) ICD_tab='stats';
+      var bar=tabs.map(function(t){ return '<button class="icd-tab'+(ICD_tab===t[0]?' on':'')+'" data-icdtab="'+t[0]+'">'+t[1]+'</button>'; }).join('');
+      box.innerHTML='<div class="icd-card kind-'+e.kind+'" style="--cc:'+e.catColor+'">'+
+        '<div class="icd-head">'+
+          (e.icon?'<img class="icd-icon'+(e.round?' round':'')+'" src="'+e.icon+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">':'')+
+          '<div class="icd-headmeta"><div class="icd-namerow">'+ICD_catTag(e)+ICD_costTag(e)+'</div>'+
+          '<div class="icd-name">'+e.name+'</div></div></div>'+
+        '<div class="icd-tabs">'+bar+'</div>'+
+        '<div class="icd-pane">'+ICD_tabPane(e)+'</div>'+
+      '</div>';
+      box.querySelectorAll('[data-icdtab]').forEach(function(b){
+        b.onclick=function(){ ICD_tab=b.dataset.icdtab; ICD_render(); };
+      });
+    }
+
     window.openItemDetail = function(name, cost, stats, desc, imgSrc) {
         var modal = document.getElementById('itemDetailModal');
         var box   = document.getElementById('itemDetailContent');
         if(!modal || !box) return;
-        box.innerHTML = '';
-
-        // Header: icon + name + cost
-        var hdr = document.createElement('div');
-        hdr.style.cssText = 'display:flex;align-items:center;gap:14px;margin-bottom:16px;';
-        if(imgSrc) {
-            var img = document.createElement('img');
-            img.src = imgSrc; img.style.cssText = 'width:64px;height:64px;border-radius:10px;flex-shrink:0;';
-            img.onerror = function(){ this.style.display='none'; };
-            hdr.appendChild(img);
-        }
-        var nameCol = document.createElement('div');
-        var nameEl = document.createElement('div');
-        nameEl.style.cssText = 'font-size:20px;font-weight:900;color:#fff;margin-bottom:6px;';
-        nameEl.textContent = name;
-        var costEl = document.createElement('span');
-        costEl.style.cssText = 'background:rgba(201,168,0,0.18);border:1px solid rgba(201,168,0,0.5);color:#FFD700;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;';
-        costEl.textContent = cost;
-        nameCol.appendChild(nameEl); nameCol.appendChild(costEl);
-        hdr.appendChild(nameCol); box.appendChild(hdr);
-
-        // Stats block
-        if(stats) {
-            var rt = window.parseRichText || function(s){ return s; };
-            var statsBox = document.createElement('div');
-            statsBox.style.cssText = 'margin-bottom:14px;background:rgba(255,255,255,0.03);border-radius:10px;padding:4px 10px;';
-            stats.split('  |  ').filter(Boolean).forEach(function(s) {
-                var row = document.createElement('div');
-                row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.06);';
-                row.innerHTML = '<span style="color:var(--accent-light);font-weight:700;font-size:14px;">' + rt(s.trim()) + '</span>';
-                statsBox.appendChild(row);
-            });
-            box.appendChild(statsBox);
-        }
-
-        // Description block
-        if(desc) {
-            var rt = window.parseRichText || function(s){ return s; };
-            var descBox = document.createElement('div');
-            desc.split('\n').filter(Boolean).forEach(function(line) {
-                var m = line.match(/^([^:]+?):\s*(.+)/s);
-                var el = document.createElement('div');
-                el.style.marginBottom = '10px';
-                if(m) {
-                    el.innerHTML = '<div style="color:var(--sel-text);font-weight:800;font-size:13px;margin-bottom:3px;">' + m[1] + '</div>'
-                                 + '<div style="color:rgba(255,255,255,0.82);font-size:13px;line-height:1.65;">' + rt(m[2]) + '</div>';
-                } else {
-                    el.style.cssText = 'color:rgba(255,255,255,0.7);font-size:13px;line-height:1.65;margin-bottom:8px;';
-                    el.innerHTML = rt(line);
-                }
-                descBox.appendChild(el);
-            });
-            box.appendChild(descBox);
-        }
-
+        var key = ICD_BY_SLUG[ICD_slugOf(imgSrc)] || ICD_BY_NAME[name];
+        ICD_box = 'itemDetailContent';
+        ICD_cur = key ? ICD_entOfItem(ICD_ITEMS[key]) : ICD_entOfRaw(name, cost, stats, desc, imgSrc);
+        ICD_tab = 'stats';
+        ICD_render();
         openModal('itemDetailModal');
     };
 
-    
+    window.openItemDetailKey = function(key) {
+        if(!ICD_ITEMS[key]) return;
+        var box = document.getElementById('itemDetailContent');
+        if(!box) return;
+        ICD_box = 'itemDetailContent';
+        ICD_cur = ICD_entOfItem(ICD_ITEMS[key]);
+        ICD_tab = 'stats';
+        ICD_render();
+        openModal('itemDetailModal');
+    };
+
     window.closeItemDetail = function() {
         closeModal('itemDetailModal');
+    };
+
+    /* ── ПИКЕР: дизайн лаб-пикера на боевых сетках (имена, точки категорий, ⚙ размер) ── */
+    function ICD_pickSize(){ return localStorage.getItem('wr_pickSize') || 'md'; }
+    function ICD_catColorFromSection(label){
+      label = label || '';
+      if(label.indexOf('⚔')>=0 || /физ/i.test(label)) return '#e8820a';
+      if(label.indexOf('🔮')>=0 || /маг/i.test(label)) return '#8b5cf6';
+      if(label.indexOf('🛡')>=0 || /защит/i.test(label)) return '#2ecc71';
+      if(label.indexOf('👟')>=0 || /ботин/i.test(label)) return '#ffffff';
+      if(label.indexOf('🔴')>=0) return '#e74c3c';
+      if(label.indexOf('🟡')>=0) return '#f1c40f';
+      if(label.indexOf('🟢')>=0) return '#2ecc71';
+      if(label.indexOf('🔵')>=0) return '#5b9bd5';
+      if(label.indexOf('⭐')>=0) return '#c8aa6e';
+      return '#ffffff';
+    }
+    function ICD_enhancePicker(maskId, isRune){
+      var mask = document.getElementById(maskId);
+      if(!mask) return;
+      mask.setAttribute('data-pick', 'lab');
+      mask.setAttribute('data-isize', ICD_pickSize());
+      mask.querySelectorAll(isRune ? '.rune-card' : '.item-card').forEach(function(card){
+        if(card._pickInit) return;
+        card._pickInit = true;
+        var grid = card.parentElement;
+        var sec = grid ? grid.previousElementSibling : null;
+        var dot = document.createElement('i');
+        dot.className = 'pc-pcat';
+        dot.style.color = ICD_catColorFromSection(sec ? sec.textContent : '');
+        card.appendChild(dot);
+        if(!isRune){
+          var parts = (card.getAttribute('data-tip') || '').split('¦');
+          var img = card.querySelector('img');
+          var nm = parts[0] || (img ? img.alt : '');
+          if(nm){ var s = document.createElement('div'); s.className = 'pc-pname'; s.textContent = nm; card.appendChild(s); }
+        }
+      });
+    }
+    window.togglePickSize = function(maskId, btn){
+      var mask = document.getElementById(maskId);
+      if(!mask) return;
+      var existing = mask.querySelector('.pick-sizepop');
+      if(existing){ existing.remove(); return; }
+      var cur = ICD_pickSize();
+      var sizes = [['sm','Маленькие'],['md','Средние'],['lg','Крупные']];
+      var pop = document.createElement('div');
+      pop.className = 'glass pick-sizepop';
+      pop.innerHTML = '<div class="ps-h">⚙ Размер иконок</div><div class="ps-seg">' +
+        sizes.map(function(o){ return '<button data-sz="'+o[0]+'" class="'+(cur===o[0]?'on':'')+'">'+o[1]+'</button>'; }).join('') +
+        '</div>';
+      (btn && btn.parentElement ? btn.parentElement : mask).appendChild(pop);
+      pop.querySelectorAll('[data-sz]').forEach(function(b){
+        b.onclick = function(){
+          localStorage.setItem('wr_pickSize', b.dataset.sz);
+          mask.setAttribute('data-isize', b.dataset.sz);
+          pop.querySelectorAll('[data-sz]').forEach(function(x){ x.classList.toggle('on', x===b); });
+        };
+      });
     };
 
     // window.openItems — открыть модалку предметов
@@ -1022,6 +1524,7 @@
                     openItemDetail(parts[0]||'', parts[1]||'', parts[2]||'', desc, imgSrc);
                 });
             });
+            ICD_enhancePicker('itemsMask', false);
         }, 80);
     };
 
@@ -1031,15 +1534,18 @@
 
     // Убрать active state со всех кнопок сайдбара
     function _sidebarClearActive() {
-        document.querySelectorAll('#sidePanel .side-btn').forEach(function(b) {
+        document.querySelectorAll('#sidePanel .rail-btn').forEach(function(b) {
             b.classList.remove('side-active');
         });
     }
-    // Установить active state по ключу 'what' (совпадение с onclick атрибутом)
+    // Установить active state по ключу 'what'. Э1.1: рельс пересобран из lab-main →
+    // у кнопок есть честный data-section. Разбор onclick-строки оставлен фоллбэком
+    // для кнопок без data-section (админские вызовы cms*).
     function _sidebarSetActive(what) {
         _sidebarClearActive();
         if (!what) return;
-        document.querySelectorAll('#sidePanel .side-btn').forEach(function(btn) {
+        document.querySelectorAll('#sidePanel .rail-btn').forEach(function(btn) {
+            if (btn.getAttribute('data-section') === what) { btn.classList.add('side-active'); return; }
             var oc = btn.getAttribute('onclick') || '';
             if (oc.indexOf("'" + what + "'") !== -1 || oc.indexOf('"' + what + '"') !== -1) {
                 btn.classList.add('side-active');
@@ -1048,6 +1554,31 @@
     }
     window._sidebarSetActive = _sidebarSetActive;
     window._sidebarClearActive = _sidebarClearActive;
+
+    // ★ Флаг «инструмент сайдбара открыт» (порт data-railopen из lab-sidebar-views).
+    // Ставим html[data-toolopen="1"] ТОЛЬКО для инлайн-инструментов (.sidebar-modal):
+    // рельс держится раскрытым (240px) + контент сдвигается вправо (CSS по флагу).
+    // Фуллскрин-драфтер (.m-fullscreen) флаг НЕ ставит — он занимает весь экран.
+    function _setToolOpen(on) {
+        if (!_isSidebarPc()) { document.documentElement.removeAttribute('data-toolopen'); return; }
+        if (on) document.documentElement.setAttribute('data-toolopen', '1');
+        else document.documentElement.removeAttribute('data-toolopen');
+    }
+    function _syncToolOpenFlag() {
+        var el = _sidebarModalId ? document.getElementById(_sidebarModalId) : null;
+        var isInline = !!(el && el.classList.contains('sidebar-modal'));
+        _setToolOpen(_pcSideMode && isInline);
+    }
+    window._syncToolOpenFlag = _syncToolOpenFlag;
+
+    // Закрыть открытый инлайн-инструмент сайдбара, если он открыт. Экспонируется,
+    // потому что _sidebarModalId и closeModal живут в ЭТОЙ IIFE, а switchMainView —
+    // в другой (читать их там напрямую = ReferenceError).
+    window._closeSidebarToolIfOpen = function() {
+        if (!_sidebarModalId) return;
+        var el = document.getElementById(_sidebarModalId);
+        if (el && el.classList.contains('sidebar-modal')) closeModal(_sidebarModalId);
+    };
 
     window.toggleSidebar = function() {
         var panel = document.getElementById('sidePanel');
@@ -1085,6 +1616,7 @@
                 _sidebarModalId = null;
                 _pcSideMode = false;
             }
+            _setToolOpen(false);
             return;
         }
 
@@ -1119,7 +1651,13 @@
 
     window.openCalc = function() {
         var fr = document.getElementById('calcFrame');
-        if (fr && !fr.getAttribute('src')) fr.setAttribute('src', 'calc-app/index.html?embed=1');  // ленивая загрузка модуля калькулятора (?embed=1 = чистый режим без лаб-полосы)
+        // ленивая загрузка модуля калькулятора (?embed=1 = чистый режим без лаб-полосы).
+        // На localhost iframe грузим свежим каждый раз (&t=) — иначе браузер кэширует
+        // старую копию calc-app и правки не видно.
+        var dev = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '');
+        if (fr && (!fr.getAttribute('src') || dev)) {
+            fr.setAttribute('src', 'calc-app/index.html?embed=1' + (dev ? '&t=' + Date.now() : ''));
+        }
         openModal('calcMask');
     };
     window.closeCalc = function() { closeModal('calcMask'); };
@@ -1541,6 +2079,7 @@
                     openRuneDetail(parts[0]||'', parts[1]||'', desc, imgSrc);
                 });
             });
+            ICD_enhancePicker('runesMask', true);
         }, 80);
     };
     window.closeRunes = function() {
@@ -1551,39 +2090,11 @@
         var modal = document.getElementById('runeDetailModal');
         var box = document.getElementById('runeDetailContent');
         if(!modal || !box) return;
-        box.innerHTML = '';
-
-        // Иконка
-        if(imgSrc) {
-            var img = document.createElement('img');
-            img.src = imgSrc;
-            img.style.cssText = 'width:72px;height:72px;border-radius:50%;display:block;margin:0 auto 14px;border:2px solid var(--sel-glow);box-shadow:0 0 20px var(--sel-fill);';
-            img.onerror = function(){ this.style.display='none'; };
-            box.appendChild(img);
-        }
-
-        // Имя
-        var nameEl = document.createElement('div');
-        nameEl.style.cssText = 'font-size:20px;font-weight:900;color:var(--sel-text);text-align:center;margin-bottom:6px;';
-        nameEl.textContent = name;
-        box.appendChild(nameEl);
-
-        // Тип
-        if(type) {
-            var typeEl = document.createElement('div');
-            typeEl.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.4);text-align:center;font-weight:700;letter-spacing:1px;margin-bottom:18px;text-transform:uppercase;';
-            typeEl.textContent = type;
-            box.appendChild(typeEl);
-        }
-
-        // Описание
-        if(desc) {
-            var descBox = document.createElement('div');
-            descBox.style.cssText = 'background:var(--sel-bg);border:1px solid var(--sel-border);border-radius:12px;padding:14px 16px;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.75;';
-            descBox.textContent = desc;
-            box.appendChild(descBox);
-        }
-
+        var key = ICD_RUNE_BY_SLUG[ICD_slugOf(imgSrc)];
+        ICD_box = 'runeDetailContent';
+        ICD_cur = key ? ICD_entOfRune(ICD_RUNES[key], imgSrc) : ICD_entOfRuneRaw(name, type, desc, imgSrc);
+        ICD_tab = 'stats';
+        ICD_render();
         openModal('runeDetailModal');
     };
     window.closeRuneDetail = function() { closeModal('runeDetailModal'); };
@@ -1641,6 +2152,16 @@
     function saveItemTierData(){ try{localStorage.setItem('itemTierData',JSON.stringify(ITEM_TIER_DATA));}catch(e){} }
     function saveRuneTierData(){ try{localStorage.setItem('runeTierData',JSON.stringify(RUNE_TIER_DATA));}catch(e){} }
     loadItemTierData(); loadRuneTierData();
+
+    /* ── Источники предметов/рун нужны и тир-мейкеру (вид «Тир-лист»).
+       Владелец один — эта коробка; наружу отдаём только читалки и списки
+       категорий, чтобы вид не заводил свой дубль реестра. ── */
+    window.TierSources = {
+        items: function(){ return getItemsByCat(); },
+        runes: function(){ return getRunesByCat(); },
+        itemCats: _ITEM_CATS,
+        runeCats: _RUNE_CATS
+    };
 
     // Map each category to items in DOM (lazy, built once per session)
     var _itemsByCat = null;
@@ -2140,7 +2661,7 @@
             lbl.style.cssText='font-size:8px;color:rgba(255,255,255,0.55);text-align:center;line-height:1.15;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:100%;';
             lbl.textContent=ch.name;
             div.appendChild(thumb); div.appendChild(lbl);
-            div.onclick=function(){openChampDetail(ch.name);};
+            div.onclick=function(){window.openChampPage(ch.name);};
             // Patch dot in champ list + tooltip
             var pI = patchMap[ch.name];
             if(pI) {
@@ -2166,313 +2687,472 @@
         var m=document.getElementById('sideChampsMask');
         if(m&&m.classList.contains('active')) scBuildGrid();
     });
-    // HTML секции гайда (сборки/руны/заклинания/прокачка) из data-pipeline/guides
-    function cdGuideHTML(g){
-        var esc=function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
-        var card=function(inner){ return '<div style="background:rgba(255,255,255,0.04);border:1px solid var(--sel-border-sub);border-radius:12px;padding:12px 14px;">'+inner+'</div>'; };
-        var h=function(txt){ return '<div style="font-size:11px;font-weight:800;letter-spacing:.5px;color:var(--accent);margin-bottom:8px;">'+txt+'</div>'; };
-        var lbl=function(txt){ return '<div style="font-size:10px;color:rgba(255,255,255,0.4);margin:6px 0 4px;">'+txt+'</div>'; };
-        var chip=function(txt){ return '<span style="display:inline-block;font-size:12px;font-weight:600;color:#fff;background:rgba(255,255,255,0.06);border:1px solid var(--sel-border-sub);border-radius:7px;padding:4px 9px;margin:0 5px 5px 0;">'+esc(txt)+'</span>'; };
-        var out='';
-        var b=g.builds&&g.builds[0]&&g.builds[0].items;
-        if(b){
-            var inner=h('🛠 '+esc(g.builds[0].title||'Сборка')+(g.builds[0].tier?(' · тир '+esc(g.builds[0].tier)):''));
-            if(b.starting&&b.starting.length) inner+=lbl('Старт')+b.starting.map(chip).join('');
-            if(b.core&&b.core.length) inner+=lbl('Ядро')+b.core.map(chip).join('');
-            if(b.boots&&b.boots.length) inner+=lbl('Ботинки')+b.boots.map(chip).join('');
-            out+=card(inner);
+    /* ══════════════════════════════════════════════════════════════════════
+       СТРАНИЦА ЧЕМПА (Э1.9) — вместо модалки champDetailMask (решение Р2).
+
+       Клик по чемпу ВЕЗДЕ ведёт на СТРАНИЦУ по адресу `champions/<slug>/` —
+       ту же самую, что видит поисковик. Разметку печатает champ-page.js, он же
+       печатает статические файлы (см. seo/generate.mjs): страница ОДНА, просто
+       здесь она рисуется без перезагрузки, а рельс сайта остаётся на месте (Р6).
+
+       ЧТО ЗДЕСЬ СВЕРХ СТАТИКИ (в статике этого нет и быть не может):
+         · личные матчапы (localStorage) + авто-матчапы из категорий + исключения;
+         · кнопка «Патч-нот» для админа (window._isAdmin);
+         · переход по чемпу без перезагрузки.
+
+       АНТИДЁРГАНЬЕ: первый кадр рисуется из уже загруженных данных, догрузка
+       (гайд/умения/качества/контры) обновляет страницу через labMorph — трогается
+       только изменившееся, узлы живут. Ползунок уровня и вкладки умений вообще
+       не пересобирают разметку (см. hydrate в champ-page.js).
+       ══════════════════════════════════════════════════════════════════════ */
+    var CP_LVL = 10;
+    var _cpFetch = {};
+    var _cpCur = null;             // какой чемп открыт сейчас
+    var _cpPrevView = 'main';      // куда вернуться по «Назад»
+
+    function cpJson(url) {
+        if (!_cpFetch[url]) {
+            _cpFetch[url] = fetch(url, { cache: 'force-cache' })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .catch(function () { return null; });
         }
-        if(g.runes&&g.runes.length) out+=card(h('💎 Руны')+g.runes.map(chip).join(''));
-        if(g.spells&&g.spells.length) out+=card(h('✨ Заклинания')+g.spells.map(function(s){ return chip((s.combo||s)+(s && s.wr?(' · '+s.wr+'%'):'')); }).join(''));
-        if(g.skillOrder&&g.skillOrder.length){
-            var so=g.skillOrder.map(function(s){ return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;"><span style="flex:1;font-size:12px;color:#fff;">'+esc(s.ability)+'</span><span style="font-size:11px;color:var(--accent);font-weight:700;">'+(s.levels||[]).join(', ')+'</span></div>'; }).join('');
-            out+=card(h('📈 Прокачка скиллов')+so);
-        }
-        if(!out) return '';
-        var dd=g.dataDate?('<div style="font-size:10px;color:rgba(255,255,255,0.3);margin-top:10px;">Источник: гайды WR · '+esc(g.dataDate)+'</div>'):'';
-        return '<div style="font-size:13px;font-weight:800;color:#fff;margin:6px 0 10px;">📖 Гайд</div><div style="display:grid;grid-template-columns:'+(window.innerWidth<=768?'1fr':'1fr 1fr')+';gap:12px;align-items:start;">'+out+'</div>'+dd;
+        return _cpFetch[url];
     }
-    window.openChampDetail=function(name){
-        var champ=raw.find(function(x){return x.name===name;});
-        var el=document.getElementById('champDetailContent');
-        el.innerHTML='';
-        el.style.cssText='text-align:left;padding:0;';
+    function cpNorm(s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+    function cpKey(name) { return cpNorm(champKey(name)); }
 
-        // ══ MAIN 2-COLUMN LAYOUT ══
-        var mainGrid=document.createElement('div');
-        mainGrid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:20px;';
-        // Mobile: stack
-        if(window.innerWidth<=768) mainGrid.style.gridTemplateColumns='1fr';
+    var CP_ROLE_LBL = { Top: 'Топ', Jungle: 'Лес', Mid: 'Мид', ADC: 'Бот (стрелок)', Support: 'Поддержка' };
+    var CP_RANKS = [['алмаз', 'Алмаз+'], ['мастер', 'Мастер+'], ['чалик', 'Челленджер'], ['суверен', 'Суверен'], ['все', 'Все ранги']];
+    var CP_ROLE_RU = { top: 'Топ', jungle: 'Лес', mid: 'Мид', adc: 'Бот', support: 'Поддержка' };
 
-        // ── LEFT COLUMN: Profile + Stats ──
-        var leftCol=document.createElement('div');
-
-        // Icon + Name header
-        var header=document.createElement('div');
-        header.style.cssText='display:flex;align-items:center;gap:14px;margin-bottom:14px;';
-        var ci=document.createElement('img');
-        ci.src=champIcon(name);
-        ci.style.cssText='width:72px;height:72px;border-radius:14px;border:2px solid var(--sel-glow-med);box-shadow:0 0 18px var(--sel-fill);object-fit:cover;flex-shrink:0;';
-        ci.onerror=function(){this.style.display='none';};
-        header.appendChild(ci);
-        var nameBlock=document.createElement('div');
-        var cn=document.createElement('div');
-        cn.style.cssText='font-size:22px;font-weight:900;color:var(--sel-text);';
-        cn.textContent=name;
-        nameBlock.appendChild(cn);
-        if(champ){
-            var roles=[]; if(champ.is.Top)roles.push('Top'); if(champ.is.Jungle)roles.push('Jungle'); if(champ.is.Mid)roles.push('Mid'); if(champ.is.ADC)roles.push('ADC'); if(champ.is.Support)roles.push('Support');
-            var rd=document.createElement('div');
-            rd.style.cssText='font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;';
-            rd.textContent=roles.join(' \u00b7 ')||'\u2014';
-            nameBlock.appendChild(rd);
-        }
-        // Category tags
-        if(window._champCategories && window._champCategories.length){
-            var champCats=(window._champCategories||[]).filter(function(c){
-                if(c.champStars){var found=false;[1,2,3].forEach(function(s){if((c.champStars[String(s)]||[]).indexOf(name)!==-1)found=true;});return found;}
-                return(c.champions||[]).indexOf(name)!==-1;
+    /* Мета и таблица по рангам — из WR_DATA (снимок wr-stats.json). Тот же
+       источник, что у вида WinRate и у статической страницы: один человек не
+       должен видеть на двух экранах разные проценты. */
+    function cpWr(name) {
+        var k = cpKey(name), rows = [], meta = null;
+        var W = window.WR_DATA || {};
+        CP_RANKS.forEach(function (r) {
+            var block = W[r[0]];
+            if (!block) return;
+            Object.keys(block).forEach(function (role) {
+                (block[role] || []).forEach(function (e) {
+                    if (cpKey(e.name) !== k) return;
+                    rows.push({ rank: r[1], role: CP_ROLE_RU[role] || role, wr: e.wr, pr: e.pr });
+                    if (!meta || r[0] === 'все') meta = { tier: e.tier, wr: e.wr, pr: e.pr, br: e.br, trend: e.ch };
+                });
             });
-            if(champCats.length){
-                var tagsRow=document.createElement('div');
-                tagsRow.style.cssText='display:flex;flex-wrap:wrap;gap:3px;margin-top:5px;';
-                champCats.forEach(function(cat){
-                    var starLevel=null;
-                    if(cat.champStars){[1,2,3].forEach(function(s){if((cat.champStars[String(s)]||[]).indexOf(name)!==-1)starLevel=s;});}
-                    var tag=document.createElement('span');
-                    tag.className='champ-cat-tag';
-                    var col=cat.color||'#6D3FF5';
-                    tag.style.cssText='background:'+col+'1a;color:'+col+';border:1px solid '+col+'44;';
-                    tag.textContent=cat.name+(starLevel?(' '+'⭐'.repeat(starLevel)):'');
-                    tagsRow.appendChild(tag);
-                });
-                nameBlock.appendChild(tagsRow);
-            }
-        }
-        header.appendChild(nameBlock);
-        leftCol.appendChild(header);
+        });
+        return { rows: rows, meta: meta };
+    }
 
-        if(champ){
-            // Patch info
-            var pDetail = patchMap[name];
-            if(pDetail) {
-                var pBadge = document.createElement('div');
-                var pColor = pDetail.type === 'buff' ? '#2ecc71' : pDetail.type === 'adjust' ? '#f1c40f' : '#e74c3c';
-                var pLabel = pDetail.type === 'buff' ? t('🟢 БАФФ') : pDetail.type === 'adjust' ? t('🟡 КОРРЕКТИРОВКА') : t('🔴 НЕРФ');
-                var pRgb = pDetail.type === 'buff' ? '46,204,113' : pDetail.type === 'adjust' ? '241,196,15' : '231,76,60';
-                pBadge.style.cssText = 'background:rgba('+pRgb+',0.12);border:1px solid '+pColor+';border-radius:10px;padding:8px 12px;margin-bottom:12px;';
-                pBadge.innerHTML = '<div style="font-size:11px;font-weight:900;color:'+pColor+';margin-bottom:3px;">'+pLabel+' <span style="color:rgba(255,255,255,0.4);font-weight:600;">Patch '+pDetail.patch+'</span></div><div style="font-size:10px;color:rgba(255,255,255,0.7);line-height:1.4;">'+pDetail.change+'</div>';
-                leftCol.appendChild(pBadge);
+    /* Теги категорий чемпа (Firestore CMS) — со звёздами, как в старой карточке. */
+    function cpTags(name) {
+        var cats = window._champCategories || [];
+        return cats.filter(function (c) {
+            if (c.champStars) {
+                return [1, 2, 3].some(function (s) { return (c.champStars[String(s)] || []).indexOf(name) !== -1; });
             }
-            // Админ: кнопка добавления/редактирования патч-нота
-            if(window._isAdmin && window.cmsOpenPatchnoteEditor) {
-                var patchBtnWrap = document.createElement('div');
-                patchBtnWrap.style.cssText = 'margin-bottom:12px;';
-                var patchBtn = document.createElement('button');
-                patchBtn.className = 'cms-patch-btn';
-                patchBtn.textContent = pDetail ? '✏ ' + t('Патч-нот') : '➕ ' + t('Патч-нот');
-                patchBtn.onclick = function() {
-                    var existing = pDetail && pDetail._id ? { _id: pDetail._id, champion: name, type: pDetail.type, change: pDetail.change, patch: pDetail.patch } : null;
-                    window.cmsOpenPatchnoteEditor(name, existing);
-                };
-                patchBtnWrap.appendChild(patchBtn);
-                leftCol.appendChild(patchBtnWrap);
+            return (c.champions || []).indexOf(name) !== -1;
+        }).map(function (cat) {
+            var star = 0;
+            if (cat.champStars) [1, 2, 3].forEach(function (s) { if ((cat.champStars[String(s)] || []).indexOf(name) !== -1) star = s; });
+            return { name: cat.name + (star ? ' ' + '★'.repeat(star) : '') };
+        });
+    }
+
+    /* Догрузка того, чего нет в памяти приложения. Файлы кэшируются браузером,
+       второй заход на страницу чемпа сети не трогает. */
+    function cpParts(name) {
+        var k = cpKey(name);
+        return Promise.all([
+            cpJson('data-pipeline/champion-abilities.json'),
+            cpJson('data-pipeline/champion-qualities.json'),
+            cpJson('data-pipeline/counters.json'),
+            window.ChampGuides ? window.ChampGuides.load(name).catch(function () { return null; }) : Promise.resolve(null)
+        ]).then(function (r) {
+            var abRoot = r[0], qlRoot = r[1], cnRoot = r[2], guide = r[3] || null;
+            var ab = abRoot && (abRoot.champions || []).filter(function (c) { return cpNorm(c.dd || c.en) === k; })[0];
+            var ql = qlRoot && (qlRoot.champions || []).filter(function (q) { return cpNorm(q.id || q.name) === k; })[0];
+            var cnEntry = null;
+            if (cnRoot && cnRoot.champions) {
+                Object.keys(cnRoot.champions).forEach(function (n) { if (cpKey(n) === k) cnEntry = cnRoot.champions[n]; });
             }
-            // Level slider
-            var _cardLvl = lvl;
-            var lvlWrap=document.createElement('div');
-            lvlWrap.style.cssText='margin-bottom:14px;background:rgba(255,255,255,0.04);border:1px solid var(--sel-border-sub);border-radius:12px;padding:10px 14px;';
-            var lvlRow=document.createElement('div');
-            lvlRow.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;';
-            lvlRow.innerHTML='<span style="font-size:12px;color:rgba(255,255,255,0.5);font-weight:700;">'+t('УРОВЕНЬ')+'</span><span id="cdLvlNum" style="font-size:28px;font-weight:900;color:var(--accent);">'+_cardLvl+'</span>';
-            lvlWrap.appendChild(lvlRow);
-            var slider=document.createElement('input');
-            slider.type='range'; slider.min='1'; slider.max='15'; slider.value=String(_cardLvl);
-            slider.style.cssText='width:100%;height:4px;appearance:none;background:linear-gradient(90deg,var(--sel-dark),var(--accent));border-radius:10px;outline:none;';
-            slider.oninput=function(){
-                _cardLvl=+this.value;
-                document.getElementById('cdLvlNum').textContent=_cardLvl;
-                updateCardStats(champ, _cardLvl);
+            /* Имена соседних чемпов — ПО-РУССКИ (ddragon ru_RU в champion-abilities),
+               иначе на одной странице соседствовали «Мисс Фортуна» и «Samira».
+               Заодно ищем имя в таблице сайта — по нему строится иконка и ссылка. */
+            var ruBySlug = {}, rowBySlug = {};
+            (abRoot && abRoot.champions || []).forEach(function (c) {
+                if (c && c.dd) ruBySlug[ChampPage.slugify(c.dd)] = c.ru || c.en || c.dd;
+            });
+            raw.forEach(function (x) { rowBySlug[ChampPage.slugify(x.name)] = x.name; });
+            var nameOf = function (m) {
+                var en = rowBySlug[m.slug] || '';
+                return { name: ruBySlug[m.slug] || en || ChampPage.prettyCaps(m.name), en: en };
             };
-            lvlWrap.appendChild(slider);
-            leftCol.appendChild(lvlWrap);
-            // Stats grid
-            var sg=document.createElement('div');
-            sg.id='cdStatsGrid';
-            sg.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;';
-            leftCol.appendChild(sg);
-            function updateCardStats(c, l){
-                var f=function(b,g){return Math.round(b+(l-1)*g);};
-                var stats=[
-                    {id:'cd_ad',label:'\u2694 AD',val:f(c.ad_b,c.ad_g),color:'#e8820a'},
-                    {id:'cd_hp',label:'\u271a HP',val:f(c.hp_b,c.hp_g),color:'#2ecc71'},
-                    {id:'cd_mn',label:'\ud83d\udca7 '+(c.res==='Energy'?'Energy':'Mana'),val:c.res==='Energy'?'150':String(f(c.mn_b,c.mn_g)),color:'#5dade2'},
-                    {id:'cd_ar',label:'\ud83d\udee1 \u0411\u0440\u043e\u043d\u044f',val:f(c.ar_b,c.ar_g),color:'#f1c40f'},
-                    {id:'cd_mr',label:'\u2726 \u041c\u0421',val:f(c.mr_b,c.mr_g),color:'var(--sel-stat)'},
-                    {id:'cd_rng',label:'\ud83c\udff9 RNG',val:f(c.rng_b||0,c.rng_g||0),color:'#bb8fce'}
-                ];
-                var grid=document.getElementById('cdStatsGrid')||sg;
-                if(!grid.children.length){
-                    stats.forEach(function(s){
-                        var box=document.createElement('div');
-                        box.style.cssText='background:rgba(255,255,255,0.04);border:1px solid var(--sel-border-sub);border-radius:10px;padding:8px 12px;';
-                        box.innerHTML='<div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:3px;">'+s.label+'</div><div id="'+s.id+'" style="font-size:20px;font-weight:900;color:'+s.color+';">'+s.val+'</div>';
-                        grid.appendChild(box);
-                    });
-                } else {
-                    stats.forEach(function(s){
-                        var v=document.getElementById(s.id)||sg.querySelector('#'+s.id);
-                        if(v) v.textContent=s.val;
-                    });
-                }
-            }
-            updateCardStats(champ, _cardLvl);
-        }
-        mainGrid.appendChild(leftCol);
+            return {
+                abil: ab || null, qual: ql || null, guide: guide,
+                cnt: ChampPage.mergeCounters(cnEntry, function (s) {
+                    return ruBySlug[s] || rowBySlug[s] || ChampPage.unslug(s);
+                }),
+                mu: ChampPage.pickMatchups(guide, nameOf)
+            };
+        });
+    }
 
-        // ── RIGHT COLUMN: Matchups ──
-        if(champ){
-            var rightCol=document.createElement('div');
-            rightCol.style.cssText='display:flex;flex-direction:column;gap:8px;';
+    function cpData(name, parts) {
+        parts = parts || {};
+        var champ = raw.filter(function (x) { return x.name === name; })[0] || {};
+        var wr = cpWr(name);
+        var roles = [];
+        Object.keys(CP_ROLE_LBL).forEach(function (kk) { if (champ.is && champ.is[kk]) roles.push(CP_ROLE_LBL[kk]); });
+        var ab = parts.abil;
+        return ChampPage.buildData({
+            name: name,
+            ru: (ab && ab.ru) || name,
+            en: (ab && ab.en) || name,
+            slug: ChampPage.slugify(name),
+            icon: champIcon(name),
+            roles: roles,
+            row: champ,
+            meta: wr.meta,
+            wrRanks: wr.rows,
+            qual: parts.qual || null,
+            abils: (ab && ab.abilities) || [],
+            guide: parts.guide || null,
+            mu: parts.mu || null,
+            counters: parts.cnt || null,
+            patch: (window.patchMap || {})[name] || null,
+            tags: cpTags(name)
+        });
+    }
 
-            function makeSection(id, title, color, bgRgb, key, pickerTitle) {
-                var box = document.createElement('div');
-                box.style.cssText = 'background:rgba('+bgRgb+',0.06);border:1px solid rgba('+bgRgb+',0.25);border-radius:10px;padding:10px;flex:1;';
-                var hdr = document.createElement('div');
-                hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;';
-                var titleEl = document.createElement('div');
-                titleEl.style.cssText = 'font-size:10px;color:'+color+';font-weight:800;letter-spacing:0.5px;';
-                titleEl.textContent = title;
-                hdr.appendChild(titleEl);
-                var addBtn = document.createElement('button');
-                addBtn.style.cssText = 'width:26px;height:26px;border-radius:8px;border:1px solid rgba('+bgRgb+',0.4);background:transparent;color:rgba(255,255,255,0.5);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0;';
-                addBtn.textContent = '+';
-                hdr.appendChild(addBtn);
-                box.appendChild(hdr);
-                var list = document.createElement('div');
-                list.id = id;
-                list.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;';
-                box.appendChild(list);
-                (function(k, pt){
-                    addBtn.onclick = function() {
-                        openChampPicker(pt, function(c) {
-                            var cur = k==='strongVs' ? getStrongVs(name) : k==='weakVs' ? getWeakVs(name) : getCombos(name);
-                            if(cur.length >= 7) return;
-                            addTo(name, k, c.name);
-                            renderMatchups(name);
-                            champPickerBuildGrid();
-                        },{multi:true,getSelected:function(){
-                            if(k==='strongVs') return getStrongVs(name);
-                            if(k==='weakVs') return getWeakVs(name);
-                            return getCombos(name);
-                        },getExcluded:function(){ return [name]; },onRemove:function(c){
-                            removeFrom(name, k, c.name);
-                            renderMatchups(name);
-                            champPickerBuildGrid();
-                        }});
-                    };
-                }(key, pickerTitle));
-                box.appendChild(addBtn);
-                return box;
-            }
-
-            // Вычисляем авто-чемпов из категорий (доступно в renderMatchups)
-            var _derivedStrong = new Set();
-            var _derivedWeak   = new Set();
-            var _derivedCombo  = new Set();
-            (function() {
-                var allCats = window._champCategories || [];
-                if (!allCats.length) return;
-                var champCatsArr = allCats.filter(function(c){ return (c.champions||[]).indexOf(name) !== -1; });
-                if (!champCatsArr.length) return;
-                var _allChampNames = (window._champsRaw || []).map(function(c){ return c.name; });
-                champCatsArr.forEach(function(cat) {
-                    (cat.strongAgainst||[]).forEach(function(cn) {
-                        if (_allChampNames.indexOf(cn) !== -1) { if (cn !== name) _derivedStrong.add(cn); }
-                        else { var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; }); if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) _derivedStrong.add(x); }); }
-                    });
-                    (cat.weakAgainst||[]).forEach(function(cn) {
-                        if (_allChampNames.indexOf(cn) !== -1) { if (cn !== name) _derivedWeak.add(cn); }
-                        else { var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; }); if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) _derivedWeak.add(x); }); }
-                    });
-                    (cat.combo||[]).forEach(function(cn) {
-                        if (_allChampNames.indexOf(cn) !== -1) { if (cn !== name) _derivedCombo.add(cn); }
-                        else { var tc = allCats.find(function(x){ return x.name === cn || x._id === cn; }); if (tc) (tc.champions||[]).forEach(function(x){ if(x!==name) _derivedCombo.add(x); }); }
-                    });
+    /* ── ЛИЧНЫЕ + АВТО МАТЧАПЫ (то, чего нет в статике) ──────────────────────
+       Ручной список — localStorage (как было), авто — из категорий чемпа.
+       Клик по авто-чемпу открывает ЕГО страницу (ЗАКОН СВЯЗЕЙ), крестик у авто
+       добавляет исключение — обе механики перенесены из старой карточки. */
+    var CP_MU_SECS = [
+        { key: 'strongVs', title: 'Силён против', pick: 'Силён против' },
+        { key: 'weakVs', title: 'Слаб против', pick: 'Слаб против' },
+        { key: 'combos', title: 'Комбо', pick: 'Комбо с' }
+    ];
+    function cpDerived(name) {
+        var out = { strongVs: [], weakVs: [], combos: [] };
+        var allCats = window._champCategories || [];
+        if (!allCats.length) return out;
+        var mine = allCats.filter(function (c) { return (c.champions || []).indexOf(name) !== -1; });
+        if (!mine.length) return out;
+        var names = raw.map(function (c) { return c.name; });
+        var push = function (list, cn) {
+            if (cn === name) return;
+            if (names.indexOf(cn) !== -1) { if (list.indexOf(cn) < 0) list.push(cn); return; }
+            var tc = allCats.filter(function (x) { return x.name === cn || x._id === cn; })[0];
+            if (tc) (tc.champions || []).forEach(function (x) { if (x !== name && list.indexOf(x) < 0) list.push(x); });
+        };
+        mine.forEach(function (cat) {
+            (cat.strongAgainst || []).forEach(function (cn) { push(out.strongVs, cn); });
+            (cat.weakAgainst || []).forEach(function (cn) { push(out.weakVs, cn); });
+            (cat.combo || []).forEach(function (cn) { push(out.combos, cn); });
+        });
+        return out;
+    }
+    function cpChip(cn, isAuto, onX) {
+        var chip = document.createElement('span');
+        chip.className = 'cp-own-chip' + (isAuto ? ' is-auto' : '');
+        var img = document.createElement('img');
+        img.src = champIcon(cn);
+        img.title = cn + (isAuto ? ' (авто)' : '');
+        img.loading = 'lazy';
+        img.onerror = function () { window._champImgError(this, cn); };
+        img.onclick = function (e) { e.stopPropagation(); window.openChampPage(cn); };
+        chip.appendChild(img);
+        var x = document.createElement('span');
+        x.className = 'cp-own-x';
+        x.textContent = '×';
+        x.title = isAuto ? 'Убрать из авто-списка' : 'Удалить';
+        x.onclick = function (e) { e.stopPropagation(); onX(); };
+        chip.appendChild(x);
+        return chip;
+    }
+    function cpRenderOwn(pane, name) {
+        var host = pane.querySelector('[data-own]');
+        if (!host) return;
+        host.hidden = false;
+        host.textContent = '';
+        var derived = cpDerived(name);
+        CP_MU_SECS.forEach(function (s) {
+            var wrap = document.createElement('div');
+            var head = document.createElement('div');
+            head.className = 'cp-sub';
+            head.textContent = 'Мой список · ' + s.title;
+            wrap.appendChild(head);
+            var box = document.createElement('div');
+            box.className = 'cp-own-box';
+            var manual = s.key === 'strongVs' ? getStrongVs(name) : s.key === 'weakVs' ? getWeakVs(name) : getCombos(name);
+            manual.forEach(function (cn) {
+                box.appendChild(cpChip(cn, false, function () { removeFrom(name, s.key, cn); cpRenderOwn(pane, name); }));
+            });
+            derived[s.key].forEach(function (cn) {
+                if (manual.indexOf(cn) !== -1 || isExcluded(name, s.key, cn)) return;
+                box.appendChild(cpChip(cn, true, function () { addExclusion(name, s.key, cn); cpRenderOwn(pane, name); }));
+            });
+            var add = document.createElement('button');
+            add.type = 'button';
+            add.className = 'cp-own-add';
+            add.textContent = '+';
+            add.title = 'Добавить чемпиона';
+            add.onclick = function () {
+                openChampPicker(t(s.pick), function (c) {
+                    var cur = s.key === 'strongVs' ? getStrongVs(name) : s.key === 'weakVs' ? getWeakVs(name) : getCombos(name);
+                    if (cur.length >= 7) return;
+                    addTo(name, s.key, c.name);
+                    cpRenderOwn(pane, name);
+                    champPickerBuildGrid();
+                }, {
+                    multi: true,
+                    getSelected: function () { return s.key === 'strongVs' ? getStrongVs(name) : s.key === 'weakVs' ? getWeakVs(name) : getCombos(name); },
+                    getExcluded: function () { return [name]; },
+                    onRemove: function (c) { removeFrom(name, s.key, c.name); cpRenderOwn(pane, name); champPickerBuildGrid(); }
                 });
-            })();
+            };
+            box.appendChild(add);
+            wrap.appendChild(box);
+            host.appendChild(wrap);
+        });
+    }
 
-            rightCol.appendChild(makeSection('cdStrongVs', t('⚔ СИЛЁН ПРОТИВ'), '#2ecc71', '39,174,96', 'strongVs', t('⚔ Силён против')));
-            rightCol.appendChild(makeSection('cdWeakVs', t('💀 СЛАБ ПРОТИВ'), '#e74c3c', '231,76,60', 'weakVs', t('💀 Слаб против')));
-            rightCol.appendChild(makeSection('cdCombos', t('🤝 КОМБО'), '#5dade2', '93,173,226', 'combos', t('🤝 Комбо с')));
+    /* Админ: правка патч-нота прямо со страницы (было в старой карточке). */
+    function cpRenderAdmin(pane, name) {
+        var host = pane.querySelector('[data-admin]');
+        if (!host) return;
+        host.textContent = '';
+        if (!(window._isAdmin && window.cmsOpenPatchnoteEditor)) { host.hidden = true; return; }
+        host.hidden = false;
+        var pd = (window.patchMap || {})[name];
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'cms-patch-btn';
+        b.textContent = (pd ? '✏ ' : '➕ ') + t('Патч-нот');
+        b.onclick = function () {
+            var existing = pd && pd._id ? { _id: pd._id, champion: name, type: pd.type, change: pd.change, patch: pd.patch } : null;
+            window.cmsOpenPatchnoteEditor(name, existing);
+        };
+        host.appendChild(b);
+    }
 
-            function renderMatchups(n) {
-                var sections = [
-                    {id:'cdStrongVs', key:'strongVs', bgRgb:'39,174,96'},
-                    {id:'cdWeakVs', key:'weakVs', bgRgb:'231,76,60'},
-                    {id:'cdCombos', key:'combos', bgRgb:'93,173,226'}
-                ];
-                sections.forEach(function(sec) {
-                    var el2 = document.getElementById(sec.id);
-                    if(!el2) return;
-                    el2.innerHTML = '';
-                    var data = [];
-                    if(sec.key === 'strongVs') data = getStrongVs(n);
-                    else if(sec.key === 'weakVs') data = getWeakVs(n);
-                    else data = getCombos(n);
-                    data.forEach(function(cn) {
-                        var chip = document.createElement('div');
-                        chip.style.cssText = 'display:flex;align-items:center;gap:2px;background:rgba('+sec.bgRgb+',0.12);border:1px solid rgba('+sec.bgRgb+',0.25);border-radius:6px;padding:2px;cursor:default;';
-                        chip.innerHTML = '<img loading="lazy" decoding="async" src="'+champIcon(cn)+'" title="'+cn+'" style="width:29px;height:29px;border-radius:4px;object-fit:cover;" onerror="this.style.display=\'none\'">';
-                        var xBtn = document.createElement('span');
-                        xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;line-height:1;';
-                        xBtn.textContent = '\u00d7';
-                        xBtn.onclick = function(e) { e.stopPropagation(); removeFrom(n, sec.key, cn); renderMatchups(n); };
-                        chip.appendChild(xBtn);
-                        el2.appendChild(chip);
-                    });
-                    // Авто-чемпы из категорий (с возможностью исключить)
-                    var derivedSet = sec.key === 'strongVs' ? _derivedStrong : sec.key === 'weakVs' ? _derivedWeak : _derivedCombo;
-                    derivedSet.forEach(function(cn) {
-                        if (data.indexOf(cn) !== -1) return; // уже добавлен вручную
-                        if (isExcluded(n, sec.key, cn)) return; // исключён пользователем
-                        var chip = document.createElement('div');
-                        chip.style.cssText = 'display:flex;align-items:center;gap:2px;background:rgba('+sec.bgRgb+',0.07);border:1px solid rgba('+sec.bgRgb+',0.18);border-radius:6px;padding:2px;cursor:pointer;opacity:0.8;';
-                        var img = document.createElement('img');
-                        img.src = champIcon(cn); img.title = cn + ' (авто)';
-                        img.style.cssText = 'width:29px;height:29px;border-radius:4px;object-fit:cover;';
-                        img.onerror = function(){ this.style.display='none'; };
-                        img.onclick = function(e){ e.stopPropagation(); openChampDetail(cn); };
-                        chip.appendChild(img);
-                        var xBtn = document.createElement('span');
-                        xBtn.style.cssText = 'color:rgba(255,255,255,0.3);cursor:pointer;font-size:12px;line-height:1;';
-                        xBtn.textContent = '\u00d7';
-                        (function(champN, sKey, champVal) {
-                            xBtn.onclick = function(e) { e.stopPropagation(); addExclusion(champN, sKey, champVal); renderMatchups(champN); };
-                        }(n, sec.key, cn));
-                        chip.appendChild(xBtn);
-                        el2.appendChild(chip);
-                    });
-                });
+    function cpPaneEl() { return window._viewPane ? window._viewPane('champ') : null; }
+
+    function cpRender(name, parts) {
+        var pane = cpPaneEl();
+        if (!pane) return;
+        var d = cpData(name, parts);
+        var html = ChampPage.renderHTML(d, {
+            mode: 'spa',
+            level: CP_LVL,
+            iconOf: function (m) { return champIcon(m.en || m.name); }
+        });
+        labMorph(pane, html);
+        ChampPage.hydrate(pane, d, {
+            onChamp: function (n) { window.openChampPage(n); },
+            calc: function () { if (window.sidebarOpen) window.sidebarOpen('calc'); },
+            tier: function () { window.switchMainView('tier'); },
+            cmp: function () { cmpStart(name); },
+            share: function () {
+                if (window.chatShareChampion) window.chatShareChampion(name);
+                else if (window.sidebarOpen) window.sidebarOpen('globalChat');
             }
-            mainGrid.appendChild(rightCol);
+        });
+        cpRenderOwn(pane, name);
+        cpRenderAdmin(pane, name);
+        /* Морф страницы стирает гнездо сравнения (в свежей разметке оно пустое) —
+           если таблица открыта ЗДЕСЬ же, печатаем её обратно. */
+        if (_cmpPlace === 'inline' && _cmpList.length) cmpRender();
+    }
+
+    /* ══ СРАВНЕНИЕ ЧЕМПОВ ══════════════════════════════════════════════════
+       Таблицу печатает champ-page.js (renderCompareHTML) — тот же модуль, что
+       печатает всю страницу. Здесь только СБОРКА данных из живого состояния
+       приложения и то, чего у статики нет: общий пикер, переходы, выбор места.
+
+       ГДЕ ЖИВЁТ ТАБЛИЦА — на тумблере, Эржан выбирает живьём:
+         · 'view'   (A) — свой вид `cmp`: рельс на месте, полная ширина под 6 колонок;
+         · 'inline' (Б) — секция во всю ширину под раскладкой страницы чемпа.
+       Механика вида — та же, что у самой страницы чемпа (_viewPane + switchMainView),
+       новых способов открывать экраны не заводим. Дизайн-полоса на боевом временная:
+       выбор сделан → полоса и проигравший вариант удаляются.                    */
+    var _cmpList = [];        // имена чемпов В СРАВНЕНИИ (ключи таблицы сайта)
+    var _cmpFrom = null;      // с чьей страницы пришли (кнопка «Назад»)
+    var _cmpRu = null;        // карта русских имён (подъезжает вместе с умениями)
+    var _cmpStripMin = false;
+    var _cmpPlace = 'view';
+    try { _cmpPlace = localStorage.getItem('cmpPlace') || 'view'; } catch (e) {}
+
+    /* Русские имена соседних чемпов берём из того же champion-abilities.json,
+       что и вся страница (файл кэширован — второй заход сети не трогает). */
+    function cmpRuMap() {
+        if (_cmpRu) return Promise.resolve(_cmpRu);
+        return cpJson('data-pipeline/champion-abilities.json').then(function (root) {
+            var m = {};
+            ((root && root.champions) || []).forEach(function (c) {
+                if (c) m[cpNorm(c.dd || c.en)] = c.ru || c.en || c.dd;
+            });
+            _cmpRu = m;
+            return m;
+        });
+    }
+    /* Тот же buildData, что у страницы — своей формы данных у сравнения нет. */
+    function cmpData(name) {
+        var d = cpData(name, {});
+        var ru = _cmpRu && _cmpRu[cpKey(name)];
+        if (ru) d.ru = ru;
+        return d;
+    }
+
+    function cmpSlotEl() {
+        var pane = cpPaneEl();
+        return pane ? pane.querySelector('[data-cmp-slot]') : null;
+    }
+    function cmpHostEl() {
+        if (_cmpPlace === 'inline') {
+            var slot = cmpSlotEl();
+            if (slot) slot.hidden = false;
+            return slot;
         }
-        el.appendChild(mainGrid);
-        renderMatchups(name);
-        // ── Гайд из data-pipeline (сборки/руны/прокачка) — полной шириной, асинхронно ──
-        var guideBox=document.createElement('div');
-        guideBox.id='cdGuide';
-        guideBox.style.cssText='margin-top:18px;';
-        guideBox.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,0.35);padding:6px 0;">Загрузка гайда…</div>';
-        el.appendChild(guideBox);
-        if(window.ChampGuides){
-            window.ChampGuides.load(name).then(function(g){
-                guideBox.innerHTML = g ? cdGuideHTML(g) : '';
-            }).catch(function(){ guideBox.innerHTML=''; });
-        } else { guideBox.innerHTML=''; }
-        openModal('champDetailMask');
+        return window._viewPane ? window._viewPane('cmp') : null;
+    }
+    /* В области ВСЕГДА одна таблица: место сменилось — прошлое гнездо чистим. */
+    function cmpClear(place) {
+        var host = place === 'inline' ? cmpSlotEl() : (window._viewPane ? window._viewPane('cmp') : null);
+        if (!host) return;
+        host.textContent = '';
+        if (place === 'inline') host.hidden = true;
+    }
+
+    function cmpRender() {
+        var host = cmpHostEl();
+        if (!host || !_cmpList.length) return;
+        var list = _cmpList.map(cmpData);
+        var backName = _cmpFrom ? ((_cmpRu && _cmpRu[cpKey(_cmpFrom)]) || _cmpFrom) : '';
+        labMorph(host, ChampPage.renderCompareHTML(list, {
+            level: CP_LVL,
+            strip: true,
+            stripPlace: _cmpPlace,
+            stripMin: _cmpStripMin,
+            /* «Назад» нужен только отдельному виду: в секции чемп и так на экране */
+            backLabel: (_cmpPlace === 'view' && backName) ? '← ' + backName : ''
+        }));
+        ChampPage.hydrateCompare(host, {
+            level: function (lv) { CP_LVL = lv; },        /* уровень общий со страницей */
+            onChamp: function (n) { window.openChampPage(n); },   /* ЗАКОН СВЯЗЕЙ */
+            add: cmpOpenPicker,
+            remove: cmpRemove,
+            back: function () { if (_cmpFrom) window.openChampPage(_cmpFrom); },
+            min: function () { _cmpStripMin = !_cmpStripMin; cmpRender(); },
+            place: cmpSetPlace
+        });
+    }
+
+    function cmpShow() {
+        cmpRuMap().then(function () { if (_cmpList.length) cmpRender(); });
+        cmpRender();
+        if (_cmpPlace === 'view') window.switchMainView('cmp');
+    }
+    function cmpSetPlace(place) {
+        if (place === _cmpPlace) return;
+        cmpClear(_cmpPlace);
+        _cmpPlace = place;
+        try { localStorage.setItem('cmpPlace', place); } catch (e) {}
+        /* Вариант Б печатается В страницу чемпа — значит она должна быть на экране. */
+        if (place === 'inline' && _cmpFrom && cpVisibleView() !== 'champ') window.openChampPage(_cmpFrom);
+        cmpShow();
+    }
+    function cmpRemove(name) {
+        var i = _cmpList.indexOf(name);
+        if (i < 0 || _cmpList.length < 2) return;
+        _cmpList.splice(i, 1);
+        cmpRender();
+    }
+    /* Добавление — ОБЩИЙ пикер сайта (тот же, что у списков матчапов). */
+    function cmpOpenPicker() {
+        openChampPicker(t('Добавить в сравнение'), function (c) {
+            if (_cmpList.length >= ChampPage.CMP_MAX || _cmpList.indexOf(c.name) !== -1) return;
+            _cmpList.push(c.name);
+            cmpRender();
+            champPickerBuildGrid();
+        }, {
+            multi: true,
+            getSelected: function () { return _cmpList.slice(); },
+            onRemove: function (c) { cmpRemove(c.name); champPickerBuildGrid(); }
+        });
+    }
+    /* Кнопка «Сравнить» на странице чемпа. Чемп уже в списке — просто показываем
+       таблицу, иначе начинаем с него и сразу спрашиваем, с кем сравнить. */
+    function cmpStart(name) {
+        _cmpFrom = name;
+        var had = _cmpList.indexOf(name) !== -1;
+        if (!had) _cmpList = [name];
+        cmpShow();
+        if (!had) cmpOpenPicker();
+    }
+
+    /* Какой вид сейчас на экране (нужно, чтобы вернуть человека туда, откуда пришёл). */
+    function cpVisibleView() {
+        var p = document.querySelector('.view-pane:not([hidden])');
+        return p ? (p.getAttribute('data-view') || 'main') : 'main';
+    }
+
+    window.openChampPage = function (name, noPush) {
+        if (!name) return;
+        var was = cpVisibleView();
+        if (was !== 'champ') _cpPrevView = was;
+        _cpCur = name;
+
+        // Пришли из модалки (пикер/список чемпов) — она уступает место странице.
+        if (typeof closeAllModals === 'function') closeAllModals();
+
+        cpRender(name, {});                       // 1) мгновенный кадр из того, что уже есть
+        cpParts(name).then(function (parts) {     // 2) гайд/умения/качества/контры
+            if (_cpCur !== name) return;          // человек уже ушёл — экран не трогаем
+            cpRender(name, parts);
+        });
+
+        window.switchMainView('champ');
+        if (!noPush) {
+            try { history.pushState({ cp: name }, '', 'champions/' + ChampPage.slugify(name) + '/'); } catch (e) {}
+        }
     };
-    window.closeChampDetail=function(){closeModal('champDetailMask');};
+    /* Старое имя держим: на него завязаны cms.js и внешние вызовы. */
+    window.openChampDetail = function (name) { window.openChampPage(name); };
+    window.closeChampPage = function () {
+        _cpCur = null;
+        window.switchMainView(_cpPrevView || 'main');
+    };
+    /* Зовёт switchMainView, когда человек ушёл со страницы вкладкой: адрес
+       возвращаем на корень БЕЗ новой записи в истории (replaceState) — иначе
+       кнопка «Назад» гоняла бы по пустым шагам. */
+    window._cpLeftPage = function () {
+        if (!_cpCur) return;
+        _cpCur = null;
+        try { history.replaceState(null, '', '/'); } catch (e) {}
+    };
+
+    /* «Назад» браузера: вернуться на вид, с которого ушли (модалок в этот момент
+       нет — их стопка обрабатывается своим слушателем выше и молчит при пустом стеке). */
+    window.addEventListener('popstate', function (e) {
+        var st = e.state || {};
+        if (st.cp) {
+            if (st.cp !== _cpCur) window.openChampPage(st.cp, true);
+            return;
+        }
+        if (cpVisibleView() === 'champ') window.closeChampPage();
+    });
+
+    /* Данные приехали позже открытия страницы — дорисовываем то, что изменилось. */
+    document.addEventListener('champsLoaded', function () { if (_cpCur) cpRender(_cpCur, {}); });
+    document.addEventListener('patchnotesLoaded', function () {
+        if (!_cpCur) return;
+        var pane = cpPaneEl();
+        if (pane) { cpRenderAdmin(pane, _cpCur); cpParts(_cpCur).then(function (p) { if (_cpCur) cpRender(_cpCur, p); }); }
+    });
 
 
     // ── Expose all global functions needed by inline onclick handlers ──
@@ -2537,7 +3217,10 @@
         'tierChamps':'tierlistMask', 'tierItems':'tierlistMask', 'tierRunes':'tierlistMask',
         'tierMenu':'tierlistMenuMask', 'globalChat':'chatSystemMask',
         'users':'chatSystemMask', 'changes':'changesMask',
-        'cybersport':'cybersportMask'
+        'cybersport':'cybersportMask',
+        /* Э1: 'drafterHub' тут НЕ БЫЛО — из-за этого _sidebarModalId оставался null,
+           active-состояние кнопки и флаг data-toolopen не выставлялись. */
+        'drafterHub':'drafterHubMask'
     };
 
     function _sidebarDoOpen(what) {
@@ -2558,6 +3241,11 @@
             case 'users': openChatSystem('users'); break;
             case 'wrpr': window.switchMainView('wrpr'); break;
             case 'changes': if(window.openChanges) openChanges(); break;
+            /* ★ ТИХИЙ ОБРЫВ (чинится здесь): ветки 'drafterHub' в switch НЕ БЫЛО.
+               Кнопка «Драфтер» в рельсе зовёт sidebarOpen('drafterHub'), switch молча
+               проваливался — ни модалки, ни ошибки в консоли. Фича была недоступна из UI
+               целиком, хотя openDrafterHub() всё это время работал (проверено вызовом). */
+            case 'drafterHub': if(window.openDrafterHub) openDrafterHub(); break;
         }
     }
 
@@ -2588,6 +3276,20 @@
             _sidebarDoOpen(what);
             // Подсвечиваем активную кнопку сайдбара
             _sidebarSetActive(what);
+            // Раскрываем рельс + сдвигаем контент, если открыт инлайн-инструмент
+            _syncToolOpenFlag();
+            // ОДНА активность across рельс↔вкладки: инструмент-вид открыт → верхние
+            // вкладки НЕ подсвечены (рельс владеет активностью). Снимаем .f-tab.active
+            // и прячем скользящую пилюлю — но только если это инлайн-инструмент-вид
+            // (не фуллскрин-драфтер, который флаг data-toolopen не ставит).
+            if (document.documentElement.getAttribute('data-toolopen') === '1') {
+                var _vt = document.getElementById('viewTabs');
+                if (_vt) {
+                    _vt.querySelectorAll('.f-tab.active').forEach(function(tb){ tb.classList.remove('active'); });
+                    var _ind = _vt.querySelector('.f-ind');
+                    if (_ind) _ind.style.opacity = '0';
+                }
+            }
             return;
         }
 
@@ -2653,194 +3355,153 @@
         };
     }
 
-    var _draftSlotsL = [null,null,null,null,null];
-    var _draftSlotsR = [null,null,null,null,null];
-    var _draftActiveSlot = null;
+
+    // ── Драфтер: единый вход → выбор режима (Соло / Серия) ──
+    window.openDrafterHub = function() { openModal('drafterHubMask'); };
+    window.closeDrafterHub = function() { closeModal('drafterHubMask'); };
+    window.drafterPick = function(mode) {
+        // openModal главной модалки заменяет стек → хаб закроется сам.
+        // Идём через sidebarOpen чтобы корректно отработал PC side-mode / mobile.
+        sidebarOpen(mode === 'solo' ? 'draft' : 'draftCoop');
+    };
+
+    // ══════════════════════════════════════════
+    // СОЛО-ДРАФТ — тренажёр пиков (раскладка из lab-drafter, на стекле),
+    // подсказки на реальном движке контрпиков/синергий (getDraftData).
+    // ══════════════════════════════════════════
+    var SOLO_ROLE_TABS = [
+        {k:'Top',t:'Top'},{k:'Jungle',t:'Jng'},{k:'Mid',t:'Mid'},{k:'ADC',t:'Adc'},{k:'Support',t:'Sup'}
+    ];
+    var SOLO_SLOT_ROLES = ['Соло','Лес','Мид','АДК','Сап'];
+    var _soloFill = 'me';
+    var _soloRole = 'Top';
+    var _solo = { me:[], opp:[] };
+
+    function soloPort(name, extra) {
+        return '<span class="dl-port'+(extra?' '+extra:'')+'"><img loading="lazy" decoding="async" src="'+champIcon(name)+'" alt="'+name+'" onerror="this.style.display=\'none\'"></span>';
+    }
+    function soloUsedSet() {
+        var s = {};
+        _solo.me.concat(_solo.opp).forEach(function(n){ s[n] = 1; });
+        return s;
+    }
+    function soloColHtml(who) {
+        var arr = _solo[who];
+        var label = who==='me' ? t('Ты') : t('Соперник');
+        var side = who==='me' ? 'blue' : 'red';
+        var rows = '';
+        for(var i=0;i<5;i++) {
+            var n = arr[i];
+            var active = !n && _soloFill===who && i===arr.length;
+            rows += '<div class="dl-pick'+(active?' active':'')+'">'
+                + (n ? soloPort(n) : '<span class="dl-pick-num">'+(i+1)+'</span>')
+                + '<div class="dl-pick-meta"><span class="dl-pick-name">'+(n||'—')+'</span><span class="dl-pick-role">'+SOLO_SLOT_ROLES[i]+'</span></div>'
+                + (n ? '<button class="dl-pick-x" data-soloremove="'+who+':'+i+'" title="'+t('Убрать')+'">×</button>' : '')
+                + '</div>';
+        }
+        return '<div class="dl-side dl-side-'+side+' glass"><div class="dl-side-head"><span class="dl-side-dot"></span>'+label+'</div><div class="dl-picks">'+rows+'</div></div>';
+    }
+    function soloHintsHtml() {
+        var used = soloUsedSet();
+        var map = {}; // name -> {counter:[], syn:[], s:0}
+        _solo.opp.forEach(function(n){
+            var d = getDraftData(n); if(!d) return;
+            (d.counters||[]).forEach(function(c){
+                if(used[c.n]) return;
+                if(!map[c.n]) map[c.n] = {counter:[],syn:[],s:0};
+                map[c.n].counter.push(n); map[c.n].s = Math.max(map[c.n].s, c.s||1);
+            });
+        });
+        _solo.me.forEach(function(n){
+            var d = getDraftData(n); if(!d) return;
+            (d.synergies||[]).forEach(function(sy){
+                if(used[sy.n]) return;
+                if(!map[sy.n]) map[sy.n] = {counter:[],syn:[],s:0};
+                map[sy.n].syn.push(n); map[sy.n].s = Math.max(map[sy.n].s, sy.s||1);
+            });
+        });
+        var list = Object.keys(map).map(function(n){ return {n:n, counter:map[n].counter, syn:map[n].syn, s:map[n].s}; });
+        list.sort(function(a,b){ return (b.counter.length+b.syn.length+b.s) - (a.counter.length+a.syn.length+a.s); });
+        list = list.slice(0,6);
+        var body;
+        if(!list.length) {
+            body = '<div class="dl-hint-empty">'+t('Выбери чемпионов — появятся подсказки контрпиков и синергий')+'</div>';
+        } else {
+            body = list.map(function(x){
+                var reason, tag;
+                if(x.counter.length && x.syn.length) { reason = t('контрит')+' '+x.counter[0]+' · '+t('синергия')+' '+x.syn[0]; tag = '⚔'; }
+                else if(x.counter.length) { reason = t('контрит')+' '+x.counter.join(', '); tag = '⚔'; }
+                else { reason = t('синергия с')+' '+x.syn.join(', '); tag = '🔗'; }
+                return '<div class="dl-hint" data-solopick="'+x.n+'">'+soloPort(x.n,'mini')
+                    + '<div class="dl-hint-info"><b>'+x.n+'</b><span>'+reason+'</span></div>'
+                    + '<span class="dl-hint-tag">'+tag+'</span></div>';
+            }).join('');
+        }
+        return '<div class="dl-hints glass"><div class="dl-hints-h">💡 '+t('Подсказки')+'</div>'+body+'</div>';
+    }
+    function soloGridHtml() {
+        var used = soloUsedSet();
+        var list = raw.filter(function(c){ return c.is && c.is[_soloRole]; });
+        return list.map(function(c){
+            var u = !!used[c.name];
+            return '<div class="dl-cell'+(u?' used':'')+'" data-solopick="'+c.name+'" title="'+c.name+'">'+soloPort(c.name)+'<span class="dl-cell-name">'+c.name+'</span></div>';
+        }).join('');
+    }
+    function renderSolo() {
+        var frame = document.getElementById('draftSoloFrame');
+        if(!frame) return;
+        var rolesBtns = SOLO_ROLE_TABS.map(function(rt){ return '<button class="'+(rt.k===_soloRole?'on':'')+'" data-solorole="'+rt.k+'">'+rt.t+'</button>'; }).join('');
+        frame.innerHTML =
+            '<div class="dl-hdr-solo">'
+              + '<div class="dl-solo-title">🎯 '+t('Соло-тренировка')+'<span class="dl-solo-sub">'+t('тренируй пики — тул подсказывает контрпики и синергии')+'</span></div>'
+              + '<div class="dl-solo-fill">'+t('Заполняю')+': <button class="dl-fillbtn'+(_soloFill==='me'?' on':'')+'" data-solofill="me">'+t('Ты')+'</button><button class="dl-fillbtn'+(_soloFill==='opp'?' on':'')+'" data-solofill="opp">'+t('Соперник')+'</button></div>'
+              + '<button class="dl-cbtn" data-soloreset="1" title="'+t('Сброс')+'">↺</button>'
+            + '</div>'
+            + '<div class="dl-board dl-board-solo">'
+              + soloColHtml('me')
+              + '<div class="dl-center"><div class="dl-roles">'+rolesBtns+'</div>'
+                + '<div class="dl-pool-wrap"><div class="dl-pool-main glass"><div class="dl-search">🔍 <input type="text" placeholder="'+t('Поиск чемпиона…')+'" id="draftSoloSearch"></div><div class="dl-grid" id="draftSoloGrid">'+soloGridHtml()+'</div></div>'+soloHintsHtml()+'</div>'
+              + '</div>'
+              + soloColHtml('opp')
+            + '</div>';
+        wireSolo();
+    }
+    function wireSolo() {
+        var frame = document.getElementById('draftSoloFrame');
+        if(!frame) return;
+        frame.querySelectorAll('[data-solorole]').forEach(function(b){ b.onclick = function(){ _soloRole = b.getAttribute('data-solorole'); renderSolo(); }; });
+        frame.querySelectorAll('[data-solofill]').forEach(function(b){ b.onclick = function(){ _soloFill = b.getAttribute('data-solofill'); renderSolo(); }; });
+        frame.querySelectorAll('[data-solopick]').forEach(function(el){
+            if(el.classList.contains('used')) return;
+            el.onclick = function(){
+                var n = el.getAttribute('data-solopick');
+                if(_solo[_soloFill].length < 5 && _solo.me.concat(_solo.opp).indexOf(n) === -1) { _solo[_soloFill].push(n); renderSolo(); }
+            };
+        });
+        frame.querySelectorAll('[data-soloremove]').forEach(function(el){
+            el.onclick = function(e){ e.stopPropagation(); var p = el.getAttribute('data-soloremove').split(':'); _solo[p[0]].splice(parseInt(p[1],10),1); renderSolo(); };
+        });
+        var rs = frame.querySelector('[data-soloreset]');
+        if(rs) rs.onclick = function(){ _solo = {me:[],opp:[]}; renderSolo(); };
+        var search = document.getElementById('draftSoloSearch'), grid = document.getElementById('draftSoloGrid');
+        if(search && grid) {
+            search.oninput = function(){
+                var q = search.value.trim().toLowerCase();
+                grid.querySelectorAll('.dl-cell').forEach(function(c){
+                    var nm = (c.getAttribute('data-solopick')||'').toLowerCase();
+                    c.style.display = nm.indexOf(q) !== -1 ? '' : 'none';
+                });
+            };
+        }
+    }
 
     window.openDraft = function() {
-        _draftSlotsL = [null,null,null,null,null];
-        _draftSlotsR = [null,null,null,null,null];
-        _draftActiveSlot = null;
+        _solo = { me:[], opp:[] };
+        _soloFill = 'me'; _soloRole = 'Top';
         openModal('draftMask');
-        draftBuildSlots();
-        draftRenderPanels();
+        renderSolo();
     };
     window.closeDraft = function() { closeModal('draftMask'); };
-
-    function draftBuildSlots() {
-        function buildSide(slotsArr, side) {
-            var elId = side==='left' ? 'draftSlotsLeft' : 'draftSlotsRight';
-            var el = document.getElementById(elId);
-            if(!el) return;
-            el.innerHTML = '';
-            var teamColor = side==='left' ? 'rgba(93,173,226,0.6)' : 'rgba(231,76,60,0.6)';
-            for(var i=0;i<5;i++) {
-                (function(idx){
-                    var champ = slotsArr[idx];
-                    var slot = document.createElement('div');
-                    slot.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:9px;cursor:pointer;border:2px solid '+(champ?teamColor:'var(--sel-border-xs)')+';background:'+(champ?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.02)')+';transition:all 0.12s;min-height:36px;position:relative;';
-                    slot.onmouseenter = function(){ if(!champ) this.style.borderColor='var(--sel-border-str)'; };
-                    slot.onmouseleave = function(){ if(!champ) this.style.borderColor='var(--sel-border-xs)'; };
-                    if(champ) {
-                        var img = document.createElement('img');
-                        img.src = champIcon(champ);
-                        img.style.cssText = 'width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0;';
-                        img.onerror = function(){ this.style.background='var(--sel-placeholder)'; };
-                        var nm = document.createElement('div');
-                        nm.style.cssText = 'font-size:10px;font-weight:700;color:#fff;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;';
-                        nm.textContent = champ;
-                        var x = document.createElement('button');
-                        x.textContent = '×';
-                        x.style.cssText = 'background:none;border:none;color:rgba(255,255,255,0.3);font-size:14px;cursor:pointer;padding:0 2px;flex-shrink:0;line-height:1;';
-                        x.onclick = function(e){ e.stopPropagation(); draftClearSlot(side, idx); };
-                        slot.appendChild(img); slot.appendChild(nm); slot.appendChild(x);
-                    } else {
-                        var numBadge = document.createElement('div');
-                        numBadge.style.cssText = 'width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:rgba(255,255,255,0.25);flex-shrink:0;';
-                        numBadge.textContent = idx+1;
-                        var ph = document.createElement('div');
-                        ph.style.cssText = 'font-size:9px;color:rgba(255,255,255,0.2);font-style:italic;';
-                        ph.textContent = t('нажми для выбора');
-                        slot.appendChild(numBadge); slot.appendChild(ph);
-                    }
-                    slot.onclick = function() { draftSetActiveSlot(side, idx); };
-                    el.appendChild(slot);
-                })(i);
-            }
-        }
-        buildSide(_draftSlotsL, 'left');
-        buildSide(_draftSlotsR, 'right');
-    }
-
-    function draftSetActiveSlot(side, idx) {
-        _draftActiveSlot = {side:side, idx:idx};
-        draftBuildSlots();
-        var allPicked = _draftSlotsL.concat(_draftSlotsR).filter(Boolean);
-        openChampPicker(t('⚔ Выбери чемпиона'), function(c) {
-            draftPickChamp(c.name);
-        }, {
-            getExcluded: function() { return allPicked; }
-        });
-    }
-
-    function draftPickChamp(name) {
-        if(!_draftActiveSlot) return;
-        var side = _draftActiveSlot.side, idx = _draftActiveSlot.idx;
-        if(side==='left') _draftSlotsL[idx]=name;
-        else _draftSlotsR[idx]=name;
-        _draftActiveSlot = null;
-        draftBuildSlots();
-        draftRenderPanels();
-    }
-
-    window.draftClearAll = function() {
-        _draftSlotsL=[null,null,null,null,null]; _draftSlotsR=[null,null,null,null,null]; _draftActiveSlot=null;
-        draftBuildSlots(); draftRenderPanels();
-    };
-
-    function draftClearSlot(side, idx) {
-        if(side==='left') _draftSlotsL[idx]=null;
-        else _draftSlotsR[idx]=null;
-        _draftActiveSlot=null;
-        draftBuildSlots(); draftRenderPanels();
-    }
-
-    function getChampTierStar(name) {
-        var isSplus = false, isS = false;
-        _TIER_ROLES_LIST.forEach(function(r) {
-            if(TIER_DATA[r] && TIER_DATA[r]['S+'] && TIER_DATA[r]['S+'].indexOf(name) !== -1) isSplus = true;
-            if(TIER_DATA[r] && TIER_DATA[r]['S'] && TIER_DATA[r]['S'].indexOf(name) !== -1) isS = true;
-        });
-        if(isSplus) return 'red';
-        if(isS) return 'green';
-        return null;
-    }
-
-    function draftRenderPanels() {
-        function compute(slots) {
-            var picked = slots.filter(Boolean);
-            var cm={}, sm={};
-            picked.forEach(function(n){
-                var d=getDraftData(n); if(!d) return;
-                (d.counters||[]).forEach(function(c){ if(picked.indexOf(c.n)!==-1) return; if(!cm[c.n]) cm[c.n]={stars:0,from:[]}; cm[c.n].stars=Math.max(cm[c.n].stars,c.s); cm[c.n].from.push(n); });
-                (d.synergies||[]).forEach(function(s){ if(picked.indexOf(s.n)!==-1) return; if(!sm[s.n]) sm[s.n]={stars:0,from:[]}; sm[s.n].stars=Math.max(sm[s.n].stars,s.s); sm[s.n].from.push(n); });
-            });
-            return {cm:cm,sm:sm,picked:picked};
-        }
-        function starScore(x) {
-            var s = 0;
-            if(x.counterFrom.length === 1) s += 1; else if(x.counterFrom.length > 1) s += 2;
-            if(x.synergyFrom.length === 1) s += 1; else if(x.synergyFrom.length > 1) s += 2;
-            var ts = getChampTierStar(x.name);
-            if(ts === 'red') s += 2; else if(ts) s += 1;
-            return s;
-        }
-        function renderMap(map) {
-            var e = Object.keys(map).map(function(n) {
-                return {name:n, counterFrom:map[n].counterFrom, synergyFrom:map[n].synergyFrom};
-            });
-            e.sort(function(a,b) { return starScore(b) - starScore(a); });
-            if(!e.length) return '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">—</div>';
-            var wrap = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:4px;">';
-            wrap += e.slice(0,20).map(function(x) {
-                var stars = [];
-                if(x.counterFrom.length === 1) stars.push('#2ecc71');
-                else if(x.counterFrom.length > 1) stars.push('#e74c3c');
-                if(x.synergyFrom.length === 1) stars.push('#2ecc71');
-                else if(x.synergyFrom.length > 1) stars.push('#e74c3c');
-                var ts = getChampTierStar(x.name);
-                if(ts) stars.push(ts === 'red' ? '#e74c3c' : '#2ecc71');
-                var starsHtml = stars.length
-                    ? '<div style="display:flex;justify-content:center;gap:1px;margin-top:2px;">'
-                      + stars.map(function(c){ return '<span style="font-size:8px;color:'+c+';line-height:1;text-shadow:0 1px 3px #000;">★</span>'; }).join('')
-                      + '</div>'
-                    : '<div style="height:12px;"></div>';
-                return '<div style="display:inline-flex;flex-direction:column;align-items:center;">'
-                    + '<img loading="lazy" decoding="async" src="'+champIcon(x.name)+'" style="width:44px;height:44px;border-radius:7px;object-fit:cover;display:block;" onerror="this.style.background=\'var(--sel-placeholder)\'">'
-                    + starsHtml
-                    + '</div>';
-            }).join('');
-            wrap += '</div>';
-            return wrap;
-        }
-
-        var allPicked = _draftSlotsL.concat(_draftSlotsR).filter(Boolean);
-        var L = compute(_draftSlotsL);
-        var R = compute(_draftSlotsR);
-        var hasAny = L.picked.length || R.picked.length;
-        var empty = '<div style="color:rgba(255,255,255,0.18);font-size:11px;text-align:center;padding:8px;">'+t('Выбери чемпиона')+'</div>';
-
-        // GOOD PICK = counters to enemy picks (R.cm) + synergies with our picks (L.sm)
-        var goodMap = {};
-        Object.keys(R.cm).forEach(function(n) {
-            if(allPicked.indexOf(n)!==-1) return;
-            if(!goodMap[n]) goodMap[n]={counterFrom:[],synergyFrom:[]};
-            goodMap[n].counterFrom = goodMap[n].counterFrom.concat(R.cm[n].from);
-        });
-        Object.keys(L.sm).forEach(function(n) {
-            if(allPicked.indexOf(n)!==-1) return;
-            if(!goodMap[n]) goodMap[n]={counterFrom:[],synergyFrom:[]};
-            goodMap[n].synergyFrom = goodMap[n].synergyFrom.concat(L.sm[n].from);
-        });
-
-        // DANGER = counters to our picks (L.cm) + synergies with enemy picks (R.sm)
-        var dangerMap = {};
-        Object.keys(L.cm).forEach(function(n) {
-            if(allPicked.indexOf(n)!==-1) return;
-            if(!dangerMap[n]) dangerMap[n]={counterFrom:[],synergyFrom:[]};
-            dangerMap[n].counterFrom = dangerMap[n].counterFrom.concat(L.cm[n].from);
-        });
-        Object.keys(R.sm).forEach(function(n) {
-            if(allPicked.indexOf(n)!==-1) return;
-            if(!dangerMap[n]) dangerMap[n]={counterFrom:[],synergyFrom:[]};
-            dangerMap[n].synergyFrom = dangerMap[n].synergyFrom.concat(R.sm[n].from);
-        });
-
-        var gpEl = document.getElementById('draftGoodPick');
-        var dgEl = document.getElementById('draftDanger');
-        if(gpEl) gpEl.innerHTML = hasAny ? renderMap(goodMap) : empty;
-        if(dgEl) dgEl.innerHTML = hasAny ? renderMap(dangerMap) : empty;
-    }
 
     // ══ UNIVERSAL CHAMPION PICKER ══
     var _champPickerCallback = null;
@@ -3174,6 +3835,8 @@
         if (typeof window.cmsLoadPatchnotes === 'function') {
             window.cmsLoadPatchnotes(function() {
                 console.log('[CMS] Патч-ноты загружены, patchMap обновлён');
+                /* лента приехала — блок «Что нового» в Мета-хабе обязан её показать */
+                try { document.dispatchEvent(new CustomEvent('patchnotesLoaded')); } catch(e){}
             });
         }
         // Загружаем конфигурацию лейаута
@@ -3401,12 +4064,14 @@
         var tierData = {};
         var itemTierData = {};
         var runeTierData = {};
+        var objectTierData = {};
         var selectedChamps = [];
 
         try { matchups = JSON.parse(localStorage.getItem('matchups') || '{}'); } catch(e) {}
         try { tierData = JSON.parse(localStorage.getItem('tierData') || '{}'); } catch(e) {}
         try { itemTierData = JSON.parse(localStorage.getItem('itemTierData') || '{}'); } catch(e) {}
         try { runeTierData = JSON.parse(localStorage.getItem('runeTierData') || '{}'); } catch(e) {}
+        try { objectTierData = JSON.parse(localStorage.getItem('objectTierData') || '{}'); } catch(e) {}
         try { selectedChamps = JSON.parse(localStorage.getItem('p') || '[]'); } catch(e) {}
 
         docRef.set({
@@ -3414,6 +4079,7 @@
             tierData: JSON.stringify(tierData),
             itemTierData: JSON.stringify(itemTierData),
             runeTierData: JSON.stringify(runeTierData),
+            objectTierData: JSON.stringify(objectTierData),
             selectedChamps: JSON.stringify(selectedChamps),
             displayName: _currentUser.displayName || '',
             photoURL: _currentUser.photoURL || '',
@@ -3443,6 +4109,7 @@
                             if (ad.tierData)     try { localStorage.setItem('tierData', ad.tierData); loadTierData(); } catch(e) {}
                             if (ad.itemTierData) try { localStorage.setItem('itemTierData', ad.itemTierData); loadItemTierData(); } catch(e) {}
                             if (ad.runeTierData) try { localStorage.setItem('runeTierData', ad.runeTierData); loadRuneTierData(); } catch(e) {}
+                            if (ad.objectTierData) try { localStorage.setItem('objectTierData', ad.objectTierData); } catch(e) {}
                             if (ad.selectedChamps) try { localStorage.setItem('p', ad.selectedChamps); } catch(e) {}
                             console.log('Default data loaded from admin');
                             showSyncStatus(t('Данные по умолчанию загружены ✓'));
@@ -3474,6 +4141,9 @@
                 }
                 if (d.runeTierData) {
                     try { localStorage.setItem('runeTierData', d.runeTierData); loadRuneTierData(); } catch(e) {}
+                }
+                if (d.objectTierData) {
+                    try { localStorage.setItem('objectTierData', d.objectTierData); } catch(e) {}
                 }
                 if (d.selectedChamps) {
                     try { localStorage.setItem('p', d.selectedChamps); } catch(e) {}
@@ -3530,7 +4200,7 @@
     var _origSetItem = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(key, value) {
         _origSetItem(key, value);
-        if (key === 'matchups' || key === 'tierData' || key === 'itemTierData' || key === 'runeTierData' || key === 'p') {
+        if (key === 'matchups' || key === 'tierData' || key === 'itemTierData' || key === 'runeTierData' || key === 'objectTierData' || key === 'p') {
             scheduleSyncToFirestore();
         }
     };
@@ -4372,11 +5042,58 @@
             container.innerHTML = '<div class="chat-login-msg">'+t('Напиши первым! 💬')+'</div>';
             return;
         }
-        _chatMessages.forEach(function(msg) {
-            var isMe = _currentUser && msg.uid === _currentUser.uid;
-            renderBubble(container, msg, isMe, true);
+
+        // ТОЧЕЧНОЕ ОБНОВЛЕНИЕ: не пересобираем ленту целиком.
+        // Раньше container.innerHTML='' на КАЖДОЕ сообщение и КАЖДУЮ реакцию
+        // пересоздавал все пузыри → у всех заново играл fadeIn → мигала вся лента.
+        // Теперь трогаем только то, что реально изменилось.
+        var placeholder = container.querySelector('.chat-login-msg');
+        if (placeholder) container.innerHTML = '';
+
+        // «стоим ли внизу» — считаем ДО правок, иначе автоскролл вырвет ленту из рук
+        var nearBottom = (container.scrollHeight - container.scrollTop - container.clientHeight) < 80;
+
+        var existing = {};
+        Array.prototype.forEach.call(container.querySelectorAll('.chat-bubble-row'), function(r) {
+            if (r.dataset.id) existing[r.dataset.id] = r;
         });
-        container.scrollTop = container.scrollHeight;
+
+        var seen = {}, prev = null, added = false;
+        _chatMessages.forEach(function(msg) {
+            var id = msg._id;
+            if (!id) return;
+            seen[id] = true;
+            var sig = JSON.stringify(msg);          // подпись: текст, реакции, ответ, правки
+            var row = existing[id];
+            if (!row || row.dataset.sig !== sig) {
+                var frag = document.createDocumentFragment();
+                renderBubble(frag, msg, _currentUser && msg.uid === _currentUser.uid, true);
+                var fresh = frag.firstChild;
+                if (!fresh) return;
+                fresh.dataset.sig = sig;
+                if (row) {
+                    // Пузырь БЫЛ — это правка (реакция/ответ/редактирование), а не появление.
+                    // Гасим анимацию появления, иначе при каждой реакции сообщение «мигает».
+                    fresh.classList.add('no-anim');
+                    container.replaceChild(fresh, row);
+                }
+                else {
+                    if (prev && prev.nextSibling) container.insertBefore(fresh, prev.nextSibling);
+                    else container.appendChild(fresh);
+                    added = true;
+                }
+                row = fresh;
+            }
+            prev = row;
+        });
+
+        // удалённые сообщения
+        Array.prototype.forEach.call(container.querySelectorAll('.chat-bubble-row'), function(r) {
+            if (!seen[r.dataset.id]) r.remove();
+        });
+
+        // скроллим вниз только если пришло новое И пользователь и так был внизу
+        if (added && nearBottom) container.scrollTop = container.scrollHeight;
     }
 
     // ═══════════════════════════════════════════
@@ -4512,8 +5229,7 @@
         try {
             if (card.type === 'tier') { if (window.sidebarOpen) sidebarOpen('tierMenu'); return; }
             if (card.type === 'item') { if (window.sidebarOpen) sidebarOpen('items'); return; }
-            if (window.openChampionByName) { window.openChampionByName(card.name); return; }
-            if (window.openChampDetail) { window.openChampDetail(card.name); return; }
+            if (window.openChampPage) { window.openChampPage(card.name); return; }
             if (window.sidebarOpen) sidebarOpen('sideChamps');
         } catch (e) { console.warn('openCardTarget', e); }
     }
@@ -5956,6 +6672,7 @@
     var _wrprRank = 'чалик';
     var _wrprRole = 'top';
     var _wrprSortCol = 'manual'; // 'manual' = показываем сохранённый порядок; клик по колонке временно сортирует
+    var _wrprSelName = null;     // Э1.2: выбранная строка (эталонный класс .sel + карточка справа)
     var _wrprSortDir = -1; // -1 = desc (высокий сверху), 1 = asc
 
     // Russian name → English DDragon key
@@ -6248,10 +6965,14 @@
                         if(fresh[ru][role].length) WR_DATA[ru][role] = fresh[ru][role];
                     });
                 });
+                /* дата снимка — общая: её показывает Мета-хаб («Снимок 26.07.2026 · lolm.qq.com») */
+                window.WR_SNAPSHOT = j.snapshotDate || '';
                 console.log('[WR] wr-stats.json загружен, ранги:', Object.keys(fresh).join(','), 'снимок', j.snapshotDate || '');
                 try { if(typeof wrprUpdateButtons === 'function') wrprUpdateButtons(); if(typeof wrprRender === 'function') wrprRender(); } catch(e){}
-                try { var ph = document.getElementById('viewPlaceholder'); if(window.renderMetaHub && ph && ph.querySelector('.f-hub')) window.renderMetaHub(ph); } catch(e){}
-                try { var pt = document.getElementById('viewPlaceholder'); if(window.renderTierBoard && pt && pt.querySelector('.f-tier')) window.renderTierBoard(pt); } catch(e){}
+                /* Э1.1: у каждого вида своя панель (#viewPlaceholder умер). Пере-рендерим
+                   ТОЛЬКО уже построенные — данные приехали, содержимое обязано обновиться. */
+                try { var ph = document.querySelector('.view-pane[data-view="hub"]'); if(window.renderMetaHub && ph && ph.querySelector('.f-hub')) window.renderMetaHub(ph); } catch(e){}
+                try { var pt = document.querySelector('.view-pane[data-view="tier"]'); if(window.renderTierBoard && pt && pt.querySelector('.f-tier')) window.renderTierBoard(pt); } catch(e){}
             })
             .catch(function(e){ console.warn('[WR] wr-stats.json недоступен:', e.message); });
     })();
@@ -6263,6 +6984,9 @@
         {id:'суверен', label:t('Суверен')},
         {id:'все', label:t('Все')},
     ];
+    /* ОДИН список рангов на сайт: им пользуются и WinRate, и ранг-пилюли Мета-хаба.
+       Свой дубль в другой коробке = два владельца одной вещи. */
+    window.WR_RANKS = _WRPR_RANKS;
     var _WRPR_ROLES = [
         {id:'top', label:t('Топ')},
         {id:'jungle', label:t('Лес')},
@@ -6271,46 +6995,83 @@
         {id:'support', label:t('Сап')},
     ];
 
-    // ── Main view toggle: 'main' = matchups table, 'wrpr' = WinRate inline section ──
+    /* ══════════════════════════════════════════════════════════════════════
+       ★ Э1.1 · ПЕРЕКЛЮЧЕНИЕ ВИДОВ = ЛЕНИВО + КЭШ (механика showView из lab-main).
+
+       БЫЛО (корень дёрганья): все виды hub/tier/patch делили ОДИН #viewPlaceholder,
+       и каждое переключение звало renderMetaHub/renderTierBoard, которые пишут
+       innerHTML целиком. То есть возврат на уже открытый вид ПЕРЕСОЗДАВАЛ ВСЕ его
+       узлы — сотни штук ради того, чтобы показать то же самое.
+
+       СТАЛО: у каждого вида своя панель .view-pane[data-view]. Панель строится
+       ОДИН раз при ПЕРВОМ заходе, дальше только показывается/прячется [hidden].
+       Возврат на вид = 0 пересозданных узлов; скролл, выделение и состояние живы.
+       ══════════════════════════════════════════════════════════════════════ */
+    var _viewPaneBuilt = {};      // какие виды уже построены (кэш)
+    var _wrprBuilt = false;       // WinRate живёт в разметке — флаг «фильтры+таблица собраны»
+
+    // Панель вида: берём существующую, иначе создаём пустую в .stage.
+    function _viewPane(view) {
+        var stage = document.getElementById('stage');
+        if (!stage) return null;
+        var p = stage.querySelector('.view-pane[data-view="' + view + '"]');
+        if (!p) {
+            p = document.createElement('section');
+            p.className = 'view-pane';
+            p.setAttribute('data-view', view);
+            p.hidden = true;
+            stage.appendChild(p);
+        }
+        return p;
+    }
+    /* Э1.9: панель вида нужна и странице чемпа, а она живёт в ДРУГОЙ коробке
+       (IIFE) этого файла — приватная функция оттуда не видна. Один владелец
+       остаётся здесь, наружу отдаём ссылку. */
+    window._viewPane = _viewPane;
+
     window.switchMainView = function(view) {
-        var mainEl = document.querySelector('.table-wrap-outer');
-        var wrprEl = document.getElementById('wrprSection');
-        if (!mainEl || !wrprEl) return;
-        var lvlEl = document.querySelector('.lvl-container');
+        var stage = document.getElementById('stage');
+        if (!stage) return;
 
-        // Виды, которые пока открывают существующее окно/страницу (Фазы M2/M3)
-        if (view === 'tactics') { window.location.href = 'tactics-board/'; return; }
+        // Переключение вкладки-вида закрывает открытый инструмент сайдбара (в области ВСЕГДА одно)
+        if (window._closeSidebarToolIfOpen) window._closeSidebarToolIfOpen();
 
-        // Плейсхолдер-секция для будущих инлайн-видов (Мета-хаб = M2, Патч = M3)
-        var phEl = document.getElementById('viewPlaceholder');
-        if (!phEl) {
-            phEl = document.createElement('div');
-            phEl.id = 'viewPlaceholder';
-            phEl.style.cssText = 'display:none;padding:64px 20px;text-align:center;color:rgba(255,255,255,0.45);font-size:15px;';
-            mainEl.parentNode.insertBefore(phEl, mainEl.nextSibling);
+        /* Э1.8: «Тактич» больше не уводит со страницы — доска стала под-вкладкой
+           вида «Карта» (Home → Карта → [Карта][Страта]). Старые ссылки/закладки
+           на страницу tactics-board/ живут, но из вкладок сюда никто не попадает. */
+        if (view === 'tactics') view = 'map';
+
+        var pane = _viewPane(view);
+        if (!pane) return;
+
+        /* СТРОИМ ТОЛЬКО ПРИ ПЕРВОМ ЗАХОДЕ. Второй заход сюда не попадает вообще —
+           поэтому innerHTML на каждое переключение больше не происходит. */
+        if (!_viewPaneBuilt[view]) {
+            if (view === 'hub' && window.renderMetaHub) window.renderMetaHub(pane);
+            else if (view === 'tier' && window.renderTierBoard) window.renderTierBoard(pane);
+            else if (view === 'map' && window.renderMapView) window.renderMapView(pane);
+            else if (view === 'patch') pane.innerHTML = '<div class="view-stub">Патч — появится в Фазе M3</div>';
+            _viewPaneBuilt[view] = true;
         }
-        var placeholder = (view === 'hub' || view === 'patch' || view === 'tier');
 
-        mainEl.style.display = (view === 'main') ? '' : 'none';
-        if (lvlEl) lvlEl.style.display = (view === 'main') ? '' : 'none';
-        wrprEl.style.display = (view === 'wrpr') ? 'flex' : 'none';
-        phEl.style.display = placeholder ? 'block' : 'none';
-        // правая карточка чемпа — на видах Статы/WinRate
+        /* Показ = переключение [hidden] у ГОТОВЫХ панелей. Ни одна не удаляется. */
+        stage.querySelectorAll('.view-pane').forEach(function(p) { p.hidden = (p !== pane); });
+
+        // правая колонка — на видах Статы/WinRate (резервирует место справа)
         document.body.setAttribute('data-sidecard', (view === 'main' || view === 'wrpr') ? 'on' : 'off');
+        // СВАП правой колонки по виду: Статы → панель-выборка, WinRate → карточка чемпа
+        document.body.setAttribute('data-rightcol', view === 'main' ? 'select' : (view === 'wrpr' ? 'card' : 'off'));
+        if (view === 'main' && window.drawM) window.drawM();
+        /* ★ WinRate строим ТОЛЬКО в первый заход — как hub/tier.
+           Раньше здесь на КАЖДОЕ переключение звались wrprBuildFilters()+wrprRender(),
+           а обе пишут innerHTML → возврат на вкладку пересоздавал 358 из 381 узла
+           (счётчик показал 23/381). Дальше вид обновляют те, кому положено:
+           клик по фильтру, сортировка, приход данных из wr-stats.json. */
+        if (view === 'wrpr' && !_wrprBuilt) { wrprBuildFilters(); wrprRender(); _wrprBuilt = true; }
 
-        if (placeholder) {
-            if (view === 'hub' && window.renderMetaHub) {
-                phEl.style.cssText = 'display:block;padding:18px 22px 24px;text-align:left;';
-                window.renderMetaHub(phEl);
-            } else if (view === 'tier' && window.renderTierBoard) {
-                phEl.style.cssText = 'display:block;padding:18px 22px 24px;text-align:left;';
-                window.renderTierBoard(phEl);
-            } else {
-                phEl.style.cssText = 'display:block;padding:64px 20px;text-align:center;color:rgba(255,255,255,0.45);font-size:15px;';
-                phEl.textContent = '📰 Патч — появится в Фазе M3';
-            }
-        }
-        if (view === 'wrpr') { wrprBuildFilters(); wrprRender(); }
+        /* Ушли со страницы чемпа вкладкой — адрес обязан вернуться на корень,
+           иначе F5 увёл бы человека на страницу чемпа, а не туда, где он стоит. */
+        if (view !== 'champ' && window._cpLeftPage) window._cpLeftPage();
 
         // активная вкладка + скользящая пилюля
         var tabs = document.querySelectorAll('#viewTabs .f-tab');
@@ -6381,27 +7142,27 @@
         if (!rr || !ro) return;
         rr.innerHTML = '';
         ro.innerHTML = '';
+        // Э1.2 канон: вид кнопок живёт в CSS (.wrpr-fbtn / .on), не в инлайн-стилях.
         _WRPR_RANKS.forEach(function(r) {
             var b = document.createElement('button');
+            b.className = 'wrpr-fbtn';
             b.textContent = r.label;
             b.dataset.rank = r.id;
             b.onclick = function() { _wrprRank = r.id; wrprUpdateButtons(); wrprRender(); };
-            b.style.cssText = 'padding:6px 13px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.15);background:none;color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;';
             rr.appendChild(b);
         });
         _WRPR_ROLES.forEach(function(r) {
             var b = document.createElement('button');
+            b.className = 'wrpr-fbtn role';
             b.dataset.role = r.id;
             b.title = r.label;
             b.onclick = function() { _wrprRole = r.id; wrprUpdateButtons(); wrprRender(); };
-            b.style.cssText = 'padding:5px 8px;border-radius:20px;border:1.5px solid rgba(255,255,255,0.15);background:none;color:rgba(255,255,255,0.6);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.15s;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
             var iconKey = r.id === 'adc' ? 'ADC' : (r.id.charAt(0).toUpperCase() + r.id.slice(1));
             var iconSrc = window._roleIcons && window._roleIcons[iconKey];
             if (iconSrc) {
                 var img = document.createElement('img');
                 img.src = iconSrc;
                 img.alt = r.label;
-                img.style.cssText = 'width:22px;height:22px;object-fit:contain;';
                 b.appendChild(img);
             } else {
                 b.textContent = r.label;
@@ -6416,23 +7177,22 @@
         var ro = document.getElementById('wrprRoleRow');
         if (!rr || !ro) return;
         Array.from(rr.querySelectorAll('button')).forEach(function(b) {
-            var active = b.dataset.rank === _wrprRank;
-            b.style.background = active ? 'rgba(46,204,113,0.25)' : 'none';
-            b.style.borderColor = active ? '#2ecc71' : 'rgba(255,255,255,0.15)';
-            b.style.color = active ? '#2ecc71' : 'rgba(255,255,255,0.6)';
+            b.classList.toggle('on', b.dataset.rank === _wrprRank);
         });
         Array.from(ro.querySelectorAll('button')).forEach(function(b) {
-            var active = b.dataset.role === _wrprRole;
-            b.style.background = active ? 'var(--sel-hover)' : 'none';
-            b.style.borderColor = active ? 'var(--sel-text)' : 'rgba(255,255,255,0.15)';
-            b.style.color = active ? 'var(--sel-text)' : 'rgba(255,255,255,0.6)';
+            b.classList.toggle('on', b.dataset.role === _wrprRole);
         });
     }
 
+    /* ★ Э1.2: +Тир и +Тренд — колонки ЭТАЛОНА lab-main. Данные для них УЖЕ приходят
+       из wr-stats.json (поля tier и wrTrend), боевой их просто не показывал.
+       Заводим их обычными столбцами → юзер управляет ими в том же ⚙, что и WR/PR/BR. */
     var WRPR_COL_DEFS = [
+        { key:'tier', label:'Тир' },
         { key:'wr', label:'WR%' },
         { key:'pr', label:'PR%' },
         { key:'br', label:'BR%' },
+        { key:'trend', label:'Тренд' },
     ];
     function getWrprCols() {
         var cfg = window._colSettings ? window._colSettings.load('wrpr', WRPR_COL_DEFS) : { order: WRPR_COL_DEFS.map(function(d){return d.key;}), hidden: [] };
@@ -6441,23 +7201,34 @@
             .map(function(k){ return WRPR_COL_DEFS.find(function(d){ return d.key === k; }); })
             .filter(function(d){ return d && !hidden.has(d.key); });
     }
+    /* ★ Э1.2 · ШАПКА — РАЗМЕТКА ЭТАЛОНА lab-main (viewWinrate).
+       Было: div-строка с инлайн-стилями (flex/ширины/цвета прямо в HTML) и id-шками
+       вида wrprThWR/wrprArWR, по которым потом искали стрелки сортировки.
+       Стало: обычные <th data-sort="…"> + <span class="arr">, вид целиком в CSS.
+       Клик вешаем делегированно (см. wireWrprSort) — inline onclick в разметке не пишем. */
     function wrprBuildHeader() {
         var thead = document.getElementById('wrprThead');
         if(!thead) return;
-        var cols = getWrprCols();
-        var grip = window._isAdmin ? '<span style="width:20px;flex:0 0 auto;"></span>' : '';
-        var html = '<div class="wrpr-thead-row" style="display:flex;align-items:center;gap:6px;padding:6px 8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:rgba(255,255,255,0.5);border-bottom:1px solid rgba(255,255,255,0.08);">' +
-            grip +
-            '<span style="width:30px;flex:0 0 auto;text-align:center;">#</span>' +
-            '<span style="flex:1;min-width:0;" data-i18n="Чемпион">Чемпион</span>';
-        cols.forEach(function(c){
-            var upper = c.key.toUpperCase();
-            html += '<span id="wrprTh' + upper + '" onclick="wrprSort(\'' + c.key + '\')" style="width:62px;flex:0 0 auto;text-align:center;cursor:pointer;">' +
-                c.label + ' <span id="wrprAr' + upper + '"></span></span>';
+        var html = '<tr><th data-sort="manual" data-i18n="Чемпион">Чемпион</th>';
+        getWrprCols().forEach(function(c){
+            var on = _wrprSortCol === c.key;
+            html += '<th data-sort="' + c.key + '" class="' + (on ? 'sorted' : '') + '">' + c.label +
+                '<span class="arr">' + (on ? (_wrprSortDir < 0 ? '▼' : '▲') : '▼') + '</span></th>';
         });
-        if (window._isAdmin) html += '<span style="width:30px;flex:0 0 auto;"></span>';
-        html += '</div>';
-        thead.innerHTML = html;
+        html += '</tr>';
+        labMorph(thead, html);          /* точечно: меняется класс/стрелка, не вся шапка */
+    }
+
+    /* Клик по шапке — ОДИН делегированный слушатель на всю таблицу.
+       Так узлы шапки можно свободно пересобирать: слушатель живёт выше и не теряется. */
+    function wireWrprSort() {
+        var thead = document.getElementById('wrprThead');
+        if (!thead || thead.__wired) return;
+        thead.__wired = 1;
+        thead.addEventListener('click', function(e){
+            var th = e.target.closest('th[data-sort]');
+            if (th) window.wrprSort(th.getAttribute('data-sort'));
+        });
     }
     window.openWrprColSettings = function(){
         window._colSettings.open('wrpr', WRPR_COL_DEFS, 'Настройка столбцов WinRate', function(){
@@ -6466,106 +7237,135 @@
         });
     };
 
+    /* ★★ Э1.2 · РЕНДЕР WINRATE — СОБРАН ИЗ ЭТАЛОНА lab-main (viewWinrate).
+       СНЕСЕНО старое целиком: `tbody.innerHTML = ''` + ручная сборка div-строк
+       (span-ячейки с инлайн-стилями, свои id на стрелки сортировки, keyed-кеш строк).
+       Разметка теперь эталонная: <tr> · .ch-cell · .tier-badge · .wr-cell/.wr-track/
+       .wr-fill · .trend + <svg class="spark">. Весь вид живёт в CSS, инлайн-стилей нет.
+       Дёрганье лечит labMorph: собираем HTML и отдаём ему — он трогает ТОЛЬКО
+       изменившееся. data-key на <tr> = якорь: при смене порядка и набора чемпионов
+       узлы переиспользуются, а не рубятся сдвигом соседей. */
+
+    /* мини-график тренда: 5 точек от (wr - trend) к wr — на РЕАЛЬНЫХ полях wr/wrTrend */
+    function wrprSparkPts(wr, tr) {
+        var from = wr - (tr || 0), vals = [], i;
+        for (i = 0; i < 5; i++) vals.push(from + (wr - from) * (i / 4));
+        var mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
+        var rg = (mx - mn) || 1;
+        return vals.map(function (v, k) {
+            return (k * 15) + ',' + (17 - ((v - mn) / rg) * 14).toFixed(1);
+        }).join(' ');
+    }
+    /* класс цвета WR — ДАННЫЕ (лучше/около/хуже среднего), цвет тут каноном разрешён */
+    function wrprWrCls(v) { return v >= 52 ? 'wr-g' : (v >= 50 ? 'wr-m' : 'wr-b'); }
+
+    function wrprEsc(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
     function wrprRender() {
         var tbody = document.getElementById('wrprTbody');
         var noData = document.getElementById('wrprNoData');
         if (!tbody) return;
 
-        // Build header if empty (lazy)
-        if (!document.getElementById('wrprThead').innerHTML.trim()) {
-            wrprBuildHeader();
-        }
+        wrprBuildHeader();          /* шапка сама точечная (labMorph) — зовём всегда */
+        wireWrprSort();
 
         var cols = getWrprCols();
-
-        // Update sort arrows
-        cols.forEach(function(c) {
-            var el = document.getElementById('wrprAr' + c.key.toUpperCase());
-            if (!el) return;
-            if (_wrprSortCol === c.key) {
-                el.textContent = _wrprSortDir === -1 ? ' ▼' : ' ▲';
-            } else {
-                el.textContent = '';
-            }
-        });
-        // Update header highlight
-        cols.forEach(function(c) {
-            var el = document.getElementById('wrprTh' + c.key.toUpperCase());
-            if (!el) return;
-            el.style.color = _wrprSortCol === c.key ? 'var(--sel-text)' : 'rgba(255,255,255,0.7)';
-        });
-
         var rankData = WR_DATA[_wrprRank];
         var list = rankData ? (rankData[_wrprRole] || []) : [];
 
         if (list.length === 0) {
-            tbody.innerHTML = '';
+            labMorph(tbody, '');
             noData.style.display = 'block';
             return;
         }
         noData.style.display = 'none';
 
+        /* 'manual' = порядок как пришёл из данных (ручной), иначе сортировка кликом */
         var sorted = (_wrprSortCol === 'manual')
             ? list.slice()
-            : list.slice().sort(function(a, b) {
-                var field = {wr:'wr', pr:'pr', br:'br'}[_wrprSortCol] || 'wr';
-                return _wrprSortDir * (a[field] - b[field]);
+            : list.slice().sort(function (a, b) {
+                var field = { wr: 'wr', pr: 'pr', br: 'br', trend: 'ch', tier: 'tier' }[_wrprSortCol] || 'wr';
+                if (field === 'tier') {
+                    var ord = { 'S+': 6, 'S': 5, 'A': 4, 'B': 3, 'C': 2, 'D': 1 };
+                    return _wrprSortDir * ((ord[a.tier] || 0) - (ord[b.tier] || 0));
+                }
+                return _wrprSortDir * ((a[field] || 0) - (b[field] || 0));
             });
 
-        tbody.innerHTML = '';
-        sorted.forEach(function(d, i) {
-            var row = document.createElement('div');
-            row.className = 'wrpr-row';
-            row.dataset.name = d.name;
-            row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;border-bottom:1px solid rgba(255,255,255,0.04);' + (i % 2 === 0 ? 'background:rgba(255,255,255,0.015);' : '');
-
-            // Номер
-            var nCell = document.createElement('span');
-            nCell.style.cssText = 'width:30px;flex:0 0 auto;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;';
-            nCell.textContent = i + 1;
-            row.appendChild(nCell);
-
-            // Чемпион
-            var cCell = document.createElement('span');
-            cCell.style.cssText = 'flex:1;min-width:0;display:flex;align-items:center;gap:8px;position:relative;';
-            var iconUrl = wrprIcon(d.name);
+        var html = sorted.map(function (d, i) {
             var engName = _wrprDisplayName[d.name] || d.name;
             var pWR = (window.patchMap || {})[d.name];
-            cCell.innerHTML = '<img loading="lazy" decoding="async" src="' + iconUrl + '" alt="' + engName + '" '
-                + 'onerror="this.onerror=null;this.style.cssText=\'width:34px;height:34px;border-radius:7px;background:linear-gradient(135deg,var(--sel-fill),var(--sel-glow-sub));flex-shrink:0;display:block;\'" '
-                + 'style="width:34px;height:34px;border-radius:7px;object-fit:cover;flex-shrink:0;">'
-                + '<span class="wrpr-champ-name" style="font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + engName + '</span>'
-                + (pWR ? '<span class="patch-dot ' + pWR.type + '" style="margin-left:4px;flex-shrink:0;"></span>' : '');
-            if (pWR) {
-                (function(pi, cell) {
-                    cell.style.cursor = 'pointer';
-                    cell.addEventListener('mouseenter', function(e){ showGlobalPatchTip(e, pi, cell); });
-                    cell.addEventListener('mouseleave', function(){ var t=document.getElementById('patchTip'); if(t) t.remove(); });
-                })(pWR, cCell);
-            }
-            row.appendChild(cCell);
+            var tier = d.tier || '';
+            var tr = (d.ch == null) ? null : +d.ch;
 
-            // WR/PR/BR в порядке конфига
-            cols.forEach(function(c){
-                var cell = document.createElement('span');
-                var base = 'width:62px;flex:0 0 auto;text-align:center;';
-                if (c.key === 'wr') {
-                    cell.style.cssText = base;
-                    var wrColor = d.wr >= 52 ? '#2ecc71' : d.wr >= 50 ? '#f1c40f' : '#e74c3c';
-                    cell.innerHTML = '<span style="color:' + wrColor + ';font-weight:900;font-size:14px;">' + d.wr.toFixed(2) + '%</span>';
-                } else if (c.key === 'pr') {
-                    cell.style.cssText = base + 'font-size:14px;color:rgba(255,255,255,0.85);font-weight:700;';
-                    cell.textContent = d.pr + '%';
-                } else if (c.key === 'br') {
-                    cell.style.cssText = base + 'font-size:14px;color:rgba(255,255,255,0.6);';
-                    cell.textContent = d.br + '%';
+            var cells = cols.map(function (c) {
+                if (c.key === 'tier') {
+                    return '<td>' + (tier
+                        ? '<span class="tier-badge t-' + wrprEsc(tier.toLowerCase()) + '">' + wrprEsc(tier) + '</span>'
+                        : '—') + '</td>';
                 }
-                row.appendChild(cell);
-            });
+                if (c.key === 'wr') {
+                    return '<td><span class="wr-cell"><span class="wr-track"><span class="wr-fill" style="width:' +
+                        Math.max(0, Math.min(100, (d.wr - 40) * 5)) + '%"></span></span>' +
+                        '<b class="' + wrprWrCls(d.wr) + '">' + d.wr.toFixed(2) + '%</b></span></td>';
+                }
+                if (c.key === 'pr') return '<td>' + d.pr + '%</td>';
+                if (c.key === 'br') return '<td>' + d.br + '%</td>';
+                if (c.key === 'trend') {
+                    if (tr == null) return '<td>—</td>';
+                    return '<td><span class="wr-cell"><span class="trend ' + (tr >= 0 ? 'up' : 'dn') + '">' +
+                        (tr >= 0 ? '▲' : '▼') + Math.abs(tr).toFixed(1) + '</span>' +
+                        '<svg class="spark" viewBox="0 0 60 18" preserveAspectRatio="none">' +
+                        '<polyline points="' + wrprSparkPts(d.wr, tr) + '"/></svg></span></td>';
+                }
+                return '<td></td>';
+            }).join('');
 
-            tbody.appendChild(row);
+            return '<tr data-key="' + wrprEsc(d.name) + '" data-ch="' + wrprEsc(d.name) + '"' +
+                (d.name === _wrprSelName ? ' class="sel"' : '') + '>' +
+                '<td><div class="ch-cell"><span class="ch-num">' + (i + 1) + '</span>' +
+                '<img class="ch-ava" loading="lazy" decoding="async" src="' + wrprEsc(wrprIcon(d.name)) + '" alt="' + wrprEsc(engName) + '">' +
+                '<span class="ch-name">' + wrprEsc(engName) + '</span>' +
+                (pWR ? '<span class="patch-dot ' + wrprEsc(pWR.type) + '"></span>' : '') +
+                '</div></td>' + cells + '</tr>';
+        }).join('');
+
+        labMorph(tbody, html);
+        wireWrprRows();
+    }
+
+    /* Клик/ховер по строкам — ОДИН делегированный слушатель на tbody.
+       Узлы переживают ре-рендер, поэтому вешаем под флагом (ГОЧА lab-morph):
+       иначе на каждый рендер копился бы новый слушатель. */
+    function wireWrprRows() {
+        var tbody = document.getElementById('wrprTbody');
+        if (!tbody || tbody.__wired) return;
+        tbody.__wired = 1;
+        tbody.addEventListener('click', function (e) {
+            var tr = e.target.closest('tr[data-ch]');
+            if (!tr) return;
+            _wrprSelName = tr.getAttribute('data-ch');
+            /* выделение — точечно: снимаем класс с прежней строки, ставим на новую */
+            var prev = tbody.querySelector('tr.sel');
+            if (prev && prev !== tr) prev.classList.remove('sel');
+            tr.classList.add('sel');
+            /* ЗАКОН СВЯЗЕЙ: клик по чемпу ведёт в карточку справа (свап data-rightcol) */
+            if (window.ChampSidePanel) window.ChampSidePanel.render(_wrprSelName);
         });
-
+        tbody.addEventListener('mouseover', function (e) {
+            var dot = e.target.closest('.patch-dot');
+            if (!dot) return;
+            var tr = dot.closest('tr[data-ch]');
+            var pi = tr && (window.patchMap || {})[tr.getAttribute('data-ch')];
+            if (pi) showGlobalPatchTip(e, pi, dot);
+        });
+        tbody.addEventListener('mouseout', function (e) {
+            if (!e.target.closest || !e.target.closest('.patch-dot')) return;
+            var t = document.getElementById('patchTip'); if (t) t.remove();
+        });
     }
 
 })();
@@ -6602,14 +7402,14 @@
         try { localStorage.removeItem(storageKey(tableId)); } catch(e){}
     }
 
-    function openModal(tableId, defs, title, onApply){
+    function openColTableModal(tableId, defs, title, onApply){
         var cfg = loadConfig(tableId, defs);
         var overlay = document.createElement('div');
         overlay.className = 'cms-modal-overlay';
         overlay.addEventListener('click', function(e){ if(e.target === overlay) overlay.remove(); });
 
         var win = document.createElement('div');
-        win.className = 'cms-modal-win';
+        win.className = 'cms-modal-win glass';
         win.style.maxWidth = '420px';
         win.innerHTML = '<h3 style="margin:0 0 16px;color:#fff;font-size:16px;">⚙ ' + title + '</h3>' +
             '<div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Галочка — показывать. Стрелки — менять порядок.</div>' +
@@ -6637,8 +7437,8 @@
                 row.innerHTML =
                     '<input type="checkbox" ' + (!hidden.has(key) ? 'checked' : '') + (locked ? ' disabled' : '') + ' data-key="'+key+'" style="width:16px;height:16px;cursor:'+(locked?'not-allowed':'pointer')+';">' +
                     '<span style="flex:1;color:#fff;font-size:13px;font-weight:600;">' + (def.icon ? def.icon + ' ' : '') + def.label + (locked ? ' <span style="color:rgba(255,255,255,0.4);font-size:10px;">(нельзя скрыть)</span>' : '') + '</span>' +
-                    '<button data-dir="up" data-idx="'+idx+'" '+(idx===0?'disabled':'')+' style="width:28px;height:28px;background:rgba(11,196,227,0.1);border:1px solid rgba(11,196,227,0.3);color:#0bc4e3;border-radius:6px;cursor:pointer;'+(idx===0?'opacity:0.3;':'')+'">↑</button>' +
-                    '<button data-dir="down" data-idx="'+idx+'" '+(idx===order.length-1?'disabled':'')+' style="width:28px;height:28px;background:rgba(11,196,227,0.1);border:1px solid rgba(11,196,227,0.3);color:#0bc4e3;border-radius:6px;cursor:pointer;'+(idx===order.length-1?'opacity:0.3;':'')+'">↓</button>';
+                    '<button data-dir="up" data-idx="'+idx+'" '+(idx===0?'disabled':'')+' style="width:28px;height:28px;background:rgba(255, 255, 255,0.1);border:1px solid rgba(255, 255, 255,0.3);color:#ffffff;border-radius:6px;cursor:pointer;'+(idx===0?'opacity:0.3;':'')+'">↑</button>' +
+                    '<button data-dir="down" data-idx="'+idx+'" '+(idx===order.length-1?'disabled':'')+' style="width:28px;height:28px;background:rgba(255, 255, 255,0.1);border:1px solid rgba(255, 255, 255,0.3);color:#ffffff;border-radius:6px;cursor:pointer;'+(idx===order.length-1?'opacity:0.3;':'')+'">↓</button>';
                 box.appendChild(row);
             });
             box.querySelectorAll('input[type=checkbox]').forEach(function(cb){
@@ -6679,7 +7479,7 @@
         load: loadConfig,
         save: saveConfig,
         reset: resetConfig,
-        open: openModal
+        open: openColTableModal
     };
 })();
 
@@ -6692,33 +7492,51 @@
    ════════════════════════════════════════════════════════════════ */
 (function(){
   'use strict';
-  var DD = 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash';
-  var SPLASH = {
-    lux:    "url('"+DD+"/Lux_0.jpg')",
-    thresh: "url('"+DD+"/Thresh_0.jpg')",
-    ahri:   "url('"+DD+"/Ahri_0.jpg')",
-    yasuo:  "url('"+DD+"/Yasuo_0.jpg')",
-    jinx:   "url('"+DD+"/Jinx_0.jpg')",
-    brand:  "radial-gradient(ellipse at 28% 18%,rgba(11,196,227,.38),transparent 55%),radial-gradient(ellipse at 78% 82%,rgba(200,155,60,.30),transparent 55%),linear-gradient(135deg,#02121f,#0a0617)"
+  /* ★ Э1.1 · ⚙ ПЕРЕЕХАЛИ НА wr-prefs.js (ЕДИНЫЙ ХАБ). Реестр артов больше НЕ здесь —
+     он живёт в WRPrefs.ARTS, вместе с состоянием, хранением и применением.
+     Смена настройки = меняются глобальные переменные на :root, узлы не трогаются вообще.
+     Здесь остаётся ТОЛЬКО UI-попап и настройки, которых в хабе нет (dim/tblfont/railmode). */
+  var P = window.WRPrefs;
+  var ARTS = P ? P.ARTS : [];
+  var KIND_LBL = {
+    dark:  'Тёмные — текст читается легко',
+    light: 'СВЕТЛЫЕ — худший случай, тут и проверяй читабельность',
+    busy:  'Пёстрые — много контраста'
   };
-  var DEF = { splash:'thresh', splashcolor:'#04121f', accent:'#0BC4E3', dim:'light', glasspow:'mid', glasstint:'neutral', glasssat:'rich', glassborder:'thin', density:'normal', tblfont:'medium' };
+  /* ★ BRAND_BG (градиент режима «Бренд») отсюда УБРАН — он переехал в
+     canon-tokens.css как --splash-brand. Картинка фона не должна жить строкой в JS:
+     оттуда её неизбежно кто-нибудь присвоит элементу напрямую. */
+
+  /* ★ ЧЕГО ЗДЕСЬ БОЛЬШЕ НЕТ и почему (канон, DESIGN.md + выбор владельца):
+       · glasspow / glassdark / glasstint / glasssat / glassborder — сила, тёмность,
+         блюр, оттенок и граница стекла ЗАФИКСИРОВАНЫ каноном. Один материал = одна
+         правда на весь сайт; ползунок тут означал, что у каждого юзера своё стекло.
+       · accent — АКЦЕНТ БЕЛЫЙ, ОДИН, выбора нет. Цвет несут только ДАННЫЕ.
+     Осталось то, что канон юзеру оставляет: арт за стеклом, затемнение фона,
+     плотность, шрифт таблиц, режим рельса. */
+  /* splashcolor отсюда убран: цвет подложки — часть подложки, а у неё ОДИН
+     владелец (WRPrefs.splashColor). Тут остаётся только то, что подложки не касается. */
+  var DEF = { dim:'light', railmode:'overlay', tblfont:'medium' };
   var KEY = 'site-settings';
   function load(){ try { return Object.assign({}, DEF, JSON.parse(localStorage.getItem(KEY)||'{}')); } catch(e){ return Object.assign({}, DEF); } }
   function persist(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
   var S = load();
 
+  /* splash и density живут в WRPrefs — читаем оттуда, а не из своей копии */
+  function prefSplash(){ return P ? P.get().splash : 'thresh'; }
+  function prefDensity(){ return P ? P.get().density : 'normal'; }
+
+  // splash вынесен в свой пикер-миниатюры (см. splashGroup) — тут только сегменты.
   var OPTS = [
-    { k:'splash',    label:'Арт фона за стеклом', items:[
-      {v:'lux',t:'Lux'},{v:'thresh',t:'Thresh'},{v:'ahri',t:'Ahri'},{v:'yasuo',t:'Yasuo'},{v:'jinx',t:'Jinx'},{v:'brand',t:'Бренд'},{v:'color',t:'Свой цвет'} ]},
+    { k:'railmode',  label:'Рельс (боковое меню) при наведении', items:[{v:'overlay',t:'Оверлей'},{v:'shift',t:'Раздвигание'}] },
     { k:'dim',       label:'Затемнение фона (виден сплэш)', items:[{v:'none',t:'Нет'},{v:'light',t:'Слабо'},{v:'mid',t:'Средне'},{v:'strong',t:'Сильно'}] },
-    { k:'glasspow',  label:'Сила стекла',     items:[{v:'light',t:'Лёгкое'},{v:'mid',t:'Среднее'},{v:'strong',t:'Сильное'},{v:'ultra',t:'Экстрим'}] },
-    { k:'glasstint', label:'Оттенок стекла',  items:[{v:'neutral',t:'Нейтр.'},{v:'accent',t:'Акцент'},{v:'warm',t:'Тёплое'},{v:'cool',t:'Холодное'}] },
-    { k:'glasssat',  label:'Насыщенность стекла', items:[{v:'norm',t:'Обычная'},{v:'rich',t:'Сочная'},{v:'max',t:'Максимум'}] },
-    { k:'glassborder', label:'Граница стекла', items:[{v:'thin',t:'Тонкая'},{v:'glow',t:'Свечение'},{v:'none',t:'Без'}] },
-    { k:'density',   label:'Плотность таблиц',items:[{v:'cozy',t:'Просторно'},{v:'normal',t:'Средне'},{v:'dense',t:'Плотно'}] },
     { k:'tblfont',   label:'Шрифт таблиц',    items:[{v:'small',t:'Мелкий'},{v:'medium',t:'Средний'},{v:'large',t:'Крупный'}] }
   ];
+  /* Плотность — сегмент как у прочих, но владелец значения WRPrefs (токен --dens) */
+  var DENS_OPT = { k:'density', label:'Плотность', items:(P ? P.DENSITY.map(function(d){ return { v:d.v, t:d.t }; }) : []) };
 
+  /* Подложка — ОДИН элемент на весь сайт. Здесь его только СОЗДАЮТ; чем он
+     закрашен, решает исключительно --splash-img (владелец — wr-prefs.js). */
   function ensureSplash(){
     var el = document.getElementById('siteSplash');
     if (!el){ el = document.createElement('div'); el.id = 'siteSplash'; document.body.appendChild(el); }
@@ -6728,27 +7546,47 @@
     var h = document.documentElement;
     h.setAttribute('data-glass', 'on');
     h.setAttribute('data-dim', S.dim);
-    h.setAttribute('data-glasspow', S.glasspow);
-    h.setAttribute('data-glasstint', S.glasstint);
-    h.setAttribute('data-glasssat', S.glasssat);
-    h.setAttribute('data-glassborder', S.glassborder);
-    h.setAttribute('data-density', S.density);
     h.setAttribute('data-tblfont', S.tblfont);
-    // Акцент-цвет → --accent-rgb (один раз → рекрашивается весь сайт: заголовки, кнопки, рамки)
-    var hex = (S.accent || '#0BC4E3').replace('#','');
-    if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
-    var r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
-    if (!isNaN(r) && !isNaN(g) && !isNaN(b)) h.style.setProperty('--accent-rgb', r+', '+g+', '+b);
-    var el = ensureSplash();
-    if (S.splash === 'color') {
-      h.setAttribute('data-splashmode','color');
-      el.style.backgroundImage = 'none';
-      el.style.backgroundColor = S.splashcolor || '#04121f';
-    } else {
-      h.setAttribute('data-splashmode','art');
-      el.style.backgroundColor = '';
-      el.style.backgroundImage = SPLASH[S.splash] || SPLASH.thresh;
+    h.setAttribute('data-railmode', S.railmode || 'overlay');
+    /* ★ ФОН ЗДЕСЬ НЕ КРАСИТСЯ. Раньше было три ветки el.style.backgroundImage =
+       ('none' / BRAND_BG / 'var(--splash)') — инлайн-стиль сильнее CSS, поэтому
+       фактическим владельцем подложки был ЭТОТ код, а переменная — фикцией.
+       Отсюда и рождался класс багов «вид ставит свой фон-арт».
+       Теперь: элемент создаём, картинку не трогаем — её даёт --splash-img.
+       АКЦЕНТ и ПЛОТНОСТЬ тоже не трогаем (владелец WRPrefs), СИЛА СТЕКЛА — канон-фикс. */
+    h.setAttribute('data-splashmode', prefSplash() === 'color' ? 'color' : 'art');
+    ensureSplash();
+  }
+
+  // Пикер сплэш-арта: миниатюры, сгруппированные по яркости.
+  // ★ Плитка = THUMB (308×560, ~40 КБ), а НЕ полный сплэш (~500 КБ):
+  //   ассет подбирается под размер показа, иначе 11 плиток = мегабайты впустую.
+  function splashGroup(){
+    var cur = prefSplash();
+    function row(kind){
+      return '<div class="ss-kind">'+KIND_LBL[kind]+'</div><div class="ss-splash">'+
+        ARTS.filter(function(a){ return a.kind===kind; }).map(function(a){
+          return '<button class="ss-thumb'+(cur===a.v?' on':'')+'" data-v="'+a.v+'" title="'+a.t+'" '+
+            'style="background-image:url(\''+P.thumbURL(a.v)+'\')"><span>'+a.t+'</span></button>';
+        }).join('')+'</div>';
     }
+    return '<div class="ss-grp">'+
+      '<div class="ss-label">Арт фона за стеклом — ОДИН на весь сайт</div>'+
+      row('dark') + row('light') + row('busy') +
+      '<div class="ss-kind">Без арта</div><div class="ss-splash">'+
+        '<button class="ss-thumb ss-thumb-grad'+(cur==='brand'?' on':'')+'" data-v="brand"><span>Бренд</span></button>'+
+        '<button class="ss-thumb ss-thumb-solid'+(cur==='color'?' on':'')+'" data-v="color"><span>Свой цвет</span></button>'+
+      '</div>'+
+      '<div class="ss-color" style="'+(cur==='color'?'':'display:none')+'"><input type="color" value="'+(P ? P.get().splashColor : '#04121f')+'"><span>свой цвет фона</span></div>'+
+    '</div>';
+  }
+  /* Плотность: сегмент рисуем тут, значение пишет WRPrefs (один токен --dens). */
+  function densGroup(){
+    var cur = prefDensity();
+    return '<div class="ss-grp"><div class="ss-label">'+DENS_OPT.label+'</div>'+
+      '<div class="ss-seg" data-k="density">'+
+        DENS_OPT.items.map(function(it){ return '<button data-v="'+it.v+'" class="'+(cur===it.v?'on':'')+'">'+it.t+'</button>'; }).join('')+
+      '</div></div>';
   }
 
   function build(){
@@ -6758,14 +7596,11 @@
         '<div class="ss-seg" data-k="'+o.k+'">'+
           o.items.map(function(it){ return '<button data-v="'+it.v+'" class="'+(S[o.k]===it.v?'on':'')+'">'+it.t+'</button>'; }).join('')+
         '</div>'+
-        (o.k==='splash' ? '<div class="ss-color" style="'+(S.splash==='color'?'':'display:none')+'"><input type="color" value="'+(S.splashcolor||'#04121f')+'"><span>свой цвет фона</span></div>' : '')+
       '</div>';
     }).join('');
-    var accentGrp = '<div class="ss-grp"><div class="ss-label">Цвет акцента (заголовки · кнопки · рамки)</div>'+
-      '<div class="ss-color"><input type="color" id="ssAccent" value="'+(S.accent||'#0BC4E3')+'"><span>основной цвет сайта</span></div></div>';
-    ov.innerHTML = '<div class="ss-modal">'+
+    ov.innerHTML = '<div class="ss-modal glass">'+
       '<div class="ss-h"><div class="ss-title">⚙ Настройки отображения</div><button class="ss-x" title="Закрыть">✕</button></div>'+
-      grps + accentGrp + '</div>';
+      splashGroup() + densGroup() + grps + '</div>';
     document.body.appendChild(ov);
 
     function close(){ ov.remove(); }
@@ -6776,17 +7611,27 @@
       var k = seg.getAttribute('data-k');
       seg.querySelectorAll('button').forEach(function(b){
         b.onclick = function(){
-          S[k] = b.getAttribute('data-v');
+          var v = b.getAttribute('data-v');
           seg.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x===b); });
-          if (k==='splash' && colorWrap) colorWrap.style.display = (S.splash==='color') ? '' : 'none';
-          persist(); apply();
+          /* плотность принадлежит хабу — пишем туда; остальное локальное */
+          if (k === 'density') { if (P) P.set('density', v); return; }
+          S[k] = v; persist(); apply();
         };
       });
     });
+    // Пикер артов — состояние в WRPrefs (там же localStorage и применение переменной)
+    ov.querySelectorAll('.ss-thumb').forEach(function(b){
+      b.onclick = function(){
+        var v = b.getAttribute('data-v');
+        ov.querySelectorAll('.ss-thumb').forEach(function(x){ x.classList.toggle('on', x===b); });
+        if (colorWrap) colorWrap.style.display = (v==='color') ? '' : 'none';
+        if (P) P.set('splash', v);
+        apply();
+      };
+    });
     var ci = ov.querySelector('.ss-color input[type="color"]');
-    if (ci) ci.oninput = function(){ S.splashcolor = ci.value; if (S.splash==='color'){ persist(); apply(); } };
-    var ac = ov.querySelector('#ssAccent');
-    if (ac) ac.oninput = function(){ S.accent = ac.value; persist(); apply(); };
+    /* цвет подложки пишем в WRPrefs — он один владеет фоном (и --splash-color) */
+    if (ci) ci.oninput = function(){ if (P) P.set('splashColor', ci.value); };
   }
 
   window.openDisplaySettings = function(){
@@ -6794,7 +7639,46 @@
     if (!document.querySelector('.ss-ov')) build();
   };
 
+  /* ★ Э1.1 КАРКАС — рельс = ЧИСТО HOVER.
+     Раскрытие рисует CSS (clip-path), состояние держит html[data-railopen] — оно нужно
+     режиму «Раздвигание», чтобы контент (--shell-left) знал, что рельс раскрыт.
+     Никаких transform/width — 0 reflow.
+
+     ★ ДЕБАУНС ЗАКРЫТИЯ (120мс). Открытие — СРАЗУ (реакция должна быть мгновенной).
+     Закрытие — с задержкой, таймер отменяется при возврате мыши.
+     ПОЧЕМУ: по пути к нижнему пункту курсор на миг выскакивает за край рельса →
+     mouseleave снимал флаг мгновенно → рельс и контент дёргались туда-обратно
+     («мигание»). Задержка гасит случайный проскок, не задерживая осознанный уход. */
+  var RAIL_CLOSE_DELAY = 120;
+  function wireRail(){
+    var rail = document.getElementById('sidePanel');
+    if (!rail) return;
+    var h = document.documentElement;
+    var closeTimer = null;
+
+    function openRail(){
+      if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+      h.setAttribute('data-railopen','1');
+    }
+    function scheduleClose(){
+      if (closeTimer) clearTimeout(closeTimer);
+      closeTimer = setTimeout(function(){
+        closeTimer = null;
+        /* мышь могла вернуться до срабатывания — не закрываем то, что под курсором */
+        if (rail.matches(':hover')) return;
+        h.removeAttribute('data-railopen');
+      }, RAIL_CLOSE_DELAY);
+    }
+
+    rail.addEventListener('mouseenter', openRail);
+    rail.addEventListener('mouseleave', scheduleClose);
+    /* уход курсора со страницы целиком → закрыть без ожидания «возврата» */
+    rail.addEventListener('focusin', openRail);
+    rail.addEventListener('focusout', scheduleClose);
+  }
+
   apply();
+  wireRail();
 })();
 
 /* ════════════════════════════════════════════════════════════════
@@ -6844,14 +7728,21 @@
       var triedIcon = false;
       bigImg.onerror = function(){ if(!triedIcon){ triedIcon = true; this.src = icon(name); } else { this.style.display = 'none'; } };
     }
-    var b = p.querySelector('.csc-btn'); if(b) b.onclick = function(){ if(window.openChampDetail) window.openChampDetail(name); };
+    var b = p.querySelector('.csc-btn'); if(b) b.onclick = function(){ if(window.openChampPage) window.openChampPage(name); };
   }
 
-  // делегированный клик по строкам таблицы статов → выбрать чемпа в карточку
+  /* Делегированный клик по строкам таблицы статов.
+     ЗАКОН СВЯЗЕЙ (Э1.9): клик по САМОМУ чемпу — имени или иконке — открывает его
+     СТРАНИЦУ. Клик по остальной строке остаётся выбором чемпа в правую карточку:
+     это разные намерения (сравнить числа vs изучить чемпа), и терять второе нельзя. */
   document.addEventListener('click', function(e){
     var body = document.getElementById('statBody'); if(!body) return;
     var tr = e.target.closest('tr'); if(!tr || !body.contains(tr)) return;
-    var nm = tr.querySelector('.f-cname'); if(nm) render(nm.textContent.trim());
+    var nm = tr.querySelector('.f-cname'); if(!nm) return;
+    var name = nm.textContent.trim();
+    var onChamp = e.target.closest('.f-cname, .f-portwrap');
+    if (onChamp && window.openChampPage) { e.stopPropagation(); window.openChampPage(name); return; }
+    render(name);
   });
   // карточка пересчитывается при смене уровня
   document.addEventListener('input', function(e){ if(e.target && e.target.id === 'lvlRange' && sel) render(sel); });
@@ -6859,7 +7750,8 @@
   document.addEventListener('champsLoaded', function(){ if(!sel){ var c = champs()[0]; if(c) render(c.name); else render(null); } });
 
   // панель видна на главном экране по умолчанию (вид Статы); switchMainView переключает
-  try { document.body.setAttribute('data-sidecard','on'); } catch(e){}
+  // Старт = вид Статы → справа панель-выборка (не карточка). Первый кадр сразу правильный.
+  try { document.body.setAttribute('data-sidecard','on'); document.body.setAttribute('data-rightcol','select'); } catch(e){}
   if(!champs().length) render(null);
   else if(!sel){ render(champs()[0].name); }
 
@@ -6867,78 +7759,123 @@
 })();
 
 /* ════════════════════════════════════════════════════════════════
-   M2 · МЕТА-ХАБ — ПОРТ из lab-main hubView (вид «Мета-хаб»).
-   Структура+стиль 1-в-1 из лаба; данные РЕАЛЬНЫЕ из WR_DATA['чалик'] (Challenger) +
-   реальные иконки чемпов. Турниры/новости пока заглушки (нет источника).
+   Э1.5 · МЕТА-ХАБ — ПЕРЕСБОРКА ИЗ lab-metahub (канон DESIGN.md).
+   Старый hubHTML снесён ЦЕЛИКОМ (не рескин): каркас, шапка, лидер, KPI и
+   ВЕЕР собраны из лаба, данные — РЕАЛЬНЫЕ из WR_DATA (data-pipeline/wr-stats.json):
+   винрейт, пикрейт, банрейт, ТИР и ТРЕНД приходят из снимка, ничего не выдумано.
+
+   ЧЕГО ИЗ ЛАБА НЕ ВЗЯЛИ (осознанно):
+   · applySplash (metahub.js:318) — свой фон-арт. Подложка на сайте ОДНА
+     (--splash-img, ⚙ рельса); вид, красящий фон под себя, = второй владелец фона.
+   · ⚙-попап лаба — на боевом настройки живут в одном месте (.rail-gear → WRPrefs).
+   · дизайн-полоса и meta-data.js (демо-снимок) — это дев-инструменты песочницы.
+   · демо-кривая «WR за 5 патчей» — заменена реальной: снимок даёт wr и trend,
+     линия строится ровно как в виде WinRate (wrprSparkPts): было wr−trend → стало wr.
+
+   АНТИДЁРГАНЬЕ: шапка и бенто строятся ОДИН раз; смена ранга и приход данных
+   идут через labMorph — трогается только изменившееся, узлы живут.
+   ВЕЕР (.mh-*) — god-tier, геометрия и анимация перенесены 1-в-1.
    ════════════════════════════════════════════════════════════════ */
 (function(){
   'use strict';
-  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-  function icon(n){ return window._champIcon ? window._champIcon(n) : ''; }
-  function roleRu(r){ return {top:'Соло',jungle:'Лес',mid:'Мид',adc:'АДК',support:'Сап'}[r] || r; }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function gnorm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+  function ckey(n){ return window._champKey ? window._champKey(n) : n; }
+  function icon(n){ return window._champIcon ? window._champIcon(canon(n)) : ''; }
+  function splash(n){ return 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/' + ckey(canon(n)) + '_0.jpg'; }
+  function roleRu(r){ return { top:'Топ', jungle:'Лес', mid:'Мид', adc:'АДК', support:'Сап' }[r] || r; }
+  function wrCls(v){ return v>=52 ? 'wr-g' : (v<49 ? 'wr-b' : 'wr-n'); }
   function tierOf(wr){ return wr>=53?'S':wr>=51?'A':wr>=49?'B':'C'; }
-  function wrCls(v){ return v>=50?'wr-g':'wr-b'; }
-  function port(n){ return '<img class="f-port" src="'+icon(n)+'" alt="" onerror="this.style.visibility=\'hidden\'">'; }
-  function splash(n){ var k = window._champKey ? window._champKey(n) : n; return 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/' + k + '_0.jpg'; }
-  function chRaw(n){ return (window._champsRaw||[]).find(function(x){ return x.name===n; }); }
-  // 🔥 ВЕЕР-витрина меты — ПОРТ из lab-hover-reveal (layout v-fan + раскрытие «мини»).
-  // Раздвигающаяся витрина топ-N чемпов: наведение растит карту и раскрывает AD/HP/WR.
-  function fanHTML(list){
-    return '<div class="mh-fan-wrap"><h4>🔥 Витрина меты <span class="pill">Топ-'+list.length+' Challenger</span></h4>'+
-      '<div class="mh-fan-stage v-fan">'+list.map(function(c){
-        var cr = chRaw(c.name);
-        var ad = cr ? Math.round(cr.ad_b) : '—';
-        var hp = cr ? Math.round(cr.hp_b) : '—';
-        return '<div class="mh-card glow" data-champ="'+esc(c.name)+'">'+
-          '<div class="mh-art"><img src="'+splash(c.name)+'" alt="" onerror="this.onerror=null;this.src=\''+icon(c.name)+'\'"></div>'+
-          '<div class="mh-shade"></div>'+
-          '<div class="mh-body">'+
-            '<div class="mh-name">'+esc(c.name)+'</div>'+
-            '<div class="mh-role">'+roleRu(c.role)+'</div>'+
-            '<div class="mh-reveal"><div class="rv-mini">'+
-              '<div><div class="mv" style="color:#e8820a">'+ad+'</div><div class="ml">⚔ AD</div></div>'+
-              '<div><div class="mv" style="color:#43e08a">'+hp+'</div><div class="ml">✚ HP</div></div>'+
-              '<div><div class="mv" style="color:'+(c.wr>=50?'#43e08a':'#ff6b6b')+'">'+c.wr.toFixed(1)+'%</div><div class="ml">WR</div></div>'+
-            '</div><div class="click-tip">клик → подробнее</div></div>'+
-          '</div>'+
-        '</div>';
-      }).join('')+'</div></div>';
-  }
+  function port(n){ return '<img class="f-port" src="'+icon(n)+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'; }
 
-  // Реальные данные из WR_DATA. Заполнен только ранг 'чалик' (Challenger) —
-  // алмаз/мастер/ГМ/суверен пока пустые (ждут Firestore/пайплайн).
-  function wrPool(){
-    var rd = (window.WR_DATA || {})['чалик'] || {};
-    var out = [];
-    ['top','jungle','mid','adc','support'].forEach(function(role){
-      (rd[role] || []).forEach(function(o){
-        if(o && o.name && !isNaN(+o.wr)) out.push({ name:o.name, wr:+o.wr, pr:+o.pr||0, br:+o.br||0, role:role });
-      });
-    });
-    return out;
-  }
-  // лучший вход на чемпа (по WR), дедуп между ролями
-  function bestPerChamp(pool){
+  /* ── ИМЯ ИЗ СНИМКА → ИМЯ ТАБЛИЦЫ. В wr-stats имена свои («Kogmaw», «LeeSin»,
+     «MonkeyKing»), в таблице чемпионов — свои («KogMaw», «Lee Sin», «Wukong»).
+     Сводим их одним ключом (тем же champKey, что сводит иконки) и дальше по САЙТУ
+     ходим ИМЕНЕМ ТАБЛИЦЫ: иначе ddragon отдаёт 404 на Kogmaw.png, а страницы чемпа
+     не находится. Индекс перестраивается, когда таблица догрузилась. ── */
+  var _idx = null, _idxLen = -1;
+  function slugify(s){ return String(s).toLowerCase().replace(/['’.]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+  function index(){
+    var raw = window._champsRaw || [];
+    if(_idx && _idxLen === raw.length) return _idx;
     var m = {};
-    pool.forEach(function(o){ if(!m[o.name] || o.wr > m[o.name].wr) m[o.name] = o; });
-    return Object.keys(m).map(function(k){ return m[k]; });
+    raw.forEach(function(c){ if(c && c.name) m[gnorm(ckey(c.name))] = { name:c.name, slug:slugify(c.name) }; });
+    _idx = m; _idxLen = raw.length;
+    return m;
+  }
+  function canon(name){ var e = index()[gnorm(ckey(name))]; return e ? e.name : name; }
+  /* ЗАКОН СВЯЗЕЙ: клик по чемпу → ЕГО СТРАНИЦА (та же, что в поиске и в выдаче).
+     Чемпа нет в таблице (совсем новый) — ведём в каталог, а не в 404. */
+  function champHref(name){ var e = index()[gnorm(ckey(name))]; return e ? ('champions/'+e.slug+'/') : 'champions/'; }
+  /* адрес страницы чемпа нужен и тир-мейкеру — владелец один, дубля нет */
+  window.champPageHref = champHref;
+
+  /* ── 🔥 ВЕЕР-витрина: радар «качеств» чемпа. Оси — игровые качества
+     (Урон/Сложн./Выжив./Польза, шкала 1-3) из data-pipeline/champion-qualities.json.
+     Грузим один раз, радары дозаполняются по готовности (пустой бокс держит размер
+     — без мигания). Обновляется: node data-pipeline/fetch-champion-qualities.mjs ── */
+  var QSRC = 'data-pipeline/champion-qualities.json';
+  var RAXES = [
+    { f:'damage',    lbl:'Урон' },
+    { f:'difficult', lbl:'Сложн.' },
+    { f:'survive',   lbl:'Выжив.' },
+    { f:'utility',   lbl:'Польза' }
+  ];
+  var _qmap = null, _qPromise = null;
+  function loadQualities(){
+    if(_qPromise) return _qPromise;
+    _qPromise = fetch(QSRC, { cache:'force-cache' })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(j){
+        var arr = Array.isArray(j) ? j : ((j && j.champions) || []);
+        var m = {}; arr.forEach(function(c){ if(!c) return; if(c.name) m[gnorm(c.name)]=c; if(c.id) m[gnorm(c.id)]=c; }); _qmap = m; return m;
+      })
+      .catch(function(){ _qmap = {}; return {}; });
+    return _qPromise;
+  }
+  function radarInner(name){
+    var q = _qmap && _qmap[gnorm(name)];
+    if(!q) return '';
+    var n=RAXES.length, cx=120, cy=110, R=66;
+    function frac(v){ return Math.max(0.14, Math.min(1, (+v||0)/3)); }
+    function pt(i,f){ var a=(-90+i*(360/n))*Math.PI/180; return [cx+Math.cos(a)*R*f, cy+Math.sin(a)*R*f]; }
+    var grid=[0.33,0.66,1].map(function(g){ return '<polygon points="'+RAXES.map(function(_,i){return pt(i,g).join(',');}).join(' ')+'" fill="none" stroke="var(--sel-12)" stroke-width="1"/>'; }).join('');
+    var axes=RAXES.map(function(_,i){ var e=pt(i,1); return '<line x1="'+cx+'" y1="'+cy+'" x2="'+e[0]+'" y2="'+e[1]+'" stroke="var(--sel-12)" stroke-width="1"/>'; }).join('');
+    var labels=RAXES.map(function(a,i){ var l=pt(i,1.28); return '<text x="'+l[0]+'" y="'+l[1]+'" fill="var(--txt-mute)" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="middle">'+a.lbl+'</text>'; }).join('');
+    var data=RAXES.map(function(a,i){ return pt(i, frac(q[a.f])).join(','); }).join(' ');
+    var dots=RAXES.map(function(a,i){ var p=pt(i, frac(q[a.f])); return '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="2.6" fill="var(--accent)"/>'; }).join('');
+    return '<svg viewBox="0 0 240 220">'+grid+axes+'<polygon points="'+data+'" fill="var(--sel-18)" stroke="var(--accent)" stroke-width="2"/>'+dots+labels+'</svg>';
   }
 
-  // ── Гайды чемпов (data-pipeline/guides): матчапы/контры/сборки/руны/прокачка ──
+  /* ── Спарклайн тренда. РЕАЛЬНЫЙ: снимок даёт текущий wr и trend (дельта за патч),
+     значит известны обе точки — было (wr−trend) и стало (wr). Между ними интерполяция,
+     ровно как в виде WinRate (wrprSparkPts) — одна механика на весь сайт. ── */
+  function trendVals(wr, tr){
+    var from = wr - tr, vals = [], i;
+    for(i=0;i<5;i++) vals.push(from + (wr-from)*(i/4));
+    return vals;
+  }
+  function spark(vals, cls, w, h){
+    var min=Math.min.apply(null,vals), max=Math.max.apply(null,vals), span=(max-min)||1;
+    var pts = vals.map(function(v,i){ var x=(i/(vals.length-1))*(w-2)+1; var y=h-2-((v-min)/span)*(h-4); return x.toFixed(1)+','+y.toFixed(1); });
+    var last = pts[pts.length-1].split(',');
+    return '<svg class="spark '+cls+'" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" aria-hidden="true"><polyline class="ln" points="'+pts.join(' ')+'"/><circle class="dot" cx="'+last[0]+'" cy="'+last[1]+'" r="1.9"/></svg>';
+  }
+
+  /* ── Гайды чемпов (data-pipeline/guides): матчапы/контры/сборки/руны/прокачка ── */
   var GUIDE_BASE = 'data-pipeline/guides/';
   var _gIndex = null, _gCache = {}, _gAlias = { monkeyking:'wukong' };
-  function _gnorm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
   function guideIndex(){
     if(_gIndex) return _gIndex;
     _gIndex = fetch(GUIDE_BASE + '_index.json', { cache:'no-cache' })
       .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(j){ var map = {}; if(j && j.champions) j.champions.forEach(function(c){ map[_gnorm(c.name)] = c.slug; }); return map; })
+      .then(function(j){ var map = {}; if(j && j.champions) j.champions.forEach(function(c){ map[gnorm(c.name)] = c.slug; }); return map; })
       .catch(function(){ return {}; });
     return _gIndex;
   }
   function loadGuide(name){
     return guideIndex().then(function(map){
-      var n = _gnorm(name), slug = map[n] || _gAlias[n] || n;
+      var n = gnorm(name), slug = map[n] || _gAlias[n] || n;
       if(_gCache[slug]) return _gCache[slug];
       _gCache[slug] = fetch(GUIDE_BASE + slug + '.json', { cache:'no-cache' })
         .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
@@ -6947,187 +7884,1122 @@
   }
   window.ChampGuides = { load: loadGuide, index: guideIndex };
 
-  var _lastHero = null;   // имя героя дня (для подгрузки его гайда в renderMetaHub)
+  /* ════════════════════════════════════════════════════════════════
+     ДАННЫЕ РАНГА — из WR_DATA[rank] (заполняет loadWrStats из wr-stats.json)
+     ════════════════════════════════════════════════════════════════ */
+  var ROLES = ['top','jungle','mid','adc','support'];
+  var _rank = 'чалик';
 
-  function kpiCards(pool, champs){
-    var topWr = champs.slice().sort(function(a,b){ return b.wr-a.wr; })[0];
-    var mostBan = pool.slice().sort(function(a,b){ return b.br-a.br; })[0];
-    var roleSum = {}; pool.forEach(function(o){ roleSum[o.role] = (roleSum[o.role]||0) + o.pr; });
-    var metaRole = Object.keys(roleSum).sort(function(a,b){ return roleSum[b]-roleSum[a]; })[0];
-    return '<div class="f-kpi"><div class="k-lbl">Топ винрейт</div><div class="k-val">'+(topWr?esc(topWr.name):'—')+'</div><div class="k-sub">'+(topWr?topWr.wr.toFixed(1)+'% WR':'')+'</div></div>'+
-      '<div class="f-kpi"><div class="k-lbl">Мета-роль</div><div class="k-val">'+(metaRole?roleRu(metaRole):'—')+'</div><div class="k-sub">по пикрейту</div></div>'+
-      '<div class="f-kpi"><div class="k-lbl">Самый банимый</div><div class="k-val">'+(mostBan?esc(mostBan.name):'—')+'</div><div class="k-sub">'+(mostBan?mostBan.br.toFixed(1)+'% банов':'')+'</div></div>'+
-      '<div class="f-kpi"><div class="k-lbl">Чемпионов</div><div class="k-val">'+champs.length+'</div><div class="k-sub">ранг Challenger</div></div>';
+  function ranks(){ return window.WR_RANKS || [{ id:'чалик', label:'Чалик' }]; }
+  function rankLabel(id){
+    var r = ranks().filter(function(x){ return x.id === (id || _rank); })[0];
+    return r ? r.label : (id || _rank);
   }
-  function hubHTML(){
-    var pool = wrPool();
-    var tools=[['👥','Чемпионы','sideChamps'],['⚔','Калькулятор','calc'],['📦','Предметы','items'],['💎','Руны','runes'],['📋','Драфтер','draftCoop'],['🏆','Киберспорт','cybersport']];
-    var toolsHTML = '<div class="hub-tools">'+tools.map(function(t){ return '<div class="hub-tool" data-tool="'+t[2]+'"><div class="ti">'+t[0]+'</div><div class="tn">'+t[1]+'</div></div>'; }).join('')+'</div>';
-    if(!pool.length){
-      return '<div class="f-hub"><div class="hub-card"><h4>📈 Мета-хаб</h4><div style="color:var(--text-muted);font-size:13px;padding:8px 0;">Данные WinRate ещё загружаются…</div></div>'+toolsHTML+'</div>';
-    }
+  function poolOf(rank){
+    var rd = (window.WR_DATA || {})[rank] || {};
+    var out = [];
+    ROLES.forEach(function(role){
+      (rd[role] || []).forEach(function(o){
+        if(o && o.name && !isNaN(+o.wr))
+          out.push({ name:o.name, wr:+o.wr, pr:+o.pr||0, br:+o.br||0, role:role,
+                     tier:o.tier || null, trend:(o.ch==null ? null : +o.ch) });
+      });
+    });
+    return out;
+  }
+  function hasData(rank){ return poolOf(rank).length > 0; }
+  /* лучший вход на чемпа (по WR), дедуп между ролями */
+  function bestPerChamp(pool){
+    var m = {};
+    pool.forEach(function(o){ if(!m[o.name] || o.wr > m[o.name].wr) m[o.name] = o; });
+    return Object.keys(m).map(function(k){ return m[k]; });
+  }
+  function ctx(){
+    var pool = poolOf(_rank);
+    if(!pool.length) return null;
     var champs = bestPerChamp(pool);
-    var byWr  = champs.slice().sort(function(a,b){ return b.wr-a.wr; });
-    var hero  = byWr[0];
-    _lastHero = hero.name;
-    var top5  = byWr.slice(0,5);
-    var sTier = byWr.filter(function(c){ return c.wr>=52; }).slice(0,10);
-    var topPr = champs.slice().sort(function(a,b){ return b.pr-a.pr; }).slice(0,5);
-    var topBr = champs.slice().sort(function(a,b){ return b.br-a.br; }).slice(0,5);
-    var tours=[['🔴','WR Masters','сегодня 18:00'],['🟡','Asia Cup','завтра 14:00'],['⚪','EU Open','12.06']];
-    return '<div class="f-hub">'+
-      '<div class="hub-hero"><img class="big" src="'+icon(hero.name)+'" alt="" onerror="this.style.visibility=\'hidden\'">'+
-        '<div class="info"><span class="lbl">★ Лидер мета · Challenger</span><h2>'+esc(hero.name)+'</h2>'+
-          '<div class="row"><span class="tag">🎖 Тир '+tierOf(hero.wr)+'</span><span class="tag">📈 '+hero.wr.toFixed(1)+'% WR</span><span class="tag">🗺 '+roleRu(hero.role)+'</span></div>'+
-          '<button class="cta" data-tool="sideChamps">Открыть гайды →</button></div></div>'+
-      '<div class="f-kpis">'+kpiCards(pool, champs)+'</div>'+
-      fanHTML(top5)+
-      '<div class="hub-cards">'+
-        '<div class="hub-card"><h4>📈 Топ-5 по винрейту <span class="pill">Challenger</span></h4>'+top5.map(function(c){ return '<div class="hc-row">'+port(c.name)+'<span class="hc-n">'+esc(c.name)+'</span><span class="hc-v '+wrCls(c.wr)+'">'+c.wr.toFixed(1)+'%</span></div>'; }).join('')+'</div>'+
-        '<div class="hub-card"><h4>🎖 S-тир сейчас</h4><div class="hc-pool">'+sTier.map(function(c){ return '<div class="hc-champ">'+port(c.name)+'<span>'+esc(c.name)+'</span></div>'; }).join('')+'</div></div>'+
-        '<div class="hub-card"><h4>🎯 Топ по пикрейту</h4>'+topPr.map(function(c){ return '<div class="hc-row">'+port(c.name)+'<span class="hc-n">'+esc(c.name)+'</span><span class="hc-v">'+c.pr.toFixed(1)+'%</span></div>'; }).join('')+'</div>'+
-        '<div class="hub-card"><h4>🚫 Топ по банрейту</h4>'+topBr.map(function(c){ return '<div class="hc-row">'+port(c.name)+'<span class="hc-n">'+esc(c.name)+'</span><span class="hc-v wr-b">'+c.br.toFixed(1)+'%</span></div>'; }).join('')+'</div>'+
-        '<div class="hub-card" id="mhBuild"><h4>🛠 Сборка дня <span class="pill">'+esc(hero.name)+'</span></h4><div class="hc-mini" style="color:var(--text-muted);font-size:12px;padding:4px 0;">загрузка…</div></div>'+
-        '<div class="hub-card" id="mhCounter"><h4>⚔ Контрят '+esc(hero.name)+'</h4><div class="hc-mini" style="color:var(--text-muted);font-size:12px;padding:4px 0;">загрузка…</div></div>'+
-        '<div class="hub-card"><h4>🏆 Ближайшие турниры</h4>'+tours.map(function(t){ return '<div class="hc-tour"><span class="hc-dot">'+t[0]+'</span><b>'+t[1]+'</b><span class="hc-when">'+t[2]+'</span></div>'; }).join('')+'</div>'+
-        '<div class="hub-card"><h4>📰 Что нового <span class="pill">Patch 7.0f</span></h4><ul class="hc-news"><li>Раздел в разработке — патч-ноты подключим к ленте изменений</li></ul></div>'+
-      '</div>'+
-      toolsHTML+
+    var byWr = champs.slice().sort(function(a,b){ return b.wr-a.wr; });
+    return {
+      pool: pool, champs: champs, hero: byWr[0], top5: byWr.slice(0,5),
+      sTier: byWr.filter(function(c){ return c.wr>=52; }).slice(0,10),
+      topPr: champs.slice().sort(function(a,b){ return b.pr-a.pr; }).slice(0,5),
+      topBr: champs.slice().sort(function(a,b){ return b.br-a.br; }).slice(0,5)
+    };
+  }
+
+  /* ── ГАЙД ЛИДЕРА (реальный, data-pipeline/guides) кормит ДВА блока: «Сборка дня»
+     и «Контрят». Держим разобранный результат в кэше по чемпу: без кэша смена ранга
+     туда-обратно каждый раз показывала бы «загружаю…» и мигала. ── */
+  var _guide = {};
+  function ensureGuide(name, done){
+    if(Object.prototype.hasOwnProperty.call(_guide, name)) return;   /* уже есть или уже грузится */
+    _guide[name] = null;
+    loadGuide(canon(name)).then(function(g){
+      var b = g && g.builds && g.builds[0] && g.builds[0].items;
+      _guide[name] = {
+        build: b ? (b.core || []).concat((b.boots && b.boots[0]) ? [b.boots[0]] : []) : [],
+        counters: (g && g.counters) || []
+      };
+      done();
+    });
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     БЛОКИ (порт из lab-metahub)
+     ════════════════════════════════════════════════════════════════ */
+
+  /* 1 — Лидер меты */
+  function heroBlock(c){
+    var href = champHref(c.name);
+    var t = c.tier || tierOf(c.wr);
+    var line = '';
+    /* строку тренда показываем, только если он ЕСТЬ: «55.8% → 55.8%» с плоской
+       линией — это не данные, а шум (у лидера чалика trend обычно 0) */
+    if(c.trend){
+      var v = trendVals(c.wr, c.trend);
+      line = '<div class="spark-row">' + spark(v, c.trend>=0 ? 'up' : 'dn', 84, 20) +
+        '<span>WR за патч: <b>' + v[0].toFixed(1) + '%</b> → <b>' + c.wr.toFixed(1) + '%</b></span></div>';
+    }
+    return '<div class="hub-hero glass">' +
+      '<div class="hero-art" style="background-image:url(\'' + splash(c.name) + '\')"></div>' +
+      '<img class="big" src="' + icon(c.name) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+      '<div class="info">' +
+        '<span class="lbl">★ Лидер меты · ' + esc(rankLabel()) + '</span>' +
+        '<h2><a href="' + href + '">' + esc(c.name) + '</a></h2>' +
+        '<div class="hrow">' +
+          '<span class="tag">Тир <span class="tier" data-t="' + esc(t) + '">' + esc(t) + '</span></span>' +
+          '<span class="tag">WR <b>' + c.wr.toFixed(1) + '%</b></span>' +
+          '<span class="tag">' + roleRu(c.role) + '</span>' +
+        '</div>' + line +
+        '<a class="cta" href="' + href + '">Открыть гайды →</a>' +
+      '</div></div>';
+  }
+
+  /* 2 — KPI */
+  function kpiBlock(c){
+    var topWr = c.hero;
+    var mostBan = c.champs.slice().sort(function(a,b){ return b.br-a.br; })[0];
+    var roleSum = {}; c.pool.forEach(function(o){ roleSum[o.role] = (roleSum[o.role]||0) + o.pr; });
+    var metaRole = Object.keys(roleSum).sort(function(a,b){ return roleSum[b]-roleSum[a]; })[0];
+    function kpi(lbl, val, sub){ return '<div class="f-kpi glass"><div class="k-lbl">'+lbl+'</div><div class="k-val">'+val+'</div><div class="k-sub">'+sub+'</div></div>'; }
+    return '<div class="f-kpis">' +
+      kpi('Топ винрейт', '<a href="'+champHref(topWr.name)+'">'+esc(topWr.name)+'</a>', '<b>'+topWr.wr.toFixed(1)+'%</b> WR') +
+      kpi('Мета-роль', roleRu(metaRole), 'по пикрейту') +
+      kpi('Самый банимый', '<a href="'+champHref(mostBan.name)+'">'+esc(mostBan.name)+'</a>', '<b>'+mostBan.br.toFixed(1)+'%</b> банов') +
+      kpi('Чемпионов', c.champs.length, esc(rankLabel())) +
     '</div>';
   }
+
+  /* 3 — 🔥 ВЕЕР-витрина (god-tier, 1-в-1: геометрия и анимация не тронуты).
+     `fresh` (появление карт) — ТОЛЬКО при первой сборке: смена ранга это не
+     «появление», блок постоянный. Иначе веер мигает на каждый клик. */
+  var _fanShown = false;
+  function fanBlock(list){
+    var fresh = _fanShown ? '' : ' fresh'; _fanShown = true;
+    return '<div class="mh-fan-wrap' + fresh + '"><h4>Витрина меты <span class="pill-lbl">Топ-' + list.length + ' ' + esc(rankLabel()) + '</span></h4>' +
+      '<div class="mh-fan-stage v-fan">' + list.map(function(c){
+        return '<a class="mh-card glow" href="' + champHref(c.name) + '" data-key="' + esc(c.name) + '">' +
+          '<div class="mh-art"><img src="' + splash(c.name) + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + icon(c.name) + '\'"></div>' +
+          '<div class="mh-shade"></div>' +
+          '<div class="mh-body">' +
+            '<div class="mh-name">' + esc(c.name) + '</div>' +
+            '<div class="mh-role">' + roleRu(c.role) + '</div>' +
+          '</div>' +
+          '<div class="mh-reveal">' +
+            '<div class="mh-radar" data-radar="' + esc(canon(c.name)) + '">' + radarInner(canon(c.name)) + '</div>' +
+            '<div class="mh-wrs">' +
+              '<div class="mh-wr ' + (c.wr>=50?'wr-g':'wr-b') + '"><b>' + c.wr.toFixed(1) + '%</b><span>WR</span></div>' +
+              '<div class="mh-wr mh-wr-pr"><b>' + c.pr.toFixed(1) + '%</b><span>PR</span></div>' +
+              '<div class="mh-wr mh-wr-br"><b>' + c.br.toFixed(1) + '%</b><span>BR</span></div>' +
+            '</div>' +
+            '<div class="click-tip">клик → страница чемпа</div>' +
+          '</div>' +
+        '</a>';
+      }).join('') + '</div></div>';
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     БЛОКИ 4-11 — карточки данных. Общие кирпичики: строка чемпа и чип чемпа.
+     Оба — ССЫЛКИ на страницу чемпа (ЗАКОН СВЯЗЕЙ), не «мёртвые» div.
+     ════════════════════════════════════════════════════════════════ */
+  function champRow(c, i, val, cls, withSpark){
+    var sp = (withSpark && c.trend) ? spark(trendVals(c.wr, c.trend), c.trend>=0 ? 'up' : 'dn', 44, 16) : '';
+    return '<a class="hc-row" href="' + champHref(c.name) + '"><span class="rank-i">' + (i+1) + '</span>' + port(c.name) +
+      '<span class="hc-n">' + esc(c.name) + '</span>' + sp + '<span class="hc-v ' + cls + '">' + val + '</span></a>';
+  }
+  function champChip(name){ return '<a class="hc-champ" href="' + champHref(name) + '">' + port(name) + '<span>' + esc(name) + '</span></a>'; }
+
+  /* 4 — Топ-5 по винрейту (со спарклайном реального тренда) */
+  function topWrBlock(list){
+    return '<div class="hub-card glass"><h4>Топ-5 по винрейту <span class="pill-lbl">' + esc(rankLabel()) + '</span></h4>' +
+      list.map(function(c,i){ return champRow(c, i, c.wr.toFixed(1)+'%', wrCls(c.wr), true); }).join('') + '</div>';
+  }
+  /* 5 — S-тир сейчас */
+  function sTierBlock(list){
+    if(!list.length) return '<div class="hub-card glass"><h4>S-тир сейчас</h4>' +
+      '<div class="empty"><b>На этом ранге нет чемпов с WR ≥ 52%.</b><br>Это не пропажа данных — мета ровная.</div></div>';
+    return '<div class="hub-card glass"><h4>S-тир сейчас <span class="pill-lbl">WR ≥ 52%</span></h4>' +
+      '<div class="hc-pool">' + list.map(function(c){ return champChip(c.name); }).join('') + '</div></div>';
+  }
+  /* 6 — Топ по пикрейту · 7 — Топ по банрейту */
+  function topRateBlock(list, kind){
+    var isBan = kind === 'ban';
+    return '<div class="hub-card glass"><h4>' + (isBan ? 'Топ по банрейту' : 'Топ по пикрейту') + '</h4>' +
+      list.map(function(c,i){ return champRow(c, i, (isBan ? c.br : c.pr).toFixed(1)+'%', isBan ? 'wr-b' : 'wr-n', false); }).join('') + '</div>';
+  }
+  /* 8 — Сборка дня (реальная: первый билд из гайда лидера) */
+  function buildBlock(hero){
+    var g = _guide[hero.name];
+    var head = '<h4>Сборка дня <span class="pill-lbl">' + esc(hero.name) + '</span>' +
+      '<a class="go-all" href="' + champHref(hero.name) + '">Весь гайд →</a></h4>';
+    if(!g) return '<div class="hub-card glass" id="mhBuild">' + head + '<div class="empty">Читаю сборку из гайда…</div></div>';
+    if(!g.build.length) return '<div class="hub-card glass" id="mhBuild">' + head +
+      '<div class="empty"><b>Сборки для этого чемпа в гайдах нет.</b><br>Появится в гайде — встанет сюда сама.</div></div>';
+    return '<div class="hub-card glass" id="mhBuild">' + head + g.build.map(function(it,i){
+      return '<button type="button" class="hc-row" data-tool="items"><span class="rank-i">' + (i+1) + '</span>' +
+        '<span class="hc-n">' + esc(it) + '</span></button>';
+    }).join('') + '</div>';
+  }
+  /* 9 — Контрят лидера (реальные контры из гайда) */
+  function counterBlock(hero){
+    var g = _guide[hero.name];
+    var head = '<h4>Контрят: ' + esc(hero.name) + '</h4>';
+    if(!g) return '<div class="hub-card glass" id="mhCounter">' + head + '<div class="empty">Читаю контры из гайда…</div></div>';
+    if(!g.counters.length) return '<div class="hub-card glass" id="mhCounter">' + head +
+      '<div class="empty"><b>Контры для этого чемпа в гайдах не указаны.</b></div></div>';
+    return '<div class="hub-card glass" id="mhCounter">' + head +
+      '<div class="hc-pool">' + g.counters.map(champChip).join('') + '</div></div>';
+  }
+  /* 10 — Ближайшие турниры. ★ ДЕМО: живая турнирная база (Firestore /tournaments)
+     принадлежит разделу «Турниры» (cybersport.js) и наружу список не отдаёт.
+     Лезть в неё вторым владельцем нельзя — поэтому превью честно помечено ДЕМО. */
+  var TOURS_DEMO = [
+    { name: 'WR Masters · Финал',   when: 'сегодня 18:00', live: true },
+    { name: 'Asia Cup · Полуфинал', when: 'завтра 14:00' },
+    { name: 'EU Open · Групповой',  when: '12.06' }
+  ];
+  function toursBlock(){
+    return '<div class="hub-card glass"><h4>Ближайшие турниры <span class="demo">демо</span>' +
+      '<button type="button" class="go-all" data-tool="cybersport">В Турниры →</button></h4>' +
+      TOURS_DEMO.map(function(x){
+        return '<button type="button" class="hc-tour" data-tool="cybersport">' +
+          (x.live ? '<span class="es-live">LIVE</span>' : '<span class="hc-dot"></span>') +
+          '<b>' + esc(x.name) + '</b><span class="hc-when">' + esc(x.when) + '</span></button>';
+      }).join('') +
+      '<div class="empty">Цифры выдуманы. Станут живыми, когда раздел «Турниры» начнёт отдавать свою базу.</div></div>';
+  }
+  /* 11 — Что нового. РЕАЛЬНОЕ: патч-ноты из Firestore (коллекция patchnotes,
+     та же лента, что в «Изменениях»). Не приехали — честный пустой стейт. */
+  var KIND_LBL = { buff: 'БАФФ', adjust: 'ПРАВКА', nerf: 'НЕРФ' };
+  function newsBlock(){
+    var list = (window._cmsPatchnotes || []).filter(function(n){ return n && n.champion && n.change; }).slice(0, 4);
+    var patch = list[0] && list[0].patch;
+    var head = '<h4>Что нового' + (patch ? ' <span class="pill-lbl">Патч ' + esc(patch) + '</span>' : '') +
+      '<button type="button" class="go-all" data-act="changes">Все изменения →</button></h4>';
+    if(!list.length) return '<div class="hub-card glass">' + head +
+      '<div class="empty"><b>Патч-ноты ещё не приехали.</b><br>Лента изменений тянется из базы — как приедет, топ буфов и нерфов встанет сюда.</div></div>';
+    return '<div class="hub-card glass">' + head + '<ul class="hc-news">' + list.map(function(n){
+      var k = KIND_LBL[n.type] ? n.type : 'nerf';
+      return '<li><a href="' + champHref(n.champion) + '"><b>' + esc(n.champion) + '</b> <span>' + esc(n.change) + '</span></a>' +
+        '<span class="n-kind ' + k + '">' + KIND_LBL[k] + '</span></li>';
+    }).join('') + '</ul></div>';
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     ЛАУНЧЕР ИНСТРУМЕНТОВ. ★ Глифы ЛИНЕЙНЫЕ, не эмодзи (DESIGN.md: эмодзи
+     рисуются шрифтом ОС — чужеродно). Стиль набора 1-в-1 из lab-ui-kit:
+     24×24, stroke currentColor 1.9, круглые концы.
+     ════════════════════════════════════════════════════════════════ */
+  var SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">', ESVG = '</svg>';
+  var GLYPH = {
+    champs: SVG + '<circle cx="9.2" cy="8" r="3.3"/><path d="M3.4 19.2 C3.4 15.5 6 13.7 9.2 13.7 C12.4 13.7 15 15.5 15 19.2"/><path d="M16.2 5.2 A3.3 3.3 0 0 1 16.2 10.8"/><path d="M17.6 14 C19.7 14.7 21 16.4 21 19.2"/>' + ESVG,
+    calc:   SVG + '<rect x="4.5" y="2.8" width="15" height="18.4" rx="2.6"/><path d="M8 7.4 H16"/><path d="M8.6 12 H9.4 M11.6 12 H12.4 M14.6 12 H15.4 M8.6 16.4 H9.4 M11.6 16.4 H12.4 M14.6 16.4 H15.4"/>' + ESVG,
+    items:  SVG + '<path d="M12 2.8 L20.6 7.4 V16.6 L12 21.2 L3.4 16.6 V7.4 Z"/><path d="M3.4 7.4 L12 12 L20.6 7.4"/><path d="M12 12 V21.2"/>' + ESVG,
+    runes:  SVG + '<circle cx="12" cy="12" r="8.4"/><path d="M12 3.6 V20.4"/><path d="M4.7 7.8 L19.3 16.2"/><path d="M4.7 16.2 L19.3 7.8"/>' + ESVG,
+    draft:  SVG + '<circle cx="12" cy="12" r="8.4"/><circle cx="12" cy="12" r="3.4"/><path d="M12 1.6 V5 M12 19 V22.4 M1.6 12 H5 M19 12 H22.4"/>' + ESVG,
+    cup:    SVG + '<path d="M7 3.6 H17 V9.4 A5 5 0 0 1 7 9.4 Z"/><path d="M7 5.4 H4.3 A2.7 2.7 0 0 0 7 10.6"/><path d="M17 5.4 H19.7 A2.7 2.7 0 0 1 17 10.6"/><path d="M12 14.4 V17.8"/><path d="M8.4 20.4 H15.6"/>' + ESVG
+  };
+  var TOOLS = [
+    ['champs', 'Чемпионы',    'sideChamps'],
+    ['calc',   'Калькулятор', 'calc'],
+    ['items',  'Предметы',    'items'],
+    ['runes',  'Руны',        'runes'],
+    ['draft',  'Драфтер',     'drafterHub'],
+    ['cup',    'Турниры',     'cybersport']
+  ];
+  function toolsBlock(){
+    return '<div class="hub-tools">' + TOOLS.map(function(t){
+      return '<button type="button" class="hub-tool glass" data-tool="' + t[2] + '">' +
+        '<span class="ti">' + GLYPH[t[0]] + '</span><span class="tn">' + t[1] + '</span></button>';
+    }).join('') + '</div>';
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     СБОРКА ВИДА. Каркас (шапка + бенто) — ОДИН раз; дальше только labMorph.
+     ════════════════════════════════════════════════════════════════ */
+  function snapText(){
+    var d = String(window.WR_SNAPSHOT || '');
+    var pretty = /^\d{8}$/.test(d) ? (d.slice(6,8)+'.'+d.slice(4,6)+'.'+d.slice(0,4)) : d;
+    return pretty ? ('Снимок <b>' + esc(pretty) + '</b> · lolm.qq.com') : 'Данные Wild Rift · lolm.qq.com';
+  }
+  function pillsHTML(){
+    return ranks().filter(function(r){ return hasData(r.id); })
+      .map(function(r){ return '<button type="button" class="pill'+(r.id===_rank?' on':'')+'" data-r="'+esc(r.id)+'">'+esc(r.label)+'</button>'; }).join('');
+  }
+  function bentoHTML(){
+    var c = ctx();
+    if(!c) return '<div class="hub-card glass"><h4>Мета-хаб</h4>' +
+      '<div class="empty"><b>Винрейты ещё загружаются.</b><br>Снимок приходит из data-pipeline/wr-stats.json — как приедет, хаб заполнится сам.</div></div>' +
+      toolsBlock();
+    return heroBlock(c.hero) + kpiBlock(c) + fanBlock(c.top5) +
+      '<div class="hub-cards">' +
+        topWrBlock(c.top5) + sTierBlock(c.sTier) + topRateBlock(c.topPr, 'pick') + topRateBlock(c.topBr, 'ban') +
+        buildBlock(c.hero) + counterBlock(c.hero) + toursBlock() + newsBlock() +
+      '</div>' +
+      toolsBlock();
+  }
+
+  function paint(mount){
+    var head = mount.querySelector('.hub-head');
+    var bento = mount.querySelector('.bento');
+    if(!head || !bento) return;
+    labMorph(head, '<span class="hub-patch">' + snapText() + '</span><div class="pills">' + pillsHTML() + '</div>');
+    labMorph(bento, bentoHTML());
+    /* радары веера дозаполняются по готовности качеств (пустой бокс держит размер) */
+    loadQualities().then(function(){
+      bento.querySelectorAll('.mh-radar[data-radar]').forEach(function(el){
+        if(!el.innerHTML.trim()) el.innerHTML = radarInner(el.getAttribute('data-radar'));
+      });
+    });
+    var fan = bento.querySelector('.mh-fan-wrap.fresh');
+    if(fan) setTimeout(function(){ fan.classList.remove('fresh'); }, 400);
+    /* гайд лидера (сборка + контры) — как прочитается, перекрашиваем: labMorph
+       тронет ТОЛЬКО эти две карточки, остальной хаб не шевельнётся */
+    var c = ctx();
+    if(c) ensureGuide(c.hero.name, function(){ paint(mount); });
+  }
+
   window.renderMetaHub = function(mount){
     if(!mount) return;
-    mount.innerHTML = hubHTML();
-    mount.querySelectorAll('[data-tool]').forEach(function(el){
-      el.addEventListener('click', function(){ if(window.sidebarOpen) window.sidebarOpen(el.getAttribute('data-tool')); });
-    });
-    mount.querySelectorAll('[data-champ]').forEach(function(el){
-      el.addEventListener('click', function(){ if(window.openChampDetail) window.openChampDetail(el.getAttribute('data-champ')); });
-    });
-    // Реальная сборка + контры героя дня из гайда (асинхронно; при сбое — «нет данных»)
-    if(_lastHero){
-      loadGuide(_lastHero).then(function(g){
-        var bEl = mount.querySelector('#mhBuild .hc-mini');
-        if(bEl){
-          var b = g && g.builds && g.builds[0] && g.builds[0].items;
-          var core = b ? (b.core || []).concat((b.boots && b.boots[0]) ? [b.boots[0]] : []) : [];
-          bEl.innerHTML = core.length
-            ? core.map(function(it){ return '<div class="hc-row" style="padding:5px 0;"><span class="hc-n" style="font-size:12.5px;">🔹 '+esc(it)+'</span></div>'; }).join('')
-            : 'нет данных';
+    /* Каркас строим ОДИН раз. Повторный вызов (приехали данные) — только перекраска:
+       узлы шапки и бенто переживают его, пересоздаётся лишь изменившееся. */
+    if(!mount.querySelector('.f-hub')){
+      mount.innerHTML = '<div class="f-hub"><header class="hub-head glass"></header><div class="bento"></div></div>';
+      mount.addEventListener('click', function(e){
+        var p = e.target.closest('.pill[data-r]');
+        if(p && mount.contains(p)){
+          if(p.dataset.r === _rank) return;
+          _rank = p.dataset.r; paint(mount); return;
         }
-        var cEl = mount.querySelector('#mhCounter .hc-mini');
-        if(cEl){
-          var cs = (g && g.counters) || [];
-          cEl.innerHTML = cs.length
-            ? '<div class="hc-pool">'+cs.map(function(n){ return '<div class="hc-champ">'+port(n)+'<span>'+esc(n)+'</span></div>'; }).join('')+'</div>'
-            : 'нет данных';
-        }
+        /* ЗАКОН СВЯЗЕЙ: инструмент → его раздел, «Все изменения» → лента изменений.
+           Модалку открывает ЕЁ владелец (openChanges → openModal), не мы руками. */
+        var t = e.target.closest('[data-tool]');
+        if(t && mount.contains(t)){ if(window.sidebarOpen) window.sidebarOpen(t.dataset.tool); return; }
+        var a = e.target.closest('[data-act="changes"]');
+        if(a && mount.contains(a) && window.openChanges) window.openChanges();
       });
+      /* имена чемпов таблицы приезжают асинхронно, а из них строится адрес страницы
+         чемпа (ЗАКОН СВЯЗЕЙ) — как приедут, перекрашиваем: morph поправит только href */
+      document.addEventListener('champsLoaded', function(){ if(mount.querySelector('.f-hub')) paint(mount); });
+      /* патч-ноты приезжают из Firestore — «Что нового» обязано их подхватить */
+      document.addEventListener('patchnotesLoaded', function(){ if(mount.querySelector('.f-hub')) paint(mount); });
     }
+    paint(mount);
   };
 })();
 
 /* ════════════════════════════════════════════════════════════════
-   🎖 ТИР-ЛИСТ — ПОРТ из lab-main (инлайн tiermaker .f-tier/.tl-*).
-   Разметка/CSS/sortable 1-в-1 из лаба; чемпы РЕАЛЬНЫЕ (иконки + авто-тир
-   из WR-данных S+/S/A/B/C/D), перетаскивание, ⚙ 4 настройки (localStorage),
-   «↺ Сброс к мете». Заменяет старую фуллскрин-модалку чемпионского тира.
+   Э1.4 · ТИР-ЛИСТ — ПЕРЕСБОРКА ИЗ lab-main (тир-мейкер).
+   4 источника: Чемпионы · Предметы · Руны · Объекты (стихийные драконы).
+   Старый вид (.f-tier/.tl-chip, один общий список без ролей) снесён целиком.
+
+   ★ ЛАБ НЕПОЛНЫЙ — недостающее взято ИЗ БОЕВОГО, не выдумано:
+   · под-листы по РОЛЯМ и по КАТЕГОРИЯМ (в лабе фильтр и 6 выдуманных типов
+     предметов; в боевом — отдельные списки и 7 реальных категорий CMS) → боевое;
+   · руны по категориям (в лабе их нет вовсе) → боевое;
+   · авто-раскладка по WR + «Сброс к мете» (в лабе демо-тиры) → боевое;
+   · перетаскивание на Sortable, а не нативный HTML5 drag лаба: нативный drag
+     не работает на тач-экранах, Sortable уже подключён и умеет оба;
+   · ХРАНЕНИЕ. Лаб пишет свои ключи `tm-<вид>|<подвид>`. На боевом это молча
+     сломало бы синк: localStorage.setItem пропатчен (app.js ~4030) и сам шлёт
+     в Firestore ТОЛЬКО перечисленные ключи. Поэтому пишем в ЕГО ключи
+     (tierData / itemTierData / runeTierData / objectTierData) и в его схеме —
+     облако работает даром, владелец один, рельсовый тир-лист видит те же данные.
+
+   Из ЛАБА взято 1-в-1: раскладка (сетка + карточка справа + фуллскрин),
+   ряды S+…D, палитра-пул, ОБЩИЙ ТАЙЛ (ховер-зум без мыла + WR-шторка).
+   АНТИДЁРГАНЬЕ: drop перемещает ОДИН узел (Sortable), ряды и пул не пересобираются;
+   смена вкладки/под-вкладки — labMorph, не innerHTML.
    ════════════════════════════════════════════════════════════════ */
 (function(){
   'use strict';
-  var TIERKEYS=['S+','S','A','B','C','D'];
-  var TIERCOLORS={'S+':'#FF3A3A','S':'#C43A3A','A':'#C46A1C','B':'#BC9800','C':'#1E8848','D':'#555566'};
-  var TIER_ORD={'S+':6,'S':5,'A':4,'B':3,'C':2,'D':1};
-  var TIEROPTS={
-    tlayout:{label:'Раскладка',items:[['rows','Ряды'],['cols','Колонки']]},
-    tpool:{label:'Пул',items:[['bottom','Снизу'],['side','Сбоку']]},
-    tsize:{label:'Размер в тирах',items:[['s','S'],['m','M'],['l','L']]},
-    psize:{label:'Размер в пуле',items:[['s','S'],['m','M'],['l','L']]}
-  };
-  var DEF={tlayout:'rows',tpool:'bottom',tsize:'m',psize:'m'};
-  var S=loadSettings();
-  function loadSettings(){ try{ var o=JSON.parse(localStorage.getItem('tier-settings')||'{}'); var r={}; Object.keys(DEF).forEach(function(k){ r[k]=o[k]||DEF[k]; }); return r; }catch(e){ return JSON.parse(JSON.stringify(DEF)); } }
-  function saveSettings(){ try{ localStorage.setItem('tier-settings',JSON.stringify(S)); }catch(e){} }
-  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function icon(n){ return window._champIcon ? window._champIcon(n) : ''; }
+  var TIERS = [['S+','s-plus'],['S','s'],['A','a'],['B','b'],['C','c'],['D','d']];
+  var TIER_KEYS = TIERS.map(function(t){ return t[0]; });
+  var TIER_ORD = {'S+':6,'S':5,'A':4,'B':3,'C':2,'D':1};
+  /* роли = схема боевого хранилища (tierData): all/adc/mid/top/jungle/sup */
+  var ROLES = [
+    { k:'all',    t:'Все' },
+    { k:'top',    t:'Топ' },
+    { k:'jungle', t:'Лес' },
+    { k:'mid',    t:'Мид' },
+    { k:'adc',    t:'АДК' },
+    { k:'sup',    t:'Сап' }
+  ];
+  var WR_ROLE = { top:'top', jungle:'jungle', mid:'mid', adc:'adc', sup:'support' };
 
-  // Источник: WR_DATA. Берём лучший (высший) тир чемпа среди его ролей.
-  function wrChamps(){
+  /* ── 4 ИСТОЧНИКА. Ключ хранения у каждого — ТОТ ЖЕ, что у рельсового
+     тир-листа, поэтому облачный синк работает сам (setItem пропатчен). ── */
+  var TABS = [
+    { k:'champ',  t:'Чемпионы', store:'tierData' },
+    { k:'item',   t:'Предметы', store:'itemTierData' },
+    { k:'rune',   t:'Руны',     store:'runeTierData' },
+    { k:'object', t:'Объекты',  store:'objectTierData' }
+  ];
+
+  /* Стихийные драконы — РЕАЛЬНЫЕ, из data-pipeline/jungle-economy.json
+     (epicMonsters.elementalDragons.types). Читаем файл, не выдумываем. */
+  var DRAGONS = null, _dragP = null;
+  function loadDragons(){
+    if(_dragP) return _dragP;
+    /* ОДИН загрузчик jungle-economy.json на сайт (его же читает вид «Карта») —
+       второй fetch того же файла = лишний запрос и второй владелец данных */
+    _dragP = (window.loadJungleEconomy ? window.loadJungleEconomy()
+              : fetch('data-pipeline/jungle-economy.json', { cache:'force-cache' }).then(function(r){ return r.ok ? r.json() : null; }))
+      .then(function(j){
+        var t = j && j.epicMonsters && j.epicMonsters.elementalDragons && j.epicMonsters.elementalDragons.types;
+        /* имя тайла — короткое («Огненный»): на вкладке «Объекты» слово «дракон»
+           у всех одинаковое и только съедает ширину, полное имя — в карточке */
+        DRAGONS = t ? Object.keys(t).map(function(k){
+          return { id:k, name:t[k].ru || k, buff:t[k].buff || '', rift:t[k].rift || '', sourced:!!t[k].sourced };
+        }) : [];
+        return DRAGONS;
+      })
+      .catch(function(){ DRAGONS = []; return DRAGONS; });
+    return _dragP;
+  }
+  /* Линейные глифы стихий (эмодзи каноном запрещены, DESIGN.md).
+     Стиль набора 1-в-1 из lab-ui-kit: 24×24, stroke currentColor 1.9. */
+  var SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">', ESVG = '</svg>';
+  var DRAG_GLYPH = {
+    infernal: SVG + '<path d="M12 2.8 C13.6 7 17.4 8.2 17.4 13 A5.4 5.4 0 0 1 6.6 13 C6.6 10.6 8 9.4 9 8.2 C9.6 10 10.6 10.6 11.2 10.6 C12 10.6 11 7 12 2.8 Z"/>' + ESVG,
+    mountain: SVG + '<path d="M2.6 19.4 L9 7.6 L13 14.4 L15.4 10.4 L21.4 19.4 Z"/><path d="M7.4 10.4 L10.6 10.4"/>' + ESVG,
+    ocean:    SVG + '<path d="M2.6 9.4 C5 6.6 7.4 6.6 9.8 9.4 C12.2 12.2 14.6 12.2 17 9.4 C18.6 7.6 20 7 21.4 7.8"/><path d="M2.6 15.4 C5 12.6 7.4 12.6 9.8 15.4 C12.2 18.2 14.6 18.2 17 15.4 C18.6 13.6 20 13 21.4 13.8"/>' + ESVG,
+    cloud:    SVG + '<path d="M7.4 18 A4.4 4.4 0 0 1 7.8 9.2 A5.6 5.6 0 0 1 18 10.4 A3.8 3.8 0 0 1 17.4 18 Z"/>' + ESVG
+  };
+
+  var esc = function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+  var icon = function(n){ return window._champIcon ? window._champIcon(n) : ''; };
+  var href = function(n){ return window.champPageHref ? window.champPageHref(n) : 'champions/'; };
+  function wrCls(v){ return v>=52 ? 'wr-g' : (v<49 ? 'wr-b' : 'wr-n'); }
+
+  /* ── ДАННЫЕ: реальный ростер из WR_DATA (снимок wr-stats.json) ── */
+  function champsOf(role){
     var rd = window.WR_DATA || {};
-    var rank = (rd['все'] && roleHasData(rd['все'])) ? 'все' : (rd['чалик'] ? 'чалик' : Object.keys(rd)[0]);
+    var rank = (rd['все'] && hasAny(rd['все'])) ? 'все' : (rd['чалик'] ? 'чалик' : Object.keys(rd)[0]);
     var pool = rd[rank] || {};
+    var roles = role === 'all' ? ['top','jungle','mid','adc','support'] : [WR_ROLE[role]];
     var best = {};
-    ['top','jungle','mid','adc','support'].forEach(function(ro){
+    roles.forEach(function(ro){
       (pool[ro]||[]).forEach(function(c){
+        if(!c || !c.name || isNaN(+c.wr)) return;
         var tier = (c.tier && TIER_ORD[c.tier]) ? c.tier : tierFromWr(+c.wr);
-        var ord = TIER_ORD[tier];
-        if(!best[c.name] || ord > best[c.name].ord) best[c.name] = { name:c.name, tier:tier, ord:ord };
+        if(!best[c.name] || TIER_ORD[tier] > TIER_ORD[best[c.name].tier])
+          best[c.name] = { kind:'champ', id:c.name, name:c.name, wr:+c.wr, pr:+c.pr||0, br:+c.br||0, tier:tier, role:ro };
       });
     });
-    return Object.keys(best).map(function(n){ return best[n]; });
+    return Object.keys(best).map(function(n){ return best[n]; }).sort(function(a,b){ return a.name.localeCompare(b.name); });
   }
-  // фолбэк, если в данных нет поля tier (хардкод-WR) — раскидать по винрейту
+  function hasAny(r){ return ['top','jungle','mid','adc','support'].some(function(ro){ return (r[ro]||[]).length; }); }
+  /* фолбэк, когда в снимке нет поля tier — раскидываем по винрейту (поведение боевого) */
   function tierFromWr(wr){ return wr>=53?'S+':wr>=51.5?'S':wr>=50?'A':wr>=48.5?'B':wr>=47?'C':'D'; }
-  function roleHasData(r){ return ['top','jungle','mid','adc','support'].some(function(ro){ return (r[ro]||[]).length; }); }
 
-  function autoPlacement(){
-    var p={pool:[]}; TIERKEYS.forEach(function(k){ p[k]=[]; });
-    wrChamps().sort(function(a,b){ return a.name.localeCompare(b.name); }).forEach(function(c){ (p[c.tier]||p.pool).push(c.name); });
-    return p;
+  /* ── ЕДИНЫЙ СПИСОК СУЩНОСТЕЙ вкладки. Предметы и руны берём у их владельца
+     (window.TierSources → getItemsByCat/getRunesByCat, реестр CMS/Firestore),
+     свой дубль реестра не заводим. ── */
+  function subsOf(tab){
+    var S = window.TierSources;
+    if(tab === 'champ') return ROLES;
+    if(tab === 'item')  return (S && S.itemCats || []).map(function(c){ return { k:c.k, t:c.l }; });
+    if(tab === 'rune')  return (S && S.runeCats || []).map(function(c){ return { k:c.k, t:c.l }; });
+    return [];
   }
-  var _placement=null;
-  function placement(){
-    if(_placement) return _placement;
-    var auto=autoPlacement();
-    var all={}; Object.keys(auto).forEach(function(z){ auto[z].forEach(function(n){ all[n]=1; }); });
-    try{
-      var saved=JSON.parse(localStorage.getItem('tier-placement')||'null');
-      if(saved && saved.pool){
-        // сверка с актуальным ростером: выкинуть ушедших, докинуть новых в пул
-        var seen={}, p={pool:[]}; TIERKEYS.forEach(function(k){ p[k]=[]; });
-        ['pool'].concat(TIERKEYS).forEach(function(z){ (saved[z]||[]).forEach(function(n){ if(all[n] && !seen[n]){ seen[n]=1; p[z].push(n); } }); });
-        Object.keys(all).forEach(function(n){ if(!seen[n]) p.pool.push(n); });
-        _placement=p; return _placement;
-      }
-    }catch(e){}
-    _placement=auto; return _placement;
+  function entriesOf(tab, sub){
+    var S = window.TierSources;
+    if(tab === 'champ') return champsOf(sub);
+    if(tab === 'item')  return ((S && S.items() || {})[sub] || []).map(function(o){ return { kind:'item', id:o.name, name:o.name, img:o.img }; });
+    if(tab === 'rune')  return ((S && S.runes() || {})[sub] || []).map(function(o){ return { kind:'rune', id:o.name, name:o.name, img:o.img }; });
+    return (DRAGONS || []).map(function(d){ return { kind:'object', id:d.id, name:d.name, buff:d.buff, rift:d.rift, sourced:d.sourced }; });
   }
-  function savePlacement(){ try{ localStorage.setItem('tier-placement',JSON.stringify(_placement)); }catch(e){} }
+  function storeKey(tab){ return (TABS.filter(function(x){ return x.k === tab; })[0] || TABS[0]).store; }
 
-  function tchip(name){ return '<div class="tl-chip" data-champ="'+esc(name)+'" title="'+esc(name)+'"><img src="'+icon(name)+'" alt="" onerror="this.style.visibility=\'hidden\'"></div>'; }
-  function render(mount){
-    if(!mount) return;
-    if(!roleHasData((window.WR_DATA||{})['чалик']||{}) && !wrChamps().length){
-      mount.innerHTML='<div style="padding:48px 20px;text-align:center;color:rgba(255,255,255,.45);">Данные WinRate ещё загружаются…</div>';
-      return;
-    }
-    var p=placement();
-    var tiers='<div class="tl-tiers">'+TIERKEYS.map(function(k){ return '<div class="tl-tier"><div class="tl-badge" style="background:'+TIERCOLORS[k]+'">'+k+'</div><div class="tl-lane" data-zone="'+k+'">'+(p[k]||[]).map(tchip).join('')+'</div></div>'; }).join('')+'</div>';
-    var pool='<div class="tl-poolwrap"><div class="tl-plabel">Пул чемпионов</div><div class="tl-pool" data-zone="pool">'+(p.pool||[]).map(tchip).join('')+'</div></div>';
-    var settings='<div class="tl-settings" id="tlSettings">'+Object.keys(TIEROPTS).map(function(key){ var o=TIEROPTS[key]; return '<div class="tl-grp"><span class="tl-glabel">'+o.label+'</span><div class="tl-seg" data-topt="'+key+'">'+o.items.map(function(it){ return '<button data-v="'+it[0]+'" class="'+(it[0]===S[key]?'on':'')+'">'+it[1]+'</button>'; }).join('')+'</div></div>'; }).join('')+'<button class="tl-reset" id="tlReset">↺ Сбросить к мете</button></div>';
-    var bar='<div class="tl-bar"><span class="tl-title">🎖 Тир-лист</span><button class="tl-gear" id="tlGear" title="Настройки">⚙</button></div>';
-    mount.innerHTML='<div class="f-tier" data-tlayout="'+S.tlayout+'" data-tpool="'+S.tpool+'" data-tsize="'+S.tsize+'" data-psize="'+S.psize+'">'+bar+settings+'<div class="tl-board">'+tiers+pool+'</div></div>';
-    wire(mount);
-    initSortable(mount);
+  /* ── ХРАНИЛИЩЕ: схема и ключи рельсового тир-листа → синк в Firestore даром ── */
+  function readStore(tab){
+    try { return JSON.parse(localStorage.getItem(storeKey(tab)) || '{}') || {}; } catch(e){ return {}; }
   }
-  function wire(mount){
-    var fTier=mount.querySelector('.f-tier');
-    var gear=mount.querySelector('#tlGear'), sett=mount.querySelector('#tlSettings');
-    if(gear) gear.onclick=function(e){ e.stopPropagation(); var open=!sett.classList.contains('open'); sett.classList.toggle('open',open); gear.classList.toggle('on',open); };
-    if(!document._tlOutside){ document._tlOutside=true; document.addEventListener('click',function(e){ var s=document.getElementById('tlSettings'); if(s&&s.classList.contains('open')&&!e.target.closest('#tlSettings')&&!e.target.closest('#tlGear')){ s.classList.remove('open'); var g=document.getElementById('tlGear'); if(g)g.classList.remove('on'); } }); }
-    mount.querySelectorAll('.tl-seg').forEach(function(seg){ var key=seg.dataset.topt; seg.querySelectorAll('button').forEach(function(b){ b.onclick=function(){ S[key]=b.dataset.v; saveSettings(); seg.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on',x===b); }); if(fTier) fTier.setAttribute('data-'+key,b.dataset.v); }; }); });
-    var rb=mount.querySelector('#tlReset'); if(rb) rb.onclick=function(){ _placement=autoPlacement(); try{ localStorage.removeItem('tier-placement'); }catch(e){} render(mount); };
+  function writeStore(tab, all){
+    try { localStorage.setItem(storeKey(tab), JSON.stringify(all)); } catch(e){}
   }
-  function snapshot(mount){
-    var p={}; mount.querySelectorAll('.f-tier [data-zone]').forEach(function(z){ p[z.dataset.zone]=Array.prototype.map.call(z.querySelectorAll('.tl-chip'),function(c){ return c.dataset.champ; }); });
-    _placement=p; savePlacement();
+  function emptyList(){ var o={}; TIER_KEYS.forEach(function(k){ o[k]=[]; }); return o; }
+  /* авто-раскладка по WR — только у чемпов (тиры есть в снимке).
+     У предметов/рун/объектов «правильного» тира не существует — начинаем с пула,
+     чтобы не выдумывать за игрока. */
+  function autoPlace(tab, sub){
+    var o = emptyList();
+    if(tab !== 'champ') return o;
+    entriesOf(tab, sub).forEach(function(e){ o[e.tier].push(e.id); });
+    return o;
   }
-  function initSortable(mount){
-    if(!window.Sortable) return;
-    mount.querySelectorAll('.f-tier [data-zone]').forEach(function(zone){
-      new window.Sortable(zone,{ group:'tier', animation:90, ghostClass:'tl-ghost', chosenClass:'tl-chosen', dragClass:'tl-drag', forceFallback:true, fallbackOnBody:true, onEnd:function(){ snapshot(mount); } });
+  function placement(tab, sub, roster){
+    var saved = readStore(tab)[sub];
+    var alive = {};
+    roster.forEach(function(e){ alive[e.id] = 1; });
+    var any = saved && TIER_KEYS.some(function(k){ return (saved[k]||[]).length; });
+    if(!any) return autoPlace(tab, sub);
+    var out = emptyList(), seen = {};
+    TIER_KEYS.forEach(function(k){
+      (saved[k]||[]).forEach(function(id){ if(alive[id] && !seen[id]){ seen[id]=1; out[k].push(id); } });
     });
+    return out;                      /* неразмещённые сами окажутся в пуле */
   }
-  window.renderTierBoard = function(mount){ render(mount); };
+  function poolOf(roster, place){
+    var placed = {};
+    TIER_KEYS.forEach(function(k){ (place[k]||[]).forEach(function(id){ placed[id]=1; }); });
+    return roster.filter(function(e){ return !placed[e.id]; });
+  }
+
+  var _tab = 'champ', _sub = 'all', _full = false, _sel = null;
+  var _byId = {};                    /* id → сущность текущего под-листа */
+
+  /* ── ОБЩИЙ ТАЙЛ (порт 1-в-1): крупный источник, покой .88 → ховер 1.0 (зум без
+     мыла), у чемпа снизу выезжает WR-шторка. Тайл ПЕРЕТАСКИВАЕТСЯ — не пикер-чип. ── */
+  function tileHTML(id){
+    var d = _byId[id];
+    if(!d) return '';
+    var inner, extra = '';
+    if(d.kind === 'champ'){
+      inner = '<img class="tile-img" src="' + icon(d.name) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">';
+      extra = '<span class="tile-shade"><b class="' + wrCls(d.wr) + '">' + d.wr.toFixed(1) + '%</b></span>';
+    } else if(d.kind === 'object'){
+      inner = '<span class="tile-glyph">' + (DRAG_GLYPH[d.id] || '') + '</span>';
+    } else {
+      inner = '<img class="tile-img tile-img-flat" src="' + esc(d.img || '') + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">';
+    }
+    return '<div class="tile tile-' + d.kind + (id === _sel ? ' on' : '') + '" data-tid="' + esc(id) + '" title="' + esc(d.name) + '">' +
+      '<span class="tile-lift">' + inner + extra + '</span>' +
+      '<span class="tile-n">' + esc(d.name) + '</span></div>';
+  }
+
+  function boardHTML(){
+    var roster = entriesOf(_tab, _sub);
+    _byId = {};
+    roster.forEach(function(e){ _byId[e.id] = e; });
+    var place = placement(_tab, _sub, roster);
+    var pool = poolOf(roster, place);
+
+    var rows = TIERS.map(function(t){
+      return '<div class="tm-row"><span class="tm-badge" style="background:var(--tier-' + t[1] + ')">' + t[0] + '</span>' +
+        '<div class="tm-lane" data-zone="' + t[0] + '">' + (place[t[0]]||[]).map(tileHTML).join('') + '</div></div>';
+    }).join('');
+
+    var tabs = '<div class="tm-tabs glass">' + TABS.map(function(x){
+      return '<button type="button" class="tm-tab' + (x.k===_tab ? ' on' : '') + '" data-tab="' + x.k + '">' + x.t + '</button>';
+    }).join('') + '</div>';
+
+    var subs = subsOf(_tab);
+    var subsHTML = subs.length ? '<div class="tm-subs glass">' + subs.map(function(s){
+      return '<button type="button" class="tm-sub' + (s.k===_sub ? ' on' : '') + '" data-sub="' + esc(s.k) + '">' + esc(s.t) + '</button>';
+    }).join('') + '</div>' : '';
+
+    var bar = '<div class="tm-bar">' + tabs +
+      '<div class="tm-actions">' +
+        '<button type="button" class="tm-btn" data-act="share">Поделиться</button>' +
+        '<button type="button" class="tm-btn" data-act="reset">' + (_tab === 'champ' ? 'Сброс к мете' : 'Сброс') + '</button>' +
+        '<button type="button" class="tm-btn" data-act="full">' + (_full ? 'Свернуть' : 'Во весь экран') + '</button>' +
+      '</div></div>';
+
+    var body = roster.length
+      ? '<div class="tm-grid glass">' + rows + '</div>' + subsHTML +
+        '<div class="tm-pool glass"><div class="tm-pool-h">Палитра · тащи в тир · ' + pool.length + ' шт.</div>' +
+        '<div class="tm-pool-grid" data-zone="pool">' + pool.map(function(e){ return tileHTML(e.id); }).join('') + '</div></div>'
+      : subsHTML + '<div class="tm-pool glass"><div class="empty">' + emptyText() + '</div></div>';
+
+    return '<div class="tm-wrap' + (_full ? ' tm-full' : '') + '">' +
+      '<div class="tm-main">' + bar + body + '</div>' +
+      '<aside class="tm-side glass">' + sideHTML() + '</aside>' +
+    '</div>';
+  }
+  function emptyText(){
+    if(_tab === 'champ')  return '<b>Винрейты ещё загружаются.</b><br>Ростер строится из снимка wr-stats.json — как приедет, доска заполнится сама.';
+    if(_tab === 'object') return '<b>Данные объектов ещё читаются.</b><br>Источник — data-pipeline/jungle-economy.json.';
+    return '<b>Реестр ещё не загрузился.</b><br>Предметы и руны приходят из базы сайта — открой раздел и вернись, либо подожди загрузку.';
+  }
+
+  /* карточка справа: реальные данные + связь (ЗАКОН СВЯЗЕЙ) */
+  function sideHTML(){
+    var d = _sel && _byId[_sel];
+    var collapse = '<button type="button" class="tm-side-collapse" data-act="full" title="Свернуть карточку — тир на весь экран">›</button>';
+    if(!d) return collapse + '<div class="tm-side-empty">Клик по любому тайлу — карточка встанет сюда. Свернёшь — тир на весь экран.</div>';
+    if(d.kind === 'champ'){
+      return collapse + '<div class="tmc">' +
+        '<img class="tmc-ava" src="' + icon(d.name) + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+        '<div class="tmc-name">' + esc(d.name) + '</div>' +
+        '<div class="tmc-sub"><span class="tier" data-t="' + esc(d.tier) + '">' + esc(d.tier) + '</span> · ' + roleRu(d.role) + '</div>' +
+        '<div class="tmc-kpi"><b class="' + wrCls(d.wr) + '">' + d.wr.toFixed(1) + '%</b> WR · ' + d.pr.toFixed(1) + '% PR · ' + d.br.toFixed(1) + '% BR</div>' +
+        '<a class="tm-btn tmc-open" href="' + href(d.name) + '">Открыть страницу чемпа →</a>' +
+      '</div>';
+    }
+    if(d.kind === 'object'){
+      return collapse + '<div class="tmc">' +
+        '<span class="tmc-glyph">' + (DRAG_GLYPH[d.id] || '') + '</span>' +
+        '<div class="tmc-name">' + esc(d.name) + ' дракон</div>' +
+        '<div class="tmc-kpi">' + esc(d.buff) + (d.sourced ? '' : ' <span class="demo">не сверено</span>') + '</div>' +
+        (d.rift ? '<div class="tmc-pass">Ущелье: ' + esc(d.rift) + '</div>' : '') +
+      '</div>';
+    }
+    var isItem = d.kind === 'item';
+    return collapse + '<div class="tmc">' +
+      '<img class="tmc-ava tmc-ava-flat" src="' + esc(d.img || '') + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+      '<div class="tmc-name">' + esc(d.name) + '</div>' +
+      '<button type="button" class="tm-btn tmc-open" data-open="' + (isItem ? 'item' : 'rune') + '" data-name="' + esc(d.name) + '">' +
+        (isItem ? 'Открыть карточку предмета →' : 'Открыть карточку руны →') + '</button>' +
+    '</div>';
+  }
+  function roleRu(r){ return { top:'Топ', jungle:'Лес', mid:'Мид', adc:'АДК', support:'Сап' }[r] || r; }
+
+  /* снимок размещения ИЗ DOM после drop — узлы живут, ничего не пересобираем */
+  function snapshot(host){
+    var o = emptyList();
+    host.querySelectorAll('.tm-lane[data-zone]').forEach(function(z){
+      o[z.getAttribute('data-zone')] = [].map.call(z.querySelectorAll('.tile'), function(t){ return t.getAttribute('data-tid'); });
+    });
+    var all = readStore(_tab);
+    all[_sub] = o;
+    writeStore(_tab, all);           /* ← отсюда патченный setItem сам шлёт в Firestore */
+    var h = host.querySelector('.tm-pool-h');
+    if(h) h.textContent = 'Палитра · тащи в тир · ' + host.querySelectorAll('.tm-pool-grid .tile').length + ' шт.';
+  }
+
+  /* ЗАКОН СВЯЗЕЙ для предмета/руны: открываем раздел-владелец и его же карточку
+     (через его UI — значит через openModal, матрёшка цела). Своей модалки не заводим. */
+  function openEntity(kind, name){
+    if(window.sidebarOpen) window.sidebarOpen(kind === 'item' ? 'items' : 'runes');
+    setTimeout(function(){
+      var sel = kind === 'item' ? '#itemsMask .item-card' : '.rune-card';
+      var hit = [].slice.call(document.querySelectorAll(sel)).filter(function(c){
+        return String(c.getAttribute('data-tip')||'').split('\xa6')[0].trim() === name;
+      })[0];
+      if(hit) hit.click();
+    }, 260);
+  }
+
+  function wire(host){
+    /* DnD: Sortable переставляет ОДИН узел между зонами (боевое, работает и на тач) */
+    if(window.Sortable){
+      host.querySelectorAll('[data-zone]').forEach(function(z){
+        if(z._sortable) return;
+        z._sortable = new window.Sortable(z, {
+          group:'tier', animation:90, ghostClass:'tm-ghost', chosenClass:'tm-chosen', dragClass:'tm-drag',
+          forceFallback:true, fallbackOnBody:true,
+          onEnd:function(){ snapshot(host); }
+        });
+      });
+    }
+    host.querySelectorAll('.tm-tab[data-tab]').forEach(function(b){
+      b.onclick = function(){
+        if(b.dataset.tab === _tab) return;
+        _tab = b.dataset.tab; _sel = null;
+        var subs = subsOf(_tab);
+        _sub = subs.length ? subs[0].k : 'all';
+        if(_tab === 'object' && !DRAGONS){ loadDragons().then(function(){ paint(host); }); }
+        paint(host);
+      };
+    });
+    host.querySelectorAll('.tm-sub[data-sub]').forEach(function(b){
+      b.onclick = function(){ if(b.dataset.sub === _sub) return; _sub = b.dataset.sub; _sel = null; paint(host); };
+    });
+    host.querySelectorAll('[data-act="full"]').forEach(function(b){
+      b.onclick = function(){ _full = !_full; paint(host); };
+    });
+    var rs = host.querySelector('[data-act="reset"]');
+    if(rs) rs.onclick = function(){ var all = readStore(_tab); delete all[_sub]; writeStore(_tab, all); paint(host); };
+    var sh = host.querySelector('[data-act="share"]');
+    if(sh) sh.onclick = function(){ share(host, sh); };
+    /* клик по тайлу — только карточка справа; перетаскивание тайл не теряет */
+    host.querySelectorAll('.tile[data-tid]').forEach(function(t){
+      t.onclick = function(){
+        _sel = t.getAttribute('data-tid');
+        host.querySelectorAll('.tile.on').forEach(function(x){ x.classList.remove('on'); });
+        t.classList.add('on');
+        var side = host.querySelector('.tm-side');
+        if(side){ labMorph(side, sideHTML()); wireSide(host, side); }
+      };
+    });
+    wireSide(host, host.querySelector('.tm-side'));
+  }
+  function wireSide(host, side){
+    if(!side) return;
+    side.querySelectorAll('[data-act="full"]').forEach(function(b){ b.onclick = function(){ _full = !_full; paint(host); }; });
+    var op = side.querySelector('[data-open]');
+    if(op) op.onclick = function(){ openEntity(op.getAttribute('data-open'), op.getAttribute('data-name')); };
+  }
+
+  function share(host, btn){
+    var tabT = (TABS.filter(function(x){ return x.k===_tab; })[0]||{}).t || '';
+    var subT = (subsOf(_tab).filter(function(s){ return s.k===_sub; })[0]||{}).t || '';
+    var lines = TIERS.map(function(t){
+      var ids = [].map.call(host.querySelectorAll('.tm-lane[data-zone="' + t[0] + '"] .tile'), function(x){
+        var d = _byId[x.getAttribute('data-tid')]; return d ? d.name : '';
+      }).filter(Boolean);
+      return t[0] + ': ' + (ids.length ? ids.join(', ') : '—');
+    });
+    var text = 'Тир-лист · ' + tabT + (subT ? ' · ' + subT : '') + '\n' + lines.join('\n');
+    var done = function(){ var o = btn.textContent; btn.textContent = 'Скопировано'; setTimeout(function(){ btn.textContent = o; }, 1400); };
+    if(navigator.clipboard) navigator.clipboard.writeText(text).then(done, done); else done();
+  }
+
+  /* host = .f-tier (его же передаёт wire) — не контейнер вида: иначе действия
+     полосы молча становились no-op, доска не перерисовывалась. */
+  function paint(host){
+    if(!host) return;
+    labMorph(host, boardHTML());
+    /* Sortable висит на самом узле зоны. Пережил morph — флаг _sortable при нём,
+       wire() его пропустит; узел создан заново — флага нет, подключим. */
+    wire(host);
+  }
+
+  window.renderTierBoard = function(mount){
+    if(!mount) return;
+    if(!mount.querySelector('.f-tier')) mount.innerHTML = '<div class="f-tier"></div>';
+    paint(mount.querySelector('.f-tier'));
+  };
 })();
 
+/* ══════════════════════════════════════════════════════════════════════
+   ★ Э1.8 · ВИД «КАРТА» — [Карта (экономика)] · [Страта (тактич-доска)]
+
+   ПОРТ из lab-map/map-lab.js (лаб = источник правды), НЕ рескин старого.
+   Что изменилось при переносе (принудительная канонизация):
+     · дев-полоса лаба выброшена — варианты зафиксированы в дефолт
+       (объекты=точка · панель=справа · ползунок=fill);
+     · эмодзи-иконки → линейные глифы 24×24 (стиль lab-ui-kit);
+     · ДЕМО-плейсхолдер карты → РЕАЛЬНЫЙ арт ущелья + позиции объектов
+       выверены по арту (решение владельца 2026-08-21);
+     · добавлены Герольд и Старший дракон (данные лежали, лаб их не показывал);
+     · добавлена полоса ЗОЛОТА снизу (MASTERPLAN Э2: «цена/голда снизу,
+       меняется ползунком»);
+     · ЗАКОН СВЯЗЕЙ: у каждого объекта есть выход в соседнюю фичу.
+
+   НЕ ТАЩИТЬ ДЁРГАНЬЕ:
+     п.1/п.3 — у под-вкладок НЕТ анимации появления (постоянные блоки);
+     п.4 — никаких принудительных перезапусков анимации на контейнере;
+     п.5 — тик ползунка меняет ТОЛЬКО изменившиеся числа (живые узлы держим
+           в ссылках), панель целиком не пересобирается.
+   Приёмка счётчиком узлов: window.MAP_AUDIT() в консоли.
+   ══════════════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  /* ── ДАННЫЕ: реальные, data-pipeline/jungle-economy.json. ОДИН загрузчик на сайт
+     (тир-лист «Объекты» берёт стихии драконов отсюда же — второй fetch не нужен) ── */
+  var _ecoP = null;
+  window.loadJungleEconomy = function(){
+    if(_ecoP) return _ecoP;
+    _ecoP = fetch('data-pipeline/jungle-economy.json', { cache:'force-cache' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .catch(function(){ return null; });
+    return _ecoP;
+  };
+
+  var DATA = null;
+
+  /* ── ЛИНЕЙНЫЕ ГЛИФЫ по КАТЕГОРИИ объекта (эмодзи каноном запрещены, DESIGN.md).
+     Категория, а не «иконка на каждого монстра»: в кружке 28px узнаётся только
+     простая форма, а зоопарк мелких картинок = шум. ── */
+  var S = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">', ES = '</svg>';
+  var GLYPH = {
+    epic:   S + '<path d="M12 3.2 L19.4 6.4 V12 C19.4 16.4 16.2 19.4 12 20.8 C7.8 19.4 4.6 16.4 4.6 12 V6.4 Z"/><path d="M12 9.2 V14"/>' + ES,
+    dragon: S + '<path d="M12 2.8 C13.6 7 17.4 8.2 17.4 13 A5.4 5.4 0 0 1 6.6 13 C6.6 10.6 8 9.4 9 8.2 C9.6 10 10.6 10.6 11.2 10.6 C12 10.6 11 7 12 2.8 Z"/>' + ES,
+    buff:   S + '<path d="M12 3 L13.8 9.4 L20.2 11.2 L13.8 13 L12 19.4 L10.2 13 L3.8 11.2 L10.2 9.4 Z"/>' + ES,
+    camp:   S + '<path d="M12 3.6 L16.8 11.2 H13.8 L17.8 17.4 H6.2 L10.2 11.2 H7.2 Z"/><path d="M12 17.4 V20.6"/>' + ES,
+    river:  S + '<path d="M2.6 9.4 C5 6.6 7.4 6.6 9.8 9.4 C12.2 12.2 14.6 12.2 17 9.4 C18.6 7.6 20 7 21.4 7.8"/><path d="M2.6 15.4 C5 12.6 7.4 12.6 9.8 15.4 C12.2 18.2 14.6 18.2 17 15.4 C18.6 13.6 20 13 21.4 13.8"/>' + ES,
+    lane:   S + '<path d="M4.6 12 H17.4"/><path d="M13 7.6 L17.4 12 L13 16.4"/>' + ES,
+    gold:   S + '<circle cx="12" cy="12" r="8.4"/><path d="M12 7.6 V16.4"/><path d="M14.4 9.8 A2.6 2.6 0 0 0 9.6 11 C9.6 13.8 14.4 12.4 14.4 15 A2.6 2.6 0 0 1 9.6 14.2"/>' + ES
+  };
+
+  /* ── ОБЪЕКТЫ НА КАРТЕ.
+     x/y — проценты, ВЫВЕРЕНЫ ПО АРТУ (tactics-board/assets/map-square.webp:
+     синяя база снизу-слева, красная сверху-справа, ров Барона слева-сверху,
+     ров Дракона справа-снизу). Это ориентир по картинке, не координаты из игры —
+     честно сказано плашкой на карте. Данные объектов — реальные. ── */
+  var OBJECTS = [
+    { id:'baron',    ru:'Барон Нашор',      g:'epic',   cls:'o-epic', x:33, y:30, cat:'epic',    get:function(d){ return d.epicMonsters.baronNashor; } },
+    { id:'herald',   ru:'Предвестник Рифта',g:'epic',   cls:'o-epic', x:25, y:22, cat:'epic',    get:function(d){ return d.epicMonsters.riftHerald; } },
+    { id:'dragon',   ru:'Стихийный дракон', g:'dragon', cls:'o-epic', x:66, y:71, cat:'dragon',  get:function(d){ return d.epicMonsters.elementalDragons; } },
+    { id:'elder',    ru:'Старший дракон',   g:'dragon', cls:'o-epic', x:74, y:79, cat:'elder',   get:function(d){ return d.epicMonsters.elderDragon; } },
+    { id:'blue',     ru:'Синий страж',      g:'buff',   cls:'o-blue', x:24, y:52, cat:'camp',    get:function(d){ return d.jungleCamps.blueSentinel; } },
+    { id:'red',      ru:'Красный шипоспин', g:'buff',   cls:'o-red',  x:57, y:86, cat:'camp',    get:function(d){ return d.jungleCamps.redBrambleback; } },
+    { id:'gromp',    ru:'Громп',            g:'camp',   cls:'',       x:18, y:66, cat:'camp',    get:function(d){ return d.jungleCamps.gromp; } },
+    { id:'wolves',   ru:'Волки',            g:'camp',   cls:'',       x:31, y:67, cat:'camp',    get:function(d){ return d.jungleCamps.murkWolves; } },
+    { id:'raptors',  ru:'Крылатые',         g:'camp',   cls:'',       x:46, y:82, cat:'camp',    get:function(d){ return d.jungleCamps.raptors; } },
+    { id:'scuttleT', ru:'Скатл (ров Барона)',g:'river', cls:'',       x:42, y:40, cat:'camp',    get:function(d){ return d.jungleCamps.scuttleCrab; } },
+    { id:'scuttleB', ru:'Скатл (ров Дракона)',g:'river',cls:'',       x:59, y:60, cat:'camp',    get:function(d){ return d.jungleCamps.scuttleCrab; } },
+    { id:'laneT',    ru:'Линия Барона',     g:'lane',   cls:'o-lane', x:9,  y:15, cat:'minions', get:function(d){ return d.minions; } },
+    { id:'laneM',    ru:'Центр',            g:'lane',   cls:'o-lane', x:50, y:50, cat:'minions', get:function(d){ return d.minions; } },
+    { id:'laneB',    ru:'Линия Дракона',    g:'lane',   cls:'o-lane', x:91, y:87, cat:'minions', get:function(d){ return d.minions; } }
+  ];
+
+  /* полоса золота снизу: что показываем и откуда берём */
+  var GOLDBAR = [
+    { id:'blue',    l:'Синий бафф',  get:function(d){ return d.jungleCamps.blueSentinel; } },
+    { id:'red',     l:'Красный бафф',get:function(d){ return d.jungleCamps.redBrambleback; } },
+    { id:'gromp',   l:'Громп',       get:function(d){ return d.jungleCamps.gromp; } },
+    { id:'wolves',  l:'Волки',       get:function(d){ return d.jungleCamps.murkWolves; } },
+    { id:'raptors', l:'Крылатые',    get:function(d){ return d.jungleCamps.raptors; } },
+    { id:'scuttle', l:'Скатл',       get:function(d){ return d.jungleCamps.scuttleCrab; } },
+    { id:'dragon',  l:'Дракон',      get:function(d){ return d.epicMonsters.elementalDragons; } },
+    { id:'herald',  l:'Герольд',     get:function(d){ return d.epicMonsters.riftHerald; } },
+    { id:'baron',   l:'Барон',       get:function(d){ return d.epicMonsters.baronNashor; } }
+  ];
+
+  var selectedId = null;
+  /* ЖИВЫЕ УЗЛЫ: тик ползунка трогает только их (никаких innerHTML на контейнер) */
+  var live = { goldN:null, goldTag:null, minLabel:null, deathN:null, slider:null, gold:{} };
+  var root = null;
+
+  function fmtTime(s){ return (s == null) ? '—' : (Math.floor(s/60) + ':' + String(s%60).padStart(2,'0')); }
+  function pickPatch(obj, key){
+    var bp = obj[key + '_byPatch'];
+    if(bp) return { v: (bp.p6 != null ? bp.p6 : bp.older), note: bp.note };
+    return { v: obj[key], note: null };
+  }
+  /* золото на текущей минуте (у баффов оно растёт ступенями) */
+  function goldAt(node, minute){
+    var g = node && node.gold;
+    if(!g) return { text:'—', demo:false, live:false };
+    if(Array.isArray(g.scaling)){
+      var val = g.scaling[0].gold;
+      for(var i=0;i<g.scaling.length;i++) if(minute >= g.scaling[i].atMinute) val = g.scaling[i].gold;
+      return { text:String(val), demo:!!g.demo, live:true };
+    }
+    if(g.individual != null){
+      return { text: (g.team != null ? (g.individual + ' / ' + g.team + ' команде') : String(g.individual)), demo:!!g.demo, live:false };
+    }
+    var v = (g.value != null ? g.value : g.total);
+    return { text: (v != null ? String(v) : '—'), demo:!!g.demo, live:false };
+  }
+  /* дез-таймер — ДЕМО-модель (Riot формулу WR не публикует, см. _meta.unresolved) */
+  function deathTimer(minute){
+    var dt = DATA.scaling.deathTimer;
+    var lvl = Math.max(1, Math.min(dt.maxLevel, Math.floor(minute * 0.6) + 1));
+    var base = dt.approxTableDemo[0].baseRespawn_s;
+    for(var i=0;i<dt.approxTableDemo.length;i++) if(lvl >= dt.approxTableDemo[i].level) base = dt.approxTableDemo[i].baseRespawn_s;
+    var lateMul = minute > 15 ? 1 + (minute - 15) * 0.08 : 1;
+    return { sec: Math.round(base * lateMul), lvl: lvl };
+  }
+  function minuteNow(){ return live.slider ? +live.slider.value : 0; }
+  function demoTag(on){ return on ? ' <span class="demo">демо</span>' : ''; }
+  function row(l, v){ return '<div class="d-row"><span class="r-l">' + l + '</span><span class="r-v">' + v + '</span></div>'; }
+
+  /* ── РАЗМЕТКА вида (строится ОДИН раз при первом заходе) ── */
+  function shell(){
+    return '' +
+    '<div class="mapv">' +
+      '<nav class="mapv-tabs glass" role="tablist">' +
+        '<button class="subtab active" data-mtab="eco" role="tab">Карта<span class="subtab-note">экономика</span></button>' +
+        '<button class="subtab" data-mtab="strata" role="tab">Страта<span class="subtab-note">доска</span></button>' +
+      '</nav>' +
+      '<div class="mapv-main">' +
+        '<section class="tabpane map-layout active" data-mtab="eco">' +
+          '<div class="timebar glass">' +
+            '<div class="tb-slider">' +
+              '<div class="tb-top"><span>Минута игры</span><span class="tb-min" data-role="minLabel">0:00</span></div>' +
+              '<input type="range" class="minSlider" data-role="slider" min="0" max="30" step="1" value="0" aria-label="Минута игры">' +
+              '<div class="tb-ticks"><span>0</span><span>10</span><span>20</span><span>30</span></div>' +
+            '</div>' +
+            '<div class="tb-death">' +
+              '<div class="tb-death-n" data-role="deathN">6с</div>' +
+              '<div class="tb-death-l">Дез-таймер <span class="demo soft">демо</span></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="map-stage glass">' +
+            '<div class="map-frame">' +
+              '<img class="map-art" src="tactics-board/assets/map-square.webp" alt="Карта ущелья Wild Rift" draggable="false">' +
+              '<span class="demo soft map-note">позиции — ориентир по арту</span>' +
+              '<div data-role="objLayer"></div>' +
+            '</div>' +
+          '</div>' +
+          '<aside class="detail glass">' +
+            '<div class="d-empty" data-role="empty">Кликни объект на карте — кэмп, дракон, Барон или линию.<br><br>Золото и дез-таймер пересчитываются ползунком минуты.</div>' +
+            '<div data-role="body" hidden></div>' +
+          '</aside>' +
+          '<div class="goldbar glass">' +
+            '<span class="gb-title">Золото на минуте</span>' +
+            '<div class="gb-items" data-role="goldItems"></div>' +
+          '</div>' +
+        '</section>' +
+        '<section class="tabpane strata-layout" data-mtab="strata" data-strata-host></section>' +
+      '</div>' +
+    '</div>';
+  }
+
+  /* ── объекты на карте: строятся ОДИН раз, дальше только класс .sel ── */
+  function buildObjects(layer){
+    var frag = document.createDocumentFragment();
+    OBJECTS.forEach(function(o){
+      var b = document.createElement('button');
+      b.className = 'obj ' + o.cls;
+      b.style.left = o.x + '%';
+      b.style.top = o.y + '%';
+      b.dataset.id = o.id;
+      b.title = o.ru;
+      var dot = document.createElement('span');
+      dot.className = 'dot';
+      dot.innerHTML = GLYPH[o.g];
+      var lbl = document.createElement('span');
+      lbl.className = 'obj-lbl';
+      lbl.textContent = o.ru;
+      b.appendChild(dot); b.appendChild(lbl);
+      b.addEventListener('click', function(){ selectObject(o.id); });
+      frag.appendChild(b);
+    });
+    layer.appendChild(frag);
+  }
+
+  function selectObject(id){
+    if(selectedId === id) return;
+    selectedId = id;
+    root.querySelectorAll('.obj').forEach(function(el){ el.classList.toggle('sel', el.dataset.id === id); });
+    renderDetail();
+  }
+
+  /* ── полоса золота снизу: строится один раз, тик меняет ТОЛЬКО числа ── */
+  function buildGoldbar(host){
+    var frag = document.createDocumentFragment();
+    GOLDBAR.forEach(function(it){
+      var box = document.createElement('div');
+      box.className = 'gb-item';
+      var n = document.createElement('div');
+      n.className = 'gb-n';
+      n.textContent = '—';
+      var l = document.createElement('div');
+      l.className = 'gb-l';
+      l.textContent = it.l;
+      box.appendChild(n); box.appendChild(l);
+      frag.appendChild(box);
+      live.gold[it.id] = n;
+    });
+    /* волна миньонов — все per-type числа для 7.x не подтверждены → демо */
+    var wbox = document.createElement('div');
+    wbox.className = 'gb-item';
+    var wn = document.createElement('div');
+    wn.className = 'gb-n';
+    wn.textContent = '—';
+    var wl = document.createElement('div');
+    wl.className = 'gb-l';
+    wl.innerHTML = 'Волна миньонов <span class="demo">демо</span>';
+    wbox.appendChild(wn); wbox.appendChild(wl);
+    frag.appendChild(wbox);
+    live.gold._wave = wn;
+    host.appendChild(frag);
+  }
+
+  /* ЗАКОН СВЯЗЕЙ: у объекта есть выход в соседнюю фичу, а не тупик */
+  function linkFor(o){
+    if(o.cat === 'dragon' || o.cat === 'elder')
+      return '<button class="d-link" data-go="tier">Стихии драконов в Тир-листе →</button>';
+    if(o.cat === 'minions')
+      return '<button class="d-link" data-go="strata">Разобрать волну на доске →</button>';
+    return '<button class="d-link" data-go="strata">Спланировать заход на доске →</button>';
+  }
+
+  /* ПОЛНАЯ сборка панели — только при СМЕНЕ объекта, не на каждый тик ползунка */
+  function renderDetail(){
+    var empty = root.querySelector('[data-role="empty"]');
+    var body = root.querySelector('[data-role="body"]');
+    live.goldN = live.goldTag = null;
+    if(!selectedId || !DATA){ empty.hidden = false; body.hidden = true; return; }
+
+    var o = null;
+    for(var i=0;i<OBJECTS.length;i++) if(OBJECTS[i].id === selectedId) o = OBJECTS[i];
+    var node = o.get(DATA);
+    var minute = minuteNow();
+    var html = '<div class="d-head"><span class="d-ico">' + GLYPH[o.g] + '</span><h2>' + (node.ru || o.ru) + '</h2></div>';
+
+    if(o.cat === 'minions'){
+      var t = node.types;
+      html += '<div class="d-sub">Волна: ' + node.wave.baseComposition.melee + '× ближних + ' +
+              node.wave.baseComposition.caster + '× дальних, осадный по каденции · интервал ~' + node.wave.interval_s + 'с</div>' +
+        '<div class="d-rows">' +
+          row('Ближний (воин)' + demoTag(t.melee.gold.demo), t.melee.gold.value + ' зол.') +
+          row('Дальний (маг)' + demoTag(t.caster.gold.demo), t.caster.gold.value + ' зол.') +
+          row('Осадный (пушка)' + demoTag(t.siege.gold.demo), t.siege.gold.value + ' зол.') +
+          row('Супер-миньон' + demoTag(t.super.gold.demo), t.super.gold.value + ' зол.') +
+        '</div>' +
+        '<div class="d-buff">Осадный дорожает с минутой игры; точные per-type числа для 7.x не подтверждены — сверить вручную.</div>';
+    } else {
+      var g = goldAt(node, minute);
+      var respawn = pickPatch(node, 'respawn_s');
+      var spawn = pickPatch(node, 'spawn_s');
+      var goldTag = g.demo ? '<span class="demo">демо</span>'
+                           : (g.live ? '<span class="demo soft" data-role="goldTag">' + minute + ' мин</span>' : '');
+      html += '<div class="d-kpis">' +
+          '<div class="d-kpi"><div class="k-n ' + (g.live ? 'live' : '') + '" data-role="goldN">' + g.text + '</div><div class="k-l">золото ' + goldTag + '</div></div>' +
+          '<div class="d-kpi"><div class="k-n">' + fmtTime(respawn.v) + '</div><div class="k-l">респаун</div></div>' +
+        '</div>';
+      var rows = row('Спаун (первый)', fmtTime(spawn.v));
+      if(node.xp) rows += row('Опыт' + demoTag(node.xp.demo), node.xp.value != null ? node.xp.value : '—');
+      if(node.hp) rows += row('Здоровье', node.hp);
+      if(node.hp_leader) rows += row('Здоровье (главный)', node.hp_leader);
+      if(o.cat === 'dragon'){
+        rows += row('Слой', 'Dragon Slayer (со 2-го дракона)');
+        rows += row('Старший дракон', 'с 19:00');
+      }
+      html += '<div class="d-rows">' + rows + '</div>';
+      if(node.units && node.units.length){
+        html += '<div class="d-buff"><b>Состав:</b> ' + node.units.map(function(u){ return u.name + ' — ' + u.gold; }).join(' · ') + ' зол.</div>';
+      }
+      if(node.buff){
+        var bf = node.buff;
+        if(typeof bf === 'string') html += '<div class="d-buff"><b>Бафф:</b> ' + bf + '</div>';
+        else html += '<div class="d-buff"><b>Бафф:</b> ' + (bf.name ? bf.name + ' — ' : '') + (bf.effect || '') + (bf.duration_s ? ' (' + fmtTime(bf.duration_s) + ')' : '') + '</div>';
+      }
+      if(node.effect) html += '<div class="d-buff"><b>Эффект:</b> ' + node.effect + '</div>';
+      if(o.cat === 'dragon'){
+        var ty = node.types;
+        html += '<div class="d-buff"><b>Стихии:</b> ' + Object.keys(ty).map(function(k){
+          return ty[k].ru + ' — ' + ty[k].buff + (ty[k].demo ? ' (демо)' : '');
+        }).join('; ') + '.</div>';
+      }
+      if(spawn.note || respawn.note) html += '<div class="d-buff">Патчи: ' + (spawn.note || respawn.note) + '</div>';
+    }
+    html += linkFor(o);
+
+    body.innerHTML = html;
+    empty.hidden = true;
+    body.hidden = false;
+    live.goldN = body.querySelector('[data-role="goldN"]');
+    live.goldTag = body.querySelector('[data-role="goldTag"]');
+  }
+
+  /* ── ТИК ПОЛЗУНКА: обновляем ТОЛЬКО изменившиеся числа. Никакого re-render ── */
+  function updateTime(){
+    var minute = +live.slider.value;
+    live.slider.style.setProperty('--p', (minute - live.slider.min) / (live.slider.max - live.slider.min) * 100);
+    live.minLabel.textContent = minute + ':00';
+    if(!DATA) return;
+    live.deathN.textContent = deathTimer(minute).sec + 'с';
+
+    GOLDBAR.forEach(function(it){
+      var el = live.gold[it.id]; if(!el) return;
+      var txt = goldAt(it.get(DATA), minute).text;
+      if(el.textContent !== txt) el.textContent = txt;
+    });
+    if(live.gold._wave){
+      var ty = DATA.minions.types;
+      var w = ty.melee.gold.value * DATA.minions.wave.baseComposition.melee +
+              ty.caster.gold.value * DATA.minions.wave.baseComposition.caster;
+      if(live.gold._wave.textContent !== String(w)) live.gold._wave.textContent = String(w);
+    }
+    if(selectedId && live.goldN){
+      var o = null;
+      for(var i=0;i<OBJECTS.length;i++) if(OBJECTS[i].id === selectedId) o = OBJECTS[i];
+      if(o && o.cat !== 'minions'){
+        var g = goldAt(o.get(DATA), minute);
+        if(live.goldN.textContent !== g.text) live.goldN.textContent = g.text;
+        if(live.goldTag) live.goldTag.textContent = minute + ' мин';
+      }
+    }
+  }
+
+  /* ── под-вкладки [Карта][Страта]: ИНЛАЙН, ленивые, БЕЗ анимации появления ── */
+  var _strataLoading = false;
+  function openStrata(host){
+    if(host.dataset.mounted) return;
+    if(window.mountStrata){ host.dataset.mounted = '1'; window.mountStrata(host); return; }
+    if(_strataLoading) return;
+    _strataLoading = true;
+    host.innerHTML = '<div class="view-stub">Загружаю доску…</div>';
+    /* Редактор раскладки нужен только доске → грузим ВМЕСТЕ с ней, а не на старте сайта.
+       LE_KEY_PREFIX НЕ трогаем: он читается один раз при загрузке модуля, и свой
+       префикс тут отобрал бы черновики у админского «Редактора позиций». */
+    if(!document.getElementById('leCss')){
+      var css = document.createElement('link');
+      css.id = 'leCss'; css.rel = 'stylesheet'; css.href = 'layout-editor.css';
+      document.head.appendChild(css);
+    }
+    window._lazyScript('layout-editor.js')
+      .catch(function(){})                       /* без редактора доска всё равно работает */
+      .then(function(){ return window._lazyScript('strata-board.js'); })
+      .then(function(){
+        _strataLoading = false;
+        if(window.mountStrata){ host.innerHTML = ''; host.dataset.mounted = '1'; window.mountStrata(host); }
+      })
+      .catch(function(e){
+        _strataLoading = false;
+        host.innerHTML = '<div class="view-stub">Не удалось загрузить тактическую доску.</div>';
+        console.warn('[Страта]', e);
+      });
+  }
+
+  function switchTab(tab){
+    root.querySelectorAll('.subtab').forEach(function(b){ b.classList.toggle('active', b.dataset.mtab === tab); });
+    root.querySelectorAll('.tabpane').forEach(function(p){ p.classList.toggle('active', p.dataset.mtab === tab); });
+    if(tab === 'strata') openStrata(root.querySelector('[data-strata-host]'));
+  }
+  /* открыть Страту снаружи (ссылки ЗАКОНА СВЯЗЕЙ ведут сюда) */
+  window.openStrata = function(){ if(root) switchTab('strata'); };
+
+  /* ── ПРИЁМКА СЧЁТЧИКОМ УЗЛОВ: пометить всё → дёрнуть ползунок → сколько выжило ── */
+  window.MAP_AUDIT = function(){
+    if(!root) return 'вид «Карта» ещё не построен';
+    var pane = root.querySelector('.map-layout');
+    var before = Array.prototype.slice.call(pane.querySelectorAll('*'));
+    before.forEach(function(n){ n.__keep = true; });
+    var old = +live.slider.value;
+    live.slider.value = old >= +live.slider.max ? old - 1 : old + 1;
+    live.slider.dispatchEvent(new Event('input'));
+    var after = Array.prototype.slice.call(pane.querySelectorAll('*'));
+    var survived = after.filter(function(n){ return n.__keep; }).length;
+    var msg = survived + '/' + before.length + ' узлов пережили тик ползунка';
+    console.log('[Карта] ПРИЁМКА:', msg, '| было', before.length, '→ стало', after.length);
+    return msg;
+  };
+
+  /* ── СТАРТ вида ── */
+  window.renderMapView = function(mount){
+    if(!mount) return;
+    mount.innerHTML = shell();
+    root = mount.querySelector('.mapv');
+
+    live.slider = root.querySelector('[data-role="slider"]');
+    live.minLabel = root.querySelector('[data-role="minLabel"]');
+    live.deathN = root.querySelector('[data-role="deathN"]');
+
+    root.querySelectorAll('.subtab').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(!btn.classList.contains('active')) switchTab(btn.dataset.mtab);
+      });
+    });
+    live.slider.addEventListener('input', updateTime);
+    root.addEventListener('click', function(e){
+      var go = e.target.closest('[data-go]');
+      if(!go) return;
+      if(go.dataset.go === 'tier' && window.switchMainView) window.switchMainView('tier');
+      else if(go.dataset.go === 'strata') switchTab('strata');
+    });
+
+    buildGoldbar(root.querySelector('[data-role="goldItems"]'));
+    updateTime();                       /* заливка трека сразу, до данных */
+
+    window.loadJungleEconomy().then(function(j){
+      if(!j){
+        root.querySelector('[data-role="empty"]').textContent =
+          'Не удалось загрузить jungle-economy.json — данные карты недоступны.';
+        return;
+      }
+      DATA = j;
+      buildObjects(root.querySelector('[data-role="objLayer"]'));
+      updateTime();
+    });
+  };
+})();

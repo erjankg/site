@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on"
+      data-br="tree" data-mcard="compact" data-gtable="table" data-tcard="roster" data-icard="poster"
+      data-wiz="steps" data-conn="on" data-hover="glow" data-density="normal" data-anim="fade">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>lab-tournaments — «Турниры Wild Rift»</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="stylesheet" href="../canon-tokens.css?v=1">
+<link rel="stylesheet" href="tournaments-lab.css?v=4">
+</head>
+<body>
+  <div class="splash" id="splash" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- ДЕВ-ПОЛОСА (для НАС): подбор вида. На боевой НЕ переносится -->
+  <div class="lab-strip" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ Дизайн-полоса — Турниры Wild Rift</span>
+      <button class="strip-min" id="stripMin">Свернуть</button>
+    </div>
+    <div class="strip-body">
+      <div class="strip-group"><label>Сетка</label><div class="seg" data-k="br">
+        <button data-v="tree" class="on">Дерево</button><button data-v="cols">Колонки</button><button data-v="compact">Компакт</button></div></div>
+      <div class="strip-group"><label>Карточка матча</label><div class="seg" data-k="mcard">
+        <button data-v="full">Полная</button><button data-v="compact" class="on">Компакт</button><button data-v="bar">Полоса</button></div></div>
+      <div class="strip-group"><label>Таблица группы</label><div class="seg" data-k="gtable">
+        <button data-v="table" class="on">Таблица</button><button data-v="cards">Плитки</button><button data-v="minimal">Минимал</button></div></div>
+      <div class="strip-group"><label>Карточка команды</label><div class="seg" data-k="tcard">
+        <button data-v="rich">С составом</button><button data-v="compact">Без состава</button><button data-v="roster" class="on">Ростер</button></div></div>
+      <div class="strip-group"><label>Инфлюенсер</label><div class="seg" data-k="icard">
+        <button data-v="card">Карточка</button><button data-v="row">Строка</button><button data-v="poster" class="on">Постер</button></div></div>
+      <div class="strip-group"><label>Мастер</label><div class="seg" data-k="wiz">
+        <button data-v="steps" class="on">По шагам</button><button data-v="onepage">Одна страница</button></div></div>
+      <div class="strip-group"><label>Линии сетки</label><div class="seg" data-k="conn">
+        <button data-v="on" class="on">Вкл</button><button data-v="off">Выкл</button></div></div>
+      <div class="strip-group"><label>Ховер</label><div class="seg" data-k="hover">
+        <button data-v="lift">Подъём</button><button data-v="glow" class="on">Свечение</button><button data-v="none">Нет</button></div></div>
+      <div class="strip-group"><label>Плотность</label><div class="seg" data-k="density">
+        <button data-v="air">Просторно</button><button data-v="normal" class="on">Средне</button><button data-v="dense">Плотно</button></div></div>
+      <div class="strip-group"><label>Появление</label><div class="seg" data-k="anim">
+        <button data-v="fade" class="on">Фейд</button><button data-v="none">Нет</button></div></div>
+      <button class="strip-copy" id="stripCopy">📋 Скопировать мой выбор</button>
+      <button class="strip-count" id="stripCount">🔢 Приёмка счётчиком узлов</button>
+      <div class="strip-choice">Ваш выбор: <b id="choiceText">…</b></div>
+      <div class="strip-res" id="stripRes">Нажми «Приёмка» — счётчик покажет, сколько узлов пережило клик/тумблер (здоровье = единицы).</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="lab-h">
+      <h1>Турниры Wild Rift <span class="demo">бывш. Киберспорт · движок сеток сохранён 1-в-1</span></h1>
+      <p>Создай турнир мастером (тип → команды → настройки → живое превью), веди сетку, всё кликается в связь.</p>
+    </div>
+
+    <!-- переключатель раздела: Турниры / Инфлюенсеры -->
+    <div class="seg2" style="margin-bottom:16px">
+      <button id="navTours" class="on">🏆 Турниры</button>
+      <button id="navInf">⭐ Инфлюенсеры</button>
+    </div>
+
+    <div id="app"></div>
+  </div>
+
+  <div id="ovHost"></div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="tournaments-lab.js?v=4"></script>
+</body>
+</html>

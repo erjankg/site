@@ -660,7 +660,7 @@
     modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
 
     var win = document.createElement('div');
-    win.className = 'cms-modal-win';
+    win.className = 'cms-modal-win glass';
     win.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">' +
       '<h3 style="margin:0;color:#fff;font-size:18px;">📋 История изменений</h3>' +
       '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button></div>' +
@@ -752,7 +752,7 @@
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
-    win.className = 'cms-modal-win';
+    win.className = 'cms-modal-win glass';
 
     // Заголовок
     var title = document.createElement('div');
@@ -1037,7 +1037,7 @@
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
-    win.className = 'cms-modal-win';
+    win.className = 'cms-modal-win glass';
 
     var t = window.translateText || function(s) { return s; };
 
@@ -1460,7 +1460,7 @@
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
-    win.className = 'cms-modal-win';
+    win.className = 'cms-modal-win glass';
 
     win.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">' +
       '<h3 style="margin:0;color:#fff;font-size:18px;">⚙ ' + t('Настройки лейаута') + '</h3>' +
@@ -1680,6 +1680,40 @@
   // Иконки загружаются из Firestore siteIcons → {name: url}
   window._siteIcons = {};
 
+  // Промах по реестру и битый URL выглядят одинаково — заглушка-точка на токенах стекла.
+  // Раньше имя подставлялось в src напрямую → фантомный 404 на свой же домен.
+  var _isDev = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.protocol === 'file:';
+
+  function _iconPlaceholder(name) {
+    return '<span class="icon-missing" title="Иконка не найдена: ' + String(name).replace(/"/g, '&quot;') + '"></span>';
+  }
+
+  window._iconBroken = function(img) {
+    var name = img.getAttribute('data-icon-name') || '';
+    if (_isDev) console.warn('[icon] битый URL иконки «' + name + '»: ' + img.getAttribute('src'));
+    var span = document.createElement('span');
+    span.className = 'icon-missing';
+    span.title = 'Иконка не загрузилась: ' + name;
+    img.replaceWith(span);
+  };
+
+  // Единый рендер [icon:name] → <img> либо заглушка. Оба рендерера ходят сюда.
+  function _iconTagHtml(name, heightCss) {
+    name = String(name).trim();
+    var url = (window._siteIcons || {})[name];
+    if (!url) {
+      if (_isDev) console.warn('[icon] нет в реестре siteIcons: «' + name + '»');
+      return _iconPlaceholder(name);
+    }
+    return '<img loading="lazy" decoding="async" src="' + url.replace(/"/g, '&quot;') + '" '
+      + 'data-icon-name="' + name.replace(/"/g, '&quot;') + '" '
+      + 'style="height:' + heightCss + ';vertical-align:middle;display:inline-block;margin:0 1px;" '
+      + 'alt="" onerror="window._iconBroken&&window._iconBroken(this)">';
+  }
+
+  // cms.js = несколько изолированных IIFE; наружу отдаём через window, иначе ReferenceError
+  window._iconTagHtml = _iconTagHtml;
+
   // parseRichText: [text|color] → <span style="color:..."> / [icon:name] → <img>
   window.parseRichText = function(text) {
     if (!text) return '';
@@ -1689,11 +1723,7 @@
       .replace(/>/g, '&gt;');
     // [icon:name] → <img>
     safe = safe.replace(/\[icon:([^\]]+)\]/g, function(_, name) {
-      name = name.trim();
-      var url = window._siteIcons[name] || name;
-      return '<img loading="lazy" decoding="async" src="' + url.replace(/"/g, '&quot;') + '" '
-        + 'style="height:1.1em;vertical-align:middle;display:inline-block;margin:0 1px;" '
-        + 'alt="" onerror="this.style.display=\'none\'">';
+      return _iconTagHtml(name, '1.1em');
     });
     // [text|colortoken] → <span>
     safe = safe.replace(/\[([^\]|]+)\|([^\]]+)\]/g, function(_, txt, color) {
@@ -1884,7 +1914,9 @@
       placeholders.push(match);
       return '__PH' + (placeholders.length - 1) + '__';
     });
-    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(protected_text) + '&langpair=ru|en&de=satyndyeverjanadylbekovich@gmail.com';
+    // Без параметра de= (личный email = утечка PII в клиентском коде). Анонимная квота
+    // MyMemory ниже, но email в исходник/сеть больше НЕ попадает.
+    var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(protected_text) + '&langpair=ru|en';
     fetch(url)
       .then(function(r) { return r.json(); })
       .then(function(json) {
@@ -2025,12 +2057,15 @@
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
-    win.className = 'cms-modal-win';
+    win.className = 'cms-modal-win glass';
     win.style.maxWidth = '560px';
 
     win.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
       + '<h3 style="margin:0;color:#fff;font-size:18px;">🖼 Иконки</h3>'
-      + '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button></div>'
+      + '<div style="display:flex;align-items:center;gap:10px;">'
+      + '<button onclick="cmsCheckIcons()" class="cms-btn-save" style="margin:0;padding:6px 12px;font-size:12px;">🔍 Проверить иконки</button>'
+      + '<button onclick="this.closest(\'.cms-modal-overlay\').remove()" style="background:none;border:none;color:#fff;font-size:22px;cursor:pointer;">✕</button></div></div>'
+      + '<div id="cmsIconsCheck" style="margin-bottom:12px;"></div>'
       + '<div id="cmsIconsList" style="display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow-y:auto;margin-bottom:16px;"></div>'
       + '<div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:14px;">'
       + '<div style="color:rgba(255,255,255,0.5);font-size:11px;font-weight:700;margin-bottom:8px;">ДОБАВИТЬ ИКОНКУ</div>'
@@ -2087,6 +2122,101 @@
         })
         .catch(function(err) { _showToast('Ошибка: ' + err.message, 'error'); });
     };
+  };
+
+  // ── Проверка иконок: битые URL реестра + опечатки [icon:X] в контенте ──
+  // Владелец заливает иконки сам и в консоль не смотрит — это его единственная защита.
+  var _ICON_SCAN_COLLECTIONS = ['items', 'runes', 'changesFeed'];
+
+  function _checkIconUrl(url) {
+    return new Promise(function(resolve) {
+      if (!url) { resolve(false); return; }
+      var img = new Image();
+      var done = false;
+      var finish = function(ok) { if (!done) { done = true; resolve(ok); } };
+      img.onload = function() { finish(true); };
+      img.onerror = function() { finish(false); };
+      setTimeout(function() { finish(false); }, 10000);
+      img.src = url;
+    });
+  }
+
+  window.cmsCheckIcons = function() {
+    var box = document.querySelector('#cmsIconsCheck');
+    if (!box) return;
+    box.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.5);padding:8px;">Проверяю…</div>';
+
+    var db = firebase.firestore();
+    var registry = window._siteIcons || {};
+    var names = Object.keys(registry);
+
+    var urlCheck = Promise.all(names.map(function(n) {
+      return _checkIconUrl(registry[n]).then(function(ok) { return { name: n, ok: ok }; });
+    }));
+
+    var contentScan = Promise.all(_ICON_SCAN_COLLECTIONS.map(function(col) {
+      return db.collection(col).get()
+        .then(function(snap) {
+          var found = {};
+          snap.forEach(function(doc) {
+            var text = JSON.stringify(doc.data() || {});
+            var m, re = /\[icon:([^\]"]+)\]/g;
+            while ((m = re.exec(text))) {
+              var nm = m[1].trim();
+              if (!found[nm]) found[nm] = 0;
+              found[nm]++;
+            }
+          });
+          return { col: col, found: found };
+        })
+        .catch(function() { return { col: col, found: {}, failed: true }; });
+    }));
+
+    Promise.all([urlCheck, contentScan]).then(function(res) {
+      var urlRes = res[0], scans = res[1];
+      var broken = urlRes.filter(function(r) { return !r.ok; });
+
+      // Имена, которые встречаются в контенте, но которых нет в реестре = опечатки
+      var unknown = {};
+      var usedCount = {};
+      scans.forEach(function(s) {
+        Object.keys(s.found).forEach(function(nm) {
+          usedCount[nm] = (usedCount[nm] || 0) + s.found[nm];
+          if (!registry[nm]) {
+            if (!unknown[nm]) unknown[nm] = [];
+            unknown[nm].push(s.col + '×' + s.found[nm]);
+          }
+        });
+      });
+      var unknownNames = Object.keys(unknown);
+      var unusedNames = Object.keys(registry).filter(function(n) { return !usedCount[n]; });
+
+      var html = '';
+      var line = function(color, text) {
+        return '<div style="font-size:12px;color:' + color + ';padding:3px 0;">' + text + '</div>';
+      };
+
+      if (!broken.length && !unknownNames.length) {
+        html += line('#55efc4', '✅ Всё чисто: ' + names.length + ' иконок грузятся, опечаток в контенте нет.');
+      }
+      if (broken.length) {
+        html += line('#e74c3c', '❌ Не грузятся (' + broken.length + '):');
+        broken.forEach(function(b) {
+          html += line('rgba(255,255,255,0.6)', '&nbsp;&nbsp;<code>[icon:' + b.name + ']</code> → ' + (registry[b.name] || '(пустой URL)'));
+        });
+      }
+      if (unknownNames.length) {
+        html += line('#f1c40f', '⚠️ Опечатки — в тексте есть, в реестре нет (' + unknownNames.length + '):');
+        unknownNames.forEach(function(nm) {
+          html += line('rgba(255,255,255,0.6)', '&nbsp;&nbsp;<code>[icon:' + nm + ']</code> — ' + unknown[nm].join(', '));
+        });
+      }
+      if (unusedNames.length) {
+        html += line('rgba(255,255,255,0.35)', 'ℹ️ В реестре есть, в тексте не используются: ' + unusedNames.join(', '));
+      }
+
+      box.innerHTML = '<div class="glass" style="padding:10px 12px;border-radius:10px;">' + html + '</div>';
+    });
   };
 
   function _refreshIconsList(db, win) {
@@ -2182,7 +2312,7 @@
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
-    win.className = 'cms-modal-win';
+    win.className = 'cms-modal-win glass';
     win.style.maxWidth = '440px';
 
     var titleHtml = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
@@ -2276,7 +2406,7 @@
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
-    win.className = 'cms-modal-win';
+    win.className = 'cms-modal-win glass';
     win.style.cssText = 'display:flex;flex-direction:column;padding:0;max-width:none;';
     if (window.innerWidth >= 769) win.style.height = '100vh';
 
@@ -2780,7 +2910,7 @@
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
-    win.className = 'cms-modal-win';
+    win.className = 'cms-modal-win glass';
     win.style.cssText = 'max-width:680px;max-height:90vh;display:flex;flex-direction:column;padding:0;';
 
     // Header
@@ -3527,8 +3657,7 @@
     var escaped = _escHtml(text).replace(/\n/g, '<br>');
     // [icon:name]
     escaped = escaped.replace(/\[icon:([^\]]+)\]/g, function(_, name) {
-      var url = (window._siteIcons || {})[name];
-      return url ? '<img loading="lazy" decoding="async" src="' + url + '" style="height:16px;vertical-align:middle;margin:0 2px;">' : '[' + name + ']';
+      return window._iconTagHtml ? window._iconTagHtml(name, '16px') : '';
     });
     return escaped;
   }
@@ -3546,7 +3675,7 @@
     overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
     var win = document.createElement('div');
-    win.className = 'cms-modal-win';
+    win.className = 'cms-modal-win glass';
     win.style.maxWidth = '500px';
 
     win.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">'
@@ -3760,7 +3889,7 @@
       overlay.onclick = function(e) { if (e.target === overlay) { _applyFont(currentFont); overlay.remove(); } };
 
       var win = document.createElement('div');
-      win.className = 'cms-modal-win';
+      win.className = 'cms-modal-win glass';
       win.style.cssText = 'max-width:580px;max-height:90vh;display:flex;flex-direction:column;padding:0;';
 
       var hdr = document.createElement('div');
@@ -3789,7 +3918,7 @@
         var sel = font.id === selectedFont;
         card.style.cssText = 'padding:14px 10px;border-radius:12px;border:2px solid '
           + (sel ? 'var(--accent)' : 'rgba(255,255,255,0.1)') + ';background:'
-          + (sel ? 'rgba(11,196,227,0.08)' : 'rgba(255,255,255,0.03)')
+          + (sel ? 'rgba(255, 255, 255,0.08)' : 'rgba(255,255,255,0.03)')
           + ';cursor:pointer;text-align:center;transition:all 0.2s;user-select:none;';
 
         var previewTxt = document.createElement('div');
@@ -3811,7 +3940,7 @@
           grid.querySelectorAll('[data-font-card]').forEach(function(c) {
             var now = c.dataset.fontCard === selectedFont;
             c.style.borderColor = now ? 'var(--accent)' : 'rgba(255,255,255,0.1)';
-            c.style.background  = now ? 'rgba(11,196,227,0.08)' : 'rgba(255,255,255,0.03)';
+            c.style.background  = now ? 'rgba(255, 255, 255,0.08)' : 'rgba(255,255,255,0.03)';
           });
           _applyFont(font.id);
         };
@@ -3950,7 +4079,7 @@
       if (currentLang === 'en' && !enVal) enVal = domText;
 
       var popup = document.createElement('div');
-      popup.className = 'cms-inline-edit-popup';
+      popup.className = 'cms-inline-edit-popup glass';
 
       function _makeField(labelText, value) {
         var lbl = document.createElement('div');

@@ -13,7 +13,7 @@
  *
  * Старые caches удаляются в activate.
  */
-const VERSION = 'wrs-v2.20260710-215409';
+const VERSION = 'wrs-v2.20260827-051531';
 
 // Сколько ждём сеть, прежде чем отдать офлайн-резерв из кэша (мс).
 const NET_TIMEOUT = 3000;
@@ -23,7 +23,12 @@ const NET_TIMEOUT = 3000;
 const PRECACHE_URLS = [
   './',
   './index.html',
+  './canon-tokens.css',
   './styles.css',
+  './wr-prefs.js',
+  './lab-morph.js',
+  './champ-page.js',
+  './champ-page.css',
   './app.js',
   './draft.js',
   './draft-logic.js',

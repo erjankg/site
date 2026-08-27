@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on" data-art="lux" data-rm="off">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>lab-ui-kit v4 — премиум UI-библиотека</title>
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="ui-kit.css?v=13">
+</head>
+<body>
+
+  <div class="splash" id="splash" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <div class="lab-strip" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ UI-KIT v4 · премиум</span>
+      <button class="strip-min-btn" id="stripMin">Свернуть</button>
+    </div>
+    <div class="strip-body">
+      <div class="strip-sec">Арт за стеклом (читабельность)</div>
+      <div class="seg" id="artPick">
+        <button data-art="lux" class="active">☀ Lux</button><button data-art="soraka">☀ Soraka</button>
+        <button data-art="thresh">🌑 Thresh</button><button data-art="jinx">🎨 Jinx</button>
+      </div>
+      <label class="tgl"><input type="checkbox" id="rmToggle"> prefers-reduced-motion (превью)</label>
+      <label class="tgl"><input type="checkbox" id="soundToggle"> 🔊 звук-хуки (эксперимент, off)</label>
+      <p class="strip-hint">Переключаешь вариант — эффект проигрывается сразу. ⌘K открывает палитру.</p>
+      <div class="strip-sec">Ваш выбор</div>
+      <div class="strip-choice" id="choiceText">…</div>
+      <button class="strip-copy" id="stripCopy">📋 Скопировать мой выбор</button>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <header class="page-head">
+      <h1>lab-ui-kit v4 — премиум UI-библиотека</h1>
+      <p>Источник правды. Эффекты уровня Linear/Vercel/Stripe/Sonner на <b>GSAP</b>. Слой-сэндвич, ховер белый,
+        акцент только на данных. <b>У каждой карточки — свои варианты</b> (шапка), эффект проигрывается сразу при выборе.
+        Жми <code>⌘K</code> / <code>Ctrl+K</code> — командная палитра.</p>
+    </header>
+
+    <div class="kit-grid">
+
+      <!-- 0 · ТЕСТ ГИПОТЕЗЫ «растр в большом размере» -->
+      <article class="kit-card wide">
+        <div class="kc-head"><div class="kc-title"><h3>★ ЗУМ ПИКЕРА — тест гипотезы «растр в большом размере»</h3><span class="kc-note">один портрет · одна ячейка 136px · один переход .4s</span></div>
+          <p class="strip-hint" style="margin-top:4px">У всех трёх ОДИНАКОВО: картинка (тайл 380px), визуальный размер (покой 120px → ховер 136px),
+            длительность и кривая. Отличается ТОЛЬКО способ. Включи «замедлить» и смотри <b>пока едет</b>.</p>
+          <div class="kc-controls" style="margin-top:8px">
+            <div class="kc-axis"><span>тест</span><div class="tgls"><button class="tgl-chip" id="slowTgl">замедлить ×7.5 (3с)</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass">
+          <div class="pz-wrap">
+            <div class="pz-item"><div class="pz-cell pz-a"><img data-portrait-tile="Ahri" alt=""></div>
+              <div class="pz-lbl"><b>A · классика</b>layout 120px, scale 1 → 1.133<br>снимок РАСТЯГИВАЕТСЯ</div></div>
+            <div class="pz-item"><div class="pz-cell pz-b"><img data-portrait-tile="Ahri" alt=""></div>
+              <div class="pz-lbl"><b>B · растр в большом</b>layout 136px, scale .882 → 1<br>снимок СЖАТ и возвращается к 100%</div></div>
+            <div class="pz-item"><div class="pz-cell pz-c"><img data-portrait-tile="Ahri" alt=""></div>
+              <div class="pz-lbl"><b>C · контроль</b>без зума: подъём + кольцо</div></div>
+          </div>
+          <div style="width:100%;border-top:1px solid rgba(255,255,255,.1);margin:26px 0 20px"></div>
+          <p class="strip-hint" style="width:100%;text-align:center;margin-bottom:14px">Замер показал: способ не решает. Решает <b>ДЛИТЕЛЬНОСТЬ</b> —
+            мыло живёт ровно столько, сколько идёт движение. Ниже способ A на реальных скоростях (замедление на них не действует):</p>
+          <div class="pz-wrap">
+            <div class="pz-item"><div class="pz-cell pz-fast pz-d1"><img data-portrait-tile="Ahri" alt=""></div>
+              <div class="pz-lbl"><b>150 мс</b>как на топ-сайтах</div></div>
+            <div class="pz-item"><div class="pz-cell pz-fast pz-d2"><img data-portrait-tile="Ahri" alt=""></div>
+              <div class="pz-lbl"><b>250 мс</b>средне</div></div>
+            <div class="pz-item"><div class="pz-cell pz-fast pz-d3"><img data-portrait-tile="Ahri" alt=""></div>
+              <div class="pz-lbl"><b>400 мс</b>медленно — мыло заметнее</div></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 1 · КНОПКИ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>1 · Кнопки</h3><span class="kc-note">spring-press база · эффекты КОМБИНИРУЮТСЯ</span></div>
+          <div class="kc-controls">
+            <div class="kc-axis"><span>эффекты</span><div class="tgls">
+              <button class="tgl-chip" data-tgl data-attr="lift">lift</button><button class="tgl-chip" data-tgl data-attr="magnetic">magnetic</button>
+              <button class="tgl-chip" data-tgl data-attr="shimmer">shimmer</button><button class="tgl-chip" data-tgl data-attr="shine">shine-луп</button>
+              <button class="tgl-chip" data-tgl data-attr="glow">glow</button><button class="tgl-chip" data-tgl data-attr="gradborder">град-рамка</button>
+              <button class="tgl-chip" data-tgl data-attr="ripple">ripple</button><button class="tgl-chip" data-tgl data-attr="iconslide">icon-slide</button></div></div>
+            <div class="kc-axis"><span>размер</span><div class="seg" data-seg data-axis="size">
+              <button data-val="s">S</button><button data-val="m" class="active">M</button><button data-val="l">L</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="btn" data-size="m">
+          <button class="el btn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content"><span data-icon="ad"></span><span class="btn-txt">Собрать билд</span></span></button>
+          <button class="el btn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content"><span data-icon="ap"></span><span class="btn-txt">Сравнить</span></span></button>
+        </div></div>
+      </article>
+
+      <!-- 2 · КРЕСТИК / ИКОНКИ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>2 · Крестик / Иконки</h3><span class="kc-note">кликни для draw/copy/spin</span></div>
+          <div class="kc-controls">
+            <div class="kc-axis"><span>эффект</span><div class="seg" data-seg data-axis="fx">
+              <button data-val="rotate" class="active">rotate-spring</button><button data-val="spin">spin-refresh</button><button data-val="morph">morph ✕⇄←</button>
+              <button data-val="menu">☰⇄✕</button><button data-val="draw">draw-галочка</button><button data-val="copy">copy⇄check</button></div></div>
+            <div class="kc-axis"><span>фигура</span><div class="seg" data-seg data-axis="shape">
+              <button data-val="circle" class="active">круг</button><button data-val="square">квадрат</button><button data-val="squircle">squircle</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="ic" data-fx="rotate" data-shape="circle">
+          <button class="el ic-btn"><span class="el-surf"></span><span class="el-content"><span class="ic-glyph g-a" data-icon="close"></span><span class="ic-glyph g-b hide"></span></span></button>
+          <button class="el ic-btn"><span class="el-surf"></span><span class="el-content"><span class="ic-glyph g-a" data-icon="copy"></span><span class="ic-glyph g-b hide"></span></span></button>
+        </div></div>
+      </article>
+
+      <!-- 3 · ТАБЫ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>3 · Табы / Сегменты</h3><span class="kc-note">скользящая пилюля (GSAP)</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="tab">
+            <button data-val="pill" class="active">пилюля</button><button data-val="underline">underline</button><button data-val="inkgrow">ink-grow</button>
+            <button data-val="segment">сегмент</button><button data-val="weight">вес-текст</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="tab" data-tab="pill">
+          <div class="el tabs"><span class="el-surf"></span><span class="tab-pill"></span>
+            <button class="tab active">Статс</button><button class="tab">WinRate</button><button class="tab">Тир</button></div>
+        </div></div>
+      </article>
+
+      <!-- 4 · ЧИПЫ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>4 · Чипы-фильтры</h3><span class="kc-note">аддоны КОМБИНИРУЮТСЯ</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>аддоны</span><div class="tgls">
+            <button class="tgl-chip" data-tgl data-attr="cico">иконка</button><button class="tgl-chip" data-tgl data-attr="count">счётчик</button>
+            <button class="tgl-chip" data-tgl data-attr="check">галочка</button><button class="tgl-chip" data-tgl data-attr="removable">удаляемый ✕</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="chip">
+          <button class="el chip on"><span class="el-surf"></span><span class="el-content"><span class="chip-ico" data-icon="ad"></span><span class="chip-check" data-icon="check"></span>Топ<span class="chip-cnt">24</span><span class="chip-x" data-icon="close"></span></span></button>
+          <button class="el chip"><span class="el-surf"></span><span class="el-content"><span class="chip-ico" data-icon="ap"></span><span class="chip-check" data-icon="check"></span>Мид<span class="chip-cnt">18</span><span class="chip-x" data-icon="close"></span></span></button>
+          <button class="el chip"><span class="el-surf"></span><span class="el-content"><span class="chip-ico" data-icon="as"></span><span class="chip-check" data-icon="check"></span>Лес<span class="chip-cnt">12</span><span class="chip-x" data-icon="close"></span></span></button>
+        </div></div>
+      </article>
+
+      <!-- 5 · ТУМБЛЕРЫ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>5 · Тумблеры / Свитчи</h3><span class="kc-note">spring-knob · ВКЛ=ярче</span></div>
+          <div class="kc-controls">
+            <div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="sw">
+              <button data-val="slide" class="active">классик</button><button data-val="icon">☀⇄🌙 в кнопке</button><button data-val="labels">ON/OFF</button><button data-val="squash">squash</button></div></div>
+            <div class="kc-axis"><span>размер</span><div class="seg" data-seg data-axis="size"><button data-val="s">S</button><button data-val="m" class="active">M</button><button data-val="l">L</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="sw" data-sw="slide" data-size="m">
+          <label class="sw-field"><span class="sw on" data-sw-el><span class="sw-txt t-on">ON</span><span class="sw-txt t-off">OFF</span><span class="sw-knob"><span class="k-on" data-icon="sun"></span><span class="k-off" data-icon="moon"></span></span></span> Тема</label>
+          <label class="sw-field"><span class="sw" data-sw-el><span class="sw-txt t-on">ON</span><span class="sw-txt t-off">OFF</span><span class="sw-knob"><span class="k-on" data-icon="sun"></span><span class="k-off" data-icon="moon"></span></span></span> Только меты</label>
+        </div></div>
+      </article>
+
+      <!-- 6 · ПОЛЗУНКИ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>6 · Ползунки</h3></div>
+          <div class="kc-controls">
+            <div class="kc-axis"><span>трек</span><div class="seg" data-seg data-axis="track"><button data-val="fill" class="active">заливка</button><button data-val="gradient">данные-градиент</button></div></div>
+            <div class="kc-axis"><span>аддоны</span><div class="tgls"><button class="tgl-chip" data-tgl data-attr="bubble">пузырёк</button><button class="tgl-chip" data-tgl data-attr="ticks">насечки</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="slider" data-track="fill">
+          <div class="rng-field"><div class="rng-bubble" id="rngBubble">11</div><div class="rng-lbl">Уровень чемпиона <b id="rngVal">11</b></div>
+            <input type="range" class="rng" min="1" max="18" value="11" id="rngDemo">
+            <div class="rng-ticks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+        </div></div>
+      </article>
+
+      <!-- 7 · ДРОПДАУНЫ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>7 · Дропдауны</h3><span class="kc-note">тёмные по закону</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="drop">
+            <button data-val="rise" class="active">glass-rise</button><button data-val="combobox">с поиском</button><button data-val="visual">с иконками</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="drop" data-drop="rise">
+          <div class="drop" id="dropDemo"><button class="drop-btn"><span class="drop-cur">Ahri</span><span class="caret" data-icon="down"></span></button>
+            <div class="drop-menu"><input class="drop-search" placeholder="Поиск…">
+              <div class="drop-opt sel"><img data-portrait="Ahri" alt="">Ahri</div><div class="drop-opt"><img data-portrait="LeeSin" alt="">Lee Sin</div>
+              <div class="drop-opt"><img data-portrait="Garen" alt="">Garen</div><div class="drop-opt"><img data-portrait="Teemo" alt="">Teemo</div>
+              <div class="drop-opt"><img data-portrait="Jinx" alt="">Jinx</div></div></div>
+        </div></div>
+      </article>
+
+      <!-- 8 · ПОИСК -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>8 · Поле поиска</h3></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="search">
+            <button data-val="clear" class="active">с очисткой</button><button data-val="expand">раскрытие</button><button data-val="results">живые результаты</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="search" data-search="clear">
+          <div class="search"><span class="s-ico" data-icon="search"></span><input type="text" placeholder="Поиск чемпиона…" value="Ahri">
+            <button class="s-clear" aria-label="очистить"><span data-icon="close"></span></button>
+            <div class="search-results"><div class="sr-row"><img data-portrait="Ahri" alt="">Ahri · 52.4%</div><div class="sr-row"><img data-portrait="Akali" alt="">Akali · 50.1%</div><div class="sr-row"><img data-portrait="Ahri" alt="">Ahri (Support) · 48.7%</div></div></div>
+        </div></div>
+      </article>
+
+      <!-- 9 · БЕЙДЖИ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>9 · Бейджи / Теги</h3><span class="kc-note">данные → акцент ок</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="badge">
+            <button data-val="fill" class="active">заливка</button><button data-val="outline">контур</button><button data-val="dot">точка</button><button data-val="soft">мягкий</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="badge" data-badge="fill">
+          <span class="badge tier t-s">S</span><span class="badge tier t-a">A</span><span class="badge tier t-b">B</span><span class="badge tier t-c">C</span>
+          <span class="badge buf"><span data-icon="up"></span>Буф</span><span class="badge nerf"><span data-icon="dn"></span>Нерф</span><span class="badge new"><span data-icon="spark"></span>New</span>
+        </div></div>
+      </article>
+
+      <!-- 10 · ТУЛТИПЫ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>10 · Тултипы / Поповеры</h3><span class="kc-note">наведи</span></div>
+          <div class="kc-controls">
+            <div class="kc-axis"><span>поведение</span><div class="seg" data-seg data-axis="fx"><button data-val="spring" class="active">spring-in</button><button data-val="follow">follow-cursor</button></div></div>
+            <div class="kc-axis"><span>контент</span><div class="tgls"><button class="tgl-chip" data-tgl data-attr="rich">rich-карточка</button><button class="tgl-chip" data-tgl data-attr="keycap">с клавишей</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="tip" data-fx="spring">
+          <div class="tip-host"><div class="tip-anchor">Пробитие брони</div>
+            <div class="tip"><span class="tip-plain">Игнорирует часть брони цели перед расчётом физ. урона. <span class="kbd">Shift</span></span>
+              <div class="tip-rich"><img data-portrait="Ahri" alt=""><div><b>Ahri</b><span>Мид · маг · <span class="tr-wr">52.4% WR</span></span></div></div></div></div>
+        </div></div>
+      </article>
+
+      <!-- 11 · ТОСТЫ -->
+      <article class="kit-card wide">
+        <div class="kc-head"><div class="kc-title"><h3>11 · Тосты (Sonner)</h3><span class="kc-note">наведи на стопку · свайп вбок</span></div>
+          <div class="kc-controls">
+            <div class="kc-axis"><span>позиция</span><div class="seg" data-seg data-axis="pos"><button data-val="br" class="active">↘ низ-право</button><button data-val="bl">↙ низ-лево</button><button data-val="tc">↑ верх-центр</button></div></div>
+            <div class="kc-axis"><span>модель</span><div class="seg" data-seg data-axis="model"><button data-val="stack" class="active">стопка</button><button data-val="expand">раскрытая</button><button data-val="list">список</button><button data-val="single">одна</button></div></div>
+            <div class="kc-axis"><span>стиль</span><div class="seg" data-seg data-axis="tstyle"><button data-val="solid" class="active">солид</button><button data-val="glass">стекло</button><button data-val="rich">rich (данные)</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass col"><div class="kit" data-kind="toast" data-pos="br" data-model="stack" data-tstyle="solid">
+          <div class="toast-stack" id="toastStack">
+            <div class="toast ok"><span class="t-dot"></span><div class="t-body"><b>Билд сохранён</b><span>Добавлен в коллекцию</span></div></div>
+            <div class="toast info"><span class="t-dot"></span><div class="t-body"><b>WinRate обновлён</b><span>Пересчитан за сегодня</span></div></div>
+            <div class="toast warn"><span class="t-dot"></span><div class="t-body"><b>Патч 7.x скоро</b><span>Мета сдвинется</span></div></div>
+          </div>
+          <div class="li-tools" style="margin-top:16px">
+            <button class="el btn" id="toastBtn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content"><span data-icon="spark"></span><span class="btn-txt">Живой тост</span></span></button>
+            <button class="el btn" id="promiseBtn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content"><span class="btn-txt">Промис (loading→ok)</span></span></button>
+            <button class="el btn" id="actionBtn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content"><span class="btn-txt">С действием (Undo)</span></span></button>
+            <button class="el btn" id="progressBtn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content"><span class="btn-txt">С прогресс-баром</span></span></button>
+            <button class="el btn" id="confettiBtn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content"><span data-icon="check"></span><span class="btn-txt">Успех (confetti)</span></span></button>
+          </div>
+        </div></div>
+      </article>
+
+      <!-- 12 · КАРТОЧКИ -->
+      <article class="kit-card wide">
+        <div class="kc-head"><div class="kc-title"><h3>12 · Карточки</h3><span class="kc-note">tilt на обёртке, стекло стоит</span></div>
+          <div class="kc-controls">
+            <div class="kc-axis"><span>поверхн.</span><div class="seg" data-seg data-axis="surface"><button data-val="none">нет</button><button data-val="spotlight" class="active">spotlight</button><button data-val="borderglow">border-glow</button><button data-val="beam">beam</button><button data-val="gradborder">град-рамка</button></div></div>
+            <div class="kc-axis"><span>+доп.</span><div class="tgls"><button class="tgl-chip" data-tgl data-attr="tilt">3D-tilt</button><button class="tgl-chip" data-tgl data-attr="lift">lift</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="card" data-surface="spotlight" style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center">
+          <div class="card-el"><span class="el-surf glass"></span><span class="el-fx"></span><span class="el-content"><div class="cc-top"><img data-portrait="Ahri" alt=""><div><div class="cc-name">Ahri</div><div class="cc-role">Мид · маг</div></div></div><div class="cc-stats"><div class="cc-stat"><b>52.4%</b><span>WinRate</span></div><div class="cc-stat"><b>14.1%</b><span>PickRate</span></div></div></span></div>
+          <div class="card-el"><span class="el-surf glass"></span><span class="el-fx"></span><span class="el-content"><div class="cc-top"><img data-portrait="LeeSin" alt=""><div><div class="cc-name">Lee Sin</div><div class="cc-role">Лес · боец</div></div></div><div class="cc-stats"><div class="cc-stat"><b>50.8%</b><span>WinRate</span></div><div class="cc-stat"><b>11.7%</b><span>PickRate</span></div></div></span></div>
+          <div class="card-el"><span class="el-surf glass"></span><span class="el-fx"></span><span class="el-content"><div class="cc-top"><img data-portrait="Jinx" alt=""><div><div class="cc-name">Jinx</div><div class="cc-role">АДК · стрелок</div></div></div><div class="cc-stats"><div class="cc-stat"><b>49.2%</b><span>WinRate</span></div><div class="cc-stat"><b>9.3%</b><span>PickRate</span></div></div></span></div>
+        </div></div>
+      </article>
+
+      <!-- 13 · СПИСКИ / ЧИСЛА -->
+      <article class="kit-card wide">
+        <div class="kc-head"><div class="kc-title"><h3>13 · Списки / Числа</h3><span class="kc-note">stagger · count-up · FLIP · scramble</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>строки</span><div class="seg" data-seg data-axis="list">
+            <button data-val="cards" class="active">карточки</button><button data-val="lines">линии</button><button data-val="zebra">зебра</button></div></div></div>
+        </div>
+        <div class="kc-stage glass start col"><div class="kit" data-kind="list" data-list="cards" style="width:100%">
+          <div class="li-tools">
+            <button class="el btn" id="staggerBtn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content">↻ Stagger</span></button>
+            <button class="el btn" id="countBtn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content">123 Count-up</span></button>
+            <button class="el btn" id="scrambleBtn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content">🎰 Scramble</span></button>
+            <button class="el btn" id="flipBtn"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content">⇅ FLIP-сорт</span></button>
+            <span class="big-num" id="bigNum" data-target="52.4">0.0</span><span style="color:var(--txt-dim);font-size:12px">avg WR%</span>
+          </div>
+          <div class="list-el" id="listEl">
+            <div class="li-row" data-wr="52.4"><span class="li-rank">1</span><img data-portrait="Ahri" alt=""><span class="li-name">Ahri</span><span class="badge tier t-s">S</span><span class="li-wr" data-num="52.4">0.0%</span></div>
+            <div class="li-row" data-wr="50.8"><span class="li-rank">2</span><img data-portrait="LeeSin" alt=""><span class="li-name">Lee Sin</span><span class="badge tier t-a">A</span><span class="li-wr" data-num="50.8">0.0%</span></div>
+            <div class="li-row" data-wr="49.2"><span class="li-rank">3</span><img data-portrait="Garen" alt=""><span class="li-name">Garen</span><span class="badge tier t-b">B</span><span class="li-wr" data-num="49.2">0.0%</span></div>
+            <div class="li-row" data-wr="47.1"><span class="li-rank">4</span><img data-portrait="Teemo" alt=""><span class="li-name">Teemo</span><span class="badge tier t-c">C</span><span class="li-wr" data-num="47.1">0.0%</span></div>
+          </div>
+        </div></div>
+      </article>
+
+      <!-- 14 · СКЕЛЕТОНЫ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>14 · Скелетоны</h3></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="skel">
+            <button data-val="shimmer" class="active">shimmer</button><button data-val="pulse">пульс</button><button data-val="wave">волна</button><button data-val="spinner">спиннер</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="skel" data-skel="shimmer">
+          <div class="skel-card"><div class="skel circ sk-ava"></div><div class="sk-lines"><div class="skel sk-line"></div><div class="skel sk-line short"></div></div></div>
+          <div class="skel-spin"></div>
+        </div></div>
+      </article>
+
+      <!-- 15 · АВАТАРКИ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>15 · Аватарки</h3><span class="kc-note">spring hover</span></div>
+          <div class="kc-controls">
+            <div class="kc-axis"><span>форма</span><div class="seg" data-seg data-axis="ashape"><button data-val="circle" class="active">круг</button><button data-val="squircle">squircle</button></div></div>
+            <div class="kc-axis"><span>вкл/выкл</span><div class="tgls"><button class="tgl-chip" data-tgl data-attr="rank">рамка ранга</button><button class="tgl-chip" data-tgl data-attr="status">статус</button><button class="tgl-chip" data-tgl data-attr="stack">стопка</button><button class="tgl-chip on" data-tgl data-attr="zoom">hover-зум</button></div></div>
+            <div class="kc-axis"><span>размер</span><div class="seg" data-seg data-axis="size"><button data-val="s">S</button><button data-val="m" class="active">M</button><button data-val="l">L</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="ava" data-ashape="circle" data-size="m" data-zoom><div class="ava-row">
+          <div class="ava-cell"><div class="ava" style="--rank:#C89B3C"><img data-portrait="Ahri" alt=""><div class="rank-ring"></div><div class="rank-badge">👑</div><div class="status-dot live"></div></div></div>
+          <div class="ava-cell"><div class="ava" style="--rank:#5bc0ff"><img data-portrait="LeeSin" alt=""><div class="rank-ring"></div><div class="rank-badge">💎</div><div class="status-dot"></div></div></div>
+          <div class="ava-cell"><div class="ava" style="--rank:#ff5470"><img data-portrait="Jinx" alt=""><div class="rank-ring"></div><div class="rank-badge">🔥</div><div class="status-dot live"></div></div></div>
+        </div></div></div>
+      </article>
+
+      <!-- 16 · ПУСТЫЕ -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>16 · Пустые состояния</h3></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="empty">
+            <button data-val="illustrated" class="active">ико-плавает</button><button data-val="results">нет результатов</button><button data-val="ghost">ghost-превью</button><button data-val="error">ошибка</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="empty" data-empty="illustrated"><div class="empty">
+          <div class="e-ico" data-icon="search"></div>
+          <div class="empty-ghost"><div class="skel"></div><div class="skel"></div></div>
+          <h4>Ничего не найдено</h4><p>По запросу <span class="empty-q">«Ahri»</span> ничего нет. Измените фильтры.</p>
+          <button class="el btn" style="margin:0 auto"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content">Сбросить фильтры</span></button>
+        </div></div></div>
+      </article>
+
+      <!-- 17 · ИКОНКИ -->
+      <article class="kit-card wide">
+        <div class="kc-head"><div class="kc-title"><h3>17 · Иконки — единый набор статов</h3><span class="kc-note">без emoji · currentColor</span></div>
+          <div class="kc-controls">
+            <div class="kc-axis"><span>стиль</span><div class="seg" data-seg data-axis="istyle"><button data-val="line" class="active">линия</button><button data-val="drawon">draw-on</button></div></div>
+            <div class="kc-axis"><span>цвет</span><div class="seg" data-seg data-axis="icolor"><button data-val="white" class="active">белый</button><button data-val="accent">акцент</button></div></div>
+            <div class="kc-axis"><span>размер</span><div class="seg" data-seg data-axis="size"><button data-val="s">S</button><button data-val="m" class="active">M</button><button data-val="l">L</button></div></div>
+          </div>
+        </div>
+        <div class="kc-stage glass start"><div class="kit" data-kind="icon" data-istyle="line" data-icolor="white" data-size="m" style="width:100%"><div class="icons-grid" id="iconsGrid"></div></div></div>
+      </article>
+
+      <!-- 18 · МАГНИТНЫЙ РЕЛЬС -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>18 · Магнитный рельс / dock</h3><span class="kc-note">курсор тянет иконки (macOS dock)</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="mag">
+            <button data-val="dock" class="active">dock-масштаб</button><button data-val="magnetic">магнит</button><button data-val="indicator">+ индикатор</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="mrail" data-mag="dock">
+          <div class="el mrail" id="mrail"><span class="el-surf"></span><span class="mrail-ind" id="mrailInd"></span>
+            <button class="el mr-ico"><span class="el-surf"></span><span class="el-content" data-icon="ad"></span></button>
+            <button class="el mr-ico"><span class="el-surf"></span><span class="el-content" data-icon="ap"></span></button>
+            <button class="el mr-ico"><span class="el-surf"></span><span class="el-content" data-icon="armor"></span></button>
+            <button class="el mr-ico"><span class="el-surf"></span><span class="el-content" data-icon="crit"></span></button>
+            <button class="el mr-ico"><span class="el-surf"></span><span class="el-content" data-icon="ms"></span></button>
+          </div>
+        </div></div>
+      </article>
+
+      <!-- 19 · VIEW-TRANSITION -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>19 · Смена вида</h3><span class="kc-note">морф-кроссфейд контента</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>переход</span><div class="seg" data-seg data-axis="vt">
+            <button data-val="native" class="active">View-Transition API</button><button data-val="crossfade">кроссфейд</button><button data-val="slide">слайд</button><button data-val="scale">масштаб</button></div></div></div>
+        </div>
+        <div class="kc-stage glass col"><div class="kit" data-kind="vt" data-vt="native"><div class="vt-wrap">
+          <div class="el tabs" id="vtTabs"><span class="el-surf"></span><span class="tab-pill"></span>
+            <button class="tab active" data-view="stats">Статы</button><button class="tab" data-view="wr">WinRate</button><button class="tab" data-view="tier">Тир</button></div>
+          <div class="vt-pane" id="vtPane"></div>
+        </div></div></div>
+      </article>
+
+      <!-- 20 · OVERSCROLL -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>20 · Elastic overscroll</h3><span class="kc-note">крути колесом за край</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="os">
+            <button data-val="rubber" class="active">rubber-band</button><button data-val="edgefade">+ края-фейд</button><button data-val="bounce">жёсткий отскок</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="os" data-os="rubber"><div class="os-panel" id="osPanel"><div class="os-inner">
+          <div class="os-item">Ahri — 52.4%</div><div class="os-item">Lee Sin — 50.8%</div><div class="os-item">Garen — 49.2%</div><div class="os-item">Teemo — 47.1%</div>
+          <div class="os-item">Jinx — 51.3%</div><div class="os-item">Thresh — 50.1%</div><div class="os-item">Lux — 49.7%</div><div class="os-item">Zed — 51.9%</div>
+        </div></div></div></div>
+      </article>
+
+      <!-- 21 · ПРОГРЕСС / СТЕППЕР (NEW) -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>21 · Прогресс / Степпер <span class="badge new" style="font-size:9px">NEW</span></h3></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="prog">
+            <button data-val="steps" class="active">степпер</button><button data-val="bar">бар</button><button data-val="indeterminate">бесконечный</button></div></div></div>
+        </div>
+        <div class="kc-stage glass col"><div class="kit" data-kind="prog" data-prog="steps"><div class="prog-wrap">
+          <div class="stepper" id="stepper">
+            <div class="step done"><span class="st-dot" data-icon="check"></span><span class="st-lbl">Чемпион</span></div>
+            <div class="st-conn fill"></div>
+            <div class="step active"><span class="st-dot">2</span><span class="st-lbl">Предметы</span></div>
+            <div class="st-conn"></div>
+            <div class="step"><span class="st-dot">3</span><span class="st-lbl">Руны</span></div>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+          <button class="el btn" id="progBtn" style="align-self:flex-start"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content">▶ Следующий шаг</span></button>
+        </div></div></div>
+      </article>
+
+      <!-- 22 · KPI-ПЛИТКИ (NEW) -->
+      <article class="kit-card wide">
+        <div class="kc-head"><div class="kc-title"><h3>22 · KPI-плитки <span class="badge new" style="font-size:9px">NEW</span></h3><span class="kc-note">count-up · дельта · спарклайн</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="kpi">
+            <button data-val="spark" class="active">+ спарклайн</button><button data-val="delta">+ дельта</button><button data-val="plain">только число</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="kpi" data-kpi="spark" style="width:100%"><div class="kpi-row">
+          <div class="el kpi"><span class="el-surf"></span><span class="el-content"><div class="k-lbl">Средний WinRate</div><div class="k-val" data-kval="52.4" data-suf="%">0</div><div class="k-delta up"><span data-icon="up"></span>+1.8%</div><div class="k-spark" data-spark="6,20 16,14 26,17 36,9 46,12 56,5 66,8"></div></span></div>
+          <div class="el kpi"><span class="el-surf"></span><span class="el-content"><div class="k-lbl">Матчей за день</div><div class="k-val" data-kval="12840" data-suf="">0</div><div class="k-delta up"><span data-icon="up"></span>+6.2%</div><div class="k-spark" data-spark="6,18 16,16 26,10 36,13 46,7 56,9 66,4"></div></span></div>
+          <div class="el kpi"><span class="el-surf"></span><span class="el-content"><div class="k-lbl">Бан-рейт</div><div class="k-val" data-kval="31.6" data-suf="%">0</div><div class="k-delta dn"><span data-icon="dn"></span>-2.1%</div><div class="k-spark" data-spark="6,6 16,9 26,7 36,12 46,10 56,15 66,17"></div></span></div>
+        </div></div></div>
+      </article>
+
+      <!-- 23 · РЕЙТИНГ (NEW) -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>23 · Рейтинг <span class="badge new" style="font-size:9px">NEW</span></h3><span class="kc-note">наведи/кликни звёзды</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="rating">
+            <button data-val="count" class="active">звёзды + среднее</button><button data-val="stars">только звёзды</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="rating" data-rating="count"><div class="rating" id="rating">
+          <div class="stars"></div><div><span class="r-avg" data-avg="4.6">0.0</span> <span class="r-cnt">· 1 284 оценки</span></div>
+        </div></div></div>
+      </article>
+
+      <!-- 24 · COMMAND PALETTE (NEW) -->
+      <article class="kit-card">
+        <div class="kc-head"><div class="kc-title"><h3>24 · Command Palette ⌘K <span class="badge new" style="font-size:9px">NEW</span></h3><span class="kc-note">главный «pro»-сигнал</span></div></div>
+        <div class="kc-stage glass"><div class="kit" data-kind="cmdk">
+          <button class="el btn" id="cmdkOpen"><span class="el-surf"></span><span class="el-fx"></span><span class="el-content"><span data-icon="search"></span><span class="btn-txt">Открыть палитру</span> <span class="kbd" style="font-family:ui-monospace,monospace;font-size:11px;padding:2px 7px;border-radius:6px;background:rgba(255,255,255,.12)">⌘K</span></span></button>
+        </div></div>
+      </article>
+
+      <!-- 25 · МАРКИЗ-ТИКЕР (NEW) -->
+      <article class="kit-card wide">
+        <div class="kc-head"><div class="kc-title"><h3>25 · Маркиз-тикер <span class="badge new" style="font-size:9px">NEW</span></h3><span class="kc-note">живая лента изменений меты</span></div>
+          <div class="kc-controls"><div class="kc-axis"><span>вид</span><div class="seg" data-seg data-axis="marquee">
+            <button data-val="ltr" class="active">→ влево</button><button data-val="rtl">← вправо</button><button data-val="pause">пауза на ховер</button></div></div></div>
+        </div>
+        <div class="kc-stage glass"><div class="kit" data-kind="marquee" data-marquee="ltr" style="width:100%"><div class="marquee"><div class="marquee-track" id="marqTrack"></div></div></div></div>
+      </article>
+
+    </div>
+  </main>
+
+  <div class="toast-host br" id="toastHost" aria-live="polite"></div>
+
+  <!-- Command Palette overlay -->
+  <div class="cmdk-overlay" id="cmdkOverlay">
+    <div class="el cmdk" id="cmdkBox"><span class="el-surf"></span><span class="el-content">
+      <input class="cmdk-input" id="cmdkInput" placeholder="Поиск чемпиона, предмета, инструмента…" autocomplete="off">
+      <div class="cmdk-list" id="cmdkList"></div>
+    </span></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Flip.min.js"></script>
+  <script src="ui-kit.js?v=13"></script>
+</body>
+</html>

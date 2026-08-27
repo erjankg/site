@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>lab-map — раздел «Карта»: [Карта · Страта]</title>
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="map-lab.css?v=11">
+  <link rel="stylesheet" href="map-strata.css?v=11">
+  <link id="le-css" rel="stylesheet" href="../layout-editor.css">
+</head>
+<body>
+  <!-- ГЛОБАЛЬНЫЙ СПЛЭШ-АРТ: один на весь лаб, fixed, за всем стеклом.
+       Lux = СВЕТЛЫЙ арт: DESIGN.md требует валидировать читабельность на худшем случае. -->
+  <div class="splash" aria-hidden="true"></div>
+
+  <div class="app">
+    <!-- слим-рельс Suno (демо-каркас) -->
+    <nav class="rail glass" aria-label="Навигация">
+      <button class="rail-btn active" title="Home">◎</button>
+      <button class="rail-btn" title="Драфтер">⚔</button>
+      <button class="rail-btn" title="Калькулятор">∑</button>
+      <button class="rail-btn rail-gear" title="Настройки">⚙</button>
+    </nav>
+
+    <main class="stage">
+      <!-- ДЕВ-ПОЛОСА (для НАС): тёмный солид (НЕ стекло — намеренное исключение, чтобы
+           инструмент нельзя было спутать с оцениваемым стеклянным дизайном). -->
+      <div class="designbar" id="designbar">
+        <div class="db-row">
+          <span class="db-grip" id="dbGrip" title="Перетащить">⠿</span>
+          <span class="db-title">Дев-полоса <span class="db-tag">дев</span></span>
+          <button class="db-min" id="dbMin">Свернуть настройки</button>
+        </div>
+
+        <div class="db-vars">
+          <div class="db-group" data-var="obj">
+            <span class="db-lbl">Объекты</span>
+            <button class="db-seg active" data-val="dot">Точка</button>
+            <button class="db-seg" data-val="pin">Пин</button>
+            <button class="db-seg" data-val="chip">Чип</button>
+          </div>
+          <div class="db-group" data-var="panel">
+            <span class="db-lbl">Панель</span>
+            <button class="db-seg active" data-val="right">Справа</button>
+            <button class="db-seg" data-val="bottom">Снизу</button>
+          </div>
+          <div class="db-group" data-var="slider">
+            <span class="db-lbl">Ползунок</span>
+            <button class="db-seg active" data-val="fill">Fill+ticks</button>
+            <button class="db-seg" data-val="compact">Компакт</button>
+          </div>
+        </div>
+
+        <div class="db-foot">
+          <span class="db-choice" id="dbChoice">Ваш выбор: —</span>
+          <button class="db-audit" id="dbAudit" title="Приёмка: пометить узлы → дёрнуть ползунок → сколько выжило">🔬 Счётчик узлов</button>
+          <button class="db-copy" id="dbCopy">📋 Скопировать мой выбор</button>
+        </div>
+      </div>
+
+      <!-- ВЕРТИКАЛЬНЫЙ переключатель СЛЕВА — одно место для обеих вкладок, сверху НИЧЕГО не
+           занимает → карта/доска растягиваются на ВСЮ высоту. Кнопки не прыгают. -->
+      <nav class="viewtabs glass" role="tablist">
+        <button class="subtab active" data-tab="map" role="tab">Карта</button>
+        <button class="subtab" data-tab="strata" role="tab">Страта</button>
+        <span class="head-note" id="headNote"></span>
+      </nav>
+
+      <div class="stage-main">
+
+      <!-- ══════════ ВКЛАДКА 1: КАРТА (экономика) ══════════ -->
+      <section class="tabpane map-layout active" id="pane-map"
+               data-obj="dot" data-panel="right" data-slider="fill">
+        <!-- полоса времени: ползунок минуты + дез-таймер -->
+        <div class="timebar glass">
+          <div class="tb-slider">
+            <div class="tb-top">
+              <span>Минута игры</span>
+              <span class="tb-min" id="minLabel">0:00</span>
+            </div>
+            <input type="range" id="minSlider" min="0" max="30" step="1" value="0" aria-label="Минута игры">
+            <div class="tb-ticks"><span>0</span><span>10</span><span>20</span><span>30</span></div>
+          </div>
+          <div class="tb-death">
+            <div class="tb-death-n" id="deathN">6с</div>
+            <div class="tb-death-l">Дез-таймер <span class="demo soft">демо</span></div>
+          </div>
+        </div>
+
+        <!-- карта -->
+        <div class="map-stage glass">
+          <div class="map-art" aria-hidden="true"></div>
+          <span class="demo map-demo-tag">арт карты — демо</span>
+          <div id="objLayer"></div>
+        </div>
+
+        <!-- инлайн-панель деталей (стекло, НЕ модалка) -->
+        <aside class="detail glass" id="detail">
+          <div class="d-empty" id="detailEmpty">
+            Кликни объект на карте — кэмп, дракон, Барон или линию миньонов.<br><br>
+            Золото и дез-таймер пересчитываются при движении ползунка минуты.
+          </div>
+          <div id="detailBody" hidden></div>
+        </aside>
+      </section>
+
+      <!-- ══════════ ВКЛАДКА 2: СТРАТА (тактич-доска, полный порт board.js) ══════════ -->
+      <section class="tabpane strata-layout" id="pane-strata">
+        <div class="tb-layout">
+
+          <!-- ЛЕВО: синяя команда + инструменты рисования -->
+          <aside class="tb-side tb-side-left">
+            <div class="tb-panel tb-blue-side" id="tbBlueTeam">
+              <div class="tb-panel-in glass">
+                <div class="tb-side-header">
+                  <span class="tb-side-dot tb-side-dot-blue"></span>
+                  <span class="tb-side-title">Синяя</span>
+                </div>
+                <div class="tb-team-slots" data-team="blue">
+                  <button class="tb-slot" data-team="blue" data-idx="0"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Топ</span></button>
+                  <button class="tb-slot" data-team="blue" data-idx="1"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Лес</span></button>
+                  <button class="tb-slot" data-team="blue" data-idx="2"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Мид</span></button>
+                  <button class="tb-slot" data-team="blue" data-idx="3"><span class="tb-slot-plus">+</span><span class="tb-slot-label">АДК</span></button>
+                  <button class="tb-slot" data-team="blue" data-idx="4"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Саппорт</span></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="tb-panel" id="tbToolsPanel">
+              <div class="tb-panel-in glass">
+                <div class="tb-panel-title">Инструменты</div>
+                <button class="tb-tool" data-tool="arrow" title="Рисовать стрелки"><span class="tb-tool-icon">↗</span> Стрелка</button>
+                <button class="tb-tool" data-tool="pen" title="Свободное рисование"><span class="tb-tool-icon">✏</span> Карандаш</button>
+                <button class="tb-tool" data-tool="note" title="Текстовая заметка"><span class="tb-tool-icon">📝</span> Заметка</button>
+                <div class="tb-colors" title="Цвет стрелок и карандаша">
+                  <button class="tb-color tb-color-active" data-color="#FFD700" style="background:#FFD700" title="Золотой"></button>
+                  <button class="tb-color" data-color="#3ca0e6" style="background:#3ca0e6" title="Синяя команда"></button>
+                  <button class="tb-color" data-color="#e64646" style="background:#e64646" title="Красная команда"></button>
+                </div>
+                <button class="tb-tool tb-tool-ward" data-tool="ward-ally" title="Свой вард"><span class="tb-ward-chip tb-ward-chip-ally"></span> Свой вард</button>
+                <button class="tb-tool tb-tool-ward" data-tool="ward-enemy" title="Вражеский вард"><span class="tb-ward-chip tb-ward-chip-enemy"></span> Враг вард</button>
+              </div>
+            </div>
+          </aside>
+
+          <!-- ЦЕНТР: доска -->
+          <section class="tb-board-wrap">
+            <div class="tb-board" id="tbBoard">
+              <img class="tb-map-bg" id="tbMapBg" src="../tactics-board/assets/map-square.webp" alt="Карта Wild Rift" draggable="false">
+              <svg class="tb-arrows-layer" id="tbArrowsLayer" viewBox="0 0 1000 1000" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <marker id="tbArrowHead" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto" markerUnits="strokeWidth">
+                    <path d="M 0 0 L 8 4 L 0 8 z" fill="currentColor"/>
+                  </marker>
+                </defs>
+              </svg>
+              <div class="tb-tokens-layer" id="tbTokensLayer"></div>
+            </div>
+          </section>
+
+          <!-- ПРАВО: красная команда + карта + действия -->
+          <aside class="tb-side tb-side-right">
+            <div class="tb-panel tb-red-side" id="tbRedTeam">
+              <div class="tb-panel-in glass">
+                <div class="tb-side-header">
+                  <span class="tb-side-dot tb-side-dot-red"></span>
+                  <span class="tb-side-title">Красная</span>
+                </div>
+                <div class="tb-team-slots" data-team="red">
+                  <button class="tb-slot" data-team="red" data-idx="0"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Топ</span></button>
+                  <button class="tb-slot" data-team="red" data-idx="1"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Лес</span></button>
+                  <button class="tb-slot" data-team="red" data-idx="2"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Мид</span></button>
+                  <button class="tb-slot" data-team="red" data-idx="3"><span class="tb-slot-plus">+</span><span class="tb-slot-label">АДК</span></button>
+                  <button class="tb-slot" data-team="red" data-idx="4"><span class="tb-slot-plus">+</span><span class="tb-slot-label">Саппорт</span></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="tb-panel" id="tbMapPanel">
+              <div class="tb-panel-in glass">
+                <div class="tb-panel-title">🗺 Карта</div>
+                <button class="tb-mp-btn" id="tbMapUpload">📁 Загрузить файл</button>
+                <input type="file" id="tbMapFile" accept="image/*" hidden>
+                <div class="tb-mp-urlrow">
+                  <input type="text" class="tb-mp-url" id="tbMapUrl" placeholder="ссылка на картинку">
+                  <button class="tb-mp-btn" id="tbMapUrlApply">OK</button>
+                </div>
+                <button class="tb-mp-btn tb-mp-toggle" id="tbMapCalib" title="Двигать карту мышкой, колесо/слайдер — масштаб">🎯 Калибровка</button>
+                <label class="tb-mp-scale">Масштаб <input type="range" id="tbMapScale" min="0.4" max="3" step="0.02" value="1"></label>
+                <button class="tb-mp-btn tb-mp-reset" id="tbMapReset">↺ Сброс карты</button>
+                <div class="tb-map-panel-hint" id="tbMapHint"></div>
+              </div>
+            </div>
+
+            <div class="tb-panel" id="tbActionsPanel">
+              <div class="tb-panel-in glass">
+                <div class="tb-panel-title">Действия</div>
+                <button class="tb-mirror-btn" id="tbMirrorBtn" title="Поменять стороны (Baron / Dragon)"><span class="tb-tool-icon">⇄</span> Стороны</button>
+                <div class="tb-clear-row">
+                  <button class="tb-clear-btn" data-clear="arrows">Стрелки</button>
+                  <button class="tb-clear-btn" data-clear="wards">Варды</button>
+                  <button class="tb-clear-btn" data-clear="notes">Заметки</button>
+                  <button class="tb-clear-btn tb-clear-all" data-clear="all">Всё</button>
+                </div>
+                <button class="tb-edit-toggle" id="tbEditToggle" title="Редактор раскладки: двигать и менять размер панелей">✥ Редактор раскладки</button>
+                <div class="tb-status" id="tbStatus">Доска загружается…</div>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+
+        <!-- пикер чемпов (инлайн-оверлей раздела, НЕ страничная модалка) -->
+        <div class="tb-picker" id="tbPicker" hidden>
+          <div class="tb-picker-backdrop" data-picker-close></div>
+          <div class="tb-picker-box glass glass--e3">
+            <div class="tb-picker-header">
+              <span class="tb-picker-title">Выбери чемпиона</span>
+              <input type="text" class="tb-picker-search" id="tbPickerSearch" placeholder="Поиск по имени…" autocomplete="off">
+              <button class="tb-picker-close" data-picker-close>×</button>
+            </div>
+            <div class="tb-picker-roles" id="tbPickerRoles">
+              <button class="tb-prole tb-prole-active" data-role="all">Все</button>
+              <button class="tb-prole" data-role="Top"><img src="../image/role_top.webp" alt="">Топ</button>
+              <button class="tb-prole" data-role="Jungle"><img src="../image/role_jungle.webp" alt="">Лес</button>
+              <button class="tb-prole" data-role="Mid"><img src="../image/role_mid.webp" alt="">Мид</button>
+              <button class="tb-prole" data-role="ADC"><img src="../image/role_adc.webp" alt="">АДК</button>
+              <button class="tb-prole" data-role="Support"><img src="../image/role_support.webp" alt="">Сап</button>
+            </div>
+            <div class="tb-picker-grid" id="tbPickerGrid">
+              <div class="tb-picker-loading">Загружаю чемпов…</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div><!-- /.stage-main -->
+    </main>
+  </div>
+
+  <script>window.LE_KEY_PREFIX = 'labmap';</script>
+  <script src="../layout-editor.js" defer></script>
+  <script src="map-lab.js?v=11"></script>
+</body>
+</html>

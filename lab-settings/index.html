@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>lab-settings — ⚙ юзер-настройки (хаб посетителя)</title>
+
+  <!-- ЕДИНЫЙ источник токенов. Своего блока токенов у лаба НЕТ. -->
+  <link rel="stylesheet" href="../canon-tokens.css?v=2">
+  <!-- ★ БЛОКИРУЮЩИЙ скрипт в head: настройки применяются ДО первой отрисовки
+       (первый кадр сразу правильный, ничего не мигает). defer/async — нельзя. -->
+  <script src="../wr-prefs.js?v=2"></script>
+  <link rel="stylesheet" href="settings-lab.css?v=4">
+</head>
+<body>
+  <!-- ГЛОБАЛЬНЫЙ СПЛЭШ-АРТ: один на весь сайт, за ВСЕМ стеклом. Меняется из ⚙. -->
+  <div class="splash" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- ДЕВ-ПОЛОСА (для НАС): плавающая, перетаскивается за шапку, сворачивается.
+       НЕ стекло и НЕ часть сайта — на боевой не переносится. -->
+  <div class="lab-strip" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ lab-settings · ⚙ юзер-настройки</span>
+      <span class="strip-count" id="stripInfo"></span>
+      <span class="strip-actions">
+        <span id="labTools"></span>
+        <button class="sbtn" id="stripMin" type="button">Свернуть</button>
+      </span>
+    </div>
+    <div class="strip-body">
+      <div class="strip-group">
+        <label>Вид хаба ⚙ (выбрать один)</label>
+        <div class="seg" id="viewSeg">
+          <button type="button" data-view="list">Список</button>
+          <button type="button" data-view="grid">Сетка-карточки</button>
+          <button type="button" data-view="compact">Компакт</button>
+        </div>
+      </div>
+      <div class="strip-group">
+        <label>Приёмка (счётчик пересозданных узлов)</label>
+        <div class="sc-row">
+          <button class="sbtn" id="btnAudit" type="button">Прогнать 3 настройки</button>
+          <span class="strip-count" id="nodeCount">не замерялось</span>
+        </div>
+      </div>
+      <div class="strip-group">
+        <label>Проверка</label>
+        <div class="sc-row">
+          <button class="sbtn" id="btnOpen" type="button">Открыть ⚙</button>
+          <button class="sbtn" id="btnResetPrefs" type="button">Сбросить настройки юзера</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <!-- ДЕМО-САЙТ вокруг ⚙: рельс + шапка + данные. Нужен, чтобы ВИДЕТЬ,
+         что настройка применилась ВЕЗДЕ, а не только внутри попапа. -->
+    <nav class="rail glass" id="rail" aria-label="Разделы"></nav>
+
+    <div class="main">
+      <header class="topbar glass">
+        <span class="brand">WILD RIFT · СТАТС</span>
+        <div class="seg tabs" id="tabs">
+          <button type="button" data-tab="stats">Статс</button>
+          <button type="button" data-tab="winrate">WinRate</button>
+          <button type="button" data-tab="tier">Тир-лист</button>
+        </div>
+        <button class="gear" id="gearBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="setCard" title="Настройки"></button>
+      </header>
+
+      <main class="shell" id="stage"></main>
+    </div>
+  </div>
+
+  <!-- ⚙ ПОПАП. Появление есть ТОЛЬКО у него (он реально появляется).
+       Анимируем ТОЛЬКО opacity: transform на стеклянном блоке гасит стекло. -->
+  <div class="set-pop" id="setPop">
+    <div class="set-card glass" id="setCard" role="dialog" aria-modal="false" aria-label="Настройки вида"></div>
+  </div>
+
+  <script src="../lab-morph.js?v=1"></script>
+  <script src="../lab-settings.js?v=1"></script>
+  <script src="settings-lab.js?v=2"></script>
+</body>
+</html>

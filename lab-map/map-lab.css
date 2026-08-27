@@ -1,0 +1,318 @@
+/* ============================================================
+   lab-map — раздел «Карта» (MASTERPLAN Э2) по канону DESIGN.md
+   Стекло/анимации ТОЛЬКО через токены. Свой background/backdrop-filter ЗАПРЕЩЁН.
+   ============================================================ */
+
+/* ---- ТОКЕНЫ — из ../canon-tokens.css. Свой блок снесён 2026-08-02.
+   Смаплено: шкала 4/8/16/24/32/48 → --sp-1/3/5/6/7/8 ·
+   --sel/--sel-strong/--hair → --sel-12/--sel-18/--sel-09.
+   Ниже — ТОЛЬКО уникальное для карты. ---- */
+html[data-glass="on"] {
+  --team-blue: #3ca0e6;
+  --team-red: #e64646;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--txt);
+  text-shadow: var(--txt-shadow);
+  background: #05090d;
+  overflow: hidden;
+}
+
+/* ---- ГЛОБАЛЬНЫЙ СПЛЭШ-АРТ: fixed, за всем стеклом. Lux = светлый (валидация читабельности) ---- */
+.splash {
+  position: fixed; inset: 0; z-index: 0;
+  background: url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg') center/cover no-repeat;
+}
+/* виньетка ВКЛ (канон-материал) */
+.splash::after {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(1, 8, 14, .55) 100%);
+}
+
+/* ---- ЕДИНАЯ ОБЁРТКА .glass — своё стекло ЗАПРЕЩЕНО ---- */
+/* .glass — из ../canon-tokens.css. Тут только тени уровней высоты (тень ≠ стекло).
+   СТЕКЛО НАД СТЕКЛОМ канонизировано 2026-08-02 под стиль B: было «ярче» (--glass-dark минус),
+   стало ТЕМНЕЕ через --g-op. blur ОДИНАКОВЫЙ, 3 уровня высоты. */
+.glass--e2 {
+  --g-op: calc(var(--glass-dark) + .06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .09), 0 18px 44px rgba(0, 0, 0, calc(.44 * var(--sh-k)));
+}
+.glass--e3 {
+  --g-op: var(--glass-dark-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 28px 70px rgba(0, 0, 0, calc(.55 * var(--sh-k)));
+}
+
+/* ---- каркас: слим-рельс + сцена (Suno) ---- */
+.app { position: relative; z-index: 1; display: flex; height: 100vh; gap: var(--sp-5); padding: var(--sp-5); }
+.rail {
+  flex: 0 0 56px; display: flex; flex-direction: column; gap: var(--sp-1);
+  padding: var(--sp-3); overflow: hidden; align-items: center;
+}
+.rail-btn {
+  width: 40px; height: 40px; display: grid; place-items: center;
+  border: none; border-radius: 12px; background: transparent;
+  color: var(--txt-dim); cursor: pointer; font-size: 18px;
+  transition: background var(--dur-base) var(--ease-standard), color var(--dur-base) var(--ease-standard);
+}
+.rail-btn:hover { background: var(--sel-12); color: var(--txt); }
+.rail-btn.active { background: var(--sel-18); color: var(--txt); }
+.rail-gear { margin-top: auto; }
+
+/* сцена = РЯД: [вертикальные вкладки слева] [контент]. Сверху ничего → полная высота. */
+.stage { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: row; gap: var(--sp-5); overflow: hidden; }
+
+/* ---- ВЕРТИКАЛЬНЫЙ переключатель [Карта][Страта] СЛЕВА (одно место для обеих вкладок) ---- */
+.viewtabs {
+  flex: 0 0 auto; width: 92px; align-self: stretch;
+  display: flex; flex-direction: column; gap: var(--sp-1);
+  padding: var(--sp-3);
+}
+.viewtabs .subtab { width: 100%; text-align: center; }
+.viewtabs .head-note { display: none; }   /* длинную подпись в узкой колонке не показываем */
+
+.stage-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-5); min-height: 0; overflow: hidden; }
+
+/* сегменты = скользящая пилюля (UI-KIT), выделение БЕЛОЕ */
+.subtabs { position: relative; display: inline-flex; gap: var(--sp-1); padding: var(--sp-1); border-radius: 12px; background: rgba(255, 255, 255, .05); }
+.subtab {
+  position: relative; z-index: 1;
+  border: none; border-radius: 9px; background: transparent; color: var(--txt-dim);
+  padding: 6px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: color var(--dur-base) var(--ease-standard), background var(--dur-base) var(--ease-standard);
+}
+.subtab:hover { color: var(--txt); }
+.subtab.active { background: var(--sel-18); color: var(--txt); }
+
+.demo {
+  font-size: 10px; font-weight: 600; color: #0a1016; text-shadow: none;
+  background: var(--accent); padding: 2px 6px; border-radius: 6px;
+  letter-spacing: .3px; text-transform: uppercase;
+}
+.demo.soft { background: rgba(255, 255, 255, .16); color: var(--txt); }
+
+/* ★ НЕ ТАЩИТЬ ДЁРГАНЬЕ (1,3): вкладка = ПОСТОЯННЫЙ блок, анимации появления НЕТ.
+   display:none → обратно перезапускал бы анимацию на каждом переключении. */
+.tabpane { display: none; flex: 1; min-height: 0; }
+.tabpane.active { display: flex; flex-direction: column; gap: var(--sp-5); }
+
+/* ============================================================
+   ДЕВ-ПОЛОСА (для НАС): варианты вида. Не юзер-⚙.
+   Тёмный СОЛИД (НЕ .glass) — намеренное исключение: инструмент ≠ оцениваемый дизайн.
+   ============================================================ */
+.designbar {
+  position: fixed; top: 16px; right: 16px; z-index: 60;
+  max-width: min(860px, 68vw);
+  padding: 10px 14px;
+  display: flex; flex-direction: column; gap: 8px;
+  background: rgba(10, 14, 20, .94);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+  text-shadow: none;
+}
+.db-row { display: flex; align-items: center; gap: var(--sp-5); flex-wrap: wrap; }
+.db-grip { cursor: move; color: var(--txt-dim); font-size: 16px; user-select: none; padding: 0 2px; }
+.db-grip:hover { color: var(--txt); }
+.db-title { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; white-space: nowrap; flex: 1; }
+.db-tag { font-size: 10px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; color: #0a1016; background: #7aa2c4; padding: 2px 6px; border-radius: 6px; }
+
+.db-vars { display: flex; flex-wrap: wrap; gap: 14px; }
+.db-group { display: flex; align-items: center; gap: 6px; }
+.db-lbl { font-size: 11px; color: var(--txt-dim); text-transform: uppercase; letter-spacing: .4px; }
+.db-seg {
+  border: 1px solid rgba(255, 255, 255, .12); border-radius: 9px;
+  background: rgba(255, 255, 255, .05); color: var(--txt-dim);
+  padding: 5px 10px; font-size: 12px; cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+.db-seg:hover { background: rgba(255, 255, 255, .12); color: var(--txt); }
+.db-seg.active { background: rgba(255, 255, 255, .22); color: #fff; border-color: rgba(255, 255, 255, .3); }
+
+.db-foot { display: flex; align-items: center; gap: var(--sp-5); flex-wrap: wrap; border-top: 1px solid rgba(255, 255, 255, .1); padding-top: 8px; }
+.db-choice { font-size: 12px; color: var(--txt-dim); flex: 1; min-width: 0; }
+.db-copy, .db-audit, .db-min {
+  border: none; border-radius: 10px; color: var(--txt);
+  padding: 6px 12px; font-size: 12px; cursor: pointer; white-space: nowrap;
+  background: rgba(255, 255, 255, .08);
+  transition: background var(--dur-fast) var(--ease-standard);
+}
+.db-copy:hover, .db-audit:hover, .db-min:hover { background: rgba(255, 255, 255, .18); }
+.designbar.min { padding: 6px 10px; gap: 0; }
+.designbar.min .db-title, .designbar.min .db-vars, .designbar.min .db-foot { display: none; }
+
+/* ============================================================
+   ПОЛОСА ВРЕМЕНИ: ползунок «минута игры» + дез-таймер
+   ============================================================ */
+.timebar { display: flex; align-items: center; gap: var(--sp-6); padding: var(--sp-5) var(--sp-6); }
+.tb-slider { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.tb-slider .tb-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--txt-dim); }
+.tb-slider .tb-min { font-size: 15px; color: var(--txt); font-weight: 700; font-variant-numeric: tabular-nums; }
+.tb-ticks { display: flex; justify-content: space-between; font-size: 10px; color: var(--txt-dim); }
+
+/* ---- ВАРИАНТ ползунка A: трек FILL + ticks (UI-KIT дефолт) ---- */
+#minSlider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 6px; border-radius: 999px; outline: none; cursor: pointer;
+  background: linear-gradient(to right,
+    rgba(255, 255, 255, .55) 0 calc(var(--p, 0) * 1%),
+    rgba(255, 255, 255, .12) calc(var(--p, 0) * 1%) 100%);
+}
+#minSlider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #fff; border: none; cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+  transition: transform var(--dur-fast) var(--ease-overshoot);
+}
+#minSlider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+#minSlider::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%; background: #fff; border: none; cursor: grab;
+}
+
+/* ---- ВАРИАНТ ползунка B: КОМПАКТ (тоньше, без тиков, подпись инлайн) ---- */
+[data-slider="compact"] .tb-ticks { display: none; }
+[data-slider="compact"] #minSlider { height: 3px; }
+[data-slider="compact"] #minSlider::-webkit-slider-thumb { width: 12px; height: 12px; }
+[data-slider="compact"] .timebar { padding: var(--sp-3) var(--sp-6); }
+[data-slider="compact"] .tb-slider { flex-direction: row; align-items: center; gap: var(--sp-5); }
+[data-slider="compact"] .tb-slider .tb-top { flex: 0 0 auto; gap: 8px; }
+
+.tb-death {
+  flex: 0 0 auto; text-align: center; padding: var(--sp-3) var(--sp-6);
+  border-left: 1px solid var(--sel-09); min-width: 128px;
+}
+.tb-death .tb-death-n { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--txt); }
+.tb-death .tb-death-l { font-size: 11px; color: var(--txt-dim); display: flex; align-items: center; gap: 6px; justify-content: center; }
+
+/* ============================================================
+   РАСКЛАДКА КАРТЫ + инлайн-панель (сплит, без модалки)
+   ============================================================ */
+.tabpane.map-layout.active {
+  display: grid;
+  gap: var(--sp-5);
+  position: relative;      /* relative НЕ ломает стекло (в отличие от transform) */
+  min-height: 0;
+}
+/* ВАРИАНТ панели A: справа на всю высоту */
+[data-panel="right"].map-layout.active {
+  grid-template-columns: 1fr 340px;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "time info" "map info";
+}
+/* ВАРИАНТ панели B: лентой снизу во всю ширину */
+[data-panel="bottom"].map-layout.active {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "time" "map" "info";
+}
+[data-panel="bottom"] .detail { max-height: 34vh; }
+[data-panel="bottom"] .detail .d-empty { margin: 0 auto; }
+[data-panel="bottom"] .d-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.timebar   { grid-area: time; }
+.map-stage { grid-area: map; min-height: 0; }
+.detail    { grid-area: info; min-height: 0; }
+
+@media (max-width: 1000px) {
+  .tabpane.map-layout.active {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto 1fr !important;
+    grid-template-areas: "time" "map" "info" !important;
+  }
+}
+
+.map-stage { position: relative; overflow: hidden; padding: 0; }
+/* ДЕМО-арт карты: стилизованная сетка ущелья (плейсхолдер, помечен в UI) */
+.map-art {
+  position: absolute; inset: 10px; border-radius: 12px;
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, .02) 0 2px, transparent 2px 26px),
+    radial-gradient(circle at 22% 78%, rgba(255, 255, 255, .06), transparent 42%),
+    radial-gradient(circle at 78% 22%, rgba(255, 255, 255, .06), transparent 42%),
+    rgba(4, 12, 18, .72);
+  border: 1px solid var(--sel-09);
+}
+.map-art::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 44%, rgba(255, 255, 255, .10) 49%, rgba(255, 255, 255, .10) 51%, transparent 56%);
+}
+.map-demo-tag { position: absolute; top: 18px; left: 18px; z-index: 3; }
+
+/* ---- объекты на карте: 3 ВАРИАНТА ВИДА (дев-полоса) ---- */
+.obj {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  border: none; background: transparent; color: var(--txt); cursor: pointer;
+  z-index: 2; padding: 0;
+}
+.obj .dot {
+  width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 14px; line-height: 1;
+  background: rgba(255, 255, 255, .14); border: 1.5px solid rgba(255, 255, 255, .38);
+  transition: transform var(--dur-base) var(--ease-overshoot),
+              border-color var(--dur-base) var(--ease-standard),
+              background var(--dur-base) var(--ease-standard);
+  text-shadow: none;
+}
+.obj .obj-lbl {
+  font-size: 10px; color: var(--txt-dim); white-space: nowrap;
+  opacity: 0; transition: opacity var(--dur-base) var(--ease-standard);
+}
+.obj:hover .dot, .obj.sel .dot { transform: scale(1.18); border-color: #fff; background: var(--sel-18); }
+.obj:hover .obj-lbl, .obj.sel .obj-lbl { opacity: 1; }
+.obj.sel .obj-lbl { color: var(--txt); }
+
+/* цветовая метка типа объекта = ФУНКЦИОНАЛЬНАЯ (не покраска UI) */
+.obj.o-blue  .dot { box-shadow: 0 0 0 3px rgba(80, 150, 255, .20); }
+.obj.o-red   .dot { box-shadow: 0 0 0 3px rgba(255, 84, 112, .20); }
+.obj.o-epic  .dot { box-shadow: 0 0 0 3px rgba(200, 155, 60, .24); }
+.obj.o-lane  .dot { width: 20px; height: 20px; font-size: 11px; }
+
+/* ВАРИАНТ B — ПИН (капля с остриём вниз) */
+[data-obj="pin"] .obj .dot {
+  border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  width: 28px; height: 28px;
+}
+[data-obj="pin"] .obj .dot > * { transform: rotate(45deg); }
+[data-obj="pin"] .obj:hover .dot, [data-obj="pin"] .obj.sel .dot { transform: rotate(-45deg) scale(1.18); }
+
+/* ВАРИАНТ C — ЧИП (иконка + подпись всегда видны) */
+[data-obj="chip"] .obj {
+  flex-direction: row; gap: 6px; padding: 4px 10px 4px 4px;
+  background: rgba(2, 9, 15, .55); border: 1px solid var(--sel-09); border-radius: 999px;
+}
+[data-obj="chip"] .obj .obj-lbl { opacity: 1; font-size: 11px; }
+[data-obj="chip"] .obj .dot { width: 22px; height: 22px; font-size: 12px; }
+[data-obj="chip"] .obj:hover, [data-obj="chip"] .obj.sel { background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .3); }
+
+/* ---- инлайн-панель деталей (стекло, НЕ модалка) ---- */
+.detail { padding: var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-5); overflow-y: auto; }
+.detail .d-empty { color: var(--txt-dim); font-size: 13px; line-height: 1.6; margin: auto 0; text-align: center; max-width: 420px; }
+.d-head { display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap; }
+.d-head .d-ico { font-size: 20px; }
+.d-head h2 { font-size: 17px; font-weight: 700; }
+.d-sub { font-size: 12px; color: var(--txt-dim); }
+
+/* плитки БЕЗ backdrop-filter (стекло только на контейнерах) */
+.d-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); }
+.d-kpi { padding: var(--sp-5); border-radius: 12px; background: rgba(255, 255, 255, .06); text-align: center; }
+.d-kpi .k-n { font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.d-kpi .k-n.live { color: var(--accent); }   /* акцент ТОЛЬКО на данных */
+.d-kpi .k-l { font-size: 11px; color: var(--txt-dim); margin-top: 2px; display: flex; gap: 5px; justify-content: center; align-items: center; }
+
+.d-rows { display: flex; flex-direction: column; gap: 0; font-size: 13px; }
+.d-row { display: flex; justify-content: space-between; gap: var(--sp-5); padding: 9px 0; }
+.d-row + .d-row { border-top: 1px solid var(--sel-09); }
+.d-row .r-l { color: var(--txt-dim); }
+.d-row .r-v { text-align: right; }
+.d-buff { font-size: 12.5px; color: var(--txt-dim); line-height: 1.55; }
+.d-buff b { color: var(--txt); font-weight: 600; }
+
+/* тонкий скролл (жирный дефолтный — запрещён) */
+.detail::-webkit-scrollbar { width: 8px; }
+.detail::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .18); border-radius: 8px; }
+.detail::-webkit-scrollbar-track { background: transparent; }

@@ -1,52 +1,71 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-glass="on">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<title>Песочница — Мой профиль</title>
+<title>lab-profile — Мой профиль (финальный канон)</title>
 <link rel="preconnect" href="https://ddragon.leagueoflegends.com">
-<link rel="stylesheet" href="profile-lab.css?v=2">
+<link rel="stylesheet" href="../canon-tokens.css?v=1">
+<link rel="stylesheet" href="profile-lab.css?v=9">
 </head>
 <body>
-  <header class="lab-top">
-    <div class="lab-top-title">
-      <span class="lab-logo">👤</span>
-      <div>
-        <div class="lab-h1">Мой профиль — песочница</div>
-        <div class="lab-sub">Слева редактор, справа живая карточка (как тебя видят другие). Аватар = сплэш любимого чемпа, он же фон за стеклом. Боевой сайт не трогается.</div>
-      </div>
+  <!-- ГЛОБАЛЬНЫЙ СПЛЭШ-АРТ за всем стеклом (по умолчанию = сплэш чемпа-аватара) -->
+  <div class="splash" aria-hidden="true"></div>
+
+  <!-- ДЕВ-ПОЛОСА: наш инструмент. Тёмный солид, плавает поверх контента, тащится за грип. -->
+  <div class="lab-strip" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ Дизайн-полоса · профиль</span>
+      <button class="strip-min-btn" id="stripMin">Свернуть</button>
     </div>
-    <div id="labTools"></div>
-    <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
-  </header>
+    <div class="strip-body" id="stripBody"></div>
+  </div>
 
-  <nav id="variantBar" class="variant-bar"></nav>
-
-  <main id="labMain" class="lab-main">
-    <section class="editor glassy" id="editor"></section>
+  <!-- #app: data-атрибуты стиля кнопок ставит JS -->
+  <div class="app" id="app">
+    <section class="editor glass lvl1" id="editor"></section>
     <section class="preview-wrap" id="previewWrap">
-      <div class="preview-card glassy" id="previewCard"></div>
+      <div class="preview-card glass lvl2" id="previewCard"></div>
     </section>
-  </main>
+  </div>
 
-  <!-- Пикер чемпионов (стекло) -->
+  <!-- Пикер чемпионов: scrim + одно стеклянное окно (уровень 3) -->
   <div id="champPicker" class="cp-mask" hidden>
-    <div class="cp-win glassy">
+    <div class="cp-win glass lvl3">
       <div class="cp-head">
         <span id="cpTitle" class="cp-title">Выбрать чемпиона</span>
-        <button id="cpClose" class="cp-close">✕</button>
+        <button id="cpClose" class="cp-close" aria-label="Закрыть">✕</button>
       </div>
-      <input id="cpSearch" class="cp-search" type="text" placeholder="Поиск чемпиона…" autocomplete="off">
+      <input id="cpSearch" class="ed-input cp-search" type="text" placeholder="Поиск чемпиона…" autocomplete="off">
       <div id="cpGrid" class="cp-grid"></div>
       <div class="cp-foot">
         <span id="cpHint" class="cp-hint"></span>
-        <button id="cpDone" class="cp-done">Готово</button>
+        <button id="cpDone" class="btn"><span class="bi">✓</span><span class="bl">Готово</span></button>
       </div>
     </div>
   </div>
 
-  <script src="../lab-settings.js?v=3"></script>
-  <script src="profile-lab.js?v=2"></script>
+  <!-- Шаринг: PNG-снимок карточки + ссылка /u/ник (уровень 3) -->
+  <div id="shareMask" class="share-mask" hidden>
+    <div class="share-win glass lvl3">
+      <h3>Поделиться профилем <span style="font-size:11px;opacity:.7;font-weight:400">демо-снимок</span></h3>
+      <div class="share-canvas-wrap"><canvas id="shareCanvas" width="380" height="230"></canvas></div>
+      <div class="share-link">
+        <input id="shareUrl" class="ed-input" readonly>
+        <button id="shareCopy" class="btn"><span class="bi">🔗</span><span class="bl">Копировать</span></button>
+      </div>
+      <div class="share-actions">
+        <button id="shareChat" class="btn"><span class="bi">💬</span><span class="bl">В чат</span></button>
+        <button id="shareDl" class="btn"><span class="bi">⬇</span><span class="bl">Скачать PNG</span></button>
+        <button id="shareClose" class="btn"><span class="bi">✕</span><span class="bl">Закрыть</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="profile-lab.js?v=9"></script>
 </body>
 </html>

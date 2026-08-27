@@ -7,8 +7,8 @@
   --bg-base:        #010A13;
   --bg-primary:     #010d18;
   --bg-secondary:   #011520;
-  --accent:         #0BC4E3;
-  --grad1:          #0BC4E3;
+  --accent:         #ffffff;
+  --grad1:          #ffffff;
   --grad2:          #6D3FF5;
   --angle:          160deg;
   --text:           #64d2ff;
@@ -31,7 +31,7 @@ body{
   font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
   color:#e6f3fb;
   background:
-    radial-gradient(ellipse at 20% 0%, rgba(11,196,227,0.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255,0.10) 0%, transparent 55%),
     radial-gradient(ellipse at 90% 100%, rgba(109,63,245,0.12) 0%, transparent 55%),
     linear-gradient(160deg,var(--bg-primary) 0%, var(--bg-base) 55%, var(--bg-base) 100%);
   background-attachment:fixed;
@@ -43,7 +43,7 @@ body{
   background-size:cover;background-position:center 18%;background-repeat:no-repeat;}
 .lab-bg::after{content:"";position:absolute;inset:0;
   background:
-    radial-gradient(ellipse at 20% 0%, rgba(11,196,227,.10) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255,.10) 0%, transparent 55%),
     radial-gradient(ellipse at 90% 100%, rgba(109,63,245,.14) 0%, transparent 55%),
     linear-gradient(160deg, rgb(1 13 24 / calc(var(--dim) * .82)) 0%, rgb(1 10 19 / var(--dim)) 58%, rgb(1 10 19 / calc(var(--dim) * 1.16)) 100%);}
 
@@ -59,7 +59,7 @@ body[data-glasspow="mid"]{    --glass-op:.085; --glass-blur:16px; }
 body[data-glasspow="strong"]{ --glass-op:.12;  --glass-blur:24px; }
 body[data-glasspow="ultra"]{  --glass-op:.16;  --glass-blur:34px; }
 body[data-glasstint="neutral"]{ --glass-tint:255,255,255; }
-body[data-glasstint="accent"]{  --glass-tint:11,196,227; }
+body[data-glasstint="accent"]{  --glass-tint:255, 255, 255; }
 body[data-glasstint="warm"]{    --glass-tint:255,205,150; }
 body[data-glasstint="cool"]{    --glass-tint:150,200,255; }
 body[data-glasssat="norm"]{ --glass-sat:1.2; }
@@ -83,16 +83,16 @@ body[data-glassnoise="on"]::after{
 
 /* ── Шапка лаба ── */
 .lab-top{display:flex;align-items:center;justify-content:space-between;gap:16px;
-  padding:16px 24px;border-bottom:1px solid rgba(11,196,227,0.12);
+  padding:16px 24px;border-bottom:1px solid rgba(255, 255, 255,0.12);
   background:rgba(1,13,24,0.6);backdrop-filter:blur(10px)}
 .lab-top-title{display:flex;align-items:center;gap:14px}
-.lab-logo{font-size:24px;color:var(--accent);filter:drop-shadow(0 0 8px rgba(11,196,227,.6))}
+.lab-logo{font-size:24px;color:var(--accent);filter:drop-shadow(0 0 8px rgba(255, 255, 255,.6))}
 .lab-h1{font-size:18px;font-weight:900;letter-spacing:.3px;color:#cdeefb}
 .lab-sub{font-size:12px;color:rgba(230,243,251,.45);margin-top:2px;max-width:680px}
 .lab-top-btns{display:flex;gap:10px;align-items:center}
-.lab-reset{background:rgba(11,196,227,.08);border:1px solid rgba(11,196,227,.28);
+.lab-reset{background:rgba(255, 255, 255,.08);border:1px solid rgba(255, 255, 255,.28);
   color:var(--text);font-weight:700;font-size:13px;padding:9px 16px;border-radius:10px;cursor:pointer;transition:.15s;white-space:nowrap}
-.lab-reset:hover{background:rgba(11,196,227,.18);border-color:var(--accent)}
+.lab-reset:hover{background:rgba(255, 255, 255,.18);border-color:var(--accent)}
 .lab-toggle{background:rgba(var(--hi),.10);border:1px solid rgba(var(--hi),.3);
   color:#eef7fd;font-weight:700;font-size:13px;padding:9px 16px;border-radius:10px;cursor:pointer;transition:.15s;white-space:nowrap}
 .lab-toggle:hover{background:rgba(var(--hi),.2);border-color:rgba(var(--hi),.55)}
@@ -112,12 +112,17 @@ body.dc-min .settings{display:none}
 /* ── EMBED-режим (айфрейм на боевом, ?embed=1): прячем лаб-обвязку, шире на ПК ── */
 html.embed .lab-top,
 html.embed .settings{display:none!important}
+/* Встроен в боевой сайт: НЕ рисуем свой фон/сплэш — за прозрачным iframe проступает
+   ГЛОБАЛЬНЫЙ фон сайта (один сплэш на весь сайт). Стекло блюрит фон сайта. */
+html.embed,
+html.embed body{background:transparent!important}
+html.embed .lab-bg{display:none!important}
 html.embed .lab-main{padding:10px 14px 22px}
 html.embed .stage{min-height:0}
 html.embed .stage-inner{max-width:min(1480px,100%)}
 /* боевая шапка (← Калькулятор урона) уже есть → убираем дублирующий заголовок модалки и
    её ✕ (закрывает боевой ←), оставляем тонкую полосу с ⚙ юзер-настройками */
-html.embed .dc-head{padding-top:10px;padding-bottom:0}
+html.embed .dc-head{padding:8px 14px;justify-content:flex-end}
 html.embed .dc-head .dc-title{display:none}
 html.embed .dc-head .dc-close{display:none}
 
@@ -131,7 +136,7 @@ html.embed .dc-head .dc-close{display:none}
 .ctrl-label{font-size:12px;color:#eaf6ff;font-weight:700;display:flex;justify-content:space-between;margin-bottom:6px;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .ctrl-label .val{color:var(--accent);font-weight:800}
 .ctrl input[type=range]{width:100%;accent-color:var(--accent)}
-.ctrl select{width:100%;background:#011520;color:#e6f3fb;border:1px solid rgba(11,196,227,.25);
+.ctrl select{width:100%;background:#011520;color:#e6f3fb;border:1px solid rgba(255, 255, 255,.25);
   border-radius:8px;padding:7px 9px;font-size:13px;font-family:inherit}
 .ctrl select option{background:#011520;color:#e6f3fb}
 .toggle{display:flex;align-items:center;gap:9px;cursor:pointer;font-size:13px;color:#cfe9f8}
@@ -140,13 +145,12 @@ html.embed .dc-head .dc-close{display:none}
 /* ════════════════════════════════════════════════════════════════
    САМА МОДАЛКА КАЛЬКУЛЯТОРА (то, что попадёт на боевой)
    ════════════════════════════════════════════════════════════════ */
-.dc-modal{position:relative;border-radius:18px;padding:0;overflow:hidden}
-.dc-modal::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit;
-  background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,0) 40%)}
+/* бенто: модалка = прозрачный контейнер-колонка, шапка/вкладки/тело — отдельные стеклянные карты */
+.dc-modal{position:relative;padding:0;display:flex;flex-direction:column;gap:var(--gap)}
 
-/* шапка модалки */
+/* шапка модалки — своя карта */
 .dc-head{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+  padding:16px 20px;border-radius:var(--radius)}
 .dc-title{display:flex;align-items:center;gap:11px;font-size:17px;font-weight:900;color:#eef7fd}
 .dc-title .dc-mark{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;
   background:linear-gradient(var(--angle),var(--grad1),var(--grad2));color:#021018;font-size:17px}
@@ -170,16 +174,16 @@ html.embed .dc-head .dc-close{display:none}
 .dc-userset .ctrl{padding:8px 2px;border-top:1px solid rgba(255,255,255,.08)}
 .dc-userset .ctrl:first-of-type{border-top:0}
 
-/* вкладки урон / предметы (когда itempos=tab) */
-.dc-tabs{position:relative;z-index:3;display:flex;gap:8px;padding:12px 20px 0}
+/* вкладки — своя карта-полоса (бенто); кнопки = пилюли */
+.dc-tabs{position:relative;z-index:3;display:flex;flex-wrap:wrap;gap:8px;padding:9px 12px;border-radius:var(--radius)}
 .dc-tab{font-size:13px;font-weight:800;color:#cfe9f8;cursor:pointer;
   background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);
-  border-radius:11px 11px 0 0;padding:9px 16px;transition:.14s}
+  border-radius:10px;padding:9px 16px;transition:.14s}
 .dc-tab:hover{background:rgba(var(--hi),.12)}
 .dc-tab.on{background:rgba(var(--hi),.16);border-color:rgba(var(--hi),.5);color:#fff}
 
-/* тело модалки */
-.dc-body{position:relative;z-index:2;padding:18px 20px 20px;display:flex;flex-direction:column;gap:var(--gap)}
+/* тело модалки — прозрачный контейнер; секции внутри уже стеклянные карты */
+.dc-body{position:relative;z-index:2;padding:0;display:flex;flex-direction:column;gap:var(--gap)}
 
 /* ── панель (атакующий / цель) ── */
 .dc-panel{border-radius:var(--radius);padding:14px 15px;display:flex;flex-direction:column;gap:11px}
@@ -203,7 +207,7 @@ html.embed .dc-head .dc-close{display:none}
 .dc-input{width:100%;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.14);border-radius:9px;
   color:#eef7fd;font-size:14px;font-weight:700;font-family:inherit;padding:8px 10px;transition:.14s}
 .dc-input:focus{outline:none;border-color:rgba(var(--hi),.55);background:rgba(0,0,0,.4)}
-.dc-input[readonly]{color:#9fe3f5;background:rgba(11,196,227,.06);cursor:default}
+.dc-input[readonly]{color:#9fe3f5;background:rgba(255, 255, 255,.06);cursor:default}
 .dc-sel{width:100%;background:#011520;color:#eef7fd;border:1px solid rgba(255,255,255,.16);
   border-radius:9px;padding:8px 10px;font-size:13.5px;font-weight:700;font-family:inherit}
 .dc-sel option{background:#011520;color:#eef7fd}
@@ -254,6 +258,18 @@ html.embed .dc-head .dc-close{display:none}
 .dc-build-rune{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .dc-build-rune .dc-bcol-t{flex-shrink:0}
 .dc-build-rune .dc-runeslot{margin-top:0;padding-top:0;border-top:0;flex:1;min-width:240px}
+
+/* полоса выбора роли (готовые сборки) */
+.dc-rolebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-radius:var(--radius);padding:10px 14px}
+.dc-rolebar .dc-bcol-t{flex-shrink:0}
+.dc-rolechips{display:flex;gap:6px;flex-wrap:wrap}
+.dc-rolechip{font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;color:#dcebf5;white-space:nowrap;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);border-radius:11px;padding:7px 12px;transition:.13s}
+.dc-rolechip:hover{background:rgba(var(--hi),.12);border-color:rgba(var(--hi),.4)}
+.dc-rolechip.on{background:rgba(var(--hi),.2);border-color:rgba(var(--hi),.7);color:#fff;box-shadow:0 0 0 1px rgba(var(--hi),.45)}
+.dc-rolefill{font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;color:#021018;white-space:nowrap;margin-left:auto;
+  background:linear-gradient(var(--angle),var(--grad1),var(--grad2));border:0;border-radius:11px;padding:8px 14px;transition:.14s}
+.dc-rolefill:hover{filter:brightness(1.1);transform:translateY(-1px)}
 
 /* пикер снаряги (оверлей поверх модалки) */
 .dc-gpick-ov{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;
@@ -563,7 +579,7 @@ html.embed .dc-head .dc-close{display:none}
 .dc-cmp-bigwrap{display:flex;flex-direction:column;gap:6px}
 .dc-cmp-bar{height:10px;border-radius:5px;background:rgba(255,255,255,.07);overflow:hidden}
 .dc-cmp-bar span{display:block;height:100%;border-radius:5px;transition:width .3s}
-.dc-cmp-bar .b0{background:linear-gradient(90deg,#0BC4E3,#0892ab)}
+.dc-cmp-bar .b0{background:linear-gradient(90deg,#ffffff,#0892ab)}
 .dc-cmp-bar .b1{background:linear-gradient(90deg,#ffcf4d,#e0a800)}
 @media(max-width:680px){.dc-cmp-grid{grid-template-columns:1fr}}
 
@@ -736,8 +752,8 @@ html.embed .dc-head .dc-close{display:none}
 .dc-modal[data-tabpos="seg"] .dc-tabs{justify-content:center;gap:6px}
 .dc-modal[data-tabpos="seg"] .dc-tab{border-radius:10px}
 /* слева: вертикальные вкладки сбоку, тело справа */
-.dc-tabwrap-left{display:flex;align-items:stretch}
-.dc-tabwrap-left .dc-tabs{flex-direction:column;gap:6px;padding:18px 0 18px 18px;flex-shrink:0;width:210px}
+.dc-tabwrap-left{display:flex;align-items:stretch;gap:var(--gap)}
+.dc-tabwrap-left .dc-tabs{flex-direction:column;gap:6px;padding:14px;flex-shrink:0;width:210px}
 .dc-tabwrap-left .dc-tab{border-radius:10px;text-align:left}
 .dc-tabwrap-left .dc-leftbody{flex:1;min-width:0}
 @media(max-width:780px){.dc-tabwrap-left{flex-direction:column}.dc-tabwrap-left .dc-tabs{flex-direction:row;width:auto;padding:12px 20px 0}}
@@ -783,3 +799,45 @@ html.embed .dc-head .dc-close{display:none}
 
 /* Ориентация «Сравнения»: бок-о-бок (по умолч.) / друг под другом */
 .dc-modal[data-tab="cmp"][data-orient="stack"] .dc-cmp-grid{grid-template-columns:1fr}
+
+/* ════════════════════════════════════════════════════════════════════════
+   ИНФОРМАТИВНЫЙ СКЕЙЛ + РЕАЛЬНАЯ МЕТА + ПАТЧ 7.2 (v35)
+   Цвет только у ДАННЫХ (сегменты урона, тир) — по DESIGN.md. Стекло не трогаем.
+   ════════════════════════════════════════════════════════════════════════ */
+/* разбивка урона умения: «130 база + 70 от AD = 200» */
+.dc-abil.has-break{flex-wrap:wrap}
+.dc-abil-main{display:flex;align-items:center;gap:10px;width:100%}
+.dc-break{flex-basis:100%;display:flex;flex-wrap:wrap;align-items:center;gap:5px;
+  margin:6px 0 1px 34px;font-size:11.5px;line-height:1.5;opacity:.92}
+.dc-break i{font-style:normal;opacity:.55;margin:0 1px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+/* тёмные чипы — читаемы и на СВЕТЛОМ арте (Lux), и на тёмном (валидация DESIGN.md) */
+.dc-seg{display:inline-flex;align-items:center;gap:3px;padding:1px 8px;border-radius:7px;
+  background:rgba(4,10,18,.55);white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.dc-seg b{font-weight:800;color:#fff}
+.dc-seg.s-base{color:#e9f2fb}
+.dc-seg.s-ad b{color:#ffb27a}    /* физ. источник */
+.dc-seg.s-ap b{color:#4fc8e8}    /* маг. источник */
+.dc-seg.s-hp b{color:#6ee08a}    /* от HP */
+.dc-seg.s-crit b{color:#ffcf3f}  /* крит */
+.dc-seg-eq{font-weight:900;color:#fff;margin-left:3px;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.dc-seg-x{opacity:.7;font-weight:600}
+.dc-rank{display:inline-block;margin-left:6px;padding:0 6px;border-radius:6px;font-size:10px;
+  font-weight:700;background:rgba(255,255,255,.10);color:#fff;vertical-align:middle}
+.dc-demo-tag,.dc-seg.demo-mark{font-size:10px;font-weight:700;color:#ffd76a;
+  background:rgba(255,215,106,.14);padding:1px 7px;border-radius:6px;margin-left:6px}
+
+/* бейдж реальной меты WR (тир/винрейт) */
+.dc-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:7px}
+.dc-tier{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;
+  padding:0 5px;border-radius:7px;font-weight:900;font-size:13px;color:#0b1016;
+  background:var(--tc,#88a);box-shadow:0 1px 6px rgba(0,0,0,.3)}
+.dc-mchip{font-size:11.5px;padding:2px 8px;border-radius:7px;background:rgba(255,255,255,.08);color:#fff}
+.dc-mchip b{color:var(--accent)}
+.dc-mchip.role{opacity:.85}
+.dc-mchip.real{color:var(--accent);background:rgba(255, 255, 255,.12);font-weight:700}
+
+/* Патч 7.2: ботинки T3 + зачарование */
+.dc-gchip.t3,.dc-pcard.t3{position:relative}
+.dc-t3{position:absolute;top:-4px;right:-4px;font-size:8.5px;font-weight:900;line-height:1;
+  padding:1px 3px;border-radius:5px;background:var(--accent);color:#0b1016;pointer-events:none}
+.dc-gbtn.ench.on{background:rgba(255,255,255,.16);color:#fff}

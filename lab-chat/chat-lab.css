@@ -1,409 +1,634 @@
 /* ════════════════════════════════════════════════════════════════
-   chat-lab.css — песочница ЧАТА. Дизайн-полоса сверху (для нас),
-   варианты по каждому пункту. Боевой не трогаем — это подбор вида.
-   Стекло + ОДИН сплэш-арт за стеклом (стандарт сайта).
-   Скроллбар НИКОГДА не виден (полоса прокрутки скрыта, скролл работает).
+   lab-chat — ЧАТ = ПОСТОЯННАЯ ПРАВАЯ ПАНЕЛЬ-ОВЕРЛЕЙ (Discord/Twitch).
+   По КАНОНУ (DESIGN.md): токены + .glass из эталона lab-design-system.
+   Стекло ТОЛЬКО на контейнерах (панель / попапы). Сообщения, карточки,
+   строки списков — БЕЗ backdrop-filter. Панель слайдит через `right`
+   (layout), НЕ transform → backdrop не гаснет (GOTCHA). Кнопка вызова
+   всегда видна (fixed), в т.ч. поверх фуллскрин-драфтера.
    ════════════════════════════════════════════════════════════════ */
-:root{
-  --accent:#0bc4e3;
-  --accent2:#0a7ea4;
-  --gold:#ffd700;
-  --ink:#eaf6ff;
-  --dim:rgba(234,246,255,.55);
-  --faint:rgba(234,246,255,.32);
-  --bg0:#05101a;
-  --bg1:#0a1a28;
-  --glass-bd:rgba(255,255,255,.12);
-  --glass-bg:rgba(14,30,44,.46);
-  --art:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Brand_0.jpg');
-  --blur:16px;
-  --row-gap:8px;
-  --bub-pad:7px 11px;
-  --bub-radius:16px;
-  --bub-max:74%;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0}
 
-/* ── скроллбар НИКОГДА не виден (везде в лабе) ── */
-*{scrollbar-width:none;-ms-overflow-style:none}
-*::-webkit-scrollbar{width:0;height:0;display:none}
+/* ---- ТОКЕНЫ — из ../canon-tokens.css. Свой блок снесён 2026-08-02.
+   Смаплено: шкала 4/8/16/24/32 → --sp-1/3/5/6/7 · своя белая шкала
+   --sel-surf/-surf-2/-hover/-active/-brd/-brd-2/-brd-act/-line → --sel-05/09/12/18/45.
+   Ниже — ТОЛЬКО уникальное для чата. ---- */
+html[data-glass="on"] {
+  --sel-solid:   rgba(255, 255, 255, .92);   /* яркая непрозрачная поверхность (FAB/отправка) */
+  --on-solid:    #0a1016;
 
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
-  color:var(--ink);
-  background:
-    radial-gradient(1200px 700px at 80% -10%, rgba(11,196,227,.10), transparent 60%),
-    radial-gradient(900px 600px at 0% 110%, rgba(255,215,0,.06), transparent 55%),
-    linear-gradient(160deg,#06121d,#04111b 60%,#030b13);
-  display:flex;flex-direction:column;height:100vh;overflow:hidden;
+  /* ★ МОЙ ПУЗЫРЬ = ЯРКОЕ БЕЛОЕ (не акцент). Один токен — вся идентичность «я».
+     Пузыри — элементы списка, поэтому БЕЗ backdrop-filter (DESIGN.md), материал даёт яркость. */
+  --bub-me:      rgba(255, 255, 255, .92);
+  --on-bub:      #0a1016;                    /* текст/иконки поверх моего пузыря */
+  --on-bub-dim:  rgba(10, 16, 22, .16);      /* вложенные поверхности внутри моего пузыря */
+  --on-bub-brd:  rgba(10, 16, 22, .26);
+
+  /* панель чата */
+  --panel-w: 380px;
+  --row-gap: 8px;
+  --bub-pad: 7px 12px;
+  --bub-r: 15px;
+  --bub-max: 82%;
 }
 
-/* ── Шапка лаба ── */
-.lab-top{display:flex;align-items:flex-start;gap:16px;padding:14px 18px;border-bottom:1px solid var(--glass-bd);
-  background:rgba(4,12,20,.6);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);flex-shrink:0}
-.lab-top-title{display:flex;gap:12px;flex:1;min-width:0}
-.lab-logo{font-size:26px;line-height:1}
-.lab-h1{font-size:16px;font-weight:900;letter-spacing:.2px}
-.lab-sub{font-size:12px;color:var(--dim);margin-top:3px;max-width:780px;line-height:1.45}
-.lab-top-btns{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.lab-toggle,.lab-reset{font:inherit;font-size:12px;font-weight:700;color:var(--ink);background:rgba(255,255,255,.06);
-  border:1px solid var(--glass-bd);border-radius:10px;padding:8px 12px;cursor:pointer;transition:.14s}
-.lab-toggle:hover,.lab-reset:hover{background:rgba(11,196,227,.14);border-color:rgba(11,196,227,.4)}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
 
-/* ── Дизайн-полоса (варианты) ── */
-.settings{padding:12px 18px;border-bottom:1px solid var(--glass-bd);background:rgba(6,16,26,.5);
-  display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;flex-shrink:0;overflow:auto;max-height:44vh;
-  transition:max-height .25s ease,padding .25s ease,opacity .2s}
-.settings.cfg-min{max-height:0;padding-top:0;padding-bottom:0;opacity:0;overflow:hidden;border-bottom-color:transparent}
-.cfg-group{display:flex;flex-direction:column;gap:7px;min-width:0}
-.cfg-label{font-size:10.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--accent)}
-.seg{display:inline-flex;gap:3px;padding:3px;border-radius:11px;background:rgba(255,255,255,.04);
-  border:1px solid var(--glass-bd);flex-wrap:wrap}
-.seg button{font:inherit;font-size:11.5px;font-weight:700;color:var(--dim);background:transparent;border:none;
-  border-radius:8px;padding:6px 10px;cursor:pointer;transition:.12s;white-space:nowrap}
-.seg button:hover{color:var(--ink);background:rgba(255,255,255,.05)}
-.seg button.on{color:#02121a;background:linear-gradient(135deg,var(--accent),#7fe9ff);box-shadow:0 4px 12px rgba(11,196,227,.3)}
-.cfg-range{display:flex;align-items:center;gap:8px}
-.cfg-range input[type=range]{width:120px;accent-color:var(--accent)}
-.cfg-range .val{font-size:11px;color:var(--dim);min-width:34px;font-variant-numeric:tabular-nums}
-
-/* ── Сцена ── */
-.lab-main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:24px;overflow:hidden}
-.chat-stage{
-  position:relative;width:min(980px,100%);height:100%;max-height:780px;border-radius:22px;overflow:hidden;
-  border:1px solid var(--glass-bd);box-shadow:0 40px 100px rgba(0,0,0,.55);display:flex;
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--txt);
+  text-shadow: var(--txt-shadow);
+  background: #05090d;
+  overflow: hidden;
+  display: flex; flex-direction: column; height: 100vh;
 }
-/* фон за стеклом */
-.chat-art{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;transition:opacity .25s}
-.chat-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(4,12,20,.55),rgba(4,12,20,.78))}
-.chat-stage.bg-dark .chat-art{opacity:0}
-.chat-stage.bg-dark .chat-scrim{background:linear-gradient(180deg,#08121c,#050d15)}
-.chat-stage.bg-art .chat-art{background-image:var(--art);opacity:1}
-.chat-stage.bg-dots .chat-art{opacity:0}
-.chat-stage.bg-dots .chat-scrim{
-  background:linear-gradient(180deg,#08121c,#050d15),
-  radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px) 0 0/16px 16px}
-.chat-stage.bg-grad .chat-art{opacity:0}
-.chat-stage.bg-grad .chat-scrim{background:
-  radial-gradient(700px 500px at 85% 0%,rgba(11,196,227,.18),transparent 60%),
-  radial-gradient(600px 500px at 0% 100%,rgba(255,215,0,.10),transparent 55%),
-  linear-gradient(150deg,#0a1f30,#0a1424 55%,#160f24)}
-.chat-stage.bg-lines .chat-art{opacity:0}
-.chat-stage.bg-lines .chat-scrim{background:
-  linear-gradient(180deg,#08121c,#050d15),
-  repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 1px,transparent 1px 13px)}
 
-/* стеклянная подложка окна */
-.chat-glass{position:relative;z-index:2;flex:1;display:flex;min-width:0;
-  -webkit-backdrop-filter:blur(var(--blur)) saturate(1.4);backdrop-filter:blur(var(--blur)) saturate(1.4);
-  background:var(--glass-bg)}
+.splash {
+  position: fixed; inset: 0; z-index: 0;
+  background-position: center; background-size: cover; background-repeat: no-repeat;
+}
 
-/* ── Сайдбар пользователей ── */
-.cs-side{width:230px;flex-shrink:0;border-right:1px solid var(--glass-bd);display:flex;flex-direction:column;
-  background:rgba(6,16,26,.4)}
-.cs-side-h{padding:14px 14px 10px;font-size:13px;font-weight:900;color:var(--accent);display:flex;align-items:center;gap:6px;
-  border-bottom:1px solid var(--glass-bd)}
-.cs-side-h .cnt{margin-left:auto;font-size:10px;color:var(--faint);font-weight:700}
-.cs-users{flex:1;overflow:auto;padding:8px}
-.cs-user{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:10px;cursor:pointer;transition:.12s}
-.cs-user:hover{background:rgba(255,255,255,.07)}
-.cs-user:active{transform:scale(.98)}
-.cs-user .av{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:800;color:#02121a;position:relative}
-.cs-user .nm{font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cs-user .nm small{display:block;font-size:10px;color:var(--faint);font-weight:600}
-.cs-dot{position:absolute;right:0;bottom:0;width:10px;height:10px;border-radius:50%;background:#37e07a;
-  border:2px solid #0b1a28}
+/* ---- единая обёртка .glass ---- */
+/* .glass живёт в ../canon-tokens.css — своего стекла тут НЕТ. */
+.anim-in { animation: fadeIn var(--anim-dur) var(--anim-ease); }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 
-/* раскладки */
-.chat-stage.lay-full .cs-side,
-.chat-stage.lay-float .cs-side,
-.chat-stage.lay-center .cs-side,
-.chat-stage.lay-tabs .cs-side{display:none}
-.chat-stage.lay-right .chat-glass{flex-direction:row-reverse}
-.chat-stage.lay-right .cs-side{border-right:none;border-left:1px solid var(--glass-bd)}
-.chat-stage.lay-float{width:min(420px,100%);max-height:600px;align-self:flex-end;margin:auto 0}
-.chat-stage.lay-center .chat-glass{justify-content:center}
-.chat-stage.lay-center .cs-main{flex:0 1 700px;width:100%;border-left:1px solid var(--glass-bd);border-right:1px solid var(--glass-bd)}
-.chat-stage.lay-rail .cs-side{width:62px}
-.chat-stage.lay-rail .cs-side-h{justify-content:center;font-size:0;padding:12px 0}
-.chat-stage.lay-rail .cs-side-h::before{content:'👥';font-size:16px}
-.chat-stage.lay-rail .cs-side-h .cnt{display:none}
-.chat-stage.lay-rail .cs-users{padding:8px 6px;align-items:center}
-.chat-stage.lay-rail .cs-user{justify-content:center;padding:6px}
-.chat-stage.lay-rail .cs-user .nm{display:none}
+.thin::-webkit-scrollbar { width: 8px; }
+.thin::-webkit-scrollbar-thumb { background: var(--sel-18); border-radius: 8px; }
+.thin::-webkit-scrollbar-track { background: transparent; }
 
-/* ── Панель чата ── */
-.cs-main{flex:1;display:flex;flex-direction:column;min-width:0}
-.cs-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--glass-bd);
-  background:rgba(6,16,26,.35);flex-shrink:0}
-.cs-head .ttl{font-size:14px;font-weight:900}
-.cs-head .sub{font-size:11px;color:var(--faint);font-weight:600}
-.cs-head .spacer{flex:1}
-.cs-head .hbtn{font:inherit;font-size:11px;font-weight:800;color:#ff6b6b;background:rgba(255,68,68,.12);
-  border:1px solid rgba(255,68,68,.3);border-radius:9px;padding:5px 10px;cursor:pointer;transition:.12s}
-.cs-head .hbtn:hover{background:rgba(255,68,68,.2)}
-.cs-head .hbtn:active{transform:scale(.95)}
+/* ============================================================
+   КАРКАС: рельс + сцена (это фон, чтобы видеть панель ОВЕРЛЕЕМ)
+   ============================================================ */
+.app {
+  position: relative; z-index: 1; flex: 1; min-height: 0;
+  overflow: hidden; padding: var(--sp-5);
+  transition: margin-right var(--anim-dur) var(--anim-ease);
+}
+/* push-режим: контент сжимается на ширину панели */
+body.behav-push.chat-open .app { margin-right: calc(var(--panel-w) + var(--sp-5)); }
 
-/* каналы-вкладки (lay-tabs) */
-.cs-tabs{display:none;gap:6px;padding:10px 16px 0;flex-shrink:0}
-.chat-stage.lay-tabs .cs-tabs{display:flex}
-.cs-tabs .tab{font-size:11.5px;font-weight:700;color:var(--dim);padding:7px 13px;border-radius:10px 10px 0 0;
-  background:rgba(255,255,255,.04);border:1px solid var(--glass-bd);border-bottom:none;cursor:pointer}
-.cs-tabs .tab.on{color:var(--ink);background:rgba(11,196,227,.16);border-color:rgba(11,196,227,.4)}
+.rail {
+  position: absolute; top: var(--sp-5); left: var(--sp-5); bottom: var(--sp-5);
+  width: var(--rail-w); z-index: 2;
+  display: flex; flex-direction: column; gap: var(--sp-1); padding: var(--sp-3);
+  clip-path: inset(0 calc(var(--rail-w) - var(--rail-min)) 0 0 round var(--ds-r));
+  transition: clip-path var(--anim-dur) var(--anim-ease);
+}
+.app.rail-open .rail { clip-path: inset(0 0 0 0 round var(--ds-r)); }
+.rail-items { display: flex; flex-direction: column; gap: var(--sp-1); flex: 1; }
+.rail-btn {
+  display: flex; align-items: center; gap: var(--sp-5); padding: 10px var(--sp-5);
+  border: none; border-radius: 12px; background: transparent; color: var(--txt);
+  cursor: pointer; font: inherit; font-size: 14px; text-align: left; white-space: nowrap;
+  transition: background var(--anim-dur);
+}
+.rail-btn .ico { font-size: 17px; width: 20px; text-align: center; flex: 0 0 auto; }
+.rail-btn:hover { background: var(--sel-12); }
+.rail-btn.active { background: var(--sel-18); }
+.rail .lbl { opacity: 0; transition: opacity var(--anim-dur) var(--anim-ease); }
+.app.rail-open .rail .lbl { opacity: 1; }
 
-/* лента сообщений */
-.cs-msgs{flex:1;overflow:auto;padding:14px 16px;display:flex;flex-direction:column;gap:var(--row-gap)}
+.stage {
+  position: absolute; top: var(--sp-5); bottom: var(--sp-5); right: var(--sp-5);
+  left: calc(var(--sp-5) + var(--rail-min) + var(--sp-5));
+  overflow: hidden; contain: layout;
+}
+/* фуллскрин-драфтер: рельс уходит, сцена во всю ширину, но кнопка чата ЖИВЁТ */
+body.scene-drafter .rail { display: none; }
+body.scene-drafter .stage { left: var(--sp-5); }
 
-.row{display:flex;align-items:flex-end;gap:7px;animation:fade .2s ease;position:relative}
-.row.me{flex-direction:row-reverse}
-@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.mock { height: 100%; display: flex; flex-direction: column; gap: var(--sp-5); }
+.mock-head { font-size: 22px; font-weight: 700; }
+.mock-grid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); min-height: 0; }
+.mock-card { padding: var(--sp-6); display: flex; flex-direction: column; gap: var(--sp-3); }
+.mock-card .t { font-size: 15px; font-weight: 600; }
+.mock-card .d { font-size: 12.5px; }
+.mock-draft { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5); min-height: 0; }
+.mock-side { padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--sp-3); }
+.mock-side h3 { font-size: 14px; }
+.mock-slot { height: 44px; border-radius: 10px; background: var(--sel-05); }
 
-.av{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:800;color:#02121a;position:relative}
-.av img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+/* ============================================================
+   КНОПКА ВЫЗОВА (всегда fixed, поверх всего). Варианты: язычок / иконка / плавающая.
+   Solid (не стекло) — чтобы читалась и над тёмным драфтером.
+   ============================================================ */
+.chat-tab {
+  position: fixed; z-index: 60;
+  border: 1px solid var(--glass-bd-c);
+  background: rgba(10, 18, 26, .92);
+  color: var(--txt);
+  cursor: pointer; font: inherit; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
+  transition: right var(--anim-dur) var(--anim-ease), background var(--anim-dur);
+}
+.chat-tab:hover { background: rgba(16, 26, 36, .98); }
+.chat-tab .tbadge {
+  min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px;
+  background: var(--accent); color: var(--on-accent); text-shadow: none;
+  font-size: 11px; font-weight: 700; line-height: 18px; display: none;
+}
+.chat-tab.has-unread .tbadge { display: inline-block; }
 
-.bub{max-width:var(--bub-max);padding:var(--bub-pad);border-radius:var(--bub-radius);position:relative;
-  font-size:13.5px;line-height:1.45;word-break:break-word}
-.row:not(.me) .bub{background:rgba(255,255,255,.08);color:rgba(255,255,255,.9);border-bottom-left-radius:5px}
-.row.me .bub{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#02121a;font-weight:600;
-  border-bottom-right-radius:5px}
-.bub .nm{font-size:10.5px;font-weight:800;color:var(--accent);margin-bottom:2px}
-.bub .nm.admin{color:var(--gold)}
-.row.me .bub .nm{display:none}
-.bub .meta{display:flex;align-items:center;gap:6px;margin-top:3px;justify-content:flex-end}
-.bub .tm{font-size:9.5px;color:var(--faint)}
-.row.me .bub .tm{color:rgba(2,18,26,.5)}
-.row.sys{justify-content:center}
-.row.sys .bub{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.22);color:#ffe89a;text-align:center;
-  font-size:12px;max-width:80%}
-.row.sys .av{display:none}
-.bub .txt b{color:var(--accent);font-weight:800}
-.row.me .bub .txt b{color:#02323d}
+/* — язычок на правом краю — */
+body.tab-edge .chat-tab {
+  top: 50%; right: 0; transform: translateY(-50%);
+  writing-mode: vertical-rl; padding: var(--sp-5) 7px;
+  border-radius: 12px 0 0 12px; border-right: none;
+}
+body.tab-edge.chat-open .chat-tab { right: calc(var(--panel-w) + var(--sp-5) * 2); border-radius: 12px; border-right: 1px solid var(--glass-bd-c); }
+body.tab-edge .chat-tab .tbadge { writing-mode: horizontal-tb; }
 
-/* ─ варианты ПУЗЫРЯ ─ */
-.bub-tail .row:not(.me) .bub::before{content:'';position:absolute;left:-5px;bottom:0;width:12px;height:12px;
-  background:inherit;clip-path:polygon(100% 0,100% 100%,0 100%)}
-.bub-tail .row.me .bub::before{content:'';position:absolute;right:-5px;bottom:0;width:12px;height:12px;
-  background:linear-gradient(135deg,var(--accent2),var(--accent));clip-path:polygon(0 0,0 100%,100% 100%)}
-.bub-card .row .bub{border-radius:12px!important;border:1px solid var(--glass-bd)}
-.bub-card .row:not(.me) .bub{background:rgba(10,22,34,.6)}
-.bub-card .row.me .bub{background:rgba(11,196,227,.16);color:var(--ink);font-weight:500;border-color:rgba(11,196,227,.4)}
-.bub-line .row .bub{background:none!important;border:none!important;border-radius:0!important;padding:2px 0 2px 10px;
-  border-left:2px solid var(--glass-bd)!important;max-width:88%}
-.bub-line .row.me .bub{color:var(--ink);padding:2px 10px 2px 0;
-  border-left:none!important;border-right:2px solid var(--accent)!important;text-align:right}
-.bub-line .row .bub .tm{color:var(--faint)}
-.bub-glass .row .bub{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid var(--glass-bd)}
-.bub-glass .row:not(.me) .bub{background:rgba(255,255,255,.06)}
-.bub-glass .row.me .bub{background:rgba(11,196,227,.22);color:var(--ink);border-color:rgba(11,196,227,.45)}
-.bub-pill .row .bub{border-radius:20px!important;padding-left:14px;padding-right:14px}
-.bub-neon .row .bub{border-radius:14px!important}
-.bub-neon .row:not(.me) .bub{background:rgba(11,196,227,.07);border:1px solid rgba(11,196,227,.5);
-  box-shadow:0 0 14px rgba(11,196,227,.22)}
-.bub-neon .row.me .bub{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.5);color:var(--ink);
-  font-weight:500;box-shadow:0 0 14px rgba(255,215,0,.18)}
-.bub-neon .row.me .bub .tm{color:var(--faint)}
+/* — иконка сверху-справа — */
+body.tab-icon .chat-tab {
+  top: var(--sp-5); right: var(--sp-5);
+  width: 46px; height: 46px; border-radius: 50%; font-size: 18px;
+}
+body.tab-icon.chat-open .chat-tab { right: calc(var(--panel-w) + var(--sp-5) * 2); }
+body.tab-icon .chat-tab .tlabel { display: none; }
+body.tab-icon .chat-tab .tbadge { position: absolute; top: -4px; right: -4px; }
 
-/* ─ варианты АВАТАРА ─ */
-.av-left .av,.av-others .av,.av-square .av,.av-online .av,.av-big .av,.av-ring .av{
-  background:linear-gradient(135deg,var(--accent),#7fe9ff)}
-.av-others .row.me .av{visibility:hidden}
-.av-square .av,.av-square .cs-user .av{border-radius:9px}
-.av-none .av{display:none}
-.av-online .av .udot{display:block}
-.av-big .av,.av-big .cs-user .av{width:38px;height:38px;font-size:14px}
-.av-ring .av,.av-ring .cs-user .av{box-shadow:0 0 0 2px var(--accent),0 0 0 4px rgba(11,196,227,.22)}
-.av .udot{display:none;position:absolute;right:0;bottom:0;width:10px;height:10px;border-radius:50%;
-  background:#37e07a;border:2px solid #0b1a28}
+/* — плавающая (FAB) снизу-справа — */
+body.tab-float .chat-tab {
+  bottom: var(--sp-6); right: var(--sp-6);
+  width: 54px; height: 54px; border-radius: 50%; font-size: 20px;
+  background: var(--sel-solid); color: var(--on-solid); border-color: transparent;
+}
+body.tab-float.chat-open .chat-tab { right: calc(var(--panel-w) + var(--sp-5) * 2); }
+body.tab-float .chat-tab .tlabel { display: none; }
+body.tab-float .chat-tab .tbadge { position: absolute; top: -3px; right: -3px; }
 
-/* ─ варианты МЕТА ─ */
-.meta-inline .bub{display:inline-flex;flex-direction:column}
-.meta-hover .bub .meta{opacity:0;transition:.15s;height:0;margin:0;overflow:hidden}
-.meta-hover .row:hover .bub .meta{opacity:1;height:auto;margin-top:3px}
-.meta-grouped .row.grp{margin-top:calc(var(--row-gap) * -0.6)}
-.meta-grouped .row.grp .av{visibility:hidden}
-.meta-grouped .row.grp .bub .nm{display:none}
-.meta-timeonly .bub .nm{display:none}
+/* ============================================================
+   ПАНЕЛЬ ЧАТА — стеклянный КОНТЕЙНЕР, fixed справа, слайд по `right`
+   ============================================================ */
+.chat-panel {
+  position: fixed; z-index: 55;
+  top: var(--sp-5); bottom: var(--sp-5); right: var(--sp-5);
+  width: var(--panel-w);
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: right var(--anim-dur) var(--anim-ease), opacity var(--anim-dur) var(--anim-ease);
+}
+body:not(.chat-open) .chat-panel {
+  right: calc(-1 * (var(--panel-w) + var(--sp-5) * 2));
+  opacity: 0; pointer-events: none;
+}
 
-/* ─ плотность ─ */
-.chat-stage.dens-cozy{--row-gap:14px;--bub-pad:9px 14px}
-.chat-stage.dens-compact{--row-gap:8px;--bub-pad:7px 11px}
-.chat-stage.dens-tight{--row-gap:3px;--bub-pad:6px 10px}
-.chat-stage.dens-airy{--row-gap:20px;--bub-pad:11px 16px}
+/* ширина панели (вариант) */
+body.w-narrow { --panel-w: 320px; }
+body.w-mid    { --panel-w: 380px; }
+body.w-wide   { --panel-w: 460px; }
 
-/* ── Карточка-вложение («кнопка-ссылка») ── */
-.card{margin-top:2px;width:min(280px,72vw);border:1px solid var(--glass-bd);border-radius:13px;overflow:hidden;
-  background:rgba(8,18,28,.5);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-.row.me .card{background:rgba(2,18,26,.28);border-color:rgba(2,30,40,.35)}
-.card-h{display:flex;align-items:center;gap:9px;padding:9px 11px}
-.card-ic{width:34px;height:34px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,var(--accent2),var(--accent));
-  display:flex;align-items:center;justify-content:center;font-size:16px;color:#02121a;overflow:hidden}
-.card-ic img{width:100%;height:100%;object-fit:cover}
-.card-ic.round{border-radius:50%}
-.card-tt{min-width:0}
-.card-tt .t{font-size:12.5px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-tt .s{font-size:10.5px;color:var(--dim);font-weight:600}
-.row.me .card-tt .t{color:#02323d}.row.me .card-tt .s{color:rgba(2,30,40,.7)}
-.card-body{padding:0 11px 9px;display:flex;flex-direction:column;gap:5px}
-.card-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dim)}
-.row.me .card-row{color:rgba(2,30,40,.75)}
-.card-row .ok{color:#46e08a;font-weight:800}.card-row .no{color:#ff6b6b;font-weight:800}
-.tierchip{font-size:10px;font-weight:900;padding:1px 6px;border-radius:6px;color:#02121a}
-.tierchip.S{background:#ffd84d}.tierchip.A{background:#7fe9ff}.tierchip.B{background:#9fb4c4}
-.card-items{display:flex;gap:5px;padding:0 11px 9px;flex-wrap:wrap}
-.card-items img{width:30px;height:30px;border-radius:7px;background:rgba(255,255,255,.06)}
-.card-photo{width:100%;display:block;aspect-ratio:16/10;object-fit:cover}
-.card-btn{display:block;width:100%;text-align:center;font:inherit;font-size:11.5px;font-weight:800;cursor:pointer;
-  color:var(--accent);background:rgba(11,196,227,.1);border:none;border-top:1px solid var(--glass-bd);padding:9px;transition:.12s}
-.card-btn:hover{background:rgba(11,196,227,.2)}
-.row.me .card-btn{color:#02323d;background:rgba(2,30,40,.18);border-top-color:rgba(2,30,40,.25)}
+/* шапка */
+.cp-head {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: 10px var(--sp-5); border-bottom: 1px solid var(--glass-bd-c); flex-shrink: 0;
+}
+.cp-head .ttl { font-size: 14px; font-weight: 700; }
+.cp-head .sub { font-size: 11px; opacity: .85; }
+.cp-head .spacer { flex: 1; }
+.cp-ibtn {
+  border: none; border-radius: 9px; background: transparent; color: var(--txt);
+  font: inherit; font-size: 15px; line-height: 1; padding: 6px 8px; cursor: pointer;
+  transition: background var(--anim-dur);
+}
+.cp-ibtn:hover { background: var(--sel-12); }
 
-/* ── Поле ввода ── */
-.cs-input{display:flex;gap:9px;padding:12px 16px;border-top:1px solid var(--glass-bd);flex-shrink:0;
-  background:rgba(6,16,26,.4);align-items:center;position:relative}
-.cs-input .extra{display:none;gap:2px;flex-shrink:0}
-.cs-input .extra button{background:none;border:none;color:var(--dim);font-size:17px;cursor:pointer;padding:5px;
-  border-radius:8px;transition:.12s}
-.cs-input .extra button:hover{color:var(--accent);background:rgba(11,196,227,.1)}
-.cs-input input{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1.5px solid var(--glass-bd);border-radius:22px;
-  padding:10px 16px;color:var(--ink);font-size:14px;font-weight:500;outline:none;font-family:inherit;transition:.14s}
-.cs-input input::placeholder{color:var(--faint)}
-.cs-input input:focus{border-color:var(--accent);background:rgba(11,196,227,.06)}
-.cs-send{flex-shrink:0;border:none;cursor:pointer;color:#02121a;font-weight:800;
-  background:linear-gradient(135deg,var(--accent),#7fe9ff);transition:.14s;font-family:inherit}
-.cs-send:active{transform:scale(.92)}
+/* каналы-вкладки: пилюли сверху (дефолт) / иконки слева */
+.cp-chans { display: flex; gap: var(--sp-1); padding: var(--sp-3) var(--sp-5) 0; flex-shrink: 0; flex-wrap: wrap; }
+.cp-chan {
+  position: relative;
+  border: none; border-radius: 10px; background: transparent; color: var(--txt);
+  font: inherit; font-size: 12.5px; font-weight: 600; padding: 6px 12px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background var(--anim-dur);
+}
+.cp-chan:hover { background: var(--sel-12); }
+.cp-chan.on { background: var(--sel-18); }
+.cp-chan.draft.on { box-shadow: inset 0 -2px 0 var(--sel-45); }
+.cp-chan .cbadge {
+  min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px;
+  background: var(--accent); color: var(--on-accent); text-shadow: none;
+  font-size: 10px; font-weight: 700; line-height: 16px; display: none;
+}
+.cp-chan.has-unread .cbadge { display: inline-block; }
 
-/* варианты ВВОДА */
-.inp-rect .cs-input input{border-radius:12px}
-.inp-rich .cs-input .extra{display:inline-flex}
-.inp-minimal .cs-input input{border:none;border-bottom:1.5px solid var(--glass-bd);border-radius:0;background:none;padding:9px 4px}
-.inp-minimal .cs-input input:focus{border-bottom-color:var(--accent);background:none}
-.inp-big .cs-input input{border-radius:16px;padding:14px 18px;font-size:15px}
-.inp-float .cs-input{border-top:none;background:none;justify-content:center;padding:14px}
-.inp-float .cs-input .ibox{display:flex;gap:9px;align-items:center;width:min(580px,100%);
-  background:rgba(8,18,28,.7);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
-  border:1px solid var(--glass-bd);border-radius:26px;padding:6px 6px 6px 8px;box-shadow:0 14px 36px rgba(0,0,0,.4)}
-.inp-float .cs-input input{border:none;background:none}
-.cs-input .ibox{display:contents}
-.inp-float .cs-input .ibox{display:flex}
+/* тело панели */
+.cp-body { flex: 1; min-height: 0; display: flex; }
+.cp-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+/* каналы живут в DOM разом, переключение = показать/скрыть (антидёрганье) */
+.cp-chanwrap { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#chatPanel [hidden] { display: none !important; }
 
-/* варианты КНОПКИ отправки */
-.snd-circle .cs-send{width:40px;height:40px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center}
-.snd-pill .cs-send{height:40px;border-radius:22px;padding:0 18px;font-size:13px}
-.snd-icon .cs-send{width:40px;height:40px;border-radius:50%;background:none;color:var(--accent);font-size:20px}
-.snd-icon .cs-send:hover{color:#7fe9ff}
-.snd-square .cs-send{width:40px;height:40px;border-radius:11px;font-size:16px;display:flex;align-items:center;justify-content:center}
+/* — вариант «Каналы иконками слева» — */
+body.chans-icons .cp-chans {
+  position: absolute; left: 0; top: 52px; bottom: 0; z-index: 2;
+  flex-direction: column; padding: var(--sp-3) var(--sp-1);
+  border-right: 1px solid var(--glass-bd-c);
+}
+body.chans-icons .cp-chan { padding: 8px; font-size: 0; border-radius: 12px; }
+body.chans-icons .cp-chan .cname { display: none; }
+body.chans-icons .cp-chan .cico { font-size: 17px; }
+body.chans-icons .cp-body { margin-left: 46px; }
 
-/* меню вложений (📎) */
-.attach-menu{position:absolute;bottom:60px;left:14px;z-index:10;display:none;flex-direction:column;gap:2px;
-  width:210px;padding:6px;border-radius:14px;border:1px solid var(--glass-bd);
-  background:rgba(10,22,34,.92);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
-  box-shadow:0 20px 50px rgba(0,0,0,.5)}
-.attach-menu.open{display:flex;animation:fade .14s ease}
-.attach-menu button{display:flex;align-items:center;gap:9px;font:inherit;font-size:12.5px;font-weight:700;
-  color:var(--ink);background:none;border:none;border-radius:9px;padding:8px 10px;cursor:pointer;text-align:left;transition:.1s}
-.attach-menu button:hover{background:rgba(11,196,227,.14)}
-.attach-menu .ai{font-size:16px;width:20px;text-align:center}
-.attach-menu .am-h{font-size:9.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--faint);padding:4px 10px 2px}
+/* — список юзеров: колонкой (вариант) — */
+.cp-users { display: none; flex-direction: column; min-height: 0; }
+body.ulist-column .cp-users {
+  display: flex; width: 128px; flex-shrink: 0;
+  border-left: 1px solid var(--glass-bd-c); padding: var(--sp-3);
+}
+body.ulist-column .cp-users .uh { font-size: 10.5px; font-weight: 700; opacity: .8; padding: 2px 4px 6px; }
+.cp-userlist { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
 
-/* тост */
-.cl-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(8px);z-index:10000;
-  background:rgba(12,26,38,.95);border:1px solid rgba(11,196,227,.4);color:var(--ink);font-size:13px;font-weight:700;
-  padding:10px 16px;border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(10px);
-  backdrop-filter:blur(10px);opacity:0;transition:.2s;pointer-events:none}
-.cl-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* — список юзеров: внутри (горизонтальный ряд аватаров под шапкой) — */
+.cp-uinline { display: none; gap: 6px; padding: var(--sp-3) var(--sp-5); flex-wrap: wrap; flex-shrink: 0; border-bottom: 1px solid var(--glass-bd-c); }
+body.ulist-inside .cp-uinline { display: flex; }
+.cp-uinline .uav { cursor: pointer; }
 
-/* ── Мок-рельс сайта (слева) — тут живёт кнопка 💬 Чат ── */
-.site-rail{position:relative;z-index:3;width:54px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;
-  gap:6px;padding:12px 0;background:rgba(3,9,15,.72);border-right:1px solid var(--glass-bd)}
-.sr-logo{font-size:20px;margin-bottom:6px}
-.sr-btn{position:relative;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
-  font-size:17px;color:var(--dim);background:rgba(255,255,255,.04);border:1px solid transparent;cursor:pointer;transition:.12s}
-.sr-btn:hover{color:var(--ink);background:rgba(255,255,255,.08)}
-.sr-btn.on{color:var(--accent);background:rgba(11,196,227,.14);border-color:rgba(11,196,227,.35)}
-.sr-badge{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;
-  background:#ff4d4d;color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;
-  border:2px solid #06121d}
-.sr-btn.lit .sr-badge{display:flex}
-.sr-btn.lit{color:#ff8a8a;animation:railPulse 1s ease 3}
-@keyframes railPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,77,77,.5)}50%{box-shadow:0 0 0 7px rgba(255,77,77,0)}}
+/* — список юзеров: сворачивается (дропдаун из шапки) — */
+.cp-udrop {
+  position: absolute; z-index: 5; right: var(--sp-5); top: 92px;
+  width: 200px; max-height: 320px; overflow-y: auto; padding: var(--sp-1);
+  display: flex; flex-direction: column; gap: 2px;
+  background: rgba(10, 18, 26, .96); border: 1px solid var(--glass-bd-c); border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
+}
+.cp-udrop[hidden] { display: none; }
+body:not(.ulist-collapse) .cp-ubtn { display: none; }
 
-/* ── Карточка-профиль пользователя ── */
-.cs-profile{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;
-  background:rgba(2,8,14,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
-.cs-profile.open{display:flex;animation:fade .15s ease}
-.pf-card{width:290px;border-radius:18px;border:1px solid var(--glass-bd);overflow:hidden;position:relative;
-  background:rgba(12,26,38,.86);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
-  box-shadow:0 30px 70px rgba(0,0,0,.55)}
-.pf-cover{height:70px;background:linear-gradient(135deg,var(--accent2),var(--accent))}
-.pf-x{position:absolute;top:8px;right:10px;background:rgba(0,0,0,.35);border:none;color:#fff;width:26px;height:26px;
-  border-radius:50%;cursor:pointer;font-size:13px;line-height:1}
-.pf-av{width:74px;height:74px;border-radius:50%;margin:-37px auto 0;border:3px solid rgba(12,26,38,.95);position:relative;
-  display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#02121a}
-.pf-av .udot{display:block;width:14px;height:14px;right:4px;bottom:4px;border-width:3px;border-color:#0c1a26}
-.pf-name{text-align:center;font-size:16px;font-weight:900;margin-top:8px}
-.pf-name.admin{color:var(--gold)}
-.pf-sub{display:flex;gap:8px;justify-content:center;align-items:center;font-size:12px;color:var(--dim);margin-top:3px}
-.pf-rank{font-weight:800;padding:1px 8px;border-radius:7px;font-size:11px}
-.pf-actions{display:flex;flex-direction:column;gap:8px;padding:14px}
-.pf-link{display:flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-size:13px;font-weight:800;
-  padding:10px;border-radius:11px;border:none;cursor:pointer;color:#fff;transition:.12s}
-.pf-link.tg{background:#2aabee}.pf-link.dc{background:#5865f2}
-.pf-link:hover{filter:brightness(1.12)}
-.pf-mention{font:inherit;font-size:13px;font-weight:800;padding:10px;border-radius:11px;cursor:pointer;
-  color:var(--accent);background:rgba(11,196,227,.12);border:1px solid rgba(11,196,227,.35);transition:.12s}
-.pf-mention:hover{background:rgba(11,196,227,.2)}
+.u-item {
+  display: flex; align-items: center; gap: var(--sp-3);
+  border: none; border-radius: 10px; background: transparent; color: var(--txt);
+  font: inherit; text-align: left; padding: 5px 6px; cursor: pointer;
+  transition: background var(--anim-dur);
+}
+.u-item:hover { background: rgba(255, 255, 255, .08); }
+.u-item .nm { font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.u-item .nm small { display: block; font-size: 10px; font-weight: 400; opacity: .8; }
 
-/* ── Ответы (reply) ── */
-.reply-quote{display:block;border-left:2px solid var(--accent);padding:2px 8px;margin-bottom:5px;border-radius:5px;
-  background:rgba(11,196,227,.08);cursor:pointer;overflow:hidden}
-.reply-quote .qn{font-size:10px;font-weight:800;color:var(--accent)}
-.reply-quote .qt{font-size:11px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.row.me .reply-quote{border-left-color:#02323d;background:rgba(2,30,40,.18)}
-.row.me .reply-quote .qn{color:#02323d}.row.me .reply-quote .qt{color:rgba(2,30,40,.7)}
+/* аватар (элемент → без backdrop-filter) */
+.av {
+  position: relative; flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 12px; font-weight: 700;
+  color: var(--on-accent); text-shadow: none; cursor: pointer;
+}
+.av .udot {
+  position: absolute; right: -1px; bottom: -1px; width: 10px; height: 10px; border-radius: 50%;
+  border: 2px solid #0a141c; display: none;
+}
+.av.st-online .udot { display: block; background: #4ade80; }
+.av.st-draft  .udot { display: block; background: var(--accent); }
+.av.st-game   .udot { display: block; background: #ffb454; }
 
-/* ── Реакции (chips под сообщением) ── */
-.reacts{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
-.rchip{display:inline-flex;align-items:center;gap:3px;font:inherit;font-size:11px;font-weight:700;
-  padding:2px 7px;border-radius:11px;cursor:pointer;border:1px solid var(--glass-bd);background:rgba(255,255,255,.06);
-  color:var(--ink);transition:.1s}
-.rchip:hover{border-color:var(--accent)}
-.rchip:active{transform:scale(.92)}
-.rchip.mine{background:rgba(11,196,227,.18);border-color:rgba(11,196,227,.5)}
-.row.me .rchip{background:rgba(2,30,40,.16);color:#02323d;border-color:rgba(2,30,40,.22)}
-.row.me .rchip.mine{background:rgba(2,30,40,.34)}
+/* закреп */
+.cp-pin {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-5); flex-shrink: 0;
+  background: var(--sel-05); border-bottom: 1px solid var(--glass-bd-c);
+  font-size: 12px;
+}
+.cp-pin[hidden] { display: none; }
+.cp-pin .ptx { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-pin .px { border: none; background: transparent; color: var(--txt); cursor: pointer; font-size: 13px; opacity: .7; }
+.cp-pin .px:hover { opacity: 1; }
 
-/* панель действий над сообщением (hover) */
-.row-tools{position:absolute;top:-12px;display:none;gap:1px;background:rgba(10,22,34,.96);border:1px solid var(--glass-bd);
-  border-radius:10px;padding:2px;box-shadow:0 8px 22px rgba(0,0,0,.45);z-index:6}
-.row:not(.me) .row-tools{left:40px}
-.row.me .row-tools{right:40px}
-.row:hover .row-tools{display:flex}
-.row-tools button{background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:4px 6px;border-radius:7px;line-height:1}
-.row-tools button:hover{background:rgba(11,196,227,.16);color:var(--ink)}
+/* лента (панель → тонкий внутренний скролл разрешён) */
+.cp-msgs { flex: 1; min-height: 0; overflow-y: auto; padding: var(--sp-5); display: flex; flex-direction: column; gap: var(--row-gap); }
 
-/* выбор эмодзи-реакции */
-.react-pop{position:absolute;z-index:60;display:flex;gap:1px;padding:4px;border-radius:13px;
-  background:rgba(10,22,34,.98);border:1px solid var(--glass-bd);box-shadow:0 14px 34px rgba(0,0,0,.55);animation:fade .12s ease}
-.react-pop button{background:none;border:none;font-size:18px;cursor:pointer;padding:3px 5px;border-radius:8px;transition:.1s}
-.react-pop button:hover{background:rgba(11,196,227,.16);transform:scale(1.25)}
+/* разделитель непрочитанных */
+.unread-div {
+  display: flex; align-items: center; gap: var(--sp-3); margin: var(--sp-1) 0;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; color: var(--accent);
+}
+.unread-div::before, .unread-div::after { content: ''; height: 1px; flex: 1; background: var(--accent); opacity: .4; }
 
-/* строка «отвечаю на …» над полем ввода */
-.reply-bar{display:flex;align-items:center;gap:8px;padding:8px 16px;border-top:1px solid var(--glass-bd);
-  background:rgba(11,196,227,.07);font-size:12px;flex-shrink:0}
-.reply-bar .rb-ic{color:var(--accent);font-weight:800;font-size:14px}
-.reply-bar .rb-tx{flex:1;min-width:0;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.reply-bar .rb-tx b{color:var(--accent)}
-.reply-bar .rb-x{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;flex-shrink:0}
-.reply-bar .rb-x:hover{color:var(--ink)}
+/* ============================================================
+   СТРОКИ / ПУЗЫРИ — БЕЗ backdrop-filter
+   ============================================================ */
+/* ★ НЕ ТАЩИТЬ ДЁРГАНЬЕ: появление (fadeIn) — только у РЕАЛЬНО нового сообщения.
+   Правка существующего пузыря (реакция/полл/ответ) получает .no-anim → не мигает. */
+.row { position: relative; display: flex; align-items: flex-end; gap: var(--sp-3); animation: fadeIn .2s var(--anim-ease); }
+.row.no-anim { animation: none; }
+.row.me { flex-direction: row-reverse; }
+.row.sys { justify-content: center; }
+.row.sys .av { display: none; }
 
-/* имя в пузыре — кликабельно (открыть профиль) */
-.bub .nm.clickable{cursor:pointer}
-.bub .nm.clickable:hover{text-decoration:underline}
+.bub {
+  max-width: var(--bub-max); padding: var(--bub-pad); border-radius: var(--bub-r);
+  background: rgba(255, 255, 255, .10); font-size: 13.5px; line-height: 1.45; word-break: break-word;
+}
+.row.me .bub { background: var(--bub-me); color: var(--on-bub); text-shadow: none; }
+.row.sys .bub { background: rgba(255, 255, 255, .07); text-align: center; font-size: 12px; max-width: 90%; }
+.row.bot .bub { background: rgba(255, 255, 255, .1); box-shadow: inset 2px 0 0 var(--sel-45); }
+.bub .nm { font-size: 11px; font-weight: 700; margin-bottom: 2px; display: inline-flex; align-items: center; gap: 5px; }
+.bub .nm.clickable { cursor: pointer; }
+.bub .nm.clickable:hover { text-decoration: underline; }
+.bub .nm .stag { font-size: 9px; font-weight: 700; padding: 0 5px; border-radius: 5px; text-shadow: none; }
+.stag.st-online { background: #4ade80; color: #06210f; }
+.stag.st-draft  { background: var(--accent); color: var(--on-accent); }
+.stag.st-game   { background: #ffb454; color: #2a1a06; }
+.bub .meta { display: flex; justify-content: flex-end; margin-top: 2px; }
+.bub .tm { font-size: 10px; opacity: .85; }
+.row.me .bub .nm { display: none; }
+.bub .txt b { font-weight: 700; }
+.bub .txt .chat-mention { color: var(--accent); font-weight: 700; }
+.row.me .bub .txt .chat-mention { color: var(--on-bub); text-decoration: underline; }
+.bub .txt .wre { height: 17px; width: 17px; vertical-align: -3px; border-radius: 4px; }
 
-/* подсказка-подвал */
-.lab-foot{padding:8px 18px;font-size:11px;color:var(--faint);border-top:1px solid var(--glass-bd);
-  background:rgba(4,12,20,.6);flex-shrink:0;text-align:center}
-.lab-foot b{color:var(--dim)}
+/* ─ ВАРИАНТЫ ВИДА ПУЗЫРЯ (дев-полоса) ─ */
+body.bub-card .bub { border-radius: 12px; border: 1px solid var(--glass-bd-c); }
+body.bub-pill .bub { border-radius: 22px; padding-left: var(--sp-5); padding-right: var(--sp-5); }
+body.bub-line .bub {
+  background: none; border-radius: 0; max-width: 90%;
+  padding: 2px 0 2px 10px; box-shadow: inset 2px 0 0 rgba(255, 255, 255, .22);
+}
+body.bub-line .row.me .bub {
+  background: none; color: var(--txt); text-shadow: var(--txt-shadow); text-align: right;
+  padding: 2px 10px 2px 0; box-shadow: inset -2px 0 0 var(--sel-45);
+}
+body.bub-line .row.me .card, body.bub-line .row.me .card-btn { color: var(--txt); text-shadow: var(--txt-shadow); }
+
+/* ─ ВАРИАНТЫ КАРТОЧКИ-ССЫЛКИ (шаринг контента) ─ */
+body.cardv-compact .card { max-width: 230px; }
+body.cardv-compact .card-body,
+body.cardv-compact .card-items,
+body.cardv-compact .card-photo,
+body.cardv-compact .card-tt .s { display: none; }
+body.cardv-compact .card-btn {
+  border-top: none; background: transparent; text-align: right;
+  padding: 0 10px 8px; font-size: 11px;
+}
+body.cardv-outline .card { background: transparent; box-shadow: inset 3px 0 0 var(--sel-45); }
+body.cardv-outline .card-btn { background: transparent; }
+body.cardv-outline .card-btn:hover { background: var(--sel-12); }
+body.cardv-outline .row.me .card { box-shadow: inset 3px 0 0 var(--on-bub); }
+
+/* инлайн-эмодзи, время по наведению, группировка */
+.meta-hover .bub .meta { opacity: 0; height: 0; margin: 0; overflow: hidden; transition: opacity var(--anim-dur); }
+.meta-hover .row:hover .bub .meta { opacity: 1; height: auto; margin-top: 2px; }
+.row.grp { margin-top: calc(var(--row-gap) * -0.5); }
+.row.grp .av { visibility: hidden; }
+.row.grp .bub .nm { display: none; }
+
+/* карточка-вложение */
+.card {
+  margin-top: var(--sp-1); width: 100%; max-width: 260px;
+  border: 1px solid var(--glass-bd-c); border-radius: 12px; overflow: hidden;
+  background: rgba(255, 255, 255, .07);
+}
+.row.me .card { background: var(--on-bub-dim); border-color: var(--on-bub-brd); }
+.card-h { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) 10px; }
+.card-ic {
+  width: 34px; height: 34px; flex: 0 0 auto; border-radius: 9px; overflow: hidden;
+  display: grid; place-items: center; font-size: 16px; background: rgba(255, 255, 255, .12);
+}
+.card-ic.round { border-radius: 50%; }
+.card-ic img { width: 100%; height: 100%; object-fit: cover; }
+.card-tt { min-width: 0; }
+.card-tt .t { font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-tt .s { font-size: 10.5px; opacity: .85; }
+.card-body { display: flex; flex-direction: column; gap: var(--sp-1); padding: 0 10px var(--sp-3); }
+.card-row { display: flex; align-items: center; gap: 6px; font-size: 11.5px; }
+.card-row .ok { color: #4ade80; font-weight: 700; }
+.card-row .no { color: #ff5470; font-weight: 700; }
+.tierchip { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 6px; color: var(--on-accent); text-shadow: none; }
+.tierchip.S { background: #ff5470; } .tierchip.A { background: #ffb454; } .tierchip.B { background: #4ade80; }
+.card-items { display: flex; gap: var(--sp-1); flex-wrap: wrap; padding: 0 10px var(--sp-3); }
+.card-items img { width: 30px; height: 30px; border-radius: 7px; background: rgba(255, 255, 255, .08); }
+.card-photo { display: block; width: 100%; aspect-ratio: 16/10; object-fit: cover; }
+.card-btn {
+  display: block; width: 100%; border: none; border-top: 1px solid var(--glass-bd-c);
+  background: rgba(255, 255, 255, .08); color: var(--txt); text-shadow: var(--txt-shadow);
+  font: inherit; font-size: 11.5px; font-weight: 600; padding: 8px; cursor: pointer;
+  transition: background var(--anim-dur);
+}
+.card-btn:hover { background: var(--sel-18); }
+.row.me .card-btn { color: var(--on-bub); text-shadow: none; background: var(--on-bub-dim); border-top-color: var(--on-bub-brd); }
+
+/* полл */
+.poll { margin-top: var(--sp-1); width: 100%; max-width: 260px; }
+.poll .q { font-size: 12.5px; font-weight: 700; margin-bottom: var(--sp-3); }
+.poll-opt {
+  position: relative; display: block; width: 100%; text-align: left;
+  border: 1px solid var(--glass-bd-c); border-radius: 9px; overflow: hidden;
+  background: transparent; color: var(--txt); font: inherit; font-size: 12px;
+  padding: 7px 10px; margin-bottom: 5px; cursor: pointer;
+}
+.poll-opt .fill { position: absolute; inset: 0; background: rgba(255, 255, 255, .2); width: 0; transition: width var(--anim-dur); }
+.poll-opt.voted .fill { width: var(--pct, 0%); }
+.poll-opt .lab, .poll-opt .pct { position: relative; z-index: 1; }
+.poll-opt .pct { float: right; font-variant-numeric: tabular-nums; opacity: .85; }
+.poll-opt.mine { border-color: var(--sel-45); }
+
+/* цитата ответа */
+.reply-quote {
+  display: block; padding: 2px 8px; margin-bottom: var(--sp-1); border-radius: 6px;
+  background: var(--sel-09); box-shadow: inset 2px 0 0 var(--sel-45); cursor: pointer;
+}
+.row.me .reply-quote { background: var(--on-bub-dim); box-shadow: inset 2px 0 0 var(--on-bub); }
+.reply-quote .qn { font-size: 10.5px; font-weight: 700; }
+.reply-quote .qt { display: block; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: .9; }
+
+/* реакции */
+.reacts { display: flex; flex-wrap: wrap; gap: var(--sp-1); margin-top: var(--sp-1); }
+.rchip {
+  display: inline-flex; align-items: center; gap: 3px;
+  border: 1px solid var(--glass-bd-c); border-radius: 11px;
+  background: rgba(255, 255, 255, .08); color: var(--txt);
+  font: inherit; font-size: 11px; padding: 1px 7px; cursor: pointer;
+  transition: background var(--anim-dur), border-color var(--anim-dur);
+}
+.rchip:hover { border-color: var(--sel-18); }
+.rchip.mine { background: var(--sel-18); border-color: var(--sel-45); }
+.rchip img { height: 15px; width: 15px; border-radius: 3px; vertical-align: -2px; }
+.row.me .rchip { background: var(--on-bub-dim); color: var(--on-bub); text-shadow: none; border-color: var(--on-bub-brd); }
+
+/* hover-инструменты */
+.row-tools {
+  position: absolute; top: -12px; z-index: 3;
+  display: none; gap: 1px; padding: 2px;
+  border: 1px solid var(--glass-bd-c); border-radius: 10px; background: rgba(10, 18, 26, .96);
+}
+.row:not(.me) .row-tools { left: 38px; }
+.row.me .row-tools { right: 38px; }
+.row:hover .row-tools { display: flex; }
+.row-tools button {
+  border: none; border-radius: 7px; background: transparent; color: var(--txt);
+  font: inherit; font-size: 13px; line-height: 1; padding: 4px 6px; cursor: pointer;
+}
+.row-tools button:hover { background: var(--sel-18); }
+.row-tools .danger:hover { background: rgba(255, 84, 112, .25); }
+
+/* ============================================================
+   ДРАФТ-КАНАЛ: участники + зрители
+   ============================================================ */
+.dch { padding: var(--sp-5); overflow-y: auto; flex: 1; min-height: 0; }
+.dch h3 { font-size: 11px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; opacity: .8; margin: var(--sp-3) 0 var(--sp-1); }
+.dch h3:first-child { margin-top: 0; }
+.dch-cap { display: flex; align-items: center; gap: var(--sp-3); padding: 6px; border-radius: 10px; background: var(--sel-05); margin-bottom: 5px; }
+.dch-cap .side { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 6px; text-shadow: none; }
+.dch-cap .side.blue { background: #4aa8ff; color: #04203f; }
+.dch-cap .side.red { background: #ff6b6b; color: #2a0808; }
+.dch-cap .nm { font-size: 12.5px; font-weight: 600; }
+.dch-specs { display: flex; flex-wrap: wrap; gap: 5px; }
+.dch-spec { display: flex; align-items: center; gap: 5px; font-size: 11.5px; padding: 3px 8px; border-radius: 20px; background: rgba(255, 255, 255, .07); }
+
+/* ============================================================
+   LFG-КАНАЛ
+   ============================================================ */
+.lfg { padding: var(--sp-5); overflow-y: auto; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+.lfg-post { padding: var(--sp-5); border-radius: 12px; background: rgba(255, 255, 255, .07); border: 1px solid var(--glass-bd-c); }
+.lfg-post .lh { display: flex; align-items: center; gap: var(--sp-3); }
+.lfg-post .role { font-size: 12.5px; font-weight: 700; }
+.lfg-post .need { font-size: 11.5px; opacity: .9; margin: 5px 0 8px; }
+.lfg-post .lbtn { border: 1px solid var(--sel-18); border-radius: 9px; background: var(--sel-18); color: var(--txt); font: inherit; font-size: 11.5px; font-weight: 600; padding: 6px 12px; cursor: pointer; }
+.lfg-new { border: 1px dashed var(--glass-bd-c); border-radius: 12px; background: transparent; color: var(--txt); font: inherit; font-size: 12.5px; padding: 10px; cursor: pointer; }
+.lfg-new:hover { background: var(--sel-05); }
+
+/* ============================================================
+   ПОЛЕ ВВОДА + @-автодополнение
+   ============================================================ */
+.reply-bar {
+  display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5);
+  border-top: 1px solid var(--glass-bd-c); background: var(--sel-05); font-size: 12px; flex-shrink: 0;
+}
+.reply-bar[hidden] { display: none; }
+.reply-bar .rb-tx { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reply-bar .rb-x { border: none; background: transparent; color: var(--txt); font-size: 14px; cursor: pointer; }
+
+.cp-input { position: relative; display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-5) var(--sp-5); flex-shrink: 0; }
+.cp-input .extra { display: flex; gap: 2px; flex: 0 0 auto; }
+.cp-input .extra button {
+  border: none; border-radius: 8px; background: transparent; color: var(--txt);
+  font-size: 17px; padding: 5px; cursor: pointer; transition: background var(--anim-dur);
+}
+.cp-input .extra button:hover { background: var(--sel-12); }
+.cp-input input {
+  flex: 1; min-width: 0; border: 1px solid var(--glass-bd-c); border-radius: 22px;
+  background: rgba(255, 255, 255, .08); color: var(--txt); text-shadow: var(--txt-shadow);
+  font: inherit; font-size: 14px; padding: 10px var(--sp-5); outline: none;
+  transition: border-color var(--anim-dur), background var(--anim-dur);
+}
+.cp-input input::placeholder { color: var(--txt); opacity: .6; }
+.cp-input input:focus { border-color: var(--sel-45); background: var(--sel-12); }
+.cp-send {
+  flex: 0 0 auto; border: none; cursor: pointer; font: inherit; font-weight: 700;
+  background: var(--sel-solid); color: var(--on-solid); text-shadow: none;
+  width: 40px; height: 40px; border-radius: 50%; font-size: 16px; display: grid; place-items: center;
+  transition: filter var(--anim-dur);
+}
+.cp-send:hover { filter: brightness(1.08); }
+.bot-hint { font-size: 10px; opacity: .6; padding: 0 var(--sp-5) var(--sp-1); flex-shrink: 0; }
+.bot-hint[hidden] { display: none; }
+
+/* @-автодополнение */
+.mention-pop {
+  position: absolute; left: var(--sp-5); right: var(--sp-5); bottom: 56px; z-index: 6;
+  max-height: 190px; overflow-y: auto; padding: var(--sp-1);
+  display: flex; flex-direction: column; gap: 1px;
+  background: rgba(10, 18, 26, .97); border: 1px solid var(--glass-bd-c); border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
+}
+.mention-pop[hidden] { display: none; }
+.mention-pop button {
+  display: flex; align-items: center; gap: var(--sp-3);
+  border: none; border-radius: 9px; background: transparent; color: var(--txt);
+  font: inherit; font-size: 12.5px; text-align: left; padding: 6px 8px; cursor: pointer;
+}
+.mention-pop button:hover, .mention-pop button.hl { background: var(--sel-12); }
+
+/* ============================================================
+   ПОПАПЫ (в body → сами контейнеры → стекло)
+   ============================================================ */
+.attach-menu {
+  position: fixed; z-index: 62; width: 220px; padding: var(--sp-1);
+  display: flex; flex-direction: column; gap: 1px; animation: fadeIn var(--anim-dur) var(--anim-ease);
+}
+.attach-menu[hidden] { display: none; }
+.attach-menu .am-h { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; padding: 6px 10px 2px; opacity: .75; }
+.attach-menu button {
+  display: flex; align-items: center; gap: var(--sp-3); border: none; border-radius: 9px;
+  background: transparent; color: var(--txt); font: inherit; font-size: 12.5px; text-align: left;
+  padding: 8px 10px; cursor: pointer; transition: background var(--anim-dur);
+}
+.attach-menu button:hover { background: var(--sel-12); }
+.attach-menu .ai { width: 20px; text-align: center; font-size: 15px; }
+
+.react-pop { position: fixed; z-index: 63; display: flex; gap: 1px; padding: var(--sp-1); animation: fadeIn var(--anim-dur) var(--anim-ease); }
+.react-pop[hidden] { display: none; }
+.react-pop button { border: none; border-radius: 8px; background: transparent; font-size: 18px; padding: 3px 5px; cursor: pointer; transition: background var(--anim-dur); }
+.react-pop button:hover { background: var(--sel-18); }
+.react-pop button img { height: 20px; width: 20px; border-radius: 4px; vertical-align: middle; }
+
+.pf-scrim { position: fixed; inset: 0; z-index: 64; display: grid; place-items: center; background: var(--scrim-bg); }
+.pf-scrim[hidden] { display: none; }
+.pf-card { width: 300px; overflow: hidden; animation: fadeIn var(--anim-dur) var(--anim-ease); position: relative; }
+.pf-cover { height: 60px; background: rgba(255, 255, 255, .08); }
+.pf-x { position: absolute; top: var(--sp-3); right: var(--sp-3); width: 26px; height: 26px; border-radius: 50%; border: none; background: var(--sel-12); color: var(--txt); font-size: 13px; cursor: pointer; }
+.pf-av { width: 72px; height: 72px; margin: -36px auto 0; border: 3px solid var(--sel-18); font-size: 26px; cursor: default; }
+.pf-name { text-align: center; font-size: 16px; font-weight: 700; margin-top: var(--sp-3); }
+.pf-sub { display: flex; justify-content: center; align-items: center; gap: 6px; font-size: 12px; margin-top: var(--sp-1); flex-wrap: wrap; }
+.pf-rank { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 7px; background: rgba(255, 255, 255, .1); }
+.pf-actions { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-5); }
+.pf-btn {
+  border: 1px solid var(--glass-bd-c); border-radius: 11px; background: rgba(255, 255, 255, .08);
+  color: var(--txt); font: inherit; font-size: 13px; font-weight: 600; padding: 10px; cursor: pointer;
+  transition: background var(--anim-dur);
+}
+.pf-btn:hover { background: var(--sel-18); }
+.pf-btn.primary { background: var(--sel-18); color: var(--txt); border-color: var(--sel-45); }
+.pf-btn.primary:hover { filter: brightness(1.08); }
+
+.toast { position: fixed; left: 50%; bottom: 26px; z-index: 70; margin-left: -150px; width: 300px; text-align: center; padding: 10px var(--sp-5); font-size: 13px; opacity: 0; transition: opacity var(--anim-dur); pointer-events: none; }
+.toast.show { opacity: 1; }
+
+/* ============================================================
+   ДЕВ-ПОЛОСА (инструмент для НАС): тёмный солид, плавающая, драг, оверлей,
+   сворачивается в пилюлю. БЕЗ localStorage.
+   ============================================================ */
+.lab-strip {
+  position: fixed; top: var(--sp-5); left: 50%; transform: translateX(-50%);
+  width: min(1120px, calc(100% - 2 * var(--sp-5))); z-index: 90;
+  display: flex; flex-direction: column;
+  background: rgba(10, 14, 20, .95); border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: var(--ds-r); box-shadow: 0 10px 30px rgba(0, 0, 0, .45); text-shadow: none;
+}
+.strip-head { display: flex; align-items: center; gap: var(--sp-5); padding: var(--sp-3) var(--sp-5); border-bottom: 1px solid rgba(255, 255, 255, .08); cursor: grab; user-select: none; }
+.strip-head:active { cursor: grabbing; }
+.strip-title { font-size: 12px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+.strip-min-btn, .strip-copy { border: none; border-radius: 8px; font: inherit; font-size: 12px; cursor: pointer; }
+.strip-min-btn { margin-left: auto; background: rgba(255, 255, 255, .1); color: #fff; padding: 5px 10px; }
+.strip-min-btn:hover { background: rgba(255, 255, 255, .18); }
+.strip-copy { background: var(--accent); color: var(--on-accent); font-weight: 600; padding: 7px 12px; }
+.strip-copy:hover { filter: brightness(1.08); }
+.lab-strip.min .strip-body { display: none; }
+.lab-strip.min .strip-head { border-bottom: none; }
+.lab-strip.min { width: auto; }
+
+.strip-body { display: flex; flex-wrap: wrap; gap: var(--sp-5) var(--sp-6); padding: var(--sp-5); max-height: 52vh; overflow-y: auto; }
+.strip-sec { flex-basis: 100%; font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--accent); opacity: .9; margin-top: var(--sp-1); }
+.strip-sec:first-child { margin-top: 0; }
+.strip-group { display: flex; flex-direction: column; gap: 6px; }
+.strip-group > label { font-size: 10.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #9fb6c6; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 2px; border-radius: 10px; background: rgba(255, 255, 255, .06); }
+.seg button { border: none; border-radius: 8px; background: transparent; color: #c8d8e4; font: inherit; font-size: 12px; padding: 5px 11px; cursor: pointer; white-space: nowrap; transition: background var(--anim-dur), color var(--anim-dur); }
+.seg button:hover { color: #fff; }
+.seg button.on { background: rgba(255, 255, 255, .16); color: #fff; }
+
+/* тумблеры фич */
+.toggles { display: flex; flex-wrap: wrap; gap: 6px; flex-basis: 100%; }
+.tgl {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px;
+  border: 1px solid rgba(255, 255, 255, .12); border-radius: 20px;
+  background: rgba(255, 255, 255, .04); color: #c8d8e4; font: inherit; font-size: 12px; cursor: pointer;
+  transition: background var(--anim-dur), color var(--anim-dur), border-color var(--anim-dur);
+}
+.tgl .dot { width: 8px; height: 8px; border-radius: 50%; background: #5a6b78; transition: background var(--anim-dur); }
+.tgl.on { background: rgba(255, 255, 255, .16); color: #fff; border-color: rgba(255, 255, 255, .5); }
+.tgl.on .dot { background: var(--accent); }
+
+.strip-foot { flex-basis: 100%; display: flex; align-items: center; gap: var(--sp-5); padding-top: var(--sp-3); border-top: 1px solid rgba(255, 255, 255, .08); }
+.strip-choice { flex: 1; min-width: 0; font-size: 11.5px; color: #9fb6c6; line-height: 1.5; }
+.strip-choice b { color: #fff; font-weight: 600; }
+/* приёмка антидёрганья — счётчик выживших узлов, не «на глаз» */
+.strip-choice .nodestat { color: #7fd8a0; }
+.strip-choice .nodestat b { color: #7fd8a0; }

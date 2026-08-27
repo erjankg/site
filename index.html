@@ -2,6 +2,13 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
+    <!-- ★ Э1.9 · БАЗА АДРЕСОВ. Страница чемпа меняет адрес на champions/<slug>/
+         (pushState) — без этой строки ЛЮБОЙ относительный запрос приложения после
+         этого искался бы внутри champions/<slug>/ и падал в 404
+         (поймано в браузере: data-pipeline/guides/ezreal.json → 404).
+         Приложение и так живёт в корне, поэтому база = «/» ничего не меняет
+         на других экранах, но чинит болезнь для всех сразу, а не в одном месте. -->
+    <base href="/">
     <meta name="google-site-verification" content="TIUrZqRHsoStR6ASx-k6uKFFQsrSIJu7qYFuuSZ1z-g" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <!-- CSP: ограничиваем источники скриптов/стилей/коннектов. unsafe-inline нужен из-за inline onclick= в HTML и inline стилей. -->
@@ -96,7 +103,22 @@
       ]
     }
     </script>
+    <!-- ★ Э1.1 · ЕДИНЫЙ ИСТОЧНИК ТОКЕНОВ. Подключается ПЕРВЫМ, до styles.css:
+         канон задаёт базу, styles.css только доопределяет то, чего в каноне нет.
+         Всё, что канон уже держит (--sel-*/--r-*/--dur-*/--glass-*/--ds-r), из
+         styles.css вычищено — иначе оно грузилось бы позже и перебивало канон. -->
+    <link rel="stylesheet" href="canon-tokens.css?v=2">
     <link rel="stylesheet" href="styles.css">
+    <!-- Э1.9 · страница чемпа: ОДИН файл стилей на приложение и на статические
+         страницы champions/<slug>/ — вид там и тут обязан совпадать. -->
+    <link rel="stylesheet" href="champ-page.css?v=1">
+    <!-- ⚙ ЮЗЕР-НАСТРОЙКИ: БЛОКИРУЮЩИЙ скрипт в <head> (не defer/async) —
+         успевает выставить --splash-img/--accent/--dens ДО первой отрисовки,
+         поэтому первый кадр сразу правильный и ничего не мигает. -->
+    <script src="wr-prefs.js?v=2"></script>
+    <!-- ⚙ сменили в другой вкладке (или в калькуляторе отдельной страницей) →
+         подхватываем: подложка одна на весь сайт, значит и на все вкладки. -->
+    <script>if(window.WRPrefs) WRPrefs.listenCrossDoc();</script>
     <script src="i18n.js"></script>
     <!-- Firebase SDK (с SRI integrity checks — защита от компрометации CDN) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" integrity="sha384-AQ3POAMqIhwS81FrUH95ekxqBZHeP5tG2JfEL3+7GuTtfRLWnrRh32UxwzM+//A9" crossorigin="anonymous"></script>
@@ -155,7 +177,7 @@
                 <button class="f-tab" data-view="hub" onclick="switchMainView('hub')">Мета-хаб</button>
                 <button class="f-tab" data-view="tier" onclick="switchMainView('tier')">Тир-лист</button>
                 <button class="f-tab" data-view="patch" onclick="switchMainView('patch')">Патч</button>
-                <button class="f-tab" data-view="tactics" onclick="switchMainView('tactics')">Тактич</button>
+                <button class="f-tab" data-view="map" onclick="switchMainView('map')">Карта</button>
                 <span class="f-ind"></span>
             </nav>
         </div>
@@ -191,6 +213,16 @@
         </div>
     </header>
 
+<!-- ★ Э1.1 · STAGE — ЕДИНАЯ ОБЛАСТЬ КОНТЕНТА (каркас lab-main).
+     Раньше виды Home лежали вразнобой: Статы внутри .app-wrapper, а WinRate —
+     ОТДЕЛЬНЫМ блоком снаружи, со своим центрированием. Из-за этого вкладки
+     центровались по-разному и прыгали друг относительно друга.
+     Теперь у всех видов ОДИН родитель .stage и одна раскладка.
+     Каждый вид = .view-pane[data-view] и прячется атрибутом [hidden]:
+     показ/скрытие ГОТОВОГО узла, без пересборки (см. showView в app.js). -->
+    <main class="stage" id="stage">
+    <section class="view-pane" data-view="main">
+
     <div class="lvl-container">
         <div class="lvl-info">
             <span class="lvl-label" data-i18n="УРОВЕНЬ">УРОВЕНЬ</span>
@@ -213,27 +245,43 @@
     </div>
 </div>
 
-<!-- ══ WINRATE INLINE SECTION ══ -->
-<div id="wrprSection" style="display:none;flex-direction:column;">
-  <!-- Header -->
-  <div class="wrpr-header">
-    <span style="font-size:18px;margin-right:8px;">📊</span>
-    <span class="wrpr-title">WinRate &amp; PickRate</span>
-    <span class="wrpr-update" data-i18n="обновлено 04.04.2026">обновлено 04.04.2026</span>
-    <button class="wrpr-share-btn" style="margin-left:auto;" onclick="shareWinrates()" title="Поделиться картинкой" aria-label="Поделиться">📷</button>
-    <button class="col-cfg-btn" onclick="openWrprColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button>
+    </section><!-- /view-pane main -->
+
+<!-- ══ WINRATE INLINE SECTION — КАНОН (Э1.2, пилот) ══
+     Оболочка #wrprSection = ПРОЗРАЧНАЯ flex-колонка (НЕ стекло: иначе стекло в стекле → мутнеет).
+     Стекло несут ДВЕ ячейки-контейнера: .wrpr-head и #wrprTable. Строки таблицы — без backdrop-filter. -->
+    <section class="view-pane" data-view="wrpr" hidden>
+<div id="wrprSection">
+  <!-- Ячейка 1 (стекло): шапка + фильтры -->
+  <div class="wrpr-head glass">
+    <div class="wrpr-header">
+      <span style="font-size:18px;margin-right:8px;">📊</span>
+      <span class="wrpr-title">WinRate &amp; PickRate</span>
+      <span class="wrpr-update" data-i18n="обновлено 04.04.2026">обновлено 04.04.2026</span>
+      <button class="wrpr-share-btn" style="margin-left:auto;" onclick="shareWinrates()" title="Поделиться картинкой" aria-label="Поделиться">📷</button>
+      <button class="col-cfg-btn" onclick="openWrprColSettings()" title="Настроить столбцы" aria-label="Настроить столбцы">⚙</button>
+    </div>
+    <!-- Rank filters -->
+    <div class="wrpr-frow" id="wrprRankRow"></div>
+    <!-- Role filters -->
+    <div class="wrpr-frow" id="wrprRoleRow"></div>
   </div>
-  <!-- Rank filters -->
-  <div style="display:flex;gap:6px;padding:10px 12px 8px;overflow-x:auto;justify-content:center;" id="wrprRankRow"></div>
-  <!-- Role filters -->
-  <div style="display:flex;gap:6px;padding:0 12px 10px;overflow-x:auto;justify-content:center;" id="wrprRoleRow"></div>
-  <!-- Table (div-строки: нужно для drag-перетаскивания строк) -->
-  <div id="wrprTable" style="font-size:14px;">
-    <div id="wrprThead"></div>
-    <div id="wrprTbody"></div>
+  <!-- Ячейка 2 (стекло): таблица. ★ БЕЗ внутреннего скролла — существует ЦЕЛИКОМ,
+       скролится СТРАНИЦА (DESIGN.md).
+       ★ Э1.2: div-строки СНЕСЕНЫ, тут настоящая <table class="tbl"> — разметка ЭТАЛОНА
+       lab-main (viewWinrate). Комментарий про «drag-перетаскивание» был неверен:
+       перетаскивания строк в коде нет вообще (0 обработчиков), а «ручной порядок» —
+       это режим сортировки manual, таблице он не мешает. -->
+  <div id="wrprTable" class="panel glass tbl-panel">
+    <table class="tbl" data-tbl="wr">
+      <thead id="wrprThead"></thead>
+      <tbody id="wrprTbody"></tbody>
+    </table>
     <div id="wrprNoData" data-i18n="Данные для этого ранга скоро появятся">Данные для этого ранга скоро появятся</div>
   </div>
 </div>
+    </section><!-- /view-pane wrpr -->
+    </main><!-- /stage · виды hub/tier/patch допекаются сюда лениво, по первому заходу -->
 
 <!-- ══ FOOTER (подвал) ══ -->
 <footer class="site-footer">
@@ -260,15 +308,34 @@
   </div>
 </footer>
 
+<!-- ══ ВЫБОРКА ЧЕМПИОНОВ — постоянная правая панель во вкладке Статы (порт #mMask) ══ -->
+<aside id="statsChampPanel" class="glass" aria-label="Выбор чемпионов для таблицы">
+  <div class="scp-bar">
+    <span class="scp-count"><b id="statsChampCount">0</b> <span data-i18n="чемп. в таблице">чемп. в таблице</span></span>
+    <button type="button" class="scp-clear" onclick="clearAll()" data-i18n="Очистить">Очистить</button>
+  </div>
+  <div class="scp-search">
+    <input type="text" id="statsChampSearch" placeholder="🔍 Поиск..." data-i18n="🔍 Поиск..." data-i18n-attr="placeholder" oninput="refilterPickers()">
+  </div>
+  <div class="scp-rolefilter" id="statsChampRoleFilter">
+    <button type="button" class="scp-rf on" data-role="" onclick="statsSetRoleFilter('')" title="Все роли">Все</button>
+    <button type="button" class="scp-rf" data-role="Top"     onclick="statsRoleCycle('Top')"     title="Топ · клик: фильтр → выбрать всех → убрать всех"><img src="image/role_top.webp" alt="Топ"></button>
+    <button type="button" class="scp-rf" data-role="Jungle"  onclick="statsRoleCycle('Jungle')"  title="Лес · клик: фильтр → выбрать всех → убрать всех"><img src="image/role_jungle.webp" alt="Лес"></button>
+    <button type="button" class="scp-rf" data-role="Mid"     onclick="statsRoleCycle('Mid')"     title="Мид · клик: фильтр → выбрать всех → убрать всех"><img src="image/role_mid.webp" alt="Мид"></button>
+    <button type="button" class="scp-rf" data-role="ADC"     onclick="statsRoleCycle('ADC')"     title="АДК · клик: фильтр → выбрать всех → убрать всех"><img src="image/role_adc.webp" alt="АДК"></button>
+    <button type="button" class="scp-rf" data-role="Support" onclick="statsRoleCycle('Support')" title="Сапп · клик: фильтр → выбрать всех → убрать всех"><img src="image/role_support.webp" alt="Сапп"></button>
+  </div>
+  <div class="scp-grid m-grid" id="statsChampGrid"></div>
+</aside>
+
 <div class="m-mask" id="mMask" onclick="if(event.target===this)closeM()">
-    <div class="cp-splash"></div>
     <div class="m-win" style="width:96vw;max-width:920px;height:88vh;">
         <div class="mhdr">
             <button class="btn-close-x" onclick="closeM()">←</button>
             <span class="mhdr-t">Champions</span>
         </div>
         <div class="m-search">
-            <input type="text" id="mSearch" placeholder="🔍 Поиск..." data-i18n="🔍 Поиск..." data-i18n-attr="placeholder" oninput="drawM()">
+            <input type="text" id="mSearch" placeholder="🔍 Поиск..." data-i18n="🔍 Поиск..." data-i18n-attr="placeholder" oninput="refilterPickers()">
         </div>
         <div class="m-grid" id="mGrid"></div>
     </div>
@@ -285,7 +352,7 @@
     </div>
     <!-- НОВЫЙ калькулятор (изолированный модуль calc-app/) — порт из lab-damage-calc 2026-06-16 -->
     <iframe id="calcFrame" title="Калькулятор урона" loading="lazy"
-      style="flex:1;width:100%;border:0;min-height:0;background:#010A13;display:block;"></iframe>
+      style="flex:1;width:100%;border:0;min-height:0;background:transparent;display:block;"></iframe>
   </div>
 </div>
 
@@ -295,12 +362,13 @@
 
 
 <!-- ═══════════════ ITEMS REFERENCE MODAL ═══════════════ -->
-<div class="m-mask sidebar-modal" id="itemsMask" onclick="if(event.target===this)closeItems()">
+<div class="m-mask sidebar-modal" id="itemsMask" data-pick="lab" data-isize="md" onclick="if(event.target===this)closeItems()">
   <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;overflow-y:auto;padding:0 16px 16px;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeItems()">←</button>
       <span class="mhdr-t" data-i18n="📦 Предметы Wild Rift">📦 Предметы Wild Rift</span>
       <button onclick="openItemCalcMenu()" class="btn-items-calc" data-i18n="🧮 Калькулятор">🧮 Калькулятор</button>
+      <button class="btn-pick-gear" onclick="togglePickSize('itemsMask',this)" title="Размер иконок">⚙</button>
     </div>
         <div class="items-section-label">⚔ Физические</div>
     <div class="items-grid">
@@ -464,73 +532,59 @@ Stormarrow: При максимальных зарядах следующая б
 <div id="sideOverlay" onclick="closeSidebar()"></div>
 
 <!-- ══ SIDEBAR PANEL ══ -->
-<div id="sidePanel">
-  <div id="sideHeader">
-    <span class="side-logo">🎮</span>
-    <div>
-      <div class="side-title">pro-wildrift</div>
-      <div class="side-subtitle" data-i18n="справочник чемпионов">справочник чемпионов</div>
-    </div>
-    <button class="side-close" onclick="closeSidebar()">✕</button>
+<!-- ★ Э1.1 · РЕЛЬС — ПОРТ ИЗ lab-main (ЭТАЛОН), не рескин старого.
+     Было: #sideHeader с лого+подзаголовком, подписи-секции «Инструменты/Новости/
+     Сообщество», кнопки .side-btn с 4 разными цветами (#ff6b6b/#ffd24a/#2ecc71/
+     #f39c12) и ховером на transform — и всё это гасилось на ПК горой !important.
+     Стало: разметка эталона 1-в-1 — ОДИН стеклянный элемент .rail.glass,
+     .rail-items > .rail-btn > .ico + .lbl, ⚙ внизу (.rail-gear).
+     Подсветка — отдельным слоем ::before (островок ↔ плашка), цвет БЕЛЫЙ.
+     id="sidePanel" сохранён намеренно: на него завязана рабочая ЛОГИКА
+     (toggleSidebar / closeSidebar / active-state / мобайл) — её не переписываем. -->
+<nav id="sidePanel" class="rail glass" aria-label="Разделы сайта">
+  <div class="rail-items">
+    <button class="rail-btn" data-section="sideChamps" onclick="sidebarOpen('sideChamps')"><span class="ico">👥</span><span class="lbl">Чемпионы</span></button>
+    <button class="rail-btn" data-section="calc" onclick="sidebarOpen('calc')"><span class="ico">⚔</span><span class="lbl">Калькулятор урона</span></button>
+    <button class="rail-btn" data-section="items" onclick="sidebarOpen('items')"><span class="ico">📦</span><span class="lbl">Предметы</span></button>
+    <button class="rail-btn" data-section="runes" onclick="sidebarOpen('runes')"><span class="ico">💎</span><span class="lbl">Руны</span></button>
+    <button class="rail-btn" data-section="drafterHub" onclick="sidebarOpen('drafterHub')"><span class="ico">🎯</span><span class="lbl" data-i18n="Драфтер">Драфтер</span></button>
+    <button class="rail-btn admin-only" id="sideBtnCategories" onclick="if(window.cmsOpenCategoriesEditor)cmsOpenCategoriesEditor()" style="display:none"><span class="ico">🏷</span><span class="lbl">Категории</span></button>
+    <button class="rail-btn admin-only" data-section="changes" onclick="sidebarOpen('changes')" style="display:none"><span class="ico">📰</span><span class="lbl">Изменения</span><span class="rail-badge" id="sidebarChangesBadge" style="display:none;"></span></button>
+    <button class="rail-btn" data-section="globalChat" onclick="sidebarOpen('globalChat')"><span class="ico">💬</span><span class="lbl">Чат</span><span class="rail-badge" id="sidebarChatBadge" style="display:none;"></span></button>
+    <button class="rail-btn" data-section="cybersport" onclick="sidebarOpen('cybersport')"><span class="ico">🏆</span><span class="lbl">Киберспорт</span></button>
   </div>
 
-  <div class="side-section">Инструменты</div>
-  <button class="side-btn" onclick="sidebarOpen('sideChamps')"><span class="side-icon">👥</span>Чемпионы</button>
-  <button class="side-btn" onclick="sidebarOpen('calc')"><span class="side-icon">⚔</span>Калькулятор урона</button>
-  <button class="side-btn" onclick="sidebarOpen('items')"><span class="side-icon">📦</span>Предметы</button>
-  <button class="side-btn" onclick="sidebarOpen('runes')"><span class="side-icon">💎</span>Руны</button>
-  <button class="side-btn side-btn-draft" onclick="sidebarOpen('draft')"><span class="side-icon">📋</span>Драфт-помощник</button>
-  <button class="side-btn side-btn-coop" onclick="sidebarOpen('draftCoop')"><span class="side-icon">🎯</span>Драфт (серии)</button>
-
-  <button class="side-btn admin-only" id="sideBtnCategories" onclick="if(window.cmsOpenCategoriesEditor)cmsOpenCategoriesEditor()" style="display:none"><span class="side-icon">🏷</span>Категории</button>
-
-  <div class="side-section" style="margin-top:8px;">Новости</div>
-  <button class="side-btn side-btn-changes admin-only" onclick="sidebarOpen('changes')" style="display:none"><span class="side-icon">📰</span>Изменения<span id="sidebarChangesBadge" style="display:none;background:#e74c3c;color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:auto;"></span></button>
-
-  <div class="side-section" style="margin-top:8px;">Сообщество</div>
-  <button class="side-btn side-btn-chat" onclick="sidebarOpen('globalChat')"><span class="side-icon">💬</span>Чат<span id="sidebarChatBadge" style="display:none;"></span></button>
-  <button class="side-btn side-btn-cs" onclick="sidebarOpen('cybersport')"><span class="side-icon">🏆</span>Киберспорт</button>
-
-  <div style="flex:1;"></div>
-  <div style="padding:0 8px;display:flex;flex-direction:column;gap:6px;">
-    <!-- Кнопка версии видна ТОЛЬКО в установленном PWA (standalone), -->
-    <!-- т.к. в браузере F5 и так подтягивает свежий код. -->
-    <!-- Показывает текущую vXXX серым; когда SW нашёл обновление — -->
-    <!-- становится зелёной «🟢 Обновить до vXXX». -->
-    <button id="sideVersion"
-            class="side-btn side-version"
-            type="button"
-            style="display:none;opacity:0.55;cursor:pointer;"
+  <div class="rail-foot">
+    <!-- Кнопка версии видна ТОЛЬКО в установленном PWA (standalone): в браузере F5
+         и так подтягивает свежий код. Серая = текущая; SW нашёл обновление → «Обновить». -->
+    <button id="sideVersion" class="rail-btn rail-version" type="button" style="display:none;"
             onclick="window._handleVersionClick && window._handleVersionClick()"
             title="Текущая версия приложения. Клик — проверить обновления.">
-      <span class="side-icon" id="sideVersionIcon">📦</span><span id="sideVersionLabel">v…</span>
+      <span class="ico" id="sideVersionIcon">📦</span><span class="lbl" id="sideVersionLabel">v…</span>
     </button>
-    <!-- PWA install button — скрыта по умолчанию, показывается через JS если -->
-    <!-- браузер поддерживает install OR это iOS Safari (там показываем инструкцию). -->
-    <button id="sideInstallPwa"
-            class="side-btn side-install"
-            type="button"
-            style="display:none;"
+    <!-- PWA install — скрыта, показывается через JS при поддержке install (или iOS Safari). -->
+    <button id="sideInstallPwa" class="rail-btn" type="button" style="display:none;"
             onclick="window._showInstallPwa && window._showInstallPwa()">
-      <span class="side-icon">📲</span>Установить приложение
+      <span class="ico">📲</span><span class="lbl">Установить приложение</span>
     </button>
-    <a href="#"
-       id="sideSupport"
-       class="side-btn side-support"
-       style="text-decoration:none;display:flex;"
+    <a href="#" id="sideSupport" class="rail-btn"
        onclick="event.preventDefault();openExternalLink('https://www.donationalerts.com/r/erjankg','Поддержать проект')">
-      <span class="side-icon">💎</span>Поддержать проект
+      <span class="ico">💎</span><span class="lbl">Поддержать проект</span>
     </a>
+    <!-- ⚙ ЮЗЕР-НАСТРОЙКИ (эталон: .rail-gear внизу рельса) -->
+    <button class="rail-btn rail-gear" type="button" onclick="if(window.openDisplaySettings)openDisplaySettings()">
+      <span class="ico">⚙</span><span class="lbl">Настройки</span>
+    </button>
   </div>
-</div>
+</nav>
 
 <!-- ══ RUNES MODAL ══ -->
-<div class="m-mask sidebar-modal" id="runesMask" onclick="if(event.target===this)closeRunes()">
+<div class="m-mask sidebar-modal" id="runesMask" data-pick="lab" data-isize="md" onclick="if(event.target===this)closeRunes()">
   <div class="m-win" style="width:96vw;max-width:1400px;max-height:92vh;overflow-y:auto;padding:0 16px 16px;">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeRunes()">←</button>
       <span class="mhdr-t" data-i18n="💎 Руны Wild Rift">💎 Руны Wild Rift</span>
-      <span style="font-size:10px;color:rgba(255,255,255,0.3);" data-i18n="Наведи — описание">Наведи — описание</span>
+      <button class="btn-pick-gear" onclick="togglePickSize('runesMask',this)" title="Размер иконок">⚙</button>
     </div>
     <div class="side-section" style="padding:0;margin-bottom:8px;">⭐ ОСНОВНЫЕ РУНЫ</div>
     <div class="rune-grid" id="runeGridKeystone">
@@ -637,20 +691,10 @@ Stormarrow: При максимальных зарядах следующая б
     </div>
   </div>
 </div>
-<!-- ══ CHAMPION DETAIL MODAL ══ -->
-<div class="m-mask" id="champDetailMask" onclick="if(event.target===this)closeChampDetail()">
-  <div class="m-win" style="width:96vw;max-width:920px;height:92vh;overflow-y:auto;padding:0 20px 20px;">
-    <div class="mhdr">
-      <button class="btn-close-x" onclick="closeChampDetail()">←</button>
-      <span class="mhdr-t" data-i18n="⚔ Чемпион">⚔ Чемпион</span>
-    </div>
-    <div id="champDetailContent" style="text-align:center;padding:24px 0;">
-      <div style="font-size:40px;margin-bottom:12px;">⚔</div>
-      <div style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);" data-i18n="Информация о чемпионе">Информация о чемпионе</div>
-      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px;" data-i18n="Скоро будет!">Скоро будет!</div>
-    </div>
-  </div>
-</div>
+<!-- ══ Э1.9 · МОДАЛКИ ЧЕМПА БОЛЬШЕ НЕТ ══
+     Клик по чемпу ведёт на СТРАНИЦУ champions/<slug>/ — ту же, что видит поиск
+     (решение владельца Р2). Разметку печатает champ-page.js, вид живёт в
+     .view-pane[data-view="champ"], см. openChampPage в app.js. -->
 
 <!-- ══ RUNE DETAIL MODAL ══ -->
 <div class="m-mask" id="runeDetailModal" onclick="if(event.target===this)closeRuneDetail()">
@@ -798,46 +842,39 @@ Stormarrow: При максимальных зарядах следующая б
   </div>
 </div>
 
-<!-- ══ DRAFT MODAL ══ -->
-<div class="m-mask m-fullscreen" id="draftMask" onclick="if(event.target===this)closeDraft()">
-  <div style="width:100vw;height:100dvh;background:linear-gradient(135deg,var(--bg-primary) 0%,var(--bg-base) 100%);display:flex;flex-direction:column;overflow:hidden;position:relative;padding-top:env(safe-area-inset-top,0px);box-sizing:border-box;">
+<!-- ══ DRAFTER HUB (выбор режима: Соло / Серия) ══ -->
+<div class="m-mask m-fullscreen" id="drafterHubMask" onclick="if(event.target===this)closeDrafterHub()">
+  <div class="dh-wrap">
+    <div class="mhdr">
+      <button class="btn-close-x" onclick="closeDrafterHub()">←</button>
+      <span class="mhdr-t" data-i18n="🎯 Драфтер">🎯 Драфтер</span>
+    </div>
+    <div class="dh-body">
+      <div class="dh-h" data-i18n="Тренируй драфт соло или собери серию с командой">Тренируй драфт соло или собери серию с командой</div>
+      <div class="dh-cards">
+        <button class="dh-card" onclick="drafterPick('solo')">
+          <span class="dh-ic">🎯</span>
+          <b data-i18n="Соло-тренировка">Соло-тренировка</b>
+          <span data-i18n="Драфт один, с подсказками контрпиков. Без входа, сразу.">Драфт один, с подсказками контрпиков. Без входа, сразу.</span>
+        </button>
+        <button class="dh-card" onclick="drafterPick('series')">
+          <span class="dh-ic">👥</span>
+          <b data-i18n="Серия с командой">Серия с командой</b>
+          <span data-i18n="Онлайн пик/бан капитан vs капитан · Bo3/5/7 · fearless · зрители.">Онлайн пик/бан капитан vs капитан · Bo3/5/7 · fearless · зрители.</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <!-- Header with back btn -->
+<!-- ══ СОЛО-ДРАФТ (тренажёр пиков + подсказки контрпиков) ══ -->
+<div class="m-mask m-fullscreen" id="draftMask" onclick="if(event.target===this)closeDraft()">
+  <div class="dl-window">
     <div class="mhdr">
       <button class="btn-close-x" onclick="closeDraft()">←</button>
-      <span class="mhdr-t" style="text-align:center;" data-i18n="📋 Драфт-помощник">📋 Драфт-помощник</span>
+      <span class="mhdr-t" data-i18n="🎯 Соло-драфт">🎯 Соло-драфт</span>
     </div>
-
-    <!-- GOOD PICK panel -->
-    <div style="flex:1;overflow-y:auto;padding:10px 12px;border-bottom:1px solid var(--accent-border-sub);min-height:0;">
-      <div style="font-size:10px;color:#2ecc71;font-weight:800;letter-spacing:1px;margin-bottom:6px;">✅ GOOD PICK</div>
-      <div id="draftGoodPick" style="display:flex;flex-direction:column;gap:4px;">
-        <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;" data-i18n="Выбери чемпиона">Выбери чемпиона</div>
-      </div>
-    </div>
-
-    <!-- Slots row: 2 columns -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--accent-border);border-top:1px solid var(--accent-border);flex-shrink:0;">
-      <!-- Left: Our team -->
-      <div style="padding:8px 10px;border-right:1px solid var(--accent-border-sub);">
-        <div style="font-size:9px;color:rgba(93,173,226,0.8);font-weight:700;letter-spacing:1px;margin-bottom:5px;" data-i18n="🔵 МОЯ КОМАНДА">🔵 МОЯ КОМАНДА</div>
-        <div id="draftSlotsLeft" style="display:flex;flex-direction:column;gap:4px;"></div>
-      </div>
-      <!-- Right: Enemy team -->
-      <div style="padding:8px 10px;">
-        <div style="font-size:9px;color:rgba(231,76,60,0.8);font-weight:700;letter-spacing:1px;margin-bottom:5px;" data-i18n="🔴 ПРОТИВНИКИ">🔴 ПРОТИВНИКИ</div>
-        <div id="draftSlotsRight" style="display:flex;flex-direction:column;gap:4px;"></div>
-      </div>
-    </div>
-
-    <!-- DANGER panel -->
-    <div style="flex:1;overflow-y:auto;padding:10px 12px;min-height:0;">
-      <div style="font-size:10px;color:#e74c3c;font-weight:800;letter-spacing:1px;margin-bottom:6px;">☠ DANGER</div>
-      <div id="draftDanger" style="display:flex;flex-direction:column;gap:4px;">
-        <div style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;padding:10px;" data-i18n="Выбери чемпиона">Выбери чемпиона</div>
-      </div>
-    </div>
-
+    <div class="dl-frame dl-solo-frame" id="draftSoloFrame"></div>
   </div>
 </div>
 
@@ -1235,6 +1272,13 @@ Stormarrow: При максимальных зарядах следующая б
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js" integrity="sha384-HZZ/fukV+9G8gwTNjN7zQDG0Sp7MsZy5DDN6VfY3Be7V9dvQpEpR2jF2HlyFUUjU" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
 <script src="share.js"></script>
+<!-- ★ Э1.1 · ЛЕКАРСТВО ОТ ДЁРГАНЬЯ. labMorph(host, html) вместо host.innerHTML =
+     сравнивает разметку со старым деревом и трогает ТОЛЬКО изменившееся.
+     Должен идти ДО app.js — app.js его уже использует. -->
+<script src="lab-morph.js?v=2"></script>
+<!-- Э1.9 · рендерер страницы чемпа. ТОТ ЖЕ модуль печатает статические страницы
+     champions/<slug>/ (см. seo/generate.mjs) — разметка у них общая. До app.js. -->
+<script src="champ-page.js?v=1"></script>
 <script src="cms.js"></script>
 <script src="app.js"></script>
 <script src="tab-pill.js"></script>
@@ -1344,7 +1388,13 @@ Stormarrow: При максимальных зарядах следующая б
       });
     }
 
-    if ('serviceWorker' in navigator) {
+    var _isLocalDev = (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname === '');
+    if ('serviceWorker' in navigator && _isLocalDev) {
+      // DEV (localhost / Live Server): Service Worker только мешает — кэширует старьё,
+      // и Ctrl+Shift+R его не убивает. Сносим любой залипший SW + чистим кэш, НЕ регистрируем.
+      navigator.serviceWorker.getRegistrations().then(function(rs){ rs.forEach(function(r){ r.unregister(); }); }).catch(function(){});
+      if (window.caches) caches.keys().then(function(ks){ ks.forEach(function(k){ caches.delete(k); }); }).catch(function(){});
+    } else if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('sw.js', { scope: './' })
           .then(function(reg) {

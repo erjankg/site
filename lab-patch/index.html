@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on" data-inner="on" data-edge="on" data-edge2="on" data-vignette="on"
+      data-feed="feed" data-change="row" data-hl="cards" data-ind="both" data-filter="chips"
+      data-spark="on" data-layout="single" data-anim="fade" data-hover="lift" data-density="normal" data-nov="badge">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>lab-patch — экран «Патчи» (патч-ноты)</title>
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="preconnect" href="https://www.wildriftfire.com">
+<link rel="stylesheet" href="../canon-tokens.css?v=1">
+<link rel="stylesheet" href="patch-lab.css?v=3">
+</head>
+<body>
+  <div class="splash" id="splash" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- ДЕВ-ПОЛОСА (для НАС): тёмный солид, плавающая, драг за грип, оверлеем -->
+  <div class="lab-strip" id="labStrip">
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ Дизайн-полоса — Патчи</span>
+      <button class="strip-min" id="stripMin">Свернуть</button>
+    </div>
+    <div class="strip-body">
+      <div class="strip-group"><label>Лента</label><div class="seg" data-k="feed">
+        <button data-v="feed" class="on">Лента</button><button data-v="accordion">Аккордеон</button><button data-v="cattabs">Вкладки</button></div></div>
+      <div class="strip-group"><label>Изменение</label><div class="seg" data-k="change">
+        <button data-v="row" class="on">Строка</button><button data-v="card">Карточка</button><button data-v="badge">Бейдж</button></div></div>
+      <div class="strip-group"><label>Главное</label><div class="seg" data-k="hl">
+        <button data-v="cards" class="on">Карточки</button><button data-v="row">Строка</button><button data-v="hidden">Скрыт</button></div></div>
+      <div class="strip-group"><label>Индикатор</label><div class="seg" data-k="ind">
+        <button data-v="both" class="on">Цвет+иконка</button><button data-v="icon">Иконка</button><button data-v="color">Цвет</button></div></div>
+      <div class="strip-group"><label>Новизна</label><div class="seg" data-k="nov">
+        <button data-v="badge" class="on">Бейдж News</button><button data-v="ring">Рамка</button><button data-v="bar">Полоса</button><button data-v="off">Нет</button></div></div>
+      <div class="strip-group"><label>Фильтры</label><div class="seg" data-k="filter">
+        <button data-v="chips" class="on">Чипы</button><button data-v="dropdown">Дропдаун</button></div></div>
+      <div class="strip-group"><label>Спарклайн WR</label><div class="seg" data-k="spark">
+        <button data-v="on" class="on">Вкл</button><button data-v="off">Выкл</button></div></div>
+      <div class="strip-group"><label>Раскладка</label><div class="seg" data-k="layout">
+        <button data-v="single" class="on">1 колонка</button><button data-v="wide">2 колонки</button></div></div>
+      <div class="strip-group"><label>Кнопки</label><div class="seg" data-k="btn">
+        <button data-v="round">Круглые</button><button data-v="soft" class="on">Мягкие</button><button data-v="sharp">Острые</button></div></div>
+      <div class="strip-group"><label>Появление</label><div class="seg" data-k="anim">
+        <button data-v="fade" class="on">Фейд</button><button data-v="slide">Сдвиг</button><button data-v="none">Нет</button></div></div>
+      <div class="strip-group"><label>Ховер</label><div class="seg" data-k="hover">
+        <button data-v="lift" class="on">Подъём</button><button data-v="glow">Свечение</button><button data-v="none">Нет</button></div></div>
+      <div class="strip-group"><label>Плотность</label><div class="seg" data-k="density">
+        <button data-v="air">Просторно</button><button data-v="normal" class="on">Средне</button><button data-v="dense">Плотно</button></div></div>
+      <button class="strip-copy" id="stripCopy">📋 Скопировать мой выбор</button>
+      <div class="strip-choice">Ваш выбор: <b id="choiceText">…</b></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="lab-h">
+      <h1>Патчи — что изменилось <span class="demo">демо-данные (структура 7.2 как пример)</span></h1>
+      <p>Лента патч-нот. Клик по изменению → карточка чемпа / предмета / руны (связь, не тупик).</p>
+    </div>
+
+    <!-- ФИЛЬТР-БАР -->
+    <section class="filters glass" id="filters"></section>
+
+    <!-- ГЛАВНОЕ ПАТЧА (топ-3) -->
+    <section class="highlight glass" id="highlight"></section>
+
+    <!-- ЛЕНТА ПАТЧЕЙ -->
+    <div class="feed" id="feed"></div>
+  </div>
+
+  <div id="ovHost"></div>
+
+  <script src="patch-lab.js?v=3"></script>
+</body>
+</html>

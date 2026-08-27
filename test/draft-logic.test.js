@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import DraftLogic from '../draft-logic.js';
 
-const { WR_DRAFT_SEQUENCE, SEQ_LEN, getUnavailable, sideRoles, deterministicPick } = DraftLogic;
+const { WR_DRAFT_SEQUENCE, SEQ_LEN, getUnavailable, sideRoles, currentTurn, viewerRole, deterministicPick } = DraftLogic;
 
 describe('WR_DRAFT_SEQUENCE', () => {
   it('содержит ровно 20 шагов', () => {
@@ -155,6 +155,128 @@ describe('sideRoles', () => {
     const r = sideRoles({}, {});
     expect(r.blue.teamName).toBe('Blue');
     expect(r.red.teamName).toBe('Red');
+  });
+});
+
+// ★ Единый источник «чей ход» — гарантия, что оба клиента (одна pure-функция)
+// согласны по capUid активного шага в ОБОИХ направлениях свапа сторон.
+describe('currentTurn (единый резолвер хода)', () => {
+  const lobby = {
+    createdBy: 'u-blue',
+    blueCaptain: { uid: 'u-blue', nick: 'BlueCap' },
+    redCaptain: { uid: 'u-red', nick: 'RedCap' },
+    blueTeamName: 'Team Blue',
+    redTeamName: 'Team Red'
+  };
+
+  it('шаг 0 (синий бан) без свапа → капитан команды blue', () => {
+    const t = currentTurn(lobby, { blueSide: 'blue', turnIndex: 0, phase: 'ban1' });
+    expect(t.side).toBe('blue');
+    expect(t.action).toBe('ban');
+    expect(t.team).toBe('blue');
+    expect(t.capUid).toBe('u-blue');
+    expect(t.isDone).toBe(false);
+  });
+
+  it('СВАП (проигравший red выбрал синюю): на синей позиции ходит капитан red', () => {
+    // blueSide='red' → команда red играет на синей позиции (first pick)
+    const t = currentTurn(lobby, { blueSide: 'red', turnIndex: 0, phase: 'ban1' });
+    expect(t.side).toBe('blue');       // ПОЗИЦИЯ синяя (её ход первый)
+    expect(t.team).toBe('red');        // но это КОМАНДА red
+    expect(t.capUid).toBe('u-red');    // и её капитан — u-red
+  });
+
+  it('СВАП (проигравший blue выбрал синюю = без свапа): на синей ходит капитан blue', () => {
+    const t = currentTurn(lobby, { blueSide: 'blue', turnIndex: 0, phase: 'ban1' });
+    expect(t.team).toBe('blue');
+    expect(t.capUid).toBe('u-blue');
+  });
+
+  it('второй шаг (красная позиция) отдаёт капитана противоположной команды при свапе', () => {
+    const t = currentTurn(lobby, { blueSide: 'red', turnIndex: 1, phase: 'ban1' });
+    expect(t.side).toBe('red');        // красная позиция
+    expect(t.team).toBe('blue');       // на ней команда blue
+    expect(t.capUid).toBe('u-blue');
+  });
+
+  it('после последнего шага (turnIndex>=20) — isDone, ходов нет', () => {
+    const t = currentTurn(lobby, { blueSide: 'blue', turnIndex: SEQ_LEN, phase: 'done' });
+    expect(t.isDone).toBe(true);
+    expect(t.step).toBeNull();
+    expect(t.capUid).toBeNull();
+  });
+
+  it('phase=done → isDone даже если turnIndex не докручен', () => {
+    const t = currentTurn(lobby, { blueSide: 'blue', turnIndex: 5, phase: 'done' });
+    expect(t.isDone).toBe(true);
+  });
+
+  it('нет игры → null', () => {
+    expect(currentTurn(lobby, null)).toBeNull();
+  });
+
+  it('ПРЕПИК и ЛОКИН согласованы: capUid одинаков на каждом шаге в обоих свапах', () => {
+    ['blue', 'red'].forEach((bs) => {
+      for (let i = 0; i < SEQ_LEN; i++) {
+        const t1 = currentTurn(lobby, { blueSide: bs, turnIndex: i, phase: 'ban1' });
+        const t2 = currentTurn(lobby, { blueSide: bs, turnIndex: i, phase: 'ban1' });
+        expect(t1.capUid).toBe(t2.capUid);          // детерминизм (два клиента = один ответ)
+        expect([lobby.blueCaptain.uid, lobby.redCaptain.uid]).toContain(t1.capUid);
+      }
+    });
+  });
+});
+
+describe('viewerRole (права зрителя)', () => {
+  const lobby = {
+    createdBy: 'u-blue',
+    blueCaptain: { uid: 'u-blue' },
+    redCaptain: { uid: 'u-red' },
+    invitedSpectators: ['u-spec']
+  };
+  const game = { blueSide: 'red', turnIndex: 0, phase: 'ban1' }; // свап: red на синей
+
+  it('капитан red после свапа = на синей позиции, может ходить на шаге 0', () => {
+    const vr = viewerRole(lobby, game, 'u-red');
+    expect(vr.isCaptain).toBe(true);
+    expect(vr.mySide).toBe('blue');     // позиция после свапа
+    expect(vr.myTeam).toBe('red');      // команда (для readyBlue/readyRed)
+    expect(vr.canActNow).toBe(true);    // шаг 0 — синяя позиция, а на ней он
+  });
+
+  it('капитан blue после свапа = на красной позиции, на шаге 0 ходить НЕ может', () => {
+    const vr = viewerRole(lobby, game, 'u-blue');
+    expect(vr.mySide).toBe('red');
+    expect(vr.canActNow).toBe(false);
+  });
+
+  it('создатель, который НЕ капитан = судья: не пикает', () => {
+    const judgeLobby = { ...lobby, createdBy: 'u-judge' };
+    const vr = viewerRole(judgeLobby, game, 'u-judge');
+    expect(vr.isCreator).toBe(true);
+    expect(vr.isCaptain).toBe(false);
+    expect(vr.isJudge).toBe(true);
+    expect(vr.canActNow).toBe(false);   // судья не ходит
+  });
+
+  it('создатель-капитан судьёй НЕ считается', () => {
+    const vr = viewerRole(lobby, game, 'u-blue'); // u-blue = и создатель, и капитан
+    expect(vr.isJudge).toBe(false);
+  });
+
+  it('приглашённый зритель = spectator, не капитан, не ходит', () => {
+    const vr = viewerRole(lobby, game, 'u-spec');
+    expect(vr.isSpectator).toBe(true);
+    expect(vr.isCaptain).toBe(false);
+    expect(vr.canActNow).toBe(false);
+  });
+
+  it('посторонний = ни капитан, ни судья, ни зритель', () => {
+    const vr = viewerRole(lobby, game, 'u-nobody');
+    expect(vr.isCaptain).toBe(false);
+    expect(vr.isJudge).toBe(false);
+    expect(vr.isSpectator).toBe(false);
+    expect(vr.canActNow).toBe(false);
   });
 });
 

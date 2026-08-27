@@ -208,7 +208,21 @@ service cloud.firestore {
         resource.data.createdBy == request.auth.uid ||
         resource.data.blueCaptain.uid == request.auth.uid ||
         (resource.data.redCaptain != null && resource.data.redCaptain.uid == request.auth.uid) ||
-        (request.auth.uid in resource.data.invitedSpectators) ||
+        // Зритель, уже принятый в лобби: ТОЛЬКО spectator-поля и ТОЛЬКО свой ник.
+        // Раньше эта ветка была голой (`uid in invitedSpectators`) без ограничения
+        // affectedKeys — любой принятый зритель мог перезаписать ЛЮБОЕ поле лобби
+        // (seriesScore, status, currentGameBlueSide, usedChampions, blueCaptain/redCaptain),
+        // т.е. подделать счёт, «завершить» серию или выкинуть капитана.
+        // Управляющие поля серии меняют только создатель и капитаны (ветки выше).
+        (
+          request.auth.uid in resource.data.invitedSpectators &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['invitedSpectators', 'spectatorNicks', 'updatedAt']) &&
+          (
+            !('spectatorNicks' in request.resource.data.keys()) ||
+            !('spectatorNicks' in resource.data.keys()) ||
+            request.resource.data.spectatorNicks.diff(resource.data.spectatorNicks).affectedKeys().hasOnly([request.auth.uid])
+          )
+        ) ||
         // Самодобавление зрителя по share-ссылке: токен совпадает, слот свободен,
         // меняется только spectator-related поля, other untouched
         (

@@ -1,0 +1,64 @@
+{
+ "patch": "7.2c",
+ "seen": "2026-08-23",
+ "source": "https://wildriftallstats.ru/guides/aatrox",
+ "checkedAt": "2026-08-23",
+ "timingsVerifiedFor": "7.2c (частично)",
+ "recheck": [
+  {
+   "id": "dragon_first",
+   "what": "первый элементальный дракон — время спауна",
+   "where": "jungle-economy.json → epicMonsters.elementalDragons.spawn_s"
+  },
+  {
+   "id": "dragon_respawn",
+   "what": "респаун дракона после убийства",
+   "where": "jungle-economy.json → epicMonsters.elementalDragons"
+  },
+  {
+   "id": "herald",
+   "what": "Герольд — спаун и до какой минуты живёт",
+   "where": "jungle-economy.json → epicMonsters.riftHerald"
+  },
+  {
+   "id": "baron",
+   "what": "Барон — спаун",
+   "where": "jungle-economy.json → epicMonsters.baronNashor"
+  },
+  {
+   "id": "elder",
+   "what": "Старший дракон — спаун",
+   "where": "jungle-economy.json → epicMonsters.elderDragon"
+  },
+  {
+   "id": "scuttle",
+   "what": "крабы — спаун и респаун",
+   "where": "jungle-economy.json → jungleCamps.scuttleCrab"
+  },
+  {
+   "id": "camps",
+   "what": "респаун лесных кэмпов и баффов",
+   "where": "jungle-economy.json → jungleCamps"
+  },
+  {
+   "id": "minions",
+   "what": "первая волна миньонов и интервал между волнами",
+   "where": "jungle-economy.json → minions"
+  },
+  {
+   "id": "death_timer",
+   "what": "дез-таймер по уровням",
+   "where": "jungle-economy.json → scaling"
+  }
+ ],
+ "note": "Робот только СТОРОЖИТ версию. Числа таймингов он не качает — их нет в открытом виде. Вышел новый патч → timingsVerifiedFor обнуляется, значит тайминги показывать с пометкой «сверить».",
+ "verified": [
+  "Дракон 6:00 — сверено владельцем (одновременно с Герольдом)",
+  "Герольд 6:00 — офиц. ноуты 7.0",
+  "Старший дракон 19:00 — офиц. обзор Стихийного Рифта",
+  "Барон 12:00 / респаун 3.5 мин — ноуты 6.0"
+ ],
+ "stillOpen": [
+  "крабы, кэмпы, баффы, волны миньонов, дез-таймер"
+ ]
+}

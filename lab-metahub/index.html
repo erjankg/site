@@ -1,51 +1,70 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-glass="on">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Lab · Мета-хаб (бенто, стекло)</title>
-  <link rel="stylesheet" href="metahub.css?v=3">
+  <title>lab-metahub — Мета-хаб (канон · паритет 11 блоков)</title>
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="metahub.css?v=14">
 </head>
 <body>
+  <!-- ОДИН глобальный сплэш-арт за всем стеклом (выбирается в ⚙) -->
+  <div class="splash" aria-hidden="true"></div>
 
-  <!-- ░░ ДИЗАЙН-ПОЛОСА ЛАБА (сворачивается) — подбор раскладок/панелей ░░ -->
+  <!-- ДИЗАЙН-ПОЛОСА (дев-инструмент): тёмный солид, плавающая оверлеем, тащится за грип.
+       НЕ стекло, НЕ UI сайта, на боевой не едет. БЕЗ localStorage. -->
   <div class="lab-strip" id="labStrip">
-    <div class="lab-strip-head">
-      <span class="lab-strip-ttl">🧪 Дизайн-полоса · Мета-хаб</span>
-      <span class="spacer"></span>
-      <button class="lab-min" id="labMin" type="button">▲ Свернуть настройки</button>
+    <div class="strip-head" id="stripHead">
+      <span class="strip-title">⋮⋮ Дизайн-полоса · Мета-хаб</span>
+      <button class="strip-btn" id="countVisual" title="Приёмка: визуальный тумблер не должен пересоздавать узлы">🔬 Счётчик · визуал</button>
+      <button class="strip-btn" id="countRank" title="Приёмка: смена ранга легитимно пересоздаёт данные">🔬 · ранг</button>
+      <span class="strip-count" id="nodeCount">счётчик узлов…</span>
+      <button class="strip-btn strip-min-btn" id="stripMin">Свернуть</button>
     </div>
-    <div id="labTools" hidden></div>
-    <div class="lab-strip-body" id="stripBody"></div>
+    <div class="strip-body" id="stripBody"></div>
   </div>
 
-  <!-- ░░ ОДИН сплэш-арт за стеклом на весь хаб (то, что размывают плитки) ░░ -->
-  <div class="hub-art" id="hubArt"></div>
-
-  <div class="wrap" id="wrap" data-place="top">
-    <header class="hub-header" id="hubHeader">
-      <div class="hub-top">
-        <h1 class="hub-title">🔮 <b>Мета-хаб</b></h1>
-        <span class="hub-badge" id="patchBadge"></span>
-        <span class="spacer"></span>
-      </div>
-      <div class="hub-filter">
-        <div class="pills" id="rankPills"></div>
-      </div>
+  <div class="app" id="app">
+    <header class="hub-head glass">
+      <h1 class="hub-title">Мета-хаб</h1>
+      <span class="hub-patch" id="patchBadge"></span>
+      <div class="pills" id="rankPills"></div>
+      <button class="gear-btn" id="gearBtn" title="Настройки">⚙</button>
     </header>
 
-    <div class="bento" id="bento" data-v="A"></div>
+    <div class="bento" id="bento"></div>
 
-    <div class="foot">Песочница · реальные данные из <b>data-pipeline/</b> · ФИНАЛ: раскладка <b>A·Витрина</b>, шапка сверху, герой норм+параллакс. В полосе сверху — только глобальная визуалка (превью, на боевой наследуется)</div>
+    <p class="foot">
+      Песочница · паритет с боевым (hubHTML, app.js:7625) — 11 блоков.
+      WR/тиры/пик/бан/тренды/пул + сборка и контры лидера — <b>реальный снимок</b> из <b>data-pipeline/</b> (lolm.qq.com + гайды).<br>
+      <span class="demo">демо</span> — под что <b>ещё нет источника</b>: история WR по патчам (нужен снимок каждый патч),
+      «почему в топе», турниры (тянутся из турнирной базы Киберспорта — пусто = честно пусто), «что нового» (лента изменений/патч-ноты).
+    </p>
   </div>
 
-  <!-- ░░ Плавающая ⚙ (для варианта размещения «плавающая») ░░ -->
-  <button class="hub-gear" id="hubGear" type="button" hidden>⚙</button>
-  <div class="hub-gear-pop glassy" id="hubGearPop" hidden></div>
+  <!-- ⚙ НАСТРОЙКИ ЮЗЕРА -->
+  <div class="settings-pop glass" id="settingsPop" hidden>
+    <div class="set-head"><b>⚙ Настройки</b><button class="set-close" id="setClose" aria-label="Закрыть">✕</button></div>
+    <div id="ssHost"></div>
+    <div class="set-block">
+      <label>Акцент — цвет ДАННЫХ (WR, тиры, ↑↓)</label>
+      <div class="swatches">
+        <button class="sw active" data-accent="#ffffff" style="--sw:#ffffff" title="Циан"></button>
+        <button class="sw" data-accent="#C89B3C" style="--sw:#C89B3C" title="Золото"></button>
+        <button class="sw" data-accent="#9B6BFF" style="--sw:#9B6BFF" title="Фиолет"></button>
+        <button class="sw" data-accent="#4ADE80" style="--sw:#4ADE80" title="Зелёный"></button>
+      </div>
+    </div>
+    <div class="set-block"><label>Сила стекла <span class="val" id="opVal">0.05</span></label><input type="range" id="opRange" min="2" max="18" value="5"></div>
+    <div class="set-block"><label>Blur <span class="val" id="blurVal">9px</span></label><input type="range" id="blurRange" min="0" max="26" value="9"></div>
+    <div class="set-block"><label>Тёмность стекла <span class="val" id="darkVal">0.46</span></label><input type="range" id="darkRange" min="0" max="0.6" step="0.01" value="0.46"></div>
+  </div>
 
-  <script src="../lab-settings.js"></script>
-  <script src="meta-data.js?v=2"></script>
-  <script src="metahub.js?v=4"></script>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="meta-data.js?v=3"></script>
+  <script src="metahub.js?v=14"></script>
 </body>
 </html>

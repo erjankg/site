@@ -11,10 +11,10 @@
   --tb-bg-card:       rgba(1, 21, 32, 0.85);
   --tb-bg-input:      rgba(1, 15, 32, 0.6);
 
-  --tb-accent:        #0BC4E3;
-  --tb-accent-glow:   rgba(11, 196, 227, 0.4);
-  --tb-accent-dim:    rgba(11, 196, 227, 0.15);
-  --tb-accent-border: rgba(11, 196, 227, 0.25);
+  --tb-accent:        #ffffff;
+  --tb-accent-glow:   rgba(255, 255, 255, 0.4);
+  --tb-accent-dim:    rgba(255, 255, 255, 0.15);
+  --tb-accent-border: rgba(255, 255, 255, 0.25);
   --tb-gold:          #C89B3C;
 
   --tb-blue:          #3a9ad9;
@@ -32,7 +32,7 @@
   --tb-ward-ally-rgb:   60, 160, 230;
   --tb-ward-enemy-rgb:  230, 70, 70;
 
-  --tb-shadow-glow:   0 0 18px rgba(11, 196, 227, 0.35);
+  --tb-shadow-glow:   0 0 18px rgba(255, 255, 255, 0.35);
 
   --tb-header-h:    52px;
   --tb-toolbar-h:   54px;
@@ -52,7 +52,7 @@ html, body {
 
 body {
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(11, 196, 227, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 80%, rgba(30, 10, 80, 0.3) 0%, transparent 60%),
     var(--tb-bg-base);
   display: flex;
@@ -133,7 +133,7 @@ body {
   gap: 8px;
   padding: 8px 20px;
   background: rgba(1, 13, 24, 0.4);
-  border-bottom: 1px solid rgba(11, 196, 227, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   align-items: center;
   flex-shrink: 0;
   height: var(--tb-toolbar-h);
@@ -362,7 +362,7 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 7px;
-  background: rgba(11, 196, 227, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--tb-accent);
   font-size: 20px;
   font-weight: 300;
@@ -408,7 +408,7 @@ body {
   border: 2px solid var(--tb-accent-border);
   box-shadow:
     0 16px 50px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(11, 196, 227, 0.08);
+    0 0 30px rgba(255, 255, 255, 0.08);
   user-select: none;
   touch-action: none;
 }
@@ -586,7 +586,7 @@ body {
   align-items: center;
   gap: 12px;
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(11, 196, 227, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 .tb-picker-title {
   font-size: 15px;

@@ -1,0 +1,262 @@
+/* ════════════════════════════════════════════════════════════════
+   canon-tokens.css — ЕДИНЫЙ источник дизайн-токенов сайта
+   Утверждён в мастере lab-tokens · 2026-08-07
+
+   ВЫБОР ВЛАДЕЛЬЦА ПО ШАГАМ:
+   · Отступы .................. Средне
+   · Шрифты ................... Средний
+   · Скругления ............... Мягкие
+   · Стекло ................... Вложенное темнее
+   · Акцент ................... БЕЛЫЙ
+   · Тиры ..................... Красный → холодный
+   · Ширина контента .......... Канон · 1400
+   · Движение ................. Средне
+   · Иконки и аватарки ........ Крупнее
+
+   ★★ АКЦЕНТ = БЕЛЫЙ. ОКОНЧАТЕЛЬНО (Эржан, 2026-08-07).
+   Циан #0BC4E3 был выбран в прошлый раз ТОЛЬКО потому, что белого не было среди
+   вариантов. Циан и золото как варианты акцента УДАЛЕНЫ — не предлагать снова.
+   Цветным остаётся ТОЛЬКО то, что несёт смысл данных: WR (зелёный/красный), тиры,
+   типы урона, статы, роли, статусы, валюта --gold. Всё остальное — белая шкала.
+   ════════════════════════════════════════════════════════════════ */
+
+:root,
+html[data-glass="on"] {
+
+  /* ── 1 · ОТСТУПЫ ── */
+  --sp-px: 1px;
+  --sp-0: 2px;
+  --sp-1: 4px;
+  --sp-2: 6px;
+  --sp-3: 8px;
+  --sp-4: 12px;
+  --sp-5: 16px;
+  --sp-6: 24px;
+  --sp-7: 32px;
+  --sp-8: 48px;
+  --sp-9: 64px;
+
+  /* ── 2 · ШРИФТЫ ── */
+  --fs-2xs: 10px;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-base: 13px; /* базовый текст сайта */
+  --fs-md: 14px;
+  --fs-lg: 15px;
+  --fs-xl: 17px;
+  --fs-2xl: 20px;
+  --fs-3xl: 24px;
+  --fs-4xl: 28px;
+  --fs-5xl: 36px;
+  --fw-normal: 400;
+  --fw-med: 500;
+  --fw-semi: 600;
+  --fw-bold: 700;
+  --fw-black: 800; /* снап 900→800 */
+  --lh-tight: 1.15;
+  --lh-snug: 1.35;
+  --lh-normal: 1.5;
+  --lh-relaxed: 1.6;
+  --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* ── 3 · СКРУГЛЕНИЯ ── */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 11px;
+  --r-lg: 15px; /* = --ds-r */
+  --r-xl: 20px;
+  --r-2xl: 24px;
+  --r-pill: 999px;
+  --r-full: 50%;
+
+  /* ── 4 · ШИРИНЫ ── */
+  --content-max: 1400px; /* лечит «кнопку на весь монитор» */
+  --content-max-narrow: 920px;
+  --rail-w: 235px;
+  --rail-min: 64px;
+  --rail-inset: 14px;
+  --rail-gap: 18px;
+  --shell-left: calc(var(--rail-min) + var(--rail-inset) + var(--rail-gap));
+  --header-h: 64px;
+  --tbl-w: 1050px;
+  --card-w: 300px;
+  --pick-w: 330px;
+  --sidecard-reserve: 348px;
+  --modal-sm: 400px;
+  --modal-md: 520px;
+  --modal-lg: 760px;
+
+  /* ── 5 · ЦВЕТА ── */
+  /* Текст */
+  --txt: #ffffff;
+  --txt-dim: #cfe4f0;
+  --txt-mute: rgba(255, 255, 255, 0.72);
+  --txt-faint: rgba(255, 255, 255, 0.42);
+  --txt-shadow: 0 2px 14px rgba(1,10,19,.8);
+  --on-accent: #0a1016; /* тёмный текст поверх белой акцентной заливки */
+  /* Chrome — БЕЛАЯ шкала (синяя удалена) */
+  --sel-05: rgba(255, 255, 255, 0.06);
+  --sel-09: rgba(255, 255, 255, 0.09);
+  --sel-12: rgba(255, 255, 255, 0.12);
+  --sel-18: rgba(255, 255, 255, 0.18);
+  --sel-45: rgba(255, 255, 255, 0.45);
+  --sel-bd: rgba(255, 255, 255, 0.5);
+  /* ★ АКЦЕНТ = БЕЛЫЙ. Не циан, не золото, не «тема» — белый. */
+  --accent: #ffffff;
+  --accent-rgb: 255, 255, 255;
+  --accent-glow: rgba(255, 255, 255, 0.45);
+  --accent-dim: rgba(255, 255, 255, 0.15);
+  /* WinRate */
+  --data-good: #4ade80;
+  --data-good-soft: #7fdca4;
+  --data-mid: #ffb454;   /* WR ~50% (нейтральный) — было #f1c40f руками; поправь оттенок если надо */
+  --data-bad: #ff5470;
+  --data-bad-soft: #ff8080;
+  /* Тиры */
+  --tier-s-plus: #ff3a3a;
+  --tier-s: #ff5470;
+  --tier-a: #ffb454;
+  --tier-b: #ffd700;
+  --tier-c: #4ade80;
+  --tier-d: #7aa2c4;
+  /* Урон */
+  --dmg-phys: #f0a43c;
+  --dmg-magic: #29b6f6;
+  --dmg-true: #ffffff;
+  --dmg-onhit: #B48CFF;
+  --dmg-mixed: #ffd66b;
+  /* Статы */
+  --stat-ad: #8B5E3C;
+  --stat-ap: #B48CFF;
+  --stat-hp: #27AE60;
+  --stat-mana: #5dade2;
+  --stat-armor: #D4AC00;
+  --stat-mr: #7fb3d5; /* было var(--accent); акцент теперь белый — MR нужен свой цвет */
+  --stat-as: #f0a43c;
+  --stat-ms: #7fdca4;
+  --stat-crit: #ff5470;
+  /* Роли */
+  --role-top: #e8935a;
+  --role-jungle: #4ade80;
+  --role-mid: #5dade2;
+  --role-adc: #ff5470;
+  --role-support: #c88bff;
+  /* Статусы */
+  --status-online: #4ade80;
+  --status-ingame: #5dade2; /* было var(--accent); белый статус не читался бы */
+  --status-away: #ffb454;
+  --status-offline: #8b8ba0;
+  /* Золото — ВАЛЮТА ИГРЫ (цена предметов, экономика), НЕ вариант акцента */
+  --gold: #C89B3C;
+  --gold-glow: rgba(200, 155, 60, 0.45);
+  --bg-page: #05090d;
+  --scrim-bg: rgba(2,9,15,.72);
+
+  /* ── ★ ГЛОБАЛЬНАЯ ПОДЛОЖКА (ОДИН сплэш на весь сайт, DESIGN.md) ──
+     ЕДИНСТВЕННЫЙ канал, которым задаётся фон-арт. Значение пишет ТОЛЬКО wr-prefs.js
+     (⚙ юзера), один раз на :root — и весь сайт, включая калькулятор, меняется разом.
+     ЗАПРЕЩЕНО: свой background-image на подложку вида/раздела/лаба и любой
+     императивный `el.style.backgroundImage = ...`. Ловится линтером (правило 8).
+     Здесь — только дефолт-фоллбэк и варианты «без арта». */
+  --splash-img: url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_0.jpg');
+  --splash-color: transparent;   /* режим «Свой цвет»: сплошная заливка вместо арта */
+  /* режим «Бренд»: фирменный градиент вместо арта. ОДНОЙ строкой намеренно —
+     это объявление токена подложки; разбитое на строки, оно читается линтером
+     как «градиент в chrome» и «hex мимо токена», хотя это и есть сам фон. */
+  --splash-brand: radial-gradient(ellipse at 28% 18%, rgba(255,255,255,.38), transparent 55%), radial-gradient(ellipse at 78% 82%, rgba(200,155,60,.30), transparent 55%), linear-gradient(135deg, #02121f, #0a0617);
+
+  /* ── 6 · СТЕКЛО ── */
+  --glass-tint: 255, 255, 255;
+  --glass-op: 0.06;
+  --glass-blur: 12px; /* сила размытия */
+  --glass-sat: 1.55;
+  --glass-dark: 0.58; /* тёмность */
+  --glass-dark-strong: 0.66; /* 2-й уровень */
+  --glass-bd-c: var(--sel-12);
+  --grain: 0;
+  --sh-k: 1;
+  --bg-blur: 0px;
+  /* Тонировка (работает только при стиле «Тонировка») */
+  --tint-c: #24292f;
+  --tint-rgb: 36, 41, 47;
+  --tint-op: 0.58; /* прозрачность */
+  --tint-sat: 1.35; /* насыщенность */
+  --tint-blur: 3px;
+
+  /* ── 7 · ТЕНИ ── */
+  --sh-sm: 0 2px 8px rgba(0,0,0,.3);
+  --sh-md: 0 8px 24px rgba(0,0,0,.4);
+  --sh-lg: 0 16px 48px rgba(0,0,0,.5);
+  --sh-lift: 0 12px 32px rgba(0,0,0,.45), 0 0 0 1px var(--sel-12);
+  --sh-glow: 0 0 24px var(--accent-glow);
+  --sh-inset: inset 0 1px 0 rgba(255,255,255,.08);
+
+  /* ── 8 · Z-СЛОИ ── */
+  --z-base: 0;
+  --z-raised: 1;
+  --z-rail: 10;
+  --z-sticky: 20;
+  --z-dropdown: 30;
+  --z-scrim: 40;
+  --z-modal: 50;
+  --z-overlay-modal: 60;
+  --z-toast: 70;
+  --z-tooltip: 80;
+  --z-devstrip: 90;
+
+  /* ── 9 · ДВИЖЕНИЕ ── */
+  --dur-fast: 130ms;
+  --dur-base: 200ms;
+  --dur-slow: 280ms;
+  --dur-slower: 500ms;
+  --stagger: 45ms;
+  --ease-out-expo: cubic-bezier(.16, 1, .3, 1);
+  --ease-standard: cubic-bezier(.4, 0, .2, 1);
+  --ease-overshoot: cubic-bezier(.34, 1.56, .64, 1);
+
+  /* ── 10 · ИКОНКИ ── */
+  --ic-xs: 17px;
+  --ic-sm: 20px;
+  --ic-md: 25px;
+  --ic-lg: 32px;
+  --ic-xl: 56px;
+  --ava-sm: 38px;
+  --ava-md: 70px;
+  --ava-lg: 112px;
+
+  /* ── АЛИАСЫ МИГРАЦИИ ── */
+  --ds-r: var(--r-lg);
+  --anim-dur: var(--dur-base);
+  --anim-ease: var(--ease-standard);
+}
+
+/* СТИЛЬ СТЕКЛА: Вложенное темнее */
+:root {
+  --g-rgb: 2, 9, 15;
+  --g-op: var(--glass-dark);
+  --g-blur: var(--glass-blur);
+  --g-sat: var(--glass-sat);
+  --g-inner: rgba(2, 9, 15, var(--glass-dark));
+  --g-inner-2: rgba(2, 9, 15, var(--glass-dark-strong));
+}
+.glass {
+  background:
+    linear-gradient(rgba(var(--g-rgb), var(--g-op)), rgba(var(--g-rgb), var(--g-op))),
+    rgba(var(--glass-tint), var(--glass-op));
+  -webkit-backdrop-filter: blur(var(--g-blur)) saturate(var(--g-sat));
+  backdrop-filter: blur(var(--g-blur)) saturate(var(--g-sat));
+  border: 1px solid var(--glass-bd-c);
+  border-radius: var(--ds-r);
+  box-shadow: var(--sh-inset), var(--sh-md);
+}
+.glass--strong { --g-op: var(--glass-dark-strong); }
+
+/* ★ Обёртка контента. max-width:none тут ЗАПРЕЩЁН — это и есть
+   «одинокая кнопка на весь монитор». Пустые бока = НОРМА. */
+.shell {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+.shell--narrow { max-width: var(--content-max-narrow); }

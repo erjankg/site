@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Калькулятор урона (старый экран) — Wild Rift</title>
+<!-- ⚠️ ВРЕМЕННЫЙ ФАЙЛ. Старый экран калькулятора (вкладки Урон/Предметы/Сборка/
+     Сравнение/Авто/Арена). Главным стал calc-app/index.html (новый, под канон).
+     Держим только чтобы не потерять ещё не перенесённые фичи (калькулятор
+     предметов, сравнение, арена) — они переезжают в главный как ЕГО фичи.
+     Как только переедут — этот файл и damage-calc-lab.* удалить целиком. -->
+<link rel="preconnect" href="https://ddragon.leagueoflegends.com">
+<link rel="preconnect" href="https://www.wildriftfire.com">
+<link rel="stylesheet" href="damage-calc-lab.css?v=35">
+<script>
+  if(/[?&]embed=1/.test(location.search)) document.documentElement.classList.add('embed');
+</script>
+</head>
+<body>
+  <div class="lab-bg" id="labBg"></div>
+
+  <header class="lab-top">
+    <div class="lab-top-title">
+      <span class="lab-logo">⚔</span>
+      <div>
+        <div class="lab-h1">Калькулятор урона — СТАРЫЙ экран</div>
+        <div class="lab-sub">Главный калькулятор теперь в <a href="index.html" style="color:#ffffff">index.html</a>. Эта страница живёт до переезда вкладок Предметы / Сравнение / Арена.</div>
+      </div>
+    </div>
+    <div class="lab-top-btns">
+      <div id="labTools" hidden></div>
+      <button id="toggleBtn" class="lab-toggle">▲ Свернуть настройки</button>
+      <button id="resetBtn" class="lab-reset">↺ Сбросить</button>
+    </div>
+  </header>
+
+  <section class="settings glassy" id="settings"></section>
+
+  <main class="lab-main">
+    <section class="stage" id="stage">
+      <div class="stage-inner" id="stageInner"></div>
+    </section>
+  </main>
+
+  <script src="../lab-settings.js"></script>
+  <script src="champ-base.js?v=1"></script>
+  <script src="wr-data.js?v=2"></script>
+  <script src="damage-calc-lab.js?v=35"></script>
+</body>
+</html>

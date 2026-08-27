@@ -1,35 +1,58 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru"
+      data-glass="on"
+      data-inner="on"
+      data-edge="on"
+      data-vignette="on"
+      data-bgdim="off">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Drafter-Lab · песочница драфтера</title>
-  <link rel="stylesheet" href="drafter-lab.css?v=14">
+  <title>lab-drafter · драфтер (финальный канон стекла)</title>
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="drafter-lab.css?v=20">
 </head>
 <body>
 
-  <div class="dl-bg art" id="dlBg"></div>
+  <!-- ФОН: один глобальный сплэш за всем стеклом + затемнение + виньетка -->
+  <div class="dl-splash" id="dlSplash" aria-hidden="true"></div>
+  <div class="dl-bgscrim" aria-hidden="true"></div>
+  <div class="dl-vignette" aria-hidden="true"></div>
 
-  <header class="dl-head">
-    <h1 class="dl-title">
-      ✦ Drafter-Lab
-      <small>песочница полноэкранного драфтера · стеклянный редизайн · не индексируется, не на сайте</small>
-    </h1>
-    <button class="dl-min-btn" id="dlMinBtn">Свернуть панель</button>
-    <div id="labTools"></div>
-    <div class="dl-controls" id="dlControls"></div>
-  </header>
+  <!-- ДРАФТЕР = ФУЛЛСКРИН-РАЗДЕЛ (не модалка). Рельс сворачивается;
+       в кооп-«клетке» (data-cage="on") рельса нет вообще — выхода нет. -->
+  <div class="dl-app" id="dlApp" data-cage="off">
+    <nav class="dl-rail glass" data-el="2" id="dlRail" aria-label="Навигация">
+      <button class="dl-rail-btn" data-nav="home"><span class="ico">◎</span><span class="lbl">Home</span></button>
+      <button class="dl-rail-btn on" data-nav="drafter"><span class="ico">🎯</span><span class="lbl">Драфтер</span></button>
+      <button class="dl-rail-btn" data-nav="calc"><span class="ico">∑</span><span class="lbl">Калькулятор</span></button>
+      <button class="dl-rail-btn" data-nav="items"><span class="ico">◆</span><span class="lbl">Предметы</span></button>
+    </nav>
 
-  <main class="dl-stage">
-    <div class="dl-frame-wrap">
-      <div class="dl-frame" id="dlFrame"></div>
-    </div>
-  </main>
+    <main class="dl-frame" id="dlFrame"></main>
+  </div>
+
+  <!-- ЧАТ-ПАНЕЛЬ: ОВЕРЛЕЕМ поверх драфтера (рельс/доска не сдвигаются).
+       Во время кооп-драфта — вкладка «ДРАФТ» с участниками и зрителями. -->
+  <aside class="dl-chat glass" data-el="3" id="dlChat" hidden></aside>
 
   <div class="dl-toast" id="dlToast"></div>
 
-  <script src="../lab-settings.js"></script>
-  <script src="drafter-lab.js?v=14"></script>
+  <!-- ДЕВ-ПОЛОСА (наш инструмент): тёмный солид, плавающая, драг за грип, оверлеем -->
+  <div class="dl-strip" id="dlStrip">
+    <div class="dl-strip-head" id="dlStripHead">
+      <span class="dl-strip-title">⋮⋮ Дизайн-полоса · lab-drafter</span>
+      <button class="dl-strip-min" id="dlStripMin">Свернуть</button>
+    </div>
+    <div class="dl-strip-body" id="dlControls"></div>
+    <div class="dl-strip-foot">
+      <div class="dl-choice">Ваш выбор: <b id="dlChoice">…</b></div>
+      <button class="dl-copy" id="dlCopy">📋 Скопировать мой выбор</button>
+    </div>
+  </div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="drafter-lab.js?v=20"></script>
 </body>
 </html>
