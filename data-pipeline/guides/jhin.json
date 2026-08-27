@@ -2,8 +2,8 @@
   "slug": "jhin",
   "name": "Jhin",
   "role": "Дракон",
-  "tier": "S",
-  "patch": "7.1f",
+  "tier": "A",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -307,11 +307,11 @@
           "Galeforce"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "The Collector",
           "Magnetic Blaster",
           "Lord Dominik's Regard",
-          "Infinity Edge",
-          "Bloodthirster",
+          "Galeforce",
           "Gluttonous Greaves - Galeforce"
         ]
       }
@@ -319,7 +319,7 @@
   ],
   "runes": [
     "Dark Harvest",
-    "Brutal",
+    "Battle Zeal",
     "Cut Down",
     "Legend: Alacrity",
     "Celerity"

@@ -2,8 +2,8 @@
   "slug": "draven",
   "name": "Draven",
   "role": "Дракон",
-  "tier": "A",
-  "patch": "7.1f",
+  "tier": "B",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,19 +300,18 @@
         "core": [
           "Bloodthirster",
           "Essence Reaver",
-          "Lord Dominik's Regard"
+          "Mortal Reminder"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
           "Bloodthirster",
+          "Berserker's Greaves",
           "Essence Reaver",
-          "Lord Dominik's Regard",
+          "Mortal Reminder",
           "Magnetic Blaster",
-          "Infinity Edge",
-          "Gluttonous Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     }

@@ -2,8 +2,8 @@
   "slug": "teemo",
   "name": "Teemo",
   "role": "Барон",
-  "tier": "A",
-  "patch": "7.1f",
+  "tier": "B",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -575,20 +575,19 @@
         ],
         "core": [
           "Liandry's Torment",
-          "Infinity Orb",
+          "Nashor's Tooth",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Liandry's Torment",
-          "Infinity Orb",
+          "Nashor's Tooth",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Lich Bane",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     },
@@ -602,20 +601,19 @@
         ],
         "core": [
           "Liandry's Torment",
-          "Infinity Orb",
+          "Stormsurge",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Liandry's Torment",
-          "Infinity Orb",
+          "Stormsurge",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Lich Bane",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
@@ -625,7 +623,7 @@
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",
-    "Brutal"
+    "Bone Plating"
   ],
   "spells": [
     {

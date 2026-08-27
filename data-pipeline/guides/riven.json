@@ -3,7 +3,7 @@
   "name": "Riven",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,28 +567,28 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
           "Eclipse",
-          "Trinity Force",
+          "Sundered Sky",
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Plated Steelcaps",
           "Goredrinker"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Eclipse",
-          "Trinity Force",
+          "Sundered Sky",
           "Serylda's Grudge",
           "Death's Dance",
-          "Guardian Angel",
-          "Gluttonous Greaves - Goredrinker"
+          "Plated Steelcaps - Goredrinker"
         ]
       }
     },
@@ -602,20 +602,19 @@
         ],
         "core": [
           "Trinity Force",
-          "Death's Dance",
-          "Serylda's Grudge"
+          "Sundered Sky",
+          "Death's Dance"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Trinity Force",
+          "Sundered Sky",
           "Death's Dance",
           "Serylda's Grudge",
-          "Serpent's Fang",
-          "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -624,7 +623,7 @@
     "Conqueror",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

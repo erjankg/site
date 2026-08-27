@@ -3,7 +3,7 @@
   "name": "Zed",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -579,22 +579,21 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Eclipse",
           "Serpent's Fang",
           "Serylda's Grudge",
           "Spear of Shojin",
-          "Trinity Force",
-          "Ionian Boots of Lucidity - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "A",
+      "tier": "B",
       "default": false,
       "items": {
         "starting": [
@@ -606,16 +605,15 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Youmuu's Ghostblade",
           "Trinity Force",
           "Serylda's Grudge",
-          "Serpent's Fang",
           "Spear of Shojin",
-          "Ionian Boots of Lucidity - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }

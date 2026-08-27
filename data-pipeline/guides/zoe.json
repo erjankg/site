@@ -2,8 +2,8 @@
   "slug": "zoe",
   "name": "Zoe",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.1f",
+  "tier": "A",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,27 +298,26 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Lich Bane",
+          "Luden's Echo",
           "Infinity Orb",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Lich Bane",
+          "Boots of Mana",
+          "Luden's Echo",
           "Infinity Orb",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "First Strike",
+    "Fleet Footwork",
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",

@@ -2,8 +2,8 @@
   "slug": "rell",
   "name": "Rell",
   "role": "Саппорт",
-  "tier": "B",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,30 +298,29 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
           "Zeke's Convergence",
-          "Radiant Virtue"
+          "Radiant Virtue",
+          "Dawnshroud"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Plated Steelcaps",
           "Zeke's Convergence",
           "Radiant Virtue",
           "Dawnshroud",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
     "Ice Overlord",
-    "Unshakeable",
+    "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Hextech Flashtraption"
   ],
   "spells": [

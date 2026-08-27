@@ -3,7 +3,7 @@
   "name": "Malphite",
   "role": "Барон",
   "tier": "A",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -704,8 +704,8 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -717,16 +717,41 @@
           "Frozen Heart"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Iceborn Gauntlet",
           "Thornmail",
           "Frozen Heart",
+          "Force of Nature",
+          "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Support Build",
+      "tier": "C",
+      "default": false,
+      "items": {
+        "starting": [
+          "Relic Shield"
+        ],
+        "core": [
           "Zeke's Convergence",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Thornmail",
+          "Iceborn Gauntlet"
+        ],
+        "boots": [
+          "Plated Steelcaps"
+        ],
+        "finalBuild": [
+          "Bulwark of the Mountain",
+          "Plated Steelcaps",
+          "Zeke's Convergence",
+          "Thornmail",
+          "Iceborn Gauntlet",
+          "Plated Steelcaps"
         ]
       }
     }
@@ -736,7 +761,7 @@
     "Unshakeable",
     "Second Wind",
     "Overgrowth",
-    "Brutal"
+    "Empowered Attack"
   ],
   "spells": [
     {

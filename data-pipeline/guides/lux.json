@@ -3,7 +3,7 @@
   "name": "Lux",
   "role": "Саппорт",
   "tier": "S",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -574,21 +574,20 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
           "Infinity Orb",
-          "Oceanid's Trident"
+          "Luden's Echo",
+          "Void Staff"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Black Mist Scythe",
+          "Boots of Mana",
           "Infinity Orb",
-          "Oceanid's Trident",
-          "Rabadon's Deathcap",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Luden's Echo",
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     },
@@ -602,30 +601,29 @@
         ],
         "core": [
           "Luden's Echo",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Luden's Echo",
-          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Crown of the Shattered Queen",
-          "Awakened Soulstealer",
-          "Boots of Mana - Stasis"
+          "Infinity Orb",
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
     "Arcane Comet",
-    "Cheap Shot",
-    "Chain Assault",
-    "Zombie Ward",
-    "Transcendence"
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
+    "Bone Plating"
   ],
   "spells": [
     {

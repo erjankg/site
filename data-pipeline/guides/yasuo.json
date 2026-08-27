@@ -2,8 +2,8 @@
   "slug": "yasuo",
   "name": "Yasuo",
   "role": "Мид",
-  "tier": "S+",
-  "patch": "7.1f",
+  "tier": "S",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -705,64 +705,64 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "A",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Bloodthirster",
-          "Mortal Reminder",
-          "Infinity Edge"
+          "Blade of the Ruined King",
+          "Essence Reaver",
+          "Mortal Reminder"
         ],
         "boots": [
           "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "Bloodthirster",
+          "Berserker's Greaves",
+          "Blade of the Ruined King",
+          "Essence Reaver",
           "Mortal Reminder",
           "Infinity Edge",
-          "Death's Dance",
-          "Guardian Angel",
           "Berserker's Greaves - Galeforce"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "C",
       "default": false,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Bloodthirster",
-          "Mortal Reminder",
-          "Infinity Edge"
+          "Blade of the Ruined King",
+          "Essence Reaver",
+          "Mortal Reminder"
         ],
         "boots": [
           "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "Bloodthirster",
+          "Berserker's Greaves",
+          "Blade of the Ruined King",
+          "Essence Reaver",
           "Mortal Reminder",
           "Infinity Edge",
-          "Death's Dance",
-          "Guardian Angel",
           "Berserker's Greaves - Galeforce"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
-    "Unshakeable",
+    "Grasp of the Undying",
+    "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Legend: Alacrity"
   ],
   "spells": [

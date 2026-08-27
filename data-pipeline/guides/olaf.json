@@ -2,8 +2,8 @@
   "slug": "olaf",
   "name": "Olaf",
   "role": "Лес",
-  "tier": "D",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -303,16 +303,15 @@
           "Death's Dance"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Glorious"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Trinity Force",
+          "Plated Steelcaps",
           "Zeke's Convergence",
           "Death's Dance",
-          "Sundered Sky",
-          "Sterak's Gage",
-          "Plated Steelcaps - Glorious"
+          "Force of Nature",
+          "Plated Steelcaps"
         ]
       }
     },
@@ -322,7 +321,7 @@
       "default": false,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
           "Trinity Force",
@@ -330,16 +329,15 @@
           "Death's Dance"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Glorious"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Trinity Force",
           "Zeke's Convergence",
           "Death's Dance",
-          "Sundered Sky",
-          "Sterak's Gage",
-          "Plated Steelcaps - Glorious"
+          "Force of Nature",
+          "Plated Steelcaps"
         ]
       }
     }
@@ -349,7 +347,7 @@
     "Triumph",
     "Last Stand",
     "Legend: Alacrity",
-    "Overgrowth"
+    "Nimbus Cloak"
   ],
   "spells": [
     {

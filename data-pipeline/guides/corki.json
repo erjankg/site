@@ -2,8 +2,8 @@
   "slug": "corki",
   "name": "Corki",
   "role": "Дракон",
-  "tier": "C",
-  "patch": "7.1f",
+  "tier": "A",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -369,19 +369,18 @@
         "core": [
           "Essence Reaver",
           "Magnetic Blaster",
-          "Lord Dominik's Regard"
+          "Mortal Reminder"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Essence Reaver",
           "Magnetic Blaster",
-          "Lord Dominik's Regard",
+          "Mortal Reminder",
           "Infinity Edge",
-          "Bloodthirster",
-          "Gluttonous Greaves - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }

@@ -2,8 +2,8 @@
   "slug": "darius",
   "name": "Darius",
   "role": "Барон",
-  "tier": "S",
-  "patch": "7.1f",
+  "tier": "S+",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,34 +567,33 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
-          "Trinity Force",
+          "Stridebreaker",
           "Sterak's Gage",
           "Amaranth's Twinguard"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Protobelt"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Trinity Force",
+          "Plated Steelcaps",
+          "Stridebreaker",
           "Sterak's Gage",
           "Amaranth's Twinguard",
           "Dead Man's Plate",
-          "Force of Nature",
-          "Plated Steelcaps - Protobelt"
+          "Plated Steelcaps"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -602,29 +601,28 @@
         ],
         "core": [
           "Trinity Force",
-          "Sterak's Gage",
-          "Amaranth's Twinguard"
+          "Stridebreaker",
+          "Sterak's Gage"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Protobelt"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Trinity Force",
+          "Plated Steelcaps",
+          "Stridebreaker",
           "Sterak's Gage",
-          "Amaranth's Twinguard",
-          "Dead Man's Plate",
-          "Force of Nature",
-          "Plated Steelcaps - Protobelt"
+          "Death's Dance",
+          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
     "Conqueror",
-    "Unshakeable",
+    "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Nimbus Cloak"
   ],
   "spells": [

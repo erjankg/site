@@ -3,7 +3,7 @@
   "name": "Mel",
   "role": "Мид",
   "tier": "S+",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -367,31 +367,30 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Infinity Orb",
-          "Awakened Soulstealer",
+          "Blackfire Torch",
+          "Liandry's Torment",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Infinity Orb",
-          "Awakened Soulstealer",
+          "Boots of Mana",
+          "Blackfire Torch",
+          "Liandry's Torment",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
     "Arcane Comet",
-    "Manaflow Band",
+    "Botanist",
     "Transcendence",
-    "Scorch",
-    "Bone Plating"
+    "Nimbus Cloak",
+    "Cut Down"
   ],
   "spells": [
     {

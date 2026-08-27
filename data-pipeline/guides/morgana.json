@@ -2,8 +2,8 @@
   "slug": "morgana",
   "name": "Morgana",
   "role": "Саппорт",
-  "tier": "A",
-  "patch": "7.1f",
+  "tier": "S+",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,88 +567,59 @@
   "builds": [
     {
       "title": "Support Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
-          "Rylai's Crystal Scepter",
-          "Liandry's Torment"
+          "Blackfire Torch",
+          "Liandry's Torment",
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Rylai's Crystal Scepter",
+          "Boots of Mana",
+          "Blackfire Torch",
           "Liandry's Torment",
-          "Oceanid's Trident",
-          "Rabadon's Deathcap",
-          "Boots of Mana - Stasis"
+          "Rylai's Crystal Scepter",
+          "Boots of Mana"
         ]
       }
     },
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
+          "Blackfire Torch",
           "Liandry's Torment",
-          "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap"
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Liandry's Torment",
-          "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Riftmaker",
-          "Boots of Mana - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Liandry's Torment",
-          "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
           "Boots of Mana",
-          "Stasis"
-        ],
-        "finalBuild": [
+          "Blackfire Torch",
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Riftmaker",
-          "Boots of Mana - Stasis"
+          "Zhonya's Hourglass",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Aery",
+    "Arcane Comet",
     "Manaflow Band",
     "Transcendence",
     "Scorch",

@@ -3,7 +3,7 @@
   "name": "Kayle",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -360,7 +360,7 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -368,56 +368,54 @@
         ],
         "core": [
           "Nashor's Tooth",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Dusk and Dawn",
+          "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Quicksilver"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Nashor's Tooth",
+          "Dusk and Dawn",
           "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Riftmaker",
-          "Lich Bane",
-          "Boots of Mana - Quicksilver"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
-          "Long Sword"
+          "Amplifying Tome"
         ],
         "core": [
-          "Blade of the Ruined King",
-          "Guinsoo's Rageblade",
-          "Terminus"
+          "Nashor's Tooth",
+          "Dusk and Dawn",
+          "Rabadon's Deathcap"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Quicksilver"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Blade of the Ruined King",
-          "Guinsoo's Rageblade",
-          "Terminus",
-          "Runaan's Hurricane",
-          "Amaranth's Twinguard",
-          "Berserker's Greaves - Quicksilver"
+          "Boots of Mana",
+          "Nashor's Tooth",
+          "Dusk and Dawn",
+          "Rabadon's Deathcap",
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Fleet Footwork",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Alacrity",
+    "Conqueror",
+    "Botanist",
+    "Absolute Focus",
+    "Gathering Storm",
     "Bone Plating"
   ],
   "spells": [

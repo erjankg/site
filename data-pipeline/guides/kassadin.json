@@ -3,7 +3,7 @@
   "name": "Kassadin",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -295,7 +295,7 @@
       "default": true,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Amplifying Tome"
         ],
         "core": [
           "Rod of Ages",
@@ -303,16 +303,15 @@
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Rod of Ages",
+          "Boots of Mana",
           "Seraph's Embrace",
           "Rabadon's Deathcap",
           "Malignance",
-          "Infinity Orb",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }

@@ -2,8 +2,8 @@
   "slug": "viego",
   "name": "Viego",
   "role": "Лес",
-  "tier": "B",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -303,25 +303,24 @@
           "Lord Dominik's Regard"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Berserker's Greaves",
           "Essence Reaver",
           "The Collector",
           "Lord Dominik's Regard",
-          "Bloodthirster",
           "Infinity Edge",
-          "Gluttonous Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
     "Conqueror",
-    "Unshakeable",
-    "Bone Plating",
-    "Overgrowth",
+    "Sudden Impact",
+    "Hubris",
+    "Eyeball Collector",
     "Legend: Alacrity"
   ],
   "spells": [

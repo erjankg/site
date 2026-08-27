@@ -2,8 +2,8 @@
   "slug": "sion",
   "name": "Sion",
   "role": "Барон",
-  "tier": "S",
-  "patch": "7.1f",
+  "tier": "A",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,19 +300,18 @@
         "core": [
           "Sunfire Aegis",
           "Thornmail",
-          "Unending Despair"
+          "Mantle of the Twelfth Hour"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Sunfire Aegis",
           "Thornmail",
-          "Unending Despair",
           "Mantle of the Twelfth Hour",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Unending Despair",
+          "Plated Steelcaps"
         ]
       }
     }

@@ -2,8 +2,8 @@
   "slug": "lulu",
   "name": "Lulu",
   "role": "Саппорт",
-  "tier": "C",
-  "patch": "7.1f",
+  "tier": "D",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -295,24 +295,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Relic Shield"
+          "Spectral Sickle"
         ],
         "core": [
-          "Bulwark of the Mountain",
-          "Ardent Censer",
-          "Harmonic Echo"
-        ],
-        "boots": [
-          "Ionian Boots of Lucidity",
-          "Veil"
-        ],
-        "finalBuild": [
-          "Bulwark of the Mountain",
           "Ardent Censer",
           "Harmonic Echo",
+          "Redemption"
+        ],
+        "boots": [
+          "Ionian Boots of Lucidity"
+        ],
+        "finalBuild": [
+          "Black Mist Scythe",
+          "Ardent Censer",
+          "Ionian Boots of Lucidity",
+          "Harmonic Echo",
           "Redemption",
-          "Crown of the Shattered Queen",
-          "Ionian Boots of Lucidity - Veil"
+          "Ionian Boots of Lucidity"
         ]
       }
     }

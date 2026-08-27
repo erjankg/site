@@ -2,8 +2,8 @@
   "slug": "warwick",
   "name": "Warwick",
   "role": "Лес",
-  "tier": "D",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,66 +290,38 @@
   ],
   "builds": [
     {
-      "title": "Jungle Build",
-      "tier": "S",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Trinity Force",
+          "Kraken Slayer",
           "Blade of the Ruined King",
-          "Awakened Soulstealer"
+          "Dusk and Dawn"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Trinity Force",
+          "Berserker's Greaves",
+          "Kraken Slayer",
           "Blade of the Ruined King",
-          "Awakened Soulstealer",
+          "Dusk and Dawn",
           "Terminus",
-          "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Solo Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
-          "Trinity Force",
-          "Blade of the Ruined King",
-          "Death's Dance"
-        ],
-        "boots": [
-          "Plated Steelcaps",
-          "Goredrinker"
-        ],
-        "finalBuild": [
-          "Trinity Force",
-          "Blade of the Ruined King",
-          "Death's Dance",
-          "Terminus",
-          "Guardian Angel",
-          "Plated Steelcaps - Goredrinker"
+          "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
     "Empowerment",
-    "Brutal",
-    "Cut Down",
-    "Legend: Alacrity",
-    "Overgrowth"
+    "Axiom Arcanist",
+    "Transcendence",
+    "Nimbus Cloak",
+    "Sudden Impact"
   ],
   "spells": [
     {

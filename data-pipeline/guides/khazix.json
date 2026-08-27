@@ -2,8 +2,8 @@
   "slug": "khazix",
   "name": "Kha'Zix",
   "role": "Лес",
-  "tier": "D",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -303,25 +303,24 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Youmuu's Ghostblade",
           "Serpent's Fang",
           "Serylda's Grudge",
           "Eclipse",
-          "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Gluttonous Greaves"
         ]
       }
     }
   ],
   "runes": [
     "First Strike",
-    "Sudden Impact",
-    "Hubris",
-    "Eyeball Collector",
+    "Battle Zeal",
+    "Cut Down",
+    "Legend: Bloodline",
     "Transcendence"
   ],
   "spells": [

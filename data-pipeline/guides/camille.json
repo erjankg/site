@@ -3,7 +3,7 @@
   "name": "Camille",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,56 +290,29 @@
   ],
   "builds": [
     {
-      "title": "Solo Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
           "Trinity Force",
-          "Hullbreaker",
-          "Sundered Sky"
+          "Goredrinker",
+          "Hullbreaker"
         ],
         "boots": [
           "Plated Steelcaps",
           "Goredrinker"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Trinity Force",
+          "Goredrinker",
           "Hullbreaker",
           "Sundered Sky",
-          "Death's Dance",
-          "Amaranth's Twinguard",
           "Plated Steelcaps - Goredrinker"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
-          "Trinity Force",
-          "Eclipse",
-          "Death's Dance"
-        ],
-        "boots": [
-          "Gluttonous Greaves",
-          "Goredrinker"
-        ],
-        "finalBuild": [
-          "Trinity Force",
-          "Eclipse",
-          "Death's Dance",
-          "Hullbreaker",
-          "Amaranth's Twinguard",
-          "Gluttonous Greaves - Goredrinker"
         ]
       }
     }
@@ -348,7 +321,7 @@
     "Grasp of the Undying",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Scorch"
   ],
   "spells": [

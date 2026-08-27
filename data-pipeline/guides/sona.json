@@ -3,7 +3,7 @@
   "name": "Sona",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -295,24 +295,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Relic Shield"
+          "Spectral Sickle"
         ],
         "core": [
-          "Bulwark of the Mountain",
-          "Archangel's Staff",
+          "Tear of the Goddess",
+          "Ardent Censer",
           "Harmonic Echo"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Veil"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Bulwark of the Mountain",
+          "Black Mist Scythe",
           "Seraph's Embrace",
-          "Harmonic Echo",
+          "Ionian Boots of Lucidity",
           "Ardent Censer",
-          "Staff of Flowing Water",
-          "Ionian Boots of Lucidity - Veil"
+          "Harmonic Echo",
+          "Ionian Boots of Lucidity"
         ]
       }
     }
@@ -322,7 +321,7 @@
     "Font of Life",
     "Bone Plating",
     "Revitalize",
-    "Manaflow Band"
+    "Transcendence"
   ],
   "spells": [
     {

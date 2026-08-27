@@ -1,15 +1,15 @@
 {
-  "slug": "ksante",
-  "name": "K'Sante",
-  "role": "Барон",
-  "tier": "S",
+  "slug": "skarner",
+  "name": "Skarner",
+  "role": "Лес",
+  "tier": "D",
   "patch": "7.2c",
   "dataDate": null,
   "matchups": [],
   "counters": [
-    "Ambessa",
-    "Vayne",
-    "Garen"
+    "Lillia",
+    "Olaf",
+    "Master Yi"
   ],
   "builds": [
     {
@@ -18,65 +18,65 @@
       "default": true,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Shimmering Spark"
         ],
         "core": [
-          "Iceborn Gauntlet",
-          "Unending Despair",
-          "Thornmail"
+          "Searing Crown",
+          "Hollow Radiance",
+          "Unending Despair"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Searing Crown",
           "Plated Steelcaps",
-          "Iceborn Gauntlet",
+          "Hollow Radiance",
           "Unending Despair",
-          "Thornmail",
-          "Amaranth's Twinguard",
+          "Frozen Heart",
           "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
-    "Grasp of the Undying",
+    "Ice Overlord",
     "Unshakeable",
-    "Second Wind",
-    "Perseverance",
-    "Last Stand"
+    "Bone Plating",
+    "Overgrowth",
+    "Legend: Alacrity"
   ],
   "spells": [],
   "skillOrder": [
     {
-      "ability": "Ntofo Strikes",
+      "ability": "Shattered Earth",
       "levels": [
         1,
-        4,
+        3,
         6,
         7
       ]
     },
     {
-      "ability": "Path Maker",
+      "ability": "Seismic Bastion",
       "levels": [
-        3,
+        2,
         8,
         10,
         11
       ]
     },
     {
-      "ability": "Footwork",
+      "ability": "Ixtal's Impact",
       "levels": [
-        2,
+        4,
         12,
         14,
         15
       ]
     },
     {
-      "ability": "All Out",
+      "ability": "Impale",
       "levels": [
         5,
         9,

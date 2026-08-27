@@ -2,8 +2,8 @@
   "slug": "gnar",
   "name": "Gnar",
   "role": "Барон",
-  "tier": "D",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -303,25 +303,24 @@
           "Sterak's Gage"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Trinity Force",
           "Black Cleaver",
           "Sterak's Gage",
           "Amaranth's Twinguard",
-          "Guardian Angel",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
     "Fleet Footwork",
-    "Unshakeable",
+    "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Brutal"
   ],
   "spells": [

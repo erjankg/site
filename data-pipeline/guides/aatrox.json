@@ -3,7 +3,7 @@
   "name": "Aatrox",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -571,11 +571,11 @@
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
           "Eclipse",
-          "Trinity Force",
+          "Sundered Sky",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -583,18 +583,18 @@
           "Stridebreaker"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Eclipse",
-          "Trinity Force",
+          "Sundered Sky",
           "Serylda's Grudge",
           "Death's Dance",
-          "Spear of Shojin",
           "Plated Steelcaps - Stridebreaker"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "S",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -606,16 +606,16 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Boots of Dynamism",
           "Goredrinker"
         ],
         "finalBuild": [
+          "Boots of Dynamism",
           "Trinity Force",
           "Death's Dance",
           "Serylda's Grudge",
-          "Spear of Shojin",
-          "Guardian Angel",
-          "Gluttonous Greaves - Goredrinker"
+          "Serpent's Fang",
+          "Boots of Dynamism - Goredrinker"
         ]
       }
     }
@@ -624,7 +624,7 @@
     "Conqueror",
     "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

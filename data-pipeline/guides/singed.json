@@ -3,7 +3,7 @@
   "name": "Singed",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -433,24 +433,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Amplifying Tome"
         ],
         "core": [
           "Liandry's Torment",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Dead Man's Plate",
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Liandry's Torment",
-          "Infinity Orb",
-          "Rabadon's Deathcap",
-          "Oceanid's Trident",
+          "Dead Man's Plate",
+          "Rylai's Crystal Scepter",
           "Riftmaker",
-          "Boots of Mana - Protobelt"
+          "Boots of Mana"
         ]
       }
     }

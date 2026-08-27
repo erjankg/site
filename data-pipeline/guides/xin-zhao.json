@@ -2,8 +2,8 @@
   "slug": "xin-zhao",
   "name": "Xin Zhao",
   "role": "Лес",
-  "tier": "A",
-  "patch": "7.1f",
+  "tier": "S",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,18 +300,18 @@
         "core": [
           "Trinity Force",
           "Serpent's Fang",
-          "Serylda's Grudge"
+          "Mortal Reminder"
         ],
         "boots": [
           "Gluttonous Greaves",
           "Goredrinker"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Trinity Force",
           "Serpent's Fang",
-          "Serylda's Grudge",
+          "Mortal Reminder",
           "Death's Dance",
-          "Guardian Angel",
           "Gluttonous Greaves - Goredrinker"
         ]
       }
@@ -319,9 +319,9 @@
   ],
   "runes": [
     "Phase Rush",
-    "Unshakeable",
-    "Bone Plating",
-    "Overgrowth",
+    "Triumph",
+    "Cut Down",
+    "Legend: Bloodline",
     "Sudden Impact"
   ],
   "spells": [

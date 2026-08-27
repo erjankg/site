@@ -2,8 +2,8 @@
   "slug": "aurora",
   "name": "Aurora",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,20 +299,19 @@
         ],
         "core": [
           "Infinity Orb",
-          "Rabadon's Deathcap",
-          "Awakened Soulstealer"
+          "Stormsurge",
+          "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Infinity Orb",
+          "Stormsurge",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
@@ -322,7 +321,7 @@
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",
-    "Bone Plating"
+    "Transcendence"
   ],
   "spells": [
     {

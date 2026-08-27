@@ -3,7 +3,7 @@
   "name": "Miss Fortune",
   "role": "Дракон",
   "tier": "S+",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,20 +299,19 @@
         ],
         "core": [
           "Duskblade of Draktharr",
-          "Serpent's Fang",
-          "Serylda's Grudge"
+          "The Collector",
+          "Lord Dominik's Regard"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Duskblade of Draktharr",
-          "Serpent's Fang",
-          "Serylda's Grudge",
-          "Edge of Night",
-          "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "The Collector",
+          "Lord Dominik's Regard",
+          "Bloodthirster",
+          "Gluttonous Greaves"
         ]
       }
     }

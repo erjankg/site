@@ -3,7 +3,7 @@
   "name": "Kog'Maw",
   "role": "Дракон",
   "tier": "B",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -290,29 +290,54 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Duo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Dagger"
         ],
         "core": [
-          "Blade of the Ruined King",
           "Guinsoo's Rageblade",
-          "Navori Quickblades"
+          "Navori Quickblades",
+          "Runaan's Hurricane"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Quicksilver"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Blade of the Ruined King",
+          "Berserker's Greaves",
           "Guinsoo's Rageblade",
           "Navori Quickblades",
           "Runaan's Hurricane",
-          "Terminus",
-          "Berserker's Greaves - Quicksilver"
+          "Blade of the Ruined King",
+          "Berserker's Greaves"
+        ]
+      }
+    },
+    {
+      "title": "Mid Build",
+      "tier": "A",
+      "default": false,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Archangel's Staff",
+          "Malignance",
+          "Blackfire Torch"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Seraph's Embrace",
+          "Boots of Mana",
+          "Malignance",
+          "Blackfire Torch",
+          "Rabadon's Deathcap",
+          "Boots of Mana"
         ]
       }
     }
@@ -321,7 +346,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

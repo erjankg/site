@@ -1,16 +1,12 @@
 {
-  "slug": "ksante",
-  "name": "K'Sante",
+  "slug": "chogath",
+  "name": "Cho'Gath",
   "role": "Барон",
-  "tier": "S",
+  "tier": "S+",
   "patch": "7.2c",
   "dataDate": null,
   "matchups": [],
-  "counters": [
-    "Ambessa",
-    "Vayne",
-    "Garen"
-  ],
+  "counters": [],
   "builds": [
     {
       "title": "Build 1",
@@ -21,18 +17,18 @@
           "Ruby Crystal"
         ],
         "core": [
-          "Iceborn Gauntlet",
-          "Unending Despair",
+          "Heartsteel",
+          "Sunfire Aegis",
           "Thornmail"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Plated Steelcaps",
-          "Iceborn Gauntlet",
-          "Unending Despair",
+          "Heartsteel",
+          "Sunfire Aegis",
           "Thornmail",
+          "Gargoyle Stoneplate",
           "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
@@ -41,24 +37,24 @@
   ],
   "runes": [
     "Grasp of the Undying",
-    "Unshakeable",
+    "Demolish",
     "Second Wind",
     "Perseverance",
-    "Last Stand"
+    "Transcendence"
   ],
   "spells": [],
   "skillOrder": [
     {
-      "ability": "Ntofo Strikes",
+      "ability": "Rupture",
       "levels": [
         1,
-        4,
-        6,
-        7
+        12,
+        14,
+        15
       ]
     },
     {
-      "ability": "Path Maker",
+      "ability": "Feral Scream",
       "levels": [
         3,
         8,
@@ -67,16 +63,16 @@
       ]
     },
     {
-      "ability": "Footwork",
+      "ability": "Vorpal Spikes",
       "levels": [
         2,
-        12,
-        14,
-        15
+        4,
+        6,
+        7
       ]
     },
     {
-      "ability": "All Out",
+      "ability": "Feast",
       "levels": [
         5,
         9,

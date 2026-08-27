@@ -3,7 +3,7 @@
   "name": "Akali",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,57 +299,55 @@
         ],
         "core": [
           "Infinity Orb",
-          "Rabadon's Deathcap",
-          "Riftmaker"
+          "Lich Bane",
+          "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Infinity Orb",
+          "Lich Bane",
           "Rabadon's Deathcap",
-          "Riftmaker",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "C",
       "default": false,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Amplifying Tome"
         ],
         "core": [
-          "Rod of Ages",
-          "Rabadon's Deathcap",
-          "Psychic Projector"
+          "Infinity Orb",
+          "Lich Bane",
+          "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Rod of Ages",
+          "Boots of Mana",
+          "Infinity Orb",
+          "Lich Bane",
           "Rabadon's Deathcap",
-          "Psychic Projector",
-          "Riftmaker",
-          "Oceanid's Trident",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
     "Electrocute",
-    "Unshakeable",
-    "Second Wind",
-    "Overgrowth",
-    "Sudden Impact"
+    "Sudden Impact",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Second Wind"
   ],
   "spells": [
     {

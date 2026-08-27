@@ -3,7 +3,7 @@
   "name": "Kennen",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -575,20 +575,19 @@
         ],
         "core": [
           "Infinity Orb",
-          "Awakened Soulstealer",
+          "Hextech Rocketbelt",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Infinity Orb",
-          "Awakened Soulstealer",
+          "Hextech Rocketbelt",
           "Rabadon's Deathcap",
-          "Crown of the Shattered Queen",
-          "Oceanid's Trident",
-          "Boots of Mana - Protobelt"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     },
@@ -602,20 +601,19 @@
         ],
         "core": [
           "Infinity Orb",
-          "Awakened Soulstealer",
+          "Hextech Rocketbelt",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Infinity Orb",
-          "Awakened Soulstealer",
+          "Hextech Rocketbelt",
           "Rabadon's Deathcap",
-          "Crown of the Shattered Queen",
-          "Oceanid's Trident",
-          "Boots of Mana - Protobelt"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }

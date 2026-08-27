@@ -3,7 +3,7 @@
   "name": "Bard",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
           "Lich Bane",
-          "Infinity Orb"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Black Mist Scythe",
+          "Boots of Mana",
           "Lich Bane",
           "Infinity Orb",
-          "Oceanid's Trident",
           "Rabadon's Deathcap",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }

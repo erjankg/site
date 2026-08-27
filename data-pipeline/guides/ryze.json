@@ -2,8 +2,8 @@
   "slug": "ryze",
   "name": "Ryze",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -571,24 +571,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Sapphire Crystal"
+          "Tear of the Goddess"
         ],
         "core": [
-          "Archangel's Staff",
           "Rod of Ages",
+          "Archangel's Staff",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Seraph's Embrace",
           "Rod of Ages",
+          "Boots of Mana",
+          "Seraph's Embrace",
           "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     },
@@ -598,24 +597,23 @@
       "default": false,
       "items": {
         "starting": [
-          "Sapphire Crystal"
+          "Tear of the Goddess"
         ],
         "core": [
-          "Archangel's Staff",
           "Rod of Ages",
+          "Archangel's Staff",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Seraph's Embrace",
           "Rod of Ages",
+          "Boots of Mana",
+          "Seraph's Embrace",
           "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }

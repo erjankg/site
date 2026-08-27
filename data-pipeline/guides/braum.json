@@ -3,7 +3,7 @@
   "name": "Braum",
   "role": "Саппорт",
   "tier": "C",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
-          "Redemption",
-          "Knight's Vow"
+          "Knight's Vow",
+          "Warmog's Armor",
+          "Radiant Virtue"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Locket"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Redemption",
+          "Plated Steelcaps",
           "Knight's Vow",
-          "Frozen Heart",
-          "Force of Nature",
-          "Plated Steelcaps - Locket"
+          "Warmog's Armor",
+          "Radiant Virtue",
+          "Plated Steelcaps"
         ]
       }
     }
@@ -321,8 +320,8 @@
     "Guardian",
     "Font of Life",
     "Second Wind",
-    "Overgrowth",
-    "Ingenious Hunter"
+    "Perseverance",
+    "Transcendence"
   ],
   "spells": [
     {

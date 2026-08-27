@@ -3,7 +3,7 @@
   "name": "Alistar",
   "role": "Саппорт",
   "tier": "C",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
           "Zeke's Convergence",
-          "Radiant Virtue"
+          "Radiant Virtue",
+          "Force of Nature"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Protobelt"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Plated Steelcaps",
           "Zeke's Convergence",
           "Radiant Virtue",
-          "Frozen Heart",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Protobelt"
+          "Force of Nature",
+          "Plated Steelcaps"
         ]
       }
     }
@@ -321,7 +320,7 @@
     "Ice Overlord",
     "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Hextech Flashtraption"
   ],
   "spells": [

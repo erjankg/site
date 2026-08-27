@@ -3,7 +3,7 @@
   "name": "Galio",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,55 +567,53 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "A",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
           "Ruby Crystal"
         ],
         "core": [
-          "Riftmaker",
-          "Hollow Radiance",
-          "Thornmail"
-        ],
-        "boots": [
-          "Boots of Mana",
-          "Protobelt"
-        ],
-        "finalBuild": [
-          "Riftmaker",
           "Hollow Radiance",
           "Thornmail",
-          "Dawnshroud",
-          "Amaranth's Twinguard",
-          "Boots of Mana - Protobelt"
+          "Riftmaker"
+        ],
+        "boots": [
+          "Mercury's Treads"
+        ],
+        "finalBuild": [
+          "Mercury's Treads",
+          "Hollow Radiance",
+          "Thornmail",
+          "Riftmaker",
+          "Hextech Rocketbelt",
+          "Mercury's Treads"
         ]
       }
     },
     {
       "title": "Support Build",
-      "tier": "S",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
           "Yordle Trap",
-          "Warmog's Armor"
+          "Warmog's Armor",
+          "Frozen Heart"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
           "Yordle Trap",
+          "Plated Steelcaps",
           "Warmog's Armor",
           "Frozen Heart",
-          "Kaenic Rookern",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
@@ -624,7 +622,7 @@
     "Ice Overlord",
     "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

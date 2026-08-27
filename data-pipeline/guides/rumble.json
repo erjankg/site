@@ -3,7 +3,7 @@
   "name": "Rumble",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -295,24 +295,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Amplifying Tome"
         ],
         "core": [
-          "Riftmaker",
           "Liandry's Torment",
-          "Psychic Projector"
+          "Bloodletter's Curse",
+          "Infinity Orb"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Riftmaker",
+          "Boots of Mana",
           "Liandry's Torment",
-          "Psychic Projector",
-          "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Plated Steelcaps - Stasis"
+          "Bloodletter's Curse",
+          "Infinity Orb",
+          "Zhonya's Hourglass",
+          "Boots of Mana"
         ]
       }
     }
@@ -321,8 +320,8 @@
     "Phase Rush",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
-    "Battle Zeal"
+    "Perseverance",
+    "Nimbus Cloak"
   ],
   "spells": [
     {

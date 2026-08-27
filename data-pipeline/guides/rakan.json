@@ -3,7 +3,7 @@
   "name": "Rakan",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
-          "Redemption",
-          "Zeke's Convergence"
+          "Zeke's Convergence",
+          "Hextech Rocketbelt",
+          "Oceanid's Trident"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Protobelt"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Redemption",
+          "Ionian Boots of Lucidity",
           "Zeke's Convergence",
-          "Radiant Virtue",
-          "Abyssal Mask",
-          "Ionian Boots of Lucidity - Protobelt"
+          "Hextech Rocketbelt",
+          "Oceanid's Trident",
+          "Ionian Boots of Lucidity"
         ]
       }
     }
@@ -321,7 +320,7 @@
     "Ice Overlord",
     "Unshakeable",
     "Bone Plating",
-    "Overgrowth",
+    "Perseverance",
     "Transcendence"
   ],
   "spells": [

@@ -2,8 +2,8 @@
   "slug": "tryndamere",
   "name": "Tryndamere",
   "role": "Лес",
-  "tier": "S",
-  "patch": "7.1f",
+  "tier": "S+",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,34 +567,33 @@
   "builds": [
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Magnetic Blaster",
           "Blade of the Ruined King",
-          "Mortal Reminder"
+          "Magnetic Blaster",
+          "Infinity Edge"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Quicksilver"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Magnetic Blaster",
+          "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Mortal Reminder",
+          "Magnetic Blaster",
           "Infinity Edge",
-          "Guardian Angel",
-          "Berserker's Greaves - Quicksilver"
+          "Mortal Reminder",
+          "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -603,19 +602,18 @@
         "core": [
           "Blade of the Ruined King",
           "Magnetic Blaster",
-          "Mortal Reminder"
+          "Infinity Edge"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Quicksilver"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Berserker's Greaves",
           "Blade of the Ruined King",
           "Magnetic Blaster",
-          "Mortal Reminder",
           "Infinity Edge",
-          "Guardian Angel",
-          "Berserker's Greaves - Quicksilver"
+          "Mortal Reminder",
+          "Berserker's Greaves"
         ]
       }
     }

@@ -2,8 +2,8 @@
   "slug": "vayne",
   "name": "Vayne",
   "role": "Дракон",
-  "tier": "S",
-  "patch": "7.1f",
+  "tier": "A",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -449,29 +449,54 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Duo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Blade of the Ruined King",
-          "Magnetic Blaster",
-          "Guinsoo's Rageblade"
-        ],
-        "boots": [
-          "Berserker's Greaves",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Blade of the Ruined King",
           "Magnetic Blaster",
           "Guinsoo's Rageblade",
+          "Blade of the Ruined King"
+        ],
+        "boots": [
+          "Berserker's Greaves"
+        ],
+        "finalBuild": [
+          "Berserker's Greaves",
+          "Magnetic Blaster",
+          "Guinsoo's Rageblade",
+          "Blade of the Ruined King",
           "Terminus",
-          "Amaranth's Twinguard",
-          "Berserker's Greaves - Stasis"
+          "Berserker's Greaves"
+        ]
+      }
+    },
+    {
+      "title": "Solo Build",
+      "tier": "A",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Blade of the Ruined King",
+          "Guinsoo's Rageblade",
+          "Magnetic Blaster"
+        ],
+        "boots": [
+          "Berserker's Greaves"
+        ],
+        "finalBuild": [
+          "Berserker's Greaves",
+          "Blade of the Ruined King",
+          "Guinsoo's Rageblade",
+          "Magnetic Blaster",
+          "Terminus",
+          "Berserker's Greaves"
         ]
       }
     }
@@ -480,7 +505,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

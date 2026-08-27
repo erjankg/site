@@ -3,7 +3,7 @@
   "name": "Urgot",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Ruby Crystal"
         ],
         "core": [
-          "Heartsteel",
-          "Titanic Hydra",
-          "Black Cleaver"
-        ],
-        "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
-        ],
-        "finalBuild": [
-          "Heartsteel",
-          "Titanic Hydra",
           "Black Cleaver",
           "Thornmail",
+          "Mantle of the Twelfth Hour"
+        ],
+        "boots": [
+          "Plated Steelcaps"
+        ],
+        "finalBuild": [
+          "Plated Steelcaps",
+          "Black Cleaver",
+          "Thornmail",
+          "Mantle of the Twelfth Hour",
           "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
@@ -321,7 +320,7 @@
     "Empowerment",
     "Demolish",
     "Bone Plating",
-    "Overgrowth",
+    "Perseverance",
     "Brutal"
   ],
   "spells": [

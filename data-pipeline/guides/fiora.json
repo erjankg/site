@@ -3,7 +3,7 @@
   "name": "Fiora",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,8 +298,8 @@
           "Long Sword"
         ],
         "core": [
+          "Blade of the Ruined King",
           "Trinity Force",
-          "Eclipse",
           "Hullbreaker"
         ],
         "boots": [
@@ -307,21 +307,21 @@
           "Goredrinker"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
+          "Blade of the Ruined King",
           "Trinity Force",
-          "Eclipse",
           "Hullbreaker",
-          "Spear of Shojin",
-          "Amaranth's Twinguard",
+          "Death's Dance",
           "Gluttonous Greaves - Goredrinker"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
+    "Grasp of the Undying",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

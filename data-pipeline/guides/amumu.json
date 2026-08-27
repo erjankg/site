@@ -2,8 +2,8 @@
   "slug": "amumu",
   "name": "Amumu",
   "role": "Лес",
-  "tier": "C",
-  "patch": "7.1f",
+  "tier": "D",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,19 +300,18 @@
         "core": [
           "Searing Crown",
           "Thornmail",
-          "Zeke's Convergence"
+          "Liandry's Torment"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Searing Crown",
           "Thornmail",
-          "Zeke's Convergence",
-          "Frozen Heart",
+          "Liandry's Torment",
           "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
@@ -321,8 +320,8 @@
     "Ice Overlord",
     "Unshakeable",
     "Bone Plating",
-    "Overgrowth",
-    "Sudden Impact"
+    "Perseverance",
+    "Legend: Bloodline"
   ],
   "spells": [
     {

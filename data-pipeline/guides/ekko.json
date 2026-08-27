@@ -2,8 +2,8 @@
   "slug": "ekko",
   "name": "Ekko",
   "role": "Мид",
-  "tier": "D",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -574,58 +574,56 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Lich Bane",
+          "Dusk and Dawn",
           "Infinity Orb",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Lich Bane",
+          "Boots of Mana",
+          "Dusk and Dawn",
           "Infinity Orb",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Riftmaker",
-          "Boots of Mana - Protobelt"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Lich Bane",
+          "Dusk and Dawn",
           "Nashor's Tooth",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Lich Bane",
+          "Boots of Mana",
+          "Dusk and Dawn",
           "Nashor's Tooth",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Riftmaker",
-          "Boots of Mana - Protobelt"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
     "Fleet Footwork",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Alacrity",
-    "Transcendence"
+    "Sudden Impact",
+    "Hubris",
+    "Eyeball Collector",
+    "Legend: Bloodline"
   ],
   "spells": [
     {

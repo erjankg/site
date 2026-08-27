@@ -2,8 +2,8 @@
   "slug": "velkoz",
   "name": "Vel'Koz",
   "role": "Мид",
-  "tier": "D",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -566,8 +566,8 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Mid Build",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -579,16 +579,41 @@
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Luden's Echo",
           "Infinity Orb",
           "Rabadon's Deathcap",
-          "Crown of the Shattered Queen",
-          "Awakened Soulstealer",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
+        ]
+      }
+    },
+    {
+      "title": "Support Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Spectral Sickle"
+        ],
+        "core": [
+          "Luden's Echo",
+          "Infinity Orb",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Black Mist Scythe",
+          "Boots of Mana",
+          "Luden's Echo",
+          "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Boots of Mana"
         ]
       }
     }

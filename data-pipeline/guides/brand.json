@@ -3,7 +3,7 @@
   "name": "Brand",
   "role": "Мид",
   "tier": "S",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -574,21 +574,20 @@
           "Amplifying Tome"
         ],
         "core": [
+          "Blackfire Torch",
           "Liandry's Torment",
-          "Infinity Orb",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
+          "Blackfire Torch",
           "Liandry's Torment",
-          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     },
@@ -601,31 +600,30 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
           "Liandry's Torment",
-          "Rylai's Crystal Scepter"
+          "Rylai's Crystal Scepter",
+          "Blackfire Torch"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Black Mist Scythe",
+          "Boots of Mana",
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Blackfire Torch",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
     "Electrocute",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Bloodline",
-    "Transcendence"
+    "Axiom Arcanist",
+    "Transcendence",
+    "Scorch",
+    "Bone Plating"
   ],
   "spells": [
     {

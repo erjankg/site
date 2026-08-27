@@ -2,8 +2,8 @@
   "slug": "lissandra",
   "name": "Lissandra",
   "role": "Мид",
-  "tier": "C",
-  "patch": "7.1f",
+  "tier": "D",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Awakened Soulstealer",
+          "Malignance",
           "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Hextech Rocketbelt"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Awakened Soulstealer",
+          "Boots of Mana",
+          "Malignance",
           "Infinity Orb",
+          "Hextech Rocketbelt",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }
@@ -322,7 +321,7 @@
     "Cheap Shot",
     "Chain Assault",
     "Eyeball Collector",
-    "Bone Plating"
+    "Axiom Arcanist"
   ],
   "spells": [
     {

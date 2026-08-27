@@ -2,8 +2,8 @@
   "slug": "lee-sin",
   "name": "Lee Sin",
   "role": "Лес",
-  "tier": "S+",
-  "patch": "7.1f",
+  "tier": "S",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,29 +299,28 @@
         ],
         "core": [
           "Youmuu's Ghostblade",
-          "Serpent's Fang",
+          "Trinity Force",
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Youmuu's Ghostblade",
-          "Serpent's Fang",
-          "Serylda's Grudge",
           "Trinity Force",
-          "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Serylda's Grudge",
+          "Serpent's Fang",
+          "Gluttonous Greaves"
         ]
       }
     }
   ],
   "runes": [
     "Conqueror",
-    "Unshakeable",
-    "Bone Plating",
-    "Overgrowth",
+    "Battle Zeal",
+    "Cut Down",
+    "Legend: Alacrity",
     "Sudden Impact"
   ],
   "spells": [

@@ -2,8 +2,8 @@
   "slug": "zyra",
   "name": "Zyra",
   "role": "Саппорт",
-  "tier": "S",
-  "patch": "7.1f",
+  "tier": "S+",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -574,21 +574,20 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
           "Liandry's Torment",
-          "Rylai's Crystal Scepter"
+          "Rylai's Crystal Scepter",
+          "Cryptbloom"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
           "Black Mist Scythe",
+          "Boots of Mana",
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
-          "Oceanid's Trident",
-          "Rabadon's Deathcap",
-          "Boots of Mana - Stasis"
+          "Cryptbloom",
+          "Boots of Mana"
         ]
       }
     },
@@ -601,30 +600,29 @@
           "Amplifying Tome"
         ],
         "core": [
+          "Blackfire Torch",
           "Liandry's Torment",
-          "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap"
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
+          "Blackfire Torch",
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Awakened Soulstealer",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
     "Arcane Comet",
-    "Cheap Shot",
-    "Chain Assault",
-    "Zombie Ward",
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
     "Bone Plating"
   ],
   "spells": [

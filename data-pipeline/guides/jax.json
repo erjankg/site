@@ -2,8 +2,8 @@
   "slug": "jax",
   "name": "Jax",
   "role": "Барон",
-  "tier": "D",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -566,29 +566,54 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "S",
       "default": true,
+      "items": {
+        "starting": [
+          "Ruby Crystal"
+        ],
+        "core": [
+          "Dusk and Dawn",
+          "Blade of the Ruined King",
+          "Hullbreaker"
+        ],
+        "boots": [
+          "Plated Steelcaps"
+        ],
+        "finalBuild": [
+          "Plated Steelcaps",
+          "Dusk and Dawn",
+          "Blade of the Ruined King",
+          "Hullbreaker",
+          "Zhonya's Hourglass",
+          "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "B",
+      "default": false,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Trinity Force",
-          "Riftmaker",
-          "Zeke's Convergence"
+          "Dusk and Dawn",
+          "Blade of the Ruined King",
+          "Riftmaker"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Trinity Force",
+          "Gluttonous Greaves",
+          "Dusk and Dawn",
+          "Blade of the Ruined King",
           "Riftmaker",
-          "Zeke's Convergence",
-          "Oceanid's Trident",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Zhonya's Hourglass",
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -598,7 +623,7 @@
     "Demolish",
     "Second Wind",
     "Overgrowth",
-    "Sudden Impact"
+    "Last Stand"
   ],
   "spells": [
     {

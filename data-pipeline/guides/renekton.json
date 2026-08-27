@@ -3,7 +3,7 @@
   "name": "Renekton",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -295,24 +295,24 @@
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
-          "Hullbreaker",
           "Blade of the Ruined King",
+          "Hullbreaker",
           "Mortal Reminder"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Plated Steelcaps",
           "Goredrinker"
         ],
         "finalBuild": [
-          "Hullbreaker",
+          "Plated Steelcaps",
           "Blade of the Ruined King",
+          "Hullbreaker",
           "Mortal Reminder",
           "Trinity Force",
-          "Guardian Angel",
-          "Gluttonous Greaves - Goredrinker"
+          "Plated Steelcaps - Goredrinker"
         ]
       }
     }
@@ -321,8 +321,8 @@
     "Conqueror",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
-    "Brutal"
+    "Perseverance",
+    "Sudden Impact"
   ],
   "spells": [
     {

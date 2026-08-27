@@ -2,8 +2,8 @@
   "slug": "gwen",
   "name": "Gwen",
   "role": "Барон",
-  "tier": "D",
-  "patch": "7.1f",
+  "tier": "B",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,39 +290,64 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
           "Ruby Crystal"
         ],
         "core": [
-          "Rod of Ages",
-          "Psychic Projector",
+          "Dusk and Dawn",
+          "Riftmaker",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Rod of Ages",
-          "Psychic Projector",
+          "Plated Steelcaps",
+          "Dusk and Dawn",
+          "Riftmaker",
           "Rabadon's Deathcap",
           "Infinity Orb",
-          "Oceanid's Trident",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "A",
+      "default": false,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Dusk and Dawn",
+          "Nashor's Tooth",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Gluttonous Greaves"
+        ],
+        "finalBuild": [
+          "Gluttonous Greaves",
+          "Dusk and Dawn",
+          "Nashor's Tooth",
+          "Rabadon's Deathcap",
+          "Infinity Orb",
+          "Gluttonous Greaves"
         ]
       }
     }
   ],
   "runes": [
     "Conqueror",
-    "Demolish",
-    "Second Wind",
-    "Overgrowth",
-    "Sudden Impact"
+    "Battle Zeal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Second Wind"
   ],
   "spells": [
     {

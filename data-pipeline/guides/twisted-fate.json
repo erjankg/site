@@ -2,8 +2,8 @@
   "slug": "twisted-fate",
   "name": "Twisted Fate",
   "role": "Мид",
-  "tier": "C",
-  "patch": "7.1f",
+  "tier": "A",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Rod of Ages",
-          "Lich Bane",
-          "Nashor's Tooth"
+          "Luden's Echo",
+          "Nashor's Tooth",
+          "Dusk and Dawn"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Rod of Ages",
-          "Lich Bane",
+          "Boots of Mana",
+          "Luden's Echo",
           "Nashor's Tooth",
+          "Dusk and Dawn",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Boots of Mana - Stasis"
+          "Boots of Mana"
         ]
       }
     }
@@ -320,7 +319,7 @@
   "runes": [
     "Fleet Footwork",
     "Botanist",
-    "Transcendence",
+    "Absolute Focus",
     "Nimbus Cloak",
     "Bone Plating"
   ],

@@ -2,8 +2,8 @@
   "slug": "veigar",
   "name": "Veigar",
   "role": "Мид",
-  "tier": "S",
-  "patch": "7.1f",
+  "tier": "B",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -566,29 +566,54 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Mid Build",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Awakened Soulstealer",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Stormsurge",
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Awakened Soulstealer",
-          "Infinity Orb",
+          "Boots of Mana",
+          "Stormsurge",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Infinity Orb",
+          "Void Staff",
+          "Boots of Mana"
+        ]
+      }
+    },
+    {
+      "title": "Support Build",
+      "tier": "C",
+      "default": false,
+      "items": {
+        "starting": [
+          "Spectral Sickle"
+        ],
+        "core": [
+          "Luden's Echo",
+          "Rabadon's Deathcap",
+          "Cryptbloom"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Black Mist Scythe",
+          "Boots of Mana",
+          "Luden's Echo",
+          "Rabadon's Deathcap",
+          "Cryptbloom",
+          "Boots of Mana"
         ]
       }
     }
@@ -598,7 +623,7 @@
     "Botanist",
     "Transcendence",
     "Gathering Storm",
-    "Bone Plating"
+    "Cut Down"
   ],
   "spells": [
     {

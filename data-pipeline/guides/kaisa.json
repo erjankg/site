@@ -2,8 +2,8 @@
   "slug": "kaisa",
   "name": "Kai'Sa",
   "role": "Дракон",
-  "tier": "S",
-  "patch": "7.1f",
+  "tier": "A",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,21 +298,20 @@
           "Long Sword"
         ],
         "core": [
-          "Kraken Slayer",
+          "Magnetic Blaster",
           "Guinsoo's Rageblade",
-          "Blade of the Ruined King"
+          "Terminus"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Kraken Slayer",
+          "Magnetic Blaster",
+          "Berserker's Greaves",
           "Guinsoo's Rageblade",
-          "Blade of the Ruined King",
           "Terminus",
           "Runaan's Hurricane",
-          "Berserker's Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     }
@@ -321,7 +320,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

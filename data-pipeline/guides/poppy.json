@@ -3,7 +3,7 @@
   "name": "Poppy",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,56 +290,28 @@
   ],
   "builds": [
     {
-      "title": "Solo Build",
-      "tier": "S",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Ruby Crystal"
         ],
         "core": [
+          "Heartsteel",
           "Sunfire Aegis",
-          "Thornmail",
-          "Force of Nature"
+          "Thornmail"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
+          "Heartsteel",
           "Sunfire Aegis",
           "Thornmail",
           "Force of Nature",
-          "Frozen Heart",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
-          "Trinity Force",
-          "Thornmail",
-          "Force of Nature"
-        ],
-        "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
-        ],
-        "finalBuild": [
-          "Trinity Force",
-          "Thornmail",
-          "Force of Nature",
-          "Amaranth's Twinguard",
-          "Guardian Angel",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
@@ -348,7 +320,7 @@
     "Grasp of the Undying",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Scorch"
   ],
   "spells": [

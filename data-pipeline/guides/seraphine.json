@@ -2,8 +2,8 @@
   "slug": "seraphine",
   "name": "Seraphine",
   "role": "Саппорт",
-  "tier": "C",
-  "patch": "7.1f",
+  "tier": "B",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -295,24 +295,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Relic Shield"
+          "Spectral Sickle"
         ],
         "core": [
-          "Bulwark of the Mountain",
+          "Ardent Censer",
           "Harmonic Echo",
-          "Ardent Censer"
+          "Redemption"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Locket"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Bulwark of the Mountain",
-          "Harmonic Echo",
+          "Black Mist Scythe",
+          "Ionian Boots of Lucidity",
           "Ardent Censer",
+          "Harmonic Echo",
           "Redemption",
-          "Staff of Flowing Water",
-          "Ionian Boots of Lucidity - Locket"
+          "Ionian Boots of Lucidity"
         ]
       }
     },
@@ -326,20 +325,19 @@
         ],
         "core": [
           "Luden's Echo",
-          "Infinity Orb",
+          "Cryptbloom",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Luden's Echo",
-          "Infinity Orb",
+          "Cryptbloom",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Lich Bane",
-          "Boots of Mana - Stasis"
+          "Infinity Orb",
+          "Boots of Mana"
         ]
       }
     }

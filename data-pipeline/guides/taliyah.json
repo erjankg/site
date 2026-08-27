@@ -2,8 +2,8 @@
   "slug": "taliyah",
   "name": "Taliyah",
   "role": "Мид",
-  "tier": "S",
-  "patch": "7.1f",
+  "tier": "C",
+  "patch": "7.2c",
   "dataDate": null,
   "matchups": [],
   "counters": [
@@ -14,34 +14,33 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "S+",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Infinity Orb",
-          "Awakened Soulstealer",
-          "Rabadon's Deathcap"
+          "Luden's Echo",
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Infinity Orb",
-          "Awakened Soulstealer",
+          "Boots of Mana",
+          "Luden's Echo",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Infinity Orb",
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "S+",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -49,30 +48,29 @@
         ],
         "core": [
           "Infinity Orb",
-          "Awakened Soulstealer",
-          "Rabadon's Deathcap"
+          "Rabadon's Deathcap",
+          "Void Staff"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Infinity Orb",
-          "Awakened Soulstealer",
           "Rabadon's Deathcap",
-          "Oceanid's Trident",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Void Staff",
+          "Zhonya's Hourglass",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Electrocute",
-    "Botanist",
-    "Absolute Focus",
-    "Scorch",
-    "Bone Plating"
+    "Dark Harvest",
+    "Cheap Shot",
+    "Tyrant",
+    "Eyeball Collector",
+    "Transcendence"
   ],
   "spells": [],
   "skillOrder": [

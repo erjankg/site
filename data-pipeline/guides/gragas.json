@@ -1,9 +1,9 @@
 {
   "slug": "gragas",
   "name": "Gragas",
-  "role": "Мид",
-  "tier": "B",
-  "patch": "7.1f",
+  "role": "Лес",
+  "tier": "A",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -422,72 +422,44 @@
     }
   ],
   "counters": [
-    "Galio",
-    "Vex",
-    "Kassadin"
+    "Amumu",
+    "Nocturne",
+    "Lillia"
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "B",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Luden's Echo",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Lich Bane",
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
-          "Luden's Echo",
-          "Infinity Orb",
-          "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Lich Bane",
-          "Boots of Mana - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Lich Bane",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
           "Boots of Mana",
-          "Stasis"
-        ],
-        "finalBuild": [
           "Lich Bane",
-          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Infinity Orb",
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Electrocute",
-    "Hextech Flashtraption",
-    "Transcendence",
-    "Nimbus Cloak",
-    "Sudden Impact"
+    "Phase Rush",
+    "Sudden Impact",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Transcendence"
   ],
   "spells": [
     {
@@ -500,8 +472,8 @@
     {
       "ability": "Barrel Roll",
       "levels": [
-        1,
-        4,
+        2,
+        3,
         6,
         7
       ]
@@ -509,7 +481,7 @@
     {
       "ability": "Drunken Rage",
       "levels": [
-        2,
+        1,
         12,
         14,
         15
@@ -518,7 +490,7 @@
     {
       "ability": "Body Slam",
       "levels": [
-        3,
+        4,
         8,
         10,
         11

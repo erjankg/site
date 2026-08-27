@@ -2,8 +2,8 @@
   "slug": "norra",
   "name": "Norra",
   "role": "Мид",
-  "tier": "A",
-  "patch": "7.1f",
+  "tier": "B",
+  "patch": "7.2c",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -506,20 +506,19 @@
         ],
         "core": [
           "Luden's Echo",
-          "Infinity Orb",
+          "Horizon Focus",
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Luden's Echo",
-          "Infinity Orb",
-          "Rabadon's Deathcap",
           "Horizon Focus",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Rabadon's Deathcap",
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }

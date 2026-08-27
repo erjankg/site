@@ -3,7 +3,7 @@
   "name": "Karma",
   "role": "Саппорт",
   "tier": "C",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,66 +290,38 @@
   ],
   "builds": [
     {
-      "title": "Support Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
-          "Relic Shield"
+          "Spectral Sickle"
         ],
         "core": [
-          "Bulwark of the Mountain",
-          "Harmonic Echo",
-          "Ardent Censer"
+          "Imperial Mandate",
+          "Ardent Censer",
+          "Redemption"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Veil"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Bulwark of the Mountain",
-          "Harmonic Echo",
+          "Black Mist Scythe",
+          "Ionian Boots of Lucidity",
+          "Imperial Mandate",
           "Ardent Censer",
           "Redemption",
-          "Frozen Heart",
-          "Ionian Boots of Lucidity - Veil"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "D",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Luden's Echo",
-          "Bandle Fantasy",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Boots of Mana",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Luden's Echo",
-          "Bandle Fantasy",
-          "Rabadon's Deathcap",
-          "Malignance",
-          "Horizon Focus",
-          "Boots of Mana - Stasis"
+          "Ionian Boots of Lucidity"
         ]
       }
     }
   ],
   "runes": [
-    "Aery",
-    "Font of Life",
-    "Bone Plating",
-    "Revitalize",
-    "Ingenious Hunter"
+    "Arcane Comet",
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
+    "Bone Plating"
   ],
   "spells": [
     {

@@ -2,8 +2,8 @@
   "slug": "ambessa",
   "name": "Ambessa",
   "role": "Барон",
-  "tier": "B",
-  "patch": "7.1f",
+  "tier": "D",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,34 +567,34 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "S+",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
           "Eclipse",
-          "Trinity Force",
+          "Spear of Shojin",
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Plated Steelcaps",
           "Goredrinker"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Eclipse",
-          "Trinity Force",
+          "Spear of Shojin",
           "Serylda's Grudge",
           "Death's Dance",
-          "Spear of Shojin",
-          "Gluttonous Greaves - Goredrinker"
+          "Plated Steelcaps - Goredrinker"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "S",
+      "tier": "B",
       "default": false,
       "items": {
         "starting": [
@@ -602,29 +602,28 @@
         ],
         "core": [
           "Trinity Force",
-          "Death's Dance",
+          "Spear of Shojin",
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Gluttonous Greaves",
           "Trinity Force",
-          "Death's Dance",
-          "Serylda's Grudge",
           "Spear of Shojin",
-          "Guardian Angel",
-          "Gluttonous Greaves - Stasis"
+          "Serylda's Grudge",
+          "Serpent's Fang",
+          "Gluttonous Greaves"
         ]
       }
     }
   ],
   "runes": [
     "Conqueror",
-    "Unshakeable",
+    "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Sudden Impact"
   ],
   "spells": [

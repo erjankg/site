@@ -2,8 +2,8 @@
   "slug": "yone",
   "name": "Yone",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.1f",
+  "tier": "S",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -843,7 +843,7 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -851,26 +851,25 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Bloodthirster",
+          "Essence Reaver",
           "Mortal Reminder"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Bloodthirster",
+          "Essence Reaver",
           "Mortal Reminder",
-          "Navori Quickblades",
-          "Guardian Angel",
-          "Berserker's Greaves - Stasis"
+          "Infinity Edge",
+          "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -878,26 +877,25 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Bloodthirster",
+          "Essence Reaver",
           "Mortal Reminder"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Bloodthirster",
+          "Essence Reaver",
           "Mortal Reminder",
           "Infinity Edge",
-          "Guardian Angel",
-          "Berserker's Greaves - Stasis"
+          "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "S+",
       "default": false,
       "items": {
         "starting": [
@@ -905,29 +903,28 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Bloodthirster",
+          "Essence Reaver",
           "Mortal Reminder"
         ],
         "boots": [
-          "Berserker's Greaves",
-          "Stasis"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Bloodthirster",
+          "Essence Reaver",
           "Mortal Reminder",
-          "Death's Dance",
-          "Guardian Angel",
-          "Berserker's Greaves - Stasis"
+          "Infinity Edge",
+          "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
+    "Grasp of the Undying",
     "Courage of the Colossus",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Legend: Alacrity"
   ],
   "spells": [

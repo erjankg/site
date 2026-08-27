@@ -3,7 +3,7 @@
   "name": "Yuumi",
   "role": "Саппорт",
   "tier": "C",
-  "patch": "7.1f",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,31 +298,30 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Black Mist Scythe",
+          "Ardent Censer",
           "Harmonic Echo",
-          "Ardent Censer"
+          "Redemption"
         ],
         "boots": [
-          "Ionian Boots of Lucidity",
-          "Veil"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Harmonic Echo",
           "Ardent Censer",
-          "Staff of Flowing Water",
-          "Knight's Vow",
-          "Ionian Boots of Lucidity - Veil"
+          "Ionian Boots of Lucidity",
+          "Harmonic Echo",
+          "Redemption",
+          "Ionian Boots of Lucidity"
         ]
       }
     }
   ],
   "runes": [
     "Aery",
-    "Font of Life",
-    "Bone Plating",
-    "Revitalize",
-    "Transcendence"
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
+    "Revitalize"
   ],
   "spells": [
     {

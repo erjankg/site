@@ -2,8 +2,8 @@
   "slug": "swain",
   "name": "Swain",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.1f",
+  "tier": "A",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -579,16 +579,15 @@
           "Rabadon's Deathcap"
         ],
         "boots": [
-          "Boots of Mana",
-          "Stasis"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Malignance",
           "Infinity Orb",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Stasis"
+          "Cryptbloom",
+          "Boots of Mana"
         ]
       }
     },
@@ -601,28 +600,27 @@
           "Relic Shield"
         ],
         "core": [
-          "Bulwark of the Mountain",
+          "Malignance",
           "Rylai's Crystal Scepter",
-          "Psychic Projector"
+          "Rabadon's Deathcap"
         ],
         "boots": [
-          "Plated Steelcaps",
-          "Gargoyle"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Plated Steelcaps",
+          "Malignance",
           "Rylai's Crystal Scepter",
-          "Psychic Projector",
           "Rabadon's Deathcap",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps - Gargoyle"
+          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
     "Phase Rush",
-    "Hextech Flashtraption",
+    "Axiom Arcanist",
     "Transcendence",
     "Nimbus Cloak",
     "Bone Plating"

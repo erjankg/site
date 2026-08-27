@@ -2,8 +2,8 @@
   "slug": "evelynn",
   "name": "Evelynn",
   "role": "Лес",
-  "tier": "C",
-  "patch": "7.1f",
+  "tier": "D",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,20 +299,19 @@
         ],
         "core": [
           "Lich Bane",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
-          "Boots of Mana",
-          "Protobelt"
+          "Boots of Mana"
         ],
         "finalBuild": [
+          "Boots of Mana",
           "Lich Bane",
-          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Awakened Soulstealer",
-          "Crown of the Shattered Queen",
-          "Boots of Mana - Protobelt"
+          "Infinity Orb",
+          "Void Staff",
+          "Boots of Mana"
         ]
       }
     }
@@ -320,7 +319,7 @@
   "runes": [
     "First Strike",
     "Sudden Impact",
-    "Hubris",
+    "Chain Assault",
     "Eyeball Collector",
     "Transcendence"
   ],

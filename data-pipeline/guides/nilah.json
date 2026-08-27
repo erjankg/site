@@ -1,9 +1,9 @@
 {
   "slug": "nilah",
   "name": "Nilah",
-  "role": "Дракон",
-  "tier": "D",
-  "patch": "7.1f",
+  "role": "Лес",
+  "tier": "B",
+  "patch": "7.2c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,62 +284,34 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Xayah",
-    "Smolder"
+    "Rammus",
+    "Amumu",
+    "Kha'Zix"
   ],
   "builds": [
     {
-      "title": "Duo Build",
-      "tier": "D",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
+          "Essence Reaver",
           "Bloodthirster",
-          "The Collector",
           "Lord Dominik's Regard"
         ],
         "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
+          "Boots of Dynamism"
         ],
         "finalBuild": [
+          "Boots of Dynamism",
+          "Essence Reaver",
           "Bloodthirster",
-          "The Collector",
           "Lord Dominik's Regard",
-          "Essence Reaver",
           "Infinity Edge",
-          "Gluttonous Greaves - Stasis"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "B",
-      "default": false,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
-          "Essence Reaver",
-          "The Collector",
-          "Lord Dominik's Regard"
-        ],
-        "boots": [
-          "Gluttonous Greaves",
-          "Stasis"
-        ],
-        "finalBuild": [
-          "Essence Reaver",
-          "The Collector",
-          "Lord Dominik's Regard",
-          "Bloodthirster",
-          "Infinity Edge",
-          "Gluttonous Greaves - Stasis"
+          "Boots of Dynamism"
         ]
       }
     }
@@ -349,7 +321,7 @@
     "Brutal",
     "Cut Down",
     "Legend: Alacrity",
-    "Second Wind"
+    "Sudden Impact"
   ],
   "spells": [
     {
@@ -362,8 +334,8 @@
     {
       "ability": "Formless Blade",
       "levels": [
-        1,
-        4,
+        2,
+        3,
         6,
         7
       ]
@@ -371,7 +343,7 @@
     {
       "ability": "Jubilant Veil",
       "levels": [
-        3,
+        4,
         12,
         14,
         15
@@ -380,7 +352,7 @@
     {
       "ability": "Slipstream",
       "levels": [
-        2,
+        1,
         8,
         10,
         11
