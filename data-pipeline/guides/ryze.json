@@ -3,7 +3,7 @@
   "name": "Ryze",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.2c",
+  "patch": "7.2d",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "S+",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -593,7 +593,7 @@
     },
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "B",
       "default": false,
       "items": {
         "starting": [
