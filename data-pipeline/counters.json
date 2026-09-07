@@ -1,5 +1,5 @@
 {
- "built": "2026-08-31",
+ "built": "2026-09-07",
  "note": "ПАРЫ «кто кого контрит», собраны роботом. Данные РЕДАКЦИОННЫЕ — это мнение авторов сайтов-источников, не статистика матчей. Показывать вместе с источником и sourceDate: часть страниц отстаёт на несколько патчей. Winrate-проценты этих сайтов НЕ забираем — источник чисел там не указан. Текст «почему» берётся из champion-tags.json.",
  "sources": {
   "wildriftcounter": {
@@ -14,7 +14,7 @@
   }
  },
  "count": 141,
- "pairs": 5517,
+ "pairs": 5523,
  "champions": {
   "Aatrox": {
    "en": "Aatrox",
@@ -5059,12 +5059,12 @@
       },
       "Mid": {
        "counteredBy": [
-        "ekko",
         "brand",
-        "annie",
-        "vex",
         "yasuo",
-        "diana"
+        "diana",
+        "ekko",
+        "vex",
+        "annie"
        ],
        "strongAgainst": [
         "katarina",
@@ -6736,12 +6736,12 @@
       },
       "Support": {
        "counteredBy": [
-        "nami",
-        "maokai",
-        "pyke",
         "rakan",
+        "pyke",
         "brand",
-        "sona"
+        "maokai",
+        "sona",
+        "nami"
        ],
        "strongAgainst": [
         "alistar",
@@ -6755,11 +6755,11 @@
       "Adc": {
        "counteredBy": [
         "kalista",
-        "ashe",
-        "vayne",
         "aphelios",
+        "kaisa",
+        "ashe",
         "tristana",
-        "kaisa"
+        "vayne"
        ],
        "strongAgainst": [
         "caitlyn",
@@ -8328,7 +8328,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/sona/",
-     "sourceDate": "2026-02-12",
+     "sourceDate": "2026-09-07",
      "kind": "editorial",
      "lanes": {
       "Support": {
@@ -8408,7 +8408,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/soraka/",
-     "sourceDate": "2026-02-14",
+     "sourceDate": "2026-09-06",
      "kind": "editorial",
      "lanes": {
       "Support": {
@@ -8572,7 +8572,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/syndra/",
-     "sourceDate": "2026-02-14",
+     "sourceDate": "2026-09-04",
      "kind": "editorial",
      "lanes": {
       "Mid": {
@@ -8669,7 +8669,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/taliyah/",
-     "sourceDate": "2026-05-21",
+     "sourceDate": "2026-09-03",
      "kind": "editorial",
      "lanes": {
       "Jungle": {
@@ -8736,7 +8736,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/talon/",
-     "sourceDate": "2026-02-16",
+     "sourceDate": "2026-09-01",
      "kind": "editorial",
      "lanes": {
       "Mid": {
@@ -9062,9 +9062,9 @@
        ],
        "strongAgainst": [
         "janna",
-        "sona",
         "morgana",
         "brand",
+        "sona",
         "soraka"
        ]
       },
@@ -9535,12 +9535,12 @@
         "rammus"
        ],
        "strongAgainst": [
-        "amumu",
-        "fiddlesticks",
         "wukong",
         "ekko",
+        "evelynn",
+        "fiddlesticks",
         "dr-mundo",
-        "evelynn"
+        "amumu"
        ]
       },
       "Top": {
@@ -11309,6 +11309,18 @@
        ]
       }
      }
+    },
+    "wildriftfire": {
+     "url": "https://www.wildriftfire.com/guide/chogath",
+     "patch": "7.2d",
+     "kind": "editorial",
+     "counteredBy": {
+      "Top": [
+       "teemo",
+       "gwen",
+       "fiora"
+      ]
+     }
     }
    }
   },
@@ -11339,6 +11351,18 @@
         "smolder"
        ]
       }
+     }
+    },
+    "wildriftfire": {
+     "url": "https://www.wildriftfire.com/guide/yunara",
+     "patch": "7.2d",
+     "kind": "editorial",
+     "counteredBy": {
+      "Adc": [
+       "smolder",
+       "miss-fortune",
+       "caitlyn"
+      ]
      }
     }
    }
