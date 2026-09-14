@@ -3,7 +3,7 @@
   "name": "Ambessa",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2d",
+  "patch": "7.2e",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -594,26 +594,26 @@
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
+          "Eclipse",
           "Trinity Force",
-          "Spear of Shojin",
-          "Serylda's Grudge"
+          "Death's Dance"
         ],
         "boots": [
           "Gluttonous Greaves"
         ],
         "finalBuild": [
           "Gluttonous Greaves",
+          "Eclipse",
           "Trinity Force",
-          "Spear of Shojin",
+          "Death's Dance",
           "Serylda's Grudge",
-          "Serpent's Fang",
           "Gluttonous Greaves"
         ]
       }

@@ -2,8 +2,8 @@
   "slug": "malphite",
   "name": "Malphite",
   "role": "Барон",
-  "tier": "A",
-  "patch": "7.2d",
+  "tier": "S",
+  "patch": "7.2e",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -705,7 +705,7 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "S",
+      "tier": "S+",
       "default": true,
       "items": {
         "starting": [
@@ -731,7 +731,7 @@
     },
     {
       "title": "Support Build",
-      "tier": "C",
+      "tier": "B",
       "default": false,
       "items": {
         "starting": [
