@@ -359,8 +359,8 @@
   ],
   "builds": [
     {
-      "title": "Solo Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -381,32 +381,6 @@
           "Hullbreaker",
           "Death's Dance",
           "Gluttonous Greaves"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "B",
-      "default": false,
-      "items": {
-        "starting": [
-          "Ruby Crystal"
-        ],
-        "core": [
-          "Blade of the Ruined King",
-          "Trinity Force",
-          "Death's Dance"
-        ],
-        "boots": [
-          "Mercury's Treads"
-        ],
-        "finalBuild": [
-          "Mercury's Treads",
-          "Blade of the Ruined King",
-          "Trinity Force",
-          "Death's Dance",
-          "Terminus",
-          "Mercury's Treads"
         ]
       }
     }

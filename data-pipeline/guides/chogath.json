@@ -13,8 +13,8 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -29,11 +29,37 @@
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Heartsteel",
           "Sunfire Aegis",
           "Thornmail",
           "Gargoyle Stoneplate",
-          "Amaranth's Twinguard",
+          "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "C",
+      "default": false,
+      "items": {
+        "starting": [
+          "Shimmering Spark"
+        ],
+        "core": [
+          "Heartsteel",
+          "Sunfire Aegis",
+          "Thornmail"
+        ],
+        "boots": [
+          "Plated Steelcaps"
+        ],
+        "finalBuild": [
+          "Heartsteel",
+          "Plated Steelcaps",
+          "Sunfire Aegis",
+          "Thornmail",
+          "Gargoyle Stoneplate",
           "Plated Steelcaps"
         ]
       }

@@ -1,5 +1,5 @@
 {
- "built": "2026-09-14",
+ "built": "2026-09-21",
  "note": "ПАРЫ «кто кого контрит», собраны роботом. Данные РЕДАКЦИОННЫЕ — это мнение авторов сайтов-источников, не статистика матчей. Показывать вместе с источником и sourceDate: часть страниц отстаёт на несколько патчей. Winrate-проценты этих сайтов НЕ забираем — источник чисел там не указан. Текст «почему» берётся из champion-tags.json.",
  "sources": {
   "wildriftcounter": {
@@ -14,7 +14,7 @@
   }
  },
  "count": 141,
- "pairs": 5523,
+ "pairs": 5514,
  "champions": {
   "Aatrox": {
    "en": "Aatrox",
@@ -3154,11 +3154,6 @@
        "malphite",
        "wukong",
        "poppy"
-      ],
-      "Mid": [
-       "vladimir",
-       "vex",
-       "galio"
       ]
      }
     }
@@ -3645,7 +3640,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/jinx/",
-     "sourceDate": "2026-01-30",
+     "sourceDate": "2026-09-20",
      "kind": "editorial",
      "lanes": {
       "Adc": {
@@ -3724,7 +3719,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/kaisa/",
-     "sourceDate": "2026-01-31",
+     "sourceDate": "2026-09-19",
      "kind": "editorial",
      "lanes": {
       "Adc": {
@@ -4141,7 +4136,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/kayle/",
-     "sourceDate": "2026-01-31",
+     "sourceDate": "2026-09-18",
      "kind": "editorial",
      "lanes": {
       "Top": {
@@ -4673,7 +4668,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/lee-sin/",
-     "sourceDate": "2026-02-03",
+     "sourceDate": "2026-09-16",
      "kind": "editorial",
      "lanes": {
       "Jungle": {
@@ -4753,7 +4748,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/leona/",
-     "sourceDate": "2026-02-03",
+     "sourceDate": "2026-09-15",
      "kind": "editorial",
      "lanes": {
       "Support": {
@@ -5061,9 +5056,9 @@
        "counteredBy": [
         "ekko",
         "vex",
-        "diana",
-        "annie",
         "brand",
+        "annie",
+        "diana",
         "yasuo"
        ],
        "strongAgainst": [
@@ -6736,11 +6731,11 @@
       },
       "Support": {
        "counteredBy": [
-        "rakan",
-        "maokai",
-        "sona",
-        "nami",
         "brand",
+        "sona",
+        "maokai",
+        "nami",
+        "rakan",
         "pyke"
        ],
        "strongAgainst": [
@@ -6754,12 +6749,12 @@
       },
       "Adc": {
        "counteredBy": [
-        "tristana",
-        "aphelios",
-        "vayne",
         "kalista",
+        "vayne",
+        "ashe",
         "kaisa",
-        "ashe"
+        "aphelios",
+        "tristana"
        ],
        "strongAgainst": [
         "caitlyn",
@@ -7563,11 +7558,6 @@
        "kassadin",
        "viktor",
        "syndra"
-      ],
-      "Top": [
-       "aatrox",
-       "yasuo",
-       "renekton"
       ]
      }
     }
@@ -8719,11 +8709,6 @@
        "syndra",
        "zed",
        "orianna"
-      ],
-      "Jungle": [
-       "rammus",
-       "hecarim",
-       "zed"
       ]
      }
     }
@@ -9061,11 +9046,11 @@
         "seraphine"
        ],
        "strongAgainst": [
-        "sona",
-        "janna",
-        "soraka",
         "brand",
-        "morgana"
+        "soraka",
+        "morgana",
+        "sona",
+        "janna"
        ]
       },
       "Jungle": {
@@ -9535,12 +9520,12 @@
         "rammus"
        ],
        "strongAgainst": [
-        "wukong",
-        "evelynn",
-        "ekko",
         "fiddlesticks",
+        "wukong",
+        "ekko",
         "amumu",
-        "dr-mundo"
+        "dr-mundo",
+        "evelynn"
        ]
       },
       "Top": {
@@ -9554,11 +9539,11 @@
        ],
        "strongAgainst": [
         "olaf",
+        "darius",
         "teemo",
         "dr-mundo",
-        "volibear",
         "gwen",
-        "darius"
+        "volibear"
        ]
       }
      }

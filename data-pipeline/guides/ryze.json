@@ -566,35 +566,9 @@
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
-      "items": {
-        "starting": [
-          "Tear of the Goddess"
-        ],
-        "core": [
-          "Rod of Ages",
-          "Archangel's Staff",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Rod of Ages",
-          "Boots of Mana",
-          "Seraph's Embrace",
-          "Rabadon's Deathcap",
-          "Void Staff",
-          "Boots of Mana"
-        ]
-      }
-    },
-    {
-      "title": "Solo Build",
-      "tier": "B",
-      "default": false,
       "items": {
         "starting": [
           "Tear of the Goddess"

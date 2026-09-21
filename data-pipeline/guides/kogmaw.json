@@ -290,8 +290,8 @@
   ],
   "builds": [
     {
-      "title": "Duo Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -312,32 +312,6 @@
           "Runaan's Hurricane",
           "Blade of the Ruined King",
           "Berserker's Greaves"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "B",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Archangel's Staff",
-          "Malignance",
-          "Blackfire Torch"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Seraph's Embrace",
-          "Boots of Mana",
-          "Malignance",
-          "Blackfire Torch",
-          "Rabadon's Deathcap",
-          "Boots of Mana"
         ]
       }
     }

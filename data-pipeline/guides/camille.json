@@ -2,7 +2,7 @@
   "slug": "camille",
   "name": "Camille",
   "role": "Барон",
-  "tier": "C",
+  "tier": "D",
   "patch": "7.2e",
   "dataDate": "2026-04-20",
   "matchups": [
@@ -290,8 +290,8 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -313,6 +313,32 @@
           "Hullbreaker",
           "Sundered Sky",
           "Plated Steelcaps - Goredrinker"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "B",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Trinity Force",
+          "Eclipse",
+          "Death's Dance"
+        ],
+        "boots": [
+          "Gluttonous Greaves"
+        ],
+        "finalBuild": [
+          "Trinity Force",
+          "Gluttonous Greaves",
+          "Eclipse",
+          "Death's Dance",
+          "Sterak's Gage",
+          "Gluttonous Greaves"
         ]
       }
     }

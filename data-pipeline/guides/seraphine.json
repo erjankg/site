@@ -290,8 +290,8 @@
   ],
   "builds": [
     {
-      "title": "Support Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -312,32 +312,6 @@
           "Harmonic Echo",
           "Redemption",
           "Ionian Boots of Lucidity"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Luden's Echo",
-          "Cryptbloom",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Boots of Mana",
-          "Luden's Echo",
-          "Cryptbloom",
-          "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Boots of Mana"
         ]
       }
     }
@@ -370,7 +344,7 @@
     {
       "ability": "High Note",
       "levels": [
-        3,
+        1,
         8,
         10,
         11
@@ -379,7 +353,7 @@
     {
       "ability": "Surround Sound",
       "levels": [
-        1,
+        3,
         4,
         6,
         7
