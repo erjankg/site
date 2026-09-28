@@ -2,8 +2,8 @@
   "slug": "aurelion-sol",
   "name": "Aurelion Sol",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.2e",
+  "tier": "A",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Rylai's Crystal Scepter",
-          "Infinity Orb",
+          "Liandry's Torment",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Rylai's Crystal Scepter",
-          "Infinity Orb",
-          "Rabadon's Deathcap",
           "Liandry's Torment",
+          "Rabadon's Deathcap",
+          "Riftmaker",
           "Boots of Mana"
         ]
       }
@@ -318,9 +318,9 @@
   ],
   "runes": [
     "Dark Harvest",
-    "Botanist",
+    "Manaflow Band",
     "Absolute Focus",
-    "Gathering Storm",
+    "Scorch",
     "Bone Plating"
   ],
   "spells": [

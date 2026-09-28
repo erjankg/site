@@ -2,8 +2,8 @@
   "slug": "twisted-fate",
   "name": "Twisted Fate",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.2e",
+  "tier": "D",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,19 +298,19 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Luden's Echo",
+          "Dusk and Dawn",
           "Nashor's Tooth",
-          "Dusk and Dawn"
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Luden's Echo",
-          "Nashor's Tooth",
           "Dusk and Dawn",
+          "Nashor's Tooth",
           "Rabadon's Deathcap",
+          "Void Staff",
           "Boots of Mana"
         ]
       }
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "Fleet Footwork",
-    "Botanist",
+    "Manaflow Band",
     "Absolute Focus",
     "Nimbus Cloak",
     "Bone Plating"
@@ -359,7 +359,7 @@
     {
       "ability": "Wild Cards",
       "levels": [
-        3,
+        2,
         4,
         6,
         7
@@ -377,7 +377,7 @@
     {
       "ability": "Stacked Deck",
       "levels": [
-        2,
+        3,
         12,
         14,
         15

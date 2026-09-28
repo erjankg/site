@@ -3,7 +3,7 @@
   "name": "Lucian",
   "role": "Дракон",
   "tier": "B",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,20 +299,20 @@
         ],
         "core": [
           "Essence Reaver",
-          "Magnetic Blaster",
-          "Lord Dominik's Regard"
+          "Stormrazor",
+          "Infinity Edge"
         ],
         "boots": [
-          "Berserker's Greaves",
+          "Gluttonous Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
+          "Gluttonous Greaves",
           "Essence Reaver",
-          "Magnetic Blaster",
+          "Stormrazor",
+          "Infinity Edge",
           "Lord Dominik's Regard",
-          "Galeforce",
-          "Berserker's Greaves - Galeforce"
+          "Gluttonous Greaves - Galeforce"
         ]
       }
     }
@@ -321,8 +321,8 @@
     "Empowerment",
     "Brutal",
     "Cut Down",
-    "Legend: Bloodline",
-    "Sudden Impact"
+    "Legend: Alacrity",
+    "Bone Plating"
   ],
   "spells": [
     {

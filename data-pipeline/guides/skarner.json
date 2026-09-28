@@ -3,7 +3,7 @@
   "name": "Skarner",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": null,
   "matchups": [],
   "counters": [
@@ -18,22 +18,22 @@
       "default": true,
       "items": {
         "starting": [
-          "Shimmering Spark"
+          "Ruby Crystal"
         ],
         "core": [
-          "Searing Crown",
-          "Hollow Radiance",
-          "Unending Despair"
+          "Sunfire Aegis",
+          "Unending Despair",
+          "Thornmail"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Searing Crown",
+          "Sunfire Aegis",
           "Plated Steelcaps",
-          "Hollow Radiance",
           "Unending Despair",
-          "Frozen Heart",
+          "Thornmail",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
@@ -42,9 +42,9 @@
   "runes": [
     "Ice Overlord",
     "Unshakeable",
-    "Bone Plating",
-    "Overgrowth",
-    "Legend: Alacrity"
+    "Second Wind",
+    "Perseverance",
+    "Transcendence"
   ],
   "spells": [],
   "skillOrder": [

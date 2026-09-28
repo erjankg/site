@@ -3,7 +3,7 @@
   "name": "Fizz",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -576,7 +576,7 @@
         "core": [
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Void Staff"
         ],
         "boots": [
           "Boots of Mana"
@@ -585,15 +585,15 @@
           "Boots of Mana",
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Infinity Orb",
           "Void Staff",
+          "Infinity Orb",
           "Boots of Mana"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "C",
+      "tier": "B",
       "default": false,
       "items": {
         "starting": [
@@ -602,7 +602,7 @@
         "core": [
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Void Staff"
         ],
         "boots": [
           "Boots of Mana"
@@ -611,8 +611,8 @@
           "Boots of Mana",
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Infinity Orb",
           "Void Staff",
+          "Infinity Orb",
           "Boots of Mana"
         ]
       }
@@ -621,9 +621,9 @@
   "runes": [
     "Fleet Footwork",
     "Sudden Impact",
-    "Chain Assault",
+    "Hubris",
     "Eyeball Collector",
-    "Transcendence"
+    "Absolute Focus"
   ],
   "spells": [
     {

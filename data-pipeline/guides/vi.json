@@ -2,8 +2,8 @@
   "slug": "vi",
   "name": "Vi",
   "role": "Лес",
-  "tier": "B",
-  "patch": "7.2e",
+  "tier": "C",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -310,7 +310,7 @@
           "Plated Steelcaps",
           "Sundered Sky",
           "Death's Dance",
-          "Force of Nature",
+          "Guardian Angel",
           "Plated Steelcaps"
         ]
       }
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "Conqueror",
-    "Brutal",
+    "Triumph",
     "Cut Down",
     "Legend: Alacrity",
     "Sudden Impact"
@@ -335,7 +335,7 @@
       "ability": "Vault Breaker",
       "levels": [
         1,
-        4,
+        3,
         6,
         7
       ]
@@ -343,7 +343,7 @@
     {
       "ability": "Blast Shield",
       "levels": [
-        3,
+        4,
         12,
         14,
         15

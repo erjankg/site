@@ -3,7 +3,7 @@
   "name": "Evelynn",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Lich Bane",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Stormsurge",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -308,8 +308,8 @@
         "finalBuild": [
           "Boots of Mana",
           "Lich Bane",
+          "Stormsurge",
           "Rabadon's Deathcap",
-          "Infinity Orb",
           "Void Staff",
           "Boots of Mana"
         ]
@@ -317,11 +317,11 @@
     }
   ],
   "runes": [
-    "First Strike",
+    "Electrocute",
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",
-    "Transcendence"
+    "Absolute Focus"
   ],
   "spells": [
     {

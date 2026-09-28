@@ -3,7 +3,7 @@
   "name": "Vex",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,19 +298,19 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Luden's Echo",
           "Stormsurge",
-          "Infinity Orb"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Luden's Echo",
           "Stormsurge",
           "Infinity Orb",
           "Rabadon's Deathcap",
+          "Void Staff",
           "Boots of Mana"
         ]
       }
@@ -339,7 +339,7 @@
     {
       "ability": "Mistral Bolt",
       "levels": [
-        2,
+        1,
         4,
         6,
         7
@@ -357,7 +357,7 @@
     {
       "ability": "Looming Darkness",
       "levels": [
-        1,
+        2,
         12,
         14,
         15

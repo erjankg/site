@@ -3,7 +3,7 @@
   "name": "Zeri",
   "role": "Дракон",
   "tier": "C",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-15",
   "matchups": [
     {
@@ -298,26 +298,26 @@
           "Long Sword"
         ],
         "core": [
-          "Bloodthirster",
           "Essence Reaver",
-          "Mortal Reminder"
+          "Stormrazor",
+          "Infinity Edge"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
           "Berserker's Greaves",
-          "Bloodthirster",
           "Essence Reaver",
-          "Mortal Reminder",
+          "Stormrazor",
           "Infinity Edge",
+          "Lord Dominik's Regard",
           "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
+    "Lethal Tempo",
     "Brutal",
     "Cut Down",
     "Legend: Bloodline",

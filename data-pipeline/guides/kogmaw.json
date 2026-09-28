@@ -2,8 +2,8 @@
   "slug": "kogmaw",
   "name": "Kog'Maw",
   "role": "Дракон",
-  "tier": "C",
-  "patch": "7.2e",
+  "tier": "B",
+  "patch": "7.3",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -295,12 +295,12 @@
       "default": true,
       "items": {
         "starting": [
-          "Dagger"
+          "Long Sword"
         ],
         "core": [
           "Guinsoo's Rageblade",
           "Navori Quickblades",
-          "Runaan's Hurricane"
+          "Terminus"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -309,8 +309,8 @@
           "Berserker's Greaves",
           "Guinsoo's Rageblade",
           "Navori Quickblades",
+          "Terminus",
           "Runaan's Hurricane",
-          "Blade of the Ruined King",
           "Berserker's Greaves"
         ]
       }

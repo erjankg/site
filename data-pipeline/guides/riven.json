@@ -3,7 +3,7 @@
   "name": "Riven",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -576,7 +576,7 @@
         "core": [
           "Eclipse",
           "Sundered Sky",
-          "Serylda's Grudge"
+          "Death's Dance"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -586,8 +586,8 @@
           "Plated Steelcaps",
           "Eclipse",
           "Sundered Sky",
-          "Serylda's Grudge",
           "Death's Dance",
+          "Serylda's Grudge",
           "Plated Steelcaps - Goredrinker"
         ]
       }
@@ -601,8 +601,8 @@
           "Long Sword"
         ],
         "core": [
+          "Eclipse",
           "Trinity Force",
-          "Sundered Sky",
           "Death's Dance"
         ],
         "boots": [
@@ -610,8 +610,8 @@
         ],
         "finalBuild": [
           "Gluttonous Greaves",
+          "Eclipse",
           "Trinity Force",
-          "Sundered Sky",
           "Death's Dance",
           "Serylda's Grudge",
           "Gluttonous Greaves"
@@ -621,7 +621,7 @@
   ],
   "runes": [
     "Conqueror",
-    "Demolish",
+    "Courage of the Colossus",
     "Second Wind",
     "Perseverance",
     "Sudden Impact"

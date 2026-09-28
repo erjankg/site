@@ -3,7 +3,7 @@
   "name": "Viego",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,19 +298,19 @@
           "Long Sword"
         ],
         "core": [
-          "Essence Reaver",
           "The Collector",
-          "Lord Dominik's Regard"
+          "Immortal Shieldbow",
+          "Infinity Edge"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
           "Berserker's Greaves",
-          "Essence Reaver",
           "The Collector",
-          "Lord Dominik's Regard",
+          "Immortal Shieldbow",
           "Infinity Edge",
+          "Lord Dominik's Regard",
           "Berserker's Greaves"
         ]
       }
@@ -318,10 +318,10 @@
   ],
   "runes": [
     "Conqueror",
-    "Sudden Impact",
-    "Hubris",
-    "Eyeball Collector",
-    "Legend: Alacrity"
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Absolute Focus"
   ],
   "spells": [
     {

@@ -2,8 +2,8 @@
   "slug": "yasuo",
   "name": "Yasuo",
   "role": "Мид",
-  "tier": "S",
-  "patch": "7.2e",
+  "tier": "A",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -705,16 +705,16 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "C",
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder"
+          "Immortal Shieldbow",
+          "Infinity Edge",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves",
@@ -722,10 +722,10 @@
         ],
         "finalBuild": [
           "Berserker's Greaves",
-          "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder",
+          "Immortal Shieldbow",
           "Infinity Edge",
+          "Lord Dominik's Regard",
+          "Death's Dance",
           "Berserker's Greaves - Galeforce"
         ]
       }
@@ -740,8 +740,8 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder"
+          "Immortal Shieldbow",
+          "Infinity Edge"
         ],
         "boots": [
           "Berserker's Greaves",
@@ -750,16 +750,16 @@
         "finalBuild": [
           "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder",
+          "Immortal Shieldbow",
           "Infinity Edge",
+          "Lord Dominik's Regard",
           "Berserker's Greaves - Galeforce"
         ]
       }
     }
   ],
   "runes": [
-    "Grasp of the Undying",
+    "Lethal Tempo",
     "Courage of the Colossus",
     "Second Wind",
     "Perseverance",

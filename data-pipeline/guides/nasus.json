@@ -3,7 +3,7 @@
   "name": "Nasus",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -492,7 +492,7 @@
         "core": [
           "Trinity Force",
           "Sundered Sky",
-          "Serylda's Grudge"
+          "Thornmail"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -501,7 +501,7 @@
           "Ionian Boots of Lucidity",
           "Trinity Force",
           "Sundered Sky",
-          "Serylda's Grudge",
+          "Thornmail",
           "Amaranth's Twinguard",
           "Ionian Boots of Lucidity"
         ]
@@ -509,7 +509,7 @@
     },
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "C",
       "default": false,
       "items": {
         "starting": [
@@ -518,7 +518,7 @@
         "core": [
           "Trinity Force",
           "Sundered Sky",
-          "Serylda's Grudge"
+          "Thornmail"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -527,7 +527,7 @@
           "Ionian Boots of Lucidity",
           "Trinity Force",
           "Sundered Sky",
-          "Serylda's Grudge",
+          "Thornmail",
           "Amaranth's Twinguard",
           "Ionian Boots of Lucidity"
         ]
@@ -536,9 +536,9 @@
   ],
   "runes": [
     "Fleet Footwork",
-    "Demolish",
+    "Unshakeable",
     "Second Wind",
-    "Perseverance",
+    "Overgrowth",
     "Transcendence"
   ],
   "spells": [

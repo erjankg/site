@@ -3,7 +3,7 @@
   "name": "Jayce",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -498,24 +498,24 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Manamune",
-          "Youmuu's Ghostblade",
+          "Eclipse",
+          "Serpent's Fang",
           "Serylda's Grudge"
         ],
         "boots": [
           "Boots of Dynamism"
         ],
         "finalBuild": [
-          "Muramana",
           "Boots of Dynamism",
-          "Youmuu's Ghostblade",
+          "Eclipse",
+          "Serpent's Fang",
           "Serylda's Grudge",
           "Edge of Night",
           "Boots of Dynamism"
@@ -524,15 +524,15 @@
     },
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Youmuu's Ghostblade",
           "Eclipse",
+          "Serpent's Fang",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -540,19 +540,19 @@
         ],
         "finalBuild": [
           "Boots of Dynamism",
-          "Youmuu's Ghostblade",
           "Eclipse",
+          "Serpent's Fang",
           "Serylda's Grudge",
-          "Spear of Shojin",
+          "Edge of Night",
           "Boots of Dynamism"
         ]
       }
     }
   ],
   "runes": [
-    "First Strike",
+    "Conqueror",
     "Sudden Impact",
-    "Chain Assault",
+    "Tyrant",
     "Eyeball Collector",
     "Bone Plating"
   ],

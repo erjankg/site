@@ -3,7 +3,7 @@
   "name": "Kennen",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -586,14 +586,14 @@
           "Infinity Orb",
           "Hextech Rocketbelt",
           "Rabadon's Deathcap",
-          "Void Staff",
+          "Stormsurge",
           "Boots of Mana"
         ]
       }
     },
     {
       "title": "Mid Build",
-      "tier": "A",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
@@ -612,18 +612,18 @@
           "Infinity Orb",
           "Hextech Rocketbelt",
           "Rabadon's Deathcap",
-          "Void Staff",
+          "Stormsurge",
           "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Electrocute",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Bloodline",
-    "Bone Plating"
+    "Dark Harvest",
+    "Empowered Attack",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Hextech Flashtraption"
   ],
   "spells": [
     {

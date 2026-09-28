@@ -2,8 +2,8 @@
   "slug": "tryndamere",
   "name": "Tryndamere",
   "role": "Лес",
-  "tier": "S",
-  "patch": "7.2e",
+  "tier": "A",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Jungle Build",
-      "tier": "A",
+      "tier": "C",
       "default": true,
       "items": {
         "starting": [
@@ -575,7 +575,7 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Magnetic Blaster",
+          "Stormrazor",
           "Infinity Edge"
         ],
         "boots": [
@@ -584,16 +584,16 @@
         "finalBuild": [
           "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Magnetic Blaster",
+          "Stormrazor",
           "Infinity Edge",
-          "Mortal Reminder",
+          "Lord Dominik's Regard",
           "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "C",
       "default": false,
       "items": {
         "starting": [
@@ -601,7 +601,7 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Magnetic Blaster",
+          "Stormrazor",
           "Infinity Edge"
         ],
         "boots": [
@@ -610,9 +610,9 @@
         "finalBuild": [
           "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Magnetic Blaster",
+          "Stormrazor",
           "Infinity Edge",
-          "Mortal Reminder",
+          "Lord Dominik's Regard",
           "Berserker's Greaves"
         ]
       }

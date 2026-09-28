@@ -2,8 +2,8 @@
   "slug": "kindred",
   "name": "Kindred",
   "role": "Лес",
-  "tier": "C",
-  "patch": "7.2e",
+  "tier": "D",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -300,7 +300,7 @@
         "core": [
           "Kraken Slayer",
           "The Collector",
-          "Mortal Reminder"
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -309,19 +309,19 @@
           "Berserker's Greaves",
           "Kraken Slayer",
           "The Collector",
-          "Mortal Reminder",
-          "Magnetic Blaster",
+          "Lord Dominik's Regard",
+          "Infinity Edge",
           "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
+    "Lethal Tempo",
     "Brutal",
     "Cut Down",
     "Legend: Alacrity",
-    "Sudden Impact"
+    "Absolute Focus"
   ],
   "spells": [
     {

@@ -2,8 +2,8 @@
   "slug": "shyvana",
   "name": "Shyvana",
   "role": "Лес",
-  "tier": "A",
-  "patch": "7.2e",
+  "tier": "C",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Trinity Force",
-          "Blade of the Ruined King",
+          "Spear of Shojin",
           "Death's Dance"
         ],
         "boots": [
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Berserker's Greaves",
           "Trinity Force",
-          "Blade of the Ruined King",
+          "Spear of Shojin",
           "Death's Dance",
-          "Force of Nature",
+          "Amaranth's Twinguard",
           "Berserker's Greaves"
         ]
       }
@@ -319,8 +319,8 @@
   "runes": [
     "Fleet Footwork",
     "Unshakeable",
-    "Bone Plating",
-    "Perseverance",
+    "Second Wind",
+    "Overgrowth",
     "Transcendence"
   ],
   "spells": [

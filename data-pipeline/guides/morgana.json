@@ -3,7 +3,7 @@
   "name": "Morgana",
   "role": "Саппорт",
   "tier": "S",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Support Build",
-      "tier": "A",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
@@ -575,8 +575,8 @@
         ],
         "core": [
           "Blackfire Torch",
-          "Liandry's Torment",
-          "Rylai's Crystal Scepter"
+          "Rylai's Crystal Scepter",
+          "Liandry's Torment"
         ],
         "boots": [
           "Boots of Mana"
@@ -585,8 +585,8 @@
           "Black Mist Scythe",
           "Boots of Mana",
           "Blackfire Torch",
-          "Liandry's Torment",
           "Rylai's Crystal Scepter",
+          "Liandry's Torment",
           "Boots of Mana"
         ]
       }

@@ -3,7 +3,7 @@
   "name": "Yone",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -843,33 +843,33 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "S",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder"
+          "Immortal Shieldbow",
+          "Infinity Edge",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
           "Berserker's Greaves",
-          "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder",
+          "Immortal Shieldbow",
           "Infinity Edge",
+          "Lord Dominik's Regard",
+          "Death's Dance",
           "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "A",
+      "tier": "B",
       "default": false,
       "items": {
         "starting": [
@@ -877,8 +877,8 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder"
+          "Immortal Shieldbow",
+          "Infinity Edge"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -886,16 +886,16 @@
         "finalBuild": [
           "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder",
+          "Immortal Shieldbow",
           "Infinity Edge",
+          "Lord Dominik's Regard",
           "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "S+",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
@@ -903,8 +903,8 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder"
+          "Immortal Shieldbow",
+          "Infinity Edge"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -912,17 +912,17 @@
         "finalBuild": [
           "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder",
+          "Immortal Shieldbow",
           "Infinity Edge",
+          "Lord Dominik's Regard",
           "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
-    "Grasp of the Undying",
-    "Courage of the Colossus",
+    "Lethal Tempo",
+    "Demolish",
     "Second Wind",
     "Perseverance",
     "Legend: Alacrity"

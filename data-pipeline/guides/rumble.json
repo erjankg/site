@@ -3,7 +3,7 @@
   "name": "Rumble",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Liandry's Torment",
-          "Bloodletter's Curse",
-          "Infinity Orb"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Liandry's Torment",
-          "Bloodletter's Curse",
           "Infinity Orb",
-          "Zhonya's Hourglass",
+          "Rabadon's Deathcap",
+          "Bloodletter's Curse",
           "Boots of Mana"
         ]
       }
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "Phase Rush",
-    "Demolish",
+    "Unshakeable",
     "Second Wind",
     "Perseverance",
     "Nimbus Cloak"

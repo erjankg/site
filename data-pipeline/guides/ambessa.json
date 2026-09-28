@@ -3,7 +3,7 @@
   "name": "Ambessa",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -576,7 +576,7 @@
         "core": [
           "Eclipse",
           "Spear of Shojin",
-          "Serylda's Grudge"
+          "Death's Dance"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -586,8 +586,8 @@
           "Plated Steelcaps",
           "Eclipse",
           "Spear of Shojin",
-          "Serylda's Grudge",
           "Death's Dance",
+          "Serylda's Grudge",
           "Plated Steelcaps - Goredrinker"
         ]
       }

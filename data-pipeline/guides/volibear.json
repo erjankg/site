@@ -2,8 +2,8 @@
   "slug": "volibear",
   "name": "Volibear",
   "role": "Лес",
-  "tier": "B",
-  "patch": "7.2e",
+  "tier": "C",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Jungle Build",
-      "tier": "A",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
@@ -575,25 +575,25 @@
         ],
         "core": [
           "Dusk and Dawn",
-          "Riftmaker",
-          "Nashor's Tooth"
+          "Navori Quickblades",
+          "Riftmaker"
         ],
         "boots": [
-          "Plated Steelcaps"
+          "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Berserker's Greaves",
           "Dusk and Dawn",
-          "Plated Steelcaps",
+          "Navori Quickblades",
           "Riftmaker",
-          "Nashor's Tooth",
-          "Cosmic Drive",
-          "Plated Steelcaps"
+          "Amaranth's Twinguard",
+          "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "S",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -601,8 +601,8 @@
         ],
         "core": [
           "Dusk and Dawn",
-          "Hullbreaker",
-          "Riftmaker"
+          "Navori Quickblades",
+          "Hullbreaker"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -610,9 +610,9 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Dusk and Dawn",
+          "Navori Quickblades",
           "Hullbreaker",
           "Riftmaker",
-          "Frozen Heart",
           "Plated Steelcaps"
         ]
       }
@@ -620,10 +620,10 @@
   ],
   "runes": [
     "Lethal Tempo",
-    "Brutal",
+    "Battle Zeal",
     "Last Stand",
-    "Legend: Bloodline",
-    "Nimbus Cloak"
+    "Legend: Alacrity",
+    "Overgrowth"
   ],
   "spells": [
     {

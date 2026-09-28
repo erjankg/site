@@ -3,7 +3,7 @@
   "name": "Diana",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -524,7 +524,7 @@
     },
     {
       "title": "Jungle Build",
-      "tier": "S",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -532,7 +532,7 @@
         ],
         "core": [
           "Lich Bane",
-          "Infinity Orb",
+          "Nashor's Tooth",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -541,7 +541,7 @@
         "finalBuild": [
           "Boots of Mana",
           "Lich Bane",
-          "Infinity Orb",
+          "Nashor's Tooth",
           "Rabadon's Deathcap",
           "Void Staff",
           "Boots of Mana"
@@ -550,11 +550,11 @@
     }
   ],
   "runes": [
-    "Fleet Footwork",
+    "Electrocute",
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",
-    "Bone Plating"
+    "Absolute Focus"
   ],
   "spells": [
     {

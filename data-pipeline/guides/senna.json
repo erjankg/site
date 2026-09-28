@@ -2,8 +2,8 @@
   "slug": "senna",
   "name": "Senna",
   "role": "Саппорт",
-  "tier": "B",
-  "patch": "7.2e",
+  "tier": "S+",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -290,39 +290,65 @@
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Support Build",
+      "tier": "S+",
       "default": true,
       "items": {
         "starting": [
           "Spectral Sickle"
         ],
         "core": [
-          "Magnetic Blaster",
-          "Serpent's Fang",
-          "Mortal Reminder"
+          "Statikk Shiv",
+          "Rapid Firecannon",
+          "Lord Dominik's Regard"
         ],
         "boots": [
-          "Boots of Dynamism",
+          "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Boots of Dynamism",
-          "Magnetic Blaster",
-          "Serpent's Fang",
-          "Mortal Reminder",
-          "Boots of Dynamism - Galeforce"
+          "Berserker's Greaves",
+          "Statikk Shiv",
+          "Rapid Firecannon",
+          "Lord Dominik's Regard",
+          "Berserker's Greaves - Galeforce"
+        ]
+      }
+    },
+    {
+      "title": "Duo Build",
+      "tier": "S+",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Statikk Shiv",
+          "Rapid Firecannon",
+          "Lord Dominik's Regard"
+        ],
+        "boots": [
+          "Berserker's Greaves"
+        ],
+        "finalBuild": [
+          "Berserker's Greaves",
+          "Statikk Shiv",
+          "Rapid Firecannon",
+          "Lord Dominik's Regard",
+          "Infinity Edge",
+          "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
     "Fleet Footwork",
-    "Empowered Attack",
-    "Chain Assault",
-    "Zombie Ward",
-    "Bone Plating"
+    "Font of Life",
+    "Bone Plating",
+    "Perseverance",
+    "Brutal"
   ],
   "spells": [
     {

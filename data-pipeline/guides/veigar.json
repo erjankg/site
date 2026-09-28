@@ -2,8 +2,8 @@
   "slug": "veigar",
   "name": "Veigar",
   "role": "Мид",
-  "tier": "A",
-  "patch": "7.2e",
+  "tier": "B",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -567,7 +567,7 @@
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "A",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
@@ -576,7 +576,7 @@
         "core": [
           "Stormsurge",
           "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Horizon Focus"
         ],
         "boots": [
           "Boots of Mana"
@@ -585,7 +585,7 @@
           "Boots of Mana",
           "Stormsurge",
           "Rabadon's Deathcap",
-          "Infinity Orb",
+          "Horizon Focus",
           "Void Staff",
           "Boots of Mana"
         ]
@@ -600,9 +600,9 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Luden's Echo",
-          "Rabadon's Deathcap",
-          "Cryptbloom"
+          "Stormsurge",
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -610,9 +610,9 @@
         "finalBuild": [
           "Black Mist Scythe",
           "Boots of Mana",
-          "Luden's Echo",
+          "Stormsurge",
+          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Cryptbloom",
           "Boots of Mana"
         ]
       }
@@ -620,9 +620,9 @@
   ],
   "runes": [
     "Electrocute",
-    "Botanist",
+    "Manaflow Band",
     "Transcendence",
-    "Gathering Storm",
+    "Nimbus Cloak",
     "Cut Down"
   ],
   "spells": [
@@ -667,7 +667,7 @@
       "ability": "Baleful Strike",
       "levels": [
         1,
-        4,
+        3,
         6,
         7
       ]
@@ -684,7 +684,7 @@
     {
       "ability": "Event Horizon",
       "levels": [
-        3,
+        4,
         12,
         14,
         15

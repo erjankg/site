@@ -3,7 +3,7 @@
   "name": "Syndra",
   "role": "Мид",
   "tier": "S+",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Stormsurge",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -308,20 +308,20 @@
         "finalBuild": [
           "Boots of Mana",
           "Stormsurge",
-          "Rabadon's Deathcap",
           "Infinity Orb",
-          "Void Staff",
+          "Rabadon's Deathcap",
+          "Cryptbloom",
           "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "First Strike",
+    "Electrocute",
     "Hextech Flashtraption",
-    "Transcendence",
-    "Nimbus Cloak",
-    "Bone Plating"
+    "Absolute Focus",
+    "Scorch",
+    "Cut Down"
   ],
   "spells": [
     {

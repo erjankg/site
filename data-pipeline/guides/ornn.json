@@ -2,8 +2,8 @@
   "slug": "ornn",
   "name": "Ornn",
   "role": "Барон",
-  "tier": "D",
-  "patch": "7.2e",
+  "tier": "C",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -505,8 +505,8 @@
           "Ruby Crystal"
         ],
         "core": [
-          "Heartsteel",
           "Sunfire Aegis",
+          "Unending Despair",
           "Thornmail"
         ],
         "boots": [
@@ -514,26 +514,26 @@
         ],
         "finalBuild": [
           "Plated Steelcaps",
-          "Heartsteel",
           "Sunfire Aegis",
+          "Unending Despair",
           "Thornmail",
-          "Kaenic Rookern",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
     },
     {
       "title": "Support Build",
-      "tier": "A",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
           "Relic Shield"
         ],
         "core": [
-          "Warmog's Armor",
+          "Mantle of the Twelfth Hour",
           "Radiant Virtue",
-          "Dawnshroud"
+          "Knight's Vow"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -541,9 +541,9 @@
         "finalBuild": [
           "Bulwark of the Mountain",
           "Plated Steelcaps",
-          "Warmog's Armor",
+          "Mantle of the Twelfth Hour",
           "Radiant Virtue",
-          "Dawnshroud",
+          "Knight's Vow",
           "Plated Steelcaps"
         ]
       }
@@ -553,7 +553,7 @@
     "Grasp of the Undying",
     "Demolish",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Scorch"
   ],
   "spells": [

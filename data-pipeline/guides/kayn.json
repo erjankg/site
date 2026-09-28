@@ -3,7 +3,7 @@
   "name": "Shadow Assassin",
   "role": "Лес",
   "tier": "A",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Youmuu's Ghostblade",
-          "Manamune",
+          "Serpent's Fang",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -308,20 +308,20 @@
         "finalBuild": [
           "Boots of Dynamism",
           "Youmuu's Ghostblade",
-          "Muramana",
-          "Serylda's Grudge",
           "Serpent's Fang",
+          "Serylda's Grudge",
+          "Duskblade of Draktharr",
           "Boots of Dynamism"
         ]
       }
     }
   ],
   "runes": [
-    "First Strike",
+    "Dark Harvest",
     "Sudden Impact",
     "Hubris",
     "Eyeball Collector",
-    "Celerity"
+    "Absolute Focus"
   ],
   "spells": [
     {

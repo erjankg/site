@@ -3,7 +3,7 @@
   "name": "Camille",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -291,7 +291,7 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "S",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Trinity Force",
-          "Goredrinker",
+          "Eclipse",
           "Hullbreaker"
         ],
         "boots": [
@@ -309,16 +309,16 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Trinity Force",
-          "Goredrinker",
+          "Eclipse",
           "Hullbreaker",
-          "Sundered Sky",
+          "Death's Dance",
           "Plated Steelcaps - Goredrinker"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [

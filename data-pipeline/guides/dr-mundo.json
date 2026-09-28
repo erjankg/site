@@ -3,7 +3,7 @@
   "name": "Dr. Mundo",
   "role": "Барон",
   "tier": "S",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -360,7 +360,7 @@
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "C",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -368,8 +368,8 @@
         ],
         "core": [
           "Heartsteel",
-          "Sunfire Aegis",
-          "Thornmail"
+          "Thornmail",
+          "Unending Despair"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -377,25 +377,25 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Heartsteel",
-          "Sunfire Aegis",
           "Thornmail",
-          "Gargoyle Stoneplate",
+          "Unending Despair",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
-          "Shimmering Spark"
+          "Ruby Crystal"
         ],
         "core": [
           "Heartsteel",
           "Sunfire Aegis",
-          "Thornmail"
+          "Unending Despair"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -404,8 +404,8 @@
           "Heartsteel",
           "Plated Steelcaps",
           "Sunfire Aegis",
+          "Unending Despair",
           "Thornmail",
-          "Gargoyle Stoneplate",
           "Plated Steelcaps"
         ]
       }

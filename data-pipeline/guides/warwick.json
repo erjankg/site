@@ -3,7 +3,7 @@
   "name": "Warwick",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -317,11 +317,11 @@
     }
   ],
   "runes": [
-    "Empowerment",
+    "Lethal Tempo",
     "Axiom Arcanist",
-    "Transcendence",
+    "Absolute Focus",
     "Nimbus Cloak",
-    "Sudden Impact"
+    "Perseverance"
   ],
   "spells": [
     {
@@ -349,18 +349,18 @@
       "ability": "Blood Hunt",
       "levels": [
         2,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Primal Howl",
       "levels": [
         4,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {

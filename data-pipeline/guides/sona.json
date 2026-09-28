@@ -3,7 +3,7 @@
   "name": "Sona",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.2e",
+  "patch": "7.3",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -299,17 +299,17 @@
         ],
         "core": [
           "Tear of the Goddess",
-          "Ardent Censer",
-          "Harmonic Echo"
+          "Echoes of Helia",
+          "Whispering Circlet"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Seraph's Embrace",
           "Ionian Boots of Lucidity",
-          "Ardent Censer",
+          "Diadem of Songs",
+          "Echoes of Helia",
           "Harmonic Echo",
           "Ionian Boots of Lucidity"
         ]
@@ -317,11 +317,11 @@
     }
   ],
   "runes": [
-    "Aery",
-    "Font of Life",
-    "Bone Plating",
-    "Revitalize",
-    "Transcendence"
+    "Fleet Footwork",
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
+    "Bone Plating"
   ],
   "spells": [
     {
