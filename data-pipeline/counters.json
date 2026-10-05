@@ -1,5 +1,5 @@
 {
- "built": "2026-09-28",
+ "built": "2026-10-05",
  "note": "ПАРЫ «кто кого контрит», собраны роботом. Данные РЕДАКЦИОННЫЕ — это мнение авторов сайтов-источников, не статистика матчей. Показывать вместе с источником и sourceDate: часть страниц отстаёт на несколько патчей. Winrate-проценты этих сайтов НЕ забираем — источник чисел там не указан. Текст «почему» берётся из champion-tags.json.",
  "sources": {
   "wildriftcounter": {
@@ -14,7 +14,7 @@
   }
  },
  "count": 141,
- "pairs": 5514,
+ "pairs": 5533,
  "champions": {
   "Aatrox": {
    "en": "Aatrox",
@@ -66,17 +66,17 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/aatrox",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
        "fiora",
-       "irelia",
+       "malphite",
        "ambessa"
       ],
       "Jungle": [
-       "kindred",
-       "lillia",
+       "rammus",
+       "ekko",
        "hecarim"
       ]
      }
@@ -187,13 +187,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/ahri",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "akali",
+       "annie",
        "syndra",
-       "orianna"
+       "aurelion-sol"
       ]
      }
     }
@@ -302,18 +302,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/akali",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "veigar",
+       "galio",
        "lissandra",
        "twisted-fate"
       ],
       "Top": [
        "ambessa",
-       "renekton",
-       "aatrox"
+       "sion",
+       "chogath"
       ]
      }
     }
@@ -369,13 +369,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/akshan",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
        "yasuo",
-       "vex",
-       "irelia"
+       "orianna",
+       "lissandra"
       ]
      }
     }
@@ -448,15 +448,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/alistar",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
        "janna",
-       "zyra"
-      ],
-      "Adc": [
-       "ashe"
+       "morgana",
+       "soraka"
       ]
      }
     }
@@ -530,17 +528,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/ambessa",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "renekton",
+       "jayce",
        "malphite",
-       "irelia",
-       "poppy"
+       "renekton"
       ],
       "Jungle": [
-       "rammus"
+       "rammus",
+       "khazix",
+       "hecarim"
       ]
      }
     }
@@ -596,13 +595,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/amumu",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "lillia",
-       "nocturne",
-       "nidalee"
+       "gwen",
+       "nunu-amp-willump",
+       "olaf"
       ]
      }
     }
@@ -676,13 +675,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/annie",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
        "syndra",
-       "lissandra",
-       "viktor"
+       "irelia",
+       "lissandra"
       ]
      }
     }
@@ -695,7 +694,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/ashe/",
-     "sourceDate": "2026-01-17",
+     "sourceDate": "2026-10-04",
      "kind": "editorial",
      "lanes": {
       "Adc": {
@@ -774,7 +773,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/ashe",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -793,7 +792,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/aurelion-sol/",
-     "sourceDate": "2026-01-19",
+     "sourceDate": "2026-10-04",
      "kind": "editorial",
      "lanes": {
       "Mid": {
@@ -836,13 +835,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/aurelion-sol",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
        "yone",
-       "zed",
-       "yasuo"
+       "kassadin",
+       "akshan"
       ]
      }
     }
@@ -915,7 +914,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/aurora",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -976,13 +975,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/bard",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "nami",
+       "blitzcrank",
        "senna",
-       "zilean"
+       "thresh"
       ]
      }
     }
@@ -995,7 +994,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/blitzcrank/",
-     "sourceDate": "2026-01-20",
+     "sourceDate": "2026-10-03",
      "kind": "editorial",
      "lanes": {
       "Support": {
@@ -1071,13 +1070,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/blitzcrank",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "leona",
+       "nautilus",
        "braum",
-       "morgana"
+       "alistar"
       ]
      }
     }
@@ -1150,18 +1149,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/brand",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
        "syndra",
-       "zed",
-       "lux"
+       "zyra",
+       "hwei"
       ],
       "Support": [
-       "braum",
+       "zyra",
        "pyke",
-       "maokai"
+       "karma"
       ]
      }
     }
@@ -1199,12 +1198,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/braum",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
        "senna",
-       "bard",
+       "rakan",
        "zilean"
       ]
      }
@@ -1296,7 +1295,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/caitlyn",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -1315,7 +1314,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/camille/",
-     "sourceDate": "2026-01-21",
+     "sourceDate": "2026-10-02",
      "kind": "editorial",
      "lanes": {
       "Top": {
@@ -1376,13 +1375,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/camille",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "malphite",
-       "fiora",
-       "mordekaiser"
+       "shen",
+       "gwen",
+       "jax"
+      ],
+      "Jungle": [
+       "gwen",
+       "ekko",
+       "kayn"
       ]
      }
     }
@@ -1491,7 +1495,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/corki",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -1606,13 +1610,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/darius",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "wukong",
+       "dr-mundo",
        "malphite",
-       "jayce"
+       "ornn"
+      ],
+      "Jungle": [
+       "ekko",
+       "rammus",
+       "vi"
       ]
      }
     }
@@ -1685,18 +1694,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/diana",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "vex",
+       "lissandra",
        "galio",
-       "irelia"
+       "syndra"
       ],
       "Jungle": [
-       "master-yi",
-       "kindred",
-       "mordekaiser"
+       "xin-zhao",
+       "vi",
+       "pantheon"
       ]
      }
     }
@@ -1709,7 +1718,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/draven/",
-     "sourceDate": "2026-01-22",
+     "sourceDate": "2026-10-01",
      "kind": "editorial",
      "lanes": {
       "Adc": {
@@ -1769,7 +1778,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/draven",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -1788,7 +1797,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/ekko/",
-     "sourceDate": "2026-01-23",
+     "sourceDate": "2026-09-30",
      "kind": "editorial",
      "lanes": {
       "Mid": {
@@ -1849,18 +1858,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/ekko",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
        "vex",
-       "irelia",
+       "galio",
        "lissandra"
       ],
       "Jungle": [
-       "kindred",
-       "lillia",
-       "amumu"
+       "khazix",
+       "talon",
+       "nocturne"
       ]
      }
     }
@@ -1898,15 +1907,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/evelynn",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
        "rengar",
+       "vi",
        "lee-sin"
-      ],
-      "Mid": [
-       "twisted-fate"
       ]
      }
     }
@@ -1919,7 +1926,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/ezreal/",
-     "sourceDate": "2026-01-24",
+     "sourceDate": "2026-09-29",
      "kind": "editorial",
      "lanes": {
       "Adc": {
@@ -1962,13 +1969,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/ezreal",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "draven",
-       "miss-fortune",
-       "samira"
+       "kalista",
+       "samira",
+       "ashe"
       ]
      }
     }
@@ -2060,15 +2067,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/fiddlesticks",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
        "nocturne",
-       "aatrox"
-      ],
-      "Support": [
-       "alistar"
+       "aatrox",
+       "kindred"
       ]
      }
     }
@@ -2177,13 +2182,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/fiora",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "rumble",
+       "shen",
        "malphite",
-       "poppy"
+       "darius"
       ]
      }
     }
@@ -2292,18 +2297,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/fizz",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
        "galio",
-       "lissandra",
-       "vex"
+       "sylas",
+       "lissandra"
       ],
       "Jungle": [
-       "master-yi",
-       "riven",
-       "amumu"
+       "jarvan-iv",
+       "sylas",
+       "rammus"
       ]
      }
     }
@@ -2377,18 +2382,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/galio",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "morgana",
-       "ahri",
-       "swain"
+       "aurelion-sol",
+       "syndra",
+       "hwei"
       ],
       "Support": [
        "senna",
-       "nami",
-       "karma"
+       "lulu",
+       "soraka"
       ]
      }
     }
@@ -2498,12 +2503,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/garen",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "vayne",
-       "rumble",
+       "fiora",
+       "darius",
        "camille"
       ]
      }
@@ -2578,11 +2583,11 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/gnar",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "irelia",
+       "ksante",
        "malphite",
        "ornn"
       ]
@@ -2694,13 +2699,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/gragas",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "amumu",
+       "pantheon",
        "nocturne",
-       "lillia"
+       "jarvan-iv"
       ]
      }
     }
@@ -2792,7 +2797,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/graves",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -2872,13 +2877,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/gwen",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
        "fiora",
-       "tryndamere",
-       "riven"
+       "yone",
+       "shen"
+      ],
+      "Jungle": [
+       "rammus",
+       "kayn",
+       "amumu"
       ]
      }
     }
@@ -2934,13 +2944,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/hecarim",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "master-yi",
-       "kindred",
-       "graves"
+       "sylas",
+       "chogath",
+       "gwen"
       ]
      }
     }
@@ -3031,13 +3041,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/heimerdinger",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "zed",
+       "syndra",
        "yasuo",
-       "irelia"
+       "yone"
       ]
      }
     }
@@ -3147,13 +3157,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/irelia",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
        "malphite",
-       "wukong",
-       "poppy"
+       "jax",
+       "garen"
       ]
      }
     }
@@ -3208,12 +3218,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/janna",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
+       "seraphine",
        "blitzcrank",
-       "senna",
        "sona"
       ]
      }
@@ -3270,13 +3280,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/jarvan-iv",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "master-yi",
-       "amumu"
+       "gwen",
+       "nocturne"
       ]
      }
     }
@@ -3386,13 +3396,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/jax",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "poppy",
-       "teemo",
-       "rumble"
+       "malphite",
+       "shen",
+       "ksante"
+      ],
+      "Jungle": [
+       "ekko",
+       "kayn",
+       "khazix"
       ]
      }
     }
@@ -3500,18 +3515,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/jayce",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
        "syndra",
-       "galio",
-       "irelia"
+       "hwei",
+       "orianna"
       ],
       "Top": [
        "irelia",
        "malphite",
-       "ornn"
+       "sion"
       ]
      }
     }
@@ -3621,7 +3636,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/jhin",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -3700,7 +3715,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/jinx",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -3816,7 +3831,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/kaisa",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -3913,7 +3928,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/kalista",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -3993,13 +4008,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/karma",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "pyke",
-       "nami",
-       "bard"
+       "blitzcrank",
+       "maokai",
+       "alistar"
       ]
      }
     }
@@ -4055,12 +4070,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/kassadin",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
        "zed",
-       "yasuo",
+       "galio",
        "jayce"
       ]
      }
@@ -4117,12 +4132,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/katarina",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
+       "galio",
        "vex",
-       "zed",
        "lissandra"
       ]
      }
@@ -4215,18 +4230,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/kayle",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
+       "kassadin",
        "syndra",
-       "viktor",
-       "ryze"
+       "orianna"
       ],
       "Top": [
-       "malphite",
-       "teemo",
-       "nasus"
+       "jax",
+       "nasus",
+       "malphite"
       ]
      }
     }
@@ -4264,12 +4279,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/kayn",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "master-yi",
-       "kindred",
+       "ekko",
+       "amumu",
        "rammus"
       ]
      }
@@ -4379,18 +4394,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/kennen",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "gnar",
-       "nasus",
-       "wukong"
+       "chogath",
+       "dr-mundo",
+       "malphite"
       ],
       "Mid": [
-       "kassadin",
-       "aurora",
-       "swain"
+       "twisted-fate",
+       "ahri",
+       "galio"
       ]
      }
     }
@@ -4446,13 +4461,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/khazix",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "kindred",
-       "master-yi"
+       "nocturne",
+       "talon"
       ]
      }
     }
@@ -4543,13 +4558,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/kindred",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "xin-zhao",
-       "lillia"
+       "evelynn",
+       "hecarim"
       ]
      }
     }
@@ -4605,13 +4620,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/kogmaw",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
        "ashe",
        "caitlyn",
-       "vayne"
+       "jinx"
       ]
      }
     }
@@ -4649,13 +4664,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/ksante",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "ambessa",
-       "vayne",
-       "garen"
+       "fiora",
+       "gwen",
+       "yone"
       ]
      }
     }
@@ -4729,12 +4744,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/lee-sin",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
+       "reksai",
        "rammus",
-       "lillia",
        "nocturne"
       ]
      }
@@ -4791,11 +4806,11 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/leona",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "galio",
+       "alistar",
        "morgana",
        "janna"
       ]
@@ -4871,13 +4886,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/lillia",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "evelynn",
+       "jarvan-iv",
        "vi",
-       "master-yi"
+       "kayn"
       ]
      }
     }
@@ -4950,12 +4965,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/lissandra",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
        "morgana",
-       "kassadin",
+       "twisted-fate",
        "galio"
       ]
      }
@@ -5012,7 +5027,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/lucian",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -5055,11 +5070,11 @@
       "Mid": {
        "counteredBy": [
         "brand",
-        "annie",
+        "yasuo",
+        "diana",
         "ekko",
         "vex",
-        "diana",
-        "yasuo"
+        "annie"
        ],
        "strongAgainst": [
         "katarina",
@@ -5074,13 +5089,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/lulu",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
        "blitzcrank",
        "senna",
-       "bard"
+       "leona"
       ]
      }
     }
@@ -5135,17 +5150,17 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/lux",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "pyke",
-       "nami",
+       "milio",
+       "blitzcrank",
        "karma"
       ],
       "Mid": [
-       "irelia",
-       "kassadin",
+       "sylas",
+       "zed",
        "yasuo"
       ]
      }
@@ -5219,12 +5234,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/miss-fortune",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "smolder",
-       "jhin",
+       "sivir",
+       "kogmaw",
        "caitlyn"
       ]
      }
@@ -5334,11 +5349,11 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/malphite",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "rumble",
+       "dr-mundo",
        "mordekaiser",
        "gwen"
       ]
@@ -5431,11 +5446,11 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/maokai",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "galio",
+       "thresh",
        "braum",
        "leona"
       ]
@@ -5546,13 +5561,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/master-yi",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "viego",
-       "evelynn"
+       "reksai",
+       "khazix"
       ]
      }
     }
@@ -5626,12 +5641,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/mel",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "irelia",
-       "yone",
+       "yasuo",
+       "orianna",
        "syndra"
       ]
      }
@@ -5669,13 +5684,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/milio",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
        "blitzcrank",
-       "sona",
-       "bard"
+       "janna",
+       "senna"
       ]
      }
     }
@@ -5785,13 +5800,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/mordekaiser",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
+       "yone",
        "fiora",
-       "irelia",
-       "rumble"
+       "ksante"
       ]
      }
     }
@@ -5847,18 +5862,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/morgana",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
+       "senna",
        "soraka",
-       "karma",
-       "zyra"
+       "milio"
       ],
       "Mid": [
-       "zed",
-       "ahri",
-       "kassadin"
+       "akshan",
+       "yone",
+       "irelia"
       ]
      }
     }
@@ -5966,13 +5981,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/dr-mundo",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "riven",
+       "aatrox",
        "gwen",
-       "fiora"
+       "yone"
+      ],
+      "Jungle": [
+       "ekko",
+       "kayn",
+       "gwen"
       ]
      }
     }
@@ -6010,11 +6030,11 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/nami",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "pyke",
+       "nautilus",
        "blitzcrank",
        "braum"
       ]
@@ -6072,13 +6092,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/nasus",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
        "garen",
-       "camille",
-       "wukong"
+       "ksante",
+       "aatrox"
       ]
      }
     }
@@ -6134,13 +6154,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/nautilus",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "bard",
-       "janna",
-       "morgana"
+       "rell",
+       "leona",
+       "braum"
       ]
      }
     }
@@ -6178,15 +6198,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/nidalee",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "master-yi",
-       "rengar"
-      ],
-      "Mid": [
-       "galio"
+       "reksai",
+       "nocturne",
+       "xin-zhao"
       ]
      }
     }
@@ -6260,13 +6278,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/nilah",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "amumu",
-       "khazix"
+       "chogath",
+       "vi"
       ]
      }
     }
@@ -6322,13 +6340,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/nocturne",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "master-yi",
-       "viego"
+       "wukong",
+       "ekko"
       ]
      }
     }
@@ -6366,13 +6384,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/norra",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "kassadin",
+       "yone",
        "zed",
-       "yasuo"
+       "orianna"
       ]
      }
     }
@@ -6550,18 +6568,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/olaf",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "kindred",
+       "master-yi",
        "lillia",
-       "master-yi"
+       "jarvan-iv"
       ],
       "Top": [
-       "fiora",
-       "tryndamere",
-       "irelia"
+       "gwen",
+       "camille",
+       "aatrox"
       ]
      }
     }
@@ -6653,13 +6671,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/orianna",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "irelia",
-       "yasuo",
-       "syndra"
+       "annie",
+       "hwei",
+       "aurelion-sol"
       ]
      }
     }
@@ -6731,12 +6749,12 @@
       },
       "Support": {
        "counteredBy": [
+        "maokai",
         "sona",
-        "rakan",
         "brand",
         "pyke",
-        "maokai",
-        "nami"
+        "nami",
+        "rakan"
        ],
        "strongAgainst": [
         "alistar",
@@ -6750,11 +6768,11 @@
       "Adc": {
        "counteredBy": [
         "vayne",
-        "aphelios",
         "kalista",
+        "kaisa",
         "tristana",
         "ashe",
-        "kaisa"
+        "aphelios"
        ],
        "strongAgainst": [
         "caitlyn",
@@ -6769,20 +6787,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/ornn",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "fiora",
-       "camille",
+       "yone",
+       "mordekaiser",
        "shen"
       ],
-      "Adc": [
-       "vayne",
-       "varus"
-      ],
       "Support": [
-       "braum"
+       "alistar",
+       "rell",
+       "nautilus"
       ]
      }
     }
@@ -6856,13 +6872,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/pantheon",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "tryndamere",
+       "nocturne",
        "rammus",
-       "amumu"
+       "nunu-amp-willump"
       ]
      }
     }
@@ -6953,12 +6969,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/poppy",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "ambessa",
-       "teemo",
+       "sett",
+       "yone",
        "mordekaiser"
       ]
      }
@@ -7032,13 +7048,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/pyke",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
        "braum",
        "maokai",
-       "soraka"
+       "nautilus"
       ]
      }
     }
@@ -7076,12 +7092,12 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/rakan",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "galio",
-       "rell",
+       "janna",
+       "seraphine",
        "nautilus"
       ]
      }
@@ -7138,13 +7154,13 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/rammus",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "amumu",
+       "olaf",
        "lillia",
-       "nunu-amp-willump"
+       "nocturne"
       ]
      }
     }
@@ -7200,7 +7216,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/rell",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
@@ -7262,7 +7278,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/renekton",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
@@ -7324,7 +7340,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/rengar",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -7440,7 +7456,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/riven",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
@@ -7507,7 +7523,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/rumble",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
@@ -7551,7 +7567,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/ryze",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -7630,7 +7646,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/samira",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -7692,7 +7708,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/senna",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
@@ -7753,7 +7769,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/seraphine",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
@@ -7861,7 +7877,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/sett",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
@@ -7941,7 +7957,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/shen",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
@@ -8003,7 +8019,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/shyvana",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -8047,7 +8063,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/singed",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
@@ -8144,7 +8160,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/sion",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
@@ -8255,7 +8271,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/sivir",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -8299,7 +8315,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/smolder",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -8379,7 +8395,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/sona",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
@@ -8441,7 +8457,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/soraka",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
@@ -8538,7 +8554,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/swain",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -8640,7 +8656,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/syndra",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -8702,7 +8718,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/taliyah",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -8814,7 +8830,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/talon",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -8929,7 +8945,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/teemo",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
@@ -8978,7 +8994,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/thresh",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
@@ -9046,11 +9062,11 @@
         "seraphine"
        ],
        "strongAgainst": [
-        "morgana",
-        "brand",
-        "sona",
         "soraka",
-        "janna"
+        "sona",
+        "janna",
+        "brand",
+        "morgana"
        ]
       },
       "Jungle": {
@@ -9093,7 +9109,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/tristana",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -9173,7 +9189,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/tryndamere",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -9258,7 +9274,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/twisted-fate",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -9320,7 +9336,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/twitch",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -9435,7 +9451,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/urgot",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
@@ -9520,12 +9536,12 @@
         "rammus"
        ],
        "strongAgainst": [
-        "wukong",
         "dr-mundo",
-        "fiddlesticks",
         "evelynn",
+        "wukong",
         "amumu",
-        "ekko"
+        "ekko",
+        "fiddlesticks"
        ]
       },
       "Top": {
@@ -9538,19 +9554,19 @@
         "malphite"
        ],
        "strongAgainst": [
+        "dr-mundo",
         "teemo",
-        "darius",
-        "olaf",
         "volibear",
+        "olaf",
         "gwen",
-        "dr-mundo"
+        "darius"
        ]
       }
      }
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/varus",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -9665,7 +9681,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/vayne",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -9727,7 +9743,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/veigar",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -9789,7 +9805,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/velkoz",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -9833,7 +9849,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/vex",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -9895,7 +9911,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/vi",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -9975,7 +9991,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/viego",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -10037,7 +10053,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/viktor",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -10099,7 +10115,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/vladimir",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -10179,7 +10195,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/volibear",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -10246,7 +10262,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/warwick",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -10326,7 +10342,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/wukong",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -10375,7 +10391,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/xayah",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -10437,7 +10453,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/xin-zhao",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -10553,7 +10569,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/yasuo",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -10620,7 +10636,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/yone",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -10673,7 +10689,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/yuumi",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
@@ -10788,7 +10804,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/zed",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -10868,7 +10884,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/zeri",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
@@ -10930,7 +10946,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/ziggs",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -10992,7 +11008,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/zilean",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
@@ -11071,7 +11087,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/zoe",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
@@ -11186,7 +11202,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/zyra",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Support": [
@@ -11253,7 +11269,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/skarner",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
@@ -11297,13 +11313,18 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/chogath",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "teemo",
+       "yone",
        "gwen",
-       "fiora"
+       "dr-mundo"
+      ],
+      "Jungle": [
+       "gwen",
+       "amumu",
+       "kindred"
       ]
      }
     }
@@ -11340,7 +11361,7 @@
     },
     "wildriftfire": {
      "url": "https://www.wildriftfire.com/guide/yunara",
-     "patch": "7.3",
+     "patch": "7.3a",
      "kind": "editorial",
      "counteredBy": {
       "Adc": [

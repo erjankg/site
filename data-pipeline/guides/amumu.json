@@ -3,7 +3,7 @@
   "name": "Amumu",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Lillia",
-    "Nocturne",
-    "Nidalee"
+    "Gwen",
+    "Nunu & Willump",
+    "Olaf"
   ],
   "builds": [
     {
@@ -295,21 +295,21 @@
       "default": true,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Amplifying Tome"
         ],
         "core": [
+          "Liandry's Torment",
           "Sunfire Aegis",
-          "Abyssal Mask",
-          "Thornmail"
+          "Abyssal Mask"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Sunfire Aegis",
+          "Liandry's Torment",
           "Plated Steelcaps",
+          "Sunfire Aegis",
           "Abyssal Mask",
-          "Thornmail",
           "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
@@ -321,7 +321,7 @@
     "Unshakeable",
     "Second Wind",
     "Perseverance",
-    "Transcendence"
+    "Legend: Bloodline"
   ],
   "spells": [
     {

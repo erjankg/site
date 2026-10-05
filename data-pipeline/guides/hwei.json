@@ -1,0 +1,87 @@
+{
+  "slug": "hwei",
+  "name": "Hwei",
+  "role": "Мид",
+  "tier": "S+",
+  "patch": "7.3a",
+  "dataDate": null,
+  "matchups": [],
+  "counters": [
+    "Yasuo",
+    "Yone",
+    "Syndra"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Blackfire Torch",
+          "Infinity Orb",
+          "Liandry's Torment"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Boots of Mana",
+          "Blackfire Torch",
+          "Infinity Orb",
+          "Liandry's Torment",
+          "Cryptbloom",
+          "Boots of Mana"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Arcane Comet",
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
+    "Legend: Haste"
+  ],
+  "spells": [],
+  "skillOrder": [
+    {
+      "ability": "Subject: Disaster",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Subject: Serenity",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Subject: Torment",
+      "levels": [
+        2,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Wash Brush",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}

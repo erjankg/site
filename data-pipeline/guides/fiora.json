@@ -2,8 +2,8 @@
   "slug": "fiora",
   "name": "Fiora",
   "role": "Барон",
-  "tier": "B",
-  "patch": "7.3",
+  "tier": "C",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Rumble",
+    "Shen",
     "Malphite",
-    "Poppy"
+    "Darius"
   ],
   "builds": [
     {
@@ -295,24 +295,24 @@
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Ruby Crystal"
         ],
         "core": [
-          "Eclipse",
           "Trinity Force",
+          "Eclipse",
           "Hullbreaker"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Plated Steelcaps",
           "Goredrinker"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
-          "Eclipse",
+          "Plated Steelcaps",
           "Trinity Force",
+          "Eclipse",
           "Hullbreaker",
           "Death's Dance",
-          "Gluttonous Greaves - Goredrinker"
+          "Plated Steelcaps - Goredrinker"
         ]
       }
     }

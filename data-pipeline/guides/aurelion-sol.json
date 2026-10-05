@@ -3,7 +3,7 @@
   "name": "Aurelion Sol",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Yone",
-    "Zed",
-    "Yasuo"
+    "Kassadin",
+    "Akshan"
   ],
   "builds": [
     {
@@ -300,7 +300,7 @@
         "core": [
           "Rylai's Crystal Scepter",
           "Liandry's Torment",
-          "Rabadon's Deathcap"
+          "Cryptbloom"
         ],
         "boots": [
           "Boots of Mana"
@@ -309,8 +309,8 @@
           "Boots of Mana",
           "Rylai's Crystal Scepter",
           "Liandry's Torment",
+          "Cryptbloom",
           "Rabadon's Deathcap",
-          "Riftmaker",
           "Boots of Mana"
         ]
       }
@@ -319,9 +319,9 @@
   "runes": [
     "Dark Harvest",
     "Manaflow Band",
-    "Absolute Focus",
-    "Scorch",
-    "Bone Plating"
+    "Transcendence",
+    "Gathering Storm",
+    "Legend: Haste"
   ],
   "spells": [
     {
@@ -374,18 +374,18 @@
       "ability": "Astral Flight",
       "levels": [
         3,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {
       "ability": "Singularity",
       "levels": [
         2,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {

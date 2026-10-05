@@ -3,7 +3,7 @@
   "name": "Dr. Mundo",
   "role": "Барон",
   "tier": "S",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -353,14 +353,14 @@
     }
   ],
   "counters": [
-    "Riven",
+    "Aatrox",
     "Gwen",
-    "Fiora"
+    "Yone"
   ],
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "S",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -394,7 +394,7 @@
         ],
         "core": [
           "Heartsteel",
-          "Sunfire Aegis",
+          "Thornmail",
           "Unending Despair"
         ],
         "boots": [
@@ -403,9 +403,9 @@
         "finalBuild": [
           "Heartsteel",
           "Plated Steelcaps",
-          "Sunfire Aegis",
-          "Unending Despair",
           "Thornmail",
+          "Unending Despair",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }

@@ -3,7 +3,7 @@
   "name": "Gwen",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Fiora",
-    "Tryndamere",
-    "Riven"
+    "Yone",
+    "Shen"
   ],
   "builds": [
     {
@@ -324,17 +324,17 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Dusk and Dawn",
           "Nashor's Tooth",
+          "Dusk and Dawn",
           "Rabadon's Deathcap"
         ],
         "boots": [
           "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Dusk and Dawn",
-          "Gluttonous Greaves",
           "Nashor's Tooth",
+          "Gluttonous Greaves",
+          "Dusk and Dawn",
           "Rabadon's Deathcap",
           "Infinity Orb",
           "Gluttonous Greaves"

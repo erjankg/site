@@ -3,7 +3,7 @@
   "name": "Akali",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,7 +284,7 @@
     }
   ],
   "counters": [
-    "Veigar",
+    "Galio",
     "Lissandra",
     "Twisted Fate"
   ],
@@ -317,14 +317,14 @@
     },
     {
       "title": "Solo Build",
-      "tier": "C",
+      "tier": "B",
       "default": false,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Lich Bane",
+          "Stormsurge",
           "Infinity Orb",
           "Rabadon's Deathcap"
         ],
@@ -333,7 +333,7 @@
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Lich Bane",
+          "Stormsurge",
           "Infinity Orb",
           "Rabadon's Deathcap",
           "Void Staff",

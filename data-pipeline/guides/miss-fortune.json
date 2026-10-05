@@ -2,8 +2,8 @@
   "slug": "miss-fortune",
   "name": "Miss Fortune",
   "role": "Дракон",
-  "tier": "S",
-  "patch": "7.3",
+  "tier": "A",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
-    "Smolder",
-    "Jhin",
+    "Sivir",
+    "Kog'Maw",
     "Caitlyn"
   ],
   "builds": [
@@ -303,15 +303,15 @@
           "Infinity Edge"
         ],
         "boots": [
-          "Gluttonous Greaves"
+          "Boots of Dynamism"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
+          "Boots of Dynamism",
           "Duskblade of Draktharr",
           "The Collector",
           "Infinity Edge",
           "Lord Dominik's Regard",
-          "Gluttonous Greaves"
+          "Boots of Dynamism"
         ]
       }
     }

@@ -3,13 +3,13 @@
   "name": "K'Sante",
   "role": "Барон",
   "tier": "A",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": null,
   "matchups": [],
   "counters": [
-    "Ambessa",
-    "Vayne",
-    "Garen"
+    "Fiora",
+    "Gwen",
+    "Yone"
   ],
   "builds": [
     {
@@ -23,7 +23,7 @@
         "core": [
           "Iceborn Gauntlet",
           "Unending Despair",
-          "Amaranth's Twinguard"
+          "Thornmail"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -32,8 +32,8 @@
           "Plated Steelcaps",
           "Iceborn Gauntlet",
           "Unending Despair",
-          "Amaranth's Twinguard",
           "Thornmail",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
@@ -61,18 +61,18 @@
       "ability": "Path Maker",
       "levels": [
         3,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Footwork",
       "levels": [
         2,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {

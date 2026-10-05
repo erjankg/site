@@ -3,7 +3,7 @@
   "name": "Diana",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -491,9 +491,9 @@
     }
   ],
   "counters": [
-    "Vex",
+    "Lissandra",
     "Galio",
-    "Irelia"
+    "Syndra"
   ],
   "builds": [
     {
@@ -532,7 +532,7 @@
         ],
         "core": [
           "Lich Bane",
-          "Nashor's Tooth",
+          "Infinity Orb",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -541,7 +541,7 @@
         "finalBuild": [
           "Boots of Mana",
           "Lich Bane",
-          "Nashor's Tooth",
+          "Infinity Orb",
           "Rabadon's Deathcap",
           "Void Staff",
           "Boots of Mana"
@@ -550,7 +550,7 @@
     }
   ],
   "runes": [
-    "Electrocute",
+    "Fleet Footwork",
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",
@@ -576,7 +576,7 @@
     {
       "ability": "Pale Cascade",
       "levels": [
-        2,
+        3,
         8,
         10,
         11
@@ -585,7 +585,7 @@
     {
       "ability": "Lunar Rush",
       "levels": [
-        3,
+        2,
         12,
         14,
         15

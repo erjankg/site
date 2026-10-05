@@ -2,8 +2,8 @@
   "slug": "jax",
   "name": "Jax",
   "role": "Барон",
-  "tier": "C",
-  "patch": "7.3",
+  "tier": "B",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Poppy",
-    "Teemo",
-    "Rumble"
+    "Malphite",
+    "Shen",
+    "K'Sante"
   ],
   "builds": [
     {
@@ -574,7 +574,7 @@
           "Ruby Crystal"
         ],
         "core": [
-          "Trinity Force",
+          "Dusk and Dawn",
           "Blade of the Ruined King",
           "Hullbreaker"
         ],
@@ -583,7 +583,7 @@
         ],
         "finalBuild": [
           "Plated Steelcaps",
-          "Trinity Force",
+          "Dusk and Dawn",
           "Blade of the Ruined King",
           "Hullbreaker",
           "Zhonya's Hourglass",
@@ -600,18 +600,18 @@
           "Long Sword"
         ],
         "core": [
-          "Trinity Force",
+          "Dusk and Dawn",
           "Blade of the Ruined King",
-          "Death's Dance"
+          "Riftmaker"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Trinity Force",
+          "Dusk and Dawn",
           "Plated Steelcaps",
           "Blade of the Ruined King",
-          "Death's Dance",
+          "Riftmaker",
           "Zhonya's Hourglass",
           "Plated Steelcaps"
         ]
@@ -620,10 +620,10 @@
   ],
   "runes": [
     "Grasp of the Undying",
-    "Demolish",
-    "Second Wind",
-    "Perseverance",
-    "Last Stand"
+    "Brutal",
+    "Last Stand",
+    "Legend: Haste",
+    "Second Wind"
   ],
   "spells": [
     {

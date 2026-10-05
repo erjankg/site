@@ -3,7 +3,7 @@
   "name": "Aatrox",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,13 +561,13 @@
   ],
   "counters": [
     "Fiora",
-    "Irelia",
+    "Malphite",
     "Ambessa"
   ],
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "S",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -575,8 +575,8 @@
         ],
         "core": [
           "Eclipse",
-          "Sundered Sky",
-          "Death's Dance"
+          "Death's Dance",
+          "Serylda's Grudge"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -585,16 +585,16 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Eclipse",
-          "Sundered Sky",
           "Death's Dance",
           "Serylda's Grudge",
+          "Spear of Shojin",
           "Plated Steelcaps - Stridebreaker"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [

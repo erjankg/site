@@ -2,8 +2,8 @@
   "slug": "jarvan-iv",
   "name": "Jarvan IV",
   "role": "Лес",
-  "tier": "B",
-  "patch": "7.3",
+  "tier": "A",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Rammus",
-    "Master Yi",
-    "Amumu"
+    "Gwen",
+    "Nocturne"
   ],
   "builds": [
     {
@@ -300,7 +300,7 @@
         "core": [
           "Trinity Force",
           "Radiant Virtue",
-          "Amaranth's Twinguard"
+          "Force of Nature"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -310,8 +310,8 @@
           "Trinity Force",
           "Plated Steelcaps",
           "Radiant Virtue",
-          "Amaranth's Twinguard",
-          "Unending Despair",
+          "Force of Nature",
+          "Frozen Heart",
           "Plated Steelcaps - Goredrinker"
         ]
       }

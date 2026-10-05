@@ -3,7 +3,7 @@
   "name": "Gragas",
   "role": "Лес",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -422,9 +422,9 @@
     }
   ],
   "counters": [
-    "Amumu",
+    "Pantheon",
     "Nocturne",
-    "Lillia"
+    "Jarvan IV"
   ],
   "builds": [
     {
@@ -437,8 +437,8 @@
         ],
         "core": [
           "Lich Bane",
-          "Rabadon's Deathcap",
-          "Void Staff"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -446,20 +446,20 @@
         "finalBuild": [
           "Boots of Mana",
           "Lich Bane",
+          "Infinity Orb",
           "Rabadon's Deathcap",
           "Void Staff",
-          "Infinity Orb",
           "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Phase Rush",
+    "First Strike",
     "Sudden Impact",
-    "Hubris",
+    "Chain Assault",
     "Eyeball Collector",
-    "Absolute Focus"
+    "Transcendence"
   ],
   "spells": [
     {

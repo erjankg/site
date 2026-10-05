@@ -3,7 +3,7 @@
   "name": "Mordekaiser",
   "role": "Барон",
   "tier": "S",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
+    "Yone",
     "Fiora",
-    "Irelia",
-    "Rumble"
+    "K'Sante"
   ],
   "builds": [
     {
@@ -295,21 +295,21 @@
       "default": true,
       "items": {
         "starting": [
-          "Amplifying Tome"
+          "Ruby Crystal"
         ],
         "core": [
+          "Liandry's Torment",
           "Riftmaker",
-          "Hextech Rocketbelt",
-          "Liandry's Torment"
+          "Hextech Rocketbelt"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Boots of Mana",
+          "Liandry's Torment",
           "Riftmaker",
           "Hextech Rocketbelt",
-          "Liandry's Torment",
           "Bloodletter's Curse",
           "Boots of Mana"
         ]
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "Conqueror",
-    "Unshakeable",
+    "Demolish",
     "Second Wind",
     "Overgrowth",
     "Transcendence"

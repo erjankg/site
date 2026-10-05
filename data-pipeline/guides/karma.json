@@ -3,7 +3,7 @@
   "name": "Karma",
   "role": "Саппорт",
   "tier": "C",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Pyke",
-    "Nami",
-    "Bard"
+    "Blitzcrank",
+    "Maokai",
+    "Alistar"
   ],
   "builds": [
     {
@@ -298,9 +298,9 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Echoes of Helia",
+          "Ardent Censer",
           "Harmonic Echo",
-          "Redemption"
+          "Echoes of Helia"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Black Mist Scythe",
           "Ionian Boots of Lucidity",
-          "Echoes of Helia",
+          "Ardent Censer",
           "Harmonic Echo",
-          "Redemption",
+          "Echoes of Helia",
           "Ionian Boots of Lucidity"
         ]
       }
@@ -345,9 +345,9 @@
       "ability": "Inner Flame",
       "levels": [
         1,
-        4,
-        6,
-        7
+        8,
+        10,
+        11
       ]
     },
     {
@@ -363,9 +363,9 @@
       "ability": "Inspire",
       "levels": [
         2,
-        8,
-        10,
-        11
+        4,
+        6,
+        7
       ]
     },
     {

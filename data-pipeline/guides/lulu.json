@@ -3,7 +3,7 @@
   "name": "Lulu",
   "role": "Саппорт",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -286,7 +286,7 @@
   "counters": [
     "Blitzcrank",
     "Senna",
-    "Bard"
+    "Leona"
   ],
   "builds": [
     {
@@ -295,7 +295,7 @@
       "default": true,
       "items": {
         "starting": [
-          "Relic Shield"
+          "Spectral Sickle"
         ],
         "core": [
           "Ardent Censer",
@@ -306,7 +306,7 @@
           "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Bulwark of the Mountain",
+          "Black Mist Scythe",
           "Ardent Censer",
           "Ionian Boots of Lucidity",
           "Harmonic Echo",

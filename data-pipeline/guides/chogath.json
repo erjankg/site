@@ -3,18 +3,18 @@
   "name": "Cho'Gath",
   "role": "Барон",
   "tier": "S+",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": null,
   "matchups": [],
   "counters": [
-    "Teemo",
+    "Yone",
     "Gwen",
-    "Fiora"
+    "Dr. Mundo"
   ],
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -22,8 +22,8 @@
         ],
         "core": [
           "Heartsteel",
-          "Dead Man's Plate",
-          "Unending Despair"
+          "Sunfire Aegis",
+          "Thornmail"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -31,9 +31,9 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Heartsteel",
-          "Dead Man's Plate",
-          "Unending Despair",
+          "Sunfire Aegis",
           "Thornmail",
+          "Unending Despair",
           "Plated Steelcaps"
         ]
       }
@@ -44,23 +44,23 @@
       "default": false,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Amplifying Tome"
         ],
         "core": [
-          "Heartsteel",
-          "Sunfire Aegis",
-          "Unending Despair"
+          "Cosmic Drive",
+          "Riftmaker",
+          "Amaranth's Twinguard"
         ],
         "boots": [
-          "Plated Steelcaps"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Heartsteel",
-          "Plated Steelcaps",
-          "Sunfire Aegis",
+          "Ionian Boots of Lucidity",
+          "Cosmic Drive",
+          "Riftmaker",
+          "Amaranth's Twinguard",
           "Unending Despair",
-          "Thornmail",
-          "Plated Steelcaps"
+          "Ionian Boots of Lucidity"
         ]
       }
     }
@@ -78,18 +78,18 @@
       "ability": "Rupture",
       "levels": [
         2,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Feral Scream",
       "levels": [
         3,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {

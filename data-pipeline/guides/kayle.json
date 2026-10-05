@@ -3,7 +3,7 @@
   "name": "Kayle",
   "role": "Мид",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -353,9 +353,9 @@
     }
   ],
   "counters": [
+    "Kassadin",
     "Syndra",
-    "Viktor",
-    "Ryze"
+    "Orianna"
   ],
   "builds": [
     {
@@ -450,9 +450,9 @@
       "ability": "Radiant Blast",
       "levels": [
         2,
-        4,
-        6,
-        7
+        8,
+        10,
+        11
       ]
     },
     {
@@ -468,9 +468,9 @@
       "ability": "Starfire Spellblade",
       "levels": [
         1,
-        8,
-        10,
-        11
+        4,
+        6,
+        7
       ]
     },
     {

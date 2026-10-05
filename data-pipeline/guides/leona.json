@@ -3,7 +3,7 @@
   "name": "Leona",
   "role": "Саппорт",
   "tier": "A",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,7 +284,7 @@
     }
   ],
   "counters": [
-    "Galio",
+    "Alistar",
     "Morgana",
     "Janna"
   ],
@@ -298,9 +298,9 @@
           "Relic Shield"
         ],
         "core": [
-          "Mantle of the Twelfth Hour",
-          "Yordle Trap",
-          "Radiant Virtue"
+          "Warmog's Armor",
+          "Radiant Virtue",
+          "Dawnshroud"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Bulwark of the Mountain",
           "Plated Steelcaps",
-          "Mantle of the Twelfth Hour",
-          "Yordle Trap",
+          "Warmog's Armor",
           "Radiant Virtue",
+          "Dawnshroud",
           "Plated Steelcaps"
         ]
       }
@@ -321,7 +321,7 @@
     "Unshakeable",
     "Second Wind",
     "Perseverance",
-    "Hextech Flashtraption"
+    "Sudden Impact"
   ],
   "spells": [
     {

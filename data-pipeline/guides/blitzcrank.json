@@ -2,8 +2,8 @@
   "slug": "blitzcrank",
   "name": "Blitzcrank",
   "role": "Саппорт",
-  "tier": "C",
-  "patch": "7.3",
+  "tier": "B",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Leona",
+    "Nautilus",
     "Braum",
-    "Morgana"
+    "Alistar"
   ],
   "builds": [
     {
@@ -298,19 +298,19 @@
           "Relic Shield"
         ],
         "core": [
-          "Zeke's Convergence",
           "Yordle Trap",
-          "Frozen Heart"
+          "Zeke's Convergence",
+          "Warmog's Armor"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
+          "Yordle Trap",
           "Plated Steelcaps",
           "Zeke's Convergence",
-          "Yordle Trap",
-          "Frozen Heart",
+          "Warmog's Armor",
           "Plated Steelcaps"
         ]
       }
@@ -354,18 +354,18 @@
       "ability": "Overdrive",
       "levels": [
         3,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {
       "ability": "Power Fist",
       "levels": [
         2,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {
