@@ -3,7 +3,7 @@
   "name": "Smolder",
   "role": "Дракон",
   "tier": "A",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -617,9 +617,9 @@
     }
   ],
   "counters": [
-    "Draven",
-    "Lucian",
-    "Caitlyn"
+    "Yunara",
+    "Jinx",
+    "Ashe"
   ],
   "builds": [
     {
@@ -639,8 +639,8 @@
           "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
           "Muramana",
+          "Gluttonous Greaves",
           "Trinity Force",
           "Serylda's Grudge",
           "Spear of Shojin",
@@ -650,7 +650,7 @@
     }
   ],
   "runes": [
-    "Phase Rush",
+    "Fleet Footwork",
     "Battle Zeal",
     "Cut Down",
     "Legend: Bloodline",

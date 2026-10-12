@@ -2,8 +2,8 @@
   "slug": "malphite",
   "name": "Malphite",
   "role": "Барон",
-  "tier": "S+",
-  "patch": "7.3",
+  "tier": "S",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -698,22 +698,22 @@
     }
   ],
   "counters": [
-    "Rumble",
+    "Dr. Mundo",
     "Mordekaiser",
     "Gwen"
   ],
   "builds": [
     {
-      "title": "Solo Build",
-      "tier": "S+",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Ruby Crystal"
         ],
         "core": [
-          "Thornmail",
           "Iceborn Gauntlet",
+          "Thornmail",
           "Frozen Heart"
         ],
         "boots": [
@@ -721,36 +721,10 @@
         ],
         "finalBuild": [
           "Plated Steelcaps",
-          "Thornmail",
           "Iceborn Gauntlet",
+          "Thornmail",
           "Frozen Heart",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps"
-        ]
-      }
-    },
-    {
-      "title": "Support Build",
-      "tier": "B",
-      "default": false,
-      "items": {
-        "starting": [
-          "Relic Shield"
-        ],
-        "core": [
-          "Zeke's Convergence",
-          "Thornmail",
-          "Iceborn Gauntlet"
-        ],
-        "boots": [
-          "Plated Steelcaps"
-        ],
-        "finalBuild": [
-          "Bulwark of the Mountain",
-          "Plated Steelcaps",
-          "Zeke's Convergence",
-          "Thornmail",
-          "Iceborn Gauntlet",
+          "Force of Nature",
           "Plated Steelcaps"
         ]
       }
@@ -780,9 +754,9 @@
       "ability": "Seismic Shard",
       "levels": [
         3,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {
@@ -798,9 +772,9 @@
       "ability": "Ground Slam",
       "levels": [
         2,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {

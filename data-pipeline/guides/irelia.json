@@ -3,7 +3,7 @@
   "name": "Irelia",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -354,8 +354,8 @@
   ],
   "counters": [
     "Malphite",
-    "Wukong",
-    "Poppy"
+    "Jax",
+    "Garen"
   ],
   "builds": [
     {
@@ -368,17 +368,17 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Trinity Force",
-          "Hullbreaker"
+          "Hullbreaker",
+          "Trinity Force"
         ],
         "boots": [
           "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
           "Blade of the Ruined King",
-          "Trinity Force",
+          "Gluttonous Greaves",
           "Hullbreaker",
+          "Trinity Force",
           "Death's Dance",
           "Gluttonous Greaves"
         ]
@@ -387,10 +387,10 @@
   ],
   "runes": [
     "Conqueror",
-    "Brutal",
-    "Last Stand",
-    "Legend: Bloodline",
-    "Second Wind"
+    "Demolish",
+    "Second Wind",
+    "Perseverance",
+    "Last Stand"
   ],
   "spells": [
     {
@@ -423,18 +423,18 @@
       "ability": "Defiant Dance",
       "levels": [
         3,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Flawless Duet",
       "levels": [
         2,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {

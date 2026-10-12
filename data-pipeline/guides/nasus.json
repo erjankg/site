@@ -2,8 +2,8 @@
   "slug": "nasus",
   "name": "Nasus",
   "role": "Барон",
-  "tier": "C",
-  "patch": "7.3",
+  "tier": "B",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -477,13 +477,13 @@
   ],
   "counters": [
     "Garen",
-    "Camille",
-    "Wukong"
+    "K'Sante",
+    "Aatrox"
   ],
   "builds": [
     {
-      "title": "Solo Build",
-      "tier": "B",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -492,7 +492,7 @@
         "core": [
           "Trinity Force",
           "Sundered Sky",
-          "Thornmail"
+          "Serylda's Grudge"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -501,33 +501,7 @@
           "Ionian Boots of Lucidity",
           "Trinity Force",
           "Sundered Sky",
-          "Thornmail",
-          "Amaranth's Twinguard",
-          "Ionian Boots of Lucidity"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Long Sword"
-        ],
-        "core": [
-          "Trinity Force",
-          "Sundered Sky",
-          "Thornmail"
-        ],
-        "boots": [
-          "Ionian Boots of Lucidity"
-        ],
-        "finalBuild": [
-          "Ionian Boots of Lucidity",
-          "Trinity Force",
-          "Sundered Sky",
-          "Thornmail",
+          "Serylda's Grudge",
           "Amaranth's Twinguard",
           "Ionian Boots of Lucidity"
         ]
@@ -538,7 +512,7 @@
     "Fleet Footwork",
     "Unshakeable",
     "Second Wind",
-    "Overgrowth",
+    "Perseverance",
     "Transcendence"
   ],
   "spells": [
@@ -573,7 +547,7 @@
       "ability": "Siphoning Strike",
       "levels": [
         1,
-        3,
+        4,
         6,
         7
       ]
@@ -590,7 +564,7 @@
     {
       "ability": "Spirit Fire",
       "levels": [
-        4,
+        3,
         12,
         14,
         15

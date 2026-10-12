@@ -3,7 +3,7 @@
   "name": "Rumble",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Renekton",
-    "Ornn",
-    "Ambessa"
+    "K'Sante",
+    "Volibear",
+    "Garen"
   ],
   "builds": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Liandry's Torment",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Hextech Rocketbelt",
+          "Bloodletter's Curse"
         ],
         "boots": [
           "Boots of Mana"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Liandry's Torment",
-          "Infinity Orb",
-          "Rabadon's Deathcap",
+          "Hextech Rocketbelt",
           "Bloodletter's Curse",
+          "Riftmaker",
           "Boots of Mana"
         ]
       }
@@ -318,9 +318,9 @@
   ],
   "runes": [
     "Phase Rush",
-    "Unshakeable",
-    "Second Wind",
-    "Perseverance",
+    "Battle Zeal",
+    "Cut Down",
+    "Legend: Haste",
     "Nimbus Cloak"
   ],
   "spells": [

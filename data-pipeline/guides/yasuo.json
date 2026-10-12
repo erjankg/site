@@ -2,7 +2,7 @@
   "slug": "yasuo",
   "name": "Yasuo",
   "role": "Мид",
-  "tier": "A",
+  "tier": "S",
   "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
@@ -698,22 +698,22 @@
     }
   ],
   "counters": [
-    "Teemo",
-    "Vex",
-    "Irelia"
+    "Aurelion Sol",
+    "Lissandra",
+    "Yone"
   ],
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "C",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
+          "Blade of the Ruined King",
           "Immortal Shieldbow",
-          "Infinity Edge",
           "Lord Dominik's Regard"
         ],
         "boots": [
@@ -722,10 +722,10 @@
         ],
         "finalBuild": [
           "Berserker's Greaves",
+          "Blade of the Ruined King",
           "Immortal Shieldbow",
-          "Infinity Edge",
           "Lord Dominik's Regard",
-          "Death's Dance",
+          "Infinity Edge",
           "Berserker's Greaves - Galeforce"
         ]
       }
@@ -741,7 +741,7 @@
         "core": [
           "Blade of the Ruined King",
           "Immortal Shieldbow",
-          "Infinity Edge"
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves",
@@ -751,15 +751,15 @@
           "Berserker's Greaves",
           "Blade of the Ruined King",
           "Immortal Shieldbow",
-          "Infinity Edge",
           "Lord Dominik's Regard",
+          "Infinity Edge",
           "Berserker's Greaves - Galeforce"
         ]
       }
     }
   ],
   "runes": [
-    "Lethal Tempo",
+    "Grasp of the Undying",
     "Courage of the Colossus",
     "Second Wind",
     "Perseverance",

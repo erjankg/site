@@ -3,7 +3,7 @@
   "name": "Lillia",
   "role": "Лес",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Evelynn",
+    "Jarvan IV",
     "Vi",
-    "Master Yi"
+    "Kayn"
   ],
   "builds": [
     {
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Liandry's Torment",
-          "Blackfire Torch",
+          "Riftmaker",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Liandry's Torment",
-          "Blackfire Torch",
-          "Rabadon's Deathcap",
           "Riftmaker",
+          "Rabadon's Deathcap",
+          "Bloodletter's Curse",
           "Boots of Mana"
         ]
       }

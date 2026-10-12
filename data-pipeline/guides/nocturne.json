@@ -3,7 +3,7 @@
   "name": "Nocturne",
   "role": "Лес",
   "tier": "S+",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Rammus",
-    "Master Yi",
-    "Viego"
+    "Wukong",
+    "Ekko"
   ],
   "builds": [
     {
@@ -311,7 +311,7 @@
           "Duskblade of Draktharr",
           "Serpent's Fang",
           "Serylda's Grudge",
-          "Sundered Sky",
+          "Eclipse",
           "Boots of Dynamism - Stridebreaker"
         ]
       }
@@ -319,10 +319,10 @@
   ],
   "runes": [
     "Electrocute",
-    "Sudden Impact",
-    "Chain Assault",
-    "Eyeball Collector",
-    "Transcendence"
+    "Axiom Arcanist",
+    "Transcendence",
+    "Nimbus Cloak",
+    "Legend: Haste"
   ],
   "spells": [
     {
@@ -345,18 +345,18 @@
       "ability": "Shroud of Darkness",
       "levels": [
         2,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {
       "ability": "Unspeakable Horror",
       "levels": [
         4,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {

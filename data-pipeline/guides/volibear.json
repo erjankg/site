@@ -3,7 +3,7 @@
   "name": "Volibear",
   "role": "Лес",
   "tier": "C",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
+    "Ekko",
     "Lillia",
-    "Evelynn",
-    "Kindred"
+    "Warwick"
   ],
   "builds": [
     {
@@ -571,23 +571,23 @@
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Amplifying Tome"
         ],
         "core": [
           "Dusk and Dawn",
-          "Navori Quickblades",
+          "Heartsteel",
           "Riftmaker"
         ],
         "boots": [
-          "Berserker's Greaves"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "Dusk and Dawn",
-          "Navori Quickblades",
+          "Plated Steelcaps",
+          "Heartsteel",
           "Riftmaker",
           "Amaranth's Twinguard",
-          "Berserker's Greaves"
+          "Plated Steelcaps"
         ]
       }
     },
@@ -600,19 +600,19 @@
           "Ruby Crystal"
         ],
         "core": [
+          "Heartsteel",
           "Dusk and Dawn",
-          "Navori Quickblades",
           "Hullbreaker"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Heartsteel",
           "Plated Steelcaps",
           "Dusk and Dawn",
-          "Navori Quickblades",
           "Hullbreaker",
-          "Riftmaker",
+          "Unending Despair",
           "Plated Steelcaps"
         ]
       }
@@ -620,9 +620,9 @@
   ],
   "runes": [
     "Lethal Tempo",
-    "Battle Zeal",
+    "Triumph",
     "Last Stand",
-    "Legend: Alacrity",
+    "Legend: Haste",
     "Overgrowth"
   ],
   "spells": [

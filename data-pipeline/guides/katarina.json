@@ -3,7 +3,7 @@
   "name": "Katarina",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
+    "Galio",
     "Vex",
-    "Zed",
     "Lissandra"
   ],
   "builds": [
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Infinity Orb",
-          "Rabadon's Deathcap",
-          "Void Staff"
+          "Stormsurge",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Infinity Orb",
+          "Stormsurge",
           "Rabadon's Deathcap",
           "Void Staff",
-          "Zhonya's Hourglass",
           "Boots of Mana"
         ]
       }
@@ -319,7 +319,7 @@
   "runes": [
     "First Strike",
     "Sudden Impact",
-    "Hubris",
+    "Chain Assault",
     "Eyeball Collector",
     "Bone Plating"
   ],

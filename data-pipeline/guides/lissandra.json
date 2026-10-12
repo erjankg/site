@@ -3,7 +3,7 @@
   "name": "Lissandra",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,7 +285,7 @@
   ],
   "counters": [
     "Morgana",
-    "Kassadin",
+    "Twisted Fate",
     "Galio"
   ],
   "builds": [
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Malignance",
-          "Stormsurge",
+          "Cryptbloom",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Malignance",
-          "Stormsurge",
+          "Cryptbloom",
           "Rabadon's Deathcap",
-          "Void Staff",
+          "Infinity Orb",
           "Boots of Mana"
         ]
       }

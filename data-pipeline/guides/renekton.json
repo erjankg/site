@@ -3,7 +3,7 @@
   "name": "Renekton",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -286,7 +286,7 @@
   "counters": [
     "Gnar",
     "Teemo",
-    "Mordekaiser"
+    "Dr. Mundo"
   ],
   "builds": [
     {
@@ -298,9 +298,9 @@
           "Ruby Crystal"
         ],
         "core": [
-          "Eclipse",
-          "Black Cleaver",
-          "Death's Dance"
+          "Blade of the Ruined King",
+          "Hullbreaker",
+          "Mortal Reminder"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -308,9 +308,9 @@
         ],
         "finalBuild": [
           "Plated Steelcaps",
-          "Eclipse",
-          "Black Cleaver",
-          "Death's Dance",
+          "Blade of the Ruined King",
+          "Hullbreaker",
+          "Mortal Reminder",
           "Sterak's Gage",
           "Plated Steelcaps - Goredrinker"
         ]
@@ -322,7 +322,7 @@
     "Demolish",
     "Second Wind",
     "Perseverance",
-    "Sudden Impact"
+    "Scorch"
   ],
   "spells": [
     {
@@ -349,19 +349,19 @@
     {
       "ability": "Ruthless Predator",
       "levels": [
-        2,
-        8,
-        10,
-        11
+        3,
+        12,
+        14,
+        15
       ]
     },
     {
       "ability": "Slice and Dice",
       "levels": [
-        3,
-        12,
-        14,
-        15
+        2,
+        8,
+        10,
+        11
       ]
     },
     {

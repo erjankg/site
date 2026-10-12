@@ -3,7 +3,7 @@
   "name": "Kindred",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Rammus",
-    "Xin Zhao",
-    "Lillia"
+    "Evelynn",
+    "Hecarim"
   ],
   "builds": [
     {
@@ -310,14 +310,14 @@
           "Kraken Slayer",
           "The Collector",
           "Lord Dominik's Regard",
-          "Infinity Edge",
+          "Stormrazor",
           "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
-    "Lethal Tempo",
+    "Conqueror",
     "Brutal",
     "Cut Down",
     "Legend: Alacrity",

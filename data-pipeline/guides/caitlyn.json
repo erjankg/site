@@ -3,7 +3,7 @@
   "name": "Caitlyn",
   "role": "Дракон",
   "tier": "S+",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Sivir",
-    "Ezreal",
-    "Miss Fortune"
+    "Ashe",
+    "Kai'Sa",
+    "Ezreal"
   ],
   "builds": [
     {
@@ -298,20 +298,20 @@
           "Long Sword"
         ],
         "core": [
-          "The Collector",
+          "Stormrazor",
           "Hexoptics C44",
-          "Infinity Edge"
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
+          "Stormrazor",
           "Berserker's Greaves",
-          "The Collector",
           "Hexoptics C44",
-          "Infinity Edge",
           "Lord Dominik's Regard",
+          "Infinity Edge",
           "Berserker's Greaves - Galeforce"
         ]
       }
@@ -321,7 +321,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

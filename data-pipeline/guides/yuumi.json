@@ -2,7 +2,7 @@
   "slug": "yuumi",
   "name": "Yuumi",
   "role": "Саппорт",
-  "tier": "A",
+  "tier": "B",
   "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
@@ -286,7 +286,7 @@
   "counters": [
     "Nautilus",
     "Thresh",
-    "Alistar"
+    "Leona"
   ],
   "builds": [
     {
@@ -308,8 +308,8 @@
         "finalBuild": [
           "Black Mist Scythe",
           "Ardent Censer",
-          "Ionian Boots of Lucidity",
           "Harmonic Echo",
+          "Ionian Boots of Lucidity",
           "Redemption",
           "Ionian Boots of Lucidity"
         ]
@@ -345,10 +345,10 @@
       "ability": "Prowling Projectile",
       "levels": [
         1,
-        4,
-        8,
-        10,
-        11
+        3,
+        6,
+        7,
+        8
       ]
     },
     {
@@ -363,9 +363,9 @@
       "ability": "Zoomies",
       "levels": [
         2,
-        3,
-        6,
-        7
+        4,
+        10,
+        11
       ]
     },
     {

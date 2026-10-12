@@ -3,7 +3,7 @@
   "name": "Kog'Maw",
   "role": "Дракон",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Ashe",
+    "Twitch",
     "Caitlyn",
-    "Vayne"
+    "Jhin"
   ],
   "builds": [
     {
@@ -300,7 +300,7 @@
         "core": [
           "Guinsoo's Rageblade",
           "Navori Quickblades",
-          "Terminus"
+          "Blade of the Ruined King"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -309,8 +309,8 @@
           "Berserker's Greaves",
           "Guinsoo's Rageblade",
           "Navori Quickblades",
+          "Blade of the Ruined King",
           "Terminus",
-          "Runaan's Hurricane",
           "Berserker's Greaves"
         ]
       }
@@ -354,7 +354,7 @@
     {
       "ability": "Caustic Spittle",
       "levels": [
-        3,
+        2,
         8,
         10,
         11
@@ -372,7 +372,7 @@
     {
       "ability": "Void Ooze",
       "levels": [
-        2,
+        3,
         12,
         14,
         15

@@ -3,7 +3,7 @@
   "name": "Camille",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Malphite",
-    "Fiora",
-    "Mordekaiser"
+    "Shen",
+    "Gwen",
+    "Jax"
   ],
   "builds": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Trinity Force",
-          "Eclipse",
-          "Hullbreaker"
+          "Hullbreaker",
+          "Eclipse"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -309,8 +309,8 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Trinity Force",
-          "Eclipse",
           "Hullbreaker",
+          "Eclipse",
           "Death's Dance",
           "Plated Steelcaps - Goredrinker"
         ]
@@ -337,7 +337,7 @@
           "Gluttonous Greaves",
           "Eclipse",
           "Death's Dance",
-          "Sterak's Gage",
+          "Amaranth's Twinguard",
           "Gluttonous Greaves"
         ]
       }

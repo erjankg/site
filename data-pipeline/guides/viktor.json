@@ -2,7 +2,7 @@
   "slug": "viktor",
   "name": "Viktor",
   "role": "Мид",
-  "tier": "D",
+  "tier": "C",
   "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Zed",
-    "Yone",
-    "Kassadin"
+    "Orianna",
+    "Hwei",
+    "Syndra"
   ],
   "builds": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Luden's Echo",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
           "Boots of Mana"
@@ -308,8 +308,8 @@
         "finalBuild": [
           "Boots of Mana",
           "Luden's Echo",
-          "Infinity Orb",
           "Rabadon's Deathcap",
+          "Infinity Orb",
           "Void Staff",
           "Boots of Mana"
         ]
@@ -317,10 +317,10 @@
     }
   ],
   "runes": [
-    "Dark Harvest",
+    "Arcane Comet",
     "Axiom Arcanist",
     "Transcendence",
-    "Scorch",
+    "Nimbus Cloak",
     "Bone Plating"
   ],
   "spells": [

@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Tryndamere",
+    "Nocturne",
     "Rammus",
-    "Amumu"
+    "Nunu & Willump"
   ],
   "builds": [
     {
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Youmuu's Ghostblade",
-          "Duskblade of Draktharr",
+          "Blade of the Ruined King",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -309,7 +309,7 @@
         "finalBuild": [
           "Boots of Dynamism",
           "Youmuu's Ghostblade",
-          "Duskblade of Draktharr",
+          "Blade of the Ruined King",
           "Serylda's Grudge",
           "Edge of Night",
           "Boots of Dynamism - Galeforce"
@@ -319,10 +319,10 @@
   ],
   "runes": [
     "Conqueror",
-    "Hextech Flashtraption",
-    "Transcendence",
-    "Nimbus Cloak",
-    "Sudden Impact"
+    "Triumph",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Absolute Focus"
   ],
   "spells": [
     {
@@ -345,18 +345,18 @@
       "ability": "Shield Vault",
       "levels": [
         2,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Aegis Assault",
       "levels": [
         4,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {

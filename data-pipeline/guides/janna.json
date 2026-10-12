@@ -3,7 +3,7 @@
   "name": "Janna",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
+    "Seraphine",
     "Blitzcrank",
-    "Senna",
     "Sona"
   ],
   "builds": [
@@ -298,19 +298,19 @@
           "Spectral Sickle"
         ],
         "core": [
+          "Tear of the Goddess",
           "Harmonic Echo",
-          "Ardent Censer",
-          "Redemption"
+          "Whispering Circlet"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Harmonic Echo",
+          "Diadem of Songs",
           "Ionian Boots of Lucidity",
+          "Harmonic Echo",
           "Ardent Censer",
-          "Redemption",
           "Ionian Boots of Lucidity"
         ]
       }
@@ -344,7 +344,7 @@
     {
       "ability": "Howling Gale",
       "levels": [
-        2,
+        1,
         12,
         14,
         15
@@ -362,7 +362,7 @@
     {
       "ability": "Eye Of The Storm",
       "levels": [
-        1,
+        2,
         4,
         6,
         7

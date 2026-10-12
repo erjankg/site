@@ -1,5 +1,5 @@
 {
- "built": "2026-10-05",
+ "built": "2026-10-12",
  "note": "ПАРЫ «кто кого контрит», собраны роботом. Данные РЕДАКЦИОННЫЕ — это мнение авторов сайтов-источников, не статистика матчей. Показывать вместе с источником и sourceDate: часть страниц отстаёт на несколько патчей. Winrate-проценты этих сайтов НЕ забираем — источник чисел там не указан. Текст «почему» берётся из champion-tags.json.",
  "sources": {
   "wildriftcounter": {
@@ -14,7 +14,7 @@
   }
  },
  "count": 141,
- "pairs": 5533,
+ "pairs": 5539,
  "champions": {
   "Aatrox": {
    "en": "Aatrox",
@@ -777,9 +777,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "caitlyn",
-       "draven",
-       "lucian"
+       "samira",
+       "ezreal",
+       "twitch"
       ]
      }
     }
@@ -1299,9 +1299,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "sivir",
-       "ezreal",
-       "miss-fortune"
+       "ashe",
+       "kaisa",
+       "ezreal"
       ]
      }
     }
@@ -1499,8 +1499,8 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "kogmaw",
-       "miss-fortune",
+       "smolder",
+       "ezreal",
        "caitlyn"
       ]
      }
@@ -1782,9 +1782,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "caitlyn",
-       "samira",
-       "kogmaw"
+       "xayah",
+       "varus",
+       "caitlyn"
       ]
      }
     }
@@ -1975,7 +1975,7 @@
       "Adc": [
        "kalista",
        "samira",
-       "ashe"
+       "kaisa"
       ]
      }
     }
@@ -2802,8 +2802,8 @@
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "amumu",
-       "aatrox"
+       "nidalee",
+       "xin-zhao"
       ]
      }
     }
@@ -3640,9 +3640,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "draven",
-       "ashe",
-       "lucian"
+       "kalista",
+       "kaisa",
+       "samira"
       ]
      }
     }
@@ -3719,9 +3719,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "jhin",
-       "miss-fortune",
-       "kogmaw"
+       "ezreal",
+       "twitch",
+       "jhin"
       ]
      }
     }
@@ -3835,9 +3835,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "caitlyn",
-       "draven",
-       "kogmaw"
+       "yunara",
+       "ashe",
+       "samira"
       ]
      }
     }
@@ -3932,9 +3932,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "ashe",
-       "kogmaw",
-       "caitlyn"
+       "draven",
+       "yunara",
+       "samira"
       ]
      }
     }
@@ -4624,9 +4624,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "ashe",
+       "twitch",
        "caitlyn",
-       "jinx"
+       "jhin"
       ]
      }
     }
@@ -5031,8 +5031,8 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "caitlyn",
-       "kogmaw",
+       "varus",
+       "samira",
        "ashe"
       ]
      }
@@ -5069,12 +5069,12 @@
       },
       "Mid": {
        "counteredBy": [
-        "brand",
         "yasuo",
         "diana",
-        "ekko",
+        "annie",
+        "brand",
         "vex",
-        "annie"
+        "ekko"
        ],
        "strongAgainst": [
         "katarina",
@@ -5240,7 +5240,7 @@
       "Adc": [
        "sivir",
        "kogmaw",
-       "caitlyn"
+       "jhin"
       ]
      }
     }
@@ -6750,9 +6750,9 @@
       "Support": {
        "counteredBy": [
         "maokai",
-        "sona",
         "brand",
         "pyke",
+        "sona",
         "nami",
         "rakan"
        ],
@@ -6767,12 +6767,12 @@
       },
       "Adc": {
        "counteredBy": [
-        "vayne",
-        "kalista",
         "kaisa",
+        "kalista",
         "tristana",
+        "aphelios",
         "ashe",
-        "aphelios"
+        "vayne"
        ],
        "strongAgainst": [
         "caitlyn",
@@ -7284,7 +7284,7 @@
       "Top": [
        "gnar",
        "teemo",
-       "mordekaiser"
+       "dr-mundo"
       ]
      }
     }
@@ -7344,9 +7344,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "kindred",
+       "jarvan-iv",
        "rammus",
-       "master-yi"
+       "hecarim"
       ]
      }
     }
@@ -7461,13 +7461,13 @@
      "counteredBy": {
       "Top": [
        "renekton",
-       "darius",
-       "wukong"
+       "malphite",
+       "camille"
       ],
       "Jungle": [
        "rammus",
-       "lee-sin",
-       "vi"
+       "talon",
+       "nocturne"
       ]
      }
     }
@@ -7527,9 +7527,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "renekton",
-       "ornn",
-       "ambessa"
+       "ksante",
+       "volibear",
+       "garen"
       ]
      }
     }
@@ -7571,8 +7571,8 @@
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "kassadin",
-       "viktor",
+       "zed",
+       "yasuo",
        "syndra"
       ]
      }
@@ -7650,9 +7650,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "kogmaw",
-       "miss-fortune",
-       "caitlyn"
+       "jinx",
+       "yunara",
+       "xayah"
       ]
      }
     }
@@ -7712,9 +7712,14 @@
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "blitzcrank",
-       "pyke",
-       "nautilus"
+       "thresh",
+       "nautilus",
+       "pyke"
+      ],
+      "Adc": [
+       "yunara",
+       "kaisa",
+       "ezreal"
       ]
      }
     }
@@ -7774,8 +7779,8 @@
      "counteredBy": {
       "Support": [
        "pyke",
-       "braum",
-       "blitzcrank"
+       "yuumi",
+       "braum"
       ]
      }
     }
@@ -7881,9 +7886,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "renekton",
-       "mordekaiser",
-       "aatrox"
+       "malphite",
+       "ksante",
+       "gnar"
       ]
      }
     }
@@ -7961,9 +7966,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "fiora",
-       "renekton",
-       "gnar"
+       "jayce",
+       "sett",
+       "mordekaiser"
       ]
      }
     }
@@ -8024,8 +8029,8 @@
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "lillia",
-       "master-yi"
+       "sylas",
+       "ekko"
       ]
      }
     }
@@ -8067,9 +8072,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "ambessa",
-       "fiora",
-       "camille"
+       "dr-mundo",
+       "kayle",
+       "gnar"
       ]
      }
     }
@@ -8164,9 +8169,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "renekton",
-       "fiora",
-       "gwen"
+       "yone",
+       "gwen",
+       "mordekaiser"
       ]
      }
     }
@@ -8275,9 +8280,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "kogmaw",
-       "smolder",
-       "vayne"
+       "yunara",
+       "twitch",
+       "lucian"
       ]
      }
     }
@@ -8319,9 +8324,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "draven",
-       "lucian",
-       "caitlyn"
+       "yunara",
+       "jinx",
+       "ashe"
       ]
      }
     }
@@ -8401,7 +8406,7 @@
       "Support": [
        "blitzcrank",
        "pyke",
-       "bard"
+       "nautilus"
       ]
      }
     }
@@ -8463,7 +8468,7 @@
       "Support": [
        "blitzcrank",
        "nami",
-       "bard"
+       "rakan"
       ]
      }
     }
@@ -8558,14 +8563,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "brand",
-       "syndra",
-       "orianna"
-      ],
-      "Support": [
-       "brand",
-       "zyra",
-       "lux"
+       "hwei",
+       "orianna",
+       "ahri"
       ]
      }
     }
@@ -8661,8 +8661,8 @@
      "counteredBy": {
       "Mid": [
        "irelia",
-       "yasuo",
-       "kassadin"
+       "zed",
+       "fizz"
       ]
      }
     }
@@ -8722,7 +8722,7 @@
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "syndra",
+       "ekko",
        "zed",
        "orianna"
       ]
@@ -8835,7 +8835,7 @@
      "counteredBy": {
       "Jungle": [
        "rengar",
-       "kindred",
+       "hecarim",
        "lee-sin"
       ]
      }
@@ -8949,14 +8949,14 @@
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "ryze",
-       "rumble",
-       "wukong"
+       "ornn",
+       "irelia",
+       "sion"
       ],
       "Mid": [
-       "ryze",
+       "hwei",
        "orianna",
-       "syndra"
+       "galio"
       ]
      }
     }
@@ -8998,9 +8998,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "zyra",
-       "nami",
-       "lux"
+       "morgana",
+       "seraphine",
+       "nami"
       ]
      }
     }
@@ -9062,11 +9062,11 @@
         "seraphine"
        ],
        "strongAgainst": [
-        "soraka",
+        "morgana",
         "sona",
         "janna",
-        "brand",
-        "morgana"
+        "soraka",
+        "brand"
        ]
       },
       "Jungle": {
@@ -9113,9 +9113,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "kogmaw",
-       "caitlyn",
-       "draven"
+       "varus",
+       "corki",
+       "kaisa"
       ]
      }
     }
@@ -9194,13 +9194,13 @@
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "master-yi",
+       "nocturne",
        "amumu"
       ],
       "Top": [
        "malphite",
        "teemo",
-       "nasus"
+       "darius"
       ]
      }
     }
@@ -9278,9 +9278,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "syndra",
-       "morgana",
-       "mel"
+       "yasuo",
+       "mel",
+       "aurora"
       ]
      }
     }
@@ -9340,9 +9340,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "ashe",
+       "ezreal",
        "samira",
-       "caitlyn"
+       "kaisa"
       ]
      }
     }
@@ -9455,8 +9455,8 @@
      "kind": "editorial",
      "counteredBy": {
       "Top": [
-       "mordekaiser",
-       "fiora",
+       "sett",
+       "sion",
        "vayne"
       ]
      }
@@ -9536,12 +9536,12 @@
         "rammus"
        ],
        "strongAgainst": [
-        "dr-mundo",
-        "evelynn",
         "wukong",
-        "amumu",
         "ekko",
-        "fiddlesticks"
+        "fiddlesticks",
+        "evelynn",
+        "dr-mundo",
+        "amumu"
        ]
       },
       "Top": {
@@ -9555,11 +9555,11 @@
        ],
        "strongAgainst": [
         "dr-mundo",
-        "teemo",
-        "volibear",
         "olaf",
+        "darius",
         "gwen",
-        "darius"
+        "volibear",
+        "teemo"
        ]
       }
      }
@@ -9570,9 +9570,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "smolder",
-       "miss-fortune",
-       "vayne"
+       "xayah",
+       "twitch",
+       "zeri"
       ]
      }
     }
@@ -9685,9 +9685,14 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "caitlyn",
-       "ashe",
-       "draven"
+       "yunara",
+       "smolder",
+       "varus"
+      ],
+      "Top": [
+       "malphite",
+       "teemo",
+       "yasuo"
       ]
      }
     }
@@ -9748,8 +9753,8 @@
      "counteredBy": {
       "Mid": [
        "syndra",
-       "viktor",
-       "kassadin"
+       "yone",
+       "zed"
       ]
      }
     }
@@ -9810,8 +9815,13 @@
      "counteredBy": {
       "Mid": [
        "yone",
-       "fizz",
-       "kassadin"
+       "zed",
+       "syndra"
+      ],
+      "Support": [
+       "pyke",
+       "karma",
+       "soraka"
       ]
      }
     }
@@ -9853,9 +9863,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "lissandra",
-       "galio",
-       "veigar"
+       "hwei",
+       "orianna",
+       "syndra"
       ]
      }
     }
@@ -9915,9 +9925,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
-       "kindred",
-       "amumu",
-       "warwick"
+       "nocturne",
+       "kayn",
+       "rammus"
       ]
      }
     }
@@ -9997,7 +10007,7 @@
       "Jungle": [
        "rammus",
        "amumu",
-       "warwick"
+       "rengar"
       ]
      }
     }
@@ -10057,9 +10067,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "zed",
-       "yone",
-       "kassadin"
+       "orianna",
+       "hwei",
+       "syndra"
       ]
      }
     }
@@ -10121,7 +10131,7 @@
       "Mid": [
        "orianna",
        "kassadin",
-       "viktor"
+       "hwei"
       ]
      }
     }
@@ -10199,13 +10209,13 @@
      "kind": "editorial",
      "counteredBy": {
       "Jungle": [
+       "ekko",
        "lillia",
-       "evelynn",
-       "kindred"
+       "warwick"
       ],
       "Top": [
-       "fiora",
        "teemo",
+       "shen",
        "jax"
       ]
      }
@@ -10267,8 +10277,8 @@
      "counteredBy": {
       "Jungle": [
        "amumu",
-       "olaf",
-       "kindred"
+       "gwen",
+       "rammus"
       ]
      }
     }
@@ -10348,12 +10358,12 @@
       "Jungle": [
        "rammus",
        "lillia",
-       "warwick"
+       "amumu"
       ],
       "Top": [
-       "malphite",
+       "sion",
        "mordekaiser",
-       "renekton"
+       "shen"
       ]
      }
     }
@@ -10395,9 +10405,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "caitlyn",
-       "vayne",
-       "kogmaw"
+       "ezreal",
+       "ashe",
+       "smolder"
       ]
      }
     }
@@ -10458,8 +10468,8 @@
      "counteredBy": {
       "Jungle": [
        "rammus",
-       "shyvana",
-       "master-yi"
+       "nocturne",
+       "volibear"
       ]
      }
     }
@@ -10573,12 +10583,12 @@
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "teemo",
-       "vex",
-       "irelia"
+       "aurelion-sol",
+       "lissandra",
+       "yone"
       ],
       "Top": [
-       "renekton",
+       "sett",
        "malphite",
        "darius"
       ]
@@ -10641,18 +10651,18 @@
      "counteredBy": {
       "Mid": [
        "ahri",
-       "vex",
+       "lissandra",
        "zed"
       ],
       "Jungle": [
        "rammus",
-       "kindred",
-       "evelynn"
+       "xin-zhao",
+       "skarner"
       ],
       "Top": [
-       "renekton",
-       "malphite",
-       "teemo"
+       "jax",
+       "shen",
+       "jayce"
       ]
      }
     }
@@ -10695,7 +10705,7 @@
       "Support": [
        "nautilus",
        "thresh",
-       "alistar"
+       "leona"
       ]
      }
     }
@@ -10809,13 +10819,13 @@
      "counteredBy": {
       "Mid": [
        "lissandra",
-       "yasuo",
-       "vex"
+       "sylas",
+       "irelia"
       ],
       "Jungle": [
        "rammus",
-       "master-yi",
-       "kindred"
+       "nocturne",
+       "master-yi"
       ]
      }
     }
@@ -10888,9 +10898,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "kogmaw",
+       "kalista",
        "caitlyn",
-       "lucian"
+       "tristana"
       ]
      }
     }
@@ -10950,7 +10960,7 @@
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "yasuo",
+       "galio",
        "zed",
        "yone"
       ]
@@ -11013,7 +11023,7 @@
      "counteredBy": {
       "Support": [
        "maokai",
-       "rell",
+       "janna",
        "pyke"
       ]
      }
@@ -11091,9 +11101,9 @@
      "kind": "editorial",
      "counteredBy": {
       "Mid": [
-       "morgana",
+       "irelia",
        "yasuo",
-       "irelia"
+       "veigar"
       ]
      }
     }
@@ -11206,14 +11216,14 @@
      "kind": "editorial",
      "counteredBy": {
       "Support": [
-       "karma",
-       "rakan",
-       "nami"
+       "janna",
+       "pyke",
+       "milio"
       ],
       "Mid": [
-       "yasuo",
-       "fizz",
-       "irelia"
+       "galio",
+       "lux",
+       "hwei"
       ]
      }
     }
@@ -11274,8 +11284,8 @@
      "counteredBy": {
       "Jungle": [
        "lillia",
-       "olaf",
-       "master-yi"
+       "kayn",
+       "nocturne"
       ]
      }
     }
@@ -11365,8 +11375,8 @@
      "kind": "editorial",
      "counteredBy": {
       "Adc": [
-       "smolder",
-       "miss-fortune",
+       "ezreal",
+       "tristana",
        "caitlyn"
       ]
      }

@@ -3,7 +3,7 @@
   "name": "Nautilus",
   "role": "Саппорт",
   "tier": "A",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -836,9 +836,9 @@
     }
   ],
   "counters": [
-    "Bard",
-    "Janna",
-    "Morgana"
+    "Rell",
+    "Leona",
+    "Braum"
   ],
   "builds": [
     {
@@ -850,9 +850,9 @@
           "Relic Shield"
         ],
         "core": [
-          "Mantle of the Twelfth Hour",
-          "Yordle Trap",
-          "Knight's Vow"
+          "Warmog's Armor",
+          "Frozen Heart",
+          "Force of Nature"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -860,9 +860,9 @@
         "finalBuild": [
           "Bulwark of the Mountain",
           "Plated Steelcaps",
-          "Mantle of the Twelfth Hour",
-          "Yordle Trap",
-          "Knight's Vow",
+          "Warmog's Armor",
+          "Frozen Heart",
+          "Force of Nature",
           "Plated Steelcaps"
         ]
       }

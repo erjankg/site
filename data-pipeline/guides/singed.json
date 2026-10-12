@@ -3,7 +3,7 @@
   "name": "Singed",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -422,9 +422,9 @@
     }
   ],
   "counters": [
-    "Ambessa",
-    "Fiora",
-    "Camille"
+    "Dr. Mundo",
+    "Kayle",
+    "Gnar"
   ],
   "builds": [
     {
@@ -437,8 +437,8 @@
         ],
         "core": [
           "Liandry's Torment",
-          "Rylai's Crystal Scepter",
-          "Dead Man's Plate"
+          "Dead Man's Plate",
+          "Rylai's Crystal Scepter"
         ],
         "boots": [
           "Boots of Mana"
@@ -446,9 +446,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Liandry's Torment",
-          "Rylai's Crystal Scepter",
           "Dead Man's Plate",
-          "Mantle of the Twelfth Hour",
+          "Rylai's Crystal Scepter",
+          "Bloodletter's Curse",
           "Boots of Mana"
         ]
       }

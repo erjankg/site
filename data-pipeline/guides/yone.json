@@ -3,7 +3,7 @@
   "name": "Yone",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -837,7 +837,7 @@
   ],
   "counters": [
     "Ahri",
-    "Vex",
+    "Lissandra",
     "Zed"
   ],
   "builds": [
@@ -850,8 +850,8 @@
           "Long Sword"
         ],
         "core": [
+          "Blade of the Ruined King",
           "Immortal Shieldbow",
-          "Infinity Edge",
           "Lord Dominik's Regard"
         ],
         "boots": [
@@ -859,17 +859,17 @@
         ],
         "finalBuild": [
           "Berserker's Greaves",
+          "Blade of the Ruined King",
           "Immortal Shieldbow",
-          "Infinity Edge",
           "Lord Dominik's Regard",
-          "Death's Dance",
+          "Infinity Edge",
           "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -895,7 +895,7 @@
     },
     {
       "title": "Solo Build",
-      "tier": "S",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -903,8 +903,8 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Immortal Shieldbow",
-          "Infinity Edge"
+          "Essence Reaver",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -912,17 +912,17 @@
         "finalBuild": [
           "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Immortal Shieldbow",
-          "Infinity Edge",
+          "Essence Reaver",
           "Lord Dominik's Regard",
+          "Infinity Edge",
           "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
-    "Lethal Tempo",
-    "Demolish",
+    "Grasp of the Undying",
+    "Courage of the Colossus",
     "Second Wind",
     "Perseverance",
     "Legend: Alacrity"

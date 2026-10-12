@@ -443,9 +443,9 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Ashe",
-    "Draven"
+    "Yunara",
+    "Smolder",
+    "Varus"
   ],
   "builds": [
     {
@@ -465,8 +465,8 @@
           "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "Kraken Slayer",
+          "Berserker's Greaves",
           "Guinsoo's Rageblade",
           "Terminus",
           "Blade of the Ruined King",
@@ -491,11 +491,11 @@
           "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "Blade of the Ruined King",
+          "Berserker's Greaves",
           "Guinsoo's Rageblade",
           "Terminus",
-          "Experimental Hexplate",
+          "Mercurial Scimitar",
           "Berserker's Greaves"
         ]
       }
@@ -505,7 +505,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [
@@ -550,18 +550,18 @@
       "ability": "Tumble",
       "levels": [
         1,
-        8,
-        10,
-        11
+        4,
+        6,
+        7
       ]
     },
     {
       "ability": "Silver Bolts",
       "levels": [
         2,
-        4,
-        6,
-        7
+        8,
+        10,
+        11
       ]
     },
     {

@@ -3,7 +3,7 @@
   "name": "Poppy",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
-    "Ambessa",
-    "Teemo",
+    "Sett",
+    "Yone",
     "Mordekaiser"
   ],
   "builds": [
@@ -298,19 +298,19 @@
           "Ruby Crystal"
         ],
         "core": [
+          "Heartsteel",
           "Sunfire Aegis",
-          "Fimbulwinter",
           "Thornmail"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Heartsteel",
           "Plated Steelcaps",
           "Sunfire Aegis",
-          "Winter's Approach",
           "Thornmail",
-          "Amaranth's Twinguard",
+          "Force of Nature",
           "Plated Steelcaps"
         ]
       }

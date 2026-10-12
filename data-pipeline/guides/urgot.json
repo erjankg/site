@@ -3,7 +3,7 @@
   "name": "Urgot",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
-    "Mordekaiser",
-    "Fiora",
+    "Sett",
+    "Sion",
     "Vayne"
   ],
   "builds": [
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Black Cleaver",
-          "Sterak's Gage",
-          "Amaranth's Twinguard"
+          "Thornmail",
+          "Gargoyle Stoneplate"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Black Cleaver",
-          "Sterak's Gage",
-          "Amaranth's Twinguard",
           "Thornmail",
+          "Gargoyle Stoneplate",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
@@ -319,8 +319,8 @@
   "runes": [
     "Empowerment",
     "Demolish",
-    "Second Wind",
-    "Overgrowth",
+    "Bone Plating",
+    "Perseverance",
     "Brutal"
   ],
   "spells": [

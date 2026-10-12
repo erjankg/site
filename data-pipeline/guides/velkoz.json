@@ -2,8 +2,8 @@
   "slug": "velkoz",
   "name": "Vel'Koz",
   "role": "Мид",
-  "tier": "C",
-  "patch": "7.3",
+  "tier": "D",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,13 +561,13 @@
   ],
   "counters": [
     "Yone",
-    "Fizz",
-    "Kassadin"
+    "Zed",
+    "Syndra"
   ],
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "A",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
@@ -600,7 +600,7 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Luden's Echo",
+          "Horizon Focus",
           "Infinity Orb",
           "Rabadon's Deathcap"
         ],
@@ -610,7 +610,7 @@
         "finalBuild": [
           "Black Mist Scythe",
           "Boots of Mana",
-          "Luden's Echo",
+          "Horizon Focus",
           "Infinity Orb",
           "Rabadon's Deathcap",
           "Boots of Mana"

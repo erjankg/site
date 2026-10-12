@@ -3,7 +3,7 @@
   "name": "Galio",
   "role": "Мид",
   "tier": "S",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Morgana",
-    "Ahri",
-    "Swain"
+    "Aurelion Sol",
+    "Syndra",
+    "Hwei"
   ],
   "builds": [
     {
@@ -575,8 +575,8 @@
         ],
         "core": [
           "Hollow Radiance",
-          "Imperial Mandate",
-          "Riftmaker"
+          "Thornmail",
+          "Unending Despair"
         ],
         "boots": [
           "Mercury's Treads"
@@ -584,9 +584,9 @@
         "finalBuild": [
           "Mercury's Treads",
           "Hollow Radiance",
-          "Imperial Mandate",
+          "Thornmail",
+          "Unending Despair",
           "Riftmaker",
-          "Hextech Rocketbelt",
           "Mercury's Treads"
         ]
       }
@@ -600,9 +600,9 @@
           "Relic Shield"
         ],
         "core": [
-          "Mantle of the Twelfth Hour",
-          "Yordle Trap",
-          "Knight's Vow"
+          "Hollow Radiance",
+          "Thornmail",
+          "Unending Despair"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -610,9 +610,9 @@
         "finalBuild": [
           "Bulwark of the Mountain",
           "Plated Steelcaps",
-          "Mantle of the Twelfth Hour",
-          "Yordle Trap",
-          "Knight's Vow",
+          "Hollow Radiance",
+          "Thornmail",
+          "Unending Despair",
           "Plated Steelcaps"
         ]
       }
@@ -660,7 +660,7 @@
     {
       "ability": "Shield of Durand",
       "levels": [
-        3,
+        2,
         8,
         10,
         11
@@ -669,7 +669,7 @@
     {
       "ability": "Justice Punch",
       "levels": [
-        2,
+        3,
         12,
         14,
         15

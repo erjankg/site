@@ -3,7 +3,7 @@
   "name": "Ambessa",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Renekton",
+    "Jayce",
     "Malphite",
-    "Irelia"
+    "Renekton"
   ],
   "builds": [
     {
@@ -575,8 +575,8 @@
         ],
         "core": [
           "Eclipse",
-          "Spear of Shojin",
-          "Death's Dance"
+          "Death's Dance",
+          "Serylda's Grudge"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -585,16 +585,16 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Eclipse",
-          "Spear of Shojin",
           "Death's Dance",
           "Serylda's Grudge",
+          "Spear of Shojin",
           "Plated Steelcaps - Goredrinker"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "A",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
@@ -602,8 +602,8 @@
         ],
         "core": [
           "Eclipse",
-          "Trinity Force",
-          "Death's Dance"
+          "Death's Dance",
+          "Serylda's Grudge"
         ],
         "boots": [
           "Gluttonous Greaves"
@@ -611,9 +611,9 @@
         "finalBuild": [
           "Gluttonous Greaves",
           "Eclipse",
-          "Trinity Force",
           "Death's Dance",
           "Serylda's Grudge",
+          "Spear of Shojin",
           "Gluttonous Greaves"
         ]
       }
@@ -651,7 +651,7 @@
     {
       "ability": "Repudiation",
       "levels": [
-        3,
+        2,
         12,
         14,
         15
@@ -660,7 +660,7 @@
     {
       "ability": "Lacerate",
       "levels": [
-        2,
+        3,
         8,
         10,
         11

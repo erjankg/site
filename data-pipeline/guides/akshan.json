@@ -3,7 +3,7 @@
   "name": "Akshan",
   "role": "Мид",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-12",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Yasuo",
-    "Vex",
-    "Irelia"
+    "Orianna",
+    "Lissandra"
   ],
   "builds": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "The Collector",
-          "Infinity Edge",
-          "Lord Dominik's Regard"
+          "Stormrazor",
+          "Infinity Edge"
         ],
         "boots": [
           "Gluttonous Greaves",
@@ -309,9 +309,9 @@
         "finalBuild": [
           "Gluttonous Greaves",
           "The Collector",
+          "Stormrazor",
           "Infinity Edge",
           "Lord Dominik's Regard",
-          "Rapid Firecannon",
           "Gluttonous Greaves - Galeforce"
         ]
       }
@@ -321,7 +321,7 @@
     "Empowerment",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

@@ -3,7 +3,7 @@
   "name": "Alistar",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Janna",
-    "Zyra",
-    "Ashe"
+    "Morgana",
+    "Soraka"
   ],
   "builds": [
     {
@@ -300,7 +300,7 @@
         "core": [
           "Zeke's Convergence",
           "Radiant Virtue",
-          "Yordle Trap"
+          "Warmog's Armor"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -310,7 +310,7 @@
           "Plated Steelcaps",
           "Zeke's Convergence",
           "Radiant Virtue",
-          "Yordle Trap",
+          "Warmog's Armor",
           "Plated Steelcaps"
         ]
       }
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "Ice Overlord",
-    "Unshakeable",
+    "Courage of the Colossus",
     "Second Wind",
     "Perseverance",
     "Hextech Flashtraption"

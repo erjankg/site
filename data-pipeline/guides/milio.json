@@ -3,7 +3,7 @@
   "name": "Milio",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Blitzcrank",
-    "Sona",
-    "Bard"
+    "Janna",
+    "Senna"
   ],
   "builds": [
     {
@@ -295,22 +295,22 @@
       "default": true,
       "items": {
         "starting": [
-          "Spectral Sickle"
+          "Relic Shield"
         ],
         "core": [
-          "Echoes of Helia",
+          "Ardent Censer",
           "Harmonic Echo",
-          "Ardent Censer"
+          "Redemption"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Black Mist Scythe",
-          "Ionian Boots of Lucidity",
-          "Echoes of Helia",
-          "Harmonic Echo",
+          "Bulwark of the Mountain",
           "Ardent Censer",
+          "Ionian Boots of Lucidity",
+          "Harmonic Echo",
+          "Redemption",
           "Ionian Boots of Lucidity"
         ]
       }

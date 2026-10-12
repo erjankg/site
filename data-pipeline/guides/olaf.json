@@ -3,7 +3,7 @@
   "name": "Olaf",
   "role": "Лес",
   "tier": "C",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,14 +284,14 @@
     }
   ],
   "counters": [
-    "Kindred",
+    "Master Yi",
     "Lillia",
-    "Master Yi"
+    "Jarvan IV"
   ],
   "builds": [
     {
       "title": "Jungle Build",
-      "tier": "S",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Trinity Force",
-          "Sundered Sky",
-          "Death's Dance"
+          "Death's Dance",
+          "Force of Nature"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -308,8 +308,8 @@
         "finalBuild": [
           "Trinity Force",
           "Plated Steelcaps",
-          "Sundered Sky",
           "Death's Dance",
+          "Force of Nature",
           "Sterak's Gage",
           "Plated Steelcaps"
         ]
@@ -325,8 +325,8 @@
         ],
         "core": [
           "Trinity Force",
-          "Sundered Sky",
-          "Death's Dance"
+          "Zeke's Convergence",
+          "Hullbreaker"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -334,8 +334,8 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Trinity Force",
-          "Sundered Sky",
-          "Death's Dance",
+          "Zeke's Convergence",
+          "Hullbreaker",
           "Sterak's Gage",
           "Plated Steelcaps"
         ]

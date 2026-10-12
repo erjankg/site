@@ -8,8 +8,8 @@
   "matchups": [],
   "counters": [
     "Lillia",
-    "Olaf",
-    "Master Yi"
+    "Kayn",
+    "Nocturne"
   ],
   "builds": [
     {
@@ -21,19 +21,19 @@
           "Ruby Crystal"
         ],
         "core": [
-          "Sunfire Aegis",
           "Unending Despair",
-          "Thornmail"
+          "Warmog's Armor",
+          "Amaranth's Twinguard"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Sunfire Aegis",
-          "Plated Steelcaps",
           "Unending Despair",
-          "Thornmail",
+          "Plated Steelcaps",
+          "Warmog's Armor",
           "Amaranth's Twinguard",
+          "Thornmail",
           "Plated Steelcaps"
         ]
       }
@@ -42,9 +42,9 @@
   "runes": [
     "Ice Overlord",
     "Unshakeable",
-    "Second Wind",
-    "Perseverance",
-    "Transcendence"
+    "Bone Plating",
+    "Overgrowth",
+    "Legend: Haste"
   ],
   "spells": [],
   "skillOrder": [

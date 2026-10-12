@@ -3,7 +3,7 @@
   "name": "Senna",
   "role": "Саппорт",
   "tier": "S+",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Blitzcrank",
-    "Pyke",
-    "Nautilus"
+    "Thresh",
+    "Nautilus",
+    "Pyke"
   ],
   "builds": [
     {
@@ -300,7 +300,7 @@
         "core": [
           "Statikk Shiv",
           "Rapid Firecannon",
-          "Lord Dominik's Regard"
+          "Mortal Reminder"
         ],
         "boots": [
           "Berserker's Greaves",
@@ -308,10 +308,10 @@
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Berserker's Greaves",
           "Statikk Shiv",
+          "Berserker's Greaves",
           "Rapid Firecannon",
-          "Lord Dominik's Regard",
+          "Mortal Reminder",
           "Berserker's Greaves - Galeforce"
         ]
       }
@@ -327,16 +327,16 @@
         "core": [
           "Statikk Shiv",
           "Rapid Firecannon",
-          "Lord Dominik's Regard"
+          "Mortal Reminder"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "Statikk Shiv",
+          "Berserker's Greaves",
           "Rapid Firecannon",
-          "Lord Dominik's Regard",
+          "Mortal Reminder",
           "Infinity Edge",
           "Berserker's Greaves"
         ]
@@ -345,10 +345,10 @@
   ],
   "runes": [
     "Fleet Footwork",
-    "Font of Life",
-    "Bone Plating",
-    "Perseverance",
-    "Brutal"
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
+    "Bone Plating"
   ],
   "spells": [
     {

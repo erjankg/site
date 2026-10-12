@@ -3,7 +3,7 @@
   "name": "Fizz",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,13 +561,13 @@
   ],
   "counters": [
     "Galio",
-    "Lissandra",
-    "Vex"
+    "Sylas",
+    "Lissandra"
   ],
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "A",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
@@ -621,7 +621,7 @@
   "runes": [
     "Fleet Footwork",
     "Sudden Impact",
-    "Hubris",
+    "Chain Assault",
     "Eyeball Collector",
     "Absolute Focus"
   ],

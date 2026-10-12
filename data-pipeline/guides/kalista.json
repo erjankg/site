@@ -2,8 +2,8 @@
   "slug": "kalista",
   "name": "Kalista",
   "role": "Дракон",
-  "tier": "A",
-  "patch": "7.3",
+  "tier": "B",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -422,9 +422,9 @@
     }
   ],
   "counters": [
-    "Ashe",
-    "Kog'Maw",
-    "Caitlyn"
+    "Draven",
+    "Yunara",
+    "Samira"
   ],
   "builds": [
     {
@@ -438,7 +438,7 @@
         "core": [
           "Blade of the Ruined King",
           "Guinsoo's Rageblade",
-          "Terminus"
+          "Runaan's Hurricane"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -447,8 +447,8 @@
           "Berserker's Greaves",
           "Blade of the Ruined King",
           "Guinsoo's Rageblade",
-          "Terminus",
           "Runaan's Hurricane",
+          "Terminus",
           "Berserker's Greaves"
         ]
       }

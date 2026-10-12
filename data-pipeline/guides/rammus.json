@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Amumu",
+    "Olaf",
     "Lillia",
-    "Nunu & Willump"
+    "Nocturne"
   ],
   "builds": [
     {
@@ -295,12 +295,12 @@
       "default": true,
       "items": {
         "starting": [
-          "Ruby Crystal"
+          "Cloth Armor"
         ],
         "core": [
           "Thornmail",
-          "Dawnshroud",
-          "Iceborn Gauntlet"
+          "Iceborn Gauntlet",
+          "Amaranth's Twinguard"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Thornmail",
           "Plated Steelcaps",
-          "Dawnshroud",
           "Iceborn Gauntlet",
           "Amaranth's Twinguard",
+          "Dawnshroud",
           "Plated Steelcaps"
         ]
       }

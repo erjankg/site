@@ -560,14 +560,14 @@
     }
   ],
   "counters": [
-    "Brand",
-    "Syndra",
-    "Orianna"
+    "Hwei",
+    "Orianna",
+    "Ahri"
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "B",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -586,34 +586,8 @@
           "Malignance",
           "Rylai's Crystal Scepter",
           "Abyssal Mask",
-          "Zhonya's Hourglass",
+          "Bloodletter's Curse",
           "Boots of Mana"
-        ]
-      }
-    },
-    {
-      "title": "Support Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Relic Shield"
-        ],
-        "core": [
-          "Rylai's Crystal Scepter",
-          "Malignance",
-          "Amaranth's Twinguard"
-        ],
-        "boots": [
-          "Plated Steelcaps"
-        ],
-        "finalBuild": [
-          "Bulwark of the Mountain",
-          "Plated Steelcaps",
-          "Rylai's Crystal Scepter",
-          "Malignance",
-          "Amaranth's Twinguard",
-          "Plated Steelcaps"
         ]
       }
     }
@@ -623,7 +597,7 @@
     "Axiom Arcanist",
     "Transcendence",
     "Nimbus Cloak",
-    "Bone Plating"
+    "Legend: Haste"
   ],
   "spells": [
     {

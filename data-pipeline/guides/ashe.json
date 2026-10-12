@@ -2,7 +2,7 @@
   "slug": "ashe",
   "name": "Ashe",
   "role": "Дракон",
-  "tier": "B",
+  "tier": "A",
   "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Draven",
-    "Lucian"
+    "Samira",
+    "Ezreal",
+    "Twitch"
   ],
   "builds": [
     {
@@ -307,11 +307,11 @@
           "Galeforce"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "Kraken Slayer",
+          "Berserker's Greaves",
           "Stormrazor",
           "Lord Dominik's Regard",
-          "Infinity Edge",
+          "Hexoptics C44",
           "Berserker's Greaves - Galeforce"
         ]
       }

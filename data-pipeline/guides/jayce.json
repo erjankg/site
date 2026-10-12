@@ -3,7 +3,7 @@
   "name": "Jayce",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -492,8 +492,8 @@
   ],
   "counters": [
     "Syndra",
-    "Galio",
-    "Irelia"
+    "Hwei",
+    "Orianna"
   ],
   "builds": [
     {
@@ -505,7 +505,7 @@
           "Long Sword"
         ],
         "core": [
-          "Eclipse",
+          "Manamune",
           "Serpent's Fang",
           "Serylda's Grudge"
         ],
@@ -513,8 +513,8 @@
           "Boots of Dynamism"
         ],
         "finalBuild": [
+          "Muramana",
           "Boots of Dynamism",
-          "Eclipse",
           "Serpent's Fang",
           "Serylda's Grudge",
           "Edge of Night",
@@ -543,16 +543,16 @@
           "Eclipse",
           "Serpent's Fang",
           "Serylda's Grudge",
-          "Edge of Night",
+          "Hullbreaker",
           "Boots of Dynamism"
         ]
       }
     }
   ],
   "runes": [
-    "Conqueror",
+    "First Strike",
     "Sudden Impact",
-    "Tyrant",
+    "Chain Assault",
     "Eyeball Collector",
     "Bone Plating"
   ],

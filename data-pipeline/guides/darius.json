@@ -3,7 +3,7 @@
   "name": "Darius",
   "role": "Барон",
   "tier": "S",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Wukong",
+    "Dr. Mundo",
     "Malphite",
-    "Jayce"
+    "Ornn"
   ],
   "builds": [
     {
@@ -576,7 +576,7 @@
         "core": [
           "Stridebreaker",
           "Sterak's Gage",
-          "Death's Dance"
+          "Amaranth's Twinguard"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -585,8 +585,8 @@
           "Plated Steelcaps",
           "Stridebreaker",
           "Sterak's Gage",
-          "Death's Dance",
-          "Dead Man's Plate",
+          "Amaranth's Twinguard",
+          "Force of Nature",
           "Plated Steelcaps"
         ]
       }
@@ -600,19 +600,19 @@
           "Long Sword"
         ],
         "core": [
-          "Stridebreaker",
           "Trinity Force",
-          "Sterak's Gage"
+          "Sterak's Gage",
+          "Death's Dance"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Stridebreaker",
-          "Plated Steelcaps",
           "Trinity Force",
+          "Plated Steelcaps",
           "Sterak's Gage",
           "Death's Dance",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
@@ -620,7 +620,7 @@
   ],
   "runes": [
     "Conqueror",
-    "Demolish",
+    "Unshakeable",
     "Second Wind",
     "Perseverance",
     "Nimbus Cloak"
@@ -646,7 +646,7 @@
     {
       "ability": "Decimate",
       "levels": [
-        1,
+        2,
         4,
         6,
         7
@@ -655,7 +655,7 @@
     {
       "ability": "Crippling Strike",
       "levels": [
-        2,
+        1,
         12,
         14,
         15

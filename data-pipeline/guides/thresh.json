@@ -3,7 +3,7 @@
   "name": "Thresh",
   "role": "Саппорт",
   "tier": "S",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Zyra",
-    "Nami",
-    "Lux"
+    "Morgana",
+    "Seraphine",
+    "Nami"
   ],
   "builds": [
     {
@@ -298,9 +298,9 @@
           "Relic Shield"
         ],
         "core": [
-          "Zeke's Convergence",
-          "Yordle Trap",
-          "Knight's Vow"
+          "Warmog's Armor",
+          "Force of Nature",
+          "Thornmail"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Bulwark of the Mountain",
           "Plated Steelcaps",
-          "Zeke's Convergence",
-          "Yordle Trap",
-          "Knight's Vow",
+          "Warmog's Armor",
+          "Force of Nature",
+          "Thornmail",
           "Plated Steelcaps"
         ]
       }

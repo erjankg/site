@@ -3,7 +3,7 @@
   "name": "Riven",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,13 +561,13 @@
   ],
   "counters": [
     "Renekton",
-    "Darius",
-    "Wukong"
+    "Malphite",
+    "Camille"
   ],
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -621,10 +621,10 @@
   ],
   "runes": [
     "Conqueror",
-    "Courage of the Colossus",
-    "Second Wind",
-    "Perseverance",
-    "Sudden Impact"
+    "Battle Zeal",
+    "Last Stand",
+    "Legend: Haste",
+    "Second Wind"
   ],
   "spells": [
     {
@@ -651,7 +651,7 @@
     {
       "ability": "Ki Burst",
       "levels": [
-        2,
+        3,
         12,
         14,
         15
@@ -660,7 +660,7 @@
     {
       "ability": "Valor",
       "levels": [
-        3,
+        2,
         8,
         10,
         11

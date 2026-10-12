@@ -3,7 +3,7 @@
   "name": "Veigar",
   "role": "Мид",
   "tier": "B",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,13 +561,13 @@
   ],
   "counters": [
     "Syndra",
-    "Viktor",
-    "Kassadin"
+    "Yone",
+    "Zed"
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "B",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -586,33 +586,7 @@
           "Stormsurge",
           "Rabadon's Deathcap",
           "Horizon Focus",
-          "Void Staff",
-          "Boots of Mana"
-        ]
-      }
-    },
-    {
-      "title": "Support Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Spectral Sickle"
-        ],
-        "core": [
-          "Stormsurge",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Black Mist Scythe",
-          "Boots of Mana",
-          "Stormsurge",
-          "Infinity Orb",
-          "Rabadon's Deathcap",
+          "Cryptbloom",
           "Boots of Mana"
         ]
       }
@@ -620,10 +594,10 @@
   ],
   "runes": [
     "Electrocute",
-    "Manaflow Band",
+    "Axiom Arcanist",
     "Transcendence",
     "Nimbus Cloak",
-    "Cut Down"
+    "Bone Plating"
   ],
   "spells": [
     {
@@ -667,7 +641,7 @@
       "ability": "Baleful Strike",
       "levels": [
         1,
-        3,
+        4,
         6,
         7
       ]
@@ -684,7 +658,7 @@
     {
       "ability": "Event Horizon",
       "levels": [
-        4,
+        3,
         12,
         14,
         15

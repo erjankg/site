@@ -3,7 +3,7 @@
   "name": "Kennen",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Gnar",
-    "Nasus",
-    "Wukong"
+    "Cho'Gath",
+    "Dr. Mundo",
+    "Malphite"
   ],
   "builds": [
     {
@@ -574,7 +574,7 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Infinity Orb",
+          "Stormsurge",
           "Hextech Rocketbelt",
           "Rabadon's Deathcap"
         ],
@@ -583,24 +583,24 @@
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Infinity Orb",
+          "Stormsurge",
           "Hextech Rocketbelt",
           "Rabadon's Deathcap",
-          "Stormsurge",
+          "Infinity Orb",
           "Boots of Mana"
         ]
       }
     },
     {
       "title": "Mid Build",
-      "tier": "S",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Infinity Orb",
+          "Stormsurge",
           "Hextech Rocketbelt",
           "Rabadon's Deathcap"
         ],
@@ -609,21 +609,21 @@
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Infinity Orb",
+          "Stormsurge",
           "Hextech Rocketbelt",
           "Rabadon's Deathcap",
-          "Stormsurge",
+          "Infinity Orb",
           "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Dark Harvest",
-    "Empowered Attack",
-    "Chain Assault",
-    "Eyeball Collector",
-    "Hextech Flashtraption"
+    "Electrocute",
+    "Battle Zeal",
+    "Cut Down",
+    "Legend: Bloodline",
+    "Bone Plating"
   ],
   "spells": [
     {

@@ -3,7 +3,7 @@
   "name": "Zilean",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,7 +285,7 @@
   ],
   "counters": [
     "Maokai",
-    "Rell",
+    "Janna",
     "Pyke"
   ],
   "builds": [
@@ -298,9 +298,9 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Harmonic Echo",
+          "Echoes of Helia",
           "Ardent Censer",
-          "Redemption"
+          "Harmonic Echo"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Black Mist Scythe",
           "Ionian Boots of Lucidity",
-          "Harmonic Echo",
+          "Echoes of Helia",
           "Ardent Censer",
-          "Redemption",
+          "Harmonic Echo",
           "Ionian Boots of Lucidity"
         ]
       }

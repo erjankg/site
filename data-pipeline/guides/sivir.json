@@ -3,7 +3,7 @@
   "name": "Sivir",
   "role": "Дракон",
   "tier": "C",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Kog'Maw",
-    "Smolder",
-    "Vayne"
+    "Yunara",
+    "Twitch",
+    "Lucian"
   ],
   "builds": [
     {
@@ -298,20 +298,20 @@
           "Long Sword"
         ],
         "core": [
-          "The Collector",
-          "Stormrazor",
+          "Yun Tal Wildarrows",
+          "Infinity Edge",
           "Lord Dominik's Regard"
         ],
         "boots": [
-          "Berserker's Greaves"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
-          "The Collector",
-          "Stormrazor",
+          "Yun Tal Wildarrows",
+          "Gluttonous Greaves",
+          "Infinity Edge",
           "Lord Dominik's Regard",
           "Navori Quickblades",
-          "Berserker's Greaves"
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -320,7 +320,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

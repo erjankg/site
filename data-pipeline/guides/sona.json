@@ -286,7 +286,7 @@
   "counters": [
     "Blitzcrank",
     "Pyke",
-    "Bard"
+    "Nautilus"
   ],
   "builds": [
     {
@@ -298,9 +298,9 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Tear of the Goddess",
+          "Whispering Circlet",
           "Echoes of Helia",
-          "Whispering Circlet"
+          "Harmonic Echo"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -317,7 +317,7 @@
     }
   ],
   "runes": [
-    "Fleet Footwork",
+    "Aery",
     "Manaflow Band",
     "Transcendence",
     "Scorch",
@@ -345,18 +345,18 @@
       "ability": "Hymn of Valor",
       "levels": [
         1,
-        4,
-        6,
-        7
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Aria of Perseverance",
       "levels": [
         2,
-        8,
-        10,
-        11
+        4,
+        6,
+        7
       ]
     },
     {

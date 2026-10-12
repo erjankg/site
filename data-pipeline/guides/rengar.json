@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Kindred",
+    "Jarvan IV",
     "Rammus",
-    "Master Yi"
+    "Hecarim"
   ],
   "builds": [
     {
@@ -298,30 +298,30 @@
           "Long Sword"
         ],
         "core": [
-          "Duskblade of Draktharr",
-          "Serpent's Fang",
-          "Serylda's Grudge"
+          "Essence Reaver",
+          "The Collector",
+          "Infinity Edge"
         ],
         "boots": [
-          "Boots of Dynamism"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Boots of Dynamism",
-          "Duskblade of Draktharr",
-          "Serpent's Fang",
-          "Serylda's Grudge",
-          "Eclipse",
-          "Boots of Dynamism"
+          "Gluttonous Greaves",
+          "Essence Reaver",
+          "The Collector",
+          "Infinity Edge",
+          "Lord Dominik's Regard",
+          "Gluttonous Greaves"
         ]
       }
     }
   ],
   "runes": [
     "First Strike",
-    "Sudden Impact",
-    "Tyrant",
-    "Eyeball Collector",
-    "Transcendence"
+    "Brutal",
+    "Cut Down",
+    "Legend: Haste",
+    "Absolute Focus"
   ],
   "spells": [
     {
@@ -349,18 +349,18 @@
       "ability": "Battle Roar",
       "levels": [
         2,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {
       "ability": "Bola Strike",
       "levels": [
         3,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {

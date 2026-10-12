@@ -3,7 +3,7 @@
   "name": "Norra",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.3",
+  "patch": "7.3a",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -491,9 +491,9 @@
     }
   ],
   "counters": [
-    "Kassadin",
+    "Yone",
     "Zed",
-    "Yasuo"
+    "Orianna"
   ],
   "builds": [
     {
@@ -506,8 +506,8 @@
         ],
         "core": [
           "Luden's Echo",
-          "Infinity Orb",
-          "Horizon Focus"
+          "Stormsurge",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -515,9 +515,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Luden's Echo",
-          "Infinity Orb",
-          "Horizon Focus",
+          "Stormsurge",
           "Rabadon's Deathcap",
+          "Cryptbloom",
           "Boots of Mana"
         ]
       }
