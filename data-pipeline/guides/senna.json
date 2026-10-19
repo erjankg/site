@@ -2,8 +2,8 @@
   "slug": "senna",
   "name": "Senna",
   "role": "Саппорт",
-  "tier": "S+",
-  "patch": "7.3a",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -291,7 +291,7 @@
   "builds": [
     {
       "title": "Support Build",
-      "tier": "S+",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -318,7 +318,7 @@
     },
     {
       "title": "Duo Build",
-      "tier": "S+",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -326,7 +326,7 @@
         ],
         "core": [
           "Statikk Shiv",
-          "Rapid Firecannon",
+          "Hexoptics C44",
           "Mortal Reminder"
         ],
         "boots": [
@@ -335,7 +335,7 @@
         "finalBuild": [
           "Statikk Shiv",
           "Berserker's Greaves",
-          "Rapid Firecannon",
+          "Hexoptics C44",
           "Mortal Reminder",
           "Infinity Edge",
           "Berserker's Greaves"
