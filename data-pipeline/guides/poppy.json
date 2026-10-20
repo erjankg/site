@@ -2,8 +2,8 @@
   "slug": "poppy",
   "name": "Poppy",
   "role": "Барон",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "D",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
-    "Ambessa",
-    "Teemo",
+    "Sett",
+    "Yone",
     "Mordekaiser"
   ],
   "builds": [
@@ -306,8 +306,8 @@
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Plated Steelcaps",
           "Heartsteel",
+          "Plated Steelcaps",
           "Sunfire Aegis",
           "Thornmail",
           "Force of Nature",

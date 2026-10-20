@@ -2,8 +2,8 @@
   "slug": "zyra",
   "name": "Zyra",
   "role": "Саппорт",
-  "tier": "S+",
-  "patch": "7.2c",
+  "tier": "S",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Karma",
-    "Rakan",
-    "Nami"
+    "Janna",
+    "Pyke",
+    "Milio"
   ],
   "builds": [
     {
@@ -612,14 +612,14 @@
           "Blackfire Torch",
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
-          "Void Staff",
+          "Rabadon's Deathcap",
           "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Arcane Comet",
+    "Aery",
     "Manaflow Band",
     "Transcendence",
     "Scorch",
@@ -662,9 +662,9 @@
       "ability": "Deadly Spines",
       "levels": [
         2,
-        4,
-        6,
-        7
+        8,
+        10,
+        11
       ]
     },
     {
@@ -680,9 +680,9 @@
       "ability": "Grasping Roots",
       "levels": [
         1,
-        8,
-        10,
-        11
+        4,
+        6,
+        7
       ]
     },
     {

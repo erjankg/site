@@ -2,8 +2,8 @@
   "slug": "veigar",
   "name": "Veigar",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,13 +561,13 @@
   ],
   "counters": [
     "Syndra",
-    "Viktor",
-    "Kassadin"
+    "Yone",
+    "Zed"
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "B",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -576,7 +576,7 @@
         "core": [
           "Stormsurge",
           "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Horizon Focus"
         ],
         "boots": [
           "Boots of Mana"
@@ -585,33 +585,7 @@
           "Boots of Mana",
           "Stormsurge",
           "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Void Staff",
-          "Boots of Mana"
-        ]
-      }
-    },
-    {
-      "title": "Support Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Spectral Sickle"
-        ],
-        "core": [
-          "Luden's Echo",
-          "Rabadon's Deathcap",
-          "Cryptbloom"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Black Mist Scythe",
-          "Boots of Mana",
-          "Luden's Echo",
-          "Rabadon's Deathcap",
+          "Horizon Focus",
           "Cryptbloom",
           "Boots of Mana"
         ]
@@ -620,10 +594,10 @@
   ],
   "runes": [
     "Electrocute",
-    "Botanist",
+    "Axiom Arcanist",
     "Transcendence",
-    "Gathering Storm",
-    "Cut Down"
+    "Nimbus Cloak",
+    "Bone Plating"
   ],
   "spells": [
     {

@@ -2,8 +2,8 @@
   "slug": "morgana",
   "name": "Morgana",
   "role": "Саппорт",
-  "tier": "S+",
-  "patch": "7.2c",
+  "tier": "S",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,23 +560,23 @@
     }
   ],
   "counters": [
+    "Senna",
     "Soraka",
-    "Karma",
-    "Zyra"
+    "Milio"
   ],
   "builds": [
     {
       "title": "Support Build",
-      "tier": "A",
+      "tier": "B",
       "default": true,
       "items": {
         "starting": [
           "Spectral Sickle"
         ],
         "core": [
-          "Blackfire Torch",
           "Liandry's Torment",
-          "Rylai's Crystal Scepter"
+          "Rylai's Crystal Scepter",
+          "Blackfire Torch"
         ],
         "boots": [
           "Boots of Mana"
@@ -584,9 +584,9 @@
         "finalBuild": [
           "Black Mist Scythe",
           "Boots of Mana",
-          "Blackfire Torch",
           "Liandry's Torment",
           "Rylai's Crystal Scepter",
+          "Blackfire Torch",
           "Boots of Mana"
         ]
       }
@@ -641,7 +641,7 @@
     {
       "ability": "Dark Binding",
       "levels": [
-        2,
+        1,
         4,
         6,
         7
@@ -650,19 +650,19 @@
     {
       "ability": "Tormented Shadow",
       "levels": [
-        1,
-        12,
-        14,
-        15
+        2,
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Black Shield",
       "levels": [
         3,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {

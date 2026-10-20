@@ -3,7 +3,7 @@
   "name": "Kog'Maw",
   "role": "Дракон",
   "tier": "B",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -284,23 +284,23 @@
     }
   ],
   "counters": [
-    "Ashe",
+    "Twitch",
     "Caitlyn",
-    "Vayne"
+    "Jhin"
   ],
   "builds": [
     {
-      "title": "Duo Build",
-      "tier": "S",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
-          "Dagger"
+          "Long Sword"
         ],
         "core": [
           "Guinsoo's Rageblade",
           "Navori Quickblades",
-          "Runaan's Hurricane"
+          "Blade of the Ruined King"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -309,35 +309,9 @@
           "Berserker's Greaves",
           "Guinsoo's Rageblade",
           "Navori Quickblades",
-          "Runaan's Hurricane",
           "Blade of the Ruined King",
+          "Terminus",
           "Berserker's Greaves"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Archangel's Staff",
-          "Malignance",
-          "Blackfire Torch"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Seraph's Embrace",
-          "Boots of Mana",
-          "Malignance",
-          "Blackfire Torch",
-          "Rabadon's Deathcap",
-          "Boots of Mana"
         ]
       }
     }
@@ -380,7 +354,7 @@
     {
       "ability": "Caustic Spittle",
       "levels": [
-        3,
+        2,
         8,
         10,
         11
@@ -398,7 +372,7 @@
     {
       "ability": "Void Ooze",
       "levels": [
-        2,
+        3,
         12,
         14,
         15

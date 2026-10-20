@@ -1,12 +1,12 @@
 {
- "built": "2026-08-23",
- "ddragonVersion": "16.16.1",
+ "built": "2026-10-20",
+ "ddragonVersion": "16.20.1",
  "sources": [
   "abilities.json (Tencent CN)",
   "base-stats.json",
   "abilities-en.json",
   "ability-names-ru.json (ddragon ru_RU)",
-  "wr-stats.json (20260822)"
+  "wr-stats.json (20261019)"
  ],
  "legend": {
   "ratios": "доли: 0.75 = 75% · base — плоская часть, массив по РАНГАМ",
@@ -15,30 +15,28 @@
   "flags": "ratioByArith — стат подобран арифметикой · ratioAssumed — по типу урона · ratioUnresolved / unknownToken — РУЧНОЕ · scalesWithLevel — растёт от уровня, число не дано"
  },
  "coverage": {
-  "spells": 705,
-  "spellsWithNumbers": 537,
-  "components": 788,
-  "verifiedOk": 684,
+  "spells": 710,
+  "spellsWithNumbers": 543,
+  "components": 807,
+  "verifiedOk": 704,
   "minorDrift": 2,
   "mismatch": 30,
-  "targetDependent": 72,
+  "targetDependent": 71,
   "onHitSpells": 18,
-  "executeComponents": 44,
+  "executeComponents": 43,
   "chargeAbilities": 10,
   "ruNames": {
    "exact": 615,
    "approx": 70,
-   "missing": 20
+   "missing": 25
   },
   "manualReview": [
    "Ambessa P: scalesWithLevel · показано [5] vs [7.5]",
-   "Ambessa R: ratioUnresolved · показано [20,30,40] vs [0,0,0]",
-   "Ashe P: ratioUnresolved · показано [110] vs [0]",
+   "Ambessa R: ratioUnresolved · показано [10,17.5,25] vs [0,0,0]",
    "Aurora P: ratioUnresolved · показано [3] vs [0]",
-   "Chogath E: mismatch · показано [100,150,200,250] vs [0,0,0,0]",
    "Chogath R: unknownToken|dirtyBracket · показано [300,450,600] vs [300,450,600]",
    "Chogath R: unknownToken|dirtyBracket · показано [1200,1200,1200] vs [1200,1200,1200]",
-   "Ekko W: ratioUnresolved · показано [2,2,2,2] vs [0,0,0,0]",
+   "Ekko W: ratioUnresolved · показано [3,3,3,3] vs [0,0,0,0]",
    "Evelynn E: ratioUnresolved · показано [2,2,2,2] vs [0,0,0,0]",
    "Galio P: scalesWithLevel · показано [73] vs [83]",
    "Galio W: unknownToken|dirtyBracket · показано [25,30,35,40] vs [25,30,35,40]",
@@ -57,6 +55,8 @@
    "LeeSin R: unknownToken|dirtyBracket · показано [125,350,575] vs [125,350,575]",
    "Lillia P: ratioUnresolved · показано [6] vs [0]",
    "Lissandra R: mismatch · показано [200,300,400] vs [100,150,200]",
+   "MissFortune P: mismatch · показано [9] vs [15]",
+   "MissFortune Q: unknownToken|dirtyBracket · показано [120,120,120,120] vs [0,0,0,0]",
    "Maokai E: unknownToken|dirtyBracket · показано [60,90,120,150] vs [60,90,120,150]",
    "DrMundo W: unknownToken|dirtyBracket · показано [20,40,60,80] vs [20,40,60,80]",
    "DrMundo E: unknownToken|dirtyBracket · показано [5,20,35,50] vs [5,20,35,50]",
@@ -70,7 +70,7 @@
    "Pyke P: unknownToken|dirtyBracket · показано [160] vs [0]",
    "Rell E: ratioUnresolved · показано [5.5,6,6.5,7] vs [0,0,0,0]",
    "Ryze Q: unknownToken|dirtyBracket · показано [70,95,120,145] vs [70,95,120,145]",
-   "Ryze W: unknownToken|dirtyBracket · показано [70,110,150,190] vs [70,110,150,190]",
+   "Ryze W: unknownToken|dirtyBracket · показано [50,90,130,170] vs [50,90,130,170]",
    "Ryze E: unknownToken|dirtyBracket · показано [80,110,140,170] vs [80,110,140,170]",
    "Sett Q: ratioUnresolved · показано [1.6,1.9,2.2,2.5] vs [0,0,0,0]",
    "Sett W: ratioUnresolved · показано [25,25,25,25] vs [0,0,0,0]",
@@ -86,10 +86,11 @@
    "Urgot E: unknownToken|dirtyBracket · показано [70,100,130,160] vs [70,100,130,160]",
    "Varus W: ratioUnresolved · показано [3,3.5,4,4.5] vs [0,0,0,0]",
    "Vi P: ratioUnresolved|dirtyBracket · показано [4.8] vs [0]",
+   "Viego R: ratioUnresolved · показано [null,null,null,null] vs [0,0,0,0]",
    "Volibear W: unknownToken|dirtyBracket · показано [67,92,117,142] vs [67,92,117,142]",
    "Volibear W: unknownToken|dirtyBracket · показано [108,148,188,228] vs [107.2,147.2,187.2,227.2]",
-   "Yunara P: mismatch · показано [10] vs [0]",
-   "Yuumi W: ratioUnresolved · показано [6,7,8,9] vs [0,0,0,0]"
+   "Yunara P: mismatch · показано [8] vs [0]",
+   "Yuumi W: ratioUnresolved · показано [8,9,10,11] vs [0,0,0,0]"
   ],
   "unmappedVarTypes": {
    "暗袭-链刃伤害丨目标最大生命值": 1,
@@ -114,6 +115,24 @@
    "轻跳伤害": 1,
    "猛踏伤害": 1,
    "炮台技能伤害": 1,
+   "没骨火丨基础伤害": 1,
+   "没骨火丨最大生命值伤害": 1,
+   "攒聚雷丨基础伤害": 1,
+   "攒聚雷丨基础额外伤害": 1,
+   "连皴山丨爆炸伤害": 1,
+   "连皴山丨持续伤害": 1,
+   "飞染丨持续时间": 1,
+   "飞染丨移速加成": 1,
+   "渲浓丨基础护盾": 1,
+   "渲浓丨最大基础护盾": 1,
+   "宿墨丨基础伤害": 1,
+   "宿墨丨法力回复": 1,
+   "阴沉变意丨恐惧时长": 1,
+   "阴沉变意丨基础伤害": 1,
+   "滞涩幽瞳丨基础伤害": 1,
+   "滞涩幽瞳丨禁锢时长": 1,
+   "双钩血喉丨基础伤害": 1,
+   "双钩血喉丨移速降低": 1,
    "引爆伤害": 3,
    "全盛姿态冷却缩减": 1,
    "每次伤害": 1,
@@ -133,6 +152,7 @@
    "蘑菇生长间隔": 1,
    "掉生命转攻击": 1,
    "每点怒气回复": 1,
+   "攻击力削减": 1,
    "红牌伤害": 1,
    "蓝牌伤害": 1,
    "黄牌伤害": 1,
@@ -156,7 +176,7 @@
     "ad": 62,
     "hp": 630,
     "armor": 46,
-    "mr": 40,
+    "mr": 36,
     "mana": 0
    },
    "abilities": [
@@ -1013,10 +1033,10 @@
       {
        "kind": "damage",
        "base": [
-        70,
-        120,
-        170,
-        220
+        60,
+        125,
+        190,
+        255
        ],
        "dmgType": "magic",
        "adRatio": [
@@ -1033,16 +1053,16 @@
        ],
        "verify": {
         "shown": [
-         102,
-         152,
-         202,
-         252
+         92,
+         157,
+         222,
+         287
         ],
         "calc": [
-         102,
-         152,
-         202,
-         252
+         92,
+         157,
+         222,
+         287
         ],
         "status": "ok"
        }
@@ -1252,30 +1272,30 @@
       {
        "kind": "damage",
        "base": [
-        10,
-        40,
-        70,
-        100
+        60,
+        110,
+        160,
+        210
        ],
        "dmgType": "phys",
-       "adRatio": [
-        0.85,
-        0.85,
-        0.85,
-        0.85
+       "bonusAdRatio": [
+        0.7,
+        0.7,
+        0.7,
+        0.7
        ],
        "verify": {
         "shown": [
-         55,
-         85,
-         115,
-         145
+         60,
+         110,
+         160,
+         210
         ],
         "calc": [
-         54.2,
-         84.2,
-         114.2,
-         144.2
+         60,
+         110,
+         160,
+         210
         ],
         "status": "ok"
        }
@@ -1423,26 +1443,26 @@
       {
        "kind": "damage",
        "base": [
-        20,
-        30,
-        40
+        25,
+        35,
+        45
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.1,
-        0.1,
-        0.1
+        0.15,
+        0.15,
+        0.15
        ],
        "verify": {
         "shown": [
-         26,
-         36,
-         46
+         33,
+         43,
+         53
         ],
         "calc": [
-         25.2,
-         35.2,
-         45.2
+         32.8,
+         42.8,
+         52.8
         ],
         "status": "ok"
        }
@@ -1450,26 +1470,26 @@
       {
        "kind": "damage",
        "base": [
-        80,
-        120,
-        160
+        75,
+        105,
+        135
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.4,
-        0.4,
-        0.4
+        0.45,
+        0.45,
+        0.45
        ],
        "verify": {
         "shown": [
-         101,
-         141,
-         181
+         99,
+         129,
+         159
         ],
         "calc": [
-         100.8,
-         140.8,
-         180.8
+         98.4,
+         128.4,
+         158.4
         ],
         "status": "ok"
        }
@@ -1501,7 +1521,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 720,
+    "hp": 700,
     "armor": 52,
     "mr": 38,
     "mana": 345
@@ -2256,9 +2276,9 @@
        ],
        "verify": {
         "shown": [
-         20,
-         30,
-         40
+         10,
+         17.5,
+         25
         ],
         "calc": [
          0,
@@ -2279,9 +2299,9 @@
        30
       ],
       "dmgReduction": [
-       0.3,
-       0.4,
-       0.5
+       0.1,
+       0.2,
+       0.3
       ],
       "healOnDmg": [
        12.5,
@@ -2996,7 +3016,7 @@
    "ru": "Эш",
    "lean": "ad",
    "baseStats": {
-    "ad": 58,
+    "ad": 60,
     "hp": 630,
     "armor": 35,
     "mr": 30,
@@ -3018,29 +3038,10 @@
      ],
      "cost": [],
      "costType": null,
-     "components": [
-      {
-       "kind": "damage",
-       "base": [
-        0
-       ],
-       "verify": {
-        "shown": [
-         110
-        ],
-        "calc": [
-         0
-        ],
-        "status": "mismatch"
-       },
-       "flags": [
-        "ratioUnresolved"
-       ]
-      }
-     ],
+     "components": [],
      "effects": {
       "msSlow": [
-       0.15
+       0.2
       ]
      },
      "cc": {},
@@ -3066,10 +3067,10 @@
       0
      ],
      "cost": [
-      50,
-      50,
-      50,
-      50
+      30,
+      30,
+      30,
+      30
      ],
      "costType": "MP",
      "components": [],
@@ -3096,15 +3097,15 @@
      "maxRank": 4,
      "onHit": false,
      "cd": [
-      16,
-      13,
-      11,
-      8
+      15,
+      12,
+      9,
+      6
      ],
      "cost": [
-      50,
-      50,
-      50,
+      65,
+      60,
+      55,
       50
      ],
      "costType": "MP",
@@ -3112,30 +3113,30 @@
       {
        "kind": "damage",
        "base": [
-        20,
-        35,
-        50,
-        65
+        70,
+        110,
+        150,
+        190
        ],
        "dmgType": "phys",
-       "adRatio": [
-        1.15,
-        1.15,
-        1.15,
-        1.15
+       "bonusAdRatio": [
+        1,
+        1,
+        1,
+        1
        ],
        "verify": {
         "shown": [
-         87,
-         102,
-         117,
-         132
+         70,
+         110,
+         150,
+         190
         ],
         "calc": [
-         86.7,
-         101.7,
-         116.7,
-         131.7
+         70,
+         110,
+         150,
+         190
         ],
         "status": "ok"
        }
@@ -3699,30 +3700,30 @@
       {
        "kind": "damage",
        "base": [
-        35,
-        65,
-        95,
-        125
+        40,
+        70,
+        100,
+        130
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.3,
-        0.3,
-        0.3,
-        0.3
+        0.33,
+        0.33,
+        0.33,
+        0.33
        ],
        "verify": {
         "shown": [
-         35,
-         65,
-         95,
-         125
+         40,
+         70,
+         100,
+         130
         ],
         "calc": [
-         35,
-         65,
-         95,
-         125
+         40,
+         70,
+         100,
+         130
         ],
         "status": "ok"
        }
@@ -3730,30 +3731,30 @@
       {
        "kind": "damage",
        "base": [
-        35,
-        65,
-        95,
-        125
+        40,
+        70,
+        100,
+        130
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.3,
-        0.3,
-        0.3,
-        0.3
+        0.33,
+        0.33,
+        0.33,
+        0.33
        ],
        "verify": {
         "shown": [
-         35,
-         65,
-         95,
-         125
+         40,
+         70,
+         100,
+         130
         ],
         "calc": [
-         35,
-         65,
-         95,
-         125
+         40,
+         70,
+         100,
+         130
         ],
         "status": "ok"
        }
@@ -3833,10 +3834,10 @@
       {
        "kind": "damage",
        "base": [
-        75,
-        125,
-        175,
-        225
+        80,
+        130,
+        180,
+        230
        ],
        "dmgType": "magic",
        "apRatio": [
@@ -3847,16 +3848,16 @@
        ],
        "verify": {
         "shown": [
-         75,
-         125,
-         175,
-         225
+         80,
+         130,
+         180,
+         230
         ],
         "calc": [
-         75,
-         125,
-         175,
-         225
+         80,
+         130,
+         180,
+         230
         ],
         "status": "ok"
        }
@@ -4189,8 +4190,8 @@
    "lean": "ad",
    "baseStats": {
     "ad": 58,
-    "hp": 660,
-    "armor": 49,
+    "hp": 630,
+    "armor": 45,
     "mr": 38,
     "mana": 300
    },
@@ -4683,8 +4684,8 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 690,
-    "armor": 52,
+    "hp": 630,
+    "armor": 46,
     "mr": 38,
     "mana": 380
    },
@@ -4751,16 +4752,16 @@
        ],
        "verify": {
         "shown": [
-         81,
-         141,
-         201,
-         261
+         79,
+         139,
+         199,
+         259
         ],
         "calc": [
-         80.7,
-         140.7,
-         200.7,
-         260.7
+         78.9,
+         138.9,
+         198.9,
+         258.9
         ],
         "status": "ok"
        },
@@ -4943,7 +4944,7 @@
    "ru": "Кейтлин",
    "lean": "ad",
    "baseStats": {
-    "ad": 54,
+    "ad": 60,
     "hp": 600,
     "armor": 35,
     "mr": 30,
@@ -4957,7 +4958,7 @@
      "nameEn": "Headshot",
      "nameCn": "精准狙击",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120001_Caitlyn_passive.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120001_Caitlyn_Passive_new.png",
      "maxRank": 1,
      "onHit": false,
      "cd": [
@@ -4973,14 +4974,14 @@
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.5
+        0.6
        ],
        "verify": {
         "shown": [
-         27
+         36
         ],
         "calc": [
-         27
+         36
         ],
         "status": "ok"
        }
@@ -4998,7 +4999,7 @@
      "nameEn": "Piltover Peacemaker",
      "nameCn": "和平使者",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120201_Caitlyn_Q.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120201_Caitlyn_Q_new.png",
      "maxRank": 4,
      "onHit": false,
      "cd": [
@@ -5018,30 +5019,30 @@
       {
        "kind": "damage",
        "base": [
-        60,
-        110,
-        160,
-        210
+        50,
+        100,
+        150,
+        200
        ],
        "dmgType": "phys",
        "adRatio": [
         1.25,
-        1.4,
-        1.55,
-        1.7
+        1.45,
+        1.65,
+        1.85
        ],
        "verify": {
         "shown": [
-         128,
-         186,
-         244,
-         302
+         125,
+         187,
+         249,
+         311
         ],
         "calc": [
-         127.5,
-         185.6,
-         243.7,
-         301.8
+         125,
+         187,
+         249,
+         311
         ],
         "status": "ok"
        }
@@ -5059,7 +5060,7 @@
      "nameEn": "Yordle Snap Trap",
      "nameCn": "约德尔诱捕器",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120301_Caitlyn_W.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120301_Caitlyn_W_new.png",
      "maxRank": 4,
      "onHit": false,
      "cd": [
@@ -5075,7 +5076,39 @@
       20
      ],
      "costType": "MP",
-     "components": [],
+     "components": [
+      {
+       "kind": "damage",
+       "base": [
+        40,
+        90,
+        140,
+        190
+       ],
+       "dmgType": "phys",
+       "bonusAdRatio": [
+        0.3,
+        0.3,
+        0.3,
+        0.3
+       ],
+       "verify": {
+        "shown": [
+         40,
+         90,
+         140,
+         190
+        ],
+        "calc": [
+         40,
+         90,
+         140,
+         190
+        ],
+        "status": "ok"
+       }
+      }
+     ],
      "effects": {
       "chargeTime": [
        27,
@@ -5100,7 +5133,7 @@
      "nameEn": "90 Caliber Net",
      "nameCn": "90口径绳网",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120401_Caitlyn_E.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120401_Caitlyn_E_new.png",
      "maxRank": 4,
      "onHit": false,
      "cd": [
@@ -5170,7 +5203,7 @@
      "nameEn": "Ace In The Hole",
      "nameCn": "让子弹飞",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120501_Caitlyn_R.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11120501_Caitlyn_R_new.png",
      "maxRank": 3,
      "onHit": false,
      "cd": [
@@ -5188,26 +5221,26 @@
       {
        "kind": "damage",
        "base": [
-        200,
-        375,
-        550
+        250,
+        450,
+        650
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        2,
-        2,
-        2
+        1,
+        1,
+        1
        ],
        "verify": {
         "shown": [
-         200,
-         375,
-         550
+         250,
+         450,
+         650
         ],
         "calc": [
-         200,
-         375,
-         550
+         250,
+         450,
+         650
         ],
         "status": "ok"
        }
@@ -5239,7 +5272,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 62,
-    "hp": 690,
+    "hp": 660,
     "armor": 46,
     "mr": 38,
     "mana": 390
@@ -5272,10 +5305,10 @@
        ],
        "verify": {
         "shown": [
-         138
+         132
         ],
         "calc": [
-         138
+         132
         ],
         "status": "ok"
        },
@@ -5770,10 +5803,10 @@
       {
        "kind": "damage",
        "base": [
-        15,
-        35,
-        55,
-        75
+        20,
+        45,
+        70,
+        95
        ],
        "dmgType": "magic",
        "apRatio": [
@@ -5784,16 +5817,16 @@
        ],
        "verify": {
         "shown": [
-         15,
-         35,
-         55,
-         75
+         20,
+         45,
+         70,
+         95
         ],
         "calc": [
-         15,
-         35,
-         55,
-         75
+         20,
+         45,
+         70,
+         95
         ],
         "status": "ok"
        }
@@ -5801,10 +5834,10 @@
       {
        "kind": "damage",
        "base": [
-        0,
-        0,
-        0,
-        0
+        100,
+        150,
+        200,
+        250
        ],
        "apRatio": [
         0.3,
@@ -5820,12 +5853,12 @@
          250
         ],
         "calc": [
-         0,
-         0,
-         0,
-         0
+         100,
+         150,
+         200,
+         250
         ],
-        "status": "mismatch"
+        "status": "ok"
        }
       }
      ],
@@ -5842,7 +5875,7 @@
      "varsUnmapped": [
       {
        "type": "最大生命值伤害",
-       "value": "2.15%/2.5%/2.85%/3.2%"
+       "value": "2.3%/2.7%/3.1%/3.5%"
       }
      ]
     },
@@ -5857,9 +5890,9 @@
      "maxRank": 3,
      "onHit": false,
      "cd": [
-      80,
       70,
-      60
+      60,
+      50
      ],
      "cost": [
       100,
@@ -6017,36 +6050,36 @@
       {
        "kind": "damage",
        "base": [
-        65,
-        125,
-        185,
-        245
+        60,
+        120,
+        180,
+        240
        ],
        "dmgType": "magic",
        "bonusAdRatio": [
-        1.25,
-        1.25,
-        1.25,
-        1.25
+        1.1,
+        1.1,
+        1.1,
+        1.1
        ],
        "apRatio": [
-        0.8,
-        0.8,
-        0.8,
-        0.8
+        1,
+        1,
+        1,
+        1
        ],
        "verify": {
         "shown": [
-         65,
-         125,
-         185,
-         245
+         60,
+         120,
+         180,
+         240
         ],
         "calc": [
-         65,
-         125,
-         185,
-         245
+         60,
+         120,
+         180,
+         240
         ],
         "status": "ok"
        }
@@ -6223,9 +6256,9 @@
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        0.7,
-        0.7,
-        0.7
+        0.65,
+        0.65,
+        0.65
        ],
        "verify": {
         "shown": [
@@ -6250,9 +6283,9 @@
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        1.4,
-        1.4,
-        1.4
+        1.3,
+        1.3,
+        1.3
        ],
        "verify": {
         "shown": [
@@ -6286,7 +6319,7 @@
      "varsUnmapped": [
       {
        "type": "强化攻击加成",
-       "value": "140%/140%/140%"
+       "value": "130%/130%/130%"
       }
      ]
     }
@@ -6300,8 +6333,8 @@
    "lean": "ad",
    "baseStats": {
     "ad": 70,
-    "hp": 650,
-    "armor": 52,
+    "hp": 660,
+    "armor": 45,
     "mr": 38,
     "mana": 345
    },
@@ -6976,7 +7009,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 66,
-    "hp": 630,
+    "hp": 650,
     "armor": 35,
     "mr": 30,
     "mana": 480
@@ -7037,10 +7070,10 @@
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
+        0.8,
+        0.9,
         1,
-        1.1,
-        1.2,
-        1.3
+        1.1
        ],
        "verify": {
         "shown": [
@@ -7239,7 +7272,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 630,
+    "hp": 650,
     "armor": 40,
     "mr": 38,
     "mana": 390
@@ -7268,7 +7301,7 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.7
+        0.8
        ],
        "verify": {
         "shown": [
@@ -7431,10 +7464,10 @@
        ],
        "dmgType": "magic",
        "targetMissHpPct": [
-        0.02,
-        0.02,
-        0.02,
-        0.02
+        0.03,
+        0.03,
+        0.03,
+        0.03
        ],
        "verify": {
         "shown": [
@@ -7465,17 +7498,17 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.0001,
-        0.0001,
-        0.0001,
-        0.0001
+        0.0003,
+        0.0003,
+        0.0003,
+        0.0003
        ],
        "verify": {
         "shown": [
-         2,
-         2,
-         2,
-         2
+         3,
+         3,
+         3,
+         3
         ],
         "calc": [
          0,
@@ -7553,8 +7586,8 @@
      "cd": [
       9,
       8,
-      8,
-      7
+      7,
+      6
      ],
      "cost": [
       45,
@@ -7698,7 +7731,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 64,
-    "hp": 600,
+    "hp": 630,
     "armor": 45,
     "mr": 38,
     "mana": 345
@@ -7952,10 +7985,10 @@
          null
         ],
         "calc": [
-         12,
-         12,
-         12,
-         12
+         12.6,
+         12.6,
+         12.6,
+         12.6
         ],
         "status": "targetDependent"
        },
@@ -8074,7 +8107,7 @@
    "ru": "Эзреаль",
    "lean": "ad",
    "baseStats": {
-    "ad": 58,
+    "ad": 60,
     "hp": 600,
     "armor": 34,
     "mr": 30,
@@ -8119,10 +8152,10 @@
      "maxRank": 4,
      "onHit": true,
      "cd": [
+      5,
+      5,
       4,
-      4,
-      3,
-      3
+      4
      ],
      "cost": [
       30,
@@ -8135,10 +8168,10 @@
       {
        "kind": "damage",
        "base": [
-        50,
+        25,
+        55,
         85,
-        120,
-        155
+        115
        ],
        "dmgType": "phys",
        "adRatio": [
@@ -8155,16 +8188,16 @@
        ],
        "verify": {
         "shown": [
-         129,
-         164,
-         199,
-         234
+         106,
+         136,
+         166,
+         196
         ],
         "calc": [
-         128.3,
-         163.3,
-         198.3,
-         233.3
+         106,
+         136,
+         166,
+         196
         ],
         "status": "ok"
        }
@@ -8327,8 +8360,8 @@
      "maxRank": 3,
      "onHit": false,
      "cd": [
+      80,
       70,
-      65,
       60
      ],
      "cost": [
@@ -8341,9 +8374,9 @@
       {
        "kind": "damage",
        "base": [
-        350,
+        300,
         500,
-        650
+        700
        ],
        "dmgType": "magic",
        "bonusAdRatio": [
@@ -8352,20 +8385,20 @@
         1
        ],
        "apRatio": [
-        0.9,
-        0.9,
-        0.9
+        1,
+        1,
+        1
        ],
        "verify": {
         "shown": [
-         350,
+         300,
          500,
-         650
+         700
         ],
         "calc": [
-         350,
+         300,
          500,
-         650
+         700
         ],
         "status": "ok"
        }
@@ -8668,8 +8701,8 @@
    "lean": "ad",
    "baseStats": {
     "ad": 70,
-    "hp": 650,
-    "armor": 46,
+    "hp": 630,
+    "armor": 42,
     "mr": 38,
     "mana": 300
    },
@@ -8697,11 +8730,11 @@
        ],
        "dmgType": "true",
        "targetMaxHpPct": [
-        0.035
+        0.04
        ],
        "pctPer": {
         "bonusAdRatio": [
-         0.0005
+         0.00055
         ]
        },
        "verify": {
@@ -8935,9 +8968,9 @@
        ],
        "dmgType": "true",
        "selfMaxHpPct": [
-        0.14,
-        0.14,
-        0.14
+        0.16,
+        0.16,
+        0.16
        ],
        "verify": {
         "shown": [
@@ -8946,9 +8979,9 @@
          null
         ],
         "calc": [
-         91,
-         91,
-         91
+         100.8,
+         100.8,
+         100.8
         ],
         "status": "targetDependent"
        },
@@ -9365,7 +9398,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 660,
+    "hp": 630,
     "armor": 40,
     "mr": 44,
     "mana": 435
@@ -9468,10 +9501,10 @@
          null
         ],
         "calc": [
-         52.8,
-         52.8,
-         52.8,
-         52.8
+         50.4,
+         50.4,
+         50.4,
+         50.4
         ],
         "status": "targetDependent"
        },
@@ -9706,16 +9739,16 @@
        ],
        "verify": {
         "shown": [
-         53,
-         80,
-         106,
-         132
+         51,
+         76,
+         101,
+         126
         ],
         "calc": [
-         52.8,
-         79.2,
-         105.6,
-         132
+         50.4,
+         75.6,
+         100.8,
+         126
         ],
         "status": "ok"
        },
@@ -9882,8 +9915,8 @@
    "lean": "ad",
    "baseStats": {
     "ad": 64,
-    "hp": 660,
-    "armor": 52,
+    "hp": 690,
+    "armor": 44,
     "mr": 38,
     "mana": 0
    },
@@ -10658,11 +10691,11 @@
    "dd": "Gragas",
    "id": "10089",
    "en": "Gragas",
-   "ru": "Gragas",
+   "ru": "Грагас",
    "lean": "ap",
    "baseStats": {
     "ad": 70,
-    "hp": 720,
+    "hp": 660,
     "armor": 46,
     "mr": 38,
     "mana": 390
@@ -10694,10 +10727,10 @@
        ],
        "verify": {
         "shown": [
-         62
+         57
         ],
         "calc": [
-         61.2
+         56.1
         ],
         "status": "ok"
        }
@@ -10995,7 +11028,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 66,
-    "hp": 660,
+    "hp": 630,
     "armor": 35,
     "mr": 40,
     "mana": 390
@@ -11008,7 +11041,7 @@
      "nameEn": "New Destiny",
      "nameCn": "新命运",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720001_Graves_passive.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720001_Graves_P_new.png",
      "maxRank": 1,
      "onHit": false,
      "cd": [
@@ -11029,7 +11062,7 @@
      "nameEn": "End Of The Line",
      "nameCn": "穷途末路",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720201_Graves_Q.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720201_Graves_Q_new.png",
      "maxRank": 4,
      "onHit": false,
      "cd": [
@@ -11134,7 +11167,7 @@
      "nameEn": "Smoke Screen",
      "nameCn": "烟幕弹",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720301_Graves_W.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720301_Graves_W_new.png",
      "maxRank": 4,
      "onHit": false,
      "cd": [
@@ -11202,7 +11235,7 @@
      "nameEn": "Quickdraw",
      "nameCn": "快速拔枪",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720401_Graves_E.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720401_Graves_E_new.png",
      "maxRank": 4,
      "onHit": false,
      "cd": [
@@ -11238,7 +11271,7 @@
      "nameEn": "Collateral Damage",
      "nameCn": "终极爆弹",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720501_Graves_R.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10720501_Graves_R_new.png",
      "maxRank": 3,
      "onHit": false,
      "cd": [
@@ -11329,8 +11362,8 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 690,
-    "armor": 52,
+    "hp": 640,
+    "armor": 48,
     "mr": 38,
     "mana": 345
    },
@@ -11458,10 +11491,10 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.07,
-        0.07,
-        0.07,
-        0.07
+        0.06,
+        0.06,
+        0.06,
+        0.06
        ],
        "verify": {
         "shown": [
@@ -11489,10 +11522,10 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.35,
-        0.35,
-        0.35,
-        0.35
+        0.3,
+        0.3,
+        0.3,
+        0.3
        ],
        "verify": {
         "shown": [
@@ -11753,7 +11786,7 @@
    "baseStats": {
     "ad": 54,
     "hp": 630,
-    "armor": 46,
+    "armor": 42,
     "mr": 36,
     "mana": 380
    },
@@ -11837,10 +11870,10 @@
      ],
      "effects": {
       "msBonus": [
-       0.3,
-       0.3,
-       0.3,
-       0.3
+       0.18,
+       0.18,
+       0.18,
+       0.18
       ]
      },
      "cc": {},
@@ -12501,6 +12534,692 @@
    ]
   },
   {
+   "dd": "Hwei",
+   "id": "10147",
+   "en": "Hwei",
+   "ru": "Hwei",
+   "lean": "ap",
+   "baseStats": {
+    "ad": 54,
+    "hp": 630,
+    "armor": 34,
+    "mr": 36,
+    "mana": 480
+   },
+   "abilities": [
+    {
+     "slot": "passive",
+     "key": "P",
+     "nameRu": "",
+     "nameEn": "P",
+     "nameCn": "落款",
+     "ruMatch": "none",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11470001_Hwei_Passive.png",
+     "maxRank": 1,
+     "onHit": false,
+     "cd": [
+      0
+     ],
+     "cost": [],
+     "costType": null,
+     "components": [
+      {
+       "kind": "damage",
+       "base": [
+        33
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.33
+       ],
+       "verify": {
+        "shown": [
+         33
+        ],
+        "calc": [
+         33
+        ],
+        "status": "ok"
+       },
+       "flags": [
+        "scalesWithLevel"
+       ]
+      }
+     ],
+     "effects": {},
+     "cc": {},
+     "fromText": [],
+     "varsUnmapped": []
+    },
+    {
+     "slot": "q",
+     "key": "Q",
+     "nameRu": "",
+     "nameEn": "Q",
+     "nameCn": "主题：灾",
+     "ruMatch": "none",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11470201_Hwei_Q.png",
+     "maxRank": 4,
+     "onHit": false,
+     "cd": [
+      9,
+      8,
+      7,
+      6
+     ],
+     "cost": [
+      80,
+      90,
+      100,
+      110
+     ],
+     "costType": "MP",
+     "components": [
+      {
+       "kind": "damage",
+       "base": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "dmgType": "magic",
+       "targetMaxHpPct": [
+        0.04,
+        0.05,
+        0.06,
+        0.07
+       ],
+       "verify": {
+        "shown": [
+         null,
+         null,
+         null,
+         null
+        ],
+        "calc": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "status": "targetDependent"
+       },
+       "flags": [
+        "hpClause"
+       ]
+      },
+      {
+       "kind": "damage",
+       "base": [
+        50,
+        90,
+        130,
+        170
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.75,
+        0.75,
+        0.75,
+        0.75
+       ],
+       "verify": {
+        "shown": [
+         50,
+         90,
+         130,
+         170
+        ],
+        "calc": [
+         50,
+         90,
+         130,
+         170
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        80,
+        110,
+        140,
+        170
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.3,
+        0.3,
+        0.3,
+        0.3
+       ],
+       "verify": {
+        "shown": [
+         80,
+         110,
+         140,
+         170
+        ],
+        "calc": [
+         80,
+         110,
+         140,
+         170
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        200,
+        330,
+        490,
+        680
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.75,
+        0.9,
+        1.05,
+        1.2
+       ],
+       "verify": {
+        "shown": [
+         200,
+         330,
+         490,
+         680
+        ],
+        "calc": [
+         200,
+         330,
+         490,
+         680
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        20,
+        35,
+        50,
+        65
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.3,
+        0.3,
+        0.3,
+        0.3
+       ],
+       "verify": {
+        "shown": [
+         20,
+         35,
+         50,
+         65
+        ],
+        "calc": [
+         20,
+         35,
+         50,
+         65
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        20,
+        40,
+        60,
+        80
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.3,
+        0.3,
+        0.3,
+        0.3
+       ],
+       "verify": {
+        "shown": [
+         20,
+         40,
+         60,
+         80
+        ],
+        "calc": [
+         20,
+         40,
+         60,
+         80
+        ],
+        "status": "ok"
+       }
+      }
+     ],
+     "effects": {},
+     "cc": {},
+     "fromText": [],
+     "varsUnmapped": [
+      {
+       "type": "没骨火丨基础伤害",
+       "value": "50/90/130/170"
+      },
+      {
+       "type": "没骨火丨最大生命值伤害",
+       "value": "4%/5%/6%/7%"
+      },
+      {
+       "type": "攒聚雷丨基础伤害",
+       "value": "80/110/140/170"
+      },
+      {
+       "type": "攒聚雷丨基础额外伤害",
+       "value": "200/330/490/680"
+      },
+      {
+       "type": "连皴山丨爆炸伤害",
+       "value": "20/35/50/65"
+      },
+      {
+       "type": "连皴山丨持续伤害",
+       "value": "20/40/60/80"
+      }
+     ]
+    },
+    {
+     "slot": "w",
+     "key": "W",
+     "nameRu": "",
+     "nameEn": "W",
+     "nameCn": "主题：靖",
+     "ruMatch": "none",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11470301_Hwei_W.png",
+     "maxRank": 4,
+     "onHit": false,
+     "cd": [
+      17,
+      16,
+      16,
+      15
+     ],
+     "cost": [
+      90,
+      95,
+      100,
+      105
+     ],
+     "costType": "MP",
+     "components": [
+      {
+       "kind": "damage",
+       "base": [
+        30,
+        40,
+        50,
+        60
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.15,
+        0.15,
+        0.15,
+        0.15
+       ],
+       "verify": {
+        "shown": [
+         30,
+         40,
+         50,
+         60
+        ],
+        "calc": [
+         30,
+         40,
+         50,
+         60
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "shield",
+       "base": [
+        60,
+        80,
+        100,
+        120
+       ],
+       "apRatio": [
+        0.35,
+        0.35,
+        0.35,
+        0.35
+       ],
+       "verify": {
+        "shown": [
+         60,
+         80,
+         100,
+         120
+        ],
+        "calc": [
+         60,
+         80,
+         100,
+         120
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "shield",
+       "base": [
+        108,
+        128,
+        148,
+        168
+       ],
+       "apRatio": [
+        0.71,
+        0.71,
+        0.71,
+        0.71
+       ],
+       "verify": {
+        "shown": [
+         108,
+         128,
+         148,
+         168
+        ],
+        "calc": [
+         108,
+         128,
+         148,
+         168
+        ],
+        "status": "ok"
+       }
+      }
+     ],
+     "effects": {},
+     "cc": {},
+     "fromText": [],
+     "varsUnmapped": [
+      {
+       "type": "飞染丨持续时间",
+       "value": "4/4.5/5/5.5"
+      },
+      {
+       "type": "飞染丨移速加成",
+       "value": "30%/32%/35%/37%"
+      },
+      {
+       "type": "渲浓丨基础护盾",
+       "value": "60/80/100/120"
+      },
+      {
+       "type": "渲浓丨最大基础护盾",
+       "value": "108/128/148/168"
+      },
+      {
+       "type": "宿墨丨基础伤害",
+       "value": "30/40/50/60"
+      },
+      {
+       "type": "宿墨丨法力回复",
+       "value": "45/50/55/60"
+      }
+     ]
+    },
+    {
+     "slot": "e",
+     "key": "E",
+     "nameRu": "",
+     "nameEn": "E",
+     "nameCn": "主题：悚",
+     "ruMatch": "none",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11470401_Hwei_E.png",
+     "maxRank": 4,
+     "onHit": false,
+     "cd": [
+      13,
+      12,
+      11,
+      10
+     ],
+     "cost": [
+      50,
+      55,
+      60,
+      65
+     ],
+     "costType": "MP",
+     "components": [
+      {
+       "kind": "damage",
+       "base": [
+        70,
+        120,
+        170,
+        220
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.7,
+        0.7,
+        0.7,
+        0.7
+       ],
+       "verify": {
+        "shown": [
+         70,
+         120,
+         170,
+         220
+        ],
+        "calc": [
+         70,
+         120,
+         170,
+         220
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        70,
+        120,
+        170,
+        220
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.7,
+        0.7,
+        0.7,
+        0.7
+       ],
+       "verify": {
+        "shown": [
+         70,
+         120,
+         170,
+         220
+        ],
+        "calc": [
+         70,
+         120,
+         170,
+         220
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        70,
+        120,
+        170,
+        220
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.7,
+        0.7,
+        0.7,
+        0.7
+       ],
+       "verify": {
+        "shown": [
+         70,
+         120,
+         170,
+         220
+        ],
+        "calc": [
+         70,
+         120,
+         170,
+         220
+        ],
+        "status": "ok"
+       }
+      }
+     ],
+     "effects": {},
+     "cc": {},
+     "fromText": [],
+     "varsUnmapped": [
+      {
+       "type": "阴沉变意丨恐惧时长",
+       "value": "1/1.125/1.25/1.375"
+      },
+      {
+       "type": "阴沉变意丨基础伤害",
+       "value": "70/120/170/220"
+      },
+      {
+       "type": "滞涩幽瞳丨基础伤害",
+       "value": "70/120/170/220"
+      },
+      {
+       "type": "滞涩幽瞳丨禁锢时长",
+       "value": "1.25/1.5/1.75/2"
+      },
+      {
+       "type": "双钩血喉丨基础伤害",
+       "value": "70/120/170/220"
+      },
+      {
+       "type": "双钩血喉丨移速降低",
+       "value": "40%/50%/60%/70%"
+      }
+     ]
+    },
+    {
+     "slot": "r",
+     "key": "R",
+     "nameRu": "",
+     "nameEn": "R",
+     "nameCn": "焚心绚华绘",
+     "ruMatch": "none",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/11470501_Hwei_R.png",
+     "maxRank": 3,
+     "onHit": false,
+     "cd": [
+      70,
+      60,
+      50
+     ],
+     "cost": [
+      100,
+      100,
+      100
+     ],
+     "costType": "MP",
+     "components": [
+      {
+       "kind": "damage",
+       "base": [
+        10,
+        20,
+        30
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.05,
+        0.05,
+        0.05
+       ],
+       "verify": {
+        "shown": [
+         10,
+         20,
+         30
+        ],
+        "calc": [
+         10,
+         20,
+         30
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        250,
+        350,
+        450
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.75,
+        0.75,
+        0.75
+       ],
+       "verify": {
+        "shown": [
+         250,
+         350,
+         450
+        ],
+        "calc": [
+         250,
+         350,
+         450
+        ],
+        "status": "ok"
+       }
+      }
+     ],
+     "effects": {
+      "baseDmg2": [
+       250,
+       350,
+       450
+      ]
+     },
+     "cc": {},
+     "fromText": [],
+     "varsUnmapped": []
+    }
+   ]
+  },
+  {
    "dd": "Irelia",
    "id": "10094",
    "en": "Irelia",
@@ -12508,7 +13227,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 690,
+    "hp": 660,
     "armor": 46,
     "mr": 38,
     "mana": 345
@@ -13033,29 +13752,29 @@
       {
        "kind": "shield",
        "base": [
-        65,
-        90,
-        115,
-        140
+        80,
+        120,
+        160,
+        200
        ],
        "apRatio": [
-        0.45,
-        0.45,
-        0.45,
-        0.45
+        0.5,
+        0.5,
+        0.5,
+        0.5
        ],
        "verify": {
         "shown": [
-         65,
-         90,
-         115,
-         140
+         80,
+         120,
+         160,
+         200
         ],
         "calc": [
-         65,
-         90,
-         115,
-         140
+         80,
+         120,
+         160,
+         200
         ],
         "status": "ok"
        }
@@ -13122,7 +13841,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 58,
-    "hp": 690,
+    "hp": 660,
     "armor": 46,
     "mr": 38,
     "mana": 390
@@ -13251,16 +13970,16 @@
        ],
        "verify": {
         "shown": [
-         11,
-         13,
-         15,
-         17
+         10,
+         12,
+         14,
+         16
         ],
         "calc": [
-         11,
-         13.1,
-         15.2,
-         17.3
+         10.6,
+         12.5,
+         14.5,
+         16.5
         ],
         "status": "ok"
        }
@@ -13287,10 +14006,10 @@
          null
         ],
         "calc": [
-         34.5,
-         34.5,
-         34.5,
-         34.5
+         33,
+         33,
+         33,
+         33
         ],
         "status": "targetDependent"
        },
@@ -13459,8 +14178,8 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 690,
-    "armor": 46,
+    "hp": 660,
+    "armor": 44,
     "mr": 38,
     "mana": 390
    },
@@ -14059,8 +14778,8 @@
    "ru": "Джин",
    "lean": "ad",
    "baseStats": {
-    "ad": 58,
-    "hp": 600,
+    "ad": 60,
+    "hp": 630,
     "armor": 35,
     "mr": 30,
     "mana": 390
@@ -14084,12 +14803,16 @@
      "components": [],
      "effects": {
       "msBonus": [
-       0.15
+       0.14
+      ],
+      "asBonus": [
+       0.0044
       ]
      },
      "cc": {},
      "fromText": [
-      "msBonus"
+      "msBonus",
+      "asBonus"
      ],
      "varsUnmapped": []
     },
@@ -14142,14 +14865,14 @@
         "shown": [
          66,
          107,
-         147,
-         188
+         148,
+         189
         ],
         "calc": [
-         65.3,
-         106.1,
-         146.9,
-         187.7
+         66,
+         107,
+         148,
+         189
         ],
         "status": "ok"
        }
@@ -14207,10 +14930,10 @@
          204
         ],
         "calc": [
-         83.2,
-         123.2,
-         163.2,
-         203.2
+         84,
+         124,
+         164,
+         204
         ],
         "status": "ok"
        }
@@ -14275,16 +14998,16 @@
        ],
        "verify": {
         "shown": [
-         90,
-         170,
-         250,
-         330
+         92,
+         172,
+         252,
+         332
         ],
         "calc": [
-         89.6,
-         169.6,
-         249.6,
-         329.6
+         92,
+         172,
+         252,
+         332
         ],
         "status": "ok"
        }
@@ -14352,9 +15075,9 @@
          240
         ],
         "calc": [
-         89.5,
-         164.5,
-         239.5
+         90,
+         165,
+         240
         ],
         "status": "ok"
        }
@@ -14380,9 +15103,9 @@
    "id": "10018",
    "en": "Jinx",
    "ru": "Джинкс",
-   "lean": "ad",
+   "lean": "ap",
    "baseStats": {
-    "ad": 54,
+    "ad": 58,
     "hp": 630,
     "armor": 35,
     "mr": 30,
@@ -14567,8 +15290,8 @@
      "maxRank": 3,
      "onHit": false,
      "cd": [
+      60,
       50,
-      45,
       40
      ],
      "cost": [
@@ -14618,9 +15341,9 @@
        "dmgType": "phys",
        "role": "chargeMin",
        "bonusAdRatio": [
-        0.15,
-        0.15,
-        0.15
+        0.12,
+        0.12,
+        0.12
        ],
        "verify": {
         "shown": [
@@ -14646,9 +15369,9 @@
        "dmgType": "phys",
        "role": "chargeMax",
        "bonusAdRatio": [
-        1.5,
-        1.5,
-        1.5
+        1.2,
+        1.2,
+        1.2
        ],
        "verify": {
         "shown": [
@@ -14685,7 +15408,7 @@
    "ru": "Каиса",
    "lean": "ad",
    "baseStats": {
-    "ad": 62,
+    "ad": 59,
     "hp": 600,
     "armor": 35,
     "mr": 30,
@@ -14715,7 +15438,7 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.15
+        0.12
        ],
        "verify": {
         "shown": [
@@ -14725,7 +15448,31 @@
          5
         ],
         "status": "ok"
-       }
+       },
+       "flags": [
+        "scalesWithLevel"
+       ]
+      },
+      {
+       "kind": "damage",
+       "base": [
+        2
+       ],
+       "apRatio": [
+        0.02
+       ],
+       "verify": {
+        "shown": [
+         2
+        ],
+        "calc": [
+         2
+        ],
+        "status": "ok"
+       },
+       "flags": [
+        "scalesWithLevel"
+       ]
       },
       {
        "kind": "damage",
@@ -14734,7 +15481,7 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.0003
+        0.05
        ],
        "verify": {
         "shown": [
@@ -14856,29 +15603,29 @@
        ],
        "dmgType": "magic",
        "adRatio": [
-        1.1,
-        1.1,
-        1.1,
-        1.1
+        1.3,
+        1.3,
+        1.3,
+        1.3
        ],
        "apRatio": [
-        0.6,
-        0.6,
-        0.6,
-        0.6
+        0.5,
+        0.5,
+        0.5,
+        0.5
        ],
        "verify": {
         "shown": [
-         99,
-         129,
-         159,
-         189
+         107,
+         137,
+         167,
+         197
         ],
         "calc": [
-         98.2,
-         128.2,
-         158.2,
-         188.2
+         106.7,
+         136.7,
+         166.7,
+         196.7
         ],
         "status": "ok"
        }
@@ -14973,7 +15720,7 @@
    "ru": "Калиста",
    "lean": "ad",
    "baseStats": {
-    "ad": 54,
+    "ad": 57,
     "hp": 630,
     "armor": 34,
     "mr": 32,
@@ -15042,16 +15789,16 @@
        ],
        "verify": {
         "shown": [
-         130,
-         195,
-         260,
-         325
+         133,
+         198,
+         263,
+         328
         ],
         "calc": [
-         129.4,
-         194.4,
-         259.4,
-         324.4
+         132.7,
+         197.7,
+         262.7,
+         327.7
         ],
         "status": "ok"
        }
@@ -15180,16 +15927,16 @@
        ],
        "verify": {
         "shown": [
-         68,
-         83,
-         98,
-         113
+         70,
+         85,
+         100,
+         115
         ],
         "calc": [
-         67.8,
-         82.8,
-         97.8,
-         112.8
+         69.9,
+         84.9,
+         99.9,
+         114.9
         ],
         "status": "ok"
        }
@@ -15211,16 +15958,16 @@
        ],
        "verify": {
         "shown": [
-         32,
-         46,
-         59,
-         73
+         33,
+         47,
+         61,
+         75
         ],
         "calc": [
-         31.4,
-         45.2,
-         59,
-         72.8
+         32.5,
+         46.5,
+         60.5,
+         74.5
         ],
         "status": "ok"
        }
@@ -15794,7 +16541,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 630,
+    "hp": 650,
     "armor": 30,
     "mr": 38,
     "mana": 480
@@ -16103,7 +16850,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 630,
+    "hp": 660,
     "armor": 34,
     "mr": 38,
     "mana": 0
@@ -16422,20 +17169,20 @@
       8
      ],
      "cost": [
+      70,
       80,
-      85,
       90,
-      95
+      100
      ],
      "costType": "MP",
      "components": [
       {
        "kind": "damage",
        "base": [
-        70,
-        120,
-        170,
-        220
+        60,
+        100,
+        140,
+        180
        ],
        "dmgType": "magic",
        "bonusAdRatio": [
@@ -16452,16 +17199,16 @@
        ],
        "verify": {
         "shown": [
-         70,
-         120,
-         170,
-         220
+         60,
+         100,
+         140,
+         180
         ],
         "calc": [
-         70,
-         120,
-         170,
-         220
+         60,
+         100,
+         140,
+         180
         ],
         "status": "ok"
        }
@@ -16504,39 +17251,39 @@
       14
      ],
      "cost": [
+      75,
+      80,
       85,
-      90,
-      95,
-      100
+      90
      ],
      "costType": "MP",
      "components": [
       {
        "kind": "heal",
        "base": [
+        60,
         95,
-        125,
-        155,
-        185
+        130,
+        165
        ],
        "apRatio": [
-        0.4,
-        0.4,
-        0.4,
-        0.4
+        0.3,
+        0.3,
+        0.3,
+        0.3
        ],
        "verify": {
         "shown": [
+         60,
          95,
-         125,
-         155,
-         185
+         130,
+         165
         ],
         "calc": [
+         60,
          95,
-         125,
-         155,
-         185
+         130,
+         165
         ],
         "status": "ok"
        }
@@ -17183,7 +17930,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 62,
-    "hp": 660,
+    "hp": 600,
     "armor": 46,
     "mr": 36,
     "mana": 0
@@ -17523,7 +18270,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 58,
-    "hp": 630,
+    "hp": 640,
     "armor": 40,
     "mr": 38,
     "mana": 390
@@ -18198,7 +18945,7 @@
    "ru": "Ког'Мао",
    "lean": "ap",
    "baseStats": {
-    "ad": 54,
+    "ad": 58,
     "hp": 630,
     "armor": 34,
     "mr": 32,
@@ -18536,9 +19283,9 @@
       {
        "kind": "damage",
        "base": [
-        100,
-        140,
-        180
+        80,
+        120,
+        160
        ],
        "dmgType": "magic",
        "bonusAdRatio": [
@@ -18553,14 +19300,14 @@
        ],
        "verify": {
         "shown": [
-         100,
-         140,
-         180
+         80,
+         120,
+         160
         ],
         "calc": [
-         100,
-         140,
-         180
+         80,
+         120,
+         160
         ],
         "status": "ok"
        }
@@ -18568,9 +19315,9 @@
       {
        "kind": "damage",
        "base": [
-        200,
-        280,
-        360
+        160,
+        240,
+        320
        ],
        "dmgType": "magic",
        "bonusAdRatio": [
@@ -18585,14 +19332,14 @@
        ],
        "verify": {
         "shown": [
-         200,
-         280,
-         360
+         160,
+         240,
+         320
         ],
         "calc": [
-         200,
-         280,
-         360
+         160,
+         240,
+         320
         ],
         "status": "ok"
        }
@@ -18624,7 +19371,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 62,
-    "hp": 690,
+    "hp": 660,
     "armor": 46,
     "mr": 40,
     "mana": 380
@@ -19023,7 +19770,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 66,
-    "hp": 690,
+    "hp": 660,
     "armor": 46,
     "mr": 38,
     "mana": 0
@@ -19239,10 +19986,10 @@
       {
        "kind": "shield",
        "base": [
-        80,
-        140,
-        200,
-        260
+        100,
+        160,
+        220,
+        280
        ],
        "apRatio": [
         1,
@@ -19252,16 +19999,16 @@
        ],
        "verify": {
         "shown": [
-         80,
-         140,
-         200,
-         260
+         100,
+         160,
+         220,
+         280
         ],
         "calc": [
-         80,
-         140,
-         200,
-         260
+         100,
+         160,
+         220,
+         280
         ],
         "status": "ok"
        }
@@ -19458,8 +20205,8 @@
    "lean": "ap",
    "baseStats": {
     "ad": 62,
-    "hp": 750,
-    "armor": 55,
+    "hp": 690,
+    "armor": 50,
     "mr": 38,
     "mana": 390
    },
@@ -19560,10 +20307,10 @@
      "maxRank": 4,
      "onHit": false,
      "cd": [
-      14,
       13,
       12,
-      11
+      11,
+      10
      ],
      "cost": [
       60,
@@ -20556,7 +21303,7 @@
    "ru": "Люциан",
    "lean": "ad",
    "baseStats": {
-    "ad": 58,
+    "ad": 60,
     "hp": 630,
     "armor": 35,
     "mr": 30,
@@ -20593,7 +21340,7 @@
          26
         ],
         "calc": [
-         25.8
+         26
         ],
         "status": "ok"
        }
@@ -20631,30 +21378,30 @@
       {
        "kind": "damage",
        "base": [
-        80,
+        75,
         125,
-        170,
-        215
+        175,
+        225
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        0.65,
-        0.85,
-        1.05,
-        1.25
+        1,
+        1,
+        1,
+        1
        ],
        "verify": {
         "shown": [
-         80,
+         75,
          125,
-         170,
-         215
+         175,
+         225
         ],
         "calc": [
-         80,
+         75,
          125,
-         170,
-         215
+         175,
+         225
         ],
         "status": "ok"
        }
@@ -20788,8 +21535,8 @@
        "kind": "damage",
        "base": [
         20,
-        35,
-        50
+        25,
+        30
        ],
        "dmgType": "phys",
        "adRatio": [
@@ -20798,32 +21545,26 @@
         0.25
        ],
        "apRatio": [
-        0.1,
-        0.1,
-        0.1
+        0.15,
+        0.15,
+        0.15
        ],
        "verify": {
         "shown": [
          35,
-         50,
-         65
+         40,
+         45
         ],
         "calc": [
-         34.5,
-         49.5,
-         64.5
+         35,
+         40,
+         45
         ],
         "status": "ok"
        }
       }
      ],
-     "effects": {
-      "projectiles": [
-       22,
-       26,
-       30
-      ]
-     },
+     "effects": {},
      "cc": {},
      "fromText": [],
      "varsUnmapped": []
@@ -21537,12 +22278,12 @@
        ],
        "verify": {
         "shown": [
-         15
+         9
         ],
         "calc": [
          15
         ],
-        "status": "ok"
+        "status": "mismatch"
        }
       }
      ],
@@ -21585,10 +22326,10 @@
        ],
        "dmgType": "phys",
        "adRatio": [
-        1.12,
-        1.2,
-        1.28,
-        1.36
+        1.1,
+        1.1,
+        1.1,
+        1.1
        ],
        "apRatio": [
         0.35,
@@ -21598,19 +22339,50 @@
        ],
        "verify": {
         "shown": [
-         125,
-         160,
-         195,
-         229
+         124,
+         154,
+         184,
+         214
         ],
         "calc": [
-         125,
-         159.6,
-         194.2,
-         228.9
+         123.8,
+         153.8,
+         183.8,
+         213.8
         ],
         "status": "ok"
        }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "verify": {
+        "shown": [
+         120,
+         120,
+         120,
+         120
+        ],
+        "calc": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "status": "mismatch"
+       },
+       "flags": [
+        "unknownToken",
+        "dirtyBracket"
+       ],
+       "unknownTokens": [
+        "暴击伤害"
+       ]
       }
      ],
      "effects": {
@@ -21760,15 +22532,15 @@
       {
        "kind": "damage",
        "base": [
-        0,
-        0,
-        0
+        20,
+        30,
+        40
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.85,
-        0.85,
-        0.85
+        0.6,
+        0.6,
+        0.6
        ],
        "apRatio": [
         0.2,
@@ -21777,14 +22549,14 @@
        ],
        "verify": {
         "shown": [
-         50,
-         50,
-         50
+         55,
+         65,
+         75
         ],
         "calc": [
-         49.3,
-         49.3,
-         49.3
+         54.8,
+         64.8,
+         74.8
         ],
         "status": "ok"
        }
@@ -21920,10 +22692,10 @@
       {
        "kind": "damage",
        "base": [
-        10,
         20,
         30,
-        40
+        40,
+        50
        ],
        "dmgType": "phys",
        "apRatio": [
@@ -21940,16 +22712,16 @@
        ],
        "verify": {
         "shown": [
-         20,
          30,
          40,
-         50
+         50,
+         60
         ],
         "calc": [
-         19.8,
          29.8,
          39.8,
-         49.8
+         49.8,
+         59.8
         ],
         "status": "ok"
        }
@@ -23400,10 +24172,10 @@
      "maxRank": 4,
      "onHit": false,
      "cd": [
+      24,
       22,
       20,
-      19,
-      17
+      18
      ],
      "cost": [
       90,
@@ -23416,10 +24188,10 @@
       {
        "kind": "heal",
        "base": [
-        80,
-        100,
+        70,
+        95,
         120,
-        140
+        145
        ],
        "apRatio": [
         0.15,
@@ -23429,16 +24201,16 @@
        ],
        "verify": {
         "shown": [
-         80,
-         100,
+         70,
+         95,
          120,
-         140
+         145
         ],
         "calc": [
-         80,
-         100,
+         70,
+         95,
          120,
-         140
+         145
         ],
         "status": "ok"
        }
@@ -23446,10 +24218,10 @@
       {
        "kind": "heal",
        "base": [
-        80,
-        100,
+        70,
+        95,
         120,
-        140
+        145
        ],
        "apRatio": [
         0.15,
@@ -23459,16 +24231,16 @@
        ],
        "verify": {
         "shown": [
-         80,
-         100,
+         70,
+         95,
          120,
-         140
+         145
         ],
         "calc": [
-         80,
-         100,
+         70,
+         95,
          120,
-         140
+         145
         ],
         "status": "ok"
        }
@@ -23829,10 +24601,10 @@
      "maxRank": 4,
      "onHit": false,
      "cd": [
-      17,
       15,
-      12,
-      10
+      13,
+      11,
+      9
      ],
      "cost": [],
      "costType": null,
@@ -24239,7 +25011,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 720,
+    "hp": 680,
     "armor": 40,
     "mr": 38,
     "mana": 0
@@ -24841,7 +25613,7 @@
    "baseStats": {
     "ad": 58,
     "hp": 650,
-    "armor": 46,
+    "armor": 40,
     "mr": 32,
     "mana": 390
    },
@@ -25086,9 +25858,9 @@
      "maxRank": 3,
      "onHit": false,
      "cd": [
-      75,
-      70,
-      65
+      90,
+      80,
+      70
      ],
      "cost": [
       100,
@@ -25166,7 +25938,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 62,
-    "hp": 720,
+    "hp": 690,
     "armor": 46,
     "mr": 38,
     "mana": 390
@@ -25306,29 +26078,29 @@
       {
        "kind": "shield",
        "base": [
-        65,
-        75,
-        85,
-        95
+        70,
+        80,
+        90,
+        100
        ],
        "selfMaxHpPct": [
-        0.09,
-        0.1,
         0.11,
-        0.12
+        0.12,
+        0.13,
+        0.14
        ],
        "verify": {
         "shown": [
-         130,
-         147,
-         165,
-         182
+         146,
+         163,
+         180,
+         197
         ],
         "calc": [
-         129.8,
-         147,
-         164.2,
-         181.4
+         145.9,
+         162.8,
+         179.7,
+         196.6
         ],
         "status": "ok"
        }
@@ -25807,7 +26579,7 @@
    "dd": "Nilah",
    "id": "10027",
    "en": "Nilah",
-   "ru": "Нила",
+   "ru": "Nilah",
    "lean": "ad",
    "baseStats": {
     "ad": 58,
@@ -26764,7 +27536,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 64,
-    "hp": 690,
+    "hp": 630,
     "armor": 40,
     "mr": 38,
     "mana": 345
@@ -27325,7 +28097,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 64,
-    "hp": 690,
+    "hp": 660,
     "armor": 40,
     "mr": 38,
     "mana": 340
@@ -27386,10 +28158,10 @@
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        1.2,
-        1.2,
-        1.2,
-        1.2
+        1.05,
+        1.05,
+        1.05,
+        1.05
        ],
        "verify": {
         "shown": [
@@ -27460,10 +28232,10 @@
        ],
        "verify": {
         "shown": [
-         108,
-         143,
-         178,
-         213
+         105,
+         140,
+         175,
+         210
         ],
         "calc": [
          35,
@@ -27988,7 +28760,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 62,
-    "hp": 720,
+    "hp": 690,
     "armor": 46,
     "mr": 40,
     "mana": 380
@@ -28132,10 +28904,10 @@
          null
         ],
         "calc": [
-         72,
-         79.2,
-         86.4,
-         93.6
+         69,
+         75.9,
+         82.8,
+         89.7
         ],
         "status": "targetDependent"
        },
@@ -28166,10 +28938,10 @@
          null
         ],
         "calc": [
-         50.4,
-         50.4,
-         50.4,
-         50.4
+         48.3,
+         48.3,
+         48.3,
+         48.3
         ],
         "status": "targetDependent"
        },
@@ -28395,8 +29167,8 @@
    "lean": "ad",
    "baseStats": {
     "ad": 64,
-    "hp": 690,
-    "armor": 52,
+    "hp": 660,
+    "armor": 48,
     "mr": 40,
     "mana": 420
    },
@@ -28823,7 +29595,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 62,
-    "hp": 660,
+    "hp": 630,
     "armor": 46,
     "mr": 36,
     "mana": 380
@@ -28855,10 +29627,10 @@
        ],
        "verify": {
         "shown": [
-         86
+         82
         ],
         "calc": [
-         85.8
+         81.9
         ],
         "status": "ok"
        }
@@ -29639,8 +30411,8 @@
    "lean": "ap",
    "baseStats": {
     "ad": 58,
-    "hp": 660,
-    "armor": 49,
+    "hp": 640,
+    "armor": 42,
     "mr": 34,
     "mana": 435
    },
@@ -29983,8 +30755,8 @@
    "lean": "ap",
    "baseStats": {
     "ad": 54,
-    "hp": 690,
-    "armor": 49,
+    "hp": 670,
+    "armor": 45,
     "mr": 38,
     "mana": 345
    },
@@ -30125,10 +30897,10 @@
          23
         ],
         "calc": [
-         16.9,
-         18.9,
-         20.9,
-         22.9
+         16.5,
+         18.5,
+         20.5,
+         22.5
         ],
         "status": "ok"
        }
@@ -30721,10 +31493,10 @@
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        0.9,
-        0.9,
-        0.9,
-        0.9
+        1,
+        1,
+        1,
+        1
        ],
        "verify": {
         "shown": [
@@ -30990,10 +31762,10 @@
       {
        "kind": "damage",
        "base": [
-        24,
-        48,
-        72,
-        96
+        20,
+        60,
+        100,
+        140
        ],
        "dmgType": "phys",
        "adRatio": [
@@ -31004,16 +31776,16 @@
        ],
        "verify": {
         "shown": [
-         123,
-         147,
-         171,
-         195
+         119,
+         159,
+         199,
+         239
         ],
         "calc": [
-         123,
-         147,
-         171,
-         195
+         119,
+         159,
+         199,
+         239
         ],
         "status": "ok"
        }
@@ -31021,10 +31793,10 @@
       {
        "kind": "damage",
        "base": [
-        36,
-        72,
-        108,
-        144
+        30,
+        90,
+        150,
+        210
        ],
        "dmgType": "phys",
        "adRatio": [
@@ -31035,16 +31807,16 @@
        ],
        "verify": {
         "shown": [
-         185,
-         221,
-         257,
-         293
+         179,
+         239,
+         299,
+         359
         ],
         "calc": [
-         184.5,
-         220.5,
-         256.5,
-         292.5
+         178.5,
+         238.5,
+         298.5,
+         358.5
         ],
         "status": "ok"
        }
@@ -31229,7 +32001,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 62,
-    "hp": 660,
+    "hp": 630,
     "armor": 40,
     "mr": 38,
     "mana": 0
@@ -31568,8 +32340,8 @@
    "lean": "ad",
    "baseStats": {
     "ad": 64,
-    "hp": 690,
-    "armor": 46,
+    "hp": 660,
+    "armor": 43,
     "mr": 38,
     "mana": 0
    },
@@ -31877,7 +32649,7 @@
    "lean": "ap",
    "baseStats": {
     "ad": 62,
-    "hp": 690,
+    "hp": 660,
     "armor": 46,
     "mr": 36,
     "mana": 0
@@ -31984,10 +32756,10 @@
        ],
        "dmgType": "magic",
        "targetMaxHpPct": [
-        0.06,
+        0.07,
         0.08,
-        0.1,
-        0.12
+        0.09,
+        0.1
        ],
        "verify": {
         "shown": [
@@ -32018,10 +32790,10 @@
        ],
        "dmgType": "magic",
        "targetMaxHpPct": [
-        0.09,
+        0.11,
         0.12,
-        0.15,
-        0.18
+        0.14,
+        0.15
        ],
        "verify": {
         "shown": [
@@ -32045,30 +32817,30 @@
       {
        "kind": "damage",
        "base": [
-        120,
-        160,
-        200,
-        240
+        100,
+        140,
+        180,
+        220
        ],
        "dmgType": "magic",
        "apRatio": [
-        1.1,
-        1.1,
-        1.1,
-        1.1
+        1.25,
+        1.25,
+        1.25,
+        1.25
        ],
        "verify": {
         "shown": [
-         120,
-         160,
-         200,
-         240
+         100,
+         140,
+         180,
+         220
         ],
         "calc": [
-         120,
-         160,
-         200,
-         240
+         100,
+         140,
+         180,
+         220
         ],
         "status": "ok"
        }
@@ -32076,30 +32848,30 @@
       {
        "kind": "damage",
        "base": [
-        180,
-        240,
-        300,
-        360
+        150,
+        210,
+        270,
+        330
        ],
        "dmgType": "magic",
        "apRatio": [
-        1.65,
-        1.65,
-        1.65,
-        1.65
+        1.88,
+        1.88,
+        1.88,
+        1.88
        ],
        "verify": {
         "shown": [
-         180,
-         240,
-         300,
-         360
+         150,
+         210,
+         270,
+         330
         ],
         "calc": [
-         180,
-         240,
-         300,
-         360
+         150,
+         210,
+         270,
+         330
         ],
         "status": "ok"
        }
@@ -32107,16 +32879,16 @@
      ],
      "effects": {
       "targetMaxHpPct": [
-       0.06,
+       0.07,
        0.08,
-       0.1,
-       0.12
+       0.09,
+       0.1
       ],
       "empoweredDmg": [
-       180,
-       240,
-       300,
-       360
+       150,
+       210,
+       270,
+       330
       ]
      },
      "cc": {},
@@ -32146,15 +32918,51 @@
        "kind": "shield",
        "base": [
         40,
-        70,
-        100,
-        130
+        80,
+        120,
+        160
        ],
        "apRatio": [
         0.35,
         0.35,
         0.35,
         0.35
+       ],
+       "selfMaxHpPct": [
+        0.04,
+        0.04,
+        0.04,
+        0.04
+       ],
+       "verify": {
+        "shown": [
+         67,
+         107,
+         147,
+         187
+        ],
+        "calc": [
+         66.4,
+         106.4,
+         146.4,
+         186.4
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "shield",
+       "base": [
+        60,
+        120,
+        180,
+        240
+       ],
+       "apRatio": [
+        0.525,
+        0.525,
+        0.525,
+        0.525
        ],
        "selfMaxHpPct": [
         0.06,
@@ -32164,52 +32972,16 @@
        ],
        "verify": {
         "shown": [
-         82,
-         112,
-         142,
-         172
+         100,
+         160,
+         220,
+         280
         ],
         "calc": [
-         81.4,
-         111.4,
-         141.4,
-         171.4
-        ],
-        "status": "ok"
-       }
-      },
-      {
-       "kind": "shield",
-       "base": [
-        60,
-        105,
-        150,
-        195
-       ],
-       "apRatio": [
-        0.525,
-        0.525,
-        0.525,
-        0.525
-       ],
-       "selfMaxHpPct": [
-        0.09,
-        0.09,
-        0.09,
-        0.09
-       ],
-       "verify": {
-        "shown": [
-         122,
-         167,
-         212,
-         257
-        ],
-        "calc": [
-         122.1,
-         167.1,
-         212.1,
-         257.1
+         99.6,
+         159.6,
+         219.6,
+         279.6
         ],
         "status": "ok"
        }
@@ -32274,10 +33046,10 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.4,
-        0.4,
-        0.4,
-        0.4
+        0.5,
+        0.5,
+        0.5,
+        0.5
        ],
        "verify": {
         "shown": [
@@ -32305,10 +33077,10 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.6,
-        0.6,
-        0.6,
-        0.6
+        0.75,
+        0.75,
+        0.75,
+        0.75
        ],
        "verify": {
         "shown": [
@@ -32428,8 +33200,8 @@
    "lean": "ap",
    "baseStats": {
     "ad": 54,
-    "hp": 660,
-    "armor": 40,
+    "hp": 630,
+    "armor": 36,
     "mr": 40,
     "mana": 340
    },
@@ -32563,30 +33335,30 @@
       {
        "kind": "damage",
        "base": [
-        70,
-        110,
-        150,
-        190
+        50,
+        90,
+        130,
+        170
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.65,
-        0.65,
-        0.65,
-        0.65
+        0.55,
+        0.55,
+        0.55,
+        0.55
        ],
        "verify": {
         "shown": [
-         70,
-         110,
-         150,
-         190
+         50,
+         90,
+         130,
+         170
         ],
         "calc": [
-         70,
-         110,
-         150,
-         190
+         50,
+         90,
+         130,
+         170
         ],
         "status": "ok"
        },
@@ -32713,7 +33485,7 @@
    "ru": "Самира",
    "lean": "ad",
    "baseStats": {
-    "ad": 62,
+    "ad": 60,
     "hp": 630,
     "armor": 35,
     "mr": 30,
@@ -32750,7 +33522,7 @@
          9
         ],
         "calc": [
-         8.2
+         8.1
         ],
         "status": "ok"
        }
@@ -32769,7 +33541,7 @@
          17
         ],
         "calc": [
-         16.3
+         16.2
         ],
         "status": "ok"
        }
@@ -32777,7 +33549,7 @@
      ],
      "effects": {
       "msBonus": [
-       0.04
+       0.03
       ]
      },
      "cc": {},
@@ -32820,23 +33592,23 @@
        ],
        "dmgType": "phys",
        "adRatio": [
-        1,
-        1.15,
-        1.3,
-        1.45
+        1.1,
+        1.1,
+        1.1,
+        1.1
        ],
        "verify": {
         "shown": [
-         77,
-         92,
-         106,
-         120
+         81,
+         86,
+         91,
+         96
         ],
         "calc": [
-         77,
-         91.3,
-         105.6,
-         119.9
+         81,
+         86,
+         91,
+         96
         ],
         "status": "ok"
        }
@@ -32991,13 +33763,9 @@
      "maxRank": 3,
      "onHit": false,
      "cd": [
-      8,
-      8,
-      8
+      6
      ],
      "cost": [
-      60,
-      30,
       0
      ],
      "costType": "MP",
@@ -33005,26 +33773,26 @@
       {
        "kind": "damage",
        "base": [
-        5,
         20,
-        35
+        40,
+        60
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.6,
-        0.6,
-        0.6
+        0.4,
+        0.4,
+        0.4
        ],
        "verify": {
         "shown": [
-         43,
-         58,
-         73
+         44,
+         64,
+         84
         ],
         "calc": [
-         42.2,
-         57.2,
-         72.2
+         44,
+         64,
+         84
         ],
         "status": "ok"
        }
@@ -33053,7 +33821,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 50,
-    "hp": 600,
+    "hp": 570,
     "armor": 35,
     "mr": 30,
     "mana": 345
@@ -33074,30 +33842,7 @@
      ],
      "cost": [],
      "costType": null,
-     "components": [
-      {
-       "kind": "damage",
-       "base": [
-        0
-       ],
-       "dmgType": "phys",
-       "selfMaxHpPct": [
-        0.01
-       ],
-       "verify": {
-        "shown": [
-         null
-        ],
-        "calc": [
-         6
-        ],
-        "status": "targetDependent"
-       },
-       "flags": [
-        "hpClause"
-       ]
-      }
-     ],
+     "components": [],
      "effects": {},
      "cc": {},
      "fromText": [],
@@ -33131,9 +33876,9 @@
        "kind": "damage",
        "base": [
         50,
-        90,
-        130,
-        170
+        80,
+        110,
+        140
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
@@ -33145,15 +33890,15 @@
        "verify": {
         "shown": [
          50,
-         90,
-         130,
-         170
+         80,
+         110,
+         140
         ],
         "calc": [
          50,
-         90,
-         130,
-         170
+         80,
+         110,
+         140
         ],
         "status": "ok"
        }
@@ -33359,8 +34104,8 @@
        "kind": "damage",
        "base": [
         250,
-        375,
-        500
+        400,
+        550
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
@@ -33369,20 +34114,20 @@
         1.2
        ],
        "apRatio": [
-        0.5,
-        0.5,
-        0.5
+        0.7,
+        0.7,
+        0.7
        ],
        "verify": {
         "shown": [
          250,
-         375,
-         500
+         400,
+         550
         ],
         "calc": [
          250,
-         375,
-         500
+         400,
+         550
         ],
         "status": "ok"
        }
@@ -35624,7 +36369,7 @@
    "ru": "Сивир",
    "lean": "ad",
    "baseStats": {
-    "ad": 58,
+    "ad": 60,
     "hp": 600,
     "armor": 34,
     "mr": 28,
@@ -35675,7 +36420,45 @@
       70
      ],
      "costType": "MP",
-     "components": [],
+     "components": [
+      {
+       "kind": "damage",
+       "base": [
+        70,
+        100,
+        130,
+        160
+       ],
+       "dmgType": "phys",
+       "bonusAdRatio": [
+        0.7,
+        0.7,
+        0.7,
+        0.7
+       ],
+       "apRatio": [
+        0.6,
+        0.6,
+        0.6,
+        0.6
+       ],
+       "verify": {
+        "shown": [
+         70,
+         100,
+         130,
+         160
+        ],
+        "calc": [
+         70,
+         100,
+         130,
+         160
+        ],
+        "status": "ok"
+       }
+      }
+     ],
      "effects": {},
      "cc": {},
      "fromText": [],
@@ -35702,30 +36485,30 @@
       {
        "kind": "damage",
        "base": [
-        4,
-        6,
-        8,
-        10
+        0,
+        0,
+        0,
+        0
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.15,
-        0.18,
-        0.21,
-        0.24
+        0.3,
+        0.35,
+        0.4,
+        0.45
        ],
        "verify": {
         "shown": [
-         13,
-         17,
+         18,
          21,
-         24
+         24,
+         27
         ],
         "calc": [
-         12.7,
-         16.4,
-         20.2,
-         23.9
+         18,
+         21,
+         24,
+         27
         ],
         "status": "ok"
        }
@@ -35781,16 +36564,16 @@
        ],
        "verify": {
         "shown": [
-         38,
-         41,
-         44,
-         47
+         39,
+         42,
+         45,
+         48
         ],
         "calc": [
-         37.7,
-         40.6,
-         43.5,
-         46.4
+         39,
+         42,
+         45,
+         48
         ],
         "status": "ok"
        }
@@ -35838,6 +36621,11 @@
        10,
        11,
        12
+      ],
+      "msBonus": [
+       0.15,
+       0.2,
+       0.25
       ]
      },
      "cc": {},
@@ -35854,7 +36642,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 62,
-    "hp": 690,
+    "hp": 660,
     "armor": 46,
     "mr": 40,
     "mana": 380
@@ -36182,10 +36970,10 @@
          null
         ],
         "calc": [
-         69,
-         69,
-         69,
-         69
+         66,
+         66,
+         66,
+         66
         ],
         "status": "targetDependent"
        },
@@ -36253,16 +37041,16 @@
        ],
        "verify": {
         "shown": [
-         102,
-         132,
-         162,
-         192
+         100,
+         130,
+         160,
+         190
         ],
         "calc": [
-         101.4,
-         131.4,
-         161.4,
-         191.4
+         99.6,
+         129.6,
+         159.6,
+         189.6
         ],
         "status": "ok"
        }
@@ -37035,10 +37823,10 @@
       {
        "kind": "heal",
        "base": [
-        45,
-        60,
-        75,
-        90
+        35,
+        50,
+        65,
+        80
        ],
        "apRatio": [
         0.2,
@@ -37048,16 +37836,16 @@
        ],
        "verify": {
         "shown": [
-         45,
-         60,
-         75,
-         90
+         35,
+         50,
+         65,
+         80
         ],
         "calc": [
-         45,
-         60,
-         75,
-         90
+         35,
+         50,
+         65,
+         80
         ],
         "status": "ok"
        }
@@ -37135,8 +37923,8 @@
      "onHit": false,
      "cd": [
       80,
-      70,
-      60
+      75,
+      70
      ],
      "cost": [
       100,
@@ -37854,26 +38642,26 @@
       {
        "kind": "damage",
        "base": [
-        10,
+        15,
         25,
-        40
+        35
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.15,
-        0.15,
-        0.15
+        0.06,
+        0.06,
+        0.06
        ],
        "verify": {
         "shown": [
-         10,
+         15,
          25,
-         40
+         35
         ],
         "calc": [
-         10,
+         15,
          25,
-         40
+         35
         ],
         "status": "ok"
        }
@@ -37908,25 +38696,25 @@
       {
        "kind": "heal",
        "base": [
-        20,
+        15,
         30,
-        40
+        45
        ],
        "apRatio": [
-        0.2,
-        0.2,
-        0.2
+        0.1,
+        0.1,
+        0.1
        ],
        "verify": {
         "shown": [
-         20,
+         15,
          30,
-         40
+         45
         ],
         "calc": [
-         20,
+         15,
          30,
-         40
+         45
         ],
         "status": "ok"
        }
@@ -38007,10 +38795,10 @@
       {
        "kind": "damage",
        "base": [
-        70,
-        115,
-        160,
-        205
+        80,
+        130,
+        180,
+        230
        ],
        "dmgType": "magic",
        "apRatio": [
@@ -38021,16 +38809,16 @@
        ],
        "verify": {
         "shown": [
-         70,
-         115,
-         160,
-         205
+         80,
+         130,
+         180,
+         230
         ],
         "calc": [
-         70,
-         115,
-         160,
-         205
+         80,
+         130,
+         180,
+         230
         ],
         "status": "ok"
        }
@@ -38075,10 +38863,10 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.45,
-        0.45,
-        0.45,
-        0.45
+        0.6,
+        0.6,
+        0.6,
+        0.6
        ],
        "verify": {
         "shown": [
@@ -38151,7 +38939,7 @@
      "maxRank": 4,
      "onHit": false,
      "cd": [
-      17
+      15
      ],
      "cost": [
       50
@@ -38168,10 +38956,10 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.35,
-        0.35,
-        0.35,
-        0.35
+        0.5,
+        0.5,
+        0.5,
+        0.5
        ],
        "verify": {
         "shown": [
@@ -38199,10 +38987,10 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.35,
-        0.35,
-        0.35,
-        0.35
+        0.5,
+        0.5,
+        0.5,
+        0.5
        ],
        "verify": {
         "shown": [
@@ -39595,9 +40383,9 @@
    "id": "10045",
    "en": "Tristana",
    "ru": "Тристана",
-   "lean": "ap",
+   "lean": "ad",
    "baseStats": {
-    "ad": 54,
+    "ad": 60,
     "hp": 630,
     "armor": 35,
     "mr": 30,
@@ -39673,9 +40461,9 @@
      "onHit": false,
      "cd": [
       22,
-      19,
-      16,
-      13
+      20,
+      18,
+      16
      ],
      "cost": [
       60,
@@ -39688,12 +40476,18 @@
       {
        "kind": "damage",
        "base": [
-        85,
-        155,
-        225,
-        295
+        80,
+        120,
+        160,
+        200
        ],
        "dmgType": "magic",
+       "bonusAdRatio": [
+        0.8,
+        0.8,
+        0.8,
+        0.8
+       ],
        "apRatio": [
         0.5,
         0.5,
@@ -39702,16 +40496,16 @@
        ],
        "verify": {
         "shown": [
-         85,
-         155,
-         225,
-         295
+         80,
+         120,
+         160,
+         200
         ],
         "calc": [
-         85,
-         155,
-         225,
-         295
+         80,
+         120,
+         160,
+         200
         ],
         "status": "ok"
        }
@@ -39725,10 +40519,10 @@
        3
       ],
       "msSlow": [
-       0.6,
-       0.6,
-       0.6,
-       0.6
+       0.5,
+       0.5,
+       0.5,
+       0.5
       ]
      },
      "cc": {},
@@ -39748,10 +40542,10 @@
      "maxRank": 4,
      "onHit": false,
      "cd": [
+      16,
       15,
       14,
-      13,
-      12
+      13
      ],
      "cost": [
       55,
@@ -39764,10 +40558,10 @@
       {
        "kind": "damage",
        "base": [
-        65,
-        100,
-        135,
-        170
+        60,
+        90,
+        120,
+        150
        ],
        "dmgType": "magic",
        "apRatio": [
@@ -39778,16 +40572,16 @@
        ],
        "verify": {
         "shown": [
-         65,
-         100,
-         135,
-         170
+         60,
+         90,
+         120,
+         150
         ],
         "calc": [
-         65,
-         100,
-         135,
-         170
+         60,
+         90,
+         120,
+         150
         ],
         "status": "ok"
        }
@@ -39795,17 +40589,17 @@
       {
        "kind": "damage",
        "base": [
-        50,
-        75,
+        80,
         100,
-        125
+        120,
+        140
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        0.75,
-        1.1,
-        1.45,
-        1.8
+        1,
+        1,
+        1,
+        1
        ],
        "apRatio": [
         0.5,
@@ -39815,16 +40609,16 @@
        ],
        "verify": {
         "shown": [
-         50,
-         75,
+         80,
          100,
-         125
+         120,
+         140
         ],
         "calc": [
-         50,
-         75,
+         80,
          100,
-         125
+         120,
+         140
         ],
         "status": "ok"
        }
@@ -39869,11 +40663,16 @@
       {
        "kind": "damage",
        "base": [
+        300,
         350,
-        450,
-        550
+        400
        ],
        "dmgType": "magic",
+       "bonusAdRatio": [
+        0.7,
+        0.7,
+        0.7
+       ],
        "apRatio": [
         1,
         1,
@@ -39881,14 +40680,14 @@
        ],
        "verify": {
         "shown": [
+         300,
          350,
-         450,
-         550
+         400
         ],
         "calc": [
+         300,
          350,
-         450,
-         550
+         400
         ],
         "status": "ok"
        }
@@ -39906,9 +40705,9 @@
    "id": "10015",
    "en": "Tryndamere",
    "ru": "Триндамир",
-   "lean": "ad",
+   "lean": "ap",
    "baseStats": {
-    "ad": 54,
+    "ad": 64,
     "hp": 690,
     "armor": 46,
     "mr": 38,
@@ -39931,15 +40730,9 @@
      "cost": [],
      "costType": null,
      "components": [],
-     "effects": {
-      "asBonus": [
-       0.3
-      ]
-     },
+     "effects": {},
      "cc": {},
-     "fromText": [
-      "asBonus"
-     ],
+     "fromText": [],
      "varsUnmapped": []
     },
     {
@@ -40063,7 +40856,12 @@
      },
      "cc": {},
      "fromText": [],
-     "varsUnmapped": []
+     "varsUnmapped": [
+      {
+       "type": "攻击力削减",
+       "value": "20"
+      }
+     ]
     },
     {
      "slot": "e",
@@ -40094,16 +40892,16 @@
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        1.35,
-        1.35,
-        1.35,
-        1.35
-       ],
-       "apRatio": [
         1,
         1,
         1,
         1
+       ],
+       "apRatio": [
+        0.8,
+        0.8,
+        0.8,
+        0.8
        ],
        "verify": {
         "shown": [
@@ -40150,11 +40948,6 @@
        50,
        75,
        100
-      ],
-      "asBonus": [
-       0.45,
-       0.55,
-       0.65
       ]
      },
      "cc": {},
@@ -40168,7 +40961,7 @@
    "id": "10025",
    "en": "TwistedFate",
    "ru": "Твистед Фейт",
-   "lean": "ap",
+   "lean": "ad",
    "baseStats": {
     "ad": 52,
     "hp": 630,
@@ -40467,10 +41260,10 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.45,
-        0.45,
-        0.45,
-        0.45
+        0.35,
+        0.35,
+        0.35,
+        0.35
        ],
        "verify": {
         "shown": [
@@ -40553,9 +41346,9 @@
    "id": "10053",
    "en": "Twitch",
    "ru": "Твич",
-   "lean": "ad",
+   "lean": "ap",
    "baseStats": {
-    "ad": 54,
+    "ad": 58,
     "hp": 630,
     "armor": 40,
     "mr": 32,
@@ -40585,7 +41378,7 @@
        ],
        "dmgType": "true",
        "apRatio": [
-        0.025
+        0.03
        ],
        "verify": {
         "shown": [
@@ -40601,15 +41394,9 @@
        ]
       }
      ],
-     "effects": {
-      "asBonus": [
-       0.3
-      ]
-     },
+     "effects": {},
      "cc": {},
-     "fromText": [
-      "asBonus"
-     ],
+     "fromText": [],
      "varsUnmapped": []
     },
     {
@@ -40633,10 +41420,21 @@
      "effects": {
       "duration": [
        8
+      ],
+      "asBonus": [
+       0.35
+      ],
+      "msBonus": [
+       0.1,
+       0.1,
+       0.1,
+       0.1
       ]
      },
      "cc": {},
-     "fromText": [],
+     "fromText": [
+      "msBonus"
+     ],
      "varsUnmapped": []
     },
     {
@@ -40709,16 +41507,10 @@
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        0.42,
-        0.42,
-        0.42,
-        0.42
-       ],
-       "apRatio": [
-        0.18,
-        0.18,
-        0.18,
-        0.18
+        0.35,
+        0.35,
+        0.35,
+        0.35
        ],
        "verify": {
         "shown": [
@@ -40732,6 +41524,37 @@
          25,
          30,
          35
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "dmgType": "magic",
+       "apRatio": [
+        0.35,
+        0.35,
+        0.35,
+        0.35
+       ],
+       "verify": {
+        "shown": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "calc": [
+         0,
+         0,
+         0,
+         0
         ],
         "status": "ok"
        }
@@ -40760,9 +41583,9 @@
      "maxRank": 3,
      "onHit": false,
      "cd": [
+      75,
       70,
-      65,
-      60
+      65
      ],
      "cost": [
       100,
@@ -41166,7 +41989,7 @@
    "ru": "Варус",
    "lean": "ad",
    "baseStats": {
-    "ad": 54,
+    "ad": 58,
     "hp": 600,
     "armor": 35,
     "mr": 30,
@@ -41545,7 +42368,7 @@
    "ru": "Вейн",
    "lean": "ad",
    "baseStats": {
-    "ad": 54,
+    "ad": 60,
     "hp": 570,
     "armor": 31,
     "mr": 30,
@@ -41559,7 +42382,7 @@
      "nameEn": "Night Hunter",
      "nameCn": "暗夜猎手",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100501_vn_Passive.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100501_Vayne_P.png",
      "maxRank": 1,
      "onHit": false,
      "cd": [
@@ -41580,7 +42403,7 @@
      "nameEn": "Tumble",
      "nameCn": "闪避突袭",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100201_vn_Q.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100201_Vayne_Q_.png",
      "maxRank": 4,
      "onHit": false,
      "cd": [
@@ -41607,23 +42430,23 @@
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.35,
-        0.45,
-        0.55,
-        0.65
+        0.5,
+        0.6,
+        0.7,
+        0.8
        ],
        "verify": {
         "shown": [
-         19,
-         25,
          30,
-         36
+         36,
+         42,
+         48
         ],
         "calc": [
-         18.9,
-         24.3,
-         29.7,
-         35.1
+         30,
+         36,
+         42,
+         48
         ],
         "status": "ok"
        }
@@ -41641,7 +42464,7 @@
      "nameEn": "Silver Bolts",
      "nameCn": "圣银弩箭",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100801_vn_W.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100801_Vayne_W_.png",
      "maxRank": 4,
      "onHit": false,
      "cd": [
@@ -41668,10 +42491,10 @@
        ],
        "dmgType": "true",
        "selfMaxHpPct": [
-        0.02,
-        0.05,
+        0.06,
+        0.07,
         0.08,
-        0.11
+        0.09
        ],
        "verify": {
         "shown": [
@@ -41681,10 +42504,10 @@
          null
         ],
         "calc": [
-         11.4,
-         28.5,
+         34.2,
+         39.9,
          45.6,
-         62.7
+         51.3
         ],
         "status": "targetDependent"
        },
@@ -41732,7 +42555,7 @@
      "nameEn": "Condemn",
      "nameCn": "恶魔审判",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100301_vn_E.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100301_Vayne_E_.png",
      "maxRank": 4,
      "onHit": false,
      "cd": [
@@ -41831,7 +42654,7 @@
      "nameEn": "Final Hour",
      "nameCn": "终极时刻",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100401_vn_R.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10100401_Vayne_R.png",
      "maxRank": 3,
      "onHit": false,
      "cd": [
@@ -42838,8 +43661,8 @@
    "lean": "ad",
    "baseStats": {
     "ad": 64,
-    "hp": 690,
-    "armor": 46,
+    "hp": 660,
+    "armor": 42,
     "mr": 38,
     "mana": 390
    },
@@ -42949,10 +43772,10 @@
        "dmgType": "phys",
        "role": "chargeMin",
        "bonusAdRatio": [
-        0.8,
-        0.8,
-        0.8,
-        0.8
+        0.6,
+        0.6,
+        0.6,
+        0.6
        ],
        "verify": {
         "shown": [
@@ -42981,10 +43804,10 @@
        "dmgType": "phys",
        "role": "chargeMax",
        "bonusAdRatio": [
-        1.6,
-        1.6,
-        1.6,
-        1.6
+        1.2,
+        1.2,
+        1.2,
+        1.2
        ],
        "verify": {
         "shown": [
@@ -43142,9 +43965,9 @@
      "maxRank": 3,
      "onHit": false,
      "cd": [
-      60,
-      55,
-      50
+      80,
+      70,
+      60
      ],
      "cost": [
       100,
@@ -43193,10 +44016,10 @@
    "id": "10057",
    "en": "Viego",
    "ru": "Виего",
-   "lean": "ap",
+   "lean": "ad",
    "baseStats": {
-    "ad": 62,
-    "hp": 660,
+    "ad": 60,
+    "hp": 630,
     "armor": 46,
     "mr": 36,
     "mana": 0
@@ -43257,40 +44080,6 @@
         0
        ],
        "dmgType": "phys",
-       "targetCurHpPct": [
-        0.02,
-        0.03,
-        0.04,
-        0.05
-       ],
-       "verify": {
-        "shown": [
-         null,
-         null,
-         null,
-         null
-        ],
-        "calc": [
-         0,
-         0,
-         0,
-         0
-        ],
-        "status": "targetDependent"
-       },
-       "flags": [
-        "hpClause"
-       ]
-      },
-      {
-       "kind": "damage",
-       "base": [
-        0,
-        0,
-        0,
-        0
-       ],
-       "dmgType": "phys",
        "adRatio": [
         0.15,
         0.15,
@@ -43305,16 +44094,47 @@
        ],
        "verify": {
         "shown": [
-         10,
-         10,
-         10,
-         10
+         9,
+         9,
+         9,
+         9
         ],
         "calc": [
-         9.3,
-         9.3,
-         9.3,
-         9.3
+         9,
+         9,
+         9,
+         9
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        25,
+        45,
+        65,
+        85
+       ],
+       "dmgType": "phys",
+       "adRatio": [
+        0.7,
+        0.7,
+        0.7,
+        0.7
+       ],
+       "verify": {
+        "shown": [
+         67,
+         87,
+         107,
+         127
+        ],
+        "calc": [
+         67,
+         87,
+         107,
+         127
         ],
         "status": "ok"
        }
@@ -43455,7 +44275,73 @@
      ],
      "cost": [],
      "costType": null,
-     "components": [],
+     "components": [
+      {
+       "kind": "damage",
+       "base": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "dmgType": "phys",
+       "adRatio": [
+        1.2,
+        1.2,
+        1.2,
+        1.2
+       ],
+       "verify": {
+        "shown": [
+         72,
+         72,
+         72,
+         72
+        ],
+        "calc": [
+         72,
+         72,
+         72,
+         72
+        ],
+        "status": "ok"
+       }
+      },
+      {
+       "kind": "damage",
+       "base": [
+        0,
+        0,
+        0,
+        0
+       ],
+       "dmgType": "phys",
+       "bonusAdRatio": [
+        0.05,
+        0.05,
+        0.05,
+        0.05
+       ],
+       "verify": {
+        "shown": [
+         null,
+         null,
+         null,
+         null
+        ],
+        "calc": [
+         0,
+         0,
+         0,
+         0
+        ],
+        "status": "targetDependent"
+       },
+       "flags": [
+        "ratioUnresolved"
+       ]
+      }
+     ],
      "effects": {
       "targetMissHpPct": [
        0.12,
@@ -44158,10 +45044,10 @@
       {
        "kind": "damage",
        "base": [
-        20,
-        40,
-        60,
-        80
+        30,
+        50,
+        70,
+        90
        ],
        "dmgType": "magic",
        "apRatio": [
@@ -44171,23 +45057,23 @@
         0.35
        ],
        "selfMaxHpPct": [
-        0.025,
-        0.025,
-        0.025,
-        0.025
+        0.03,
+        0.03,
+        0.03,
+        0.03
        ],
        "verify": {
         "shown": [
-         36,
-         56,
-         76,
-         96
+         49,
+         69,
+         89,
+         109
         ],
         "calc": [
-         35.8,
-         55.8,
-         75.8,
-         95.8
+         48.9,
+         68.9,
+         88.9,
+         108.9
         ],
         "status": "ok"
        }
@@ -44289,7 +45175,7 @@
       {
        "kind": "damage",
        "base": [
-        11
+        12
        ],
        "dmgType": "magic",
        "apRatio": [
@@ -44297,10 +45183,10 @@
        ],
        "verify": {
         "shown": [
-         11
+         12
         ],
         "calc": [
-         11
+         12
         ],
         "status": "ok"
        },
@@ -45037,9 +45923,9 @@
      "maxRank": 3,
      "onHit": true,
      "cd": [
-      80,
-      70,
-      60
+      100,
+      90,
+      80
      ],
      "cost": [
       100,
@@ -45051,9 +45937,9 @@
       {
        "kind": "damage",
        "base": [
-        125,
-        300,
-        475
+        100,
+        275,
+        450
        ],
        "dmgType": "magic",
        "bonusAdRatio": [
@@ -45063,14 +45949,14 @@
        ],
        "verify": {
         "shown": [
-         125,
-         300,
-         475
+         100,
+         275,
+         450
         ],
         "calc": [
-         125,
-         300,
-         475
+         100,
+         275,
+         450
         ],
         "status": "ok"
        }
@@ -45417,7 +46303,7 @@
    "ru": "Заят",
    "lean": "ad",
    "baseStats": {
-    "ad": 54,
+    "ad": 60,
     "hp": 630,
     "armor": 40,
     "mr": 30,
@@ -45575,30 +46461,30 @@
       {
        "kind": "damage",
        "base": [
-        60,
         70,
         80,
-        90
+        90,
+        100
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        0.9,
-        0.9,
-        0.9,
-        0.9
+        0.5,
+        0.5,
+        0.5,
+        0.5
        ],
        "verify": {
         "shown": [
-         60,
          70,
          80,
-         90
+         90,
+         100
         ],
         "calc": [
-         60,
          70,
          80,
-         90
+         90,
+         100
         ],
         "status": "ok"
        }
@@ -45634,9 +46520,9 @@
       {
        "kind": "damage",
        "base": [
-        125,
+        150,
         250,
-        375
+        350
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
@@ -45646,14 +46532,14 @@
        ],
        "verify": {
         "shown": [
-         125,
+         150,
          250,
-         375
+         350
         ],
         "calc": [
-         125,
+         150,
          250,
-         375
+         350
         ],
         "status": "ok"
        }
@@ -45674,7 +46560,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 62,
-    "hp": 690,
+    "hp": 650,
     "armor": 46,
     "mr": 38,
     "mana": 345
@@ -46283,26 +47169,26 @@
       {
        "kind": "damage",
        "base": [
-        250,
-        400,
-        550
+        200,
+        350,
+        500
        ],
        "dmgType": "phys",
        "bonusAdRatio": [
-        1.6,
-        1.6,
-        1.6
+        1.5,
+        1.5,
+        1.5
        ],
        "verify": {
         "shown": [
-         250,
-         400,
-         550
+         200,
+         350,
+         500
         ],
         "calc": [
-         250,
-         400,
-         550
+         200,
+         350,
+         500
         ],
         "status": "ok"
        }
@@ -46323,8 +47209,8 @@
    "lean": "ad",
    "baseStats": {
     "ad": 54,
-    "hp": 650,
-    "armor": 43,
+    "hp": 630,
+    "armor": 37,
     "mr": 38,
     "mana": 0
    },
@@ -46424,65 +47310,31 @@
      "costType": null,
      "components": [
       {
-       "kind": "damage",
-       "base": [
-        0,
-        0,
-        0,
-        0
-       ],
-       "dmgType": "magic",
-       "targetMaxHpPct": [
-        0.11,
-        0.12,
-        0.13,
-        0.14
-       ],
-       "verify": {
-        "shown": [
-         null,
-         null,
-         null,
-         null
-        ],
-        "calc": [
-         0,
-         0,
-         0,
-         0
-        ],
-        "status": "targetDependent"
-       },
-       "flags": [
-        "hpClause"
-       ]
-      },
-      {
        "kind": "shield",
        "base": [
-        45,
-        45,
-        45,
-        45
+        40,
+        55,
+        70,
+        85
        ],
        "bonusAdRatio": [
-        0.8,
-        0.8,
-        0.8,
-        0.8
+        0.6,
+        0.6,
+        0.6,
+        0.6
        ],
        "verify": {
         "shown": [
-         45,
-         45,
-         45,
-         45
+         40,
+         55,
+         70,
+         85
         ],
         "calc": [
-         45,
-         45,
-         45,
-         45
+         40,
+         55,
+         70,
+         85
         ],
         "status": "ok"
        }
@@ -46559,25 +47411,25 @@
        "kind": "damage",
        "base": [
         200,
-        350,
-        500
+        375,
+        550
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.8,
-        0.8,
-        0.8
+        0.6,
+        0.6,
+        0.6
        ],
        "verify": {
         "shown": [
-         244,
-         394,
-         544
+         233,
+         408,
+         583
         ],
         "calc": [
-         243.2,
-         393.2,
-         543.2
+         232.4,
+         407.4,
+         582.4
         ],
         "status": "ok"
        }
@@ -46598,7 +47450,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 58,
-    "hp": 600,
+    "hp": 630,
     "armor": 35,
     "mr": 30,
     "mana": 345
@@ -46627,11 +47479,11 @@
        ],
        "dmgType": "magic",
        "apRatio": [
-        0.1
+        0.08
        ],
        "verify": {
         "shown": [
-         10
+         8
         ],
         "calc": [
          0
@@ -47224,10 +48076,10 @@
        ],
        "verify": {
         "shown": [
-         6,
-         7,
          8,
-         9
+         9,
+         10,
+         11
         ],
         "calc": [
          0,
@@ -47262,10 +48114,10 @@
      "maxRank": 4,
      "onHit": false,
      "cd": [
-      10,
-      10,
-      10,
-      10
+      9,
+      9,
+      9,
+      9
      ],
      "cost": [
       65,
@@ -47278,29 +48130,29 @@
       {
        "kind": "shield",
        "base": [
-        85,
+        80,
         110,
-        135,
-        160
+        140,
+        170
        ],
        "apRatio": [
-        0.3,
-        0.3,
-        0.3,
-        0.3
+        0.4,
+        0.4,
+        0.4,
+        0.4
        ],
        "verify": {
         "shown": [
-         85,
+         80,
          110,
-         135,
-         160
+         140,
+         170
         ],
         "calc": [
-         85,
+         80,
          110,
-         135,
-         160
+         140,
+         170
         ],
         "status": "ok"
        }
@@ -47776,7 +48628,7 @@
    "lean": "ad",
    "baseStats": {
     "ad": 58,
-    "hp": 630,
+    "hp": 600,
     "armor": 31,
     "mr": 32,
     "mana": 380
@@ -47789,7 +48641,7 @@
      "nameEn": "Living Battery",
      "nameCn": "内能迁转",
      "ruMatch": "exact",
-     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10670001_Icons_Zeri_Passive.png",
+     "icon": "https://game.gtimg.cn/images/lgamem/act/lrlib/img/SkillIcons/10670001_Icons_Zeri_Q1.png",
      "maxRank": 1,
      "onHit": false,
      "cd": [
@@ -47801,18 +48653,18 @@
       {
        "kind": "damage",
        "base": [
-        13
+        20
        ],
        "dmgType": "phys",
        "adRatio": [
-        1.05
+        1.02
        ],
        "verify": {
         "shown": [
-         74
+         80
         ],
         "calc": [
-         73.9
+         79.2
         ],
         "status": "ok"
        }
@@ -47850,17 +48702,17 @@
       {
        "kind": "damage",
        "base": [
-        35,
-        60,
-        85,
-        110
+        70,
+        100,
+        130,
+        160
        ],
        "dmgType": "magic",
-       "adRatio": [
-        0.55,
-        0.7,
-        0.85,
-        1
+       "bonusAdRatio": [
+        0.8,
+        0.8,
+        0.8,
+        0.8
        ],
        "apRatio": [
         0.3,
@@ -47870,16 +48722,16 @@
        ],
        "verify": {
         "shown": [
-         67,
-         101,
-         135,
-         168
+         70,
+         100,
+         130,
+         160
         ],
         "calc": [
-         66.9,
-         100.6,
-         134.3,
-         168
+         70,
+         100,
+         130,
+         160
         ],
         "status": "ok"
        }
@@ -47924,36 +48776,36 @@
       {
        "kind": "damage",
        "base": [
-        30,
-        70,
-        110,
-        150
+        60,
+        100,
+        140,
+        180
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.8,
-        0.8,
-        0.8,
-        0.8
+        1,
+        1,
+        1,
+        1
        ],
        "apRatio": [
-        0.4,
-        0.4,
-        0.4,
-        0.4
+        0.5,
+        0.5,
+        0.5,
+        0.5
        ],
        "verify": {
         "shown": [
-         77,
-         117,
-         157,
-         197
+         118,
+         158,
+         198,
+         238
         ],
         "calc": [
-         76.4,
-         116.4,
-         156.4,
-         196.4
+         118,
+         158,
+         198,
+         238
         ],
         "status": "ok"
        }
@@ -48071,30 +48923,30 @@
        "kind": "damage",
        "base": [
         150,
-        200,
-        250
+        225,
+        300
        ],
        "dmgType": "magic",
        "bonusAdRatio": [
-        0.7,
-        0.7,
-        0.7
+        0.6,
+        0.6,
+        0.6
        ],
        "apRatio": [
-        0.8,
-        0.8,
-        0.8
+        1,
+        1,
+        1
        ],
        "verify": {
         "shown": [
          150,
-         200,
-         250
+         225,
+         300
         ],
         "calc": [
          150,
-         200,
-         250
+         225,
+         300
         ],
         "status": "ok"
        }
@@ -48108,20 +48960,20 @@
        ],
        "dmgType": "phys",
        "adRatio": [
-        0.25,
-        0.25,
-        0.25
+        0.3,
+        0.3,
+        0.3
        ],
        "verify": {
         "shown": [
-         15,
-         15,
-         15
+         18,
+         18,
+         18
         ],
         "calc": [
-         14.5,
-         14.5,
-         14.5
+         17.4,
+         17.4,
+         17.4
         ],
         "status": "ok"
        }
@@ -48513,10 +49365,10 @@
       {
        "kind": "damage",
        "base": [
-        70,
-        140,
-        210,
-        280
+        60,
+        125,
+        190,
+        255
        ],
        "dmgType": "magic",
        "apRatio": [
@@ -48527,16 +49379,16 @@
        ],
        "verify": {
         "shown": [
-         70,
-         140,
-         210,
-         280
+         60,
+         125,
+         190,
+         255
         ],
         "calc": [
-         70,
-         140,
-         210,
-         280
+         60,
+         125,
+         190,
+         255
         ],
         "status": "ok"
        }
@@ -48684,9 +49536,9 @@
      "maxRank": 3,
      "onHit": false,
      "cd": [
-      100,
-      85,
-      70
+      110,
+      95,
+      80
      ],
      "cost": [
       125,

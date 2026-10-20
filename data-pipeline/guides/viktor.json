@@ -3,7 +3,7 @@
   "name": "Viktor",
   "role": "Мид",
   "tier": "C",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Zed",
-    "Yone",
-    "Kassadin"
+    "Orianna",
+    "Hwei",
+    "Syndra"
   ],
   "builds": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Luden's Echo",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
           "Boots of Mana"
@@ -308,8 +308,8 @@
         "finalBuild": [
           "Boots of Mana",
           "Luden's Echo",
-          "Infinity Orb",
           "Rabadon's Deathcap",
+          "Infinity Orb",
           "Void Staff",
           "Boots of Mana"
         ]
@@ -317,11 +317,11 @@
     }
   ],
   "runes": [
-    "First Strike",
+    "Arcane Comet",
     "Axiom Arcanist",
-    "Absolute Focus",
-    "Gathering Storm",
-    "Cut Down"
+    "Transcendence",
+    "Nimbus Cloak",
+    "Bone Plating"
   ],
   "spells": [
     {

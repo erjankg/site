@@ -2,8 +2,8 @@
   "slug": "lissandra",
   "name": "Lissandra",
   "role": "Мид",
-  "tier": "D",
-  "patch": "7.2c",
+  "tier": "C",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,7 +285,7 @@
   ],
   "counters": [
     "Morgana",
-    "Kassadin",
+    "Twisted Fate",
     "Galio"
   ],
   "builds": [
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Malignance",
-          "Infinity Orb",
-          "Hextech Rocketbelt"
+          "Cryptbloom",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Malignance",
-          "Infinity Orb",
-          "Hextech Rocketbelt",
+          "Cryptbloom",
           "Rabadon's Deathcap",
+          "Infinity Orb",
           "Boots of Mana"
         ]
       }
@@ -321,7 +321,7 @@
     "Cheap Shot",
     "Chain Assault",
     "Eyeball Collector",
-    "Axiom Arcanist"
+    "Bone Plating"
   ],
   "spells": [
     {

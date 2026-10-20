@@ -3,7 +3,7 @@
   "name": "Vex",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Lissandra",
-    "Galio",
-    "Veigar"
+    "Hwei",
+    "Orianna",
+    "Syndra"
   ],
   "builds": [
     {
@@ -298,19 +298,19 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Luden's Echo",
           "Stormsurge",
-          "Infinity Orb"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Luden's Echo",
           "Stormsurge",
           "Infinity Orb",
           "Rabadon's Deathcap",
+          "Void Staff",
           "Boots of Mana"
         ]
       }

@@ -3,7 +3,7 @@
   "name": "Fizz",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,8 +561,8 @@
   ],
   "counters": [
     "Galio",
-    "Lissandra",
-    "Vex"
+    "Sylas",
+    "Lissandra"
   ],
   "builds": [
     {
@@ -576,7 +576,7 @@
         "core": [
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Void Staff"
         ],
         "boots": [
           "Boots of Mana"
@@ -585,8 +585,8 @@
           "Boots of Mana",
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Infinity Orb",
           "Void Staff",
+          "Infinity Orb",
           "Boots of Mana"
         ]
       }
@@ -602,7 +602,7 @@
         "core": [
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Void Staff"
         ],
         "boots": [
           "Boots of Mana"
@@ -611,8 +611,8 @@
           "Boots of Mana",
           "Lich Bane",
           "Rabadon's Deathcap",
-          "Infinity Orb",
           "Void Staff",
+          "Infinity Orb",
           "Boots of Mana"
         ]
       }
@@ -623,7 +623,7 @@
     "Sudden Impact",
     "Chain Assault",
     "Eyeball Collector",
-    "Transcendence"
+    "Absolute Focus"
   ],
   "spells": [
     {

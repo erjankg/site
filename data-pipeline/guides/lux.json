@@ -2,8 +2,8 @@
   "slug": "lux",
   "name": "Lux",
   "role": "Саппорт",
-  "tier": "S",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,22 +560,22 @@
     }
   ],
   "counters": [
-    "Pyke",
-    "Nami",
+    "Milio",
+    "Blitzcrank",
     "Karma"
   ],
   "builds": [
     {
       "title": "Support Build",
-      "tier": "B",
+      "tier": "C",
       "default": true,
       "items": {
         "starting": [
           "Spectral Sickle"
         ],
         "core": [
-          "Infinity Orb",
           "Luden's Echo",
+          "Infinity Orb",
           "Void Staff"
         ],
         "boots": [
@@ -584,8 +584,8 @@
         "finalBuild": [
           "Black Mist Scythe",
           "Boots of Mana",
-          "Infinity Orb",
           "Luden's Echo",
+          "Infinity Orb",
           "Void Staff",
           "Boots of Mana"
         ]

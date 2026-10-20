@@ -3,7 +3,7 @@
   "name": "Rakan",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
-    "Galio",
-    "Rell",
+    "Janna",
+    "Seraphine",
     "Nautilus"
   ],
   "builds": [
@@ -298,9 +298,9 @@
           "Relic Shield"
         ],
         "core": [
+          "Imperial Mandate",
           "Zeke's Convergence",
-          "Hextech Rocketbelt",
-          "Oceanid's Trident"
+          "Warmog's Armor"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Bulwark of the Mountain",
           "Ionian Boots of Lucidity",
+          "Imperial Mandate",
           "Zeke's Convergence",
-          "Hextech Rocketbelt",
-          "Oceanid's Trident",
+          "Warmog's Armor",
           "Ionian Boots of Lucidity"
         ]
       }

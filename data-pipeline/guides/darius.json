@@ -2,8 +2,8 @@
   "slug": "darius",
   "name": "Darius",
   "role": "Барон",
-  "tier": "S+",
-  "patch": "7.2c",
+  "tier": "S",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,14 +560,14 @@
     }
   ],
   "counters": [
-    "Wukong",
+    "Dr. Mundo",
     "Malphite",
-    "Jayce"
+    "Ornn"
   ],
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "S",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -586,7 +586,7 @@
           "Stridebreaker",
           "Sterak's Gage",
           "Amaranth's Twinguard",
-          "Dead Man's Plate",
+          "Force of Nature",
           "Plated Steelcaps"
         ]
       }
@@ -601,8 +601,8 @@
         ],
         "core": [
           "Trinity Force",
-          "Stridebreaker",
-          "Sterak's Gage"
+          "Sterak's Gage",
+          "Death's Dance"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -610,9 +610,9 @@
         "finalBuild": [
           "Trinity Force",
           "Plated Steelcaps",
-          "Stridebreaker",
           "Sterak's Gage",
           "Death's Dance",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
@@ -620,7 +620,7 @@
   ],
   "runes": [
     "Conqueror",
-    "Demolish",
+    "Unshakeable",
     "Second Wind",
     "Perseverance",
     "Nimbus Cloak"
@@ -646,7 +646,7 @@
     {
       "ability": "Decimate",
       "levels": [
-        1,
+        2,
         4,
         6,
         7
@@ -655,7 +655,7 @@
     {
       "ability": "Crippling Strike",
       "levels": [
-        3,
+        1,
         12,
         14,
         15
@@ -664,7 +664,7 @@
     {
       "ability": "Apprehend",
       "levels": [
-        2,
+        3,
         8,
         10,
         11

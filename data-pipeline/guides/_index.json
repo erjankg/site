@@ -1,30 +1,30 @@
 {
-  "updated": "2026-08-23T04:05:28.099Z",
-  "count": 141,
+  "updated": "2026-10-20T19:30:08.852Z",
+  "count": 142,
   "champions": [
     {
       "slug": "aatrox",
       "name": "Aatrox",
       "role": "Барон",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "ahri",
       "name": "Ahri",
       "role": "Мид",
-      "tier": "B"
+      "tier": "C"
     },
     {
       "slug": "akali",
       "name": "Akali",
       "role": "Мид",
-      "tier": "D"
+      "tier": "C"
     },
     {
       "slug": "akshan",
       "name": "Akshan",
       "role": "Мид",
-      "tier": "D"
+      "tier": "B"
     },
     {
       "slug": "alistar",
@@ -36,7 +36,7 @@
       "slug": "ambessa",
       "name": "Ambessa",
       "role": "Барон",
-      "tier": "D"
+      "tier": "C"
     },
     {
       "slug": "amumu",
@@ -54,13 +54,13 @@
       "slug": "ashe",
       "name": "Ashe",
       "role": "Дракон",
-      "tier": "C"
+      "tier": "B"
     },
     {
       "slug": "aurelion-sol",
       "name": "Aurelion Sol",
       "role": "Мид",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "slug": "aurora",
@@ -72,7 +72,7 @@
       "slug": "bard",
       "name": "Bard",
       "role": "Саппорт",
-      "tier": "D"
+      "tier": "A"
     },
     {
       "slug": "blitzcrank",
@@ -96,7 +96,7 @@
       "slug": "caitlyn",
       "name": "Caitlyn",
       "role": "Дракон",
-      "tier": "S"
+      "tier": "S+"
     },
     {
       "slug": "camille",
@@ -120,7 +120,7 @@
       "slug": "darius",
       "name": "Darius",
       "role": "Барон",
-      "tier": "S+"
+      "tier": "S"
     },
     {
       "slug": "diana",
@@ -144,7 +144,7 @@
       "slug": "ekko",
       "name": "Ekko",
       "role": "Мид",
-      "tier": "C"
+      "tier": "B"
     },
     {
       "slug": "evelynn",
@@ -156,7 +156,7 @@
       "slug": "ezreal",
       "name": "Ezreal",
       "role": "Дракон",
-      "tier": "S"
+      "tier": "B"
     },
     {
       "slug": "fiddlesticks",
@@ -168,7 +168,7 @@
       "slug": "fiora",
       "name": "Fiora",
       "role": "Барон",
-      "tier": "D"
+      "tier": "C"
     },
     {
       "slug": "fizz",
@@ -180,25 +180,25 @@
       "slug": "galio",
       "name": "Galio",
       "role": "Мид",
-      "tier": "A"
+      "tier": "S"
     },
     {
       "slug": "garen",
       "name": "Garen",
       "role": "Барон",
-      "tier": "S"
+      "tier": "A"
     },
     {
       "slug": "gnar",
       "name": "Gnar",
       "role": "Барон",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "gragas",
       "name": "Gragas",
       "role": "Лес",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "slug": "graves",
@@ -223,6 +223,12 @@
       "name": "Heimerdinger",
       "role": "Мид",
       "tier": "D"
+    },
+    {
+      "slug": "hwei",
+      "name": "Hwei",
+      "role": "Мид",
+      "tier": "S+"
     },
     {
       "slug": "irelia",
@@ -258,13 +264,13 @@
       "slug": "jhin",
       "name": "Jhin",
       "role": "Дракон",
-      "tier": "A"
+      "tier": "S"
     },
     {
       "slug": "jinx",
       "name": "Jinx",
       "role": "Дракон",
-      "tier": "S"
+      "tier": "A"
     },
     {
       "slug": "ksante",
@@ -276,13 +282,13 @@
       "slug": "kaisa",
       "name": "Kai'Sa",
       "role": "Дракон",
-      "tier": "A"
+      "tier": "S+"
     },
     {
       "slug": "kalista",
       "name": "Kalista",
       "role": "Дракон",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "karma",
@@ -306,7 +312,7 @@
       "slug": "kayle",
       "name": "Kayle",
       "role": "Мид",
-      "tier": "D"
+      "tier": "B"
     },
     {
       "slug": "kennen",
@@ -354,31 +360,31 @@
       "slug": "lissandra",
       "name": "Lissandra",
       "role": "Мид",
-      "tier": "D"
+      "tier": "C"
     },
     {
       "slug": "lucian",
       "name": "Lucian",
       "role": "Дракон",
-      "tier": "B"
+      "tier": "C"
     },
     {
       "slug": "lulu",
       "name": "Lulu",
       "role": "Саппорт",
-      "tier": "D"
+      "tier": "C"
     },
     {
       "slug": "lux",
       "name": "Lux",
       "role": "Саппорт",
-      "tier": "S"
+      "tier": "A"
     },
     {
       "slug": "malphite",
       "name": "Malphite",
       "role": "Барон",
-      "tier": "A"
+      "tier": "S"
     },
     {
       "slug": "maokai",
@@ -396,7 +402,7 @@
       "slug": "mel",
       "name": "Mel",
       "role": "Мид",
-      "tier": "S+"
+      "tier": "S"
     },
     {
       "slug": "milio",
@@ -408,19 +414,19 @@
       "slug": "miss-fortune",
       "name": "Miss Fortune",
       "role": "Дракон",
-      "tier": "S+"
+      "tier": "S"
     },
     {
       "slug": "mordekaiser",
       "name": "Mordekaiser",
       "role": "Барон",
-      "tier": "S"
+      "tier": "S+"
     },
     {
       "slug": "morgana",
       "name": "Morgana",
       "role": "Саппорт",
-      "tier": "S+"
+      "tier": "S"
     },
     {
       "slug": "nami",
@@ -432,7 +438,7 @@
       "slug": "nasus",
       "name": "Nasus",
       "role": "Барон",
-      "tier": "B"
+      "tier": "C"
     },
     {
       "slug": "nautilus",
@@ -450,19 +456,19 @@
       "slug": "nilah",
       "name": "Nilah",
       "role": "Лес",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "nocturne",
       "name": "Nocturne",
       "role": "Лес",
-      "tier": "A"
+      "tier": "S+"
     },
     {
       "slug": "norra",
       "name": "Norra",
       "role": "Мид",
-      "tier": "B"
+      "tier": "D"
     },
     {
       "slug": "nunu-and-willump",
@@ -492,19 +498,19 @@
       "slug": "pantheon",
       "name": "Pantheon",
       "role": "Лес",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "slug": "poppy",
       "name": "Poppy",
       "role": "Барон",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "pyke",
       "name": "Pyke",
       "role": "Саппорт",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "rakan",
@@ -516,7 +522,7 @@
       "slug": "rammus",
       "name": "Rammus",
       "role": "Лес",
-      "tier": "C"
+      "tier": "B"
     },
     {
       "slug": "rell",
@@ -546,31 +552,31 @@
       "slug": "rumble",
       "name": "Rumble",
       "role": "Барон",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "ryze",
       "name": "Ryze",
       "role": "Мид",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "samira",
       "name": "Samira",
       "role": "Дракон",
-      "tier": "A"
+      "tier": "S"
     },
     {
       "slug": "senna",
       "name": "Senna",
       "role": "Саппорт",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "seraphine",
       "name": "Seraphine",
       "role": "Саппорт",
-      "tier": "B"
+      "tier": "C"
     },
     {
       "slug": "sett",
@@ -582,19 +588,19 @@
       "slug": "kayn",
       "name": "Shadow Assassin",
       "role": "Лес",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "shen",
       "name": "Shen",
       "role": "Барон",
-      "tier": "D"
+      "tier": "B"
     },
     {
       "slug": "shyvana",
       "name": "Shyvana",
       "role": "Лес",
-      "tier": "A"
+      "tier": "C"
     },
     {
       "slug": "singed",
@@ -606,13 +612,13 @@
       "slug": "sion",
       "name": "Sion",
       "role": "Барон",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "slug": "sivir",
       "name": "Sivir",
       "role": "Дракон",
-      "tier": "B"
+      "tier": "C"
     },
     {
       "slug": "skarner",
@@ -624,7 +630,7 @@
       "slug": "smolder",
       "name": "Smolder",
       "role": "Дракон",
-      "tier": "S+"
+      "tier": "S"
     },
     {
       "slug": "sona",
@@ -642,31 +648,31 @@
       "slug": "swain",
       "name": "Swain",
       "role": "Мид",
-      "tier": "A"
+      "tier": "C"
     },
     {
       "slug": "syndra",
       "name": "Syndra",
       "role": "Мид",
-      "tier": "D"
+      "tier": "A"
     },
     {
       "slug": "taliyah",
       "name": "Taliyah",
       "role": "Мид",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "talon",
       "name": "Talon",
       "role": "Лес",
-      "tier": "D"
+      "tier": "C"
     },
     {
       "slug": "teemo",
       "name": "Teemo",
       "role": "Барон",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "thresh",
@@ -678,25 +684,25 @@
       "slug": "tristana",
       "name": "Tristana",
       "role": "Дракон",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "tryndamere",
       "name": "Tryndamere",
       "role": "Лес",
-      "tier": "S+"
+      "tier": "S"
     },
     {
       "slug": "twisted-fate",
       "name": "Twisted Fate",
       "role": "Мид",
-      "tier": "A"
+      "tier": "C"
     },
     {
       "slug": "twitch",
       "name": "Twitch",
       "role": "Дракон",
-      "tier": "C"
+      "tier": "A"
     },
     {
       "slug": "urgot",
@@ -708,25 +714,25 @@
       "slug": "varus",
       "name": "Varus",
       "role": "Дракон",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "slug": "vayne",
       "name": "Vayne",
       "role": "Дракон",
-      "tier": "A"
+      "tier": "B"
     },
     {
       "slug": "veigar",
       "name": "Veigar",
       "role": "Мид",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "velkoz",
       "name": "Vel'Koz",
       "role": "Мид",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "vex",
@@ -738,7 +744,7 @@
       "slug": "vi",
       "name": "Vi",
       "role": "Лес",
-      "tier": "A"
+      "tier": "C"
     },
     {
       "slug": "viego",
@@ -756,19 +762,19 @@
       "slug": "vladimir",
       "name": "Vladimir",
       "role": "Мид",
-      "tier": "D"
+      "tier": "B"
     },
     {
       "slug": "volibear",
       "name": "Volibear",
       "role": "Лес",
-      "tier": "B"
+      "tier": "A"
     },
     {
       "slug": "warwick",
       "name": "Warwick",
       "role": "Лес",
-      "tier": "C"
+      "tier": "D"
     },
     {
       "slug": "wukong",
@@ -798,25 +804,25 @@
       "slug": "yone",
       "name": "Yone",
       "role": "Мид",
-      "tier": "S"
+      "tier": "A"
     },
     {
       "slug": "yunara",
       "name": "Yunara",
       "role": "Дракон",
-      "tier": "S"
+      "tier": "A"
     },
     {
       "slug": "yuumi",
       "name": "Yuumi",
       "role": "Саппорт",
-      "tier": "C"
+      "tier": "B"
     },
     {
       "slug": "zed",
       "name": "Zed",
       "role": "Мид",
-      "tier": "C"
+      "tier": "B"
     },
     {
       "slug": "zeri",
@@ -834,7 +840,7 @@
       "slug": "zilean",
       "name": "Zilean",
       "role": "Саппорт",
-      "tier": "S"
+      "tier": "D"
     },
     {
       "slug": "zoe",
@@ -846,7 +852,7 @@
       "slug": "zyra",
       "name": "Zyra",
       "role": "Саппорт",
-      "tier": "S+"
+      "tier": "S"
     }
   ]
 }

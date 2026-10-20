@@ -3,7 +3,7 @@
   "name": "Lee Sin",
   "role": "Лес",
   "tier": "S",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
+    "Rek'Sai",
     "Rammus",
-    "Lillia",
     "Nocturne"
   ],
   "builds": [
@@ -321,7 +321,7 @@
     "Battle Zeal",
     "Cut Down",
     "Legend: Alacrity",
-    "Sudden Impact"
+    "Absolute Focus"
   ],
   "spells": [
     {
@@ -334,7 +334,7 @@
     {
       "ability": "Sonic Wave / Resonating Strike",
       "levels": [
-        2,
+        1,
         4,
         6,
         7
@@ -352,7 +352,7 @@
     {
       "ability": "Tempest / Cripple",
       "levels": [
-        1,
+        2,
         12,
         14,
         15

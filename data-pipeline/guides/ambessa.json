@@ -2,8 +2,8 @@
   "slug": "ambessa",
   "name": "Ambessa",
   "role": "Барон",
-  "tier": "D",
-  "patch": "7.2c",
+  "tier": "C",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,14 +560,14 @@
     }
   ],
   "counters": [
-    "Renekton",
+    "Jayce",
     "Malphite",
-    "Irelia"
+    "Renekton"
   ],
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "A",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -575,7 +575,7 @@
         ],
         "core": [
           "Eclipse",
-          "Spear of Shojin",
+          "Death's Dance",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -585,24 +585,24 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Eclipse",
-          "Spear of Shojin",
-          "Serylda's Grudge",
           "Death's Dance",
+          "Serylda's Grudge",
+          "Spear of Shojin",
           "Plated Steelcaps - Goredrinker"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Trinity Force",
-          "Spear of Shojin",
+          "Eclipse",
+          "Death's Dance",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -610,10 +610,10 @@
         ],
         "finalBuild": [
           "Gluttonous Greaves",
-          "Trinity Force",
-          "Spear of Shojin",
+          "Eclipse",
+          "Death's Dance",
           "Serylda's Grudge",
-          "Serpent's Fang",
+          "Spear of Shojin",
           "Gluttonous Greaves"
         ]
       }

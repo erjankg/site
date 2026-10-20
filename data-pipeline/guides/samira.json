@@ -2,8 +2,8 @@
   "slug": "samira",
   "name": "Samira",
   "role": "Дракон",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "S",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Kog'Maw",
-    "Miss Fortune",
-    "Caitlyn"
+    "Jinx",
+    "Yunara",
+    "Xayah"
   ],
   "builds": [
     {
@@ -299,18 +299,18 @@
         ],
         "core": [
           "The Collector",
-          "Bloodthirster",
+          "Infinity Edge",
           "Lord Dominik's Regard"
         ],
         "boots": [
           "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
           "The Collector",
-          "Bloodthirster",
-          "Lord Dominik's Regard",
+          "Gluttonous Greaves",
           "Infinity Edge",
+          "Lord Dominik's Regard",
+          "Bloodthirster",
           "Gluttonous Greaves"
         ]
       }
@@ -318,10 +318,10 @@
   ],
   "runes": [
     "Conqueror",
-    "Brutal",
-    "Cut Down",
-    "Legend: Bloodline",
-    "Sudden Impact"
+    "Sudden Impact",
+    "Hubris",
+    "Eyeball Collector",
+    "Legend: Bloodline"
   ],
   "spells": [
     {

@@ -2,8 +2,8 @@
   "slug": "ekko",
   "name": "Ekko",
   "role": "Мид",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "B",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,13 +561,13 @@
   ],
   "counters": [
     "Vex",
-    "Irelia",
+    "Galio",
     "Lissandra"
   ],
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "B",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -575,7 +575,7 @@
         ],
         "core": [
           "Dusk and Dawn",
-          "Infinity Orb",
+          "Nashor's Tooth",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -584,7 +584,7 @@
         "finalBuild": [
           "Boots of Mana",
           "Dusk and Dawn",
-          "Infinity Orb",
+          "Nashor's Tooth",
           "Rabadon's Deathcap",
           "Void Staff",
           "Boots of Mana"
@@ -593,15 +593,15 @@
     },
     {
       "title": "Jungle Build",
-      "tier": "A",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Dusk and Dawn",
           "Nashor's Tooth",
+          "Dusk and Dawn",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -609,8 +609,8 @@
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Dusk and Dawn",
           "Nashor's Tooth",
+          "Dusk and Dawn",
           "Rabadon's Deathcap",
           "Void Staff",
           "Boots of Mana"
@@ -623,7 +623,7 @@
     "Sudden Impact",
     "Hubris",
     "Eyeball Collector",
-    "Legend: Bloodline"
+    "Absolute Focus"
   ],
   "spells": [
     {

@@ -2,8 +2,8 @@
   "slug": "volibear",
   "name": "Volibear",
   "role": "Лес",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
+    "Ekko",
     "Lillia",
-    "Evelynn",
-    "Kindred"
+    "Warwick"
   ],
   "builds": [
     {
@@ -571,48 +571,48 @@
       "default": true,
       "items": {
         "starting": [
-          "Long Sword"
+          "Amplifying Tome"
         ],
         "core": [
           "Dusk and Dawn",
-          "Riftmaker",
-          "Nashor's Tooth"
-        ],
-        "boots": [
-          "Plated Steelcaps"
-        ],
-        "finalBuild": [
-          "Dusk and Dawn",
-          "Plated Steelcaps",
-          "Riftmaker",
-          "Nashor's Tooth",
-          "Cosmic Drive",
-          "Plated Steelcaps"
-        ]
-      }
-    },
-    {
-      "title": "Solo Build",
-      "tier": "S",
-      "default": false,
-      "items": {
-        "starting": [
-          "Ruby Crystal"
-        ],
-        "core": [
-          "Dusk and Dawn",
-          "Hullbreaker",
+          "Heartsteel",
           "Riftmaker"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Dusk and Dawn",
+          "Plated Steelcaps",
+          "Heartsteel",
+          "Riftmaker",
+          "Amaranth's Twinguard",
+          "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Solo Build",
+      "tier": "A",
+      "default": false,
+      "items": {
+        "starting": [
+          "Ruby Crystal"
+        ],
+        "core": [
+          "Heartsteel",
+          "Dusk and Dawn",
+          "Hullbreaker"
+        ],
+        "boots": [
+          "Plated Steelcaps"
+        ],
+        "finalBuild": [
+          "Heartsteel",
           "Plated Steelcaps",
           "Dusk and Dawn",
           "Hullbreaker",
-          "Riftmaker",
-          "Frozen Heart",
+          "Unending Despair",
           "Plated Steelcaps"
         ]
       }
@@ -620,10 +620,10 @@
   ],
   "runes": [
     "Lethal Tempo",
-    "Brutal",
+    "Triumph",
     "Last Stand",
-    "Legend: Bloodline",
-    "Nimbus Cloak"
+    "Legend: Haste",
+    "Overgrowth"
   ],
   "spells": [
     {

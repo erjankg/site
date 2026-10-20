@@ -2,8 +2,8 @@
   "slug": "senna",
   "name": "Senna",
   "role": "Саппорт",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,44 +284,70 @@
     }
   ],
   "counters": [
-    "Blitzcrank",
-    "Pyke",
-    "Nautilus"
+    "Thresh",
+    "Nautilus",
+    "Pyke"
   ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Support Build",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
           "Spectral Sickle"
         ],
         "core": [
-          "Magnetic Blaster",
-          "Serpent's Fang",
+          "Statikk Shiv",
+          "Rapid Firecannon",
           "Mortal Reminder"
         ],
         "boots": [
-          "Boots of Dynamism",
+          "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Boots of Dynamism",
-          "Magnetic Blaster",
-          "Serpent's Fang",
+          "Statikk Shiv",
+          "Berserker's Greaves",
+          "Rapid Firecannon",
           "Mortal Reminder",
-          "Boots of Dynamism - Galeforce"
+          "Berserker's Greaves - Galeforce"
+        ]
+      }
+    },
+    {
+      "title": "Duo Build",
+      "tier": "A",
+      "default": false,
+      "items": {
+        "starting": [
+          "Long Sword"
+        ],
+        "core": [
+          "Statikk Shiv",
+          "Hexoptics C44",
+          "Mortal Reminder"
+        ],
+        "boots": [
+          "Berserker's Greaves"
+        ],
+        "finalBuild": [
+          "Statikk Shiv",
+          "Berserker's Greaves",
+          "Hexoptics C44",
+          "Mortal Reminder",
+          "Infinity Edge",
+          "Berserker's Greaves"
         ]
       }
     }
   ],
   "runes": [
     "Fleet Footwork",
-    "Empowered Attack",
-    "Chain Assault",
-    "Zombie Ward",
+    "Brutal",
+    "Cut Down",
+    "Legend: Alacrity",
     "Bone Plating"
   ],
   "spells": [

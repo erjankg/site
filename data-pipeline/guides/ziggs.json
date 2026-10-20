@@ -3,7 +3,7 @@
   "name": "Ziggs",
   "role": "Мид",
   "tier": "B",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,7 +284,7 @@
     }
   ],
   "counters": [
-    "Yasuo",
+    "Galio",
     "Zed",
     "Yone"
   ],
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Luden's Echo",
-          "Infinity Orb",
+          "Horizon Focus",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -308,19 +308,19 @@
         "finalBuild": [
           "Boots of Mana",
           "Luden's Echo",
-          "Infinity Orb",
+          "Horizon Focus",
           "Rabadon's Deathcap",
-          "Void Staff",
+          "Cryptbloom",
           "Boots of Mana"
         ]
       }
     }
   ],
   "runes": [
-    "Arcane Comet",
-    "Battle Zeal",
-    "Cut Down",
-    "Legend: Bloodline",
+    "First Strike",
+    "Manaflow Band",
+    "Absolute Focus",
+    "Gathering Storm",
     "Bone Plating"
   ],
   "spells": [

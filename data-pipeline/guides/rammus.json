@@ -2,8 +2,8 @@
   "slug": "rammus",
   "name": "Rammus",
   "role": "Лес",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "B",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Amumu",
+    "Olaf",
     "Lillia",
-    "Nunu & Willump"
+    "Nocturne"
   ],
   "builds": [
     {
@@ -295,21 +295,21 @@
       "default": true,
       "items": {
         "starting": [
-          "Shimmering Spark"
+          "Cloth Armor"
         ],
         "core": [
-          "Searing Crown",
           "Thornmail",
-          "Iceborn Gauntlet"
+          "Iceborn Gauntlet",
+          "Amaranth's Twinguard"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Searing Crown",
-          "Plated Steelcaps",
           "Thornmail",
+          "Plated Steelcaps",
           "Iceborn Gauntlet",
+          "Amaranth's Twinguard",
           "Dawnshroud",
           "Plated Steelcaps"
         ]
@@ -319,7 +319,7 @@
   "runes": [
     "Ice Overlord",
     "Unshakeable",
-    "Bone Plating",
+    "Second Wind",
     "Overgrowth",
     "Celerity"
   ],

@@ -2,8 +2,8 @@
   "slug": "tristana",
   "name": "Tristana",
   "role": "Дракон",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -422,9 +422,9 @@
     }
   ],
   "counters": [
-    "Kog'Maw",
-    "Caitlyn",
-    "Draven"
+    "Varus",
+    "Corki",
+    "Kai'Sa"
   ],
   "builds": [
     {
@@ -436,19 +436,19 @@
           "Long Sword"
         ],
         "core": [
-          "Magnetic Blaster",
+          "Yun Tal Wildarrows",
           "Infinity Edge",
-          "Mortal Reminder"
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Yun Tal Wildarrows",
           "Berserker's Greaves",
-          "Magnetic Blaster",
           "Infinity Edge",
-          "Mortal Reminder",
-          "Bloodthirster",
+          "Lord Dominik's Regard",
+          "Hexoptics C44",
           "Berserker's Greaves"
         ]
       }

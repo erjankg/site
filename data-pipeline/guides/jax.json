@@ -3,7 +3,7 @@
   "name": "Jax",
   "role": "Барон",
   "tier": "C",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Poppy",
-    "Teemo",
-    "Rumble"
+    "Malphite",
+    "Shen",
+    "K'Sante"
   ],
   "builds": [
     {
@@ -605,25 +605,25 @@
           "Riftmaker"
         ],
         "boots": [
-          "Gluttonous Greaves"
+          "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
           "Dusk and Dawn",
+          "Plated Steelcaps",
           "Blade of the Ruined King",
           "Riftmaker",
           "Zhonya's Hourglass",
-          "Gluttonous Greaves"
+          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
     "Grasp of the Undying",
-    "Demolish",
-    "Second Wind",
-    "Overgrowth",
-    "Last Stand"
+    "Brutal",
+    "Last Stand",
+    "Legend: Haste",
+    "Second Wind"
   ],
   "spells": [
     {

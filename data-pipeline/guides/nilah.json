@@ -2,8 +2,8 @@
   "slug": "nilah",
   "name": "Nilah",
   "role": "Лес",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Rammus",
-    "Amumu",
-    "Kha'Zix"
+    "Cho'Gath",
+    "Vi"
   ],
   "builds": [
     {
@@ -299,19 +299,19 @@
         ],
         "core": [
           "Essence Reaver",
-          "Bloodthirster",
-          "Lord Dominik's Regard"
+          "The Collector",
+          "Infinity Edge"
         ],
         "boots": [
-          "Boots of Dynamism"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Boots of Dynamism",
+          "Gluttonous Greaves",
           "Essence Reaver",
-          "Bloodthirster",
-          "Lord Dominik's Regard",
+          "The Collector",
           "Infinity Edge",
-          "Boots of Dynamism"
+          "Lord Dominik's Regard",
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -321,7 +321,7 @@
     "Brutal",
     "Cut Down",
     "Legend: Alacrity",
-    "Sudden Impact"
+    "Absolute Focus"
   ],
   "spells": [
     {

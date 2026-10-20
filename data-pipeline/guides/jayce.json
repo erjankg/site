@@ -3,7 +3,7 @@
   "name": "Jayce",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -492,8 +492,8 @@
   ],
   "counters": [
     "Syndra",
-    "Galio",
-    "Irelia"
+    "Hwei",
+    "Orianna"
   ],
   "builds": [
     {
@@ -506,7 +506,7 @@
         ],
         "core": [
           "Manamune",
-          "Youmuu's Ghostblade",
+          "Serpent's Fang",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -515,7 +515,7 @@
         "finalBuild": [
           "Muramana",
           "Boots of Dynamism",
-          "Youmuu's Ghostblade",
+          "Serpent's Fang",
           "Serylda's Grudge",
           "Edge of Night",
           "Boots of Dynamism"
@@ -524,15 +524,15 @@
     },
     {
       "title": "Solo Build",
-      "tier": "B",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Youmuu's Ghostblade",
           "Eclipse",
+          "Serpent's Fang",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -540,10 +540,10 @@
         ],
         "finalBuild": [
           "Boots of Dynamism",
-          "Youmuu's Ghostblade",
           "Eclipse",
+          "Serpent's Fang",
           "Serylda's Grudge",
-          "Spear of Shojin",
+          "Hullbreaker",
           "Boots of Dynamism"
         ]
       }
@@ -582,7 +582,7 @@
     {
       "ability": "Lightning Field / Hyper Charge",
       "levels": [
-        3,
+        2,
         6,
         7,
         10,
@@ -592,7 +592,7 @@
     {
       "ability": "Thundering Blow / Acceleration Gate",
       "levels": [
-        2,
+        3,
         12,
         13,
         14,

@@ -2,8 +2,8 @@
   "slug": "jhin",
   "name": "Jhin",
   "role": "Дракон",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "S",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Draven",
-    "Ashe",
-    "Lucian"
+    "Kalista",
+    "Kai'Sa",
+    "Samira"
   ],
   "builds": [
     {
@@ -299,20 +299,20 @@
         ],
         "core": [
           "The Collector",
-          "Magnetic Blaster",
+          "Stormrazor",
           "Lord Dominik's Regard"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Boots of Dynamism",
           "Galeforce"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
           "The Collector",
-          "Magnetic Blaster",
+          "Boots of Dynamism",
+          "Stormrazor",
           "Lord Dominik's Regard",
-          "Galeforce",
-          "Gluttonous Greaves - Galeforce"
+          "Infinity Edge",
+          "Boots of Dynamism - Galeforce"
         ]
       }
     }
@@ -321,7 +321,7 @@
     "Dark Harvest",
     "Battle Zeal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Celerity"
   ],
   "spells": [

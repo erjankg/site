@@ -2,8 +2,8 @@
   "slug": "ashe",
   "name": "Ashe",
   "role": "Дракон",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "B",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Draven",
-    "Lucian"
+    "Samira",
+    "Ezreal",
+    "Twitch"
   ],
   "builds": [
     {
@@ -299,19 +299,19 @@
         ],
         "core": [
           "Kraken Slayer",
-          "Blade of the Ruined King",
-          "Runaan's Hurricane"
+          "Stormrazor",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "Kraken Slayer",
-          "Blade of the Ruined King",
-          "Runaan's Hurricane",
-          "Guinsoo's Rageblade",
+          "Berserker's Greaves",
+          "Stormrazor",
+          "Lord Dominik's Regard",
+          "Hexoptics C44",
           "Berserker's Greaves - Galeforce"
         ]
       }
@@ -360,15 +360,6 @@
     {
       "ability": "Ranger's Focus",
       "levels": [
-        1,
-        3,
-        6,
-        7
-      ]
-    },
-    {
-      "ability": "Volley",
-      "levels": [
         2,
         8,
         10,
@@ -376,9 +367,18 @@
       ]
     },
     {
+      "ability": "Volley",
+      "levels": [
+        1,
+        4,
+        6,
+        7
+      ]
+    },
+    {
       "ability": "Hawkshot",
       "levels": [
-        4,
+        3,
         12,
         14,
         15

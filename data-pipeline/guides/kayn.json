@@ -2,8 +2,8 @@
   "slug": "kayn",
   "name": "Shadow Assassin",
   "role": "Лес",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
-    "Master Yi",
-    "Kindred",
+    "Ekko",
+    "Amumu",
     "Rammus"
   ],
   "builds": [
@@ -298,19 +298,19 @@
           "Long Sword"
         ],
         "core": [
-          "Youmuu's Ghostblade",
           "Manamune",
-          "Serylda's Grudge"
+          "Youmuu's Ghostblade",
+          "Serpent's Fang"
         ],
         "boots": [
           "Boots of Dynamism"
         ],
         "finalBuild": [
           "Boots of Dynamism",
-          "Youmuu's Ghostblade",
           "Muramana",
-          "Serylda's Grudge",
+          "Youmuu's Ghostblade",
           "Serpent's Fang",
+          "Serylda's Grudge",
           "Boots of Dynamism"
         ]
       }

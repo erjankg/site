@@ -3,7 +3,7 @@
   "name": "Rengar",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Kindred",
+    "Jarvan IV",
     "Rammus",
-    "Master Yi"
+    "Hecarim"
   ],
   "builds": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Essence Reaver",
-          "Blade of the Ruined King",
-          "Lord Dominik's Regard"
+          "The Collector",
+          "Infinity Edge"
         ],
         "boots": [
           "Gluttonous Greaves"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Gluttonous Greaves",
           "Essence Reaver",
-          "Blade of the Ruined King",
+          "The Collector",
+          "Infinity Edge",
           "Lord Dominik's Regard",
-          "Bloodthirster",
           "Gluttonous Greaves"
         ]
       }
@@ -318,10 +318,10 @@
   ],
   "runes": [
     "First Strike",
-    "Sudden Impact",
-    "Tyrant",
-    "Eyeball Collector",
-    "Transcendence"
+    "Brutal",
+    "Cut Down",
+    "Legend: Haste",
+    "Absolute Focus"
   ],
   "spells": [
     {
@@ -349,18 +349,18 @@
       "ability": "Battle Roar",
       "levels": [
         2,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {
       "ability": "Bola Strike",
       "levels": [
         3,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {

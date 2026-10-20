@@ -3,7 +3,7 @@
   "name": "Nautilus",
   "role": "Саппорт",
   "tier": "S",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -836,9 +836,9 @@
     }
   ],
   "counters": [
-    "Bard",
-    "Janna",
-    "Morgana"
+    "Rell",
+    "Leona",
+    "Braum"
   ],
   "builds": [
     {
@@ -851,8 +851,8 @@
         ],
         "core": [
           "Warmog's Armor",
-          "Force of Nature",
-          "Frozen Heart"
+          "Frozen Heart",
+          "Force of Nature"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -861,8 +861,8 @@
           "Bulwark of the Mountain",
           "Plated Steelcaps",
           "Warmog's Armor",
-          "Force of Nature",
           "Frozen Heart",
+          "Force of Nature",
           "Plated Steelcaps"
         ]
       }

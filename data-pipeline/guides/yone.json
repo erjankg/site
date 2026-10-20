@@ -2,8 +2,8 @@
   "slug": "yone",
   "name": "Yone",
   "role": "Мид",
-  "tier": "S",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -837,13 +837,13 @@
   ],
   "counters": [
     "Ahri",
-    "Vex",
+    "Lissandra",
     "Zed"
   ],
   "builds": [
     {
       "title": "Mid Build",
-      "tier": "S",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -851,8 +851,8 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder"
+          "Immortal Shieldbow",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -860,8 +860,8 @@
         "finalBuild": [
           "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder",
+          "Immortal Shieldbow",
+          "Lord Dominik's Regard",
           "Infinity Edge",
           "Berserker's Greaves"
         ]
@@ -877,8 +877,8 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder"
+          "Immortal Shieldbow",
+          "Infinity Edge"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -886,16 +886,16 @@
         "finalBuild": [
           "Berserker's Greaves",
           "Blade of the Ruined King",
-          "Essence Reaver",
-          "Mortal Reminder",
+          "Immortal Shieldbow",
           "Infinity Edge",
+          "Lord Dominik's Regard",
           "Berserker's Greaves"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "S+",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
@@ -904,7 +904,7 @@
         "core": [
           "Blade of the Ruined King",
           "Essence Reaver",
-          "Mortal Reminder"
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -913,7 +913,7 @@
           "Berserker's Greaves",
           "Blade of the Ruined King",
           "Essence Reaver",
-          "Mortal Reminder",
+          "Lord Dominik's Regard",
           "Infinity Edge",
           "Berserker's Greaves"
         ]

@@ -3,7 +3,7 @@
   "name": "Soraka",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -286,7 +286,7 @@
   "counters": [
     "Blitzcrank",
     "Nami",
-    "Bard"
+    "Rakan"
   ],
   "builds": [
     {
@@ -298,9 +298,9 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Harmonic Echo",
+          "Whispering Circlet",
           "Ardent Censer",
-          "Redemption"
+          "Harmonic Echo"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Black Mist Scythe",
           "Ionian Boots of Lucidity",
-          "Harmonic Echo",
+          "Diadem of Songs",
           "Ardent Censer",
-          "Redemption",
+          "Harmonic Echo",
           "Ionian Boots of Lucidity"
         ]
       }
@@ -353,7 +353,7 @@
     {
       "ability": "Astral Infusion",
       "levels": [
-        3,
+        2,
         4,
         6,
         7
@@ -362,7 +362,7 @@
     {
       "ability": "Equinox",
       "levels": [
-        2,
+        3,
         12,
         14,
         15

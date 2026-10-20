@@ -3,7 +3,7 @@
   "name": "Fiddlesticks",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -286,7 +286,7 @@
   "counters": [
     "Nocturne",
     "Aatrox",
-    "Alistar"
+    "Kindred"
   ],
   "builds": [
     {
@@ -298,18 +298,18 @@
           "Amplifying Tome"
         ],
         "core": [
+          "Malignance",
           "Hextech Rocketbelt",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Infinity Orb"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Boots of Mana",
+          "Malignance",
           "Hextech Rocketbelt",
           "Infinity Orb",
-          "Rabadon's Deathcap",
           "Void Staff",
           "Boots of Mana"
         ]
@@ -317,7 +317,7 @@
     }
   ],
   "runes": [
-    "First Strike",
+    "Dark Harvest",
     "Axiom Arcanist",
     "Absolute Focus",
     "Gathering Storm",

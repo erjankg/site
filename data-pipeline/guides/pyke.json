@@ -2,8 +2,8 @@
   "slug": "pyke",
   "name": "Pyke",
   "role": "Саппорт",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "D",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -286,7 +286,7 @@
   "counters": [
     "Braum",
     "Maokai",
-    "Soraka"
+    "Nautilus"
   ],
   "builds": [
     {
@@ -303,15 +303,15 @@
           "Edge of Night"
         ],
         "boots": [
-          "Boots of Dynamism"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Boots of Dynamism",
+          "Ionian Boots of Lucidity",
           "Youmuu's Ghostblade",
           "Serpent's Fang",
           "Edge of Night",
-          "Boots of Dynamism"
+          "Ionian Boots of Lucidity"
         ]
       }
     }

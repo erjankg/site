@@ -2,8 +2,8 @@
   "slug": "shen",
   "name": "Shen",
   "role": "Барон",
-  "tier": "D",
-  "patch": "7.2c",
+  "tier": "B",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Fiora",
-    "Renekton",
-    "Gnar"
+    "Jayce",
+    "Sett",
+    "Mordekaiser"
   ],
   "builds": [
     {
@@ -306,11 +306,11 @@
           "Plated Steelcaps"
         ],
         "finalBuild": [
-          "Plated Steelcaps",
           "Heartsteel",
+          "Plated Steelcaps",
           "Sunfire Aegis",
           "Thornmail",
-          "Dawnshroud",
+          "Unending Despair",
           "Plated Steelcaps"
         ]
       }
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "Grasp of the Undying",
-    "Demolish",
+    "Courage of the Colossus",
     "Second Wind",
     "Overgrowth",
     "Sudden Impact"

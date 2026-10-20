@@ -3,7 +3,7 @@
   "name": "Brand",
   "role": "Мид",
   "tier": "S",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,8 +561,8 @@
   ],
   "counters": [
     "Syndra",
-    "Zed",
-    "Lux"
+    "Zyra",
+    "Hwei"
   ],
   "builds": [
     {
@@ -620,7 +620,7 @@
   ],
   "runes": [
     "Electrocute",
-    "Axiom Arcanist",
+    "Manaflow Band",
     "Transcendence",
     "Scorch",
     "Bone Plating"
@@ -666,10 +666,10 @@
     {
       "ability": "Sear",
       "levels": [
-        2,
-        8,
-        10,
-        11
+        3,
+        12,
+        14,
+        15
       ]
     },
     {
@@ -684,10 +684,10 @@
     {
       "ability": "Conflagration",
       "levels": [
-        3,
-        12,
-        14,
-        15
+        2,
+        8,
+        10,
+        11
       ]
     },
     {

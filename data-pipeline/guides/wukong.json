@@ -3,7 +3,7 @@
   "name": "Wukong",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -562,7 +562,7 @@
   "counters": [
     "Rammus",
     "Lillia",
-    "Warwick"
+    "Amumu"
   ],
   "builds": [
     {
@@ -575,8 +575,8 @@
         ],
         "core": [
           "Trinity Force",
-          "Black Cleaver",
-          "Goredrinker"
+          "Sundered Sky",
+          "Black Cleaver"
         ],
         "boots": [
           "Plated Steelcaps",
@@ -585,23 +585,23 @@
         "finalBuild": [
           "Trinity Force",
           "Plated Steelcaps",
-          "Black Cleaver",
-          "Goredrinker",
           "Sundered Sky",
+          "Black Cleaver",
+          "Death's Dance",
           "Plated Steelcaps - Stridebreaker"
         ]
       }
     },
     {
       "title": "Solo Build",
-      "tier": "S",
+      "tier": "A",
       "default": false,
       "items": {
         "starting": [
           "Ruby Crystal"
         ],
         "core": [
-          "Sunfire Aegis",
+          "Hollow Radiance",
           "Divine Sunderer",
           "Thornmail"
         ],
@@ -611,7 +611,7 @@
         ],
         "finalBuild": [
           "Plated Steelcaps",
-          "Sunfire Aegis",
+          "Hollow Radiance",
           "Divine Sunderer",
           "Thornmail",
           "Unending Despair",
@@ -623,7 +623,7 @@
   "runes": [
     "Conqueror",
     "Unshakeable",
-    "Bone Plating",
+    "Second Wind",
     "Perseverance",
     "Sudden Impact"
   ],
@@ -643,8 +643,8 @@
     {
       "ability": "Golden Staff",
       "levels": [
-        2,
-        4,
+        1,
+        3,
         6,
         7
       ]
@@ -652,7 +652,7 @@
     {
       "ability": "Warrior Trickster",
       "levels": [
-        3,
+        4,
         12,
         14,
         15
@@ -661,7 +661,7 @@
     {
       "ability": "Nimbus Strike",
       "levels": [
-        1,
+        2,
         8,
         10,
         11

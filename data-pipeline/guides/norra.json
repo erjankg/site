@@ -2,8 +2,8 @@
   "slug": "norra",
   "name": "Norra",
   "role": "Мид",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "D",
+  "patch": "7.3b",
   "dataDate": "2026-04-19",
   "matchups": [
     {
@@ -491,9 +491,9 @@
     }
   ],
   "counters": [
-    "Kassadin",
+    "Yone",
     "Zed",
-    "Yasuo"
+    "Orianna"
   ],
   "builds": [
     {
@@ -506,7 +506,7 @@
         ],
         "core": [
           "Luden's Echo",
-          "Horizon Focus",
+          "Stormsurge",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -515,9 +515,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Luden's Echo",
-          "Horizon Focus",
+          "Stormsurge",
           "Rabadon's Deathcap",
-          "Void Staff",
+          "Cryptbloom",
           "Boots of Mana"
         ]
       }

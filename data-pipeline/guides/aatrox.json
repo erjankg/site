@@ -2,8 +2,8 @@
   "slug": "aatrox",
   "name": "Aatrox",
   "role": "Барон",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,13 +561,13 @@
   ],
   "counters": [
     "Fiora",
-    "Irelia",
+    "Malphite",
     "Ambessa"
   ],
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "S",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -575,7 +575,7 @@
         ],
         "core": [
           "Eclipse",
-          "Sundered Sky",
+          "Death's Dance",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -585,9 +585,9 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Eclipse",
-          "Sundered Sky",
-          "Serylda's Grudge",
           "Death's Dance",
+          "Serylda's Grudge",
+          "Spear of Shojin",
           "Plated Steelcaps - Stridebreaker"
         ]
       }
@@ -601,8 +601,8 @@
           "Long Sword"
         ],
         "core": [
+          "Eclipse",
           "Trinity Force",
-          "Death's Dance",
           "Serylda's Grudge"
         ],
         "boots": [
@@ -611,10 +611,10 @@
         ],
         "finalBuild": [
           "Boots of Dynamism",
+          "Eclipse",
           "Trinity Force",
-          "Death's Dance",
           "Serylda's Grudge",
-          "Serpent's Fang",
+          "Death's Dance",
           "Boots of Dynamism - Goredrinker"
         ]
       }

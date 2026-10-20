@@ -3,7 +3,7 @@
   "name": "Orianna",
   "role": "Мид",
   "tier": "B",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Irelia",
-    "Yasuo",
-    "Syndra"
+    "Annie",
+    "Hwei",
+    "Aurelion Sol"
   ],
   "builds": [
     {
@@ -299,16 +299,16 @@
         ],
         "core": [
           "Archangel's Staff",
-          "Luden's Echo",
+          "Blackfire Torch",
           "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
-          "Seraph's Embrace",
           "Boots of Mana",
-          "Luden's Echo",
+          "Seraph's Embrace",
+          "Blackfire Torch",
           "Rabadon's Deathcap",
           "Void Staff",
           "Boots of Mana"
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "Conqueror",
-    "Botanist",
+    "Manaflow Band",
     "Transcendence",
     "Nimbus Cloak",
     "Bone Plating"

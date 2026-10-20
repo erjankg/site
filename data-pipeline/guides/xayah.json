@@ -3,7 +3,7 @@
   "name": "Xayah",
   "role": "Дракон",
   "tier": "B",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Vayne",
-    "Kog'Maw"
+    "Ezreal",
+    "Ashe",
+    "Smolder"
   ],
   "builds": [
     {
@@ -298,19 +298,19 @@
           "Long Sword"
         ],
         "core": [
-          "Bloodthirster",
-          "Magnetic Blaster",
-          "Mortal Reminder"
+          "Yun Tal Wildarrows",
+          "Stormrazor",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
+          "Yun Tal Wildarrows",
           "Berserker's Greaves",
-          "Bloodthirster",
-          "Magnetic Blaster",
-          "Mortal Reminder",
+          "Stormrazor",
+          "Lord Dominik's Regard",
           "Infinity Edge",
           "Berserker's Greaves - Galeforce"
         ]
@@ -321,7 +321,7 @@
     "Conqueror",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

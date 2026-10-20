@@ -3,7 +3,7 @@
   "name": "Sett",
   "role": "Барон",
   "tier": "A",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Renekton",
-    "Mordekaiser",
-    "Aatrox"
+    "Malphite",
+    "K'Sante",
+    "Gnar"
   ],
   "builds": [
     {
@@ -574,19 +574,19 @@
           "Ruby Crystal"
         ],
         "core": [
-          "Stridebreaker",
+          "Heartsteel",
           "Overlord's Bloodmail",
-          "Hullbreaker"
+          "Stridebreaker"
         ],
         "boots": [
           "Plated Steelcaps",
           "Galeforce"
         ],
         "finalBuild": [
+          "Heartsteel",
           "Plated Steelcaps",
-          "Stridebreaker",
           "Overlord's Bloodmail",
-          "Hullbreaker",
+          "Stridebreaker",
           "Black Cleaver",
           "Plated Steelcaps - Galeforce"
         ]
@@ -595,10 +595,10 @@
   ],
   "runes": [
     "Conqueror",
-    "Demolish",
-    "Second Wind",
-    "Overgrowth",
-    "Battle Zeal"
+    "Brutal",
+    "Last Stand",
+    "Legend: Alacrity",
+    "Second Wind"
   ],
   "spells": [
     {
@@ -616,7 +616,7 @@
     {
       "ability": "Knuckle Down",
       "levels": [
-        2,
+        3,
         4,
         6,
         7
@@ -625,7 +625,7 @@
     {
       "ability": "Haymaker",
       "levels": [
-        3,
+        1,
         8,
         10,
         11
@@ -634,7 +634,7 @@
     {
       "ability": "Facebreaker",
       "levels": [
-        1,
+        2,
         12,
         14,
         15

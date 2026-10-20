@@ -2,8 +2,8 @@
   "slug": "warwick",
   "name": "Warwick",
   "role": "Лес",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "D",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Amumu",
-    "Olaf",
-    "Kindred"
+    "Gwen",
+    "Rammus"
   ],
   "builds": [
     {
@@ -321,7 +321,7 @@
     "Axiom Arcanist",
     "Transcendence",
     "Nimbus Cloak",
-    "Sudden Impact"
+    "Legend: Haste"
   ],
   "spells": [
     {
@@ -349,18 +349,18 @@
       "ability": "Blood Hunt",
       "levels": [
         2,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Primal Howl",
       "levels": [
         4,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {

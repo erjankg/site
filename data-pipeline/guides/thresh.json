@@ -3,7 +3,7 @@
   "name": "Thresh",
   "role": "Саппорт",
   "tier": "S",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Zyra",
-    "Nami",
-    "Lux"
+    "Morgana",
+    "Seraphine",
+    "Nami"
   ],
   "builds": [
     {
@@ -300,7 +300,7 @@
         "core": [
           "Warmog's Armor",
           "Force of Nature",
-          "Knight's Vow"
+          "Thornmail"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -310,7 +310,7 @@
           "Plated Steelcaps",
           "Warmog's Armor",
           "Force of Nature",
-          "Knight's Vow",
+          "Thornmail",
           "Plated Steelcaps"
         ]
       }
@@ -345,9 +345,9 @@
       "ability": "Death Sentence",
       "levels": [
         2,
-        8,
-        10,
-        11
+        4,
+        6,
+        7
       ]
     },
     {
@@ -363,9 +363,9 @@
       "ability": "Flay",
       "levels": [
         1,
-        4,
-        6,
-        7
+        8,
+        10,
+        11
       ]
     },
     {

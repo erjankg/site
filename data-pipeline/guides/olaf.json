@@ -3,7 +3,7 @@
   "name": "Olaf",
   "role": "Лес",
   "tier": "C",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Kindred",
+    "Master Yi",
     "Lillia",
-    "Master Yi"
+    "Jarvan IV"
   ],
   "builds": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Trinity Force",
-          "Zeke's Convergence",
-          "Death's Dance"
+          "Death's Dance",
+          "Force of Nature"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Trinity Force",
           "Plated Steelcaps",
-          "Zeke's Convergence",
           "Death's Dance",
           "Force of Nature",
+          "Sterak's Gage",
           "Plated Steelcaps"
         ]
       }
@@ -326,7 +326,7 @@
         "core": [
           "Trinity Force",
           "Zeke's Convergence",
-          "Death's Dance"
+          "Hullbreaker"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -335,8 +335,8 @@
           "Plated Steelcaps",
           "Trinity Force",
           "Zeke's Convergence",
-          "Death's Dance",
-          "Force of Nature",
+          "Hullbreaker",
+          "Sterak's Gage",
           "Plated Steelcaps"
         ]
       }

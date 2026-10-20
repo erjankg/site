@@ -3,7 +3,7 @@
   "name": "Leona",
   "role": "Саппорт",
   "tier": "A",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,7 +284,7 @@
     }
   ],
   "counters": [
-    "Galio",
+    "Alistar",
     "Morgana",
     "Janna"
   ],
@@ -298,9 +298,9 @@
           "Relic Shield"
         ],
         "core": [
-          "Sunfire Aegis",
-          "Dawnshroud",
-          "Radiant Virtue"
+          "Warmog's Armor",
+          "Radiant Virtue",
+          "Dawnshroud"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Bulwark of the Mountain",
           "Plated Steelcaps",
-          "Sunfire Aegis",
-          "Dawnshroud",
+          "Warmog's Armor",
           "Radiant Virtue",
+          "Dawnshroud",
           "Plated Steelcaps"
         ]
       }
@@ -320,8 +320,8 @@
     "Ice Overlord",
     "Unshakeable",
     "Second Wind",
-    "Overgrowth",
-    "Transcendence"
+    "Perseverance",
+    "Sudden Impact"
   ],
   "spells": [
     {
@@ -349,7 +349,7 @@
     {
       "ability": "Shield of Daybreak",
       "levels": [
-        1,
+        2,
         12,
         14,
         15
@@ -367,7 +367,7 @@
     {
       "ability": "Zenith Blade",
       "levels": [
-        2,
+        1,
         8,
         10,
         11

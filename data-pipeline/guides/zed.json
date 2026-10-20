@@ -2,8 +2,8 @@
   "slug": "zed",
   "name": "Zed",
   "role": "Мид",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "B",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -561,8 +561,8 @@
   ],
   "counters": [
     "Lissandra",
-    "Yasuo",
-    "Vex"
+    "Sylas",
+    "Irelia"
   ],
   "builds": [
     {
@@ -575,25 +575,25 @@
         ],
         "core": [
           "Eclipse",
-          "Serpent's Fang",
+          "Trinity Force",
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves"
+          "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
           "Eclipse",
-          "Serpent's Fang",
+          "Ionian Boots of Lucidity",
+          "Trinity Force",
           "Serylda's Grudge",
           "Spear of Shojin",
-          "Gluttonous Greaves"
+          "Ionian Boots of Lucidity"
         ]
       }
     },
     {
       "title": "Jungle Build",
-      "tier": "B",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
@@ -601,18 +601,18 @@
         ],
         "core": [
           "Youmuu's Ghostblade",
-          "Trinity Force",
+          "Eclipse",
           "Serylda's Grudge"
         ],
         "boots": [
           "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
           "Youmuu's Ghostblade",
-          "Trinity Force",
+          "Gluttonous Greaves",
+          "Eclipse",
           "Serylda's Grudge",
-          "Spear of Shojin",
+          "Serpent's Fang",
           "Gluttonous Greaves"
         ]
       }
@@ -622,7 +622,7 @@
     "Conqueror",
     "Battle Zeal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Haste",
     "Second Wind"
   ],
   "spells": [

@@ -3,7 +3,7 @@
   "name": "Corki",
   "role": "Дракон",
   "tier": "A",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -353,8 +353,8 @@
     }
   ],
   "counters": [
-    "Kog'Maw",
-    "Miss Fortune",
+    "Smolder",
+    "Ezreal",
     "Caitlyn"
   ],
   "builds": [
@@ -368,17 +368,17 @@
         ],
         "core": [
           "Essence Reaver",
-          "Magnetic Blaster",
-          "Mortal Reminder"
+          "Stormrazor",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
           "Essence Reaver",
-          "Magnetic Blaster",
-          "Mortal Reminder",
+          "Gluttonous Greaves",
+          "Stormrazor",
+          "Lord Dominik's Regard",
           "Infinity Edge",
           "Gluttonous Greaves"
         ]

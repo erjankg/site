@@ -2,8 +2,8 @@
   "slug": "twisted-fate",
   "name": "Twisted Fate",
   "role": "Мид",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "C",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Syndra",
-    "Morgana",
-    "Mel"
+    "Yasuo",
+    "Mel",
+    "Aurora"
   ],
   "builds": [
     {
@@ -298,19 +298,19 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Luden's Echo",
+          "Lich Bane",
           "Nashor's Tooth",
-          "Dusk and Dawn"
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Luden's Echo",
+          "Lich Bane",
           "Nashor's Tooth",
-          "Dusk and Dawn",
           "Rabadon's Deathcap",
+          "Void Staff",
           "Boots of Mana"
         ]
       }
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "Fleet Footwork",
-    "Botanist",
+    "Manaflow Band",
     "Absolute Focus",
     "Nimbus Cloak",
     "Bone Plating"
@@ -359,7 +359,7 @@
     {
       "ability": "Wild Cards",
       "levels": [
-        3,
+        2,
         4,
         6,
         7
@@ -377,7 +377,7 @@
     {
       "ability": "Stacked Deck",
       "levels": [
-        2,
+        3,
         12,
         14,
         15

@@ -2,8 +2,8 @@
   "slug": "seraphine",
   "name": "Seraphine",
   "role": "Саппорт",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "C",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,22 +285,22 @@
   ],
   "counters": [
     "Pyke",
-    "Braum",
-    "Blitzcrank"
+    "Yuumi",
+    "Braum"
   ],
   "builds": [
     {
-      "title": "Support Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Spectral Sickle"
         ],
         "core": [
-          "Ardent Censer",
-          "Harmonic Echo",
-          "Redemption"
+          "Whispering Circlet",
+          "Echoes of Helia",
+          "Harmonic Echo"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
@@ -308,36 +308,10 @@
         "finalBuild": [
           "Black Mist Scythe",
           "Ionian Boots of Lucidity",
-          "Ardent Censer",
+          "Diadem of Songs",
+          "Echoes of Helia",
           "Harmonic Echo",
-          "Redemption",
           "Ionian Boots of Lucidity"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Luden's Echo",
-          "Cryptbloom",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Boots of Mana",
-          "Luden's Echo",
-          "Cryptbloom",
-          "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Boots of Mana"
         ]
       }
     }
@@ -370,19 +344,19 @@
     {
       "ability": "High Note",
       "levels": [
-        3,
-        8,
-        10,
-        11
+        1,
+        4,
+        6,
+        7
       ]
     },
     {
       "ability": "Surround Sound",
       "levels": [
-        1,
-        4,
-        6,
-        7
+        3,
+        8,
+        10,
+        11
       ]
     },
     {

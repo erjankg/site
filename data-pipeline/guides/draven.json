@@ -3,7 +3,7 @@
   "name": "Draven",
   "role": "Дракон",
   "tier": "B",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Samira",
-    "Kog'Maw"
+    "Xayah",
+    "Varus",
+    "Caitlyn"
   ],
   "builds": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Bloodthirster",
-          "Essence Reaver",
-          "Mortal Reminder"
+          "Hexoptics C44",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
@@ -308,9 +308,9 @@
         "finalBuild": [
           "Bloodthirster",
           "Berserker's Greaves",
-          "Essence Reaver",
-          "Mortal Reminder",
-          "Magnetic Blaster",
+          "Hexoptics C44",
+          "Lord Dominik's Regard",
+          "Infinity Edge",
           "Berserker's Greaves"
         ]
       }

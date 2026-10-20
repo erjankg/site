@@ -3,14 +3,18 @@
   "name": "Cho'Gath",
   "role": "Барон",
   "tier": "S+",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": null,
   "matchups": [],
-  "counters": [],
+  "counters": [
+    "Yone",
+    "Gwen",
+    "Dr. Mundo"
+  ],
   "builds": [
     {
-      "title": "Build 1",
-      "tier": null,
+      "title": "Solo Build",
+      "tier": "S",
       "default": true,
       "items": {
         "starting": [
@@ -25,12 +29,38 @@
           "Plated Steelcaps"
         ],
         "finalBuild": [
+          "Plated Steelcaps",
           "Heartsteel",
           "Sunfire Aegis",
           "Thornmail",
-          "Gargoyle Stoneplate",
-          "Amaranth's Twinguard",
+          "Unending Despair",
           "Plated Steelcaps"
+        ]
+      }
+    },
+    {
+      "title": "Jungle Build",
+      "tier": "S",
+      "default": false,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Cosmic Drive",
+          "Riftmaker",
+          "Amaranth's Twinguard"
+        ],
+        "boots": [
+          "Ionian Boots of Lucidity"
+        ],
+        "finalBuild": [
+          "Ionian Boots of Lucidity",
+          "Cosmic Drive",
+          "Riftmaker",
+          "Amaranth's Twinguard",
+          "Unending Despair",
+          "Ionian Boots of Lucidity"
         ]
       }
     }
@@ -39,7 +69,7 @@
     "Grasp of the Undying",
     "Demolish",
     "Second Wind",
-    "Perseverance",
+    "Overgrowth",
     "Transcendence"
   ],
   "spells": [],
@@ -47,25 +77,25 @@
     {
       "ability": "Rupture",
       "levels": [
-        1,
-        12,
-        14,
-        15
-      ]
-    },
-    {
-      "ability": "Feral Scream",
-      "levels": [
-        3,
+        2,
         8,
         10,
         11
       ]
     },
     {
+      "ability": "Feral Scream",
+      "levels": [
+        3,
+        12,
+        14,
+        15
+      ]
+    },
+    {
       "ability": "Vorpal Spikes",
       "levels": [
-        2,
+        1,
         4,
         6,
         7

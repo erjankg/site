@@ -2,8 +2,8 @@
   "slug": "teemo",
   "name": "Teemo",
   "role": "Барон",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Ryze",
-    "Rumble",
-    "Wukong"
+    "Ornn",
+    "Irelia",
+    "Sion"
   ],
   "builds": [
     {
@@ -601,7 +601,7 @@
         ],
         "core": [
           "Liandry's Torment",
-          "Stormsurge",
+          "Nashor's Tooth",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -610,7 +610,7 @@
         "finalBuild": [
           "Boots of Mana",
           "Liandry's Torment",
-          "Stormsurge",
+          "Nashor's Tooth",
           "Rabadon's Deathcap",
           "Void Staff",
           "Boots of Mana"
@@ -621,7 +621,7 @@
   "runes": [
     "Fleet Footwork",
     "Sudden Impact",
-    "Chain Assault",
+    "Tyrant",
     "Eyeball Collector",
     "Bone Plating"
   ],

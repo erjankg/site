@@ -2,8 +2,8 @@
   "slug": "malphite",
   "name": "Malphite",
   "role": "Барон",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "S",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -698,14 +698,14 @@
     }
   ],
   "counters": [
-    "Rumble",
+    "Dr. Mundo",
     "Mordekaiser",
     "Gwen"
   ],
   "builds": [
     {
-      "title": "Solo Build",
-      "tier": "S",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -725,32 +725,6 @@
           "Thornmail",
           "Frozen Heart",
           "Force of Nature",
-          "Plated Steelcaps"
-        ]
-      }
-    },
-    {
-      "title": "Support Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Relic Shield"
-        ],
-        "core": [
-          "Zeke's Convergence",
-          "Thornmail",
-          "Iceborn Gauntlet"
-        ],
-        "boots": [
-          "Plated Steelcaps"
-        ],
-        "finalBuild": [
-          "Bulwark of the Mountain",
-          "Plated Steelcaps",
-          "Zeke's Convergence",
-          "Thornmail",
-          "Iceborn Gauntlet",
           "Plated Steelcaps"
         ]
       }

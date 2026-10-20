@@ -2,8 +2,8 @@
   "slug": "caitlyn",
   "name": "Caitlyn",
   "role": "Дракон",
-  "tier": "S",
-  "patch": "7.2c",
+  "tier": "S+",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Sivir",
-    "Ezreal",
-    "Miss Fortune"
+    "Ashe",
+    "Kai'Sa",
+    "Ezreal"
   ],
   "builds": [
     {
@@ -298,19 +298,19 @@
           "Long Sword"
         ],
         "core": [
-          "The Collector",
-          "Magnetic Blaster",
-          "Mortal Reminder"
+          "Stormrazor",
+          "Hexoptics C44",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
+          "Stormrazor",
           "Berserker's Greaves",
-          "The Collector",
-          "Magnetic Blaster",
-          "Mortal Reminder",
+          "Hexoptics C44",
+          "Lord Dominik's Regard",
           "Infinity Edge",
           "Berserker's Greaves - Galeforce"
         ]

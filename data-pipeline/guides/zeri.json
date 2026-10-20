@@ -3,7 +3,7 @@
   "name": "Zeri",
   "role": "Дракон",
   "tier": "C",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-15",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Kog'Maw",
+    "Kalista",
     "Caitlyn",
-    "Lucian"
+    "Tristana"
   ],
   "builds": [
     {
@@ -298,18 +298,18 @@
           "Long Sword"
         ],
         "core": [
-          "Bloodthirster",
-          "Essence Reaver",
-          "Mortal Reminder"
+          "Yun Tal Wildarrows",
+          "Runaan's Hurricane",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Yun Tal Wildarrows",
           "Berserker's Greaves",
-          "Bloodthirster",
-          "Essence Reaver",
-          "Mortal Reminder",
+          "Runaan's Hurricane",
+          "Lord Dominik's Regard",
           "Infinity Edge",
           "Berserker's Greaves"
         ]

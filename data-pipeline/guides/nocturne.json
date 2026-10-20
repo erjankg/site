@@ -2,8 +2,8 @@
   "slug": "nocturne",
   "name": "Nocturne",
   "role": "Лес",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "S+",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Rammus",
-    "Master Yi",
-    "Viego"
+    "Wukong",
+    "Ekko"
   ],
   "builds": [
     {
@@ -303,26 +303,26 @@
           "Serylda's Grudge"
         ],
         "boots": [
-          "Gluttonous Greaves",
+          "Boots of Dynamism",
           "Stridebreaker"
         ],
         "finalBuild": [
-          "Gluttonous Greaves",
+          "Boots of Dynamism",
           "Duskblade of Draktharr",
           "Serpent's Fang",
           "Serylda's Grudge",
-          "Sundered Sky",
-          "Gluttonous Greaves - Stridebreaker"
+          "Eclipse",
+          "Boots of Dynamism - Stridebreaker"
         ]
       }
     }
   ],
   "runes": [
-    "First Strike",
-    "Sudden Impact",
-    "Chain Assault",
-    "Eyeball Collector",
-    "Transcendence"
+    "Electrocute",
+    "Axiom Arcanist",
+    "Transcendence",
+    "Nimbus Cloak",
+    "Legend: Haste"
   ],
   "spells": [
     {

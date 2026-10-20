@@ -3,7 +3,7 @@
   "name": "Kassadin",
   "role": "Мид",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,7 +285,7 @@
   ],
   "counters": [
     "Zed",
-    "Yasuo",
+    "Galio",
     "Jayce"
   ],
   "builds": [
@@ -306,8 +306,8 @@
           "Boots of Mana"
         ],
         "finalBuild": [
-          "Rod of Ages",
           "Boots of Mana",
+          "Rod of Ages",
           "Seraph's Embrace",
           "Rabadon's Deathcap",
           "Malignance",
@@ -318,7 +318,7 @@
   ],
   "runes": [
     "First Strike",
-    "Botanist",
+    "Manaflow Band",
     "Transcendence",
     "Gathering Storm",
     "Sudden Impact"
@@ -350,18 +350,18 @@
       "ability": "Null Sphere",
       "levels": [
         2,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {
       "ability": "Nether Blade",
       "levels": [
         1,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {

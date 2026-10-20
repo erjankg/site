@@ -1,5 +1,5 @@
 {
- "built": "2026-08-26",
+ "built": "2026-10-20",
  "source": "abilities.json (Tencent CN) + base-stats.json + champion-qualities.json",
  "note": "Теги механик для (а) текста «почему» в матчапах, (б) 6 функций состава ИИ-судьи. Каждый тег несёт src — цитату из умения. manual:[...] = размечено руками (механика-однодневка). ПАРЫ «кто кого контрит» здесь НЕ живут — они в counters.json (скрейп). См. DRAFT-AI.md.",
  "tagNames": {
@@ -61,7 +61,7 @@
   "stack_stun": "контроль через стаки",
   "stack_burst": "взрыв через стаки"
  },
- "count": 141,
+ "count": 142,
  "champions": {
   "Aatrox": {
    "ru": "Аатрокс",
@@ -198,6 +198,11 @@
     "Mid"
    ],
    "tags": [
+    "as_scaling",
+    "auto_carry",
+    "cc_proj",
+    "cc_pull",
+    "cc_self_aoe",
     "crit_scaling",
     "execute",
     "immobile",
@@ -208,11 +213,16 @@
    ],
    "src": {
     "shield": "PASSIVE «无所不用»: 吸收40伤害",
+    "as_scaling": "PASSIVE «无所不用»: 攻击速度",
     "waveclear": "Q «去而复还»: 对小兵造成",
     "stealth": "W «赴险夺人»: 伪装",
+    "cc_pull": "E «骄行荡寇»: 勾住",
     "crit_scaling": "E «骄行荡寇»: 暴击",
-    "execute": "R «恩怨相抵»: 已损失生命值，最多增加至101物理伤害",
+    "cc_proj": "E «骄行荡寇»: 发射",
+    "cc_self_aoe": "E «骄行荡寇»: 周围",
+    "execute": "R «恩怨相抵»: 已损失的生命值越多，伤害越高，最多造成99物理伤害",
     "ranged": "дальность атаки 500",
+    "auto_carry": "крит + скор.атаки/роль стрелка",
     "immobile": "в наборе умений нет рывка"
    },
    "funcs": {
@@ -432,13 +442,13 @@
     "vision"
    ],
    "src": {
-    "cc_slow": "PASSIVE «冰霜射击»: 移速降低",
+    "cc_slow": "PASSIVE «冰霜射击»: 减速",
     "crit_scaling": "PASSIVE «冰霜射击»: 暴击",
     "cc_point": "PASSIVE «冰霜射击»: 对目标",
     "as_scaling": "Q «射手的专注»: 攻击速度",
+    "cc_proj": "W «万箭齐发»: 发射",
     "vision": "E «鹰击长空»: 显露",
     "cc_stun": "R «魔法水晶箭»: 晕眩",
-    "cc_proj": "R «魔法水晶箭»: 射出",
     "cc_hard": "R «魔法水晶箭»: 晕眩",
     "ranged": "дальность атаки 600",
     "auto_carry": "крит + скор.атаки/роль стрелка",
@@ -812,7 +822,7 @@
     "cc_knockup": "Q «破裂»: 击飞",
     "cc_slow": "Q «破裂»: 移速降低",
     "cc_silence": "W «野性尖叫»: 沉默",
-    "pct_maxhp": "E «恐惧之刺»: 造成15魔法伤害，并附加基于目标最大生命值",
+    "pct_maxhp": "E «恐惧之刺»: 造成20魔法伤害，并附加基于目标最大生命值",
     "waveclear": "E «恐惧之刺»: 小兵和野怪造成的基础伤害",
     "cc_proj": "E «恐惧之刺»: 发射",
     "true_dmg": "R «盛宴»: 真实伤害",
@@ -947,6 +957,7 @@
     "cc_point",
     "cc_proj",
     "cc_slow",
+    "execute",
     "immobile",
     "poke_ranged",
     "ranged"
@@ -957,6 +968,7 @@
     "cc_slow": "E «开道利斧»: 移速降低",
     "cc_proj": "E «开道利斧»: 扔出",
     "cc_point": "E «开道利斧»: 对目标",
+    "execute": "R «冷血追命»: 处决",
     "ranged": "дальность атаки 550",
     "auto_carry": "роль стрелка + скейл скор.атаки",
     "poke_ranged": "дальность 550 без входа на цель",
@@ -995,7 +1007,7 @@
     "cc_slow": "Q «时间卷曲器»: 移动速度降低",
     "cc_stun": "W «时光交错»: 晕眩",
     "shield": "W «时光交错»: 吸收70伤害",
-    "execute": "W «时光交错»: 已损失生命值2%的魔法伤害",
+    "execute": "W «时光交错»: 已损失生命值3%的魔法伤害",
     "cc_proj": "W «时光交错»: 发射",
     "cc_self_aoe": "W «时光交错»: 范围内的敌人",
     "cc_hard": "W «时光交错»: 晕眩",
@@ -1150,7 +1162,7 @@
    ],
    "src": {
     "heal_sustain": "PASSIVE «决斗之舞»: 回复45生命",
-    "pct_maxhp": "PASSIVE «决斗之舞»: 其最大生命值3.5%的真实伤害",
+    "pct_maxhp": "PASSIVE «决斗之舞»: 其最大生命值4%的真实伤害",
     "true_dmg": "PASSIVE «决斗之舞»: 真实伤害",
     "cc_stun": "W «劳伦特心眼刀»: 晕眩",
     "cc_root": "W «劳伦特心眼刀»: 定身",
@@ -1238,7 +1250,7 @@
     "waveclear": "PASSIVE «巨像重击»: 对附近敌人造成73魔法伤害",
     "cc_taunt": "W «杜朗护盾»: 嘲讽",
     "cc_slow": "W «杜朗护盾»: 移速降低",
-    "shield": "W «杜朗护盾»: 吸收53魔法伤害",
+    "shield": "W «杜朗护盾»: 吸收51魔法伤害",
     "cc_self_aoe": "W «杜朗护盾»: 附近",
     "cc_hard": "W «杜朗护盾»: 嘲讽",
     "cc_knockup": "E «正义冲拳»: 击飞",
@@ -1346,7 +1358,7 @@
    }
   },
   "Gragas": {
-   "ru": "Gragas",
+   "ru": "Грагас",
    "dd": "Gragas",
    "lanes": [
     "Top",
@@ -1366,7 +1378,7 @@
     "waveclear"
    ],
    "src": {
-    "heal_sustain": "PASSIVE «欢乐时光»: 回复自身62生命",
+    "heal_sustain": "PASSIVE «欢乐时光»: 回复自身57生命",
     "cc_slow": "Q «滚动酒桶»: 移速降低",
     "waveclear": "Q «滚动酒桶»: 对附近敌人造成65魔法伤害",
     "cc_self_aoe": "Q «滚动酒桶»: 附近",
@@ -1542,6 +1554,54 @@
     "lean": "ap"
    }
   },
+  "Hwei": {
+   "ru": "Hwei",
+   "dd": "Hwei",
+   "lanes": [
+    "Mid",
+    "Support"
+   ],
+   "tags": [
+    "cc_fear",
+    "cc_hard",
+    "cc_proj",
+    "cc_pull",
+    "cc_root",
+    "cc_self_aoe",
+    "cc_slow",
+    "execute",
+    "immobile",
+    "pct_maxhp",
+    "poke_ranged",
+    "ranged",
+    "shield",
+    "vision"
+   ],
+   "src": {
+    "cc_root": "Q «主题：灾»: 定身",
+    "cc_slow": "Q «主题：灾»: 减速",
+    "pct_maxhp": "Q «主题：灾»: 造成50外加4%目标最大生命值",
+    "execute": "Q «主题：灾»: 已损失生命值提升，最多造成200魔法伤害",
+    "shield": "W «主题：靖»: 护盾",
+    "cc_fear": "E «主题：悚»: 恐惧",
+    "cc_pull": "E «主题：悚»: 拖拽",
+    "vision": "E «主题：悚»: 视野",
+    "cc_proj": "E «主题：悚»: 射出",
+    "cc_self_aoe": "E «主题：悚»: 周围",
+    "cc_hard": "E «主题：悚»: 恐惧",
+    "ranged": "дальность атаки 550",
+    "poke_ranged": "дальность 550 без входа на цель",
+    "immobile": "в наборе умений нет рывка"
+   },
+   "funcs": {
+    "frontline": 0,
+    "engage": 0,
+    "carry": 1,
+    "waveclear": 0,
+    "peel": 1,
+    "lean": "ap"
+   }
+  },
   "Irelia": {
    "ru": "Ирелия",
    "dd": "Irelia",
@@ -1605,7 +1665,7 @@
    ],
    "src": {
     "cc_knockup": "Q «飓风呼啸»: 击飞",
-    "shield": "E «风暴之眼»: 吸收65伤害",
+    "shield": "E «风暴之眼»: 吸收80伤害",
     "cc_knockback": "R «复苏季风»: 击退",
     "heal_sustain": "R «复苏季风»: 治疗",
     "cc_self_aoe": "R «复苏季风»: 附近",
@@ -1749,6 +1809,7 @@
    "tags": [
     "as_scaling",
     "auto_carry",
+    "cc_proj",
     "cc_root",
     "cc_self_aoe",
     "cc_slow",
@@ -1771,6 +1832,7 @@
     "stealth": "E «万众倾倒»: 隐形",
     "vision": "E «万众倾倒»: 显露",
     "cc_self_aoe": "E «万众倾倒»: 附近",
+    "cc_proj": "R «完美谢幕»: 发射",
     "ranged": "дальность атаки 550",
     "auto_carry": "крит + скор.атаки/роль стрелка",
     "poke_ranged": "дальность 550 без входа на цель",
@@ -1823,7 +1885,7 @@
     "carry": 1,
     "waveclear": 0,
     "peel": 1,
-    "lean": "ad"
+    "lean": "ap"
    }
   },
   "Kaisa": {
@@ -1835,7 +1897,6 @@
    "tags": [
     "as_scaling",
     "auto_carry",
-    "cc_point",
     "cc_root",
     "cc_self_aoe",
     "dash",
@@ -1851,11 +1912,10 @@
     "cc_root": "PASSIVE «体表活肤»: 定身",
     "execute": "PASSIVE «体表活肤»: 已损失生命值的额外魔法伤害",
     "cc_self_aoe": "PASSIVE «体表活肤»: 附近",
-    "cc_point": "PASSIVE «体表活肤»: 对目标",
     "waveclear": "Q «艾卡西亚暴雨»: 小兵造成150%伤害",
     "as_scaling": "E «极限超载»: 攻击速度",
     "stealth": "E «极限超载»: 隐身",
-    "shield": "R «猎手本能»: 吸收137伤害",
+    "shield": "R «猎手本能»: 吸收148伤害",
     "dash": "R «猎手本能»: 突进",
     "gap_close": "R «猎手本能»: 突进至一名被电浆标记的敌方英雄",
     "ranged": "дальность атаки 525",
@@ -2329,7 +2389,7 @@
     "dash": "Q «天音波»: 冲向",
     "gap_close": "Q «天音波»: 冲向被天音波标记的敌人，并基于目标",
     "vision": "Q «天音波»: 显露",
-    "shield": "W «金钟罩»: 吸收80伤害",
+    "shield": "W «金钟罩»: 吸收100伤害",
     "heal_sustain": "W «金钟罩»: 全能吸血",
     "cc_slow": "E «天雷破»: 移速降低",
     "waveclear": "E «天雷破»: 对周围敌人造成95魔法伤害",
@@ -2604,7 +2664,7 @@
    "src": {
     "crit_scaling": "PASSIVE «厄运的眷顾»: 暴击",
     "as_scaling": "W «大步流星»: 攻击速度",
-    "cc_slow": "E «枪林弹雨»: 降低30%移动速度",
+    "cc_slow": "E «枪林弹雨»: 降低40%移动速度",
     "cc_proj": "E «枪林弹雨»: 发射",
     "ranged": "дальность атаки 550",
     "auto_carry": "крит + скор.атаки/роль стрелка",
@@ -2808,7 +2868,7 @@
     "cc_knockback": "Q «火爆飞踢»: 击退",
     "cc_slow": "Q «火爆飞踢»: 移速降低",
     "cc_self_aoe": "Q «火爆飞踢»: 周围",
-    "heal_sustain": "W «依依不舍»: 回复共80生命",
+    "heal_sustain": "W «依依不舍»: 回复共70生命",
     "shield": "E «融融情谊»: 吸收60伤害",
     "cc_knockup": "R «生生不息»: 击飞",
     "cc_root": "R «生生不息»: 定身",
@@ -3007,7 +3067,7 @@
     "waveclear": "Q «汲魂痛击»: 小兵、大型野怪，技能伤害",
     "cc_slow": "W «枯萎»: 降低敌人35%移动速度",
     "shred_resist": "E «灵魂烈焰»: 削弱其20%护甲",
-    "pct_maxhp": "R «死神降临»: 相当于其3%生命值的魔法伤害。风暴每秒伤害",
+    "pct_maxhp": "R «死神降临»: 其3%最大生命值的魔法伤害。风暴每秒伤害",
     "melee": "дальность атаки 125",
     "frontline": "качества: живучесть=3, урон=2",
     "immobile": "в наборе умений нет рывка",
@@ -3049,7 +3109,7 @@
    "src": {
     "cc_root": "PASSIVE «排山倒海»: 禁锢",
     "cc_point": "PASSIVE «排山倒海»: 对目标",
-    "shield": "W «泰坦之怒»: 吸收130伤害",
+    "shield": "W «泰坦之怒»: 吸收146伤害",
     "cc_slow": "E «暗流涌动»: 移动速度降低",
     "cc_stun": "R «深海冲击»: 眩晕",
     "cc_knockup": "R «深海冲击»: 击飞",
@@ -3109,7 +3169,7 @@
    }
   },
   "Nilah": {
-   "ru": "Нила",
+   "ru": "Nilah",
    "dd": "Nilah",
    "lanes": [
     "Jungle"
@@ -3312,7 +3372,7 @@
     "heal_sustain": "PASSIVE «狂战之怒»: 吸血",
     "as_scaling": "PASSIVE «狂战之怒»: 攻速",
     "cc_slow": "Q «逆流投掷»: 降低其20%移动速度",
-    "shield": "W «残暴打击»: 吸收108伤害",
+    "shield": "W «残暴打击»: 吸收105伤害",
     "true_dmg": "E «鲁莽挥击»: 真实伤害",
     "dash": "E «鲁莽挥击»: 冲向",
     "gap_close": "E «鲁莽挥击»: 冲向敌人",
@@ -3466,7 +3526,7 @@
     "untargetable"
    ],
    "src": {
-    "shield": "PASSIVE «钢铁大使»: 吸收86伤害",
+    "shield": "PASSIVE «钢铁大使»: 吸收82伤害",
     "cc_slow": "Q «圣锤猛击»: 减速",
     "pct_maxhp": "Q «圣锤猛击»: 造成50外加9%目标最大生命值",
     "dash": "W «坚定风采»: 冲刺",
@@ -3791,7 +3851,7 @@
     "pct_maxhp": "PASSIVE «机械重组»: 造成额外5外加5%目标最大生命值",
     "as_scaling": "PASSIVE «机械重组»: 攻击速度",
     "waveclear": "Q «纵火盛宴»: 对小兵造成",
-    "shield": "W «破碎护盾»: 吸收82伤害",
+    "shield": "W «破碎护盾»: 吸收67伤害",
     "cc_slow": "E «电击鱼叉»: 减速",
     "cc_proj": "E «电击鱼叉»: 发射",
     "cc_self_aoe": "R «恒温灼烧»: 范围内的敌人",
@@ -3880,7 +3940,7 @@
     "dash": "PASSIVE «悍勇本色»: 冲刺",
     "gap_close": "PASSIVE «悍勇本色»: 冲刺至自己的攻击范围。此外，如果敌人",
     "crit_scaling": "Q «交火»: 暴击",
-    "waveclear": "Q «交火»: 范围内的所有敌人造成相同的伤害",
+    "waveclear": "Q «交火»: 范围内的所有敌人造成相同伤害",
     "as_scaling": "E «狂飙»: 攻击速度",
     "cc_slow": "R «炼狱扳机»: 移动速度降低",
     "cc_proj": "R «炼狱扳机»: 射出",
@@ -3926,7 +3986,7 @@
    ],
    "src": {
     "heal_sustain": "PASSIVE «赦除»: 吸血",
-    "execute": "PASSIVE «赦除»: 当前生命值1%（随等级成长）的额外物理伤害",
+    "execute": "PASSIVE «赦除»: 当前生命值（随等级成长）的物理伤害",
     "crit_scaling": "PASSIVE «赦除»: 暴击",
     "cc_slow": "Q «黑暗洞灭»: 减速",
     "as_scaling": "Q «黑暗洞灭»: 攻击速度",
@@ -4230,7 +4290,7 @@
     "as_scaling": "Q «回旋之刃»: 攻击速度",
     "waveclear": "W «弹射»: 对小兵造成",
     "shield": "E «法术护盾»: 护盾",
-    "heal_sustain": "E «法术护盾»: 回复38生命",
+    "heal_sustain": "E «法术护盾»: 回复39生命",
     "cc_spellshield": "E «法术护盾»: 法术护盾",
     "cc_immune_any": "E «法术护盾»: 法术护盾",
     "ranged": "дальность атаки 500",
@@ -4362,7 +4422,7 @@
     "cc_stun": "PASSIVE «能量和弦»: 眩晕",
     "cc_hard": "PASSIVE «能量和弦»: 眩晕",
     "shield": "W «坚毅咏叹调»: 吸收25伤害",
-    "heal_sustain": "W «坚毅咏叹调»: 回复45生命",
+    "heal_sustain": "W «坚毅咏叹调»: 回复35生命",
     "cc_slow": "R «狂舞终乐章»: 减速",
     "cc_self_aoe": "R «狂舞终乐章»: 范围内的敌人",
     "ranged": "дальность атаки 550",
@@ -4657,22 +4717,24 @@
     "cc_proj",
     "cc_self_aoe",
     "cc_slow",
-    "dash",
+    "crit_scaling",
+    "immobile",
     "poke_ranged",
     "ranged",
     "waveclear"
    ],
    "src": {
     "as_scaling": "Q «急速射击»: 攻击速度",
-    "cc_slow": "W «火箭跳跃»: 移速降低",
-    "dash": "W «火箭跳跃»: 跃至",
+    "cc_slow": "W «火箭跳跃»: 减速",
+    "waveclear": "W «火箭跳跃»: 对附近敌人造成80魔法伤害",
     "cc_self_aoe": "W «火箭跳跃»: 附近",
-    "waveclear": "E «爆炸火花»: 对附近敌人造成65魔法伤害",
+    "crit_scaling": "E «爆炸火花»: 暴击",
     "cc_knockback": "R «毁灭射击»: 击退",
     "cc_proj": "R «毁灭射击»: 发射",
     "ranged": "дальность атаки 550",
-    "auto_carry": "роль стрелка + скейл скор.атаки",
-    "poke_ranged": "дальность 550 без входа на цель"
+    "auto_carry": "крит + скор.атаки/роль стрелка",
+    "poke_ranged": "дальность 550 без входа на цель",
+    "immobile": "в наборе умений нет рывка"
    },
    "funcs": {
     "frontline": 0,
@@ -4680,7 +4742,7 @@
     "carry": 1,
     "waveclear": 1,
     "peel": 1,
-    "lean": "ap"
+    "lean": "ad"
    }
   },
   "Trynda": {
@@ -4691,10 +4753,10 @@
     "Jungle"
    ],
    "tags": [
-    "as_scaling",
-    "auto_carry",
+    "cc_hard",
     "cc_self_aoe",
     "cc_slow",
+    "cc_taunt",
     "crit_scaling",
     "dash",
     "gap_close",
@@ -4703,22 +4765,22 @@
    ],
    "src": {
     "crit_scaling": "PASSIVE «战斗狂怒»: 暴击",
-    "as_scaling": "PASSIVE «战斗狂怒»: 攻击速度",
     "heal_sustain": "Q «嗜血杀戮»: 回复55生命",
-    "cc_slow": "W «蔑视»: 移速降低",
+    "cc_taunt": "W «蔑视»: 嘲讽",
+    "cc_slow": "W «蔑视»: 减速",
     "cc_self_aoe": "W «蔑视»: 附近",
+    "cc_hard": "W «蔑视»: 嘲讽",
     "dash": "E «旋风斩»: 冲向",
     "gap_close": "E «旋风斩»: 冲向目标，对沿路的敌人",
-    "melee": "дальность атаки 175",
-    "auto_carry": "крит + скор.атаки/роль стрелка"
+    "melee": "дальность атаки 175"
    },
    "funcs": {
     "frontline": 0,
-    "engage": 0,
-    "carry": 1,
+    "engage": 1,
+    "carry": 0,
     "waveclear": 0,
     "peel": 0,
-    "lean": "ad"
+    "lean": "ap"
    }
   },
   "Tw. Fate": {
@@ -4757,7 +4819,7 @@
     "carry": 0,
     "waveclear": 0,
     "peel": 0,
-    "lean": "ap"
+    "lean": "ad"
    }
   },
   "Twitch": {
@@ -4778,9 +4840,9 @@
    ],
    "src": {
     "true_dmg": "PASSIVE «死亡毒液»: 真实伤害",
-    "as_scaling": "PASSIVE «死亡毒液»: 攻击速度",
+    "as_scaling": "Q «埋伏»: 攻击速度",
     "stealth": "Q «埋伏»: 伪装",
-    "cc_slow": "W «剧毒之桶»: 移动速度降低",
+    "cc_slow": "W «剧毒之桶»: 减速",
     "ranged": "дальность атаки 550",
     "auto_carry": "роль стрелка + скейл скор.атаки",
     "poke_ranged": "дальность 550 без входа на цель",
@@ -4792,7 +4854,7 @@
     "carry": 1,
     "waveclear": 0,
     "peel": 0,
-    "lean": "ad"
+    "lean": "ap"
    }
   },
   "Urgot": {
@@ -4910,7 +4972,7 @@
     "dash": "Q «闪避突袭»: 翻滚",
     "stealth": "Q «闪避突袭»: 隐形",
     "heal_sustain": "W «圣银弩箭»: 全能吸血",
-    "pct_maxhp": "W «圣银弩箭»: 其2%最大生命值的真实伤害",
+    "pct_maxhp": "W «圣银弩箭»: 其6%最大生命值的真实伤害",
     "true_dmg": "W «圣银弩箭»: 真实伤害",
     "as_scaling": "W «圣银弩箭»: 攻击速度",
     "cc_stun": "E «恶魔审判»: 晕眩",
@@ -5108,7 +5170,7 @@
    "src": {
     "pct_maxhp": "PASSIVE «君命已决»: 目标最大生命值。 如果敌方英雄在受到佛耶戈伤害",
     "as_scaling": "PASSIVE «君命已决»: 攻击速度",
-    "execute": "Q «破败王剑»: 当前生命值的物理伤害。用自身技能对敌人造成伤害",
+    "execute": "Q «破败王剑»: 当前生命值的物理伤害",
     "crit_scaling": "Q «破败王剑»: 暴击",
     "cc_stun": "W «千载幽咽»: 眩晕",
     "cc_slow": "W «千载幽咽»: 移动速度降低",
@@ -5129,7 +5191,7 @@
     "carry": 1,
     "waveclear": 0,
     "peel": 1,
-    "lean": "ap"
+    "lean": "ad"
    }
   },
   "Viktor": {
@@ -5345,6 +5407,7 @@
     "as_scaling",
     "auto_carry",
     "cc_root",
+    "crit_scaling",
     "immobile",
     "poke_ranged",
     "ranged",
@@ -5354,10 +5417,11 @@
    "src": {
     "as_scaling": "W «致死羽衣»: 攻击速度",
     "cc_root": "E «倒钩»: 禁锢",
+    "crit_scaling": "E «倒钩»: 暴击",
     "waveclear": "E «倒钩»: 对小兵造成",
     "untargetable": "R «暴风羽刃»: 不可被选取",
     "ranged": "дальность атаки 525",
-    "auto_carry": "роль стрелка + скейл скор.атаки",
+    "auto_carry": "крит + скор.атаки/роль стрелка",
     "poke_ranged": "дальность 525 без входа на цель",
     "immobile": "в наборе умений нет рывка"
    },
@@ -5478,11 +5542,11 @@
     "crit_scaling": "PASSIVE «狩人之道»: 暴击",
     "cc_knockup": "Q «错玉切»: 击飞",
     "as_scaling": "Q «错玉切»: 攻击速度",
-    "dash": "Q «错玉切»: 冲刺",
-    "gap_close": "Q «错玉切»: 冲刺并释放一道旋风，击飞敌人",
-    "shield": "W «凛神斩»: 吸收45伤害",
-    "pct_maxhp": "W «凛神斩»: 造成25加上目标最大生命值",
-    "waveclear": "W «凛神斩»: 对小兵造成",
+    "dash": "Q «错玉切»: 突进",
+    "gap_close": "Q «错玉切»: 突进并释放一道旋风，击飞命中的敌人",
+    "shield": "W «凛神斩»: 吸收40伤害",
+    "pct_maxhp": "W «凛神斩»: 目标9%最大生命值。,  自身获得一道可吸收40伤害",
+    "waveclear": "W «凛神斩»: 小兵至少造成60伤害",
     "true_dmg": "E «破障之锋»: 真实伤害",
     "global_reach": "R «封尘绝念斩»: 传送",
     "melee": "дальность атаки 175",
@@ -5632,6 +5696,7 @@
     "as_scaling",
     "auto_carry",
     "cc_proj",
+    "cc_self_aoe",
     "cc_slow",
     "crit_scaling",
     "dash",
@@ -5642,10 +5707,11 @@
    "src": {
     "as_scaling": "PASSIVE «内能迁转»: 攻速",
     "cc_slow": "Q «电火迸射»: 减速",
+    "waveclear": "Q «电火迸射»: 范围内的敌人造成70魔法伤害",
+    "cc_self_aoe": "Q «电火迸射»: 范围内的敌人",
     "crit_scaling": "W «强穿激光»: 暴击",
     "cc_proj": "W «强穿激光»: 射出",
     "dash": "E «灿丽花火»: 突进",
-    "waveclear": "R «超限爆闪»: 对周围敌人造成150魔法伤害",
     "ranged": "дальность атаки 550",
     "auto_carry": "крит + скор.атаки/роль стрелка",
     "poke_ranged": "дальность 550 без входа на цель"

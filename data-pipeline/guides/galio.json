@@ -2,8 +2,8 @@
   "slug": "galio",
   "name": "Galio",
   "role": "Мид",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "S",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,9 +560,9 @@
     }
   ],
   "counters": [
-    "Morgana",
-    "Ahri",
-    "Swain"
+    "Aurelion Sol",
+    "Syndra",
+    "Hwei"
   ],
   "builds": [
     {
@@ -576,7 +576,7 @@
         "core": [
           "Hollow Radiance",
           "Thornmail",
-          "Riftmaker"
+          "Unending Despair"
         ],
         "boots": [
           "Mercury's Treads"
@@ -585,34 +585,34 @@
           "Mercury's Treads",
           "Hollow Radiance",
           "Thornmail",
+          "Unending Despair",
           "Riftmaker",
-          "Hextech Rocketbelt",
           "Mercury's Treads"
         ]
       }
     },
     {
       "title": "Support Build",
-      "tier": "A",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
           "Relic Shield"
         ],
         "core": [
-          "Yordle Trap",
-          "Warmog's Armor",
-          "Frozen Heart"
+          "Hollow Radiance",
+          "Thornmail",
+          "Unending Despair"
         ],
         "boots": [
           "Plated Steelcaps"
         ],
         "finalBuild": [
           "Bulwark of the Mountain",
-          "Yordle Trap",
           "Plated Steelcaps",
-          "Warmog's Armor",
-          "Frozen Heart",
+          "Hollow Radiance",
+          "Thornmail",
+          "Unending Despair",
           "Plated Steelcaps"
         ]
       }
@@ -622,7 +622,7 @@
     "Ice Overlord",
     "Courage of the Colossus",
     "Second Wind",
-    "Perseverance",
+    "Overgrowth",
     "Sudden Impact"
   ],
   "spells": [

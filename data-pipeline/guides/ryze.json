@@ -2,8 +2,8 @@
   "slug": "ryze",
   "name": "Ryze",
   "role": "Мид",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "D",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,59 +560,33 @@
     }
   ],
   "counters": [
-    "Kassadin",
-    "Viktor",
+    "Zed",
+    "Yasuo",
     "Syndra"
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "S+",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
           "Tear of the Goddess"
         ],
         "core": [
-          "Rod of Ages",
           "Archangel's Staff",
+          "Rod of Ages",
           "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
-          "Rod of Ages",
           "Boots of Mana",
           "Seraph's Embrace",
-          "Rabadon's Deathcap",
-          "Void Staff",
-          "Boots of Mana"
-        ]
-      }
-    },
-    {
-      "title": "Solo Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Tear of the Goddess"
-        ],
-        "core": [
           "Rod of Ages",
-          "Archangel's Staff",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Rod of Ages",
-          "Boots of Mana",
-          "Seraph's Embrace",
           "Rabadon's Deathcap",
-          "Void Staff",
+          "Infinity Orb",
           "Boots of Mana"
         ]
       }
@@ -623,7 +597,7 @@
     "Manaflow Band",
     "Transcendence",
     "Nimbus Cloak",
-    "Bone Plating"
+    "Legend: Haste"
   ],
   "spells": [
     {

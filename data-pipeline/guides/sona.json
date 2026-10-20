@@ -3,7 +3,7 @@
   "name": "Sona",
   "role": "Саппорт",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -286,7 +286,7 @@
   "counters": [
     "Blitzcrank",
     "Pyke",
-    "Bard"
+    "Nautilus"
   ],
   "builds": [
     {
@@ -298,8 +298,8 @@
           "Spectral Sickle"
         ],
         "core": [
-          "Tear of the Goddess",
-          "Ardent Censer",
+          "Whispering Circlet",
+          "Echoes of Helia",
           "Harmonic Echo"
         ],
         "boots": [
@@ -307,9 +307,9 @@
         ],
         "finalBuild": [
           "Black Mist Scythe",
-          "Seraph's Embrace",
           "Ionian Boots of Lucidity",
-          "Ardent Censer",
+          "Diadem of Songs",
+          "Echoes of Helia",
           "Harmonic Echo",
           "Ionian Boots of Lucidity"
         ]
@@ -318,10 +318,10 @@
   ],
   "runes": [
     "Aery",
-    "Font of Life",
-    "Bone Plating",
-    "Revitalize",
-    "Transcendence"
+    "Manaflow Band",
+    "Transcendence",
+    "Scorch",
+    "Bone Plating"
   ],
   "spells": [
     {
@@ -345,18 +345,18 @@
       "ability": "Hymn of Valor",
       "levels": [
         1,
-        4,
-        6,
-        7
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Aria of Perseverance",
       "levels": [
         2,
-        8,
-        10,
-        11
+        4,
+        6,
+        7
       ]
     },
     {

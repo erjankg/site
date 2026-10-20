@@ -2,8 +2,8 @@
   "slug": "talon",
   "name": "Talon",
   "role": "Лес",
-  "tier": "D",
-  "patch": "7.2c",
+  "tier": "C",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,7 +285,7 @@
   ],
   "counters": [
     "Rengar",
-    "Kindred",
+    "Hecarim",
     "Lee Sin"
   ],
   "builds": [
@@ -317,7 +317,7 @@
     }
   ],
   "runes": [
-    "First Strike",
+    "Electrocute",
     "Sudden Impact",
     "Hubris",
     "Eyeball Collector",
@@ -335,18 +335,18 @@
       "ability": "Noxian Diplomacy",
       "levels": [
         1,
-        3,
-        6,
-        7
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Rake",
       "levels": [
         2,
-        8,
-        10,
-        11
+        3,
+        6,
+        7
       ]
     },
     {

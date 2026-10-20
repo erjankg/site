@@ -2,8 +2,8 @@
   "slug": "pantheon",
   "name": "Pantheon",
   "role": "Лес",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "B",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Tryndamere",
+    "Nocturne",
     "Rammus",
-    "Amumu"
+    "Nunu & Willump"
   ],
   "builds": [
     {
@@ -298,7 +298,7 @@
           "Long Sword"
         ],
         "core": [
-          "Serpent's Fang",
+          "Youmuu's Ghostblade",
           "Blade of the Ruined King",
           "Serylda's Grudge"
         ],
@@ -308,7 +308,7 @@
         ],
         "finalBuild": [
           "Boots of Dynamism",
-          "Serpent's Fang",
+          "Youmuu's Ghostblade",
           "Blade of the Ruined King",
           "Serylda's Grudge",
           "Edge of Night",
@@ -318,10 +318,10 @@
     }
   ],
   "runes": [
-    "First Strike",
-    "Sudden Impact",
-    "Chain Assault",
-    "Eyeball Collector",
+    "Conqueror",
+    "Triumph",
+    "Cut Down",
+    "Legend: Alacrity",
     "Absolute Focus"
   ],
   "spells": [

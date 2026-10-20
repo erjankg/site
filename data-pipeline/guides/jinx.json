@@ -2,8 +2,8 @@
   "slug": "jinx",
   "name": "Jinx",
   "role": "Дракон",
-  "tier": "S",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Jhin",
-    "Miss Fortune",
-    "Kog'Maw"
+    "Ezreal",
+    "Twitch",
+    "Jhin"
   ],
   "builds": [
     {
@@ -299,18 +299,18 @@
         ],
         "core": [
           "The Collector",
-          "Magnetic Blaster",
-          "Mortal Reminder"
+          "Stormrazor",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "The Collector",
-          "Magnetic Blaster",
-          "Mortal Reminder",
+          "Berserker's Greaves",
+          "Stormrazor",
+          "Lord Dominik's Regard",
           "Runaan's Hurricane",
           "Berserker's Greaves - Galeforce"
         ]
@@ -321,7 +321,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

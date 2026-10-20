@@ -2,8 +2,8 @@
   "slug": "kaisa",
   "name": "Kai'Sa",
   "role": "Дракон",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "S+",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Draven",
-    "Kog'Maw"
+    "Yunara",
+    "Ashe",
+    "Samira"
   ],
   "builds": [
     {
@@ -298,7 +298,7 @@
           "Long Sword"
         ],
         "core": [
-          "Magnetic Blaster",
+          "Kraken Slayer",
           "Guinsoo's Rageblade",
           "Terminus"
         ],
@@ -306,7 +306,7 @@
           "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Magnetic Blaster",
+          "Kraken Slayer",
           "Berserker's Greaves",
           "Guinsoo's Rageblade",
           "Terminus",

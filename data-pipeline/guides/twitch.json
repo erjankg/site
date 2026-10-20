@@ -2,8 +2,8 @@
   "slug": "twitch",
   "name": "Twitch",
   "role": "Дракон",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Ashe",
+    "Ezreal",
     "Samira",
-    "Caitlyn"
+    "Kai'Sa"
   ],
   "builds": [
     {
@@ -298,18 +298,18 @@
           "Long Sword"
         ],
         "core": [
-          "Blade of the Ruined King",
+          "The Collector",
           "Runaan's Hurricane",
-          "Mortal Reminder"
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
+          "The Collector",
           "Berserker's Greaves",
-          "Blade of the Ruined King",
           "Runaan's Hurricane",
-          "Mortal Reminder",
+          "Lord Dominik's Regard",
           "Infinity Edge",
           "Berserker's Greaves"
         ]
@@ -320,7 +320,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [

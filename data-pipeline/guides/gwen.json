@@ -3,7 +3,7 @@
   "name": "Gwen",
   "role": "Барон",
   "tier": "B",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Fiora",
-    "Tryndamere",
-    "Riven"
+    "Yone",
+    "Shen"
   ],
   "builds": [
     {
@@ -299,7 +299,7 @@
         ],
         "core": [
           "Dusk and Dawn",
-          "Riftmaker",
+          "Nashor's Tooth",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -308,7 +308,7 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Dusk and Dawn",
-          "Riftmaker",
+          "Nashor's Tooth",
           "Rabadon's Deathcap",
           "Infinity Orb",
           "Plated Steelcaps"
@@ -317,24 +317,24 @@
     },
     {
       "title": "Jungle Build",
-      "tier": "A",
+      "tier": "S",
       "default": false,
       "items": {
         "starting": [
           "Amplifying Tome"
         ],
         "core": [
-          "Dusk and Dawn",
           "Nashor's Tooth",
+          "Dusk and Dawn",
           "Rabadon's Deathcap"
         ],
         "boots": [
           "Gluttonous Greaves"
         ],
         "finalBuild": [
+          "Nashor's Tooth",
           "Gluttonous Greaves",
           "Dusk and Dawn",
-          "Nashor's Tooth",
           "Rabadon's Deathcap",
           "Infinity Orb",
           "Gluttonous Greaves"
@@ -345,8 +345,8 @@
   "runes": [
     "Conqueror",
     "Battle Zeal",
-    "Cut Down",
-    "Legend: Alacrity",
+    "Last Stand",
+    "Legend: Bloodline",
     "Second Wind"
   ],
   "spells": [

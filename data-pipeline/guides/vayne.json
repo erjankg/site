@@ -2,8 +2,8 @@
   "slug": "vayne",
   "name": "Vayne",
   "role": "Дракон",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "B",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -443,33 +443,33 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Ashe",
-    "Draven"
+    "Yunara",
+    "Smolder",
+    "Varus"
   ],
   "builds": [
     {
       "title": "Duo Build",
-      "tier": "S",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
           "Long Sword"
         ],
         "core": [
-          "Magnetic Blaster",
+          "Kraken Slayer",
           "Guinsoo's Rageblade",
-          "Blade of the Ruined King"
+          "Terminus"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Kraken Slayer",
           "Berserker's Greaves",
-          "Magnetic Blaster",
           "Guinsoo's Rageblade",
-          "Blade of the Ruined King",
           "Terminus",
+          "Blade of the Ruined King",
           "Berserker's Greaves"
         ]
       }
@@ -485,17 +485,17 @@
         "core": [
           "Blade of the Ruined King",
           "Guinsoo's Rageblade",
-          "Magnetic Blaster"
+          "Terminus"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "Blade of the Ruined King",
+          "Berserker's Greaves",
           "Guinsoo's Rageblade",
-          "Magnetic Blaster",
           "Terminus",
+          "Mercurial Scimitar",
           "Berserker's Greaves"
         ]
       }
@@ -550,18 +550,18 @@
       "ability": "Tumble",
       "levels": [
         1,
-        8,
-        10,
-        11
+        4,
+        6,
+        7
       ]
     },
     {
       "ability": "Silver Bolts",
       "levels": [
         2,
-        4,
-        6,
-        7
+        8,
+        10,
+        11
       ]
     },
     {

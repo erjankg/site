@@ -2,8 +2,8 @@
   "slug": "swain",
   "name": "Swain",
   "role": "Мид",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "C",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -560,14 +560,14 @@
     }
   ],
   "counters": [
-    "Brand",
-    "Syndra",
-    "Orianna"
+    "Hwei",
+    "Orianna",
+    "Ahri"
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "S",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -575,8 +575,8 @@
         ],
         "core": [
           "Malignance",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Rylai's Crystal Scepter",
+          "Abyssal Mask"
         ],
         "boots": [
           "Boots of Mana"
@@ -584,46 +584,20 @@
         "finalBuild": [
           "Boots of Mana",
           "Malignance",
-          "Infinity Orb",
-          "Rabadon's Deathcap",
-          "Cryptbloom",
+          "Rylai's Crystal Scepter",
+          "Abyssal Mask",
+          "Bloodletter's Curse",
           "Boots of Mana"
-        ]
-      }
-    },
-    {
-      "title": "Support Build",
-      "tier": "C",
-      "default": false,
-      "items": {
-        "starting": [
-          "Relic Shield"
-        ],
-        "core": [
-          "Malignance",
-          "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap"
-        ],
-        "boots": [
-          "Plated Steelcaps"
-        ],
-        "finalBuild": [
-          "Bulwark of the Mountain",
-          "Plated Steelcaps",
-          "Malignance",
-          "Rylai's Crystal Scepter",
-          "Rabadon's Deathcap",
-          "Plated Steelcaps"
         ]
       }
     }
   ],
   "runes": [
-    "Phase Rush",
+    "Conqueror",
     "Axiom Arcanist",
     "Transcendence",
     "Nimbus Cloak",
-    "Bone Plating"
+    "Legend: Haste"
   ],
   "spells": [
     {

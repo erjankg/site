@@ -3,7 +3,7 @@
   "name": "Hecarim",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Master Yi",
-    "Kindred",
-    "Graves"
+    "Sylas",
+    "Cho'Gath",
+    "Gwen"
   ],
   "builds": [
     {
@@ -298,19 +298,19 @@
           "Long Sword"
         ],
         "core": [
-          "Trinity Force",
           "Manamune",
-          "Black Cleaver"
+          "Black Cleaver",
+          "Death's Dance"
         ],
         "boots": [
           "Ionian Boots of Lucidity"
         ],
         "finalBuild": [
-          "Ionian Boots of Lucidity",
-          "Trinity Force",
           "Muramana",
+          "Ionian Boots of Lucidity",
           "Black Cleaver",
           "Death's Dance",
+          "Spear of Shojin",
           "Ionian Boots of Lucidity"
         ]
       }
@@ -321,7 +321,7 @@
     "Axiom Arcanist",
     "Transcendence",
     "Nimbus Cloak",
-    "Legend: Bloodline"
+    "Legend: Haste"
   ],
   "spells": [
     {

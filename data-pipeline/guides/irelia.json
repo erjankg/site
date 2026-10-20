@@ -3,7 +3,7 @@
   "name": "Irelia",
   "role": "Барон",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -354,13 +354,13 @@
   ],
   "counters": [
     "Malphite",
-    "Wukong",
-    "Poppy"
+    "Jax",
+    "Garen"
   ],
   "builds": [
     {
-      "title": "Solo Build",
-      "tier": "A",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -368,45 +368,19 @@
         ],
         "core": [
           "Blade of the Ruined King",
-          "Trinity Force",
-          "Hullbreaker"
-        ],
-        "boots": [
-          "Gluttonous Greaves"
-        ],
-        "finalBuild": [
-          "Gluttonous Greaves",
-          "Blade of the Ruined King",
-          "Trinity Force",
           "Hullbreaker",
-          "Death's Dance",
-          "Gluttonous Greaves"
-        ]
-      }
-    },
-    {
-      "title": "Mid Build",
-      "tier": "B",
-      "default": false,
-      "items": {
-        "starting": [
-          "Ruby Crystal"
-        ],
-        "core": [
-          "Blade of the Ruined King",
-          "Trinity Force",
-          "Death's Dance"
+          "Trinity Force"
         ],
         "boots": [
-          "Mercury's Treads"
+          "Gluttonous Greaves"
         ],
         "finalBuild": [
-          "Mercury's Treads",
           "Blade of the Ruined King",
+          "Gluttonous Greaves",
+          "Hullbreaker",
           "Trinity Force",
           "Death's Dance",
-          "Terminus",
-          "Mercury's Treads"
+          "Gluttonous Greaves"
         ]
       }
     }
@@ -449,18 +423,18 @@
       "ability": "Defiant Dance",
       "levels": [
         3,
-        12,
-        14,
-        15
+        8,
+        10,
+        11
       ]
     },
     {
       "ability": "Flawless Duet",
       "levels": [
         2,
-        8,
-        10,
-        11
+        12,
+        14,
+        15
       ]
     },
     {

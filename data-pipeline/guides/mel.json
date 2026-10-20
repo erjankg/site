@@ -2,8 +2,8 @@
   "slug": "mel",
   "name": "Mel",
   "role": "Мид",
-  "tier": "S+",
-  "patch": "7.2c",
+  "tier": "S",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -353,8 +353,8 @@
     }
   ],
   "counters": [
-    "Irelia",
-    "Yone",
+    "Yasuo",
+    "Orianna",
     "Syndra"
   ],
   "builds": [
@@ -367,8 +367,8 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Blackfire Torch",
-          "Liandry's Torment",
+          "Luden's Echo",
+          "Infinity Orb",
           "Rabadon's Deathcap"
         ],
         "boots": [
@@ -376,10 +376,10 @@
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Blackfire Torch",
-          "Liandry's Torment",
+          "Luden's Echo",
+          "Infinity Orb",
           "Rabadon's Deathcap",
-          "Void Staff",
+          "Cryptbloom",
           "Boots of Mana"
         ]
       }
@@ -387,10 +387,10 @@
   ],
   "runes": [
     "Arcane Comet",
-    "Botanist",
+    "Manaflow Band",
     "Transcendence",
     "Nimbus Cloak",
-    "Cut Down"
+    "Bone Plating"
   ],
   "spells": [
     {

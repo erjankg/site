@@ -2,19 +2,19 @@
   "slug": "taliyah",
   "name": "Taliyah",
   "role": "Мид",
-  "tier": "C",
-  "patch": "7.2c",
+  "tier": "D",
+  "patch": "7.3b",
   "dataDate": null,
   "matchups": [],
   "counters": [
-    "Syndra",
+    "Ekko",
     "Zed",
     "Orianna"
   ],
   "builds": [
     {
-      "title": "Mid Build",
-      "tier": "S",
+      "title": "Build 1",
+      "tier": null,
       "default": true,
       "items": {
         "starting": [
@@ -22,8 +22,8 @@
         ],
         "core": [
           "Luden's Echo",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -31,35 +31,9 @@
         "finalBuild": [
           "Boots of Mana",
           "Luden's Echo",
-          "Rabadon's Deathcap",
-          "Infinity Orb",
-          "Void Staff",
-          "Boots of Mana"
-        ]
-      }
-    },
-    {
-      "title": "Jungle Build",
-      "tier": "A",
-      "default": false,
-      "items": {
-        "starting": [
-          "Amplifying Tome"
-        ],
-        "core": [
-          "Infinity Orb",
-          "Rabadon's Deathcap",
-          "Void Staff"
-        ],
-        "boots": [
-          "Boots of Mana"
-        ],
-        "finalBuild": [
-          "Boots of Mana",
           "Infinity Orb",
           "Rabadon's Deathcap",
           "Void Staff",
-          "Zhonya's Hourglass",
           "Boots of Mana"
         ]
       }

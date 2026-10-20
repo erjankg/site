@@ -3,7 +3,7 @@
   "name": "Zoe",
   "role": "Мид",
   "tier": "A",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Morgana",
+    "Irelia",
     "Yasuo",
-    "Irelia"
+    "Veigar"
   ],
   "builds": [
     {
@@ -298,19 +298,19 @@
           "Amplifying Tome"
         ],
         "core": [
-          "Luden's Echo",
-          "Infinity Orb",
-          "Rabadon's Deathcap"
+          "Lich Bane",
+          "Rabadon's Deathcap",
+          "Infinity Orb"
         ],
         "boots": [
           "Boots of Mana"
         ],
         "finalBuild": [
           "Boots of Mana",
-          "Luden's Echo",
-          "Infinity Orb",
+          "Lich Bane",
           "Rabadon's Deathcap",
-          "Void Staff",
+          "Infinity Orb",
+          "Cryptbloom",
           "Boots of Mana"
         ]
       }
@@ -318,10 +318,10 @@
   ],
   "runes": [
     "Fleet Footwork",
-    "Sudden Impact",
-    "Chain Assault",
-    "Eyeball Collector",
-    "Nimbus Cloak"
+    "Botanist",
+    "Transcendence",
+    "Nimbus Cloak",
+    "Legend: Haste"
   ],
   "spells": [
     {

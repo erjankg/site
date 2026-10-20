@@ -2,8 +2,8 @@
   "slug": "lucian",
   "name": "Lucian",
   "role": "Дракон",
-  "tier": "B",
-  "patch": "7.2c",
+  "tier": "C",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,8 +284,8 @@
     }
   ],
   "counters": [
-    "Caitlyn",
-    "Kog'Maw",
+    "Varus",
+    "Samira",
     "Ashe"
   ],
   "builds": [
@@ -299,20 +299,20 @@
         ],
         "core": [
           "Essence Reaver",
-          "Magnetic Blaster",
+          "Stormrazor",
           "Lord Dominik's Regard"
         ],
         "boots": [
-          "Berserker's Greaves",
+          "Gluttonous Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "Essence Reaver",
-          "Magnetic Blaster",
+          "Gluttonous Greaves",
+          "Stormrazor",
           "Lord Dominik's Regard",
-          "Galeforce",
-          "Berserker's Greaves - Galeforce"
+          "Infinity Edge",
+          "Gluttonous Greaves - Galeforce"
         ]
       }
     }
@@ -321,8 +321,8 @@
     "Empowerment",
     "Brutal",
     "Cut Down",
-    "Legend: Bloodline",
-    "Sudden Impact"
+    "Legend: Alacrity",
+    "Bone Plating"
   ],
   "spells": [
     {

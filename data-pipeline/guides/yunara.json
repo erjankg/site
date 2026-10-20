@@ -2,11 +2,15 @@
   "slug": "yunara",
   "name": "Yunara",
   "role": "Дракон",
-  "tier": "S",
-  "patch": "7.2c",
+  "tier": "A",
+  "patch": "7.3b",
   "dataDate": null,
   "matchups": [],
-  "counters": [],
+  "counters": [
+    "Ezreal",
+    "Tristana",
+    "Caitlyn"
+  ],
   "builds": [
     {
       "title": "Build 1",
@@ -17,18 +21,18 @@
           "Long Sword"
         ],
         "core": [
-          "Magnetic Blaster",
-          "Blade of the Ruined King",
-          "Mortal Reminder"
+          "Stormrazor",
+          "Runaan's Hurricane",
+          "Lord Dominik's Regard"
         ],
         "boots": [
           "Berserker's Greaves"
         ],
         "finalBuild": [
+          "Stormrazor",
           "Berserker's Greaves",
-          "Magnetic Blaster",
-          "Blade of the Ruined King",
-          "Mortal Reminder",
+          "Runaan's Hurricane",
+          "Lord Dominik's Regard",
           "Infinity Edge",
           "Berserker's Greaves"
         ]
@@ -39,7 +43,7 @@
     "Lethal Tempo",
     "Brutal",
     "Cut Down",
-    "Legend: Alacrity",
+    "Legend: Bloodline",
     "Bone Plating"
   ],
   "spells": [],

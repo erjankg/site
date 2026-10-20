@@ -3,7 +3,7 @@
   "name": "Graves",
   "role": "Лес",
   "tier": "A",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Rammus",
-    "Amumu",
-    "Aatrox"
+    "Nidalee",
+    "Xin Zhao"
   ],
   "builds": [
     {
@@ -298,8 +298,8 @@
           "Long Sword"
         ],
         "core": [
-          "Essence Reaver",
-          "Bloodthirster",
+          "The Collector",
+          "Stormrazor",
           "Lord Dominik's Regard"
         ],
         "boots": [
@@ -308,10 +308,10 @@
         ],
         "finalBuild": [
           "Gluttonous Greaves",
-          "Essence Reaver",
-          "Bloodthirster",
+          "The Collector",
+          "Stormrazor",
           "Lord Dominik's Regard",
-          "Galeforce",
+          "Infinity Edge",
           "Gluttonous Greaves - Galeforce"
         ]
       }
@@ -319,10 +319,10 @@
   ],
   "runes": [
     "Fleet Footwork",
-    "Brutal",
-    "Cut Down",
-    "Legend: Alacrity",
-    "Bone Plating"
+    "Sudden Impact",
+    "Tyrant",
+    "Eyeball Collector",
+    "Absolute Focus"
   ],
   "spells": [
     {

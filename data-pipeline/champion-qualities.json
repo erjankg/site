@@ -1,9 +1,9 @@
 {
   "_source": "https://ry2x.github.io/WildRift-Merged-Champion-Data/data_en_US.json",
   "_sourceRepo": "https://github.com/ry2x/WildRift-Merged-Champion-Data",
-  "_fetchedAt": "2026-08-23T14:20:55.458Z",
+  "_fetchedAt": "2026-10-20T19:29:36.578Z",
   "_note": "Оси радара Мета-хаба (шкала 1-3). Обновлять раз в патч: node data-pipeline/fetch-champion-qualities.mjs",
-  "count": 140,
+  "count": 141,
   "champions": [
     {
       "name": "Aatrox",
@@ -300,6 +300,14 @@
       "difficult": 2,
       "survive": 1,
       "utility": 2
+    },
+    {
+      "name": "Hwei",
+      "id": "Hwei",
+      "damage": 3,
+      "difficult": 2,
+      "survive": 1,
+      "utility": 1
     },
     {
       "name": "Irelia",

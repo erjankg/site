@@ -2,8 +2,8 @@
   "slug": "varus",
   "name": "Varus",
   "role": "Дракон",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "B",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Smolder",
-    "Miss Fortune",
-    "Vayne"
+    "Xayah",
+    "Twitch",
+    "Zeri"
   ],
   "builds": [
     {
@@ -307,8 +307,8 @@
           "Galeforce"
         ],
         "finalBuild": [
-          "Berserker's Greaves",
           "Blade of the Ruined King",
+          "Berserker's Greaves",
           "Guinsoo's Rageblade",
           "Terminus",
           "Runaan's Hurricane",

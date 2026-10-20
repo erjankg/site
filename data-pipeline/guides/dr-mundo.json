@@ -3,7 +3,7 @@
   "name": "Dr. Mundo",
   "role": "Барон",
   "tier": "A",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -353,14 +353,14 @@
     }
   ],
   "counters": [
-    "Riven",
+    "Aatrox",
     "Gwen",
-    "Fiora"
+    "Yone"
   ],
   "builds": [
     {
       "title": "Solo Build",
-      "tier": "C",
+      "tier": "A",
       "default": true,
       "items": {
         "starting": [
@@ -368,8 +368,8 @@
         ],
         "core": [
           "Heartsteel",
-          "Sunfire Aegis",
-          "Thornmail"
+          "Thornmail",
+          "Unending Despair"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -377,9 +377,9 @@
         "finalBuild": [
           "Plated Steelcaps",
           "Heartsteel",
-          "Sunfire Aegis",
           "Thornmail",
-          "Gargoyle Stoneplate",
+          "Unending Despair",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
@@ -390,12 +390,12 @@
       "default": false,
       "items": {
         "starting": [
-          "Shimmering Spark"
+          "Ruby Crystal"
         ],
         "core": [
           "Heartsteel",
-          "Sunfire Aegis",
-          "Thornmail"
+          "Thornmail",
+          "Unending Despair"
         ],
         "boots": [
           "Plated Steelcaps"
@@ -403,9 +403,9 @@
         "finalBuild": [
           "Heartsteel",
           "Plated Steelcaps",
-          "Sunfire Aegis",
           "Thornmail",
-          "Gargoyle Stoneplate",
+          "Unending Despair",
+          "Amaranth's Twinguard",
           "Plated Steelcaps"
         ]
       }
@@ -463,7 +463,7 @@
     {
       "ability": "Heart Zapper",
       "levels": [
-        2,
+        3,
         12,
         14,
         15
@@ -472,7 +472,7 @@
     {
       "ability": "Blunt Force Trauma",
       "levels": [
-        3,
+        2,
         8,
         10,
         11

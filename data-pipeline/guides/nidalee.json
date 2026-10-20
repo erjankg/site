@@ -3,7 +3,7 @@
   "name": "Nidalee",
   "role": "Лес",
   "tier": "D",
-  "patch": "7.2c",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Master Yi",
-    "Rengar",
-    "Galio"
+    "Rek'Sai",
+    "Nocturne",
+    "Xin Zhao"
   ],
   "builds": [
     {
@@ -299,8 +299,8 @@
         ],
         "core": [
           "Lich Bane",
-          "Rabadon's Deathcap",
-          "Infinity Orb"
+          "Infinity Orb",
+          "Rabadon's Deathcap"
         ],
         "boots": [
           "Boots of Mana"
@@ -308,8 +308,8 @@
         "finalBuild": [
           "Boots of Mana",
           "Lich Bane",
-          "Rabadon's Deathcap",
           "Infinity Orb",
+          "Rabadon's Deathcap",
           "Void Staff",
           "Boots of Mana"
         ]
@@ -319,7 +319,7 @@
   "runes": [
     "Dark Harvest",
     "Sudden Impact",
-    "Chain Assault",
+    "Tyrant",
     "Eyeball Collector",
     "Transcendence"
   ],

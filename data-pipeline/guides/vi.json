@@ -2,8 +2,8 @@
   "slug": "vi",
   "name": "Vi",
   "role": "Лес",
-  "tier": "A",
-  "patch": "7.2c",
+  "tier": "C",
+  "patch": "7.3b",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -284,9 +284,9 @@
     }
   ],
   "counters": [
-    "Kindred",
-    "Amumu",
-    "Warwick"
+    "Nocturne",
+    "Kayn",
+    "Rammus"
   ],
   "builds": [
     {
@@ -310,7 +310,7 @@
           "Plated Steelcaps",
           "Sundered Sky",
           "Death's Dance",
-          "Force of Nature",
+          "Mortal Reminder",
           "Plated Steelcaps"
         ]
       }
@@ -318,10 +318,10 @@
   ],
   "runes": [
     "Conqueror",
-    "Brutal",
+    "Triumph",
     "Cut Down",
     "Legend: Alacrity",
-    "Sudden Impact"
+    "Absolute Focus"
   ],
   "spells": [
     {

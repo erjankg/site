@@ -2,8 +2,8 @@
   "slug": "akshan",
   "name": "Akshan",
   "role": "Мид",
-  "tier": "D",
-  "patch": "7.2c",
+  "tier": "B",
+  "patch": "7.3b",
   "dataDate": "2026-04-12",
   "matchups": [
     {
@@ -285,8 +285,8 @@
   ],
   "counters": [
     "Yasuo",
-    "Vex",
-    "Irelia"
+    "Orianna",
+    "Lissandra"
   ],
   "builds": [
     {
@@ -298,21 +298,21 @@
           "Long Sword"
         ],
         "core": [
-          "Galeforce",
-          "Magnetic Blaster",
-          "Mortal Reminder"
+          "The Collector",
+          "Stormrazor",
+          "Infinity Edge"
         ],
         "boots": [
-          "Boots of Dynamism",
+          "Gluttonous Greaves",
           "Galeforce"
         ],
         "finalBuild": [
-          "Boots of Dynamism",
-          "Galeforce",
-          "Magnetic Blaster",
-          "Mortal Reminder",
+          "Gluttonous Greaves",
+          "The Collector",
+          "Stormrazor",
           "Infinity Edge",
-          "Boots of Dynamism - Galeforce"
+          "Lord Dominik's Regard",
+          "Gluttonous Greaves - Galeforce"
         ]
       }
     }
@@ -341,7 +341,7 @@
       "ability": "Avengerang",
       "levels": [
         1,
-        4,
+        3,
         6,
         7
       ]
@@ -349,7 +349,7 @@
     {
       "ability": "Going Rogue",
       "levels": [
-        3,
+        4,
         12,
         14,
         15
