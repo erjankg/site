@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>lab-draft-coach · два экрана ИИ-кэпа</title>
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="coach-lab.css?v=9">
+  <style>
+    .hub { max-width: var(--content-max-narrow); margin-inline: auto; display: grid; gap: var(--gap); }
+    .hub a { color: inherit; text-decoration: none; display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--pad); }
+    .hub b { font-size: var(--fs-2xl); font-weight: var(--fw-semi); }
+    .hub span { color: var(--txt-mute); }
+    .hub code { color: var(--txt-dim); }
+  </style>
+</head>
+<body>
+
+  <div class="cx-splash" aria-hidden="true"></div>
+  <div class="cx-scrim" aria-hidden="true"></div>
+
+  <div class="cx-app">
+    <header class="cx-top glass">
+      <div class="cx-mark"><b>lab-draft-coach</b> <span>· ИИ-кэп драфтера</span></div>
+      <div class="cx-sp"></div>
+      <span class="cx-chip">сервер: node tools/serve.mjs . 8777</span>
+    </header>
+
+    <div class="cx-work" style="grid-template-columns:minmax(0,1fr)">
+      <div class="hub">
+        <a class="glass" href="teams.html">
+          <b>1 · Составы и пулы</b>
+          <span>Две команды по 5 игроков: имя, роль, пул чемпионов. Пишет
+            <code>draft-ai/teams.json</code> — по нему кэп советует ТОЛЬКО то, что люди реально играют.</span>
+        </a>
+        <a class="glass" href="tiers.html">
+          <b>2 · Тирлист компета</b>
+          <span>Все 142 по рядам S+…D, соло-винрейт рядом как ориентир. Пишет
+            <code>draft-ai/knowledge/captain-tiers.json</code> — движок читает его как
+            <code>notes.tiers</code> и ставит выше соло-статистики.</span>
+        </a>
+        <a class="glass" href="coach.html">
+          <b>3 · ИИ-кэп + разметка</b>
+          <span>Драфт по последовательности Wild Rift: варианты ходов с ПОЛНЫМ рассуждением,
+            👍/👎 в <code>draft-ai/feedback.json</code>, и на каждый ход — «почему?»: теги
+            превращаются в матчапы, связки, тиры и флекс-флаги. Матчапы кэпа растут ТОЛЬКО отсюда —
+            скрейп <code>data-pipeline</code> он не читает.</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

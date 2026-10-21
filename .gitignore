@@ -36,3 +36,8 @@ build/
 # gstack local artifacts
 .gstack/security-reports/
 .gstack/
+
+# Сторонние скиллы/агенты (ставятся локально, не в репо)
+.agents/
+.claude/skills/
+skills-lock.json

@@ -15,15 +15,75 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
+  /* `root` живёт в обёртке UMD, внутрь фабрики он не передан — в браузере
+     обращение к нему падало ReferenceError ещё до первого совета. Берём
+     глобальный объект тем же способом, что и обёртка. */
+  var G = typeof self !== 'undefined' ? self : (typeof globalThis !== 'undefined' ? globalThis : {});
+
   var C = (typeof module !== 'undefined' && module.exports)
-    ? require('./coach.js') : (root && root.CaptaincyCoach);
+    ? require('./coach.js') : (G && G.CaptaincyCoach);
   var DL = (typeof module !== 'undefined' && module.exports)
-    ? require('../../draft-logic.js') : (root && root.DraftLogic);
+    ? require('../../draft-logic.js') : (G && G.DraftLogic);
 
   function other(side) { return side === 'blue' ? 'red' : 'blue'; }
 
-  // Минимум известных матчапов, чтобы вообще судить о чемпе как о слепом пике
-  var MIN_KNOWN = 8;
+  /* ── ПУЛЫ ИГРОКОВ ──────────────────────────────────────────────────────
+     Пул — это ЧТО ЧЕЛОВЕК РЕАЛЬНО УМЕЕТ. Совет взять чемпиона вне пула —
+     не совет: его никто не сыграет. Поэтому пул РЕЖЕТ кандидатов ДО
+     ранжирования, а не штрафует после: иначе «лучший ход» уже посчитан по
+     чужому составу, и срезать его потом — значит отдать второй сорт.
+
+     state.pools = { blue: [{ name, role, champs:[…], pick }], red: […] }
+       · champs — кого этот игрок играет (имена как угодно написанные)
+       · pick   — кого ему уже отдали в этом драфте (тогда он занят)
+     state.pickRole — роль ТЕКУЩЕГО хода, если тренер её назвал. Не назвал —
+     берём объединение пулов всех ещё не занятых игроков: команда вправе
+     закрыть любую свободную роль.
+
+     Пулы не заданы → возвращаем null, и всё идёт по-старому (state.ourPool /
+     state.enemyPool, как было). Пустой массив ≠ null: пул ЗАДАН и пуст —
+     значит брать некого, и выдумывать кандидатов нельзя. */
+  function roster(state, side) {
+    var r = state.pools && state.pools[side];
+    return (r && r.length) ? r : null;
+  }
+
+  function poolOf(KB, state, side, role) {
+    var r = roster(state, side);
+    if (!r) return null;
+    var seen = {}, out = [];
+    r.forEach(function (p) {
+      if (p.pick) return;                                   // игрок уже занят
+      if (role && p.role !== role) return;                  // ход за конкретную роль
+      (p.champs || []).forEach(function (c) {
+        var k = KB.idx.nameOf(c);
+        if (k && !seen[k]) { seen[k] = 1; out.push(k); }
+      });
+    });
+    return out;
+  }
+
+  /* Копия состояния, где пул соперника подставлен из ростера: по нему
+     blindRisk отсеивает контры, которых у врага всё равно нет. */
+  function withEnemyPool(KB, state) {
+    var foe = poolOf(KB, state, other(state.side));
+    if (foe === null) return state;
+    return Object.assign({}, state, { enemyPool: foe });
+  }
+
+  // «пул задан, но пуст» — отдельный случай: о нём надо сказать вслух
+  function poolNote(KB, state, side, role) {
+    var p = poolOf(KB, state, side, role);
+    if (p === null || p.length) return null;
+    return role
+      ? 'в пуле на роль ' + role + ' не осталось доступных чемпионов'
+      : 'пул команды пуст — все его чемпионы уже заняты или забанены';
+  }
+
+  /* Минимум РАЗМЕЧЕННЫХ пар, чтобы вообще судить о чемпе как о слепом пике.
+     Было 8 — столько давал скрейп; теперь пары приходят из разметки владельца,
+     их на чемпа единицы, и порог опущен до трёх. Ноль пар — чемп молчит. */
+  var MIN_KNOWN = 3;
 
   /* Шаг драфта: чей ход, бан или пик, и есть ли у нас следующий подряд. */
   function stepInfo(state) {
@@ -67,8 +127,11 @@
      слепой пик меняется от карты к карте (см. meta-web.json). */
   function blindRanking(KB, state, opts) {
     opts = opts || {};
+    state = withEnemyPool(KB, state);          // контры считаем по ростеру врага
     var unavail = C.availability(KB, state);
-    var pool = opts.pool && opts.pool.length ? opts.pool.map(KB.idx.nameOf).filter(Boolean) : null;
+    var fromRoster = poolOf(KB, state, state.side, state.pickRole);
+    var pool = fromRoster !== null ? fromRoster
+      : (opts.pool && opts.pool.length ? opts.pool.map(KB.idx.nameOf).filter(Boolean) : null);
     var out = [];
     (pool || KB.idx.names).forEach(function (name) {
       if (unavail[name]) return;
@@ -76,17 +139,17 @@
       if (opts.lane && (c.lanes || []).indexOf(opts.lane) === -1) return;
       /* ЗАЩИТА ОТ «НЕЗНАНИЕ = БЕЗОПАСНОСТЬ». У чемпа без матчапов ноль живых
          контр — и он вылезал в лучшие слепые пики просто потому, что мы про
-         него ничего не знаем. Это худший совет из возможных. */
-      var mu = KB.matchups.of(name);
-      var known = 0;
-      if (mu && mu.lanes) Object.keys(mu.lanes).forEach(function (l) { known += (mu.lanes[l] || []).length; });
-      if (known < MIN_KNOWN) return;
-
+         него ничего не знаем. Это худший совет из возможных.
+         Считаем ТВОИ размеченные пары (скрейп кэпу не источник), поэтому и
+         порог маленький: три пары про чемпа — уже не пустота. */
       var risk = C.blindRisk(KB, name, state);
+      if ((risk.known || 0) < MIN_KNOWN) return;
       var meta = KB.idx.meta(name, state.rank);
-      var tier = meta ? ({ 'S+': 3, S: 2, A: 1, B: 0, C: -1, D: -2 })[meta.tier] : 0;
-      // тот же замок, что в оценке пика: тир на малом пикрейте — шум
-      if (tier > 0 && meta) {
+      var tv = C.tierOf(KB, name, state, opts.lane);   // компет-тир капитана выше соло, по линии пика
+      var tier = tv ? ({ 'S+': 3, S: 2, A: 1, B: 0, C: -1, D: -2 })[tv.tier] : 0;
+      // тот же замок, что в оценке пика: тир на малом пикрейте — шум.
+      // Тир капитана не шум — его не глушим.
+      if (tier > 0 && meta && !(tv && tv.fromCaptain)) {
         var pr = meta.pr || 0;
         tier = tier * (pr >= 4 ? 1 : pr >= 2 ? 0.6 : pr >= 1 ? 0.25 : 0);
       }
@@ -97,7 +160,7 @@
         champ: name, ru: c.ru || name,
         liveCounters: risk.count, risk: risk.risk,
         removed: risk.removedRisk, burned: burned, main: risk.main,
-        tier: meta && meta.tier,
+        tier: tv && tv.tier,
         // ненаказуемость: мало живых контр + не мусорный тир
         score: -(risk.risk || 0) / 10 + (tier || 0),
       });
@@ -109,7 +172,7 @@
      и смотрим, входит ли он в его верхушку. Не входит — можно подождать. */
   function survives(KB, state, champ, info) {
     if (info.nextOwnPick == null) return { p: 0, why: 'нашего следующего пика уже нет' };
-    var enemyState = Object.assign({}, state, { side: other(info.side) });
+    var enemyState = Object.assign({}, state, { side: other(info.side), pickRole: null });
     var top = pickRanking(KB, enemyState, info, { limit: 6, skipSurvival: true });
     var pos = -1;
     top.forEach(function (x, i) { if (KB.idx.nameOf(x.champ) === KB.idx.nameOf(champ)) pos = i; });
@@ -125,11 +188,14 @@
   function pickRanking(KB, state, info, opts) {
     opts = opts || {};
     var side = state.side, unavail = C.availability(KB, state);
-    var pool = state.ourPool && state.ourPool.length ? state.ourPool.map(KB.idx.nameOf).filter(Boolean) : null;
+    /* Пул игрока бьёт любой общий список: роль закрывает ЧЕЛОВЕК, а не команда. */
+    var fromRoster = poolOf(KB, state, side, state.pickRole);
+    var pool = fromRoster !== null ? fromRoster
+      : (state.ourPool && state.ourPool.length ? state.ourPool.map(KB.idx.nameOf).filter(Boolean) : null);
     var out = [];
     (pool || KB.idx.names).forEach(function (name) {
       if (unavail[name]) return;
-      var v = C.valueFor(KB, name, side, state, state.rank);
+      var v = C.valueFor(KB, name, side, state, state.rank, state.pickRole);   // тир по линии пика
       if (v.value <= -50) return;
       out.push({ champ: name, ru: C.ru(KB, name), value: Math.round(v.value * 10) / 10, why: v.why });
     });
@@ -143,20 +209,26 @@
     opts = opts || {};
     var side = state.side, foe = other(side);
     var unavail = C.availability(KB, state);
-    var pool = state.enemyPool && state.enemyPool.length ? state.enemyPool.map(KB.idx.nameOf).filter(Boolean) : null;
+    /* Банить то, чего враг не умеет, — выбросить бан. Ростер соперника
+       известен → кандидаты только из него. */
+    var fromRoster = poolOf(KB, state, foe);
+    var pool = fromRoster !== null ? fromRoster
+      : (state.enemyPool && state.enemyPool.length ? state.enemyPool.map(KB.idx.nameOf).filter(Boolean) : null);
     var out = [];
     (pool || KB.idx.names).forEach(function (name) {
       if (unavail[name]) return;
       var toThem = C.valueFor(KB, name, foe, state, state.rank);
       var toUs = C.valueFor(KB, name, side, state, state.rank);
-      var meta = KB.idx.meta(name, state.rank);
-      if (!meta || ['C', 'D'].indexOf(meta.tier) !== -1) {
+      /* Тир — через tierOf: сказал капитан «мусор» — бан на него не тратим,
+         сказал «S+» — он не вылетит из кандидатов по соло-статистике. */
+      var tv = C.tierOf(KB, name, state);
+      if (!tv || ['C', 'D'].indexOf(tv.tier) !== -1) {
         // мусорный тир баним только если он прямо контрит наши пики
         var hitsUs = toThem.why.some(function (w) { return w.kind === 'matchup'; });
         if (!hitsUs) return;
       }
       out.push({
-        champ: name, ru: C.ru(KB, name), tier: meta && meta.tier,
+        champ: name, ru: C.ru(KB, name), tier: tv && tv.tier,
         denial: Math.round((toThem.value - toUs.value) * 10) / 10,
         valueToThem: Math.round(toThem.value * 10) / 10,
         why: toThem.why.slice(0, 3),
@@ -175,15 +247,26 @@
                note: 'сейчас ход соперника — считаем, что он возьмёт', expect: expected(KB, state, info) };
     }
     var lines = info.action === 'ban' ? banLines(KB, state, info) : pickLines(KB, state, info);
+    /* Откуда взялись кандидаты — тренер должен видеть: «из пула» и «из всех»
+       это два разных совета, и путать их нельзя. */
+    var side = info.action === 'ban' ? other(state.side) : state.side;
+    var cands = poolOf(KB, state, side, info.action === 'ban' ? null : state.pickRole);
     return {
       done: false, step: info.idx, phase: info.phase, action: info.action,
       isDouble: info.isDouble, lines: lines,
+      pool: cands === null ? null : {
+        from: info.action === 'ban' ? 'ростер соперника' : 'пул игрока',
+        role: info.action === 'ban' ? null : (state.pickRole || null),
+        count: cands.length,
+        note: poolNote(KB, state, side, info.action === 'ban' ? null : state.pickRole),
+      },
       dataNote: KB.staleNote('guides'),
     };
   }
 
   function expected(KB, state, info) {
-    var enemyState = Object.assign({}, state, { side: info.side });
+    // роль хода принадлежит НАМ — соперника по ней судить нельзя
+    var enemyState = Object.assign({}, state, { side: info.side, pickRole: null });
     return info.action === 'ban'
       ? banRanking(KB, enemyState, { limit: 3 })
       : pickRanking(KB, enemyState, info, { limit: 3 });
@@ -285,7 +368,7 @@
   }
 
   return {
-    advise: advise, stepInfo: stepInfo,
+    advise: advise, stepInfo: stepInfo, poolOf: poolOf,
     pickRanking: pickRanking, banRanking: banRanking,
     blindRanking: blindRanking, survives: survives,
   };

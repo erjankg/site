@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>lab-draft-coach · составы и пулы</title>
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="coach-lab.css?v=9">
+</head>
+<body>
+
+  <div class="cx-splash" aria-hidden="true"></div>
+  <div class="cx-scrim" aria-hidden="true"></div>
+
+  <div class="cx-app">
+
+    <header class="cx-top glass" id="tmTop"></header>
+
+    <div class="cx-work tm-work">
+      <!-- СИНИЕ: 5 игроков -->
+      <section class="cx-pane cx-pane--tight ch-side-blue glass" id="tmBlue"></section>
+
+      <!-- ПУЛ выбранного игрока: вся сетка чемпионов, тык = в пул / из пула -->
+      <section class="cx-pane cx-pane--tight glass" id="tmPick"></section>
+
+      <!-- КРАСНЫЕ: 5 игроков -->
+      <section class="cx-pane cx-pane--tight ch-side-red glass" id="tmRed"></section>
+    </div>
+
+  </div>
+
+  <div class="cx-toast" id="tmToast" role="status"></div>
+  <div class="cx-boot" id="tmBoot">Читаю чемпионов и составы… <b id="tmBootN"></b></div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="../draft-ai/engine/knowledge.js?v=5"></script>
+  <script src="../draft-ai/engine/coach.js?v=5"></script>
+  <script src="teams-lab.js?v=7"></script>
+</body>
+</html>

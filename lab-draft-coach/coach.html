@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>lab-draft-coach · ИИ-кэп</title>
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="coach-lab.css?v=9">
+</head>
+<body>
+
+  <div class="cx-splash" aria-hidden="true"></div>
+  <div class="cx-scrim" aria-hidden="true"></div>
+
+  <div class="cx-app">
+
+    <header class="cx-top glass" id="chTop"></header>
+
+    <div class="cx-work ch-work">
+      <!-- БОРД: обе команды, баны полосой + 5 пиков -->
+      <section class="cx-pane cx-pane--tight glass" id="chBoard"></section>
+
+      <!-- ВЫБОР ЧЕМПИОНА: тык = ход по последовательности драфта -->
+      <section class="cx-pane cx-pane--tight glass" id="chPick"></section>
+
+      <!-- ИИ-КЭП: варианты ходов с ПОЛНЫМ разбором + 👍/👎 -->
+      <aside class="cx-pane cx-pane--tight glass" id="chAi"></aside>
+    </div>
+
+  </div>
+
+  <div class="cx-toast" id="chToast" role="status"></div>
+  <div class="cx-boot" id="chBoot">Читаю мозг… <b id="chBootN">0</b></div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="../draft-logic.js?v=1"></script>
+  <script src="../draft-ai/engine/knowledge.js?v=5"></script>
+  <script src="../draft-ai/engine/coach.js?v=5"></script>
+  <script src="../draft-ai/engine/advise.js?v=5"></script>
+  <script src="coach-lab.js?v=14"></script>
+</body>
+</html>

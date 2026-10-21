@@ -154,7 +154,9 @@ function cssBlocks(lines) {
     depth += opens - closes;
     if (depth <= 0) {
       if (start >= 0) {
-        const blk = { selector: selBuf, body: bodyLines.join('\n') };
+        /* start — номер строки, где блок ОТКРЫЛСЯ: правило 14 должно ругаться
+           один раз на блок, а не на каждую его строку. */
+        const blk = { selector: selBuf, body: bodyLines.join('\n'), start };
         for (let k = start; k <= i; k++) map[k] = blk;
       }
       depth = 0; selBuf = ''; start = -1; bodyLines = [];
@@ -338,6 +340,27 @@ for (const t of targets()) {
           /contain\s*:[^;]*\b(paint|strict|content)\b/.test(line) ? 'contain:paint' : null;
         if (killer)
           add(rel, i, 'transform-на-стекле', `${killer} на .glass-элементе гасит backdrop-filter → перенеси на НЕ-стеклянную обёртку`);
+      }
+
+      /* 14 · РАСТЯНУТАЯ ПЛАШКА ПОД КОРОТКИЙ ТЕКСТ (DESIGN.md: «место используем
+         РАЗУМНО, НЕ фулл-ширина»). Признак болезни: ВИДИМАЯ плашка (свой фон,
+         рамка или скругление + отступы), содержимое по центру, а ширина ничем
+         не ограничена → два слова растягиваются на весь монитор.
+         Лечится одной строкой: width:max-content + margin-inline:auto.
+         Проверяем на блоке целиком: свойства часто раскиданы по строкам. */
+      if (isCss && blocks[i] && blocks[i].start === i) {
+        const b = blocks[i].body, sel = blocks[i].selector;
+        const isPlate = /(border-radius|background|border\s*:)/.test(b) && /padding/.test(b);
+        const isCentered = /text-align\s*:\s*center|justify-content\s*:\s*center/.test(b);
+        const isLimited = /max-width|(^|[;{\s])width\s*:|display\s*:\s*inline|grid-template-columns|(^|[;{\s])flex\s*:/.test(b);
+        /* Оверлеи, маски и подложки обязаны быть во всю площадь — это не болезнь.
+           Узнаём их структурно: вырваны из потока (absolute/fixed) и растянуты
+           по inset/сторонам, а не по ширине контента. */
+        const isOverlay = /position\s*:\s*(absolute|fixed)/.test(b)
+          && /(^|[;{\s])(inset|top|left|right|bottom)\s*:/.test(b);
+        const skip = /^(@|:root|html|body|\*)/.test(sel.trim()) || isOverlay;
+        if (isPlate && isCentered && !isLimited && !skip)
+          add(rel, i, 'растянутая-плашка', `${sel.trim().slice(0, 60)} → короткому контенту width:max-content + margin-inline:auto, пустые бока это НОРМА`);
       }
 
       /* 11 · ЧИСЛА МИМО ТОКЕНОВ — размеры/времена берём из шкал канона

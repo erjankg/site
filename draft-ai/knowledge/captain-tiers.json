@@ -1,0 +1,23 @@
+{
+ "_": "ТИРЛИСТ КОМПЕТА ПО ЛИНИЯМ. Пишет lab-draft-coach/tiers.html. knowledge.js вливает в notes.tiersByRole; coach.js:tierOf(KB,champ,state,lane) читает с учётом ЛИНИИ пика. src:\"soloCN\" — авто-сид из китайского винрейта (база, движок скидывает за малый пикрейт); src:\"captain\" — ТВОЁ компет-решение (без скидки). Файл отдельный, чтобы import-captain.mjs не затёр.",
+ "built": "2026-10-21T19:19:06.529Z",
+ "seedRank": "diamond_plus",
+ "count": 3,
+ "tiers": {},
+ "byRole": {
+  "Top": {
+   "Camille": {
+    "t": "S+",
+    "src": "captain"
+   },
+   "Gnar": {
+    "t": "S+",
+    "src": "captain"
+   },
+   "Gragas": {
+    "t": "S+",
+    "src": "captain"
+   }
+  }
+ }
+}

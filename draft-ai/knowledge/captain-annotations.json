@@ -1,0 +1,24 @@
+{
+ "_": "РАЗМЕТКА ДРАФТА ОТ ВЛАДЕЛЬЦА — ЕДИНСТВЕННЫЙ источник матчапов для кэпа. Пишет lab-draft-coach/coach.html. knowledge.js вливает derived в notes.matchups.pairs, notes.tiers, notes.flex, notes.flags и synergies.namedPairs. Скрейп data-pipeline кэп не читает вовсе.",
+ "built": "2026-10-21",
+ "counts": {
+  "annotations": 0,
+  "pairs": 0,
+  "synergy": 0,
+  "tiers": 0,
+  "flex": 0,
+  "flags": 0,
+  "seedDropped": 0,
+  "seedConfirmed": 0
+ },
+ "derived": {
+  "pairs": {},
+  "synergy": {},
+  "tiers": {},
+  "flex": {},
+  "flags": {},
+  "dropped": {},
+  "seedOk": {}
+ },
+ "annotations": []
+}

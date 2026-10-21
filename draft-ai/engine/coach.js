@@ -112,6 +112,20 @@
         text: r.say.replace('{a}', p[0].ru || p[0].dd).replace('{b}', p[1].ru || p[1].dd) });
     });
 
+    /* СВЯЗКИ, НАЗВАННЫЕ ВЛАДЕЛЬЦЕМ. Правила по механикам покрывают типовое;
+       живое «вот эти двое вместе работают» приходит из разметки драфта и
+       весит больше правила: это не вывод по тегам, а виденная игра. */
+    var named = (KB.synergies.namedPairs && KB.synergies.namedPairs.pairs) || [];
+    named.forEach(function (p) {
+      var has = function (n) { return champs.some(function (c) { return (c.dd && KB.idx.nameOf(c.dd) === KB.idx.nameOf(n)); }); };
+      if (!has(p.a) || !has(p.b)) return;
+      good.push({
+        id: 'captain_pair', fromCaptain: true,
+        weight: Math.min(5, 3 + ((p.count || 1) - 1)),
+        text: (p.why || 'связка из твоей разметки') + ' (' + ru(KB, p.a) + ' + ' + ru(KB, p.b) + ')',
+      });
+    });
+
     var hasCC = champs.some(function (c) { return ['cc_hard', 'cc_knockup', 'cc_root', 'cc_slow'].some(function (t) { return (c.tags || []).indexOf(t) !== -1; }); });
     if (champs.length >= 3 && !hasCC) {
       bad.push({ id: 'no_cc_gank', weight: 3, text: 'Ни у кого нет надёжного контроля — приходить на ганк нечем, цель просто уходит.' });
@@ -217,10 +231,30 @@
      Модель владельца: абсолютная / промежуточная / относительная. */
   var TIER_NUM = { 'S+': 5, S: 4, A: 3, B: 2, C: 1, D: 0 };
 
-  function tierOf(KB, champ, state) {
-    // капитанский тир перебивает авто: мета региональна
-    var over = KB.notes.tiers && KB.notes.tiers[KB.idx.nameOf(champ)];
+  function tierOf(KB, champ, state, lane) {
+    // мета региональна, поэтому компет-тир капитана перебивает соло-статистику.
+    // lane — линия, на которую чемпа ПИКАЮТ: тир у одного чемпа разный по ролям.
+    var name = KB.idx.nameOf(champ);
+    var byRole = KB.notes.tiersByRole;
+
+    // 1) тир по КОНКРЕТНОЙ линии пика
+    if (lane && byRole && byRole[lane] && byRole[lane][name]) {
+      var e = byRole[lane][name];
+      return { tier: e.tier, num: TIER_NUM[e.tier], fromCaptain: e.src === 'captain', perRole: true, src: e.src };
+    }
+    // 2) линия не задана (бан / оценка угрозы) — лучший тир чемпа по всем линиям
+    if (!lane && byRole) {
+      var bestT = null, bestSrc = null;
+      Object.keys(byRole).forEach(function (l) {
+        var x = byRole[l] && byRole[l][name]; if (!x) return;
+        if (bestT === null || TIER_NUM[x.tier] > TIER_NUM[bestT]) { bestT = x.tier; bestSrc = x.src; }
+      });
+      if (bestT !== null) return { tier: bestT, num: TIER_NUM[bestT], fromCaptain: bestSrc === 'captain', perRole: true, src: bestSrc };
+    }
+    // 3) плоская разметка владельца (из аннотаций) — жёсткое решение
+    var over = KB.notes.tiers && KB.notes.tiers[name];
     if (over) return { tier: over, num: TIER_NUM[over], fromCaptain: true };
+    // 4) соло-статистика по главной роли чемпа
     var m = KB.idx.meta(champ, state && state.rank);
     if (!m || TIER_NUM[m.tier] === undefined) return null;
     return { tier: m.tier, num: TIER_NUM[m.tier], pr: m.pr, fromCaptain: false };
@@ -291,8 +325,11 @@
 
   /* ── ФИРЛЕС: насколько опасно брать чемпа вслепую ─────────────────────── */
   function blindRisk(KB, champ, state) {
+    /* Источник матчапов у кэпа — разметка владельца (knowledge.js:MATCHUP_SOURCE).
+       Скрейпа может не быть вовсе, и это не повод молчать: пары капитана ниже
+       считаются сами по себе. Пусто и там — вернём честный ноль с пометкой. */
     var m = KB.matchups.of(champ);
-    if (!m || !m.lanes) return { risk: 0, killers: [], dead: [], note: 'матчапов по нему нет — риск не посчитать' };
+    var lanes = (m && m.lanes) || {};
     var gone = {};
     (state.fearlessUsed || []).forEach(function (n) { var k = KB.idx.nameOf(n); if (k) gone[k] = 'сгорел в серии'; });
     (state.bans && state.bans.blue || []).concat(state.bans && state.bans.red || []).forEach(function (n) {
@@ -307,10 +344,9 @@
     var weigh = function (row, opp) {
       var w = rowConfidence(row);
       var meta = KB.idx.meta(opp, state.rank);
-      if (meta) {
-        w += ({ 'S+': 2, S: 1.5, A: 1, B: 0.5 })[meta.tier] || 0;
-        if ((meta.pr || 0) >= 5) w += 0.5;   // его часто берут — угроза реальная
-      }
+      var tv = tierOf(KB, opp, state);                 // компет-тир выше соло
+      if (tv) w += ({ 'S+': 2, S: 1.5, A: 1, B: 0.5 })[tv.tier] || 0;
+      if (meta && (meta.pr || 0) >= 5) w += 0.5;       // его часто берут — угроза реальная
       return Math.round(w * 10) / 10;
     };
 
@@ -336,8 +372,8 @@
       if (pool && pool.indexOf(opp) === -1) { item.why = 'нет в пуле соперника'; dead.push(item); return; }
       killers.push(item);
     });
-    Object.keys(m.lanes).forEach(function (lane) {
-      (m.lanes[lane] || []).forEach(function (row) {
+    Object.keys(lanes).forEach(function (lane) {
+      (lanes[lane] || []).forEach(function (row) {
         if (row.verdict !== 'counteredBy') return;
         var opp = KB.idx.nameOf(row.opponent); if (!opp) return;
         if (refuted[opp]) return;   // капитан сказал обратное — пара выкинута
@@ -360,6 +396,11 @@
       main: killers.slice(0, 3),
       killers: killers, dead: dead,
       count: killers.length,
+      // сколько пар про него вообще размечено — по нему судим, можно ли верить нулю
+      known: capPairs.filter(function (p) {
+        return KB.idx.nameOf(p.a) === me || KB.idx.nameOf(p.b) === me;
+      }).length + Object.keys(lanes).reduce(function (n, l) { return n + (lanes[l] || []).length; }, 0),
+      note: (!killers.length && !dead.length) ? 'про него пар ещё не размечено — ноль контр тут не факт' : null,
     };
   }
 
@@ -370,10 +411,14 @@
   }
 
   /* ── ФЛЕКС: на скольких линиях реально играется ──────────────────────── */
+  /* ФЛЕКС. Теги знают только линии, которые видно по умениям. «Этот реально
+     играет на двух» знает владелец — он помечает чемпа флексом в разметке
+     драфта, и его флаг весит столько же, сколько две линии из данных. */
   function flexOf(KB, champ) {
     var c = KB.idx.champ(champ); if (!c) return { lanes: [], n: 0 };
     var lanes = (c.lanes || []).filter(function (l) { return LANES.indexOf(l) !== -1; });
-    return { lanes: lanes, n: lanes.length };
+    var marked = KB.notes.flex && KB.notes.flex[KB.idx.nameOf(champ)];
+    return { lanes: lanes, n: marked ? Math.max(lanes.length, 2) : lanes.length, fromCaptain: !!marked };
   }
 
   /* ── ДОСТУПНОСТЬ ─────────────────────────────────────────────────────── */
@@ -394,7 +439,7 @@
   function names(list) { return (list || []).map(function (p) { return p && p.champ ? p.champ : p; }).filter(Boolean); }
 
   /* ── ЦЕННОСТЬ ЧЕМПА ДЛЯ СТОРОНЫ ──────────────────────────────────────── */
-  function valueFor(KB, champ, side, state, rank) {
+  function valueFor(KB, champ, side, state, rank, lane) {
     var c = KB.idx.champ(champ); if (!c) return { value: -99, why: [] };
     var mine = names(state.picks && state.picks[side]);
     var theirSide = side === 'blue' ? 'red' : 'blue';
@@ -419,26 +464,36 @@
       else { v -= 2; why.push({ kind: 'matchup', bad: true, text: ru(KB, t) + ' его разбирает' + (mu.why[0] ? ' — ' + mu.why[0] : ''), date: mu.sourceDate }); }
     });
 
-    // мета: тир из свежей статистики
+    /* МЕТА: тир. Берём его ТОЛЬКО через tierOf — он сперва смотрит компет-тир
+       капитана (knowledge/captain-tiers.json), и лишь потом соло-статистику.
+       Раньше здесь читался meta.tier напрямую, и мнение владельца в вес пика
+       не попадало вовсе: тирлист менял один счётчик контр, а главный расчёт
+       шёл мимо него. */
     var meta = KB.idx.meta(champ, rank);
-    if (meta) {
-      var bonus = { 'S+': 3, S: 2, A: 1, B: 0, C: -1, D: -2 }[meta.tier];
+    var tv = tierOf(KB, champ, { rank: rank }, lane);      // тир с учётом линии пика
+    if (tv) {
+      var bonus = { 'S+': 3, S: 2, A: 1, B: 0, C: -1, D: -2 }[tv.tier];
       /* Тир на крошечном пикрейте — шум, а не сила: чемпа взяли пару раз,
          выиграли, и он «S+». Такой тир вытаскивал в советы чемпов, которых
-         никто не играет. Доверие к тиру растёт вместе с пикрейтом. */
-      if (bonus > 0) {
-        var pr = meta.pr || 0;
+         никто не играет. Доверие к тиру растёт вместе с пикрейтом.
+         К тиру КАПИТАНА скидка не применяется: это не выборка, а решение. */
+      if (bonus > 0 && !tv.fromCaptain) {
+        var pr = (meta && meta.pr) || 0;
         var trust = pr >= 4 ? 1 : pr >= 2 ? 0.6 : pr >= 1 ? 0.25 : 0;
         bonus = Math.round(bonus * trust * 10) / 10;
-        if (!bonus) why.push({ kind: 'meta', text: 'тир ' + meta.tier + ' при пикрейте '
+        if (!bonus) why.push({ kind: 'meta', text: 'тир ' + tv.tier + ' при пикрейте '
           + pr + '% — выборка мала, в вес не берём' });
       }
       if (bonus !== undefined) {
         v += bonus;
         // roleMismatch — статистика приписала чемпу линию, на которой он не играется.
         // Роль в таком случае не называем: соврём.
-        if (bonus) why.push({ kind: 'meta', text: 'тир ' + meta.tier
-          + (meta.roleMismatch ? '' : ' (' + meta.role + ')') + ', данные ' + fmtDate(meta.date) });
+        if (bonus) why.push({ kind: 'meta', text: tv.fromCaptain
+          ? 'тир ' + tv.tier + ' — компет-тир капитана'
+            + (meta && meta.tier ? ' (в соло ' + meta.tier + ')' : '')
+          : 'тир ' + tv.tier
+            + (!meta || meta.roleMismatch ? '' : ' (' + meta.role + ')')
+            + ', данные ' + fmtDate(meta && meta.date) });
       }
     }
 
@@ -446,7 +501,9 @@
     var fx = flexOf(KB, champ);
     if (fx.n >= 2 && !state.rolesLocked) {
       v += 1.5;
-      why.push({ kind: 'flex', text: 'играется на ' + fx.lanes.join(' и ') + ' — не показываем распределение' });
+      why.push({ kind: 'flex', text: fx.fromCaptain && fx.lanes.length < 2
+        ? 'ты отметил его флексом — распределение ролей не показываем'
+        : 'играется на ' + fx.lanes.join(' и ') + ' — не показываем распределение' });
     }
 
     // ручные заметки владельца перебивают автоматику

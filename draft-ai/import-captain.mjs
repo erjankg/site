@@ -87,6 +87,37 @@ const seen = new Map();
 for (const p of pairs) seen.set(`${p.a}|${p.b}|${p.lane || '*'}`, p);
 const final = [...seen.values()];
 
+/* ── СВЯЗКИ ОТ КАПИТАНА ────────────────────────────────────────────────────
+   Тот же человеческий формат, что у матчапов, только «A + B — почему».
+   Ложатся в synergies.namedPairs — их читает coach.js:findSynergies наравне
+   с правилами по механикам. Файла нет — значит связок пока не писали. */
+const SYN_SRC = path.join(DIR, 'knowledge', 'captain-synergies.txt');
+const SYN_OUT = path.join(DIR, 'knowledge', 'synergies.json');
+if (fs.existsSync(SYN_SRC)) {
+  const syn = JSON.parse(fs.readFileSync(SYN_OUT, 'utf8'));
+  const pairs = [];
+  const seen = new Set();
+  fs.readFileSync(SYN_SRC, 'utf8').split(/\r?\n/).forEach((raw, i) => {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) return;
+    const split = line.split(/\s[—–-]\s/);
+    const head = split[0].trim();
+    const why = split.slice(1).join(' - ').trim() || null;
+    const m = head.match(/^(.+?)\s*\+\s*(.+?)\s*$/);
+    if (!m) { problems.push(`связки, строка ${i + 1}: не понял формат — «${line}»`); return; }
+    const a = alias[norm(m[1])], b = alias[norm(m[2])];
+    if (!a || !b) { problems.push(`связки, строка ${i + 1}: не знаю «${!a ? m[1] : m[2]}»`); return; }
+    if (a === b) return;
+    const key = [a, b].sort().join('|');
+    if (seen.has(key)) return;
+    seen.add(key);
+    pairs.push({ a, b, why, count: 1, seed: /сид:/.test(why || ''), source: 'капитан' });
+  });
+  syn.namedPairs = { ...(syn.namedPairs || {}), pairs };
+  fs.writeFileSync(SYN_OUT, JSON.stringify(syn, null, 1));
+  console.log(`✓ Связок от капитана: ${pairs.length}`);
+}
+
 const notes = JSON.parse(fs.readFileSync(OUT, 'utf8'));
 notes.matchups = notes.matchups || {};
 notes.matchups._ = 'ПАРЫ ОТ КАПИТАНА. Собрано из captain-matchups.txt — правь ТОТ файл, этот перезапишется.';

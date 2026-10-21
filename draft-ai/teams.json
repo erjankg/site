@@ -1,0 +1,106 @@
+{
+ "_": "СОСТАВЫ И ПУЛЫ. Пишет lab-draft-coach/teams.html, читает coach.html → state.pools. Пул игрока режет кандидатов движка (draft-ai/engine/advise.js, poolOf).",
+ "built": "2026-10-20T23:00:29.984Z",
+ "active": "pmvha1ten",
+ "presets": [
+  {
+   "id": "pmvha1ten",
+   "name": "ПРОБНЫЙ состав — замени своим",
+   "updated": "2026-10-20",
+   "teams": {
+    "blue": {
+     "name": "ERjanKG",
+     "players": [
+      {
+       "name": "Эржан",
+       "role": "Top",
+       "champs": [
+        "Ornn",
+        "Malphite",
+        "Sion"
+       ]
+      },
+      {
+       "name": "Жан",
+       "role": "Jungle",
+       "champs": [
+        "LeeSin",
+        "Olaf"
+       ]
+      },
+      {
+       "name": "Айк",
+       "role": "Mid",
+       "champs": [
+        "Zed",
+        "Akshan",
+        "Ambessa"
+       ]
+      },
+      {
+       "name": "Дос",
+       "role": "Adc",
+       "champs": [
+        "Jinx",
+        "Ashe"
+       ]
+      },
+      {
+       "name": "Бек",
+       "role": "Support",
+       "champs": [
+        "Leona",
+        "Thresh"
+       ]
+      }
+     ]
+    },
+    "red": {
+     "name": "Соперник",
+     "players": [
+      {
+       "name": "в1",
+       "role": "Top",
+       "champs": [
+        "Darius",
+        "Garen"
+       ]
+      },
+      {
+       "name": "в2",
+       "role": "Jungle",
+       "champs": [
+        "MasterYi",
+        "Amumu"
+       ]
+      },
+      {
+       "name": "в3",
+       "role": "Mid",
+       "champs": [
+        "Yasuo",
+        "Katarina"
+       ]
+      },
+      {
+       "name": "в4",
+       "role": "Adc",
+       "champs": [
+        "Caitlyn",
+        "Ezreal"
+       ]
+      },
+      {
+       "name": "в5",
+       "role": "Support",
+       "champs": [
+        "Braum",
+        "Nami"
+       ]
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

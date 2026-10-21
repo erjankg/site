@@ -24,6 +24,7 @@
     notes:     'draft-ai/knowledge/champion-notes.json',
     bans:      'draft-ai/knowledge/ban-strategy.json',
     metaWeb:   'draft-ai/knowledge/meta-web.json',
+    counterPower: 'draft-ai/knowledge/counter-power.json',
     pro:       'draft-ai/knowledge/pro-drafting.json',
     cc:        'draft-ai/knowledge/cc-and-damage.json',
     summoners: 'draft-ai/knowledge/summoner-spells.json',
@@ -31,7 +32,27 @@
     matchIndex:'data-pipeline/matchups.json',
     stats:     'data-pipeline/wr-stats.json',
   };
+  /* НЕОБЯЗАТЕЛЬНЫЕ ФАЙЛЫ: их может не быть, и это НЕ ошибка.
+     captain-tiers.json — компет-тир от владельца. Он лежит ОТДЕЛЬНО от
+     champion-notes.json намеренно: import-captain.mjs перезаписывает notes
+     целиком (матчапы), и тиры в нём сгорали бы при каждом импорте.
+     При сборке знаний файл вливается в notes.tiers — там его и ищет
+     coach.js:tierOf(), который ставит тир капитана выше соло-статистики. */
+  var OPTIONAL = {
+    captainTiers: 'draft-ai/knowledge/captain-tiers.json',
+    annotations:  'draft-ai/knowledge/captain-annotations.json',
+  };
   var MATCHUP_DIR = 'data-pipeline/matchups/';
+
+  /* ── ИСТОЧНИК МАТЧАПОВ (решение владельца, 2026-10-21) ────────────────────
+     'captain' — кэп НЕ берёт скрейп за факт. Пары из data-pipeline/matchups
+     редакционные, местами перевёрнутые, и в расчёт драфта не идут вовсе:
+     знание матчапов начинается ПУСТЫМ и растёт только из разметки владельца
+     (captain-matchups.txt → notes.matchups.pairs, captain-annotations.json).
+     Сами файлы data-pipeline никуда не деваются — на них живут страницы
+     чемпионов сайта. Сюда они просто не попадают.
+     'scrape' — старое поведение, если когда-нибудь понадобится сравнить. */
+  var MATCHUP_SOURCE = 'captain';
 
   // Названия линий в статистике Tencent → наши
   var ROLE_TO_LANE = { Baron: 'Top', Top: 'Top', Jungle: 'Jungle', Mid: 'Mid',
@@ -118,6 +139,7 @@
     var cache = preloaded || {};
     return {
       of: function (any) {
+        if (MATCHUP_SOURCE !== 'scrape') return null;   // скрейп кэпу не источник
         var slug = idx.slugOf(any); if (!slug) return null;
         if (cache[slug] !== undefined) return cache[slug];
         var val = null;
@@ -169,7 +191,110 @@
     };
   }
 
+  /* ── РАЗМЕТКА ВЛАДЕЛЬЦА ПОВЕРХ ЗАМЕТОК ───────────────────────────────────
+     Порядок силы (слабое → сильное):
+       соло-статистика  <  разметка в драфте (captain-annotations)  <  тирлист руками
+     Разметка — быстрый сигнал «отметил по ходу дела», тирлист — осознанное
+     решение за столом, поэтому он главнее. Соло-тир остаётся фолбэком для
+     всех, кого не трогали ни там, ни там.
+     Флекс: tags-данные знают только линии из умений; «играет на двух» в
+     реальной команде знает владелец — его флаг и живёт в notes.flex. */
+  function mergeNotes(K) {
+    var der = (K.annotations && K.annotations.derived) || {};
+    var cap = (K.captainTiers && K.captainTiers.tiers) || null;
+    var capRole = (K.captainTiers && K.captainTiers.byRole) || null;   // тир ПО ЛИНИЯМ
+    var fromAnn = der.tiers || null;
+    var flex = der.flex || null;
+    if (!cap && !capRole && !fromAnn && !flex) return K.notes;
+
+    var tiers = {};
+    Object.keys(K.notes.tiers || {}).forEach(function (k) { tiers[k] = K.notes.tiers[k]; });
+    if (fromAnn) Object.keys(fromAnn).forEach(function (k) {
+      var t = fromAnn[k] && fromAnn[k].tier;
+      if (t) tiers[k] = t;
+    });
+    if (cap) Object.keys(cap).forEach(function (k) { if (cap[k]) tiers[k] = cap[k]; });
+
+    /* Тир по линии. Запись либо строка "S", либо {t:"S",src:"soloCN"|"captain"}.
+       src хранит СЛОЙ: soloCN — авто-сид из китайского винрейта (база, движок
+       всё ещё скидывает за малый пикрейт), captain — решение владельца (без
+       скидки). coach.js:tierOf читает это с учётом линии пика. */
+    var tiersByRole = null;
+    if (capRole) {
+      tiersByRole = {};
+      Object.keys(capRole).forEach(function (lane) {
+        var m = capRole[lane]; if (!m) return;
+        var o = {};
+        Object.keys(m).forEach(function (nm) {
+          var e = m[nm];
+          var t = (e && typeof e === 'object') ? e.t : e;
+          if (t) o[nm] = { tier: t, src: (e && e.src) || 'captain' };
+        });
+        tiersByRole[lane] = o;
+      });
+    }
+
+    var out = {};
+    Object.keys(K.notes).forEach(function (k) { out[k] = K.notes[k]; });
+    out.tiers = tiers;
+    if (tiersByRole) out.tiersByRole = tiersByRole;
+    if (flex) out.flex = flex;
+
+    /* Пары «кто кого бьёт», отмеченные прямо в драфте, подхватываются СРАЗУ —
+       не дожидаясь прогона import-captain.mjs. Человеческий источник всё равно
+       captain-matchups.txt: импорт перельёт те же пары в champion-notes.json,
+       а здесь они просто не теряются между разметкой и импортом.
+       Ключ — пара+линия без учёта направления: отметил наоборот — побеждает
+       СВЕЖЕЕ, потому что это и есть последнее слово владельца. */
+    if (der.flags) out.flags = der.flags;
+
+    /* ВЫКИНУТОЕ. Сид по механике — предположение, и владелец вправе сказать
+       «нет». Такая пара не просто не усиливается: она ВЫБЫВАЕТ из расчёта,
+       даже если лежит в champion-notes.json после импорта. */
+    var dropped = der.dropped || {};
+    if (Object.keys(dropped).length && K.notes.matchups && K.notes.matchups.pairs) {
+      out.matchups = Object.assign({}, K.notes.matchups, {
+        pairs: K.notes.matchups.pairs.filter(function (p) { return !dropped[p.a + '>' + p.b]; }),
+      });
+    }
+
+    var annPairs = der.pairs ? Object.keys(der.pairs).map(function (k) { return der.pairs[k]; }) : [];
+    if (annPairs.length) {
+      var byKey = {}, order = [];
+      var key = function (p) { return [p.a, p.b].sort().join('|') + '|' + (p.lane || '*'); };
+      ((out.matchups && out.matchups.pairs) || (K.notes.matchups && K.notes.matchups.pairs) || []).forEach(function (p) {
+        var k = key(p); if (!byKey[k]) order.push(k); byKey[k] = p;
+      });
+      annPairs.forEach(function (p) {
+        var k = key(p); if (!byKey[k]) order.push(k); byKey[k] = p;
+      });
+      out.matchups = Object.assign({}, K.notes.matchups, {
+        pairs: order.map(function (k) { return byKey[k]; }),
+      });
+    }
+    return out;
+  }
+
+  /* Связки, названные владельцем в драфте, кладём туда же, где живут
+     именованные пары, — findSynergies читает их наравне с правилами. */
+  function mergeSynergies(K) {
+    var der = (K.annotations && K.annotations.derived) || {};
+    var pairs = der.synergy ? Object.keys(der.synergy).map(function (k) { return der.synergy[k]; }) : [];
+    if (!pairs.length) return K.synergies;
+    var np = (K.synergies && K.synergies.namedPairs) || {};
+    var have = (np.pairs || []).slice();
+    var key = function (p) { return [p.a, p.b].sort().join('|'); };
+    var seen = {};
+    have.forEach(function (p) { seen[key(p)] = 1; });
+    pairs.forEach(function (p) { if (!seen[key(p)]) have.push(p); });
+    var out = {};
+    Object.keys(K.synergies).forEach(function (k) { out[k] = K.synergies[k]; });
+    out.namedPairs = Object.assign({}, np, { pairs: have });
+    return out;
+  }
+
   function assemble(K, base, preloadedMatchups) {
+    K = Object.assign({}, K, { notes: mergeNotes(K), synergies: mergeSynergies(K) });
     var idx = buildIndex(K);
     var policy = (K.matchIndex && K.matchIndex.policy)
       || { useStatWinrate: false, reason: 'политика не найдена — цифрам не доверяем' };
@@ -179,6 +304,7 @@
       patterns: K.patterns, rules: K.rules, archetypes: K.archetypes,
       synergies: K.synergies, timing: K.timing, notes: K.notes,
       cc: K.cc, summoners: K.summoners, bans: K.bans, pro: K.pro, metaWeb: K.metaWeb,
+      counterPower: K.counterPower,
       tags: K.tags, stats: K.stats,
       whyRules: (K.matchIndex && K.matchIndex.rules) || [],
       policy: policy,
@@ -206,17 +332,27 @@
     base = base || process.cwd();
     var K = {};
     Object.keys(PATHS).forEach(function (k) { K[k] = readJson(PATHS[k], base); });
+    Object.keys(OPTIONAL).forEach(function (k) {
+      try { K[k] = readJson(OPTIONAL[k], base); } catch (e) { K[k] = null; }   // файла нет — так и живём
+    });
     return assemble(K, base);
   }
 
   // Браузер: всё тянем по сети. Матчапы догружаются пачкой по нужным чемпам.
   function loadAsync(baseUrl) {
     baseUrl = (baseUrl || '/').replace(/\/?$/, '/');
-    var keys = Object.keys(PATHS);
+    var keys = Object.keys(PATHS), opt = Object.keys(OPTIONAL);
     return Promise.all(keys.map(function (k) {
       return fetch(baseUrl + PATHS[k]).then(function (r) { return r.json(); });
-    })).then(function (arr) {
-      var K = {}; keys.forEach(function (k, i) { K[k] = arr[i]; });
+    }).concat(opt.map(function (k) {
+      // необязательный файл: нет его — не ошибка, едем дальше
+      return fetch(baseUrl + OPTIONAL[k])
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    }))).then(function (arr) {
+      var K = {};
+      keys.forEach(function (k, i) { K[k] = arr[i]; });
+      opt.forEach(function (k, i) { K[k] = arr[keys.length + i]; });
       var kb = assemble(K, baseUrl, {});
       kb.fetchMatchups = function (namesList) {
         var slugs = namesList.map(kb.idx.slugOf).filter(Boolean);

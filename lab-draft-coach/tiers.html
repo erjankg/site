@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru" data-glass="on">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>lab-draft-coach · тирлист компета</title>
+  <link rel="stylesheet" href="../canon-tokens.css?v=1">
+  <link rel="stylesheet" href="coach-lab.css?v=9">
+</head>
+<body>
+
+  <div class="cx-splash" aria-hidden="true"></div>
+  <div class="cx-scrim" aria-hidden="true"></div>
+
+  <div class="cx-app">
+
+    <header class="cx-top glass" id="trTop"></header>
+
+    <div class="cx-work tr-work">
+      <!-- ДОСКА: 6 рядов тиров, чемпионы лежат по СВОЕМУ тиру (или по соло) -->
+      <section class="cx-pane cx-pane--tight glass" id="trBoard"></section>
+
+      <!-- ИНСПЕКТОР: что за чемпион, что говорит солока, какой тир ставим -->
+      <aside class="cx-pane cx-pane--tight glass" id="trIns"></aside>
+    </div>
+
+  </div>
+
+  <div class="cx-toast" id="trToast" role="status"></div>
+  <div class="cx-boot" id="trBoot">Читаю чемпионов и статистику…</div>
+
+  <script src="../lab-morph.js?v=2"></script>
+  <script src="../draft-ai/engine/knowledge.js?v=5"></script>
+  <script src="../draft-ai/engine/coach.js?v=5"></script>
+  <script src="tiers-lab.js?v=5"></script>
+</body>
+</html>

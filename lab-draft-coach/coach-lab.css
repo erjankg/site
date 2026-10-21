@@ -1,0 +1,478 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   lab-draft-coach — ОБЩИЙ МАТЕРИАЛ двух экранов ИИ-КЭПА.
+
+   Экраны:
+     rate.html  — вычитка матчапов (клавиатурный конвейер, пишет знания)
+     coach.html — ИИ-кэп: драфт + видимый разбор + 👍/👎
+
+   ВКУС: минимал-дашборд (Revolut/iOS). Плотная сетка, тонкие линии, один
+   акцент (белый), цвет ТОЛЬКО там, где он несёт данные (сторона, вердикт).
+
+   КАНОН (DESIGN.md + canon-tokens.css):
+     · все числа из шкал --sp-* / --r-* / --fs-* / --dur-*
+     · стекло ТОЛЬКО через .glass (своё писать запрещено)
+     · белое — по шкале --sel-*, hex не пишем
+     · слои — по шкале --z-*
+
+   ЖИВОСТЬ (правила переноса анимаций):
+     · ноль `infinite`, ноль «появления» на постоянных блоках
+     · движется только transform/opacity (шкала композитора), остальное — нет
+     · прогресс-бар — scaleX, НЕ width (width гонит layout каждый кадр)
+     · transform НИКОГДА не на самом .glass — гасит backdrop-filter
+
+   GOTCHA: тень на нажатии — opacity псевдоэлемента, а не анимация box-shadow.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+html[data-glass="on"] {
+  /* стороны драфта = ДАННЫЕ (кто ходит), а не тема оформления */
+  --blue: #7ec8e3;
+  --red: #ff8a7a;
+
+  --pad: var(--sp-5);
+  --gap: var(--sp-4);
+  --ico: var(--ava-sm);          /* иконка чемпа в списках */
+  --ico-big: var(--ava-md);      /* иконка чемпа в карточке пары */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-ui);
+  font-size: var(--fs-base);
+  line-height: var(--lh-snug);
+  color: var(--txt);
+  background: var(--bg-page);
+  overflow: hidden;
+}
+
+/* ── ПОДЛОЖКА: ОДИН глобальный сплэш за всем стеклом (канал --splash-img) ── */
+.cx-splash {
+  position: fixed; inset: 0; z-index: 0;
+  background-image: var(--splash-img);
+  background-size: cover;
+  background-position: center 18%;
+  background-repeat: no-repeat;
+}
+.cx-scrim {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: var(--scrim-bg);
+}
+
+/* ── КАРКАС ЭКРАНА: шапка + рабочая область. Скролит ТОЛЬКО область. ── */
+.cx-app {
+  position: relative; z-index: var(--z-raised);
+  height: 100%;
+  display: flex; flex-direction: column;
+  gap: var(--gap);
+  padding: var(--gap);
+}
+
+/* ── ШАПКА (постоянный блок: ничего не «появляется») ── */
+.cx-top {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: var(--sp-5);
+  padding: var(--sp-4) var(--pad);
+}
+.cx-mark { font-size: var(--fs-md); font-weight: var(--fw-semi); letter-spacing: .02em; white-space: nowrap; }
+.cx-mark b { font-weight: var(--fw-bold); }
+.cx-mark span { color: var(--txt-faint); font-weight: var(--fw-normal); }
+.cx-sp { flex: 1 1 auto; }
+
+/* счётчик прогресса «137 / 892» */
+.cx-count { font-variant-numeric: tabular-nums; font-size: var(--fs-md); font-weight: var(--fw-semi); white-space: nowrap; }
+.cx-count i { color: var(--txt-faint); font-style: normal; font-weight: var(--fw-normal); }
+.cx-bar {
+  position: relative; overflow: hidden;
+  width: var(--card-w); height: 4px;
+  border-radius: var(--r-pill);
+  background: var(--sel-09);
+}
+.cx-bar > i {
+  position: absolute; inset: 0;
+  transform-origin: left center;
+  transform: scaleX(0);                   /* прогресс = scaleX, не width */
+  background: var(--accent);
+  transition: transform var(--dur-slow) var(--ease-out-expo);
+}
+
+/* ── ПОЛЯ И КНОПКИ (один материал на оба экрана) ── */
+.cx-field, .cx-btn, .cx-chip {
+  font-family: inherit; font-size: var(--fs-sm); color: var(--txt);
+  background: var(--sel-05);
+  border: 1px solid var(--sel-09);
+  border-radius: var(--r-sm);
+  padding: var(--sp-2) var(--sp-3);
+}
+.cx-field { min-width: 0; }
+.cx-field::placeholder { color: var(--txt-faint); }
+select.cx-field { appearance: none; padding-right: var(--sp-5); cursor: pointer; }
+select.cx-field option { background: var(--bg-page); color: var(--txt); }
+
+.cx-btn {
+  position: relative;
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease-standard),
+              border-color var(--dur-fast) var(--ease-standard),
+              transform var(--dur-fast) var(--ease-standard);
+}
+.cx-btn::after {                           /* тень лежит готовой, двигаем opacity */
+  content: ""; position: absolute; inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--sh-sm);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease-standard);
+}
+.cx-btn:hover { background: var(--sel-09); border-color: var(--sel-18); }
+.cx-btn:hover::after { opacity: 1; }
+.cx-btn:active { transform: translateY(1px); }
+.cx-btn:disabled { opacity: .45; cursor: default; }
+.cx-btn kbd {
+  font-family: inherit; font-size: var(--fs-2xs); color: var(--txt-faint);
+  border: 1px solid var(--sel-12); border-radius: var(--r-xs);
+  padding: 0 var(--sp-1);
+}
+.cx-btn.on { background: var(--accent); border-color: transparent; color: var(--on-accent); }
+.cx-btn.on kbd { color: var(--on-accent); border-color: var(--sel-45); }
+.cx-btn--wide { width: 100%; justify-content: center; }
+.cx-btn--good { color: var(--data-good); }
+.cx-btn--bad { color: var(--data-bad); }
+
+.cx-chip { color: var(--txt-mute); border-radius: var(--r-pill); white-space: nowrap; }
+.cx-chip--warn { color: var(--data-mid); border-color: var(--sel-18); }
+.cx-chip--good { color: var(--data-good); }
+.cx-chip--bad { color: var(--data-bad); }
+
+.cx-seg { display: flex; gap: var(--sp-1); }
+
+/* ── РАБОЧАЯ ОБЛАСТЬ ── */
+.cx-work { flex: 1 1 auto; min-height: 0; display: grid; gap: var(--gap); }
+.cx-pane { min-height: 0; display: flex; flex-direction: column; padding: var(--pad); }
+.cx-pane--tight { padding: var(--sp-4); }
+.cx-h {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: var(--sp-3);
+  font-size: var(--fs-xs); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--txt-faint);
+  padding-bottom: var(--sp-3);
+}
+.cx-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.cx-scroll::-webkit-scrollbar { width: 6px; }
+.cx-scroll::-webkit-scrollbar-thumb { background: var(--sel-18); border-radius: var(--r-pill); }
+.cx-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* ── ИКОНКА ЧЕМПА (картинка + буквенный запас, если арта нет) ── */
+.cx-face {
+  position: relative; flex: 0 0 auto;
+  width: var(--ico); height: var(--ico);
+  border-radius: var(--r-sm); overflow: hidden;
+  background: var(--sel-09);
+  display: grid; place-items: center;
+  font-size: var(--fs-sm); font-weight: var(--fw-bold); color: var(--txt-faint);
+}
+.cx-face img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cx-face--big { width: var(--ico-big); height: var(--ico-big); border-radius: var(--r-md); font-size: var(--fs-xl); }
+
+/* ══ ЭКРАН 1 · ВЫЧИТКА ══════════════════════════════════════════════════ */
+.rt-work { grid-template-columns: minmax(0, 1fr) var(--sidecard-reserve); }
+
+/* карточка пары — ПОСТОЯННЫЙ блок: меняется содержимое, а не узлы (labMorph) */
+.rt-card { align-items: center; justify-content: center; gap: var(--gap); text-align: center; }
+.rt-lane { display: flex; justify-content: center; }
+.rt-pair {
+  display: flex; align-items: center; justify-content: center; gap: var(--sp-5);
+  width: max-content; max-width: 100%; margin-inline: auto;
+}
+.rt-who { display: flex; align-items: center; gap: var(--sp-3); }
+.rt-who b { font-size: var(--fs-2xl); font-weight: var(--fw-semi); white-space: nowrap; }
+.rt-who.loser { opacity: .55; }
+.rt-vs {
+  font-size: var(--fs-xs); letter-spacing: .16em; text-transform: uppercase;
+  color: var(--txt-faint);
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-1);
+}
+.rt-vs s { text-decoration: none; font-size: var(--fs-xl); color: var(--txt); }
+
+/* «что говорит скрейп» — отдельной плашкой: видно, где чужое мнение,
+   а где уже твоё (поле ниже) */
+.rt-plate {
+  width: 100%; max-width: var(--modal-lg); margin-inline: auto;
+  text-align: left;
+  border: 1px solid var(--sel-09); border-radius: var(--r-md);
+  background: var(--sel-05);
+  padding: var(--sp-4);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.rt-plate .cx-h { padding-bottom: 0; }
+
+/* очередь: видно, что едет следом — низ карточки не пустует */
+.rt-next { width: 100%; display: flex; flex-direction: column; gap: var(--sp-2); }
+.rt-next .cx-h { justify-content: center; padding-bottom: 0; }
+.rt-next .row { display: flex; gap: var(--sp-2); flex-wrap: wrap; justify-content: center; }
+.rt-next .q {
+  font-size: var(--fs-sm); color: var(--txt-faint);
+  border: 1px solid var(--sel-09); border-radius: var(--r-pill);
+  padding: var(--sp-1) var(--sp-3);
+  white-space: nowrap;
+}
+
+.rt-why {
+  width: 100%;
+  display: flex; flex-direction: column; gap: var(--sp-2);
+}
+.rt-why li { list-style: none; display: flex; gap: var(--sp-3); color: var(--txt-dim); font-size: var(--fs-md); }
+.rt-why li::before { content: "·"; color: var(--txt-faint); }
+.rt-why li.bare { color: var(--txt-faint); font-style: italic; }
+.rt-src { display: flex; gap: var(--sp-2); justify-content: center; flex-wrap: wrap; }
+
+.rt-edit { width: 100%; max-width: var(--modal-lg); margin-inline: auto; text-align: left; }
+.rt-edit label { display: block; font-size: var(--fs-xs); color: var(--txt-faint); padding-bottom: var(--sp-2); }
+textarea.cx-field { width: 100%; resize: vertical; min-height: var(--sp-9); line-height: var(--lh-normal); }
+
+.rt-rate { display: flex; align-items: center; gap: var(--sp-2); justify-content: center; flex-wrap: wrap; }
+.rt-rate .lbl { font-size: var(--fs-xs); color: var(--txt-faint); padding-right: var(--sp-2); }
+.rt-rate .cx-btn { min-width: var(--ic-md); justify-content: center; font-variant-numeric: tabular-nums; }
+.rt-acts { display: flex; gap: var(--sp-3); justify-content: center; flex-wrap: wrap; }
+
+.rt-done { text-align: center; color: var(--txt-mute); display: flex; flex-direction: column; gap: var(--sp-4); align-items: center; }
+.rt-done b { font-size: var(--fs-2xl); color: var(--txt); }
+
+/* правый столбец: журнал решений + подсказки клавиш */
+.rt-log { display: flex; flex-direction: column; gap: var(--sp-2); }
+.rt-log li { list-style: none; display: flex; align-items: center; gap: var(--sp-3); font-size: var(--fs-sm); color: var(--txt-mute); }
+.rt-log li .v { flex: 0 0 auto; width: var(--ic-xs); text-align: center; }
+.rt-log li .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rt-keys { display: flex; flex-direction: column; gap: var(--sp-2); font-size: var(--fs-sm); color: var(--txt-mute); }
+.rt-keys div { display: flex; gap: var(--sp-3); }
+.rt-keys kbd {
+  flex: 0 0 auto; min-width: var(--ic-md); text-align: center;
+  font-family: inherit; font-size: var(--fs-xs); color: var(--txt);
+  background: var(--sel-09); border: 1px solid var(--sel-12); border-radius: var(--r-xs);
+  padding: var(--sp-px) var(--sp-1);
+}
+.rt-filters { display: flex; flex-direction: column; gap: var(--sp-3); }
+.rt-filters .row { display: flex; align-items: center; gap: var(--sp-2); }
+.rt-filters .row > .cx-field { flex: 1 1 auto; }
+
+/* ══ ЭКРАН 2 · ИИ-КЭП ═══════════════════════════════════════════════════ */
+.ch-work { grid-template-columns: var(--pick-w) minmax(0, 1fr) var(--modal-md); }
+
+/* борд: обе команды в одной колонке */
+.ch-board { gap: var(--sp-6); overflow-y: auto; overscroll-behavior: contain; }
+.ch-board::-webkit-scrollbar { width: 6px; }
+.ch-board::-webkit-scrollbar-thumb { background: var(--sel-18); border-radius: var(--r-pill); }
+.ch-team { display: flex; flex-direction: column; gap: var(--sp-3); }
+.ch-team .cx-h { color: var(--side); padding-bottom: 0; }
+.ch-side-blue { --side: var(--blue); }
+.ch-side-red { --side: var(--red); }
+.ch-bans { display: flex; gap: var(--sp-2); }
+.ch-bans .cx-face { opacity: .5; }
+.ch-bans .cx-face.now { opacity: 1; box-shadow: 0 0 0 1px var(--side); }
+.ch-slots { display: flex; flex-direction: column; gap: var(--sp-2); }
+.ch-slot {
+  display: flex; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-2);
+  border: 1px solid var(--sel-09); border-radius: var(--r-sm);
+  background: var(--sel-05);
+}
+.ch-slot .n { font-size: var(--fs-xs); color: var(--txt-faint); width: var(--ic-sm); flex: 0 0 auto; }
+.ch-slot .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-md); }
+.ch-slot.empty .nm { color: var(--txt-faint); }
+.ch-slot.now { border-color: var(--side); }
+.ch-slot.ban { opacity: .7; }
+.ch-slot.ban .nm { text-decoration: line-through; color: var(--txt-mute); }
+.ch-sub { font-size: var(--fs-xs); color: var(--txt-faint); padding-top: var(--sp-2); }
+
+/* сетка чемпионов */
+/* ширина ячейки: имя чемпиона + тир-бейдж должны помещаться целиком,
+   иначе сетка превращается в «Аат… Амбе… Фидд…» */
+.ch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(var(--ava-lg) + var(--sp-8)), 1fr)); gap: var(--sp-2); padding-right: var(--sp-2); }
+.ch-cell {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2);
+  border: 1px solid var(--sel-09); border-radius: var(--r-sm);
+  background: var(--sel-05);
+  cursor: pointer; text-align: left;
+  color: var(--txt); font-family: inherit; font-size: var(--fs-sm);
+  transition: background var(--dur-fast) var(--ease-standard), border-color var(--dur-fast) var(--ease-standard);
+}
+.ch-cell:hover { background: var(--sel-09); border-color: var(--sel-18); }
+.ch-cell .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ch-cell .t { margin-left: auto; font-size: var(--fs-2xs); color: var(--txt-faint); }
+.ch-cell[disabled] { opacity: .3; cursor: default; }
+.ch-cell.hit { border-color: var(--accent); }
+
+/* панель ИИ: заголовок линии → ход → РАЗБОР целиком → цена → 👍/👎 */
+.ch-lines { display: flex; flex-direction: column; gap: var(--sp-4); }
+.ch-line {
+  border: 1px solid var(--sel-09); border-radius: var(--r-md);
+  background: var(--sel-05);
+  padding: var(--sp-4);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.ch-line.warn { border-color: var(--sel-18); }
+.ch-line-h { display: flex; align-items: center; gap: var(--sp-3); }
+.ch-line-h .num {
+  flex: 0 0 auto; width: var(--ic-sm); height: var(--ic-sm);
+  display: grid; place-items: center;
+  font-size: var(--fs-xs); color: var(--txt-faint);
+  border: 1px solid var(--sel-12); border-radius: var(--r-xs);
+}
+.ch-line-h .ru { font-size: var(--fs-md); font-weight: var(--fw-semi); }
+.ch-move { display: flex; align-items: center; gap: var(--sp-3); }
+.ch-move b { font-size: var(--fs-xl); font-weight: var(--fw-semi); }
+.ch-move .cx-btn { margin-left: auto; }
+.ch-arg { display: flex; flex-direction: column; gap: var(--sp-2); }
+.ch-arg li { list-style: none; display: flex; gap: var(--sp-3); font-size: var(--fs-md); color: var(--txt-dim); }
+.ch-arg li::before { content: "→"; color: var(--txt-faint); flex: 0 0 auto; }
+.ch-arg li.bad { color: var(--data-bad-soft); }
+.ch-cost { font-size: var(--fs-sm); color: var(--data-mid); display: flex; gap: var(--sp-3); }
+.ch-cost::before { content: "цена"; text-transform: uppercase; letter-spacing: .12em; font-size: var(--fs-2xs); color: var(--txt-faint); flex: 0 0 auto; padding-top: 2px; }
+.ch-wait { font-size: var(--fs-sm); color: var(--txt-mute); }
+.ch-vote { display: flex; align-items: center; gap: var(--sp-2); padding-top: var(--sp-1); }
+.ch-vote .said { font-size: var(--fs-xs); color: var(--txt-faint); margin-left: auto; }
+.ch-note { font-size: var(--fs-sm); color: var(--txt-faint); }
+.ch-turn { display: flex; align-items: center; gap: var(--sp-3); }
+.ch-turn .who { font-weight: var(--fw-semi); color: var(--side); }
+
+/* ── ТИР-БЕЙДЖ: цвет НЕСЁТ ДАННЫЕ (сила чемпиона), поэтому он цветной ── */
+.cx-tier {
+  flex: 0 0 auto;
+  min-width: var(--ic-sm);
+  text-align: center;
+  font-size: var(--fs-2xs); font-weight: var(--fw-bold);
+  border: 1px solid var(--sel-12); border-radius: var(--r-xs);
+  padding: 0 var(--sp-1);
+  color: var(--txt-faint);
+}
+.cx-tier[data-tier="S+"] { color: var(--tier-s-plus); }
+.cx-tier[data-tier="S"] { color: var(--tier-s); }
+.cx-tier[data-tier="A"] { color: var(--tier-a); }
+.cx-tier[data-tier="B"] { color: var(--tier-b); }
+.cx-tier[data-tier="C"] { color: var(--tier-c); }
+.cx-tier[data-tier="D"] { color: var(--tier-d); }
+.cx-tier.cap { border-color: var(--sel-45); }   /* тир от капитана, не авто */
+
+/* ══ ЭКРАН 0 · СЕТАП КОМАНД ═════════════════════════════════════════════ */
+.tm-work { grid-template-columns: var(--modal-md) minmax(0, 1fr) var(--modal-md); }
+.tm-team { gap: var(--sp-3); }
+.tm-name { width: 100%; font-size: var(--fs-md); font-weight: var(--fw-semi); }
+.tm-players { display: flex; flex-direction: column; gap: var(--sp-2); }
+.tm-player {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-2);
+  border: 1px solid var(--sel-09); border-radius: var(--r-sm);
+  background: var(--sel-05);
+  cursor: pointer;
+}
+.tm-player.on { border-color: var(--accent); background: var(--sel-09); }
+.tm-player .role { flex: 0 0 auto; width: calc(var(--rail-min) + var(--sp-6)); font-size: var(--fs-xs); }
+.tm-player .nm { flex: 1 1 auto; min-width: 0; }
+.tm-player .n {
+  flex: 0 0 auto; font-size: var(--fs-xs); color: var(--txt-faint);
+  font-variant-numeric: tabular-nums;
+}
+.tm-player .n b { color: var(--txt); font-weight: var(--fw-semi); }
+.tm-pool { display: flex; flex-wrap: wrap; gap: var(--sp-1); padding-top: var(--sp-1); }
+.tm-pool .p {
+  font-size: var(--fs-2xs); color: var(--txt-mute);
+  border: 1px solid var(--sel-09); border-radius: var(--r-pill);
+  padding: 0 var(--sp-2);
+}
+.tm-hint { font-size: var(--fs-sm); color: var(--txt-faint); }
+.ch-cell.in { border-color: var(--accent); background: var(--sel-12); }
+.ch-cell.out { opacity: .4; }          /* вне пула текущего хода */
+
+/* ══ РЕЖИМ РАЗМЕТКИ (в кэпе, на каждый ход) ══════════════════════════════
+   Знание матчапов начинается пустым и растёт отсюда. Поэтому форма стоит
+   НА ПУТИ хода, а не прячется в углу: разметил — поехали дальше. */
+.an-wrap { display: flex; flex-direction: column; gap: var(--sp-4); }
+.an-who { display: flex; align-items: center; gap: var(--sp-3); }
+.an-who b { font-size: var(--fs-2xl); font-weight: var(--fw-semi); }
+.an-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.an-tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.an-tags .cx-btn.on { background: var(--accent); border-color: transparent; color: var(--on-accent); }
+.an-targets {
+  display: flex; flex-wrap: wrap; gap: var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--sel-09); border-radius: var(--r-sm);
+  background: var(--sel-05);
+}
+.an-targets .lbl { font-size: var(--fs-xs); color: var(--txt-faint); width: 100%; }
+.an-targets .cx-btn.on { border-color: var(--accent); background: var(--sel-12); }
+.an-acts { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+.an-done { display: flex; flex-direction: column; gap: var(--sp-2); }
+.an-done li { list-style: none; font-size: var(--fs-sm); color: var(--txt-mute); }
+.an-done li b { color: var(--txt); font-weight: var(--fw-semi); }
+
+/* ══ ЭКРАН 3 · РЕДАКТОР ТИРЛИСТА ════════════════════════════════════════
+   Соло-тир из статистики — СИД: с него начинают, но главный тир ставит
+   человек. Поэтому «моё» и «пришло из соло» должны отличаться на глаз. */
+.tr-work { grid-template-columns: minmax(0, 1fr) var(--modal-md); }
+.tr-board { display: flex; flex-direction: column; gap: var(--sp-3); padding-right: var(--sp-2); }
+.tr-row {
+  display: flex; gap: var(--sp-3); align-items: flex-start;
+  padding: var(--sp-3);
+  border: 1px solid var(--sel-09); border-radius: var(--r-md);
+  background: var(--sel-05);
+}
+.tr-row.over { border-color: var(--accent); background: var(--sel-09); }
+.tr-lab {
+  flex: 0 0 auto; width: var(--rail-min); text-align: center; cursor: pointer;
+  font-size: var(--fs-2xl); font-weight: var(--fw-black); line-height: var(--lh-tight);
+  color: var(--txt-faint);
+}
+.tr-lab[data-tier="S+"] { color: var(--tier-s-plus); }
+.tr-lab[data-tier="S"] { color: var(--tier-s); }
+.tr-lab[data-tier="A"] { color: var(--tier-a); }
+.tr-lab[data-tier="B"] { color: var(--tier-b); }
+.tr-lab[data-tier="C"] { color: var(--tier-c); }
+.tr-lab[data-tier="D"] { color: var(--tier-d); }
+.tr-lab small { display: block; font-size: var(--fs-2xs); font-weight: var(--fw-normal); color: var(--txt-faint); }
+.tr-chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); flex: 1 1 auto; min-height: var(--ava-sm); }
+.tr-chip {
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2);
+  border: 1px solid var(--sel-09); border-radius: var(--r-sm);
+  background: var(--sel-05);
+  font-size: var(--fs-sm); color: var(--txt);
+  cursor: grab; font-family: inherit;
+}
+.tr-chip.mine { border-color: var(--sel-45); }       /* тир поставлен руками */
+.tr-chip.sel { border-color: var(--accent); background: var(--sel-12); }
+.tr-chip .wr { font-size: var(--fs-2xs); font-variant-numeric: tabular-nums; }
+.tr-chip .wr.up { color: var(--data-good); }
+.tr-chip .wr.dn { color: var(--data-bad); }
+.tr-empty { font-size: var(--fs-sm); color: var(--txt-faint); align-self: center; }
+
+.tr-ins { display: flex; flex-direction: column; gap: var(--sp-4); }
+.tr-ins .who { display: flex; align-items: center; gap: var(--sp-3); }
+.tr-ins .who b { font-size: var(--fs-2xl); font-weight: var(--fw-semi); }
+.tr-ins .solo { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.tr-set { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.tr-set .cx-btn { min-width: var(--ic-md); justify-content: center; font-weight: var(--fw-bold); }
+
+/* ── ТОСТ: единственное, что РЕАЛЬНО появляется (и потому анимируется) ── */
+.cx-toast {
+  position: fixed; left: 50%; bottom: var(--sp-6); z-index: var(--z-toast);
+  padding: var(--sp-3) var(--pad);
+  border: 1px solid var(--sel-12); border-radius: var(--r-pill);
+  background: var(--sel-09);
+  font-size: var(--fs-sm);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-standard), transform var(--dur-base) var(--ease-out-expo);
+  transform: translate(-50%, var(--sp-3));
+}
+.cx-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.cx-toast.bad { color: var(--data-bad); }
+
+/* ── ЗАГРУЗКА: честная строка, без вечного спиннера ── */
+.cx-boot { position: fixed; inset: 0; z-index: var(--z-scrim); display: grid; place-items: center; color: var(--txt-mute); background: var(--bg-page); }
+.cx-boot b { font-weight: var(--fw-semi); color: var(--txt); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cx-bar > i, .cx-btn, .cx-btn::after, .cx-toast, .ch-cell { transition: none; }
+  .cx-btn:active { transform: none; }
+}
