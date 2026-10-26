@@ -3,7 +3,7 @@
   "name": "Ashe",
   "role": "Дракон",
   "tier": "B",
-  "patch": "7.3b",
+  "patch": "7.3c",
   "dataDate": "2026-04-20",
   "matchups": [
     {
@@ -298,8 +298,8 @@
           "Long Sword"
         ],
         "core": [
-          "Kraken Slayer",
           "Stormrazor",
+          "Yun Tal Wildarrows",
           "Lord Dominik's Regard"
         ],
         "boots": [
@@ -307,11 +307,11 @@
           "Galeforce"
         ],
         "finalBuild": [
-          "Kraken Slayer",
-          "Berserker's Greaves",
           "Stormrazor",
+          "Berserker's Greaves",
+          "Yun Tal Wildarrows",
           "Lord Dominik's Regard",
-          "Hexoptics C44",
+          "Infinity Edge",
           "Berserker's Greaves - Galeforce"
         ]
       }
