@@ -1,0 +1,35 @@
+{
+ "_": "Sovereign Cup III (Wild Rift). Первый игрок в каждом составе = КАПИТАН. Везде показывать «Ник ★ КЭП». Порядок команд в группе важен (команда 1..4 для GSL-сетки). Читают: страница прогноза (Claude Design) + логика/сохранение (Claude Code).",
+ "tournament": "Sovereign Cup III",
+ "game": "Wild Rift",
+ "format": { "teams": 16, "groups": 4, "perGroup": 4, "groupStage": "GSL", "series": "Bo3", "playoff": "double-elimination (8 команд, по 2 из группы)" },
+ "scoring": { "S+": 5, "S": 4, "A+": 3, "A": 2, "B": 1, "maxTeam": 25 },
+ "teamTierThresholds": { "note": "тир команды по СРЕДНЕМУ оценённых игроков", "S+": 4.5, "S": 3.5, "A+": 2.5, "A": 1.5, "else": "B" },
+ "playerTiers": ["S+", "S", "A+", "A", "B"],
+ "groups": {
+  "A": [
+   { "team": "Dragon Slayers", "players": ["KAM1K", "QUEENIE", "SENZEE", "DED", "ANDREW TERROR"] },
+   { "team": "Silver Falcons", "players": ["HANKE", "T1M1NG1", "SXRGY", "ARBZ07", "CREED"] },
+   { "team": "Sea Devils", "players": ["MOON", "4ILD", "1MBIR", "ARMONTE", "KIRLYAO"] },
+   { "team": "Bronze Bulls", "players": ["DICIGNER", "ПОНТИЙ ПИЛАТ", "КБС", "K1DORIYA", "SORRYMAKER"] }
+  ],
+  "B": [
+   { "team": "Phoenix Order", "players": ["ERJANKG", "RAY", "IMPERATØR", "MASKA", "MASQUENO"] },
+   { "team": "Azure Ravens", "players": ["THELILOO", "VAPO", "4KUS", "LEVITY", "TEKKO"] },
+   { "team": "Scarlet Blades", "players": ["YANEALEXEY", "SAHARA", "PROX", "ILUHA PRIME", "ESSENTIALS"] },
+   { "team": "Pegasus Riders", "players": ["BRASL", "TUGERGLOKDIK", "HEHEIAA", "BERMIX", "ANIKET"] }
+  ],
+  "C": [
+   { "team": "King Snakes", "players": ["SOMI", "CROCODYLE", "MuQ", "VINSAY", "EFA"] },
+   { "team": "Rat Brotherhood", "players": ["ЛАВР", "GAVRLAGA", "RIDDLER", "BLESSED", "PENKA"] },
+   { "team": "Steel Wolves", "players": ["STARKILLER", "MORDRED", "VORGGE", "HIKTAZ", "TRAKSTEER"] },
+   { "team": "Emerald Keepers", "players": ["DVOYKA", "VALHALLA", "RAGNVALDR", "2CAST", "RUAZHENKA"] }
+  ],
+  "D": [
+   { "team": "Iron Legion", "players": ["MADNESS", "DIMYNUSIS", "KLE1Z", "NIKSON", "BR0LINE"] },
+   { "team": "Throne Guardians", "players": ["QQWIIZX", "Zaxahas", "VHN", "FALKO", "TURBOPUDGE"] },
+   { "team": "Royal Lions", "players": ["DON", "СИЛА", "CASTANEDA", "SEVENTHCEPHEUS", "HEAVEN"] },
+   { "team": "Golden Griffins", "players": ["MAYBE", "ABSENT", "TR1VENN1", "RIDANT", "AXEL"] }
+  ]
+ }
+}
