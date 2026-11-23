@@ -1,5 +1,5 @@
 {
- "built": "2026-11-16",
+ "built": "2026-11-23",
  "note": "ПАРЫ «кто кого контрит», собраны роботом. Данные РЕДАКЦИОННЫЕ — это мнение авторов сайтов-источников, не статистика матчей. Показывать вместе с источником и sourceDate: часть страниц отстаёт на несколько патчей. Winrate-проценты этих сайтов НЕ забираем — источник чисел там не указан. Текст «почему» берётся из champion-tags.json.",
  "sources": {
   "wildriftcounter": {
@@ -5069,12 +5069,12 @@
       },
       "Mid": {
        "counteredBy": [
-        "ekko",
-        "brand",
+        "vex",
         "diana",
         "yasuo",
+        "brand",
         "annie",
-        "vex"
+        "ekko"
        ],
        "strongAgainst": [
         "katarina",
@@ -6507,7 +6507,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/olaf/",
-     "sourceDate": "2026-04-06",
+     "sourceDate": "2026-11-22",
      "kind": "editorial",
      "lanes": {
       "Top": {
@@ -6592,7 +6592,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/orianna/",
-     "sourceDate": "2026-04-05",
+     "sourceDate": "2026-11-21",
      "kind": "editorial",
      "lanes": {
       "Mid": {
@@ -6690,7 +6690,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/ornn/",
-     "sourceDate": "2026-04-04",
+     "sourceDate": "2026-11-21",
      "kind": "editorial",
      "lanes": {
       "Top": {
@@ -6749,12 +6749,12 @@
       },
       "Support": {
        "counteredBy": [
-        "sona",
-        "pyke",
+        "maokai",
         "nami",
-        "rakan",
         "brand",
-        "maokai"
+        "sona",
+        "rakan",
+        "pyke"
        ],
        "strongAgainst": [
         "alistar",
@@ -6767,12 +6767,12 @@
       },
       "Adc": {
        "counteredBy": [
-        "vayne",
-        "ashe",
-        "kalista",
         "kaisa",
-        "aphelios",
-        "tristana"
+        "ashe",
+        "tristana",
+        "kalista",
+        "vayne",
+        "aphelios"
        ],
        "strongAgainst": [
         "caitlyn",
@@ -7067,7 +7067,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/rakan/",
-     "sourceDate": "2026-04-03",
+     "sourceDate": "2026-11-20",
      "kind": "editorial",
      "lanes": {
       "Support": {
@@ -7297,7 +7297,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/rengar/",
-     "sourceDate": "2026-04-02",
+     "sourceDate": "2026-11-18",
      "kind": "editorial",
      "lanes": {
       "Jungle": {
@@ -7732,7 +7732,7 @@
    "sources": {
     "wildriftcounter": {
      "url": "https://wildriftcounter.com/champions/seraphine/",
-     "sourceDate": "2026-04-01",
+     "sourceDate": "2026-11-17",
      "kind": "editorial",
      "lanes": {
       "Mid": {
@@ -9062,11 +9062,11 @@
         "seraphine"
        ],
        "strongAgainst": [
-        "janna",
         "soraka",
-        "sona",
+        "brand",
         "morgana",
-        "brand"
+        "janna",
+        "sona"
        ]
       },
       "Jungle": {
@@ -9536,12 +9536,12 @@
         "rammus"
        ],
        "strongAgainst": [
-        "evelynn",
+        "dr-mundo",
         "ekko",
         "fiddlesticks",
-        "wukong",
-        "dr-mundo",
-        "amumu"
+        "amumu",
+        "evelynn",
+        "wukong"
        ]
       },
       "Top": {
@@ -9554,12 +9554,12 @@
         "malphite"
        ],
        "strongAgainst": [
-        "teemo",
         "dr-mundo",
-        "volibear",
-        "gwen",
+        "darius",
+        "teemo",
         "olaf",
-        "darius"
+        "gwen",
+        "volibear"
        ]
       }
      }

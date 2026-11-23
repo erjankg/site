@@ -1,0 +1,87 @@
+{
+  "slug": "sylas",
+  "name": "Sylas",
+  "role": "Мид",
+  "tier": "S+",
+  "patch": "7.3f",
+  "dataDate": null,
+  "matchups": [],
+  "counters": [
+    "Galio",
+    "Vex",
+    "Hwei"
+  ],
+  "builds": [
+    {
+      "title": "Build 1",
+      "tier": null,
+      "default": true,
+      "items": {
+        "starting": [
+          "Amplifying Tome"
+        ],
+        "core": [
+          "Lich Bane",
+          "Infinity Orb",
+          "Rabadon's Deathcap"
+        ],
+        "boots": [
+          "Boots of Mana"
+        ],
+        "finalBuild": [
+          "Boots of Mana",
+          "Lich Bane",
+          "Infinity Orb",
+          "Rabadon's Deathcap",
+          "Void Staff",
+          "Boots of Mana"
+        ]
+      }
+    }
+  ],
+  "runes": [
+    "Electrocute",
+    "Sudden Impact",
+    "Chain Assault",
+    "Eyeball Collector",
+    "Legend: Haste"
+  ],
+  "spells": [],
+  "skillOrder": [
+    {
+      "ability": "Chain Lash",
+      "levels": [
+        1,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "ability": "Kingslayer",
+      "levels": [
+        2,
+        4,
+        6,
+        7
+      ]
+    },
+    {
+      "ability": "Abscond / Abduct",
+      "levels": [
+        3,
+        8,
+        10,
+        11
+      ]
+    },
+    {
+      "ability": "Hijack",
+      "levels": [
+        5,
+        9,
+        13
+      ]
+    }
+  ]
+}
